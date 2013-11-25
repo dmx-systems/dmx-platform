@@ -253,6 +253,8 @@ dm4c = new function() {
             var directives = dm4c.restc.update_topic(topic_model)
             // update client model and GUI
             process_directives(directives)
+            //
+            return directives
         } else {
             dm4c.page_panel.refresh()
         }
@@ -269,6 +271,8 @@ dm4c = new function() {
         var directives = dm4c.restc.update_association(assoc_model)
         // update client model and GUI
         process_directives(directives, stay_in_edit_mode)
+        //
+        return directives
     }
 
     /**

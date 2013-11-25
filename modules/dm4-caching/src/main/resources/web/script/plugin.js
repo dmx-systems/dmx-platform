@@ -1,28 +1,32 @@
 dm4c.add_plugin("de.deepamehta.caching", function() {
 
-    var cachable_path = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
+    var CACHABLE_PATH = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
+    var PROP_URI_MODIFIED = "dm4.time.modified"
 
     // === Webclient Listeners ===
+
+    dm4c.add_listener("pre_submit_form", function(object, new_object_model) {
+        // Note: the update model is not required to have a "composite" property at all
+        if (!new_object_model.composite) {
+            new_object_model.composite = {}
+        }
+        // Note: the pre_send_request handler below expects a time modified *topic* object, not just a plain value.
+        // So we construct the most rudimentary topic object here (with a sole "value" property).
+        new_object_model.composite[PROP_URI_MODIFIED] = {value: object.composite[PROP_URI_MODIFIED].value}
+    })
 
     dm4c.add_listener("pre_send_request", function(request) {
         if (request.method == "PUT") {
             var object_id = get_object_id(request.uri)
             if (object_id != -1) {
-                // Note: we must consider the modification timestamp of the topic displayed in the page panel -- not of
-                // the topic selected on the topicmap (dm4c.selected_object). Both may be different (namely when Geomap
-                // renderer is active), but the PUT request always relates to the topic displayed in the page panel.
-                var displayed_object = dm4c.page_panel.get_displayed_object()
-                var modified = displayed_object.composite["dm4.time.modified"].value
-                // ### TODO: displayed_object.get("dm4.time.modified") would be more comfortable
-                // ### but is not supported for non-model values. See Topic.prototype.get()
-                var modified_utc = new Date(modified).toUTCString()
-                console.log("PUT object " + object_id + ", displayed object ID=" + displayed_object.id +
-                    ", modified=" + modified + " (" + modified_utc + ")")
-                //
-                if (object_id != displayed_object.id) {
-                    throw "ID mismatch when preparing conditional PUT request (" + request.uri + "): " +
-                        "the page panel displays object " + displayed_object.id
+                var comp = request.data.composite
+                var modified = comp && comp[PROP_URI_MODIFIED] && comp[PROP_URI_MODIFIED].value
+                if (!modified) {
+                    throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
+                        "(uri=\"" + request.uri + "\", data=" + JSON.stringify(request.data) + ")"
                 }
+                var modified_utc = new Date(modified).toUTCString()
+                console.log("PUT object " + object_id + ", modified=" + modified + " (" + modified_utc + ")")
                 //
                 request.headers["If-Unmodified-Since"] = modified_utc
             }
@@ -32,7 +36,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_object_id(request_uri) {
-        var groups = request_uri.match(cachable_path)
+        var groups = request_uri.match(CACHABLE_PATH)
         return groups ? groups[2] : -1
     }
 })

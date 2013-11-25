@@ -1,7 +1,6 @@
 function SplitPanel() {
 
-    var PADDING_MIDDLE = 26     // 25px = 1.6em = 1.6 * 16px = 25(.6), Firefox needs 26
-    var PADDING_BOTTOM = 60     // was 60px, then 67 (healing login dialog), then 76 (healing datepicker)
+    var PAGE_TOOLBAR_HEIGHT = 60
 
     var topicmap_renderer_parent = $("<td>").append($("<div>", {id: "topicmap-panel"}))
     var page_panel_parent        = $("<td>")
@@ -9,7 +8,7 @@ function SplitPanel() {
     var topicmap_renderer               // the left panel
     var page_panel                      // the right panel (added first)
 
-    var page_panel_content_height
+    var page_panel_space                // horizontal margin + padding
 
     var topicmap_renderer_width
     var topicmap_renderer_height
@@ -58,7 +57,8 @@ function SplitPanel() {
         page_panel_parent.append(_page_panel.dom)
         //
         adjust_page_panel_height()
-        page_panel.width = _page_panel.dom.width()
+        page_panel.width = $("#page-content").width()
+        page_panel_space = _page_panel.dom.outerWidth(true) - page_panel.width  // includeMargin=true
         //
         calculate_topicmap_renderer_size()
         $("#topicmap-panel").resizable({handles: "e", resize: do_resize, stop: do_stop_resize})
@@ -105,7 +105,7 @@ function SplitPanel() {
      */
     function calculate_topicmap_renderer_size() {
         // update model
-        topicmap_renderer_width  = window.innerWidth  - page_panel.width - PADDING_MIDDLE
+        topicmap_renderer_width  = window.innerWidth  - page_panel.width - page_panel_space
         topicmap_renderer_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - 5  // ### Safari: 3, Firefox: 5
     }
 
@@ -126,7 +126,7 @@ function SplitPanel() {
      */
     function adjust_page_panel_width() {
         // update model
-        page_panel.width = window.innerWidth - topicmap_renderer_width - PADDING_MIDDLE
+        page_panel.width = window.innerWidth - topicmap_renderer_width - page_panel_space
         // update view
         $("#page-content").width(page_panel.width)
     }
@@ -138,10 +138,10 @@ function SplitPanel() {
      */
     function adjust_page_panel_height() {
         // update model
-        page_panel_content_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - PADDING_BOTTOM
-        page_panel.height = page_panel_content_height
+        var page_content_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - PAGE_TOOLBAR_HEIGHT
+        page_panel.height = page_content_height
         // update view
-        $("#page-content").height(page_panel_content_height)
+        $("#page-content").height(page_content_height)
     }
 
 

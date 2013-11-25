@@ -60,7 +60,7 @@ dm4c.render.page_model = (function() {
 
         this.read_form_value = function() {
             if (!form_reading_function) {
-                throw "TopicRendererError: the renderer for \"" + this.label + "\" provides no " +
+                throw "PageModelError: the renderer for \"" + this.label + "\" provides no " +
                     "form reading function (renderer_uri=\"" + renderer_uri + "\")"
             }
             //
@@ -68,7 +68,7 @@ dm4c.render.page_model = (function() {
             // Note: undefined value is an error (means: simple renderer returned no value).
             // null is a valid result (means: simple renderer prevents the field from being updated).
             if (form_value === undefined) {
-                throw "TopicRendererError: the form reading function for \"" + this.label +
+                throw "PageModelError: the form reading function for \"" + this.label +
                     "\" returned no value (renderer_uri=\"" + renderer_uri + "\")"
             }
             //
@@ -87,7 +87,7 @@ dm4c.render.page_model = (function() {
 
         this.read_form_values = function() {
             if (!form_reading_function) {
-                throw "TopicRendererError: the renderer for \"" + this.label + "\" provides no " +
+                throw "PageModelError: the renderer for \"" + this.label + "\" provides no " +
                     "form reading function (renderer_uri=\"" + renderer_uri + "\")"
             }
             //
@@ -95,7 +95,7 @@ dm4c.render.page_model = (function() {
             // Note: undefined value is an error (means: simple renderer returned no value).
             // null is a valid result (means: simple renderer prevents the field from being updated).
             if (form_values === undefined) {
-                throw "TopicRendererError: the form reading function for \"" + this.label +
+                throw "PageModelError: the form reading function for \"" + this.label +
                     "\" returned no value (renderer_uri=\"" + renderer_uri + "\")"
             }
             //
@@ -116,7 +116,7 @@ dm4c.render.page_model = (function() {
                 renderer_uri = dm4c.get_view_config(self.object_type, "multi_renderer_uri", assoc_def)
                 return dm4c.get_multi_renderer(renderer_uri)
             default:
-                throw "TopicRendererError: \"" + page_model_type + "\" is an unknown page model type"
+                throw "PageModelError: \"" + page_model_type + "\" is an unknown page model type"
             }
         }
     }
@@ -214,7 +214,7 @@ dm4c.render.page_model = (function() {
                 // ### TODO: server: don't send empty arrays
                 var child_topics = object.composite[assoc_def.child_type_uri] || []
                 if (!js.is_array(child_topics)) {
-                    throw "TopicRendererError: field \"" + assoc_def.child_type_uri + "\" is defined as multi-value " +
+                    throw "PageModelError: field \"" + assoc_def.child_type_uri + "\" is defined as multi-value " +
                         "but appears as single-value in " + JSON.stringify(object)
                 }
                 if (child_topics.length == 0) {
@@ -229,7 +229,7 @@ dm4c.render.page_model = (function() {
                 }
                 page_model.childs[assoc_def.child_type_uri] = child_model
             } else {
-                throw "TopicRendererError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
+                throw "PageModelError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
         },
 
@@ -266,7 +266,7 @@ dm4c.render.page_model = (function() {
                     }
                 }
             } else {
-                throw "TopicRendererError: invalid page model"
+                throw "PageModelError: invalid page model"
             }
 
             function render_box(accentuated, ref_element, incremental, remove_button_page_model) {
@@ -354,8 +354,8 @@ dm4c.render.page_model = (function() {
                 case "dm4.core.aggregation_def":
                     return value
                 default:
-                    throw "TopicRendererError: \"" + page_model.assoc_def.type_uri +
-                        "\" is an unexpected assoc type URI"
+                    throw "PageModelError: \"" + page_model.assoc_def.type_uri +
+                        "\" is an unexpected association definition type URI"
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
                 object_model.composite = {}
@@ -375,7 +375,7 @@ dm4c.render.page_model = (function() {
                 }
                 return object_model
             } else {
-                throw "TopicRendererError: invalid page model"
+                throw "PageModelError: invalid page model"
             }
         }
     }
