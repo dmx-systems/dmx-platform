@@ -16,7 +16,17 @@
         <version>4.1.3-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
-
+    <!--
+        POM projects with main dependency sets of the DeepaMehta 4 Standard Distribution.
+        More precisely:
+        1) The dm4-distribution POM depends on these POMs when assembling the Distribution.
+           The assembly descriptor uses the project POM dependencies to transitive include artifacts.
+        2) 3rd-party plugin development scenario:
+           The dm4-plugin-parent Pax Runner does deploy the POM dependencies statically (not hot-deployed).
+        3) Core development scenario:
+           The global Pax Runner does NOT deploy DeepaMehta bundles as they are expected to be
+           in the global POM's hot-deployment list (Felix File Install).
+    -->
     <modules>
         <module>3rd-party-bundles</module>
         <module>felix-bundles</module>

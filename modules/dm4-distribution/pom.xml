@@ -27,9 +27,10 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.main</artifactId>
-            <version>${felix.version}</version>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-bundles</artifactId>
+            <version>4.1.3-SNAPSHOT</version>
+            <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -44,10 +45,24 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-bundles</artifactId>
-            <version>4.1.3-SNAPSHOT</version>
-            <type>pom</type>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.command</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.shell</artifactId>
+            <version>0.8.0</version>
         </dependency>
     </dependencies>
 
