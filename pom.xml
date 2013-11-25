@@ -227,25 +227,7 @@
         </profile>
     </profiles>
 
-    <build>
-        <!-- Enable deployment via SCP -->
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.2</version>
-            </extension>
-        </extensions>
-    </build>
-
     <scm>
         <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
     </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>deepamehta-public-repository</id>
-            <url>scpexe://deepamehta.newthinking.net/var/lib/tomcat-6/webapps/ROOT/maven2</url>
-        </repository>
-    </distributionManagement>
 </project>
