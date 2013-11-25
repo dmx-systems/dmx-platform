@@ -95,7 +95,7 @@
                 <artifactId>maven-pax-plugin</artifactId>
                 <version>1.4</version>
                 <configuration>
-                    <runner>1.7.4</runner>
+                    <runner>1.7.5</runner>
                     <widenScope>true</widenScope>
                     <deployURLs>
                         mvn:de.deepamehta/3rd-party-bundles/4.1.3-SNAPSHOT/pom,

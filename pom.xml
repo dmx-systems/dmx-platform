@@ -34,10 +34,6 @@
         <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>
 
-        <!-- Distribution Dependency Versions -->
-        <karaf.version>2.2.9</karaf.version>
-        <pax.exam.version>2.4.0</pax.exam.version>
-
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -98,7 +94,7 @@
                         <artifactId>maven-pax-plugin</artifactId>
                         <version>1.4</version>
                         <configuration>
-                            <runner>1.7.4</runner>
+                            <runner>1.7.5</runner>
                             <deployPoms>
                                 modules/dm4-provision/3rd-party-bundles/pom.xml,
                                 modules/dm4-provision/felix-bundles/pom.xml
@@ -245,28 +241,6 @@
     <scm>
         <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
     </scm>
-
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>maven2-repository.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>deepamehta-public-repository</id>
-            <url>http://deepamehta.newthinking.net/maven2</url>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <repository>
