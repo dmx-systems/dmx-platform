@@ -8,6 +8,7 @@
     <artifactId>felix-bundles</artifactId>
     <version>4.1.3-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <description>Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.</description>
 
     <parent>
         <groupId>de.deepamehta</groupId>
@@ -15,13 +16,7 @@
         <version>4.1.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <!-- All Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.
 
-        These dependencies are deployed as bundles in Felix when
-            - running pax:run from the deepamehta-provision directory
-            - running pax:run from an external plugin directory
-            - running the deepamehta-plugin-example tests
-    -->
     <dependencies>
         <dependency>
             <groupId>org.apache.felix</groupId>
@@ -42,27 +37,6 @@
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.fileinstall</artifactId>
             <version>3.1.10</version>
-        </dependency>
-
-        <!-- FIXME: these bundles are not required when Felix is started via Pax Runner.              -->
-        <!-- The Felix ditribution deployed via Pax Runner brings its own Gogo shell.                 -->
-        <!-- When the version numbers do not match 2 versions of the Gogo shell bundles are deployed. -->
-        <!--                                                                                          -->
-        <!-- The Gogo shell dependencies are required only by the Assembly plugin actually.           -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.gogo.command</artifactId>
-            <version>0.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.gogo.runtime</artifactId>
-            <version>0.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.gogo.shell</artifactId>
-            <version>0.8.0</version>
         </dependency>
     </dependencies>
 

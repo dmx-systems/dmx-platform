@@ -16,6 +16,7 @@
     </parent>
 
     <properties>
+        <karaf.version>2.2.9</karaf.version>
         <karaf.name>deepamehta</karaf.name>
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
@@ -156,4 +157,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
