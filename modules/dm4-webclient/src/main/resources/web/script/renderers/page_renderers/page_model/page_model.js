@@ -33,8 +33,8 @@ dm4c.render.page_model = (function() {
 
         var self = this
         this.type = page_model_type // page model type (SIMPLE, COMPOSITE, MULTI)
-        this.childs = {}            // used for COMPOSITE
-        this.values = []            // used for MULTI
+        this.childs = {}            // used for COMPOSITE: page models (SIMPLE or COMPOSITE or MULTI)
+        this.values = []            // used for MULTI: page models (SIMPLE or COMPOSITE)
         this.object = object        // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
         this.object_type = object.get_type()
         this.value = object.value
@@ -187,9 +187,15 @@ dm4c.render.page_model = (function() {
         },
 
         /**
-         * Extends the page model of a composite object by one child entry. The child relationship is described
-         * by the specified association definition. Note: that association definition is *not* required to be
-         * part of the object's type definition. It may be part of a facet definition as well.
+         * Creates a page model for a certain child of the given composite object, and adds it to the given page model.
+         * The given association definition specifies which child to use.
+         *
+         * Note: the association definition is *not* required to be part of the object's type definition.
+         * It may be part of a facet definition as well.
+         *
+         * This method is used in 2 situations:
+         *   - called repeatedly to build up a composite object's page model (called internally from create_page_model).
+         *   - called from the Facets plugin to extend an objects page model based on the object's facets.
          *
          * @param   object          A composite object.
          * @param   assoc_def       The association definition that leads to the object's child(s).
@@ -250,15 +256,17 @@ dm4c.render.page_model = (function() {
             }
             //
             if (page_model.type == PageModel.SIMPLE) {
-                var box = render_box(false, ref_element, incremental, remove_button_page_model())   // accentuated=false
+                var box = render_box(PageModel.SIMPLE, page_model.object.id, ref_element, incremental,
+                                                                                          remove_button_page_model())
                 page_model[render_mode.render_func_name_simple](box)
             } else if (page_model.type == PageModel.COMPOSITE) {
-                var box = render_box(true, ref_element, incremental, remove_button_page_model())    // accentuated=true
-                for (var assoc_def_uri in page_model.childs) {
-                    var child_model = page_model.childs[assoc_def_uri]
+                var box = render_box(PageModel.COMPOSITE, page_model.object.id, ref_element, incremental,
+                                                                                             remove_button_page_model())
+                for (var child_type_uri in page_model.childs) {
+                    var child_model = page_model.childs[child_type_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
-                        var multi_box = render_box(false, box, false)                               // accentuated=false
+                        var multi_box = render_box(PageModel.MULTI, undefined, box)
                         child_model[render_mode.render_func_name_multi](multi_box, level + 1)
                     } else {
                         // cardinality "one"
@@ -269,12 +277,22 @@ dm4c.render.page_model = (function() {
                 throw "PageModelError: invalid page model"
             }
 
-            function render_box(accentuated, ref_element, incremental, remove_button_page_model) {
+            /**
+             * @param   box_type    PageModel.SIMPLE, PageModel.COMPOSITE, or PageModel.MULTI
+             * @param   topic_id    The ID of the topic represented by the box. Undefined in case of PageModel.MULTI
+             */
+            function render_box(box_type, topic_id, ref_element, incremental, remove_button_page_model) {
                 var box = $("<div>").addClass("box")
                 // Note: a simple box doesn't get a "level" class to let it inherit the background color
-                if (accentuated) {
-                    box.addClass("level" + level)
+                box.toggleClass("level" + level, box_type == PageModel.COMPOSITE)
+                // Note: only a simple and a composite box represents a revealable child topic. A multi box does not.
+                if (render_mode == dm4c.render.page_model.mode.INFO && level == 1 && (box_type == PageModel.COMPOSITE ||
+                                                                                      box_type == PageModel.SIMPLE)) {
+                    box.addClass("topic").click(function() {
+                        dm4c.do_reveal_related_topic(topic_id, "show")
+                    })
                 }
+                //
                 if (incremental) {
                     ref_element.before(box)
                 } else {
@@ -359,17 +377,17 @@ dm4c.render.page_model = (function() {
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
                 object_model.composite = {}
-                for (var assoc_def_uri in page_model.childs) {
-                    var child_model = page_model.childs[assoc_def_uri]
+                for (var child_type_uri in page_model.childs) {
+                    var child_model = page_model.childs[child_type_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
                         var values = child_model.read_form_values()
-                        object_model.composite[assoc_def_uri] = values
+                        object_model.composite[child_type_uri] = values
                     } else {
                         // cardinality "one"
                         var value = this.build_object_model(child_model)
                         if (value != null) {
-                            object_model.composite[assoc_def_uri] = value
+                            object_model.composite[child_type_uri] = value
                         }
                     }
                 }

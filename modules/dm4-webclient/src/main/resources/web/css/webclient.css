@@ -160,6 +160,11 @@ body {
 #page-content .box.level4 {background-color: #d8d8d8;}
 #page-content .box.level5 {background-color: #d0d0d0;}
 
+#page-content .box.topic:hover {
+    box-shadow: inset 0 0 0.1em blue;
+    cursor: pointer;
+}
+
 /*** Page Panel Form ***/
 
 #page-content input[type=text],
