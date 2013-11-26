@@ -205,9 +205,10 @@ function CanvasView() {
     this.begin_association = function(topic_id, x, y) {
         association_in_progress = true
         action_topic = get_topic(topic_id)
-        //
         tmp_x = x
         tmp_y = y
+        //
+        set_drawing_cursor()
         refresh()
     }
 
@@ -612,17 +613,24 @@ function CanvasView() {
             var dx = p.x - tmp_x
             var dy = p.y - tmp_y
             if (mousedown_on_canvas) {
-                canvas_move_in_progress = true
+                if (!canvas_move_in_progress) {
+                    set_moving_cursor()
+                    canvas_move_in_progress = true
+                }
                 translate_by(dx, dy)
             } else if (action_assoc) {
                 if (!cluster_move_in_progress) {
-                    cluster_move_in_progress = true
                     var cluster_viewmodel = topicmap.create_cluster(action_assoc)
                     cluster = new ClusterView(cluster_viewmodel)
+                    set_moving_cursor()
+                    cluster_move_in_progress = true
                 }
                 cluster.move_by(dx, dy)
             } else if (!association_in_progress) {
-                topic_move_in_progress = true
+                if (!topic_move_in_progress) {
+                    set_moving_cursor()
+                    topic_move_in_progress = true
+                }
                 action_topic.move_by(dx, dy)
             }
             tmp_x = p.x
@@ -685,6 +693,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_topic_position(action_topic.id, action_topic.x, action_topic.y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        // render
+        unset_moving_cursor()
         //
         dm4c.fire_event("post_move_topic", action_topic)
         //
@@ -696,6 +706,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_cluster_position(cluster)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        // render
+        unset_moving_cursor()
         //
         dm4c.fire_event("post_move_cluster", cluster)
         //
@@ -707,6 +719,8 @@ function CanvasView() {
         // update viewmodel
         topicmap.set_translation(topicmap.trans_x, topicmap.trans_y)
         // Note: the view is already up-to-date. It is constantly updated while mouse dragging.
+        // render
+        unset_moving_cursor()
         //
         dm4c.fire_event("post_move_canvas", topicmap.trans_x, topicmap.trans_y)
         //
@@ -721,7 +735,27 @@ function CanvasView() {
         //
         association_in_progress = false
         action_topic = null
+        // render
+        unset_drawing_cursor()
         refresh()
+    }
+
+    // --- Cursor Shapes ---
+
+    function set_moving_cursor() {
+        $(".topicmap-renderer").addClass("moving")
+    }
+
+    function unset_moving_cursor() {
+        $(".topicmap-renderer").removeClass("moving")
+    }
+
+    function set_drawing_cursor() {
+        $(".topicmap-renderer").addClass("drawing-assoc")
+    }
+
+    function unset_drawing_cursor() {
+        $(".topicmap-renderer").removeClass("drawing-assoc")
     }
 
 
@@ -1045,15 +1079,8 @@ function CanvasView() {
     }
 
     function update_selection_dom(topic_id) {
-        // remove former selection
-        remove_selection_dom()
-        //
-        // set new selection
-        get_topic(topic_id).dom.addClass("selected")
-        // The same via DOM traversal:
-        // $("#topicmap-panel .topic#t-" + topic_id).addClass("selected")
-        // Note: we don't store topic IDs in the DOM anymore.
-        // Meanwhile we store the topic DOM in the TopicView object.
+        remove_selection_dom()                          // remove former selection
+        get_topic(topic_id).dom.addClass("selected")    // set new selection
     }
 
     function remove_selection_dom() {

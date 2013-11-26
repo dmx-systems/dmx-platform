@@ -31,8 +31,8 @@ body {
 }
 
 .dm-toolbar {
-    -moz-user-select: none;
     -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 /*** Split Panel ***/
@@ -47,8 +47,8 @@ body {
 }
 
 #split-panel > tbody > tr > td:first-child {
-    -moz-user-select: none;
     -webkit-user-select: none;
+    -moz-user-select: none;
 }
 
 #split-panel > tbody > tr > td:nth-child(2) {
@@ -70,12 +70,35 @@ body {
     width: 100000px;    /* avoid early line wrapping */
 }
 
-#topicmap-panel .topic {
-    position: absolute;
+/*** Topicmap Renderer ***/
+
+.topicmap-renderer.moving {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
 }
 
-#topicmap-panel .topic.selected {
+.topicmap-renderer.drawing-assoc {
+    cursor: crosshair;
+}
+
+.topicmap-renderer .topic {
+    position: absolute;
+    cursor: default;
+}
+
+.topicmap-renderer.drawing-assoc .topic {
+    cursor: crosshair;
+}
+
+.topicmap-renderer .topic.selected {
     box-shadow: 0 0 1em blue;
+}
+
+.topicmap-renderer .topic.ui-draggable-dragging {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
 }
 
 /*** Page Panel ***/
