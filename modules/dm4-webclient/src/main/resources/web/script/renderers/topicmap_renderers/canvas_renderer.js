@@ -124,6 +124,9 @@ function CanvasRenderer() {
         if (assoc_viewmodel) {
             canvas.show_association(assoc_viewmodel)
         }
+        if (do_select) {
+            canvas.set_association_selection(assoc.id)
+        }
     }
 
     // ---

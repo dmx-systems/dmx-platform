@@ -165,7 +165,7 @@ function CanvasView() {
         DOM_FLAVOR && update_selection_dom(topic_id)        // topic layer DOM
     }
 
-    this.set_association_selection = function(topic_id) {
+    this.set_association_selection = function(assoc_id) {
         // render
         refresh()                                           // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
@@ -729,15 +729,18 @@ function CanvasView() {
     }
 
     function end_association_in_progress(tv) {
+        association_in_progress = false
+        // Note: dm4c.do_create_association() implies refresh(). So association_in_progress
+        // is reset before. Otherwise the last drawn association state would stay on canvas.
         if (tv && tv.id != action_topic.id) {
             dm4c.do_create_association("dm4.core.association", action_topic.id, tv.id)
+        } else {
+            refresh()   // remove incomplete association from canvas
         }
         //
-        association_in_progress = false
         action_topic = null
         // render
         unset_drawing_cursor()
-        refresh()
     }
 
     // --- Cursor Shapes ---
