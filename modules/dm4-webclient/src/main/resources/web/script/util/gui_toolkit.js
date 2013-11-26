@@ -253,6 +253,7 @@ function GUIToolkit(config) {
                     .toggleClass("ui-state-disabled", item.disabled == true)
                     .mouseup(item_handler(item))
                     .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                    .click(consume_event)       // prevent default, that is don't invoke href "#"
                 return menu_item
             }
 
