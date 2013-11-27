@@ -44,11 +44,11 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     this.get_topic = function(id) {
-        return topics[id]
+        return get_topic(id)
     }
 
     this.get_association = function(id) {
-        return assocs[id]
+        return get_association(id)
     }
 
     // ---
@@ -129,7 +129,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     // ---
 
     this.set_view_properties = function(topic_id, view_props) {
-        var topic = this.get_topic(topic_id)
+        var topic = get_topic(topic_id)
         // update memory
         topic.set_view_properties(view_props)
         // update DB
@@ -284,10 +284,10 @@ function TopicmapViewmodel(topicmap_id, config) {
      */
     this.get_selection_pos = function() {
         if (this.is_topic_selected) {
-            var topic = this.get_topic(this.selected_object_id)
+            var topic = get_topic(this.selected_object_id)
             return {x: topic.x, y: topic.y}
         } else {
-            var assoc = this.get_association(this.selected_object_id)
+            var assoc = get_association(this.selected_object_id)
             var topic_1 = assoc.get_topic_1()
             var topic_2 = assoc.get_topic_2()
             return {
@@ -342,7 +342,7 @@ function TopicmapViewmodel(topicmap_id, config) {
     this.set_cluster_position = function(cluster) {
         // update memory
         cluster.iterate_topics(function(ct) {
-            self.get_topic(ct.id).set_position(ct.x, ct.y)
+            get_topic(ct.id).set_position(ct.x, ct.y)
         })
         // update DB
         if (is_writable()) {
@@ -414,8 +414,6 @@ function TopicmapViewmodel(topicmap_id, config) {
         }
     }
 
-    // ---
-
     function compact_composite_format(comp_value) {
         var simple_comp = {}
         for (var type_uri in comp_value) {
@@ -430,6 +428,16 @@ function TopicmapViewmodel(topicmap_id, config) {
             simple_comp[type_uri] = val.value
         }
         return simple_comp
+    }
+
+    // ---
+
+    function get_topic(id) {
+        return topics[id]
+    }
+
+    function get_association(id) {
+        return assocs[id]
     }
 
     // ---
@@ -461,6 +469,13 @@ function TopicmapViewmodel(topicmap_id, config) {
      * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
      */
     function add_association(assoc) {
+        // error check
+        if (!get_topic(assoc.role_1.topic_id) || !get_topic(assoc.role_2.topic_id)) {
+            throw "TopicmapViewmodelError: can't add association " + assoc.id + " to topicmap " + self.get_id() +
+                " because a player topic is missing (player IDs=" + assoc.role_1.topic_id + ", " +
+                assoc.role_2.topic_id + ")"
+        }
+        //
         var _assoc = new AssociationViewmodel(assoc)
         assocs[assoc.id] = _assoc
         return _assoc
@@ -572,11 +587,11 @@ function TopicmapViewmodel(topicmap_id, config) {
         // ---
 
         this.get_topic_1 = function() {
-            return self.get_topic(this.topic_id_1)
+            return get_topic(this.topic_id_1)
         }
 
         this.get_topic_2 = function() {
-            return self.get_topic(this.topic_id_2)
+            return get_topic(this.topic_id_2)
         }
 
         // ---

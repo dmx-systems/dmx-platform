@@ -4,7 +4,11 @@ dm4c.render.page_model = (function() {
 
     /**
      * @param   object          The object underlying this field (a Topic or an Association). Its "value" is rendered
-     *                          through this page model. A topic "id" -1 indicates a topic to be created.
+     *                          through this page model.
+     *                          If no underlying object exists in the DB this field is about to be rendered anyway (e.g.
+     *                          as label and no content in render mode INFO or as label and input field in render mode
+     *                          FORM). In this case an empty topic with id = -1 (as created by dm4c.empty_topic()) is
+     *                          passed here.
      * @param   assoc_def       The direct association definition that leads to this field.
      *                          For a non-composite object it is <code>undefined</code>.
      *                          The association definition has 2 meanings:
@@ -286,8 +290,10 @@ dm4c.render.page_model = (function() {
                 // Note: a simple box doesn't get a "level" class to let it inherit the background color
                 box.toggleClass("level" + level, box_type == PageModel.COMPOSITE)
                 // Note: only a simple and a composite box represents a revealable child topic. A multi box does not.
-                if (render_mode == dm4c.render.page_model.mode.INFO && level == 1 && (box_type == PageModel.COMPOSITE ||
-                                                                                      box_type == PageModel.SIMPLE)) {
+                // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
+                // topic's Search Result field.
+                if (render_mode == dm4c.render.page_model.mode.INFO && level == 1 && topic_id != -1 &&
+                                    (box_type == PageModel.COMPOSITE || box_type == PageModel.SIMPLE)) {
                     box.addClass("topic").click(function() {
                         dm4c.do_reveal_related_topic(topic_id, "show")
                     })

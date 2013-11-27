@@ -387,14 +387,6 @@ function CanvasView() {
     function draw_association(av) {
         var tv1 = av.get_topic_1()
         var tv2 = av.get_topic_2()
-        // error check
-        if (!tv1 || !tv2) {
-            // TODO: deleted associations must be removed from all topicmaps.
-            // ### alert("ERROR in draw_associations: association " + this.id + " is missing a topic")
-            // ### delete assocs[i]
-            return
-        }
-        //
         draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, dm4c.get_type_color(av.type_uri))
         draw_label()
 

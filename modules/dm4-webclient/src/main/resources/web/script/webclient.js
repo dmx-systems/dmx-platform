@@ -159,13 +159,24 @@ dm4c = new function() {
      *                      If not specified (that is any falsish value) "none" is assumed.
      */
     this.do_reveal_related_topic = function(topic_id, action) {
+        // Note: -1 must not be passed to dm4c.restc.get_associations() as this would be interpreted at
+        // server side as "filter not set".
+        if (topic_id == -1) {
+            throw "InvalidArgumentError: dm4c.do_reveal_related_topic() was called with -1 as topic_id"
+        }
+        // Note: the topic must be added to the topicmap before the associations are.
+        // Note: dm4c.selected_object.id must be saved as it might change through dm4c.show_topic().
+        //
+        var selected_object_id = dm4c.selected_object.id
+        //
+        // update client model and GUI
+        dm4c.show_topic(dm4c.fetch_topic(topic_id), action, undefined, true)    // coordinates=undefined, do_center=true
         // fetch from DB
-        var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
+        var assocs = dm4c.restc.get_associations(selected_object_id, topic_id)
         // update client model and GUI
         for (var i = 0, assoc; assoc = assocs[i]; i++) {
             dm4c.show_association(assoc)
         }
-        dm4c.show_topic(dm4c.fetch_topic(topic_id), action, undefined, true)    // coordinates=undefined, do_center=true
     }
 
     // ---
