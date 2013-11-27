@@ -103,6 +103,10 @@ function PagePanel() {
         form_processing_function()
     }
 
+    this.get_displayed_object = function() {
+        return displayed_object
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     // === Model ===
