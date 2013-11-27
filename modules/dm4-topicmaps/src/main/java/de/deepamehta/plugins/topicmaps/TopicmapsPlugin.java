@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.plugins.topicmaps.ClusterCoords;
-import de.deepamehta.plugins.topicmaps.TopicmapViewmodel;
+import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
@@ -135,6 +134,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
+    @Override
+    public void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility) {
+        addTopicToTopicmap(topicmapId, topicId, new StandardViewProperties(x, y, visibility));
+    }
+
     @POST
     @Path("/{id}/association/{assoc_id}")
     @Override
@@ -142,6 +146,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
             new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)), null);       // FIXME: clientState=null
+    }
+
+    // ---
+
+    @Override
+    public boolean isTopicInTopicmap(long topicmapId, long topicId) {
+        return fetchTopicRefAssociation(topicmapId, topicId) != null;
     }
 
     // ---
@@ -171,9 +182,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
-        storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
-            .put("dm4.topicmaps.x", x)
-            .put("dm4.topicmaps.y", y));
+        storeStandardViewProperties(topicmapId, topicId, new StandardViewProperties(x, y));
     }
 
     @PUT
@@ -181,8 +190,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        storeStandardViewProperties(topicmapId, topicId, new CompositeValueModel()
-            .put("dm4.topicmaps.visibility", visibility));
+        storeStandardViewProperties(topicmapId, topicId, new StandardViewProperties(visibility));
     }
 
     @DELETE
@@ -348,6 +356,36 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
         } catch (Exception e) {
             throw new RuntimeException("Invoking the webclient failed", e);
+        }
+    }
+
+    // --------------------------------------------------------------------------------------------- Private Inner Class
+
+    private class StandardViewProperties extends CompositeValueModel {
+
+        private StandardViewProperties(int x, int y, boolean visibility) {
+            put(x, y);
+            put(visibility);
+        }
+
+        private StandardViewProperties(int x, int y) {
+            put(x, y);
+        }
+
+
+        private StandardViewProperties(boolean visibility) {
+            put(visibility);
+        }
+
+        // ---
+
+        private void put(int x, int y) {
+            put("dm4.topicmaps.x", x);
+            put("dm4.topicmaps.y", y);
+        }
+
+        private void put(boolean visibility) {
+            put("dm4.topicmaps.visibility", visibility);
         }
     }
 }

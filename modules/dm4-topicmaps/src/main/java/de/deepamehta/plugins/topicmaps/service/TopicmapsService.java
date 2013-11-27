@@ -2,8 +2,8 @@ package de.deepamehta.plugins.topicmaps.service;
 
 import de.deepamehta.plugins.topicmaps.ClusterCoords;
 import de.deepamehta.plugins.topicmaps.TopicmapRenderer;
-import de.deepamehta.plugins.topicmaps.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
+import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
@@ -25,7 +25,16 @@ public interface TopicmapsService extends PluginService {
 
     void addTopicToTopicmap(long topicmapId, long topicId, CompositeValueModel viewProps);
 
+    /**
+     * Convenience method to add a topic with the standard view properties.
+     */
+    void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility);
+
     void addAssociationToTopicmap(long topicmapId, long assocId);
+
+    // ---
+
+    boolean isTopicInTopicmap(long topicmapId, long topicId);
 
     // ---
 

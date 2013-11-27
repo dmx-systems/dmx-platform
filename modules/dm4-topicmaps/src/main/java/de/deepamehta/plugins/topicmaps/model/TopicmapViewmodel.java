@@ -1,13 +1,13 @@
-package de.deepamehta.plugins.topicmaps;
+package de.deepamehta.plugins.topicmaps.model;
+
+import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -47,7 +47,7 @@ public class TopicmapViewmodel implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
+    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
         this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
         this.customizers = customizers;
@@ -58,6 +58,22 @@ public class TopicmapViewmodel implements JSONEnabled {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public long getId() {
+        return topicmapTopic.getId();
+    }
+
+    // ---
+
+    public Iterable<TopicViewmodel> getTopics() {
+        return topics.values();
+    }
+
+    public Iterable<AssociationViewmodel> getAssociations() {
+        return assocs.values();
+    }
+
+    // ---
 
     @Override
     public JSONObject toJSON() {
@@ -75,12 +91,6 @@ public class TopicmapViewmodel implements JSONEnabled {
     @Override
     public String toString() {
         return "topicmap " + getId();
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    long getId() {
-        return topicmapTopic.getId();
     }
 
     // -------------------------------------------------------------------------------------------- Public Inner Classes
@@ -193,68 +203,5 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     private void addAssociation(AssociationViewmodel assoc) {
         assocs.put(assoc.getId(), assoc);
-    }
-
-    // ------------------------------------------------------------------------------------------- Private Inner Classes
-
-    /**
-     * A topic viewmodel as contained in a topicmap viewmodel.
-     * That is a generic topic model enriched by view properties ("x", "y", "visibility").
-     */
-    private class TopicViewmodel extends TopicModel {
-
-        // --- Instance Variables ---
-
-        private CompositeValueModel viewProps;
-
-        // --- Constructors ---
-
-        private TopicViewmodel(TopicModel topic, CompositeValueModel viewProps) {
-            super(topic);
-            this.viewProps = viewProps;
-        }
-
-        // --- Public Methods ---
-
-        @Override
-        public JSONObject toJSON() {
-            try {
-                JSONObject o = super.toJSON();
-                o.put("view_props", viewProps.toJSON());
-                return o;
-            } catch (Exception e) {
-                throw new RuntimeException("Serialization failed (" + this + ")", e);
-            }
-        }
-
-        // ---
-
-        // ### not used
-        private int getX() {
-            // Note: coordinates can be both: double (through JavaScript) and integer (programmatically placed).
-            // ### TODO: store coordinates always as integers
-            Object x = viewProps.getObject("x");
-            return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
-        }
-
-        // ### used by GridPositioning
-        private int getY() {
-            // Note: coordinates can be both: double (through JavaScript) and integer (programmatically placed).
-            // ### TODO: store coordinates always as integers
-            Object y = viewProps.getObject("y");
-            return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
-        }
-    }
-
-    /**
-     * An association viewmodel as contained in a topicmap viewmodel.
-     */
-    private class AssociationViewmodel extends AssociationModel {
-
-        // --- Constructors ---
-
-        private AssociationViewmodel(AssociationModel assoc) {
-            super(assoc);
-        }
     }
 }
