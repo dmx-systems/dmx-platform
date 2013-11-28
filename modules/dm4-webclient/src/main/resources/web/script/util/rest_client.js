@@ -1,4 +1,4 @@
-function RESTClient(core_service_uri) {
+function RESTClient(config) {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -8,7 +8,7 @@ function RESTClient(core_service_uri) {
 
     this.get_topic_by_id = function(topic_id, fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
-        return request("GET", "/topic/" + topic_id + params.to_query_string())
+        return request("GET", "/core/topic/" + topic_id + params.to_query_string())
     }
 
     /**
@@ -21,11 +21,11 @@ function RESTClient(core_service_uri) {
      * @return  the topic, or <code>null</code>.
      */
     this.get_topic_by_value = function(key, value) {
-        return request("GET", "/topic/by_value/" + key + "/" + encodeURIComponent(value))
+        return request("GET", "/core/topic/by_value/" + key + "/" + encodeURIComponent(value))
     }
 
     this.get_topic = function(type_uri, key, value) {
-        return request("GET", "/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
+        return request("GET", "/core/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
     }
 
     /**
@@ -40,7 +40,7 @@ function RESTClient(core_service_uri) {
      */
     this.get_topics = function(type_uri, fetch_composite, sort, max_result_size) {
         var params = new RequestParameter({fetch_composite: fetch_composite, max_result_size: max_result_size})
-        var result = request("GET", "/topic/by_type/" + type_uri + params.to_query_string())
+        var result = request("GET", "/core/topic/by_type/" + type_uri + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
         }
@@ -67,7 +67,7 @@ function RESTClient(core_service_uri) {
     this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
-        var result = request("GET", "/topic/" + topic_id + "/related_topics" + params.to_query_string())
+        var result = request("GET", "/core/topic/" + topic_id + "/related_topics" + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
         }
@@ -76,19 +76,19 @@ function RESTClient(core_service_uri) {
 
     this.search_topics = function(text, field_uri) {
         var params = new RequestParameter({search: text, field: field_uri})
-        return request("GET", "/topic" + params.to_query_string())
+        return request("GET", "/core/topic" + params.to_query_string())
     }
 
     this.create_topic = function(topic_model) {
-        return request("POST", "/topic", topic_model)
+        return request("POST", "/core/topic", topic_model)
     }
 
     this.update_topic = function(topic_model) {
-        return request("PUT", "/topic/" + topic_model.id, topic_model)
+        return request("PUT", "/core/topic/" + topic_model.id, topic_model)
     }
 
     this.delete_topic = function(id) {
-        return request("DELETE", "/topic/" + id)
+        return request("DELETE", "/core/topic/" + id)
     }
 
 
@@ -97,7 +97,7 @@ function RESTClient(core_service_uri) {
 
     this.get_association_by_id = function(assoc_id, fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
-        return request("GET", "/association/" + assoc_id + params.to_query_string())
+        return request("GET", "/core/association/" + assoc_id + params.to_query_string())
     }
 
     /**
@@ -112,7 +112,7 @@ function RESTClient(core_service_uri) {
     this.get_association = function(assoc_type_uri, topic1_id, topic2_id, role_type1_uri, role_type2_uri,
                                                                                           fetch_composite) {
         var params = new RequestParameter({fetch_composite: fetch_composite})
-        return request("GET", "/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
+        return request("GET", "/core/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
             role_type1_uri + "/" + role_type2_uri + params.to_query_string())
     }
 
@@ -125,7 +125,8 @@ function RESTClient(core_service_uri) {
      * @return  An array of associations.
      */
     this.get_associations = function(topic1_id, topic2_id, assoc_type_uri) {
-        return request("GET", "/association/multiple/" + topic1_id + "/" + topic2_id + "/" + (assoc_type_uri || ""))
+        return request("GET", "/core/association/multiple/" + topic1_id + "/" + topic2_id + "/" +
+            (assoc_type_uri || ""))
     }
 
     /**
@@ -148,7 +149,7 @@ function RESTClient(core_service_uri) {
     this.get_association_related_topics = function(assoc_id, traversal_filter, sort, max_result_size) {
         var params = new RequestParameter(traversal_filter)
         params.add("max_result_size", max_result_size)
-        var result = request("GET", "/association/" + assoc_id + "/related_topics" + params.to_query_string())
+        var result = request("GET", "/core/association/" + assoc_id + "/related_topics" + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
         }
@@ -156,15 +157,17 @@ function RESTClient(core_service_uri) {
     }
 
     this.create_association = function(assoc_model) {
-        return request("POST", "/association", assoc_model)
+        return request("POST", "/core/association", assoc_model)
     }
 
-    this.update_association = function(assoc_model) {
-        return request("PUT", "/association/" + assoc_model.id, assoc_model)
+    // ### TODO: remove stay_in_edit_mode parameter
+    this.update_association = function(assoc_model, stay_in_edit_mode) {
+        return request("PUT", "/core/association/" + assoc_model.id, assoc_model, undefined, undefined, undefined,
+                                                                                  stay_in_edit_mode)
     }
 
     this.delete_association = function(id) {
-        return request("DELETE", "/association/" + id)
+        return request("DELETE", "/core/association/" + id)
     }
 
 
@@ -172,23 +175,23 @@ function RESTClient(core_service_uri) {
     // === Topic Types ===
 
     this.get_topic_type_uris = function() {
-        return request("GET", "/topictype")
+        return request("GET", "/core/topictype")
     }
 
     this.get_topic_type = function(type_uri) {
-        return request("GET", "/topictype/" + type_uri)
+        return request("GET", "/core/topictype/" + type_uri)
     }
 
     this.get_all_topic_types = function(callback) {
-        request("GET", "/topictype/all", undefined, callback)
+        request("GET", "/core/topictype/all", undefined, callback)
     }
 
     this.create_topic_type = function(topic_type_model) {
-        return request("POST", "/topictype", topic_type_model)
+        return request("POST", "/core/topictype", topic_type_model)
     }
 
     this.update_topic_type = function(topic_type_model) {
-        return request("PUT", "/topictype", topic_type_model)
+        return request("PUT", "/core/topictype", topic_type_model)
     }
 
 
@@ -196,23 +199,23 @@ function RESTClient(core_service_uri) {
     // === Association Types ===
 
     this.get_association_type_uris = function() {
-        return request("GET", "/assoctype")
+        return request("GET", "/core/assoctype")
     }
 
     this.get_association_type = function(type_uri) {
-        return request("GET", "/assoctype/" + type_uri)
+        return request("GET", "/core/assoctype/" + type_uri)
     }
 
     this.get_all_association_types = function(callback) {
-        request("GET", "/assoctype/all", undefined, callback)
+        request("GET", "/core/assoctype/all", undefined, callback)
     }
 
     this.create_association_type = function(assoc_type_model) {
-        return request("POST", "/assoctype", assoc_type_model)
+        return request("POST", "/core/assoctype", assoc_type_model)
     }
 
     this.update_association_type = function(assoc_type_model) {
-        return request("PUT", "/assoctype", assoc_type_model)
+        return request("PUT", "/core/assoctype", assoc_type_model)
     }
 
 
@@ -220,7 +223,7 @@ function RESTClient(core_service_uri) {
     // === Plugins ===
 
     this.get_plugins = function() {
-        return request("GET", "/plugin")
+        return request("GET", "/core/plugin")
     }
 
 
@@ -228,13 +231,13 @@ function RESTClient(core_service_uri) {
     // === Plugin Support ===
 
     /**
-     * Sends an AJAX request. The URI is interpreted as absolute.
+     * Sends an AJAX request.
      *
      * A plugin uses this method to send a request to its REST service.
      * As an example see the DeepaMehta 4 Topicmaps plugin.
      */
     this.request = function(method, uri, data, callback, headers, response_data_type) {
-        return request(method, uri, data, callback, headers, response_data_type, true)
+        return request(method, uri, data, callback, headers, response_data_type)
     }
 
     /**
@@ -284,15 +287,15 @@ function RESTClient(core_service_uri) {
      *                              of the response data. 2 possible values:
      *                                  "json" - the response data is parsed into a JavaScript object. The default.
      *                                  "text" - the response data is returned as is.
-     * @param   is_absolute_uri     If true, the URI is interpreted as relative to the DeepaMehta core service URI.
-     *                              If false, the URI is interpreted as an absolute URI.
      *
      * @return  For successful synchronous requests: the data returned from the server. Otherwise undefined.
+     *
+     * ### TODO: remove stay_in_edit_mode parameter
      */
-    function request(method, uri, data, callback, headers, response_data_type, is_absolute_uri) {
+    function request(method, uri, data, callback, headers, response_data_type, stay_in_edit_mode) {
         var request = {
             method: method,
-            uri: is_absolute_uri ? uri : core_service_uri + uri,
+            uri: uri,
             headers: headers || {},
             data: data
         }
@@ -337,8 +340,17 @@ function RESTClient(core_service_uri) {
             // shape either of the done() or the fail() callback.
             status = text_status
         })
+        //
         if (!async && status == "success") {
-            return response_data
+            var directives = response_data.directives
+            if (directives && config && config.process_directives) {
+                // update client model and GUI
+                config.process_directives(directives, stay_in_edit_mode)
+                //
+                return directives
+            } else {
+                return response_data
+            }
         }
     }
 

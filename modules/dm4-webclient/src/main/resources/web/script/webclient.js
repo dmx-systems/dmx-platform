@@ -12,7 +12,6 @@ dm4c = new function() {
     var DEFAULT_INPUT_FIELD_ROWS = 1
 
     // constants
-    var CORE_SERVICE_URI = "/core"
     this.COMPOSITE_PATH_SEPARATOR = "/"
     this.REF_PREFIX = "ref_id:"
     this.DEL_PREFIX = "del_id:"
@@ -28,7 +27,7 @@ dm4c = new function() {
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
 
     // utilities
-    this.restc = new RESTClient(CORE_SERVICE_URI)
+    this.restc = new RESTClient({process_directives: process_directives})
     this.ui = new GUIToolkit({on_open_menu: on_open_menu})
     this.render = new RenderHelper()
     var pm = new PluginManager({
@@ -260,12 +259,8 @@ dm4c = new function() {
     this.do_update_topic = function(topic_model) {
         if (topic_model) {
             dm4c.fire_event("pre_update_topic", topic_model)
-            // update DB
-            var directives = dm4c.restc.update_topic(topic_model)
-            // update client model and GUI
-            process_directives(directives)
-            //
-            return directives
+            // update DB, client model, and GUI
+            return dm4c.restc.update_topic(topic_model)
         } else {
             dm4c.page_panel.refresh()
         }
@@ -276,14 +271,12 @@ dm4c = new function() {
      * Fires the "post_update_association" event (indirectly).
      *
      * @param   assoc_model     an association model containing the data to be udpated.
+     *
+     * ### TODO: remove stay_in_edit_mode parameter
      */
     this.do_update_association = function(assoc_model, stay_in_edit_mode) {
-        // update DB
-        var directives = dm4c.restc.update_association(assoc_model)
-        // update client model and GUI
-        process_directives(directives, stay_in_edit_mode)
-        //
-        return directives
+        // update DB, client model, and GUI
+        return dm4c.restc.update_association(assoc_model, stay_in_edit_mode)
     }
 
     /**
@@ -293,10 +286,8 @@ dm4c = new function() {
      * @param   topic_type_model    a topic type model containing the data to be udpated.
      */
     this.do_update_topic_type = function(topic_type_model) {
-        // update DB
-        var directives = dm4c.restc.update_topic_type(topic_type_model)
-        // update client model and GUI
-        process_directives(directives)
+        // update DB, client model, and GUI
+        dm4c.restc.update_topic_type(topic_type_model)
     }
 
     /**
@@ -306,19 +297,15 @@ dm4c = new function() {
      * @param   assoc_type_model    an association type model containing the data to be udpated.
      */
     this.do_update_association_type = function(assoc_type_model) {
-        // update DB
-        var directives = dm4c.restc.update_association_type(assoc_type_model)
-        // update client model and GUI
-        process_directives(directives)
+        // update DB, client model, and GUI
+        dm4c.restc.update_association_type(assoc_type_model)
     }
 
     // ---
 
     this.do_retype_topic = function(topic, type_uri) {
-        // update DB
-        var directives = dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
-        // update client model and GUI
-        process_directives(directives)
+        // update DB, client model, and GUI
+        dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
     }
 
     // ---
@@ -328,10 +315,8 @@ dm4c = new function() {
      * Fires the "post_delete_topic" event and the "post_delete_association" event (for each association).
      */
     this.do_delete_topic = function(topic) {
-        // update DB
-        var directives = dm4c.restc.delete_topic(topic.id)
-        // update client model and GUI
-        process_directives(directives)
+        // update DB, client model, and GUI
+        dm4c.restc.delete_topic(topic.id)
     }
 
     /**
@@ -339,11 +324,8 @@ dm4c = new function() {
      * Fires the "post_delete_association" event.
      */
     this.do_delete_association = function(assoc) {
-        // update DB
-        var directives = dm4c.restc.delete_association(assoc.id)
-        // alert("do_delete_association(): directives=" + js.stringify(directives))
-        // update client model and GUI
-        process_directives(directives)
+        // update DB, client model, and GUI
+        dm4c.restc.delete_association(assoc.id)
     }
 
 
@@ -453,9 +435,10 @@ dm4c = new function() {
     /**
      * Updates the client model and GUI according to a set of directives received from server.
      * Precondition: the DB is already up-to-date.
+     *
+     * ### TODO: remove stay_in_edit_mode parameter
      */
     function process_directives(directives, stay_in_edit_mode) {
-        // alert("process_directives: " + JSON.stringify(directives))
         for (var i = 0, directive; directive = directives[i]; i++) {
             switch (directive.type) {
             case "UPDATE_TOPIC":
@@ -515,6 +498,8 @@ dm4c = new function() {
      * Processes an UPDATE_ASSOCIATION directive.
      *
      * @param   an Association object
+     *
+     * ### TODO: remove stay_in_edit_mode parameter
      */
     function update_association(assoc, stay_in_edit_mode) {
         // update client model

@@ -1,8 +1,8 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
@@ -11,8 +11,7 @@ import java.util.List;
 
 
 
-// ### Note: we do not implement JSONEnabled as Directive are serialized to JSONArray, not to JSONObject.
-public class Directives implements Iterable<Directives.Entry> {
+public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -24,16 +23,13 @@ public class Directives implements Iterable<Directives.Entry> {
         directives.add(new Entry(dir, arg));
     }
 
-    public JSONArray toJSON() {
+    // *** JSONEnabled Implementation ***
+
+    public JSONObject toJSON() {
         try {
-            JSONArray array = new JSONArray();
-            for (Entry directive : directives) {
-                JSONObject dir = new JSONObject();
-                dir.put("type", directive.dir);
-                dir.put("arg",  directive.arg.toJSON());
-                array.put(dir);
-            }
-            return array;
+            JSONObject obj = new JSONObject();
+            obj.put("directives", DeepaMehtaUtils.objectsToJSON(directives));
+            return obj;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -48,7 +44,7 @@ public class Directives implements Iterable<Directives.Entry> {
 
     // --------------------------------------------------------------------------------------------------- Inner Classes
 
-    public class Entry {
+    public class Entry implements JSONEnabled {
 
         public Directive dir;
         public JSONEnabled arg;
@@ -56,6 +52,18 @@ public class Directives implements Iterable<Directives.Entry> {
         private Entry(Directive dir, JSONEnabled arg) {
             this.dir = dir;
             this.arg = arg;
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("type", dir);
+                obj.put("arg", arg.toJSON());
+                return obj;
+            } catch (Exception e) {
+                throw new RuntimeException("Serialization failed (" + this + ")", e);
+            }
         }
 
         @Override
