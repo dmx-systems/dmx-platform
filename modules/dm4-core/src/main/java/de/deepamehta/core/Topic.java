@@ -4,7 +4,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
-import java.util.Set;
+import java.util.List;
 
 
 
@@ -50,6 +50,6 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersRoleTypeUri   may be null
      * @param   othersAssocTypeUri  may be null
      */
-    Set<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+    List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                      String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 }

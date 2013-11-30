@@ -4,7 +4,6 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -16,6 +15,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.service.ResultList;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -29,7 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -65,7 +65,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topic/by_type/{type_uri}")
-    public ResultSet<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
+    public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
                                       @QueryParam("max_result_size") int maxResultSize) {
         return dms.getTopics(typeUri, fetchComposite, maxResultSize);
@@ -73,7 +73,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topic")
-    public Set<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
+    public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
         return dms.searchTopics(searchTerm, fieldUri);
     }
 
@@ -124,14 +124,14 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
-    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
+    public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
                                             @PathParam("topic2_id") long topic2Id) {
         return dms.getAssociations(topic1Id, topic2Id);
     }
 
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
-    public Set<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
+    public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
                                             @PathParam("topic2_id") long topic2Id,
                                             @PathParam("assoc_type_uri") String assocTypeUri) {
         return dms.getAssociations(topic1Id, topic2Id, assocTypeUri);
@@ -168,7 +168,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topictype")
-    public Set<String> getTopicTypeUris() {
+    public List<String> getTopicTypeUris() {
         return dms.getTopicTypeUris();
     }
 
@@ -180,7 +180,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topictype/all")
-    public Set<TopicType> getAllTopicTypes() {
+    public List<TopicType> getAllTopicTypes() {
         return dms.getAllTopicTypes();
     }
 
@@ -202,7 +202,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype")
-    public Set<String> getAssociationTypeUris() {
+    public List<String> getAssociationTypeUris() {
         return dms.getAssociationTypeUris();
     }
 
@@ -214,7 +214,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/all")
-    public Set<AssociationType> getAssociationAllTypes() {
+    public List<AssociationType> getAssociationAllTypes() {
         return dms.getAllAssociationTypes();
     }
 
@@ -238,7 +238,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/plugin")
-    public Set<PluginInfo> getPluginInfo() {
+    public List<PluginInfo> getPluginInfo() {
         return dms.getPluginInfo();
     }
 
@@ -252,7 +252,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public ResultSet<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                     long topicId,
+    public ResultList<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                     long topicId,
                                                          @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
@@ -273,7 +273,7 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/association/{id}/related_topics")
-    public ResultSet<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")               long assocId,
+    public ResultList<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")               long assocId,
                                                          @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                          @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                          @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
@@ -288,7 +288,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private ResultSet<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
+    private ResultList<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
                                                      String myRoleTypeUri, String othersRoleTypeUri,
                                                      String othersTopicTypeUri, int maxResultSize) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();

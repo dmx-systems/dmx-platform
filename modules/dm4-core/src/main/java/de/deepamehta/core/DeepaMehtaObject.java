@@ -6,9 +6,9 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
-import java.util.Set;
 
 
 
@@ -88,7 +88,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                  String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
 
-    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
+    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
 
     /**
      * @param   assocTypeUri        may be null
@@ -99,7 +99,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   fetchRelatingComposite
      * @param   maxResultSize       Result size limit. Pass 0 for no limit.
      */
-    ResultSet<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize);
 
@@ -109,7 +109,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize);
 
@@ -118,7 +118,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                              long othersTopicId);
 
-     Set<Association> getAssociations();
+     List<Association> getAssociations();
 
 
 

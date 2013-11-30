@@ -24,7 +24,7 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 
 import static java.util.Arrays.asList;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -56,7 +56,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     @Override
-    public Set<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object) {
+    public List<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object) {
         return facetsService.getFacets(object, "dm4.workspaces.workspace_facet");
     }
 

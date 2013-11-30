@@ -4,7 +4,6 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -15,6 +14,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
-import java.util.Set;
+import java.util.List;
 
 
 
@@ -179,15 +179,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void getTopicsByType() { 
         Topic type = getTopicByUri("dm4.core.data_type");
-        ResultSet<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
+        ResultList<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
         assertEquals(5, topics1.getSize());
-        Set<Topic> topics2 = getTopicInstances("dm4.core.data_type");
+        List<Topic> topics2 = getTopicInstances("dm4.core.data_type");
         assertEquals(5, topics2.size());
     }
 
     @Test
     public void getAssociationsByType() { 
-        Set<RelatedAssociation> assocs;
+        List<RelatedAssociation> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
         assertEquals(48, assocs.size());
@@ -205,14 +205,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociation() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
-        ResultSet<RelatedTopic> childTypes;
+        ResultList<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.getSize());
             //
             // retype assoc
-            Association assoc = childTypes.getIterator().next().getRelatingAssociation();
+            Association assoc = childTypes.getItems().get(0).getRelatingAssociation();
             assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
             assertEquals("dm4.core.association", assoc.getTypeUri());
@@ -242,14 +242,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociationRoles() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
-        ResultSet<RelatedTopic> childTypes;
+        ResultList<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.getSize());
             //
             // retype assoc roles
-            Association assoc = childTypes.getIterator().next().getRelatingAssociation();
+            Association assoc = childTypes.getItems().get(0).getRelatingAssociation();
             assoc.getRole1().setRoleTypeUri("dm4.core.default");
             assoc.getRole2().setRoleTypeUri("dm4.core.default");
             //
@@ -278,14 +278,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         //
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic t0;
-        ResultSet<RelatedTopic> topics;
+        ResultList<RelatedTopic> topics;
         try {
             t0 = getTopicByUri("dm4.test.t0");
             topics = getTestTopics(t0);
             assertEquals(3, topics.getSize());
             //
             // retype topic
-            Topic topic = topics.getIterator().next();
+            Topic topic = topics.getItems().get(0);
             assertEquals("dm4.core.plugin", topic.getTypeUri());
             topic.setTypeUri("dm4.core.data_type");
             assertEquals("dm4.core.data_type", topic.getTypeUri());
@@ -317,14 +317,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         //
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic t0;
-        Set<RelatedAssociation> assocs;
+        List<RelatedAssociation> assocs;
         try {
             t0 = getTopicByUri("dm4.test.t0");
             assocs = getTestAssociations(t0);
             assertEquals(3, assocs.size());
             //
             // retype topic
-            Association assoc = assocs.iterator().next();
+            Association assoc = assocs.get(0);
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
             assertEquals("dm4.core.composition", assoc.getTypeUri());
@@ -354,14 +354,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeTopicAndTraverseInstantiations() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic type;
-        ResultSet<RelatedTopic> topics;
+        ResultList<RelatedTopic> topics;
         try {
             type = getTopicByUri("dm4.core.data_type");
             topics = getTopicInstancesByTraversal(type);
             assertEquals(5, topics.getSize());
             //
             // retype topic
-            Topic topic = topics.getIterator().next();
+            Topic topic = topics.getItems().get(0);
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             topic.setTypeUri("dm4.core.index_mode");
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
@@ -414,21 +414,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         return dms.getTopic("uri", new SimpleValue(uri), false);
     }
 
-    private Set<Topic> getTopicInstances(String topicTypeUri) {
+    private List<Topic> getTopicInstances(String topicTypeUri) {
         return dms.getTopics("type_uri", new SimpleValue(topicTypeUri), false);
     }
 
-    private ResultSet<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
+    private ResultList<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0);
     }
 
-    private Set<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
+    private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
         return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
     }
 
-    private ResultSet<RelatedTopic> getChildTypes(Topic type) {
+    private ResultList<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
             "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0);
     }
@@ -475,12 +475,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     // ---
 
-    private ResultSet<RelatedTopic> getTestTopics(Topic topic) {
+    private ResultList<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0);
     }
 
-    private Set<RelatedAssociation> getTestAssociations(Topic topic) {
+    private List<RelatedAssociation> getTestAssociations(Topic topic) {
         return topic.getRelatedAssociations("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.association", false, false);
     }

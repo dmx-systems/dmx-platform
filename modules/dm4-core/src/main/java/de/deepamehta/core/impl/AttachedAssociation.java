@@ -4,27 +4,23 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import java.util.logging.Logger;
 
@@ -127,12 +123,12 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Topic getTopic(String roleTypeUri) {
-        Set<Topic> topics = getTopics(roleTypeUri);
+        List<Topic> topics = getTopics(roleTypeUri);
         switch (topics.size()) {
         case 0:
             return null;
         case 1:
-            return topics.iterator().next();
+            return topics.get(0);
         default:
             throw new RuntimeException("Ambiguity in association: " + topics.size() + " topics have role type \"" +
                 roleTypeUri + "\" (" + this + ")");
@@ -140,8 +136,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    public Set<Topic> getTopics(String roleTypeUri) {
-        Set<Topic> topics = new HashSet();
+    public List<Topic> getTopics(String roleTypeUri) {
+        List<Topic> topics = new ArrayList();
         filterTopic(getRole1(), roleTypeUri, topics);
         filterTopic(getRole2(), roleTypeUri, topics);
         return topics;
@@ -161,8 +157,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public boolean isPlayer(TopicRoleModel roleModel) {
-        Set<Topic> topics = getTopics(roleModel.getRoleTypeUri());
-        return topics.size() > 0 && topics.iterator().next().getId() == roleModel.getPlayerId();
+        List<Topic> topics = getTopics(roleModel.getRoleTypeUri());
+        return topics.size() > 0 && topics.get(0).getId() == roleModel.getPlayerId();
     }
 
     // ---
@@ -224,10 +220,10 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // --- Topic Retrieval ---
 
     @Override
-    public ResultSet<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize) {
-        ResultSet<RelatedTopicModel> topics = dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUris,
+        ResultList<RelatedTopicModel> topics = dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
     }
@@ -243,7 +239,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    public Set<Association> getAssociations() {
+    public List<Association> getAssociations() {
         return dms.instantiateAssociations(dms.storage.fetchAssociationAssociations(getId()), false);
                                                                                     // fetchComposite=false
     }
@@ -313,7 +309,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    final ResultSet<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+    final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersTopicTypeUri,
                                                           int maxResultSize) {
         return dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
@@ -356,7 +352,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
-    private void filterTopic(Role role, String roleTypeUri, Set<Topic> topics) {
+    private void filterTopic(Role role, String roleTypeUri, List<Topic> topics) {
         if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
             topics.add(((TopicRole) role).getTopic());
         }

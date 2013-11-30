@@ -9,7 +9,6 @@ import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 
 import java.util.List;
-import java.util.Set;
 
 
 
@@ -37,7 +36,7 @@ public interface FacetsService extends PluginService {
      *
      * @return  The retrieved multi-facet.
      */
-    Set<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
+    List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 

@@ -26,11 +26,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -78,11 +76,11 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //
-        Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
             "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
         assertEquals(1, topics.size());
         //
-        TopicModel type = topics.iterator().next();
+        TopicModel type = topics.get(0);
         assertEquals("dm4.core.topic_type", type.getUri());
         assertEquals("Topic Type", type.getSimpleValue().toString());
     }
@@ -92,11 +90,11 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.topic_type");
         assertNotNull(topic);
         //
-        Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", "dm4.core.topic_type");
         assertEquals(1, topics.size());
         //
-        TopicModel type = topics.iterator().next();
+        TopicModel type = topics.get(0);
         assertEquals("dm4.core.data_type", type.getUri());
         assertEquals("Data Type", type.getSimpleValue().toString());
     }
@@ -106,7 +104,7 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //
-        Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
+        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
         assertEquals(1, topics.size());
     }
 
@@ -117,11 +115,11 @@ public class Neo4jStorageTest {
             TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
             assertNotNull(topic);
             //
-            Set<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
+            List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
                 "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
             assertEquals(1, topics.size());
             //
-            AssociationModel assoc = topics.iterator().next().getRelatingAssociation();
+            AssociationModel assoc = topics.get(0).getRelatingAssociation();
             assertNotNull(assoc);
             //
             storage.deleteAssociation(assoc.getId());
@@ -214,7 +212,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndex() {
-        Collection<TopicModel> topics;
+        List<TopicModel> topics;
         // Note: The same type must be used for indexing and querying.
         // That is, you can't index a value as a Long and then query the index using an Integer.
         topics = storage.fetchTopicsByProperty("score", 12L);  assertEquals(0, topics.size());
@@ -224,7 +222,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndexRange() {
-        Collection<TopicModel> topics;
+        List<TopicModel> topics;
         topics = storage.fetchTopicsByPropertyRange("score", 1L, 1000L);  assertEquals(3, topics.size());
         topics = storage.fetchTopicsByPropertyRange("score", 23L, 23L);   assertEquals(2, topics.size());
         topics = storage.fetchTopicsByPropertyRange("score", 23L, 1234L); assertEquals(4, topics.size());

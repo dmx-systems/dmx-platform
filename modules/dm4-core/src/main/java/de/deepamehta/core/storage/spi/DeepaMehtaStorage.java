@@ -7,10 +7,8 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 
 
@@ -24,7 +22,6 @@ public interface DeepaMehtaStorage {
 
     TopicModel fetchTopic(String key, Object value);
 
-    // ### TODO: unify all List and Set results as Collection
     List<TopicModel> fetchTopics(String key, Object value);
 
     List<TopicModel> queryTopics(Object value);
@@ -44,8 +41,8 @@ public interface DeepaMehtaStorage {
     /**
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
-    void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
-                                                                                            SimpleValue indexValue);
+    void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
+                                                                                      SimpleValue indexValue);
     // ---
 
     void deleteTopic(long topicId);
@@ -56,10 +53,10 @@ public interface DeepaMehtaStorage {
 
     AssociationModel fetchAssociation(long id);
 
-    Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                               String roleTypeUri2);
+    List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                                String roleTypeUri2);
 
-    Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+    List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                       String topicRoleTypeUri, String assocRoleTypeUri);
 
     Iterator<AssociationModel> fetchAllAssociations();
@@ -75,8 +72,8 @@ public interface DeepaMehtaStorage {
     /**
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
-    void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes, String indexKey,
-                                                                                                SimpleValue indexValue);
+    void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
+                                                                                            SimpleValue indexValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 
@@ -88,9 +85,9 @@ public interface DeepaMehtaStorage {
 
     // === Traversal ===
 
-    Set<AssociationModel> fetchTopicAssociations(long topicId);
+    List<AssociationModel> fetchTopicAssociations(long topicId);
 
-    Set<AssociationModel> fetchAssociationAssociations(long assocId);
+    List<AssociationModel> fetchAssociationAssociations(long assocId);
 
     // ---
 
@@ -100,7 +97,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
+    List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -109,7 +106,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -120,7 +117,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
+    List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -129,7 +126,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -141,7 +138,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri,
+    List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -151,7 +148,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    Set<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri,
+    List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
 
@@ -164,13 +161,13 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    Collection<TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
+    List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
 
-    Collection<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
+    List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    Collection<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
+    List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
 
-    Collection<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

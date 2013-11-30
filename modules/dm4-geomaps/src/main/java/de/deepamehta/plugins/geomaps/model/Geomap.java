@@ -2,10 +2,10 @@ package de.deepamehta.plugins.geomaps.model;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -55,7 +55,7 @@ public class Geomap implements JSONEnabled {
 
     // ---
 
-    public static ResultSet<RelatedTopic> fetchGeomapTopics(long geomapId, DeepaMehtaService dms) {
+    public static ResultList<RelatedTopic> fetchGeomapTopics(long geomapId, DeepaMehtaService dms) {
         Topic geomapTopic = dms.getTopic(geomapId, false);      // fetchComposite=false
         return fetchGeomapTopics(geomapTopic, false);           // fetchComposite=false
     }
@@ -86,13 +86,13 @@ public class Geomap implements JSONEnabled {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void loadTopics() {
-        ResultSet<RelatedTopic> mapTopics = fetchGeomapTopics(geomapTopic, true);     // fetchComposite=true
+        ResultList<RelatedTopic> mapTopics = fetchGeomapTopics(geomapTopic, true);     // fetchComposite=true
         for (RelatedTopic mapTopic : mapTopics) {
             addTopic(mapTopic.getModel());
         }
     }
 
-    private static ResultSet<RelatedTopic> fetchGeomapTopics(Topic geomapTopic, boolean fetchComposite) {
+    private static ResultList<RelatedTopic> fetchGeomapTopics(Topic geomapTopic, boolean fetchComposite) {
         return geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext", "dm4.core.default",
             "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate", fetchComposite, false, 0);
             // fetchRelatingComposite=false, maxResultSize=0, clientContext=null

@@ -1,6 +1,6 @@
 package de.deepamehta.core.impl;
 
-import java.util.Set;
+import java.util.List;
 
 
 
@@ -8,12 +8,12 @@ class RestResource {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    Set<Object> resources;
-    Set<Class<?>> providerClasses;
+    List<Object> resources;
+    List<Class<?>> providerClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResource(Set<Object> resources, Set<Class<?>> providerClasses) {
+    RestResource(List<Object> resources, List<Class<?>> providerClasses) {
         this.resources = resources;
         this.providerClasses = providerClasses;
     }

@@ -1,7 +1,5 @@
 package de.deepamehta.core.impl;
 
-import java.util.Set;
-
 
 
 class WebResources {

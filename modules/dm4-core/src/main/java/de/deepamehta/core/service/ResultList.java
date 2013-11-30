@@ -1,31 +1,31 @@
-package de.deepamehta.core;
+package de.deepamehta.core.service;
 
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 
 
-// ### TODO: move to de.deepamehta.core.service
-public class ResultSet<T extends JSONEnabled> implements Iterable<T>, JSONEnabled {
+public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private int totalCount;
-    private Set<T> items;
+    private List<T> items;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public ResultSet() {
+    public ResultList() {
         this.totalCount = 0;
-        this.items = new HashSet<T>();
+        this.items = new ArrayList<T>();
     }
 
-    public ResultSet(int totalCount, Set<T> items) {
+    public ResultList(int totalCount, List<T> items) {
         this.totalCount = totalCount;
         this.items = items;
     }
@@ -40,17 +40,13 @@ public class ResultSet<T extends JSONEnabled> implements Iterable<T>, JSONEnable
         return totalCount;
     }
 
-    public Set<T> getItems() {
+    public List<T> getItems() {
         return items;
-    }
-
-    public Iterator<T> getIterator() {
-        return items.iterator();
     }
 
     // ---
 
-    public void addAll(ResultSet<T> result) {
+    public void addAll(ResultList<T> result) {
         totalCount += result.getTotalCount();
         items.addAll(result.getItems());
     }
@@ -59,7 +55,7 @@ public class ResultSet<T extends JSONEnabled> implements Iterable<T>, JSONEnable
 
     @Override
     public Iterator<T> iterator() {
-        return getIterator();
+        return items.iterator();
     }
 
     // *** JSONEnabled Implementation ***

@@ -8,7 +8,6 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -19,6 +18,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
@@ -95,7 +95,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @GET
     @Path("/{id}/topics")
     @Override
-    public ResultSet<RelatedTopic> getGeomapTopics(@PathParam("id") long geomapId) {
+    public ResultList<RelatedTopic> getGeomapTopics(@PathParam("id") long geomapId) {
         return Geomap.fetchGeomapTopics(geomapId, dms);
     }
 

@@ -15,7 +15,6 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -51,7 +50,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     // ---
 
     @Override
-    public Set<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
+    public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
         return fetchChildTopics(object, getAssocDef(facetTypeUri), true);   // fetchComposite=true
     }
@@ -120,8 +119,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private Set<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
-                                                                        boolean fetchComposite) {
+    private List<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef,
+                                                                         boolean fetchComposite) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, fetchComposite,

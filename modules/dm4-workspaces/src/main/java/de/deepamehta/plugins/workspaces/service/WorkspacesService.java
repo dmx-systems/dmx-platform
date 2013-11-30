@@ -6,7 +6,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.service.PluginService;
 
-import java.util.Set;
+import java.util.List;
 
 
 
@@ -15,7 +15,7 @@ public interface WorkspacesService extends PluginService {
     /**
      * Fetches the workspaces the specified object is assigned to.
      */
-    Set<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object);
+    List<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object);
 
     /**
      * Checks weather the specified topic is assigned to the specified workspace

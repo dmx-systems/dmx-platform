@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -123,7 +124,7 @@ public class WebPublishingService {
      * @param   resources           the set of root resource and provider singletons, may be empty.
      * @param   providerClasses     the set of root resource and provider classes, may be empty.
      */
-    synchronized RestResource addRestResource(Set<Object> resources, Set<Class<?>> providerClasses) {
+    synchronized RestResource addRestResource(List<Object> resources, List<Class<?>> providerClasses) {
         addSingletons(resources);
         addClasses(providerClasses);
         logResourceInfo();
@@ -186,24 +187,24 @@ public class WebPublishingService {
 
     // ---
 
-    private void addClasses(Set<Class<?>> classes) {
+    private void addClasses(List<Class<?>> classes) {
         getClasses().addAll(classes);
         classCount += classes.size();
     }
 
-    private void addSingletons(Set<Object> singletons) {
+    private void addSingletons(List<Object> singletons) {
         getSingletons().addAll(singletons);
         singletonCount += singletons.size();
     }
 
     // ---
 
-    private void removeClasses(Set<Class<?>> classes) {
+    private void removeClasses(List<Class<?>> classes) {
         getClasses().removeAll(classes);
         classCount -= classes.size();
     }
 
-    private void removeSingletons(Set<Object> singletons) {
+    private void removeSingletons(List<Object> singletons) {
         getSingletons().removeAll(singletons);
         singletonCount -= singletons.size();
     }

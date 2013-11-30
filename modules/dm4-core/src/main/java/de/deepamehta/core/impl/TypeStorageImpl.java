@@ -5,7 +5,6 @@ import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -24,6 +23,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -97,7 +96,7 @@ class TypeStorageImpl implements TypeStorage {
         //
         // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
-        Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
@@ -119,7 +118,7 @@ class TypeStorageImpl implements TypeStorage {
         //
         // 1) fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
-        Set<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
@@ -233,15 +232,15 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    private Set<IndexMode> fetchIndexModes(long typeId) {
-        ResultSet<RelatedTopicModel> indexModes = dms.storage.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
+    private List<IndexMode> fetchIndexModes(long typeId) {
+        ResultList<RelatedTopicModel> indexModes = dms.storage.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", null, "dm4.core.index_mode", 0);   // ### FIXME: null
         return IndexMode.fromTopics(indexModes.getItems());
     }
 
     // --- Store ---
 
-    void storeIndexModes(String typeUri, Set<IndexMode> indexModes) {
+    void storeIndexModes(String typeUri, List<IndexMode> indexModes) {
         for (IndexMode indexMode : indexModes) {
             dms.createAssociation("dm4.core.aggregation",
                 new TopicRoleModel(typeUri,           "dm4.core.type"),
@@ -277,7 +276,7 @@ class TypeStorageImpl implements TypeStorage {
         // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
         // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
         // of topic types.
-        ResultSet<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+        ResultList<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, false, false, 0);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
         //
@@ -571,7 +570,7 @@ class TypeStorageImpl implements TypeStorage {
     private ViewConfigurationModel fetchTypeViewConfig(Topic typeTopic) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            ResultSet<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
+            ResultList<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
                 "dm4.core.type", "dm4.core.view_config", null, true, false, 0);
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
@@ -583,7 +582,7 @@ class TypeStorageImpl implements TypeStorage {
     private ViewConfigurationModel fetchAssocDefViewConfig(Association assocDef) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            ResultSet<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
+            ResultList<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
                 "dm4.core.assoc_def", "dm4.core.view_config", null, true, false, 0);
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {

@@ -25,14 +25,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
-import java.awt.Point;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -58,7 +55,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
-    private Set<ViewmodelCustomizer> viewmodelCustomizers = new HashSet();
+    private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

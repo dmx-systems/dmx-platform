@@ -3,7 +3,6 @@ package de.deepamehta.plugins.webclient;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -22,6 +21,7 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.Consumes;
@@ -34,8 +34,10 @@ import javax.ws.rs.QueryParam;
 
 import java.awt.Desktop;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -83,7 +85,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", clientState=" + clientState);
-            Set<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
+            List<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
             Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
@@ -114,7 +116,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            Set<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize).getItems();
+            List<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize).getItems();
             // fetchComposite=false
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
@@ -132,10 +134,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public ResultSet getRelatedTopics(@PathParam("id") long topicId) {
+    public ResultList getRelatedTopics(@PathParam("id") long topicId) {
         Topic topic = dms.getTopic(topicId, false);
-        ResultSet<RelatedTopic> topics = topic.getRelatedTopics(null, 0);   // assocTypeUri=null, maxResultSize=0
-        Iterator<RelatedTopic> i = topics.getIterator();
+        ResultList<RelatedTopic> topics = topic.getRelatedTopics(null, 0);   // assocTypeUri=null, maxResultSize=0
+        Iterator<RelatedTopic> i = topics.iterator();
         int removed = 0;
         while (i.hasNext()) {
             RelatedTopic relTopic = i.next();
@@ -217,13 +219,13 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Search ===
 
     // ### TODO: use Collection instead of Set
-    private Set<Topic> findSearchableUnits(Set<? extends Topic> topics) {
+    private Set<Topic> findSearchableUnits(List<? extends Topic> topics) {
         Set<Topic> searchableUnits = new LinkedHashSet();
         for (Topic topic : topics) {
             if (searchableAsUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                Set<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
+                List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
                     "dm4.core.parent", null, false, false, 0).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
@@ -238,7 +240,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Creates a "Search" topic.
      */
-    private Topic createSearchTopic(String searchTerm, Set<? extends Topic> resultItems, ClientState clientState) {
+    private Topic createSearchTopic(String searchTerm, Collection<? extends Topic> resultItems,
+                                                                                   ClientState clientState) {
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValueModel()
             .put("dm4.webclient.search_term", searchTerm)
         ), clientState);

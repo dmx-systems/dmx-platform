@@ -18,7 +18,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -71,12 +70,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // --- Index Modes ---
 
     @Override
-    public Set<IndexMode> getIndexModes() {
+    public List<IndexMode> getIndexModes() {
         return getModel().getIndexModes();
     }
 
     @Override
-    public void setIndexModes(Set<IndexMode> indexModes) {
+    public void setIndexModes(List<IndexMode> indexModes) {
         // update memory
         getModel().setIndexModes(indexModes);
         // update DB

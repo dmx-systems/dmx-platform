@@ -4,7 +4,6 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -12,12 +11,10 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 
@@ -59,9 +56,9 @@ public interface DeepaMehtaService {
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite);
+    List<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite);
 
-    ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize);
+    ResultList<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize);
 
     /**
      * Performs a fulltext search.
@@ -71,7 +68,7 @@ public interface DeepaMehtaService {
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
      */
-    Set<Topic> searchTopics(String searchTerm, String fieldUri);
+    List<Topic> searchTopics(String searchTerm, String fieldUri);
 
     Iterable<Topic> getAllTopics();
 
@@ -106,19 +103,19 @@ public interface DeepaMehtaService {
 
     // ---
 
-    Set<RelatedAssociation> getAssociations(String assocTypeUri);
+    List<RelatedAssociation> getAssociations(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.
      */
-    Set<Association> getAssociations(long topic1Id, long topic2Id);
+    List<Association> getAssociations(long topic1Id, long topic2Id);
 
     /**
      * Returns the associations between two topics. If no such association exists an empty set is returned.
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
+    List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri);
 
     // ---
 
@@ -136,11 +133,11 @@ public interface DeepaMehtaService {
 
     // === Topic Types ===
 
-    Set<String> getTopicTypeUris();
+    List<String> getTopicTypeUris();
 
     TopicType getTopicType(String topicTypeUri);
 
-    Set<TopicType> getAllTopicTypes();
+    List<TopicType> getAllTopicTypes();
 
     TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
@@ -150,11 +147,11 @@ public interface DeepaMehtaService {
 
     // === Association Types ===
 
-    Set<String> getAssociationTypeUris();
+    List<String> getAssociationTypeUris();
 
     AssociationType getAssociationType(String assocTypeUri);
 
-    Set<AssociationType> getAllAssociationTypes();
+    List<AssociationType> getAllAssociationTypes();
 
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 
@@ -166,19 +163,19 @@ public interface DeepaMehtaService {
 
     Plugin getPlugin(String pluginUri);
 
-    Set<PluginInfo> getPluginInfo();
+    List<PluginInfo> getPluginInfo();
 
 
 
     // === Properties ===
 
-    Collection<Topic> getTopicsByProperty(String propUri, Object propValue);
+    List<Topic> getTopicsByProperty(String propUri, Object propValue);
 
-    Collection<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
+    List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    Collection<Association> getAssociationsByProperty(String propUri, Object propValue);
+    List<Association> getAssociationsByProperty(String propUri, Object propValue);
 
-    Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
 
 
 

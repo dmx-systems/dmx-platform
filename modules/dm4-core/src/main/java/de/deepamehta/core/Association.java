@@ -6,7 +6,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
-import java.util.Set;
+import java.util.List;
 
 
 
@@ -39,7 +39,7 @@ public interface Association extends DeepaMehtaObject {
      * @teturn  this association's topics which play the given role.
      *          The resulting set can have 0, 1, or 2 elements.
      */
-    Set<Topic> getTopics(String roleTypeUri);
+    List<Topic> getTopics(String roleTypeUri);
 
     // ---
 

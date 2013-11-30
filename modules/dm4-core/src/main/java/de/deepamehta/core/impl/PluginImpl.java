@@ -37,12 +37,10 @@ import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -60,16 +58,16 @@ public class PluginImpl implements Plugin, EventHandler {
     private PluginContext pluginContext;
     private BundleContext bundleContext;
 
-    private Bundle      pluginBundle;
-    private String      pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
-    private String      pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
-    private String      pluginClass;
+    private Bundle       pluginBundle;
+    private String       pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
+    private String       pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
+    private String       pluginClass;
 
-    private Properties  pluginProperties;   // Read from file "plugin.properties"
-    private String      pluginPackage;
-    private PluginInfo  pluginInfo;
-    private Set<String> pluginDependencies; // plugin URIs as read from "importModels" property
-    private Topic       pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
+    private Properties   pluginProperties;   // Read from file "plugin.properties"
+    private String       pluginPackage;
+    private PluginInfo   pluginInfo;
+    private List<String> pluginDependencies; // plugin URIs as read from "importModels" property
+    private Topic        pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DeepaMehta Core and OSGi)
     private EmbeddedService dms;
@@ -757,7 +755,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void registerRestResources() {
         try {
             // root resources
-            Set<Object> rootResources = getRootResources();
+            List<Object> rootResources = getRootResources();
             if (rootResources.size() != 0) {
                 String uriNamespace = webPublishingService.getUriNamespace(pluginContext);
                 logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
@@ -765,7 +763,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
             }
             // provider classes
-            Set<Class<?>> providerClasses = getProviderClasses();
+            List<Class<?>> providerClasses = getProviderClasses();
             if (providerClasses.size() != 0) {
                 logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
             } else {
@@ -790,16 +788,16 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private Set<Object> getRootResources() {
-        Set<Object> rootResources = new HashSet();
+    private List<Object> getRootResources() {
+        List<Object> rootResources = new ArrayList();
         if (webPublishingService.isRootResource(pluginContext)) {
             rootResources.add(pluginContext);
         }
         return rootResources;
     }
 
-    private Set<Class<?>> getProviderClasses() throws IOException {
-        Set<Class<?>> providerClasses = new HashSet();
+    private List<Class<?>> getProviderClasses() throws IOException {
+        List<Class<?>> providerClasses = new ArrayList();
         for (String className : scanPackage("/provider")) {
             Class providerClass = loadClass(className);
             if (providerClass == null) {
@@ -814,8 +812,8 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // === Plugin Dependencies ===
 
-    private Set<String> pluginDependencies() {
-        Set<String> pluginDependencies = new HashSet();
+    private List<String> pluginDependencies() {
+        List<String> pluginDependencies = new ArrayList();
         String importModels = getConfigProperty("importModels");
         if (importModels != null) {
             String[] pluginUris = importModels.split(", *");

@@ -5,10 +5,10 @@ import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -16,8 +16,8 @@ import org.codehaus.jettison.json.JSONObject;
 import java.awt.Point;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -38,7 +38,7 @@ public class TopicmapViewmodel implements JSONEnabled {
     private Map<Long, AssociationViewmodel> assocs = new HashMap();
 
     private DeepaMehtaService dms;
-    private Set<ViewmodelCustomizer> customizers;
+    private List<ViewmodelCustomizer> customizers;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -47,7 +47,7 @@ public class TopicmapViewmodel implements JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, Set<ViewmodelCustomizer> customizers) {
+    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, List<ViewmodelCustomizer> customizers) {
         this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
         this.dms = dms;
         this.customizers = customizers;
@@ -158,21 +158,21 @@ public class TopicmapViewmodel implements JSONEnabled {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void loadTopics() {
-        ResultSet<RelatedTopic> mapTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
+        ResultList<RelatedTopic> topics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0);
             // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
-        for (RelatedTopic mapTopic : mapTopics) {
-            CompositeValueModel viewProps = mapTopic.getRelatingAssociation().getCompositeValue().getModel();
-            invokeViewmodelCustomizers(mapTopic, viewProps);
-            addTopic(new TopicViewmodel(mapTopic.getModel(), viewProps));
+        for (RelatedTopic topic : topics) {
+            CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
+            invokeViewmodelCustomizers(topic, viewProps);
+            addTopic(new TopicViewmodel(topic.getModel(), viewProps));
         }
     }
 
     private void loadAssociations() {
-        Set<RelatedAssociation> mapAssocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
+        List<RelatedAssociation> assocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
-        for (RelatedAssociation mapAssoc : mapAssocs) {
-            addAssociation(new AssociationViewmodel(mapAssoc.getModel()));
+        for (RelatedAssociation assoc : assocs) {
+            addAssociation(new AssociationViewmodel(assoc.getModel()));
         }
     }
 

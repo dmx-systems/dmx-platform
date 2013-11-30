@@ -3,7 +3,6 @@ package de.deepamehta.core.util;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
@@ -20,12 +19,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -75,21 +71,12 @@ public class DeepaMehtaUtils {
         return ids;
     }
 
-    public static Set<TopicModel> toTopicModels(Set<RelatedTopic> relTopics) {
-        Set<TopicModel> topicModels = new LinkedHashSet();
+    public static List<TopicModel> toTopicModels(List<RelatedTopic> relTopics) {
+        List<TopicModel> topicModels = new ArrayList();
         for (Topic topic : relTopics) {
             topicModels.add(topic.getModel());
         }
         return topicModels;
-    }
-
-    // ### TODO: remove this method
-    public static Set<TopicModel> toTopicSet(List<TopicModel> topics) {
-        Set<TopicModel> set = new LinkedHashSet();
-        for (TopicModel topic : topics) {
-            set.add(topic);
-        }
-        return set;
     }
 
     public static String topicNames(Collection<? extends Topic> topics) {

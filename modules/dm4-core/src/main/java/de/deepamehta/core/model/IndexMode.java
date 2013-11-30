@@ -7,9 +7,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -22,8 +20,8 @@ public enum IndexMode {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public static Set<IndexMode> fromTopics(Set<RelatedTopicModel> topics) {
-        Set<IndexMode> indexModes = new HashSet();
+    public static List<IndexMode> fromTopics(List<RelatedTopicModel> topics) {
+        List<IndexMode> indexModes = new ArrayList();
         for (TopicModel topic : topics) {
             indexModes.add(fromUri(topic.getUri()));
         }
@@ -36,9 +34,9 @@ public enum IndexMode {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    static Set<IndexMode> parse(JSONObject topicTypeModel) {
+    static List<IndexMode> parse(JSONObject topicTypeModel) {
         try {
-            Set<IndexMode> indexModes = new HashSet();
+            List<IndexMode> indexModes = new ArrayList();
             JSONArray indexModeUris = topicTypeModel.optJSONArray("index_mode_uris");
             if (indexModeUris != null) {
                 for (int i = 0; i < indexModeUris.length(); i++) {
@@ -51,7 +49,7 @@ public enum IndexMode {
         }
     }
 
-    static void toJSON(Set<IndexMode> indexModes, JSONObject o) throws Exception {
+    static void toJSON(List<IndexMode> indexModes, JSONObject o) throws Exception {
         List indexModeUris = new ArrayList();
         for (IndexMode indexMode : indexModes) {
             indexModeUris.add(indexMode.toUri());

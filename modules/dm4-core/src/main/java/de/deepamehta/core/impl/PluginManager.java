@@ -5,10 +5,10 @@ import de.deepamehta.core.service.PluginInfo;
 
 import org.osgi.framework.Bundle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -96,8 +96,8 @@ class PluginManager {
         return plugin;
     }
 
-    synchronized Set<PluginInfo> getPluginInfo() {
-        Set info = new HashSet();
+    synchronized List<PluginInfo> getPluginInfo() {
+        List info = new ArrayList();
         for (PluginImpl plugin : activatedPlugins.values()) {
             info.add(plugin.getInfo());
         }

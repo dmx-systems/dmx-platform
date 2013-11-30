@@ -3,7 +3,6 @@ package de.deepamehta.core.model;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -29,7 +28,7 @@ public class TopicTypeModel extends TypeModel {
         super(uri, topicTypeUri, new SimpleValue(value), dataTypeUri);
     }
 
-    public TopicTypeModel(TopicModel topic, String dataTypeUri, Set<IndexMode> indexModes,
+    public TopicTypeModel(TopicModel topic, String dataTypeUri, List<IndexMode> indexModes,
                           List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                           ViewConfigurationModel viewConfig) {
         super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);

@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
@@ -13,6 +12,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
 
 import java.util.Iterator;
@@ -452,7 +452,7 @@ class ValueStorage {
         );
     }
 
-    private ResultSet<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinition assocDef) {
+    private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinition assocDef) {
         return dms.storage.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),

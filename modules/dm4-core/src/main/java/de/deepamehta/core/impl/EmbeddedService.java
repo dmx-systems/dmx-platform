@@ -5,7 +5,6 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -25,18 +24,14 @@ import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.BundleContext;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -114,7 +109,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite) {
+    public List<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite) {
         try {
             return instantiateTopics(storage.fetchTopics(key, value), fetchComposite);
         } catch (Exception e) {
@@ -123,7 +118,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultSet<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize) {
+    public ResultList<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize) {
         try {
             return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", topicTypeUri, fetchComposite, false, maxResultSize);
@@ -133,7 +128,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<Topic> searchTopics(String searchTerm, String fieldUri) {
+    public List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
             // ### FIXME: fetchComposite=false, parameterize it
             return instantiateTopics(storage.queryTopics(searchTerm, fieldUri), false);
@@ -261,7 +256,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public Set<RelatedAssociation> getAssociations(String assocTypeUri) {
+    public List<RelatedAssociation> getAssociations(String assocTypeUri) {
         try {
             return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
                 "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
@@ -273,12 +268,12 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<Association> getAssociations(long topic1Id, long topic2Id) {
+    public List<Association> getAssociations(long topic1Id, long topic2Id) {
         return getAssociations(topic1Id, topic2Id, null);
     }
 
     @Override
-    public Set<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
+    public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
             // ### FIXME: fetchComposite=false, parameterize it
@@ -367,12 +362,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Topic Types ===
 
     @Override
-    public Set<String> getTopicTypeUris() {
+    public List<String> getTopicTypeUris() {
         try {
             Topic metaType = instantiateTopic(storage.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")), false);
-            ResultSet<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type", false, false, 0);
-            Set<String> topicTypeUris = new HashSet();
+            List<String> topicTypeUris = new ArrayList();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
             topicTypeUris.add("dm4.core.assoc_type");
@@ -398,9 +393,9 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<TopicType> getAllTopicTypes() {
+    public List<TopicType> getAllTopicTypes() {
         try {
-            Set<TopicType> topicTypes = new HashSet();
+            List<TopicType> topicTypes = new ArrayList();
             for (String uri : getTopicTypeUris()) {
                 TopicType topicType = getTopicType(uri);
                 topicTypes.add(topicType);
@@ -455,12 +450,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Association Types ===
 
     @Override
-    public Set<String> getAssociationTypeUris() {
+    public List<String> getAssociationTypeUris() {
         try {
             Topic metaType = instantiateTopic(storage.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")), false);
-            ResultSet<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type", false, false, 0);
-            Set<String> assocTypeUris = new HashSet();
+            List<String> assocTypeUris = new ArrayList();
             for (Topic assocType : assocTypes) {
                 assocTypeUris.add(assocType.getUri());
             }
@@ -480,9 +475,9 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<AssociationType> getAllAssociationTypes() {
+    public List<AssociationType> getAllAssociationTypes() {
         try {
-            Set<AssociationType> assocTypes = new HashSet();
+            List<AssociationType> assocTypes = new ArrayList();
             for (String uri : getAssociationTypeUris()) {
                 AssociationType assocType = getAssociationType(uri);
                 assocTypes.add(assocType);
@@ -543,7 +538,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Set<PluginInfo> getPluginInfo() {
+    public List<PluginInfo> getPluginInfo() {
         return pluginManager.getPluginInfo();
     }
 
@@ -552,25 +547,25 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Properties ===
 
     @Override
-    public Collection<Topic> getTopicsByProperty(String propUri, Object propValue) {
+    public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
         return instantiateTopics(storage.fetchTopicsByProperty(propUri, propValue), false);
             // fetchComposite=false
     }
 
     @Override
-    public Collection<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
+    public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
         return instantiateTopics(storage.fetchTopicsByPropertyRange(propUri, from, to), false);
             // fetchComposite=false
     }
 
     @Override
-    public Collection<Association> getAssociationsByProperty(String propUri, Object propValue) {
+    public List<Association> getAssociationsByProperty(String propUri, Object propValue) {
         return instantiateAssociations(storage.fetchAssociationsByProperty(propUri, propValue), false);
             // fetchComposite=false
     }
 
     @Override
-    public Collection<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    public List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propUri, from, to), false);
             // fetchComposite=false
     }
@@ -661,8 +656,8 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedTopic(model, this);
     }
 
-    private Set<Topic> instantiateTopics(Collection<TopicModel> models, boolean fetchComposite) {
-        Set<Topic> topics = new LinkedHashSet();
+    private List<Topic> instantiateTopics(List<TopicModel> models, boolean fetchComposite) {
+        List<Topic> topics = new ArrayList();
         for (TopicModel model : models) {
             topics.add(instantiateTopic(model, fetchComposite));
         }
@@ -677,13 +672,13 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedTopic(model, this);
     }
 
-    ResultSet<RelatedTopic> instantiateRelatedTopics(ResultSet<RelatedTopicModel> models,
-                                                     boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedTopic> relTopics = new LinkedHashSet();
+    ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models,
+                                                      boolean fetchComposite, boolean fetchRelatingComposite) {
+        List<RelatedTopic> relTopics = new ArrayList();
         for (RelatedTopicModel model : models) {
             relTopics.add(instantiateRelatedTopic(model, fetchComposite, fetchRelatingComposite));
         }
-        return new ResultSet<RelatedTopic>(models.getTotalCount(), relTopics);
+        return new ResultList<RelatedTopic>(models.getTotalCount(), relTopics);
     }
 
     // ===
@@ -697,8 +692,8 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedAssociation(model, this);
     }
 
-    Set<Association> instantiateAssociations(Collection<AssociationModel> models, boolean fetchComposite) {
-        Set<Association> assocs = new LinkedHashSet();
+    List<Association> instantiateAssociations(List<AssociationModel> models, boolean fetchComposite) {
+        List<Association> assocs = new ArrayList();
         for (AssociationModel model : models) {
             assocs.add(instantiateAssociation(model, fetchComposite));
         }
@@ -716,9 +711,9 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedAssociation(model, this);
     }
 
-    Set<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models,
-                                                           boolean fetchComposite, boolean fetchRelatingComposite) {
-        Set<RelatedAssociation> relAssocs = new LinkedHashSet();
+    List<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models,
+                                                            boolean fetchComposite, boolean fetchRelatingComposite) {
+        List<RelatedAssociation> relAssocs = new ArrayList();
         for (RelatedAssociationModel model : models) {
             relAssocs.add(instantiateRelatedAssociation(model, fetchComposite, fetchRelatingComposite));
         }

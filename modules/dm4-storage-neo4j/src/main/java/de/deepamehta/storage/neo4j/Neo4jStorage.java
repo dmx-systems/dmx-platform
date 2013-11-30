@@ -33,12 +33,9 @@ import org.apache.lucene.search.TermQuery;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -186,7 +183,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeTopicValue(long topicId, SimpleValue value, Collection<IndexMode> indexModes,
+    public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
         storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey,
             getIndexValue(value, indexValue));
@@ -214,8 +211,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                                        String roleTypeUri1, String roleTypeUri2) {
+    public List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                                         String roleTypeUri1, String roleTypeUri2) {
         return queryAssociationIndex(
             assocTypeUri,
             roleTypeUri1, NodeType.TOPIC, topicId1, null,
@@ -224,7 +221,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+    public List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
         return queryAssociationIndex(
             assocTypeUri,
@@ -284,7 +281,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public void storeAssociationValue(long assocId, SimpleValue value, Collection<IndexMode> indexModes,
+    public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
                                                                        String indexKey, SimpleValue indexValue) {
         storeAndIndexAssociationValue(fetchAssociationNode(assocId), value.value(), indexModes, indexKey,
             getIndexValue(value, indexValue));
@@ -324,20 +321,20 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Traversal ===
 
     @Override
-    public Set<AssociationModel> fetchTopicAssociations(long topicId) {
+    public List<AssociationModel> fetchTopicAssociations(long topicId) {
         return fetchAssociations(fetchTopicNode(topicId));
     }
 
     @Override
-    public Set<AssociationModel> fetchAssociationAssociations(long assocId) {
+    public List<AssociationModel> fetchAssociationAssociations(long assocId) {
         return fetchAssociations(fetchAssociationNode(assocId));
     }
 
     // ---
 
     @Override
-    public Set<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+    public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
         return buildRelatedTopics(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.TOPIC, topicId, null,
@@ -346,7 +343,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    public List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
@@ -358,8 +355,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                                String othersRoleTypeUri, String othersTopicTypeUri) {
+    public List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
         return buildRelatedTopics(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     NodeType.ASSOC, assocId, null,
@@ -368,7 +365,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    public List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
@@ -380,8 +377,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Set<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
+    public List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
+                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
         return buildRelatedTopics(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     null,           id, null,
@@ -390,8 +387,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public Set<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
-                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
+    public List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
+                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociationIndex(
             assocTypeUri,
             myRoleTypeUri,     null,           id, null,
@@ -416,22 +413,22 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public Collection<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
+    public List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
         return buildTopics(queryIndexByProperty(topicContentExact, propUri, propValue));
     }
 
     @Override
-    public Collection<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
+    public List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
         return buildTopics(queryIndexByPropertyRange(topicContentExact, propUri, from, to));
     }
 
     @Override
-    public Collection<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
+    public List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
         return buildAssociations(queryIndexByProperty(assocContentExact, propUri, propValue));
     }
 
     @Override
-    public Collection<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
+    public List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return buildAssociations(queryIndexByPropertyRange(assocContentExact, propUri, from, to));
     }
 
@@ -562,7 +559,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private void storeAndIndexTopicValue(Node topicNode, Object value, Collection<IndexMode> indexModes,
+    private void storeAndIndexTopicValue(Node topicNode, Object value, List<IndexMode> indexModes,
                                                                        String indexKey, Object indexValue) {
         // store
         topicNode.setProperty(KEY_VALUE, value);
@@ -570,7 +567,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         indexNodeValue(topicNode, indexValue, indexModes, indexKey, topicContentExact, topicContentFulltext);
     }
 
-    private void storeAndIndexAssociationValue(Node assocNode, Object value, Collection<IndexMode> indexModes,
+    private void storeAndIndexAssociationValue(Node assocNode, Object value, List<IndexMode> indexModes,
                                                                              String indexKey, Object indexValue) {
         // store
         assocNode.setProperty(KEY_VALUE, value);
@@ -588,7 +585,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // === Indexing ===
 
-    private void indexNodeValue(Node node, Object value, Collection<IndexMode> indexModes, String indexKey,
+    private void indexNodeValue(Node node, Object value, List<IndexMode> indexModes, String indexKey,
                                                          Index<Node> exactIndex, Index<Node> fulltextIndex) {
         for (IndexMode indexMode : indexModes) {
             if (indexMode == IndexMode.OFF) {
@@ -713,7 +710,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private Set<AssociationModel> queryAssociationIndex(String assocTypeUri,
+    private List<AssociationModel> queryAssociationIndex(String assocTypeUri,
                                      String roleTypeUri1, NodeType playerType1, long playerId1, String playerTypeUri1,
                                      String roleTypeUri2, NodeType playerType2, long playerId2, String playerTypeUri2) {
         return buildAssociations(assocMetadata.query(buildAssociationQuery(assocTypeUri,
@@ -853,8 +850,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         );
     }
 
-    private Set<AssociationModel> buildAssociations(Iterable<Node> assocNodes) {
-        Set<AssociationModel> assocs = new HashSet();
+    private List<AssociationModel> buildAssociations(Iterable<Node> assocNodes) {
+        List<AssociationModel> assocs = new ArrayList();
         for (Node assocNode : assocNodes) {
             assocs.add(buildAssociation(assocNode));
         }
@@ -940,8 +937,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private Set<AssociationModel> fetchAssociations(Node node) {
-        Set<AssociationModel> assocs = new HashSet();
+    private List<AssociationModel> fetchAssociations(Node node) {
+        List<AssociationModel> assocs = new ArrayList();
         for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
             Node assocNode = rel.getStartNode();
             assocs.add(buildAssociation(assocNode));
@@ -1011,8 +1008,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // --- DeepaMehta Helper ---
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private Set<RelatedTopicModel> buildRelatedTopics(Collection<AssociationModel> assocs, long playerId) {
-        Set<RelatedTopicModel> relTopics = new HashSet();
+    private List<RelatedTopicModel> buildRelatedTopics(List<AssociationModel> assocs, long playerId) {
+        List<RelatedTopicModel> relTopics = new ArrayList();
         for (AssociationModel assoc : assocs) {
             relTopics.add(new RelatedTopicModel(
                 fetchTopic(
@@ -1024,8 +1021,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
-    private Set<RelatedAssociationModel> buildRelatedAssociations(Collection<AssociationModel> assocs, long playerId) {
-        Set<RelatedAssociationModel> relAssocs = new HashSet();
+    private List<RelatedAssociationModel> buildRelatedAssociations(List<AssociationModel> assocs, long playerId) {
+        List<RelatedAssociationModel> relAssocs = new ArrayList();
         for (AssociationModel assoc : assocs) {
             relAssocs.add(new RelatedAssociationModel(
                 fetchAssociation(

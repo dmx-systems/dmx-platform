@@ -8,7 +8,6 @@ import de.deepamehta.core.service.Directives;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 
 
@@ -26,9 +25,9 @@ public interface Type extends Topic {
 
     // --- Index Modes ---
 
-    Set<IndexMode> getIndexModes();
+    List<IndexMode> getIndexModes();
 
-    void setIndexModes(Set<IndexMode> indexModes);
+    void setIndexModes(List<IndexMode> indexModes);
 
     // --- Association Definitions ---
 

@@ -7,11 +7,9 @@ import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 
@@ -21,7 +19,7 @@ public abstract class TypeModel extends TopicModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;
-    private Set<IndexMode> indexModes;
+    private List<IndexMode> indexModes;
     private Map<String, AssociationDefinitionModel> assocDefs;  // is never null, may be empty
     private List<String> labelConfig;                           // is never null, may be empty
     private ViewConfigurationModel viewConfig;                  // is never null
@@ -33,13 +31,13 @@ public abstract class TypeModel extends TopicModel {
     public TypeModel(String uri, String topicTypeUri, SimpleValue value, String dataTypeUri) {
         super(uri, topicTypeUri, value);
         this.dataTypeUri = dataTypeUri;
-        this.indexModes = new HashSet();
+        this.indexModes = new ArrayList();
         this.assocDefs = new LinkedHashMap();
         this.labelConfig = new ArrayList();
         this.viewConfig = new ViewConfigurationModel();
     }
 
-    public TypeModel(TopicModel topic, String dataTypeUri, Set<IndexMode> indexModes,
+    public TypeModel(TopicModel topic, String dataTypeUri, List<IndexMode> indexModes,
                      List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                      ViewConfigurationModel viewConfig) {
         super(topic);
@@ -81,11 +79,11 @@ public abstract class TypeModel extends TopicModel {
 
     // === Index Modes ===
 
-    public Set<IndexMode> getIndexModes() {
+    public List<IndexMode> getIndexModes() {
         return indexModes;
     }
 
-    public void setIndexModes(Set<IndexMode> indexModes) {
+    public void setIndexModes(List<IndexMode> indexModes) {
         this.indexModes = indexModes;
     }
 

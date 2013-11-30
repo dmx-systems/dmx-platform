@@ -3,9 +3,9 @@ package de.deepamehta.plugins.topicmaps;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -14,7 +14,7 @@ public class ClusterCoords implements Iterable<ClusterCoords.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Set<Entry> entries = new HashSet();
+    private List<Entry> entries = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
