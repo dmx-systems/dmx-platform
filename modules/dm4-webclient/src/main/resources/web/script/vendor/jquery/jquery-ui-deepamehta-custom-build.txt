@@ -10,7 +10,9 @@ Font Settings:
 
 Corner Radius: 0
 
-Components (9):
+All background textures: flat
+
+Components (11):
     Core
     Widget
     Mouse
