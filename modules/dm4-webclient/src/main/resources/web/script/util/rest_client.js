@@ -1,3 +1,16 @@
+/**
+ * A REST client for the DeepaMehta Core Service.
+ *
+ * @param   config      Optional: an object with these properties:
+ *              on_send_request     Optional: the callback invoked before a request is sent (a function). One argument
+ *                                  is passed: the request, an object with these properties:
+ *                                      method
+ *                                      uri
+ *                                      header
+ *                                      data
+ *              process_directives  Optional: the callback invoked to process the directives received from the server.
+ *                                  (a function). One argument is passed: the directives (array of directive).
+ */
 function RESTClient(config) {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -302,7 +315,9 @@ function RESTClient(config) {
             headers: headers || {},
             data: data
         }
-        dm4c.fire_event("pre_send_request", request)
+        if (config && config.on_send_request) {
+            config.on_send_request(request)
+        }
         //
         var async = callback != undefined
         var status          // used only for synchronous request: "success" if request was successful

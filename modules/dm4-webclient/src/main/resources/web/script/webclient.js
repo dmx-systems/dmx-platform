@@ -27,8 +27,13 @@ dm4c = new function() {
     this.page_panel = null          // the page panel GUI component on the right hand side (a PagePanel object)
 
     // utilities
-    this.restc = new RESTClient({process_directives: process_directives})
-    this.ui = new GUIToolkit({on_open_menu: on_open_menu})
+    this.restc = new RESTClient({
+        on_send_request: on_send_request,
+        process_directives: process_directives
+    })
+    this.ui = new GUIToolkit({
+        on_open_menu: on_open_menu
+    })
     this.render = new RenderHelper()
     var pm = new PluginManager({
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
@@ -851,6 +856,10 @@ dm4c = new function() {
      */
     this.fire_event = function(event_name) {
         return pm.deliver_event.apply(undefined, arguments)
+    }
+
+    function on_send_request(request) {
+        dm4c.fire_event("pre_send_request", request)
     }
 
 
