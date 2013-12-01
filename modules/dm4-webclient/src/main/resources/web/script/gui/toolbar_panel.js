@@ -1,5 +1,8 @@
 function ToolbarPanel() {
 
+    var TYPE_URI_NOTE = "dm4.notes.note"    // ### TODO: Notes should not be a Webclient dependency
+    var CREATE_NOTE_BUTTON_TITLE = "Create a Note instantly [n]"
+
     var self = this
 
     // create "Search" widget
@@ -12,8 +15,11 @@ function ToolbarPanel() {
         .append(search_button)
     // create "Create" widget
     var create_menu = dm4c.ui.menu(do_create_topic, "Create")
+    var create_note_button = dm4c.ui.button({on_click: do_create_note, icon: "plus"})
+        .attr({title: CREATE_NOTE_BUTTON_TITLE, accesskey: "n"})
     var create_widget = $("<div>").attr({id: "create-widget"})
         .append(create_menu.dom)
+        .append(create_note_button)
     // create "Special" menu
     var special_menu = dm4c.ui.menu(undefined, "Help")  // renamed "Special" -> "Help" ### TODO: proper concept
     special_menu.dom.attr("id", "help-menu")
@@ -56,6 +62,10 @@ function ToolbarPanel() {
 
     function do_create_topic(menu_item) {
         dm4c.do_create_topic(menu_item.value)
+    }
+
+    function do_create_note() {
+        dm4c.do_create_topic(TYPE_URI_NOTE)
     }
 
     // === Helper ===
