@@ -87,9 +87,8 @@ dm4c.add_simple_renderer("dm4.webclient.text_renderer", {
 
                 // ### TODO: there is a copy in CheckboxRenderer
                 function option_topics(page_model) {
+                    var result = dm4c.fire_event("option_topics", page_model)
                     var topic_type_uri = page_model.object_type.uri
-                    var result = dm4c.fire_event("option_topics", page_model.toplevel_object, topic_type_uri,
-                                                                  page_model.assoc_def)
                     switch (result.length) {
                     case 0:
                         // fetch all instances                        // fetch_composite=false, sort=true

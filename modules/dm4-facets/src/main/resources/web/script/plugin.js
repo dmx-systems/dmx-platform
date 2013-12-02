@@ -16,7 +16,7 @@ dm4c.add_plugin("de.deepamehta.facets", function() {
         for (var i = 0; i < facet_types.length; i++) {
             var facet_type = dm4c.get_topic_type(facet_types[i].uri)
             var assoc_def = facet_type.assoc_defs[0]
-            dm4c.render.page_model.extend_composite_page_model(topic, assoc_def, "", topic, render_mode, page_model)
+            dm4c.render.page_model.extend_composite_page_model(topic, assoc_def, "", render_mode, page_model)
         }
     }
 })

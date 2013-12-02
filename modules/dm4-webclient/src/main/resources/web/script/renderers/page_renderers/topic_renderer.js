@@ -44,7 +44,7 @@
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object). ### FIXDOC
      */
     function create_page_model(topic, render_mode) {
-        return dm4c.render.page_model.create_page_model(topic, undefined, "", topic, render_mode)
+        return dm4c.render.page_model.create_page_model(topic, undefined, "", render_mode)
     }
 
     /**

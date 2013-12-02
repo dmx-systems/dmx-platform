@@ -39,11 +39,11 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
             function do_add() {
                 // extend page model
                 var topic = dm4c.empty_topic(topic_type.uri)
-                var assoc_def      = page_models[0].assoc_def
-                var field_uri      = page_models[0].uri
-                var toplevel_topic = page_models[0].toplevel_object
-                var page_model = dm4c.render.page_model.create_page_model(topic, assoc_def, field_uri, toplevel_topic,
-                    dm4c.render.page_model.mode.FORM)
+                var assoc_def         = page_models[0].assoc_def
+                var field_uri         = page_models[0].uri
+                var parent_page_model = page_models[0].parent
+                var page_model = dm4c.render.page_model.create_page_model(topic, assoc_def, field_uri,
+                    dm4c.render.page_model.mode.FORM, parent_page_model)
                 page_models.push(page_model)
                 // render page model
                 dm4c.render.page_model.render_page_model(page_model, dm4c.render.page_model.mode.FORM, level,
