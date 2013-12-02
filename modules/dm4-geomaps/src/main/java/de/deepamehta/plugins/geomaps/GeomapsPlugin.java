@@ -37,6 +37,7 @@ import javax.ws.rs.Consumes;
 
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -181,8 +182,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             Address address = new Address(topic.getCompositeValue().getModel());
             if (!address.isEmpty()) {
                 logger.info("### New " + address);
-                LonLat geoCoordinate = address.geocode();
-                storeGeoFacet(topic, geoCoordinate, clientState, directives);
+                geocodeAndStoreFacet(address, topic, clientState, directives);
             } else {
                 logger.info("### New empty address");
             }
@@ -193,12 +193,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            Address address    = new Address(topic.getModel().getCompositeValueModel());
+            Address address    = new Address(topic.getCompositeValue().getModel());
             Address oldAddress = new Address(oldModel.getCompositeValueModel());
             if (!address.equals(oldAddress)) {
                 logger.info("### Address changed:" + address.changeReport(oldAddress));
-                LonLat geoCoordinate = address.geocode();
-                storeGeoFacet(topic, geoCoordinate, clientState, directives);
+                geocodeAndStoreFacet(address, topic, clientState, directives);
             } else {
                 logger.info("### Address not changed");
             }
@@ -230,6 +229,16 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void geocodeAndStoreFacet(Address address, Topic topic, ClientState clientState, Directives directives) {
+        try {
+            LonLat geoCoordinate = address.geocode();
+            storeGeoFacet(topic, geoCoordinate, clientState, directives);
+        } catch (Exception e) {
+            // ### TODO: show to the user?
+            logger.log(Level.WARNING, "Adding geo facet to " + address + " failed", e);
+        }
+    }
 
     /**
      * Stores a geo facet for an address topic in the DB.
@@ -336,7 +345,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     .getJSONObject("location");
                 double lng = location.getDouble("lng");
                 double lat = location.getDouble("lat");
-                //
+                // create result
                 LonLat geoCoordinate = new LonLat(lng, lat);
                 logger.info("=> " + geoCoordinate);
                 return geoCoordinate;
@@ -370,12 +379,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof Address)) {
-                return false;
+            if (o instanceof Address) {
+                Address addr = (Address) o;
+                return street.equals(addr.street) && postalCode.equals(addr.postalCode) &&
+                    city.equals(addr.city) && country.equals(addr.country);
             }
-            Address addr = (Address) o;
-            return street.equals(addr.street) && postalCode.equals(addr.postalCode) &&
-                city.equals(addr.city) && country.equals(addr.country);
+            return false;
         }
 
         @Override
