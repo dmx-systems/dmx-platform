@@ -17,11 +17,16 @@
     position: fixed;
     display: none;
     overflow: auto;
-    z-index: 1000;
+    z-index: 1001;
+}
+
+.ui-menu .ui-menu-divider {
+    margin-top: 2px;            /* default is 5 pixel and leads to unequal      */
+    margin-bottom: 2px;         /* top/bottom margin of first/last menu items   */
 }
 
 .ui-front {                     /* Used for jQuery UI dialogs.  */
-    z-index: 1000;              /* jQuery UI default is 100.    */
+    z-index: 1001;              /* jQuery UI default is 100.    */
 }
 
 .ui-resizable-handle {
