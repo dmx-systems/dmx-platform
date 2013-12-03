@@ -84,7 +84,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                     function username_link() {
                         return dm4c.render.link(username, function() {
                             var user_account = dm4c.restc.get_topic_by_value("dm4.accesscontrol.user_account", username)
-                            dm4c.show_topic(new Topic(user_account), "show")
+                            dm4c.show_topic(new Topic(user_account), "show", undefined, true)   // coordinates=undefined
+                                                                                                // do_center=true
                         }, "Reveal the User Account topic")
                     }
 
