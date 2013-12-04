@@ -74,7 +74,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<? extends TopicModel> facetValues,
                                                       ClientState clientState, Directives directives) {
         // ### TODO: incorporate the Facets module into the DeepaMehta core?
         object.updateChildTopics(facetValues, getAssocDef(facetTypeUri), clientState, directives);

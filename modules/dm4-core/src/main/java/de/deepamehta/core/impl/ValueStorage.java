@@ -9,6 +9,7 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -97,6 +98,8 @@ class ValueStorage {
     /**
      * Stores and indexes the specified model's value, either a simple value or a composite value (child topics).
      * Depending on the model type's data type dispatches either to storeSimpleValue() or to storeCompositeValue().
+     * <p>
+     * Called to store the initial value of a newly created topic/association.
      */
     void storeValue(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
         if (getType(model).getDataTypeUri().equals("dm4.core.composite")) {
@@ -135,18 +138,22 @@ class ValueStorage {
 
     // === Helper ===
 
-    Topic associateChildTopic(TopicModel topicRef, DeepaMehtaObjectModel parent, AssociationDefinition assocDef,
-                                                                                 ClientState clientState) {
-        if (isReferenceById(topicRef)) {
-            associateChildTopic(topicRef.getId(), parent, assocDef, clientState);
-            return dms.getTopic(topicRef.getId(), false);                           // fetchComposite=false
-            // ### FIXME: fetchComposite?
-        } else if (isReferenceByUri(topicRef)) {
-            associateChildTopic(topicRef.getUri(), parent, assocDef, clientState);
-            return dms.getTopic("uri", new SimpleValue(topicRef.getUri()), false);  // fetchComposite=false
-            // ### FIXME: fetchComposite?
+    /**
+     * Creates an association between the given parent object ("Parent" role) and the referenced topic ("Child" role).
+     * The association type is taken from the given association definition.
+     */
+    Topic associateChildTopic(TopicReferenceModel childTopicRef, DeepaMehtaObjectModel parent,
+                                                              AssociationDefinition assocDef, ClientState clientState) {
+        if (childTopicRef.isReferenceById()) {
+            associateChildTopic(childTopicRef.getId(), parent, assocDef, clientState);
+            return dms.getTopic(childTopicRef.getId(), false);                           // fetchComposite=false
+            // ### FIXME: fetchComposite? Would storage.fetchTopic() be sufficient?
+        } else if (childTopicRef.isReferenceByUri()) {
+            associateChildTopic(childTopicRef.getUri(), parent, assocDef, clientState);
+            return dms.getTopic("uri", new SimpleValue(childTopicRef.getUri()), false);  // fetchComposite=false
+            // ### FIXME: fetchComposite? Would storage.fetchTopic() be sufficient?
         } else {
-            throw new RuntimeException("Not a topic reference (" + topicRef + ")");
+            throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");
         }
     }
 
@@ -164,23 +171,6 @@ class ValueStorage {
             parent.createRoleModel("dm4.core.parent"),
             new TopicRoleModel(childTopicUri, "dm4.core.child"), clientState
         );
-    }
-
-    // ---
-
-    /**
-     * Checks weather an update topic model represents a reference.
-     */
-    boolean isReference(TopicModel childTopic) {
-        return isReferenceById(childTopic) || isReferenceByUri(childTopic);
-    }
-
-    boolean isReferenceById(TopicModel childTopic) {
-        return childTopic.getId() != -1;
-    }
-
-    boolean isReferenceByUri(TopicModel childTopic) {
-        return !childTopic.getUri().equals("");     // ### FIXME: in an update topic model the URI might be null
     }
 
     // ---
@@ -227,6 +217,13 @@ class ValueStorage {
         }
     }
 
+    /**
+     * Called to store the initial value of a newly created topic/association.
+     * Just prepares the arguments and calls storeChildTopics() repetitively.
+     * <p>
+     * Note: the given model can contain childs not defined in the type definition.
+     * Only the childs defined in the type definition are stored.
+     */
     private void storeCompositeValue(DeepaMehtaObjectModel parent, ClientState clientState, Directives directives) {
         CompositeValueModel model = null;
         try {
@@ -309,10 +306,10 @@ class ValueStorage {
 
     private void storeAggregationOne(TopicModel model, DeepaMehtaObjectModel parent,
                                      AssociationDefinition assocDef, ClientState clientState, Directives directives) {
-        if (isReference(model)) {
+        if (model instanceof TopicReferenceModel) {
             // == create assignment ==
             // update DB
-            Topic childTopic = associateChildTopic(model, parent, assocDef, clientState);
+            Topic childTopic = associateChildTopic((TopicReferenceModel) model, parent, assocDef, clientState);
             // update memory
             putInCompositeValue(childTopic, parent, assocDef);
         } else {
@@ -327,10 +324,10 @@ class ValueStorage {
     private void storeAggregationMany(List<TopicModel> models, DeepaMehtaObjectModel parent,
                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         for (TopicModel model : models) {
-            if (isReference(model)) {
+            if (model instanceof TopicReferenceModel) {
                 // == create assignment ==
                 // update DB
-                Topic childTopic = associateChildTopic(model, parent, assocDef, clientState);
+                Topic childTopic = associateChildTopic((TopicReferenceModel) model, parent, assocDef, clientState);
                 // update memory
                 replaceReference(model, childTopic);
             } else {

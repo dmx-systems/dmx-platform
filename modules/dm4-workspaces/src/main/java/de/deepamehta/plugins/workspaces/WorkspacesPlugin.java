@@ -13,6 +13,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
@@ -269,9 +270,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        // Note: workspace_facet is a multi-facet. So we must pass a (one-element) list.
-        facetsService.updateFacets(object, "dm4.workspaces.workspace_facet", asList(new TopicModel(workspaceId)),
-            null, new Directives());    // clientState=null
+        // Note 1: workspace_facet is a multi-facet. So we must pass a (one-element) list.
+        // Note 2: we are refering to an existing workspace. So we must pass a topic reference.
+        facetsService.updateFacets(object, "dm4.workspaces.workspace_facet",
+            asList(new TopicReferenceModel(workspaceId)), null, new Directives());      // clientState=null
     }
 
     // --- Helper ---

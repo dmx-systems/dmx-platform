@@ -363,24 +363,24 @@ public class CompositeValueModel {
     /**
      * Puts a by-ID topic reference for a single-valued child.
      * An existing reference is overwritten.
-     *
+     * <p>
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.
      */
     public CompositeValueModel putRef(String childTypeUri, long refTopicId) {
-        put(childTypeUri, new TopicModel(refTopicId, childTypeUri));
+        put(childTypeUri, new TopicReferenceModel(refTopicId));
         return this;
     }
 
     /**
      * Puts a by-URI topic reference for a single-valued child.
      * An existing reference is overwritten.
-     *
+     * <p>
      * Used to maintain the assigment of an *aggregated* child.
      * Not applicable for a *compositioned* child.
      */
     public CompositeValueModel putRef(String childTypeUri, String refTopicUri) {
-        put(childTypeUri, new TopicModel(refTopicUri, childTypeUri));
+        put(childTypeUri, new TopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -430,7 +430,7 @@ public class CompositeValueModel {
      * Not applicable for *compositioned* childs.
      */
     public CompositeValueModel addRef(String childTypeUri, long refTopicId) {
-        add(childTypeUri, new TopicModel(refTopicId, childTypeUri));
+        add(childTypeUri, new TopicReferenceModel(refTopicId));
         return this;
     }
 
@@ -441,7 +441,7 @@ public class CompositeValueModel {
      * Not applicable for *compositioned* childs.
      */
     public CompositeValueModel addRef(String childTypeUri, String refTopicUri) {
-        add(childTypeUri, new TopicModel(refTopicUri, childTypeUri));
+        add(childTypeUri, new TopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -529,11 +529,11 @@ public class CompositeValueModel {
             if (value instanceof String) {
                 String val = (String) value;
                 if (val.startsWith(REF_ID_PREFIX)) {
-                    return new TopicModel(refTopicId(val), childTypeUri);   // topic reference by-ID
+                    return new TopicReferenceModel(refTopicId(val));    // topic reference by-ID
                 } else if (val.startsWith(REF_URI_PREFIX)) {
-                    return new TopicModel(refTopicUri(val), childTypeUri);  // topic reference by-URI
+                    return new TopicReferenceModel(refTopicUri(val));   // topic reference by-URI
                 } else if (val.startsWith(DEL_PREFIX)) {
-                    return new TopicDeletionModel(delTopicId(val));         // topic deletion reference
+                    return new TopicDeletionModel(delTopicId(val));     // topic deletion reference
                 }
             }
             // compact format (simple topic)

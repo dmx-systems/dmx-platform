@@ -10,6 +10,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
@@ -226,13 +227,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public CompositeValue setRef(String childTypeUri, long refTopicId, ClientState clientState, Directives directives) {
-        return _update(childTypeUri, new TopicModel(refTopicId, childTypeUri), clientState, directives);
+        return _update(childTypeUri, new TopicReferenceModel(refTopicId), clientState, directives);
     }
 
     @Override
     public CompositeValue setRef(String childTypeUri, String refTopicUri, ClientState clientState,
                                                                           Directives directives) {
-        return _update(childTypeUri, new TopicModel(refTopicUri, childTypeUri), clientState, directives);
+        return _update(childTypeUri, new TopicReferenceModel(refTopicUri), clientState, directives);
     }
 
     // ---
@@ -280,7 +281,7 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics,
+    void updateChildTopics(TopicModel newChildTopic, List<? extends TopicModel> newChildTopics,
                                    AssociationDefinition assocDef, ClientState clientState, Directives directives) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
@@ -385,7 +386,7 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    private void updateCompositionMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+    private void updateCompositionMany(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
                                                                        ClientState clientState, Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
@@ -427,26 +428,22 @@ class AttachedCompositeValue implements CompositeValue {
     private void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef,
                                                                 ClientState clientState, Directives directives) {
         RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
-        if (dms.valueStorage.isReference(newChildTopic)) {
+        if (newChildTopic instanceof TopicReferenceModel) {
             if (childTopic != null) {
-                if (isReferingTo(newChildTopic, childTopic)) {
+                if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
                     return;
                 }
                 // == update assignment ==
                 // update DB
                 childTopic.getRelatingAssociation().delete(directives);
-                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
-                    clientState);
-                // update memory
-                putInCompositeValue(topic, assocDef);
             } else {
                 // == create assignment ==
-                // update DB
-                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
-                    clientState);
-                // update memory
-                putInCompositeValue(topic, assocDef);
             }
+            // update DB
+            Topic topic = dms.valueStorage.associateChildTopic((TopicReferenceModel) newChildTopic,
+                parent.getModel(), assocDef, clientState);
+            // update memory
+            putInCompositeValue(topic, assocDef);
         } else {
             // == create child ==
             // update DB
@@ -460,7 +457,7 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    private void updateAggregationMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+    private void updateAggregationMany(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
                                                                        ClientState clientState, Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
@@ -476,16 +473,16 @@ class AttachedCompositeValue implements CompositeValue {
                 childTopic.getRelatingAssociation().delete(directives);
                 // update memory
                 removeFromCompositeValue(childTopic, assocDef);
-            } else if (dms.valueStorage.isReference(newChildTopic)) {
-                if (isReferingTo(newChildTopic, assocDef)) {
+            } else if (newChildTopic instanceof TopicReferenceModel) {
+                if (isReferingToAny((TopicReferenceModel) newChildTopic, assocDef)) {
                     // Note: "create assignment" is an idempotent operation. A create request for an assignment which
                     // exists already is not an error. Instead, nothing is performed.
                     continue;
                 }
                 // == create assignment ==
                 // update DB
-                Topic topic = dms.valueStorage.associateChildTopic(newChildTopic, parent.getModel(), assocDef,
-                    clientState);
+                Topic topic = dms.valueStorage.associateChildTopic((TopicReferenceModel) newChildTopic,
+                    parent.getModel(), assocDef, clientState);
                 // update memory
                 addToCompositeValue(topic, assocDef);
             } else {
@@ -644,37 +641,14 @@ class AttachedCompositeValue implements CompositeValue {
         return null;
     }
 
-    // ---
-
     /**
-     * Checks weather the specified topic reference refers to any of the child topics.
+     * Checks weather the given topic reference refers to any of the child topics.
      *
      * @param   assocDef    the child topics according to this association definition are considered.
      */
-    private boolean isReferingTo(TopicModel topicRef, AssociationDefinition assocDef) {
-        List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
-        for (Topic childTopic : childTopics) {
-            if (isReferingTo(topicRef, childTopic)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean isReferingToAny(TopicReferenceModel topicRef, AssociationDefinition assocDef) {
+        return topicRef.isReferingToAny(_getTopics(assocDef.getChildTypeUri(), new ArrayList()));
     }
-
-    /**
-     * Checks weather the specified topic reference refers the specified topic.
-     */
-    private boolean isReferingTo(TopicModel topicRef, Topic topic) {
-        if (dms.valueStorage.isReferenceById(topicRef)) {
-            return topicRef.getId() == topic.getId();
-        } else if (dms.valueStorage.isReferenceByUri(topicRef)) {
-            return topicRef.getUri().equals(topic.getUri());
-        } else {
-            throw new RuntimeException("Not a topic reference (" + topicRef + ")");
-        }
-    }
-
-    // ---
 
     private AssociationDefinition getAssocDef(String childTypeUri) {
         // Note: doesn't work for facets

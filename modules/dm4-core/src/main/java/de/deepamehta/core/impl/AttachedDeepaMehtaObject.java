@@ -199,13 +199,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                           ClientState clientState, Directives directives) {
+                                                                    ClientState clientState, Directives directives) {
         getCompositeValue().updateChildTopics(newChildTopic, null, assocDef, clientState, directives);
     }
 
     @Override
-    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                   ClientState clientState, Directives directives) {
+    public void updateChildTopics(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                                    ClientState clientState, Directives directives) {
         getCompositeValue().updateChildTopics(null, newChildTopics, assocDef, clientState, directives);
     }
 

@@ -63,7 +63,7 @@ public interface FacetsService extends PluginService {
      * @param   facetValues     The new facet values.
      * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
-    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<? extends TopicModel> facetValues,
                                                                     ClientState clientState, Directives directives);
 
     // ---
