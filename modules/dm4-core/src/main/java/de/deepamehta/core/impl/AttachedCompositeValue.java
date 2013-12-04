@@ -378,11 +378,7 @@ class AttachedCompositeValue implements CompositeValue {
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             // == create child ==
-            // update DB
-            childTopic = dms.createTopic(newChildTopic, clientState);
-            dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
-            // update memory
-            putInCompositeValue(childTopic, assocDef);
+            createChildTopicOne(newChildTopic, assocDef, clientState, directives);
         }
     }
 
@@ -403,22 +399,11 @@ class AttachedCompositeValue implements CompositeValue {
                 // update memory
                 removeFromCompositeValue(childTopic, assocDef);
             } else if (childTopicId != -1) {
-                Topic childTopic = findChildTopic(childTopicId, assocDef);
-                if (childTopic == null) {
-                    throw new RuntimeException("Topic " + childTopicId + " is not a child of " +
-                        parent.className() + " " + parent.getId() + " according to " + assocDef);
-                }
                 // == update child ==
-                // update DB
-                childTopic.update(newChildTopic, clientState, directives);
-                // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+                updateChildTopicMany(newChildTopic, assocDef, clientState, directives);
             } else {
                 // == create child ==
-                // update DB
-                Topic childTopic = dms.createTopic(newChildTopic, clientState);
-                dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
-                // update memory
-                addToCompositeValue(childTopic, assocDef);
+                createChildTopicMany(newChildTopic, assocDef, clientState, directives);
             }
         }
     }
@@ -444,16 +429,16 @@ class AttachedCompositeValue implements CompositeValue {
                 parent.getModel(), assocDef, clientState);
             // update memory
             putInCompositeValue(topic, assocDef);
+        } else if (newChildTopic.getId() != -1) {
+            // == update child ==
+            updateChildTopicOne(newChildTopic, assocDef, clientState, directives);
         } else {
             // == create child ==
             // update DB
             if (childTopic != null) {
                 childTopic.getRelatingAssociation().delete(directives);
             }
-            Topic topic = dms.createTopic(newChildTopic, clientState);
-            dms.valueStorage.associateChildTopic(topic.getId(), parent.getModel(), assocDef, clientState);
-            // update memory
-            putInCompositeValue(topic, assocDef);
+            createChildTopicOne(newChildTopic, assocDef, clientState, directives);
         }
     }
 
@@ -485,15 +470,62 @@ class AttachedCompositeValue implements CompositeValue {
                     parent.getModel(), assocDef, clientState);
                 // update memory
                 addToCompositeValue(topic, assocDef);
+            } else if (childTopicId != -1) {
+                // == update child ==
+                updateChildTopicMany(newChildTopic, assocDef, clientState, directives);
             } else {
                 // == create child ==
-                // update DB
-                Topic topic = dms.createTopic(newChildTopic, clientState);
-                dms.valueStorage.associateChildTopic(topic.getId(), parent.getModel(), assocDef, clientState);
-                // update memory
-                addToCompositeValue(topic, assocDef);
+                createChildTopicMany(newChildTopic, assocDef, clientState, directives);
             }
         }
+    }
+
+    // ---
+
+    private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
+                                                                                               Directives directives) {
+        RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
+        if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
+            // update DB
+            childTopic.update(newChildTopic, clientState, directives);
+            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+        } else {
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
+                parent.className() + " " + parent.getId() + " according to " + assocDef);
+        }
+    }
+
+    private void updateChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
+                                                                                                Directives directives) {
+        Topic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
+        if (childTopic != null) {
+            // update DB
+            childTopic.update(newChildTopic, clientState, directives);
+            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+        } else {
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
+                parent.className() + " " + parent.getId() + " according to " + assocDef);
+        }
+    }
+
+    // ---
+
+    private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
+                                                                                               Directives directives) {
+        // update DB
+        Topic childTopic = dms.createTopic(newChildTopic, clientState);
+        dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
+        // update memory
+        putInCompositeValue(childTopic, assocDef);
+    }
+
+    private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
+                                                                                               Directives directives) {
+        // update DB
+        Topic childTopic = dms.createTopic(newChildTopic, clientState);
+        dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
+        // update memory
+        addToCompositeValue(childTopic, assocDef);
     }
 
     // ---
@@ -566,6 +598,35 @@ class AttachedCompositeValue implements CompositeValue {
 
     // === Update ===
 
+    // --- Update this attached object cache + underlying model ---
+
+    /**
+     * For single-valued childs
+     */
+    private void putInCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        put(childTypeUri, childTopic);                              // attached object cache
+        getModel().put(childTypeUri, childTopic.getModel());        // underlying model
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void addToCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        add(childTypeUri, childTopic);                              // attached object cache
+        getModel().add(childTypeUri, childTopic.getModel());        // underlying model
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void removeFromCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        remove(childTypeUri, childTopic);                           // attached object cache
+        getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
+    }
+
     // --- Update this attached object cache ---
 
     /**
@@ -596,35 +657,6 @@ class AttachedCompositeValue implements CompositeValue {
         if (topics != null) {
             topics.remove(topic);
         }
-    }
-
-    // --- Update this attached object cache + underlying model ---
-
-    /**
-     * For single-valued childs
-     */
-    private void putInCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        put(childTypeUri, childTopic);                              // attached object cache
-        getModel().put(childTypeUri, childTopic.getModel());        // underlying model
-    }
-
-    /**
-     * For multiple-valued childs
-     */
-    private void addToCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        add(childTypeUri, childTopic);                              // attached object cache
-        getModel().add(childTypeUri, childTopic.getModel());        // underlying model
-    }
-
-    /**
-     * For multiple-valued childs
-     */
-    private void removeFromCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        remove(childTypeUri, childTopic);                           // attached object cache
-        getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
     }
 
 
