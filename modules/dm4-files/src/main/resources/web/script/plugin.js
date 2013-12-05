@@ -154,12 +154,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
 
         function do_open_upload_dialog() {
-            var path = topic.get("dm4.files.path")
-            self.open_upload_dialog(path, show_response)
-
-            function show_response(response) {
-                alert("Upload response=" + JSON.stringify(response))
-            }
+            self.open_upload_dialog(topic.get("dm4.files.path"), dm4c.page_panel.refresh)
         }
     })
 
@@ -215,10 +210,14 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     // ---
 
     /**
+     * Opens a dialog to allow the user to choose a local file and upload it to the server. At server side
+     * the file is stored in the DeepaMehta file repository. A corresponding File topic is created.
+     *
      * @param   path        the file repository path (a string) to upload the selected file to. Must begin with "/".
-     * @param   callback    the function that is invoked once the file has been uploaded and processed at server-side.
-     *                      One argument is passed to that function: the object (deserialzed JSON)
-     *                      returned by the (server-side) executeCommandHook. ### FIXDOC
+     * @param   callback    the function invoked once the file has been uploaded and processed at server-side.
+     *                      One argument is passed: an object with 2 properties:
+     *                          file_name   -- the name of the uploaded file
+     *                          topic_id    -- the ID of the File topic created
      */
     this.open_upload_dialog = (function() {
 
