@@ -769,7 +769,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     /**
-     * Factory method.
+     * Factory method: creates a new topic type in the DB according to the given topic type model
+     * and returns a topic type instance.
      */
     private TopicType topicTypeFactory(TopicTypeModel model) {
         // 1) store in DB
@@ -784,7 +785,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     /**
-     * Factory method.
+     * Factory method: creates a new association type in the DB according to the given association type model
+     * and returns a topic type instance.
      */
     private AssociationType associationTypeFactory(AssociationTypeModel model) {
         // 1) store in DB

@@ -22,20 +22,25 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * A composite value model that is attached to the DB.
+ */
 class AttachedCompositeValue implements CompositeValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    /**
-     * Internal representation.
-     * Key: String, value: AttachedTopic or List<AttachedTopic>
-     */
-    private Map<String, Object> childTopics = new HashMap();
+    private CompositeValueModel model;                          // underlying model
 
-    private CompositeValueModel model;
-    private AttachedDeepaMehtaObject parent;
+    private AttachedDeepaMehtaObject parent;                    // attached object cache
+
+    /**
+     * Attached object cache.
+     * Key: child type URI (String), value: AttachedTopic or List<AttachedTopic>
+     */
+    private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
     private EmbeddedService dms;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -359,8 +364,11 @@ class AttachedCompositeValue implements CompositeValue {
 
     private CompositeValue _update(String childTypeUri, TopicModel newChildTopic, ClientState clientState,
                                                                                   Directives directives) {
+        // regard parent object as updated
+        parent.addUpdateDirective(directives);
+        //
         updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri), clientState, directives);
-        dms.valueStorage.refreshLabel(parent.getModel());
+        dms.valueStorage.refreshLabel(parent.getModel());                         // newChildTopics=null
         return this;
     }
 

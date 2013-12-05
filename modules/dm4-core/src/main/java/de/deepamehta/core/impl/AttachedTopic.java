@@ -94,7 +94,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         TopicModel oldModel = getModel().clone();
         super.update(model, clientState, directives);
         //
-        directives.add(Directive.UPDATE_TOPIC, this);
+        addUpdateDirective(directives);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
     }
@@ -205,6 +205,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
+    void addUpdateDirective(Directives directives) {
+        directives.add(Directive.UPDATE_TOPIC, this);
+    }
+
+    @Override
     final void storeUri() {
         dms.storage.storeTopicUri(getId(), getUri());
     }
@@ -231,6 +236,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         return dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

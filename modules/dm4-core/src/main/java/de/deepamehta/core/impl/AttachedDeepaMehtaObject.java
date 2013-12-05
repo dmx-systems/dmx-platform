@@ -2,21 +2,15 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.CompositeValue;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
-import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
-import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
@@ -24,14 +18,13 @@ import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
 /**
- * DeepaMehtaObject implementation that takes a DeepaMehtaObjectModel and attaches it to the DB.
+ * A DeepaMehta object model that is attached to the DB.
  *
  * Method name conventions and semantics:
  *  - getXX()           Reads from memory (model).
@@ -46,10 +39,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModel model;
-    protected final EmbeddedService dms;
+    private DeepaMehtaObjectModel model;            // underlying model
 
     private AttachedCompositeValue childTopics;     // attached object cache
+
+    protected final EmbeddedService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -317,6 +311,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract String className();
+
+    abstract void addUpdateDirective(Directives directives);
 
     abstract void storeUri();
 

@@ -65,7 +65,7 @@ public interface Type extends Topic {
 
     List<String> getLabelConfig();
 
-    void setLabelConfig(List<String> labelConfig);
+    void setLabelConfig(List<String> labelConfig, Directives directives);
 
     // --- View Configuration ---
 

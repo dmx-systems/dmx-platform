@@ -143,11 +143,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void setLabelConfig(List<String> labelConfig) {
+    public void setLabelConfig(List<String> labelConfig, Directives directives) {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs());
+        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs(), directives);
     }
 
     // --- View Configuration ---
@@ -191,7 +191,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         updateDataTypeUri(model.getDataTypeUri());
         updateAssocDefs(model.getAssocDefs(), clientState, directives);
         updateSequence(model.getAssocDefs());
-        updateLabelConfig(model.getLabelConfig());
+        updateLabelConfig(model.getLabelConfig(), directives);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -271,10 +271,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateLabelConfig(List<String> newLabelConfig) {
+    private void updateLabelConfig(List<String> newLabelConfig, Directives directives) {
         if (!getLabelConfig().equals(newLabelConfig)) {
             logger.info("### Changing label configuration");
-            setLabelConfig(newLabelConfig);
+            setLabelConfig(newLabelConfig, directives);
         }
     }
 

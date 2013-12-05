@@ -39,7 +39,6 @@ import java.util.logging.Logger;
 
 /**
  * Helper for storing and fetching type models.
- * ### TODO: rename class.
  */
 class TypeStorageImpl implements TypeStorage {
 
@@ -61,7 +60,7 @@ class TypeStorageImpl implements TypeStorage {
 
 
 
-    // === Type Cache ===
+    // === Type Model Cache ===
 
     private TypeModel getType(String typeUri) {
         return typeCache.get(typeUri);
@@ -157,6 +156,12 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
+    /**
+     * Stores the type-specific parts of the given type model.
+     * Prerequisite: the generic topic parts are stored already.
+     * <p>
+     * Called to store a newly created topic type or association type.
+     */
     void storeType(TypeModel type) {
         // 1) put in type cache
         // Note: an association type must be put in type cache *before* storing its association definitions.
@@ -167,7 +172,7 @@ class TypeStorageImpl implements TypeStorage {
         associateDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getUri(), type.getAssocDefs());
-        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
+        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs(), new Directives());
         storeViewConfig(createConfigurableType(type.getId()), type.getViewConfigModel());
     }
 
@@ -553,11 +558,12 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs,
+                                                                                Directives directives) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
             new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
-                .set("dm4.core.include_in_label", includeInLabel, null, new Directives());
+                .set("dm4.core.include_in_label", includeInLabel, null, directives);    // clientState=null
         }
     }
 

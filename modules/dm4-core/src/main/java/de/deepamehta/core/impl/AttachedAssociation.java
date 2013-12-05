@@ -27,14 +27,14 @@ import java.util.logging.Logger;
 
 
 /**
- * An association that is attached to the {@link DeepaMehtaService}.
+ * An association model that is attached to the DB.
  */
 class AttachedAssociation extends AttachedDeepaMehtaObject implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Role role1;     // Attached object cache
-    private Role role2;     // Attached object cache
+    private Role role1;     // attached object cache
+    private Role role2;     // attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -189,7 +189,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
-        directives.add(Directive.UPDATE_ASSOCIATION, this);
+        addUpdateDirective(directives);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, clientState, directives);
     }
@@ -286,6 +286,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     final String className() {
         return "association";
+    }
+
+    @Override
+    void addUpdateDirective(Directives directives) {
+        directives.add(Directive.UPDATE_ASSOCIATION, this);
     }
 
     @Override

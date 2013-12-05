@@ -162,10 +162,25 @@ public interface CompositeValue {
 
     // === Manipulators ===
 
+    /**
+     * Sets a child.
+     * Works for both, single-valued child and multiple-valued child (cardinality "many").
+     */
     CompositeValue set(String childTypeUri, TopicModel value,          ClientState clientState, Directives directives);
 
+    /**
+     * Convenience method to set the simple value of a child.
+     * Works for both, single-valued child and multiple-valued child (cardinality "many").
+     *
+     * @param   value   The simple value.
+     *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
+     */
     CompositeValue set(String childTypeUri, Object value,              ClientState clientState, Directives directives);
 
+    /**
+     * Convenience method to set the composite value of a child.
+     * Works for both, single-valued child and multiple-valued child (cardinality "many").
+     */
     CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState, Directives directives);
 
     // ---

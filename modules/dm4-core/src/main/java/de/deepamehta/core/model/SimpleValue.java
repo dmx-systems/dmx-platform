@@ -13,6 +13,10 @@ public class SimpleValue {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    /**
+     * The (auto-boxed) wrapped value.
+     * Either String, Integer, Long, Double, or Boolean.
+     */
     private Object value;
 
     private Logger logger = Logger.getLogger(getClass().getName());
