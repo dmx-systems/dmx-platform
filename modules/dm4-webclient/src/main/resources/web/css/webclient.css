@@ -1,6 +1,7 @@
 body {
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
     margin: 0;
+    word-wrap: break-word;
 }
 
 /*** Main Toolbar ***/
