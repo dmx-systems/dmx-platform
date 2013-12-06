@@ -4,18 +4,14 @@ import de.deepamehta.core.impl.EmbeddedService;
 import de.deepamehta.core.impl.StorageDecorator;
 import de.deepamehta.core.impl.WebPublishingService;
 import de.deepamehta.core.service.DeepaMehtaService;
-
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 

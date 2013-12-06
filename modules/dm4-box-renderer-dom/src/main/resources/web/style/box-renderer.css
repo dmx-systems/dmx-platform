@@ -1,0 +1,67 @@
+/* Topic */
+
+#topicmap-panel .topic {
+    padding-top:    2px;
+    padding-bottom: 2px;
+    padding-left:   4px;
+    padding-right: 12px;
+}
+
+#topicmap-panel .topic .topic-label {
+    max-width: 200px;
+    min-width:  18px;   /* draggable handle for empty topics */
+    min-height: 18px;   /* draggable handle for empty topics */
+}
+
+#topicmap-panel .topic.expanded .topic-label {
+    font-weight: bold;
+    max-width: 360px;
+}
+
+#topicmap-panel .topic .topic-content {
+    display: none;
+    max-width: 360px;
+}
+
+#topicmap-panel .topic.expanded .topic-content {
+    display: block;
+}
+
+#topicmap-panel .topic .expansion-handle-container {
+    position: relative;
+}
+
+#topicmap-panel .topic .expansion-handle {
+    display: none;
+    position: absolute;
+    top:   -3px;
+    left: -10px;
+}
+
+#topicmap-panel .topic:hover .expansion-handle {
+    display: block;
+}
+
+#topicmap-panel .topic .type-icon {
+    position: absolute;
+    bottom: -5px;
+    right:  -5px;
+    cursor: crosshair;
+}
+
+/* Color Dialog */
+
+#color-dialog {
+    min-height: 0px !important;     /* Overrides style attribute */
+}
+
+#color-dialog .color-box {
+    width:  32px;
+    height: 32px;
+    margin:  3px;
+    float: left;
+}
+
+#color-dialog .color-box.selected {
+    box-shadow: 0 0 1em blue;
+}
