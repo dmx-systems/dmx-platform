@@ -78,6 +78,9 @@ function RenderHelper() {
         }
         return table
 
+        /**
+         * @param   spot    "label" or "icon".
+         */
         function click_handler_for(topic, spot) {
             // create no handler for the "icon" spot if the topic is already visible on canvas
             if (spot == "icon" && dm4c.topicmap_renderer.is_topic_visible(topic.id)) {
@@ -143,6 +146,7 @@ function RenderHelper() {
     /**
      * Renders a topic icon and optionally attaches a click handler to it.
      *
+     * @param   topic       The topic whose icon is rendered.
      * @param   handler     Optional: the click handler.
      *                      If not specified the icon is rendered as disabled and doesn't respond to clicks.
      * @param   title       Optional: the tooltip title.
@@ -171,20 +175,24 @@ function RenderHelper() {
      * Renders a topic type icon.
      *
      * @param   type_uri    The topic type URI.
-     * @param   title       Optional: the tooltip title.
-     *                      If not specified the topic type name is used.
+     * @param   title       Optional: the tooltip title. If not specified the topic type name is used.
      *
-     * @return  An <img> element of CSS class "type-icon" (jQuery object).
+     * @return  An <img> element of CSS class "icon" (jQuery object).
      */
     this.type_icon = function(type_uri, title) {
-        var src = dm4c.get_type_icon_src(type_uri)
-        title = title || dm4c.topic_type_name(type_uri)
-        return this.icon(src, title)
+        return this.icon(dm4c.get_type_icon_src(type_uri), title || dm4c.topic_type_name(type_uri))
     }
 
+    /**
+     * Renders an icon.
+     *
+     * @param   src         The icon URL.
+     * @param   title       Optional: the tooltip title. If not specified no tooltip will appear.
+     *
+     * @return  An <img> element of CSS class "icon" (jQuery object).
+     */
     this.icon = function(src, title) {
-        title = title || src
-        return $("<img>").attr({src: src, title: title}).addClass("type-icon")
+        return $("<img>").attr({src: src, title: title}).addClass("icon")
     }
 
     // ---

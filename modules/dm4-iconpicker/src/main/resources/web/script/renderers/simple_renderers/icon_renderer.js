@@ -6,13 +6,16 @@
 
         render_info: function(page_model, parent_element) {
             dm4c.render.field_label(page_model, parent_element)
-            parent_element.append(dm4c.render.icon(page_model.value))
+            parent_element.append(dm4c.render.icon(page_model.value, page_model.value))
         },
 
         render_form: function(page_model, parent_element) {
             var picked_icon = null                  // a topic of type "dm4.webclient.icon"
-            var image = dm4c.render.icon(page_model.value)
-            parent_element.append(image.add(dm4c.ui.button({on_click: do_open_iconpicker, label: "Choose"})))
+            var image = dm4c.render.icon(page_model.value, page_model.value)
+            parent_element.addClass("iconpicker")
+                .append(image)
+                .append(dm4c.ui.button({on_click: do_open_iconpicker, label: "Choose"}))
+                
             //
             return function() {
                 // prevent the field from being updated if no icon has been selected
@@ -38,7 +41,9 @@
                 // fill dialog with icons
                 iconpicker_dialog.empty()
                 for (var i = 0, icon_topic; icon_topic = icon_topics[i]; i++) {
-                    iconpicker_dialog.append(dm4c.render.icon(icon_topic.value).click(do_pick_icon(icon_topic)))
+                    iconpicker_dialog.append(dm4c.render.icon(icon_topic.value, icon_topic.value)
+                        .click(do_pick_icon(icon_topic))
+                    )
                 }
                 // open dialog
                 iconpicker_dialog.open()

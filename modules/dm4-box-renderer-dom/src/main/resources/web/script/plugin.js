@@ -117,7 +117,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
         }
 
         this.topic_dom_draggable_handle = function(topic_dom, handles) {
-            handles.push($(".topic-label, .topic-content", topic_dom))
+            handles.push(topic_dom.find(".topic-label, .topic-content"))
         }
 
         // ---
@@ -152,12 +152,12 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
 
         function sync_topic_content(topic_view) {
             // label
-            $(".topic-label", topic_view.dom).text(topic_view.label)
+            topic_view.dom.find(".topic-label").text(topic_view.label)
             // content
             if (topic_view.type_uri == "dm4.notes.note") {
                 // Note: newly created topics have an empty composite
                 var text = topic_view.composite["dm4.notes.text"]
-                text && $(".topic-content", topic_view.dom).html(text.value)
+                text && topic_view.dom.find(".topic-content").html(text.value)
             }
         }
 
@@ -170,7 +170,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             if (topic_view.type_uri == "dm4.notes.note") {
                 // Note: when undefined is passed as 2nd argument toggleClass() performs its 1-arg form
                 var expanded = topic_view.view_props[PROP_EXPANDED] == true
-                var expansion_handle = $(".expansion-handle", topic_view.dom)
+                var expansion_handle = topic_view.dom.find(".expansion-handle")
                 //
                 expansion_handle.attr("src", expanded ? IMG_SRC_EXPANDED : IMG_SRC_COLLAPSED)
                 topic_view.dom.toggleClass("expanded", expanded)
@@ -189,7 +189,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             var topic_dom = topic_view.dom
             // recreate type icon (the size might have changed through retyping)
             var type_icon = $("<img>").addClass("type-icon")
-            $(".type-icon", topic_dom).remove()
+            topic_dom.find(".type-icon").remove()
             topic_dom.append(type_icon)
             //
             set_src()

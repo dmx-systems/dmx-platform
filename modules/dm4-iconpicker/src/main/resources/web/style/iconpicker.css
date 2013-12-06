@@ -1,8 +1,9 @@
-.type-icon + .ui-button {
-    margin-left: 1em !important;
+.iconpicker .icon {
+    vertical-align: middle;
+    margin-right: 1em;
 }
 
-#iconpicker-dialog .type-icon {
+#iconpicker-dialog .icon {
     padding-right:  1em;
     padding-bottom: 1em;
 }

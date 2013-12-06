@@ -147,7 +147,7 @@ function GUIToolkit(config) {
     // === Prompt ===
 
     this.prompt = function(title, input_label, button_label, callback) {
-        var input = dm4c.render.input(undefined, 30).keyup(function(event) {
+        var input = dm4c.render.input(undefined, 30).keyup(function(event) {    // ### TODO: remove dm4c dependency
             if (event.which == 13) {
                 do_submit()
             }
@@ -263,7 +263,7 @@ function GUIToolkit(config) {
                 var anchor = $("<a>").attr("href", "#")
                 if (item.icon) {
                     anchor.append(
-                        $("<img>").attr("src", item.icon).addClass("menu-icon")
+                        $("<img>").attr("src", item.icon).addClass("icon")
                     )
                 }
                 anchor.append(item.label)
