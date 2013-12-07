@@ -2,7 +2,6 @@ dm4c = new function() {
 
     // preferences
     this.MAX_RESULT_SIZE = 100
-    this.MAX_TOPIC_LINK_CHARS = 50
     this.MAX_TOPIC_LABEL_CHARS = 100
     this.MAX_TOPIC_LABEL_WIDTH = 200    // in pixel
     this.ASSOC_WIDTH = 4

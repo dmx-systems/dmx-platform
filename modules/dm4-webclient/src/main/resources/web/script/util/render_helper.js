@@ -153,12 +153,8 @@ function RenderHelper() {
     }
 
     this.link_text = function(topic) {
-        if (dm4c.get_topic_type(topic.type_uri).data_type_uri == "dm4.core.html") {
-            var text = js.strip_html(topic.value)
-        } else {
-            var text = topic.value
-        }
-        return js.truncate(text, dm4c.MAX_TOPIC_LINK_CHARS)
+        var is_html = dm4c.get_topic_type(topic.type_uri).data_type_uri == "dm4.core.html"
+        return is_html ? js.strip_html(topic.value) : topic.value
     }
 
     /**
