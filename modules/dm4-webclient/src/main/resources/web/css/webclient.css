@@ -222,27 +222,16 @@ body {
 
 /*** Topic Lists ***/
 
-.topic-list {
-    border-spacing: 0;
-}
-
-.topic-list:first-child {
-    margin-top: 1em;
-}
-
-.topic-list > tbody > tr > td {
-    padding: 0.3em 0;
-    vertical-align: top;
-}
-
-.topic-list p {
-    line-height: 1.2em;
-    margin-bottom: 0.6em;
+.topic-list > div {
+    position: relative;
+    margin-top: 0.6em;
+    margin-left: 3em;
 }
 
 .topic-list .icon {
-    margin-left: 1em;
-    margin-right: 0.75em;
+    position: absolute;
+    top: -0.1em;
+    left: -2.1em;
     width: 24px;
     cursor: pointer;
 }

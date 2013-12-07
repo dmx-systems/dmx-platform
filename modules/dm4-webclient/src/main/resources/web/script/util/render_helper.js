@@ -31,8 +31,7 @@ function RenderHelper() {
     // ---
 
     /**
-     * Renders a clickable list of topics, one topic per row.
-     * Each row renders the topic's icon and the topic's label.
+     * Renders a clickable list of topics. Each list item consist of the topic's icon and the topic's label.
      *
      * @param   topics          Topics to render (array of Topic objects).
      *                          Note: actually the array can contain any kind of objects as long as each object
@@ -43,16 +42,18 @@ function RenderHelper() {
      *                              "uri"      -- Optional. If set it is rendered in the tooltip
      *                              "assoc"    -- Optional. If set the assoc's type name is rendered beneath the topic
      *
-     * @param   click_handler   Optional: the handler called when a topic is clicked. 2 arguments are passed:
-     *                              1) the clicked topic (an object)
-     *                              2) the spot where the topic has been clicked: "icon" or "label" (a string).
-     *                          If no click handler is specified the default handler is used. The default handler
-     *                          reveals the clicked topic by calling dm4c.do_reveal_related_topic().
+     * @param   click_handler   Optional: the callback invoked when a topic is clicked. 2 arguments are passed:
+     *                              "topic"    -- the clicked topic (object)
+     *                              "spot"     -- indicates where the topic is clicked: "icon" or "label" (string)
+     *                          If not specified the default handler is used. The default handler reveals the clicked
+     *                          topic by calling dm4c.do_reveal_related_topic().
+     *
+     * @param   render_handler  Optional.
      *
      * @return  The rendered topic list (a jQuery object)
      */
     this.topic_list = function(topics, click_handler, render_handler) {
-        var table = $("<table>").addClass("topic-list")
+        var topic_list = $("<div>").addClass("topic-list")
         for (var i = 0, topic; topic = topics[i]; i++) {
             // don't list hidden topics, e.g. passwords
             if (dm4c.get_topic_type(topic.type_uri).is_hidden()) {
@@ -64,21 +65,17 @@ function RenderHelper() {
                 var supplement = $("<div>").addClass("supplement-text").append(supplement_text)
             }
             // topic
-            var icon_handler = click_handler_for(topic, "icon")
-            var label_handler = click_handler_for(topic, "label")
             var visible_in_topicmap = dm4c.topicmap_renderer.is_topic_visible(topic.id)
             var title = tooltips(topic, visible_in_topicmap)
             var icon_class = visible_in_topicmap && "visible-in-topicmap"
-            table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon, icon_class)))
-                .append($("<td>")
-                    .append(this.topic_link(topic, label_handler, title.label))
-                    .append(assoc_type_label())
-                    .append(supplement)
-                )
+            topic_list.append($("<div>")
+                .append(this.icon_link(topic,  click_handler_for(topic, "icon"),  title.icon, icon_class))
+                .append(this.topic_link(topic, click_handler_for(topic, "label"), title.label))
+                .append(assoc_type_label())
+                .append(supplement)
             )
         }
-        return table
+        return topic_list
 
         /**
          * @param   spot    "label" or "icon".
