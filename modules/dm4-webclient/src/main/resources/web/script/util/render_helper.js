@@ -66,9 +66,11 @@ function RenderHelper() {
             // topic
             var icon_handler = click_handler_for(topic, "icon")
             var label_handler = click_handler_for(topic, "label")
-            var title = tooltips(topic, icon_handler == undefined)
+            var visible_in_topicmap = dm4c.topicmap_renderer.is_topic_visible(topic.id)
+            var title = tooltips(topic, visible_in_topicmap)
+            var icon_class = visible_in_topicmap && "visible-in-topicmap"
             table.append($("<tr>")
-                .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon)))
+                .append($("<td>").append(this.icon_link(topic, icon_handler, title.icon, icon_class)))
                 .append($("<td>")
                     .append(this.topic_link(topic, label_handler, title.label))
                     .append(assoc_type_label())
@@ -82,11 +84,6 @@ function RenderHelper() {
          * @param   spot    "label" or "icon".
          */
         function click_handler_for(topic, spot) {
-            // create no handler for the "icon" spot if the topic is already visible on canvas
-            if (spot == "icon" && dm4c.topicmap_renderer.is_topic_visible(topic.id)) {
-                return
-            }
-            //
             return function() {
                 if (click_handler) {
                     click_handler(topic, spot)
@@ -98,19 +95,19 @@ function RenderHelper() {
                 if (spot == "icon") {
                     dm4c.page_panel.refresh()
                 }
-                // suppress browser's own link-click behavoir
+                // prevent browser's default link-click behavoir
                 return false
             }
         }
 
-        function tooltips(topic, is_visible_on_canvas) {
+        function tooltips(topic, visible_in_topicmap) {
             var type_info = type_info()
-            return is_visible_on_canvas ? {
-                icon:  type_info + "\n\nAlready revealed on topicmap",
-                label: type_info + "\n\nClick to focus"
+            return visible_in_topicmap ? {
+                icon:  type_info + "\n\nAlready revealed on topicmap\nClick to focus",
+                label: type_info + "\n\nAlready revealed on topicmap\nClick to select"
             } : {
                 icon:  type_info + "\n\nClick to reveal on topicmap",
-                label: type_info + "\n\nClick to reveal on topicmap and focus"
+                label: type_info + "\n\nClick to reveal on topicmap and select"
             }
 
             function type_info() {
@@ -144,22 +141,18 @@ function RenderHelper() {
     }
 
     /**
-     * Renders a topic icon and optionally attaches a click handler to it.
+     * Renders a topic icon which is clickable and has a tooltip.
      *
-     * @param   topic       The topic whose icon is rendered.
-     * @param   handler     Optional: the click handler.
-     *                      If not specified the icon is rendered as disabled and doesn't respond to clicks.
-     * @param   title       Optional: the tooltip title.
+     * @param   topic       The icon for this topic is rendered.
+     * @param   handler     The callback invoked when the icon is clicked (function).
+     * @param   title       Optional: the text shown in the icon's tooltip (string).
      *                      If not specified the topic's type name is used.
+     * @param   css_class   Optional: the CSS class(es) added to the icon (string).
+     *                      Space separated if more than one.
+     *                      If not specified no class is added to the icon.
      */
-    this.icon_link = function(topic, handler, title) {
-        var type_icon = this.type_icon(topic.type_uri, title)
-        if (handler) {
-            type_icon.click(handler)
-        } else {
-            type_icon.addClass("disabled")
-        }
-        return type_icon
+    this.icon_link = function(topic, handler, title, css_class) {
+        return this.type_icon(topic.type_uri, title).click(handler).addClass(css_class)
     }
 
     this.link_text = function(topic) {
