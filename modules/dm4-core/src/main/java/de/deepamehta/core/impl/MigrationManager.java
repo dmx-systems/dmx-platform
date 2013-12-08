@@ -61,7 +61,7 @@ class MigrationManager {
      * Determines the core migrations to be run and run them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int migrationNr = dms.storage.fetchMigrationNr();
+        int migrationNr = dms.storageDecorator.fetchMigrationNr();
         int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
         int migrationsToRun = requiredMigrationNr - migrationNr;
         //
@@ -81,7 +81,7 @@ class MigrationManager {
 
     private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, null, isCleanInstall);
-        dms.storage.storeMigrationNr(migrationNr);
+        dms.storageDecorator.storeMigrationNr(migrationNr);
     }
 
     private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {

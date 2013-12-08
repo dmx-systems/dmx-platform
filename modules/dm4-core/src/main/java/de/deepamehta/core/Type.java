@@ -21,7 +21,7 @@ public interface Type extends Topic {
 
     String getDataTypeUri();
 
-    void setDataTypeUri(String dataTypeUri);
+    void setDataTypeUri(String dataTypeUri, Directives directives);
 
     // --- Index Modes ---
 

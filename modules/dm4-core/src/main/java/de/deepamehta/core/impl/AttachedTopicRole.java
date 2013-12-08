@@ -58,7 +58,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     @Override
     void storeRoleTypeUri() {
-        dms.storage.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
+        dms.storageDecorator.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
     }
 
 

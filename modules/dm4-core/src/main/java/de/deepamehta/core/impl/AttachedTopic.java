@@ -57,7 +57,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
             // delete topic itself
             logger.info("Deleting " + this);
             directives.add(Directive.DELETE_TOPIC, this);
-            dms.storage.deleteTopic(getId());
+            dms.storageDecorator.deleteTopic(getId());
             //
             tx.success();
         } catch (Exception e) {
@@ -109,8 +109,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri, String othersAssocTypeUri,
                                                     boolean fetchComposite, boolean fetchRelatingComposite) {
-        RelatedAssociationModel assoc = dms.storage.fetchTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
+        RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? dms.instantiateRelatedAssociation(assoc, fetchComposite, fetchRelatingComposite) : null;
     }
 
@@ -118,7 +118,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersAssocTypeUri,
                                                            boolean fetchComposite, boolean fetchRelatingComposite) {
-        List<RelatedAssociationModel> assocs = dms.storage.fetchTopicRelatedAssociations(getId(), assocTypeUri,
+        List<RelatedAssociationModel> assocs = dms.storageDecorator.fetchTopicRelatedAssociations(getId(), assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return dms.instantiateRelatedAssociations(assocs, fetchComposite, fetchRelatingComposite);
     }
@@ -139,7 +139,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize) {
-        ResultList<RelatedTopicModel> topics = dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUris,
+        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
     }
@@ -149,15 +149,15 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = dms.storage.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
-            othersRoleTypeUri);
+        AssociationModel assoc = dms.storageDecorator.fetchAssociation(assocTypeUri, getId(), othersTopicId,
+            myRoleTypeUri, othersRoleTypeUri);
         return assoc != null ? dms.instantiateAssociation(assoc, false) : null;     // fetchComposite=false
     }
 
     @Override
     public List<Association> getAssociations() {
-        return dms.instantiateAssociations(dms.storage.fetchTopicAssociations(getId()), false);
-                                                                      // fetchComposite=false
+        return dms.instantiateAssociations(dms.storageDecorator.fetchTopicAssociations(getId()), false);
+                                                                                    // fetchComposite=false
     }
 
 
@@ -166,22 +166,22 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public Object getProperty(String propUri) {
-        return dms.storage.fetchTopicProperty(getId(), propUri);
+        return dms.storageDecorator.fetchTopicProperty(getId(), propUri);
     }
 
     @Override
     public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        dms.storage.storeTopicProperty(getId(), propUri, propValue, addToIndex);
+        dms.storageDecorator.storeTopicProperty(getId(), propUri, propValue, addToIndex);
     }
 
     @Override
     public boolean hasProperty(String propUri) {
-        return dms.storage.hasTopicProperty(getId(), propUri);
+        return dms.storageDecorator.hasTopicProperty(getId(), propUri);
     }
 
     @Override
     public void removeProperty(String propUri) {
-        dms.storage.removeTopicProperty(getId(), propUri);
+        dms.storageDecorator.removeTopicProperty(getId(), propUri);
     }
 
 
@@ -211,13 +211,13 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     final void storeUri() {
-        dms.storage.storeTopicUri(getId(), getUri());
+        dms.storageDecorator.storeTopicUri(getId(), getUri());
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        dms.storage.storeTopicTypeUri(getId(), getTypeUri());
+        dms.storageDecorator.storeTopicTypeUri(getId(), getTypeUri());
     }
 
     // ---
@@ -225,7 +225,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storage.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return dms.storageDecorator.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
@@ -233,7 +233,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersTopicTypeUri,
                                                           int maxResultSize) {
-        return dms.storage.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);
     }
 

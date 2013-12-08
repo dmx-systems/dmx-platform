@@ -199,7 +199,7 @@ class ValueStorage {
     private void storeSimpleValue(DeepaMehtaObjectModel model) {
         Type type = getType(model);
         if (model instanceof TopicModel) {
-            dms.storage.storeTopicValue(
+            dms.storageDecorator.storeTopicValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -207,7 +207,7 @@ class ValueStorage {
                 getIndexValue(model)
             );
         } else if (model instanceof AssociationModel) {
-            dms.storage.storeAssociationValue(
+            dms.storageDecorator.storeAssociationValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -441,7 +441,7 @@ class ValueStorage {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModel fetchChildTopic(long parentId, AssociationDefinition assocDef) {
-        return dms.storage.fetchRelatedTopic(
+        return dms.storageDecorator.fetchRelatedTopic(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
@@ -450,7 +450,7 @@ class ValueStorage {
     }
 
     private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinition assocDef) {
-        return dms.storage.fetchRelatedTopics(
+        return dms.storageDecorator.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",

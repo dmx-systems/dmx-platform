@@ -68,7 +68,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             // delete association itself
             logger.info("Deleting " + this);
             directives.add(Directive.DELETE_ASSOCIATION, this);
-            dms.storage.deleteAssociation(getId());
+            dms.storageDecorator.deleteAssociation(getId());
             //
             tx.success();
         } catch (IllegalStateException e) {
@@ -201,7 +201,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                                          String othersRoleTypeUri) {
-        RelatedAssociationModel assoc = dms.storage.fetchAssociationRelatedAssociation(getId(),
+        RelatedAssociationModel assoc = dms.storageDecorator.fetchAssociationRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, null); // othersAssocTypeUri=null
         return assoc != null ? dms.instantiateRelatedAssociation(assoc, false, false) : null; 
                                                                    // fetchComposite=false, fetchRelatingComposite=false
@@ -223,8 +223,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                     String othersTopicTypeUri, boolean fetchComposite, boolean fetchRelatingComposite,
                                     int maxResultSize) {
-        ResultList<RelatedTopicModel> topics = dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUris,
-            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchAssociationRelatedTopics(getId(),
+            assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
     }
 
@@ -233,14 +233,14 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = dms.storage.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
+        AssociationModel assoc = dms.storageDecorator.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
             othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
         return assoc != null ? dms.instantiateAssociation(assoc, false) : null;     // fetchComposite=false
     }
 
     @Override
     public List<Association> getAssociations() {
-        return dms.instantiateAssociations(dms.storage.fetchAssociationAssociations(getId()), false);
+        return dms.instantiateAssociations(dms.storageDecorator.fetchAssociationAssociations(getId()), false);
                                                                                     // fetchComposite=false
     }
 
@@ -250,22 +250,22 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Object getProperty(String propUri) {
-        return dms.storage.fetchAssociationProperty(getId(), propUri);
+        return dms.storageDecorator.fetchAssociationProperty(getId(), propUri);
     }
 
     @Override
     public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        dms.storage.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
+        dms.storageDecorator.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
     }
 
     @Override
     public boolean hasProperty(String propUri) {
-        return dms.storage.hasAssociationProperty(getId(), propUri);
+        return dms.storageDecorator.hasAssociationProperty(getId(), propUri);
     }
 
     @Override
     public void removeProperty(String propUri) {
-        dms.storage.removeAssociationProperty(getId(), propUri);
+        dms.storageDecorator.removeAssociationProperty(getId(), propUri);
     }
 
 
@@ -295,13 +295,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     final void storeUri() {
-        dms.storage.storeAssociationUri(getId(), getUri());
+        dms.storageDecorator.storeAssociationUri(getId(), getUri());
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        dms.storage.storeAssociationTypeUri(getId(), getTypeUri());
+        dms.storageDecorator.storeAssociationTypeUri(getId(), getTypeUri());
     }
 
     // ---
@@ -309,16 +309,16 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storage.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
+        return dms.storageDecorator.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersTopicTypeUri,
                                                           int maxResultSize) {
-        return dms.storage.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize);
+        return dms.storageDecorator.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
     }
 
 

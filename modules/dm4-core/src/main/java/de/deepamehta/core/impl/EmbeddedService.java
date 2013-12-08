@@ -48,7 +48,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    StorageDecorator storage;
+    StorageDecorator storageDecorator;
     BundleContext bundleContext;
     MigrationManager migrationManager;
     PluginManager pluginManager;
@@ -64,8 +64,8 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
      */
-    public EmbeddedService(StorageDecorator storage, BundleContext bundleContext) {
-        this.storage = storage;
+    public EmbeddedService(StorageDecorator storageDecorator, BundleContext bundleContext) {
+        this.storageDecorator = storageDecorator;
         this.bundleContext = bundleContext;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
@@ -92,7 +92,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Topic getTopic(long topicId, boolean fetchComposite) {
         try {
-            return instantiateTopic(storage.fetchTopic(topicId), fetchComposite);
+            return instantiateTopic(storageDecorator.fetchTopic(topicId), fetchComposite);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -101,7 +101,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Topic getTopic(String key, SimpleValue value, boolean fetchComposite) {
         try {
-            TopicModel topic = storage.fetchTopic(key, value);
+            TopicModel topic = storageDecorator.fetchTopic(key, value);
             return topic != null ? instantiateTopic(topic, fetchComposite) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
@@ -111,7 +111,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite) {
         try {
-            return instantiateTopics(storage.fetchTopics(key, value), fetchComposite);
+            return instantiateTopics(storageDecorator.fetchTopics(key, value), fetchComposite);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -131,7 +131,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            return instantiateTopics(storage.queryTopics(searchTerm, fieldUri), false);
+            return instantiateTopics(storageDecorator.queryTopics(searchTerm, fieldUri), false);
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\")", e);
@@ -214,7 +214,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Association getAssociation(long assocId, boolean fetchComposite) {
         logger.info("assocId=" + assocId + ", fetchComposite=" + fetchComposite);
         try {
-            return instantiateAssociation(storage.fetchAssociation(assocId), fetchComposite);
+            return instantiateAssociation(storageDecorator.fetchAssociation(assocId), fetchComposite);
         } catch (Exception e) {
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
         }
@@ -228,7 +228,7 @@ public class EmbeddedService implements DeepaMehtaService {
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\", fetchComposite=" +
             fetchComposite;
         try {
-            AssociationModel assoc = storage.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
+            AssociationModel assoc = storageDecorator.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
                 roleTypeUri2);
             return assoc != null ? instantiateAssociation(assoc, fetchComposite) : null;
         } catch (Exception e) {
@@ -245,8 +245,8 @@ public class EmbeddedService implements DeepaMehtaService {
             "\", fetchComposite=" + fetchComposite;
         logger.info(info);
         try {
-            AssociationModel assoc = storage.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
-                topicRoleTypeUri, assocRoleTypeUri);
+            AssociationModel assoc = storageDecorator.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
+                topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
             return assoc != null ? instantiateAssociation(assoc, fetchComposite) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
@@ -277,8 +277,8 @@ public class EmbeddedService implements DeepaMehtaService {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
             // ### FIXME: fetchComposite=false, parameterize it
-            return instantiateAssociations(storage.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null),
-                false);     // roleTypeUri1=null, roleTypeUri2=null
+            return instantiateAssociations(storageDecorator.fetchAssociations(assocTypeUri, topic1Id, topic2Id,
+                null, null), false);     // roleTypeUri1=null, roleTypeUri2=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
@@ -364,7 +364,8 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getTopicTypeUris() {
         try {
-            Topic metaType = instantiateTopic(storage.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")), false);
+            Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
+                new SimpleValue("dm4.core.topic_type")), false);
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type", false, false, 0);
             List<String> topicTypeUris = new ArrayList();
@@ -452,7 +453,8 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getAssociationTypeUris() {
         try {
-            Topic metaType = instantiateTopic(storage.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")), false);
+            Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
+                new SimpleValue("dm4.core.assoc_type")), false);
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type", false, false, 0);
             List<String> assocTypeUris = new ArrayList();
@@ -548,25 +550,25 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return instantiateTopics(storage.fetchTopicsByProperty(propUri, propValue), false);
+        return instantiateTopics(storageDecorator.fetchTopicsByProperty(propUri, propValue), false);
             // fetchComposite=false
     }
 
     @Override
     public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateTopics(storage.fetchTopicsByPropertyRange(propUri, from, to), false);
+        return instantiateTopics(storageDecorator.fetchTopicsByPropertyRange(propUri, from, to), false);
             // fetchComposite=false
     }
 
     @Override
     public List<Association> getAssociationsByProperty(String propUri, Object propValue) {
-        return instantiateAssociations(storage.fetchAssociationsByProperty(propUri, propValue), false);
+        return instantiateAssociations(storageDecorator.fetchAssociationsByProperty(propUri, propValue), false);
             // fetchComposite=false
     }
 
     @Override
     public List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateAssociations(storage.fetchAssociationsByPropertyRange(propUri, from, to), false);
+        return instantiateAssociations(storageDecorator.fetchAssociationsByPropertyRange(propUri, from, to), false);
             // fetchComposite=false
     }
 
@@ -576,7 +578,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public DeepaMehtaTransaction beginTx() {
-        return storage.beginTx();
+        return storageDecorator.beginTx();
     }
 
     @Override
@@ -605,8 +607,8 @@ public class EmbeddedService implements DeepaMehtaService {
             AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
                 new TopicRoleModel(topicTypeUri, "dm4.core.type"),
                 new TopicRoleModel(topicId, "dm4.core.instance"));
-            storage.storeAssociation(assoc);    // direct storage calls used here ### explain
-            storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            storageDecorator.storeAssociation(assoc);   // direct storage calls used here ### explain
+            storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
             createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId +
@@ -619,8 +621,8 @@ public class EmbeddedService implements DeepaMehtaService {
             AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
                 new TopicRoleModel(assocTypeUri, "dm4.core.type"),
                 new AssociationRoleModel(assocId, "dm4.core.instance"));
-            storage.storeAssociation(assoc);    // direct storage calls used here ### explain
-            storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            storageDecorator.storeAssociation(assoc);   // direct storage calls used here ### explain
+            storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId +
                 " with association type \"" + assocTypeUri + "\" failed", e);
@@ -743,7 +745,7 @@ public class EmbeddedService implements DeepaMehtaService {
     private Topic topicFactory(TopicModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
         setDefaults(model);
-        storage.storeTopic(model);
+        storageDecorator.storeTopic(model);
         valueStorage.storeValue(model, clientState, directives);
         createTopicInstantiation(model.getId(), model.getTypeUri());
         //
@@ -758,7 +760,7 @@ public class EmbeddedService implements DeepaMehtaService {
     private Association associationFactory(AssociationModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
         setDefaults(model);
-        storage.storeAssociation(model);
+        storageDecorator.storeAssociation(model);
         valueStorage.storeValue(model, clientState, directives);
         createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
@@ -837,7 +839,7 @@ public class EmbeddedService implements DeepaMehtaService {
         DeepaMehtaTransaction tx = beginTx();
         try {
             logger.info("----- Setting up the database -----");
-            boolean isCleanInstall = storage.init();
+            boolean isCleanInstall = storageDecorator.init();
             if (isCleanInstall) {
                 setupBootstrapContent();
             }
@@ -850,21 +852,22 @@ public class EmbeddedService implements DeepaMehtaService {
             // Note: we don't put finish() in a finally clause here because
             // in case of error the database has to be shut down.
             tx.finish();
-            storage.shutdown();
+            storageDecorator.shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }
     }
 
     private void setupBootstrapContent() {
         try {
-            // Before topic types and asscociation types can be created the meta types must be created
+            // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and
+            // asscociation types
             TopicModel t = new TopicModel("dm4.core.topic_type", "dm4.core.meta_type",
                 new SimpleValue("Topic Type"));
             TopicModel a = new TopicModel("dm4.core.assoc_type", "dm4.core.meta_type",
                 new SimpleValue("Association Type"));
             _createTopic(t);
             _createTopic(a);
-            // Create topic type "Data Type"
+            // Create topic types "Data Type" and "Role Type"
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
@@ -927,27 +930,43 @@ public class EmbeddedService implements DeepaMehtaService {
             // would fail (not because the association is missed -- it's created meanwhile, but)
             // because this involves fetching the association including its value. The value doesn't exist yet,
             // because its setting forms the begin of this vicious circle.
-            typeStorage._associateDataType("dm4.core.meta_type",  "dm4.core.text");
-            typeStorage._associateDataType("dm4.core.topic_type", "dm4.core.text");
-            typeStorage._associateDataType("dm4.core.assoc_type", "dm4.core.text");
-            typeStorage._associateDataType("dm4.core.data_type",  "dm4.core.text");
-            typeStorage._associateDataType("dm4.core.role_type",  "dm4.core.text");
+            _associateDataType("dm4.core.meta_type",  "dm4.core.text");
+            _associateDataType("dm4.core.topic_type", "dm4.core.text");
+            _associateDataType("dm4.core.assoc_type", "dm4.core.text");
+            _associateDataType("dm4.core.data_type",  "dm4.core.text");
+            _associateDataType("dm4.core.role_type",  "dm4.core.text");
             //
-            typeStorage._associateDataType("dm4.core.aggregation",   "dm4.core.text");
-            typeStorage._associateDataType("dm4.core.instantiation", "dm4.core.text");
+            _associateDataType("dm4.core.aggregation",   "dm4.core.text");
+            _associateDataType("dm4.core.instantiation", "dm4.core.text");
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);
         }
     }
 
+    // ---
+
     /**
-     * A low-level call that stores a topic without its "Instantiation" association.
-     * Used for bootstrapping.
+     * Low-level method that stores a topic without its "Instantiation" association.
+     * Needed for bootstrapping.
      */
     private void _createTopic(TopicModel model) {
-        storage.storeTopic(model);
-        storage.storeTopicValue(model.getId(), model.getSimpleValue());
+        storageDecorator.storeTopic(model);
+        storageDecorator.storeTopicValue(model.getId(), model.getSimpleValue());
     }
+
+    /**
+     * Low-level method that stores an (data type) association without its "Instantiation" association.
+     * Needed for bootstrapping.
+     */
+    private void _associateDataType(String typeUri, String dataTypeUri) {
+        AssociationModel assoc = new AssociationModel("dm4.core.aggregation",
+            new TopicRoleModel(typeUri,     "dm4.core.type"),
+            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        storageDecorator.storeAssociation(assoc);
+        storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+    }
+
+    // ---
 
     private void bootstrapTypeCache() {
         typeCache.putTopicType(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",

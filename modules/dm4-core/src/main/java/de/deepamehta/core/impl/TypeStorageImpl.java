@@ -169,7 +169,7 @@ class TypeStorageImpl implements TypeStorage {
         putInTypeCache(type);
         //
         // 2) store type-specific parts
-        associateDataType(type.getUri(), type.getDataTypeUri());
+        storeDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getUri(), type.getAssocDefs());
         storeLabelConfig(type.getLabelConfig(), type.getAssocDefs(), new Directives());
@@ -184,8 +184,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = dms.storage.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
-                "dm4.core.type", null, "dm4.core.data_type");   // ### FIXME: null
+            RelatedTopicModel dataType = dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
+                "dm4.core.type", "dm4.core.default", "dm4.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
             }
@@ -198,16 +198,8 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    void storeDataTypeUri(long typeId, String typeUri, String className, String dataTypeUri) {
-        // remove current assignment
-        long assocId = fetchDataTypeTopic(typeId, typeUri, className).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId);
-        // create new assignment
-        associateDataType(typeUri, dataTypeUri);
-    }
-
-    // ### TODO: drop in favor of _associateDataType() below?
-    private void associateDataType(String typeUri, String dataTypeUri) {
+    // ### TODO: compare to low-level method EmbeddedService._associateDataType(). Remove structural similarity.
+    void storeDataType(String typeUri, String dataTypeUri) {
         try {
             dms.createAssociation("dm4.core.aggregation",
                 new TopicRoleModel(typeUri,     "dm4.core.type"),
@@ -218,19 +210,6 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    // ---
-
-    /**
-     * Low-level method. Used for bootstrapping.
-     */
-    void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModel assoc = new AssociationModel("dm4.core.aggregation",
-            new TopicRoleModel(typeUri,     "dm4.core.type"),
-            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
-        dms.storage.storeAssociation(assoc);
-        dms.storage.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-    }
-
 
 
     // === Index Modes ===
@@ -238,8 +217,8 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        ResultList<RelatedTopicModel> indexModes = dms.storage.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
-            "dm4.core.type", null, "dm4.core.index_mode", 0);   // ### FIXME: null
+        ResultList<RelatedTopicModel> indexModes = dms.storageDecorator.fetchTopicRelatedTopics(typeId,
+            "dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.index_mode", 0);
         return IndexMode.fromTopics(indexModes.getItems());
     }
 
@@ -403,8 +382,8 @@ class TypeStorageImpl implements TypeStorage {
 
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchParentCardinality(long assocDefId) {
-        RelatedTopicModel parentCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
-            "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
+        RelatedTopicModel parentCard = dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
+            "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
         // error check
         if (parentCard == null) {
             throw new RuntimeException("Invalid association definition: parent cardinality is missing (assocDefId=" +
@@ -416,8 +395,8 @@ class TypeStorageImpl implements TypeStorage {
 
     // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchChildCardinality(long assocDefId) {
-        RelatedTopicModel childCard = dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
-            "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
+        RelatedTopicModel childCard = dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
+            "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
         // error check
         if (childCard == null) {
             throw new RuntimeException("Invalid association definition: child cardinality is missing (assocDefId=" +
@@ -552,7 +531,7 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     private RelatedTopicModel fetchLabelConfigTopic(long assocDefId) {
-        return dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
+        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
             "dm4.core.parent", "dm4.core.child", "dm4.core.include_in_label");
     }
 
@@ -601,13 +580,13 @@ class TypeStorageImpl implements TypeStorage {
 
     private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
         // Note: the composite is not fetched as it is not needed
-        return dms.storage.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
+        return dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
     }
 
     private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
         // Note: the composite is not fetched as it is not needed
-        return dms.storage.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
+        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
     }
 

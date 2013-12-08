@@ -25,7 +25,7 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
     @Override
     void storeRoleTypeUri() {
-        dms.storage.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
+        dms.storageDecorator.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
     }
 
 

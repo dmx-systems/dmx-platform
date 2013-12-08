@@ -60,11 +60,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void setDataTypeUri(String dataTypeUri) {
+    public void setDataTypeUri(String dataTypeUri, Directives directives) {
         // update memory
         getModel().setDataTypeUri(dataTypeUri);
         // update DB
-        dms.typeStorage.storeDataTypeUri(getId(), getUri(), className(), dataTypeUri);
+        _updateDataTypeUri(dataTypeUri, directives);
     }
 
     // --- Index Modes ---
@@ -188,7 +188,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             putInTypeCache();   // abstract
         }
         //
-        updateDataTypeUri(model.getDataTypeUri());
+        updateDataTypeUri(model.getDataTypeUri(), directives);
         updateAssocDefs(model.getAssocDefs(), clientState, directives);
         updateSequence(model.getAssocDefs());
         updateLabelConfig(model.getLabelConfig(), directives);
@@ -216,14 +216,22 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateDataTypeUri(String newDataTypeUri) {
+    private void updateDataTypeUri(String newDataTypeUri, Directives directives) {
         if (newDataTypeUri != null) {
             String dataTypeUri = getDataTypeUri();
             if (!dataTypeUri.equals(newDataTypeUri)) {
                 logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
-                setDataTypeUri(newDataTypeUri);
+                setDataTypeUri(newDataTypeUri, directives);
             }
         }
+    }
+
+    private void _updateDataTypeUri(String dataTypeUri, Directives directives) {
+        // remove current assignment
+        getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type",
+            false, false).getRelatingAssociation().delete(directives);
+        // create new assignment
+        dms.typeStorage.storeDataType(getUri(), dataTypeUri);
     }
 
     // ---
