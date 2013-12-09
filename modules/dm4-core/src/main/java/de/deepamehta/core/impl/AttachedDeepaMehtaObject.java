@@ -328,6 +328,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    // ### TODO: add to public interface
     Type getType() {
         return dms.valueStorage.getType(getModel());
     }

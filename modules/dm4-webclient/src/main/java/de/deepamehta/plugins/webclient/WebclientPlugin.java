@@ -141,7 +141,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         int removed = 0;
         while (i.hasNext()) {
             RelatedTopic relTopic = i.next();
-            if (isPropertyTopic(relTopic, topic)) {
+            if (isDirectModelledChildTopic(relTopic, topic)) {
                 i.remove();
                 removed++;
             }
@@ -360,22 +360,19 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Misc ===
 
-    private boolean isPropertyTopic(RelatedTopic relTopic, Topic topic) {
-        // association type
-        Association assoc = relTopic.getRelatingAssociation();
-        if (assoc.getTypeUri().equals("dm4.core.composition")) {
-            // association definition
-            TopicType type = dms.getTopicType(topic.getTypeUri());
-            String childTypeUri = relTopic.getTypeUri();
-            if (type.hasAssocDef(childTypeUri)) {
-                // association definition type
-                AssociationDefinition assocDef = type.getAssocDef(childTypeUri);
-                if (assocDef.getInstanceLevelAssocTypeUri().equals("dm4.core.composition")) {
-                    // role types
-                    if (assoc.isPlayer(new TopicRoleModel(topic.getId(), "dm4.core.parent")) &&
-                        assoc.isPlayer(new TopicRoleModel(relTopic.getId(), "dm4.core.child"))) {
-                        return true;
-                    }
+    private boolean isDirectModelledChildTopic(RelatedTopic childTopic, Topic parentTopic) {
+        // association definition
+        TopicType parentType = dms.getTopicType(parentTopic.getTypeUri());
+        String childTypeUri = childTopic.getTypeUri();
+        if (parentType.hasAssocDef(childTypeUri)) {
+            // association definition type
+            AssociationDefinition assocDef = parentType.getAssocDef(childTypeUri);
+            Association assoc = childTopic.getRelatingAssociation();
+            if (assocDef.getInstanceLevelAssocTypeUri().equals(assoc.getTypeUri())) {
+                // role types
+                if (assoc.isPlayer(new TopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
+                    assoc.isPlayer(new TopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
+                    return true;
                 }
             }
         }

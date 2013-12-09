@@ -64,7 +64,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setDataTypeUri(dataTypeUri);
         // update DB
-        _updateDataTypeUri(dataTypeUri, directives);
+        storeDataTypeUri(dataTypeUri, directives);
     }
 
     // --- Index Modes ---
@@ -226,7 +226,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
-    private void _updateDataTypeUri(String dataTypeUri, Directives directives) {
+    private void storeDataTypeUri(String dataTypeUri, Directives directives) {
         // remove current assignment
         getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type",
             false, false).getRelatingAssociation().delete(directives);
