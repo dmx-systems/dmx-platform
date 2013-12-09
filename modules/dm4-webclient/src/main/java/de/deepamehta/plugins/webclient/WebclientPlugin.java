@@ -365,7 +365,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         TopicType parentType = dms.getTopicType(parentTopic.getTypeUri());
         String childTypeUri = childTopic.getTypeUri();
         if (parentType.hasAssocDef(childTypeUri)) {
-            // association definition type
+            // association type
             AssociationDefinition assocDef = parentType.getAssocDef(childTypeUri);
             Association assoc = childTopic.getRelatingAssociation();
             if (assocDef.getInstanceLevelAssocTypeUri().equals(assoc.getTypeUri())) {

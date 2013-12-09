@@ -10,7 +10,10 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
             var object_id = request_object_id()
             if (object_id != -1) {
                 var modified = request_object_timestamp()
-                if (!modified) {
+                // Note: 0 is a perfect timestamp. It is send by the server as the default timestamp for objects which
+                // don't have a timestamp. This happens e.g. when upgrading from a DM 4.1 installation. Timestamps were
+                // introduced only in DM 4.1.1. So we must compare to undefined here. !modified would not work.
+                if (modified == undefined) {
                     // possible fallback: get the timestamp from the object displayed in the page panel
                     //
                     // Note: we must consider the page panel's object -- not the object selected on the topicmap
@@ -18,7 +21,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
                     // but the PUT request always relates to the object displayed in the page panel.
                     modified = page_panel_object_timestamp()
                     //
-                    if (!modified) {
+                    if (modified == undefined) {
                         throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
                             "(uri=\"" + request.uri + "\", data=" + JSON.stringify(request.data) +
                             ", page panel object=" + dm4c.page_panel.get_displayed_object().id + ")"
