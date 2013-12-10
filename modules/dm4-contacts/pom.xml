@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Contacts</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-contacts</artifactId>
-    <version>4.1.3-SNAPSHOT</version>
+    <version>4.1.3</version>
     <packaging>bundle</packaging>
 
     <parent>
