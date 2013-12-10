@@ -34,6 +34,12 @@
         <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>
 
+        <!-- Logging -->
+        <java.util.logging.config.file>
+            ${project.basedir}/modules/dm4-distribution/conf/logging.properties
+        </java.util.logging.config.file>
+        <felix.log.level>1</felix.log.level>
+
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -45,10 +51,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <java.util.logging.config.file>
-                    ${project.basedir}/modules/dm4-distribution/conf/logging.properties
-                </java.util.logging.config.file>
-                <felix.log.level>1</felix.log.level>
                 <felix.fileinstall.dir>
                     <![CDATA[
                         ${project.basedir}/modules/dm4-core/target,

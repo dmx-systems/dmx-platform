@@ -13,31 +13,34 @@
     <!-- pre-configured plugin environment -->
     <properties>
 
-        <!-- Webserver - HTTP only -->
+        <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
         <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
+        <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
+        <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
+
+        <!-- Request Filter -->
+        <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
+        <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
+        <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
 
         <!-- Host -->
         <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
-
-        <!-- Request Filter - allows all on local host -->
-        <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
-        <dm4.security.write_requires_login>false</dm4.security.write_requires_login>
-        <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
 
         <!-- File Repository -->
-        <dm4.filerepo.path>${project.basedir}</dm4.filerepo.path>
+        <dm4.filerepo.path></dm4.filerepo.path>
 
         <!-- a plugin should provide a logging configuration -->
         <java.util.logging.config.file>
             ${project.basedir}/src/main/resources/logging.properties
         </java.util.logging.config.file>
+        <felix.log.level>1</felix.log.level>
 
-        <felix.log.level>2</felix.log.level>
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
