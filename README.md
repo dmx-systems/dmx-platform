@@ -14,14 +14,20 @@ DeepaMehta 4 is a rewrite of DeepaMehta 2.
 Project website:  
 <https://www.deepamehta.de/>
 
-Live demo, nightly builds:  
+Live demo:  
 <http://demo.deepamehta.de/>
+
+Download:  
+<http://download.deepamehta.de/>
 
 Issue tracker, documentation, release notes:  
 <https://trac.deepamehta.de/>
 
 API documentation:  
 <http://api.deepamehta.de/>
+
+Continuous integration:  
+<https://ci.deepamehta.de/jenkins/>
 
 Source code:  
 <https://github.com/jri/deepamehta>
@@ -53,7 +59,7 @@ To install and use DeepaMehta follow 5 mandatory steps:
 
 * A "modern" **webbrowser**.
 
-  DeepaMehta works fine at least with Firefox 3.6 (or newer), Google Chrome, or Safari 5 (or newer).  
+  DeepaMehta works fine at least with Firefox, Google Chrome, or Safari 5 (or newer).  
   Doesn't work with IE8. Possibly works with IE9 or IE10 (not tested).
 
 
@@ -63,10 +69,10 @@ To install and use DeepaMehta follow 5 mandatory steps:
 There are 2 distributions to suit different needs:
 
 * The **DeepaMehta Standard Distribution** focuses on small download size and easy setup for single users.  
-  <http://download.deepamehta.de/deepamehta-4.1.2.zip> (6.3 MB)
+  <http://download.deepamehta.de/deepamehta-4.1.3.zip> (6.5 MB)
 
 * The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
-  <http://download.deepamehta.de/deepamehta-4.1.2-karaf.tar.gz> (13.4 MB)
+  <http://download.deepamehta.de/deepamehta-4.1.3-karaf.tar.gz> (13.4 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
@@ -76,7 +82,7 @@ For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/
 ---------------------
 
 Unzip the downloaded file.  
-A folder `deepamehta-4.1.2` is created.
+A folder `deepamehta-4.1.3` is created.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
@@ -84,13 +90,13 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 4. Start DeepaMehta
 -------------------
 
-Open the `deepamehta-4.1.2` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.1.3` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
     deepamehta-windows.bat      # double-click it
 
-While DeepaMehta starts a terminal window opens and you see some information logged.  
+While DeepaMehta starts a terminal window opens and a lot of information is logged.  
 Then a browser window opens and DeepaMehta is ready to use.
 
 To open the DeepaMehta browser window manually:  
@@ -118,11 +124,11 @@ Auxiliary tasks follow:
 Updating DeepaMehta
 -------------------
 
-You can update from DeepaMehta 4.1.x to 4.1.2 while keeping your data:
+You can update from DeepaMehta 4.1 or newer to 4.1.3 while keeping your data:
 
-1. Install DeepaMehta 4.1.2 (see steps 2. and 3. above).
-2. Stop DeepaMehta 4.1.x if running. (Also stop DeepaMehta 4.1.2 if already started.)
-3. Copy the `deepamehta-db` folder from your DeepaMehta 4.1.x installation into the `deepamehta-4.1.2` folder.
+1. Install DeepaMehta 4.1.3 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.1.3 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.1.3` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
 
@@ -154,7 +160,7 @@ Uninstall DeepaMehta
 --------------------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.1.2` folder.
+2. Delete the entire `deepamehta-4.1.3` folder.
 
 This removes DeepaMehta completely from your computer, including all your data.
 
@@ -170,6 +176,34 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.1.3** -- Dec 10, 2013
+
+* New features:
+    * New topicmap look&feel through the Box Renderer plugin.
+    * Support for complex data models, namely "Aggregated Composites".
+    * Includes Apache Felix Gogo Shell: install/start/stop plugins without restart.
+* GUI improvements:
+    * Topicmap Panel:
+        * Create topics directly on the topicmap.
+        * Associations are displayed along with their values.
+        * The topicmap uses the full window height.
+    * Detail Panel's "related topics" list:
+        * Redundant topics are suppressed. Still revealable via page panel's upper area.
+        * Topics are grouped by Topic Type. Association types are shown beneath the topics.
+    * Menus:
+        * Long menus have a scrollbar. The mouse wheel can be used for scrolling.
+        * Menu items can be selected via 1-click gesture or 2-click gesture.
+        * All menus can be controlled via keyboard.
+* Webclient changes:
+    * The overall style is flat. No gradients.
+    * All menus are based on the jQuery UI Menu widget.
+* Plugin development framework:
+    * View Customization Framework for adapting the topicmap rendering.
+    * More data binding (automatic sync'ing of DB and topicmap panel).
+    * Utilizes Lists instead of Sets.
+* Release notes and full changelog:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.1.2** -- Sep 7, 2013
 
@@ -472,4 +506,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Sep 7, 2013
+Dec 10, 2013
