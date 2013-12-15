@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.1.3</version>
+    <version>4.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -73,7 +73,8 @@
                         ${project.basedir}/modules/dm4-time/target,
                         ${project.basedir}/modules/dm4-caching/target,
                         ${project.basedir}/modules/dm4-storage-neo4j/target,
-                        ${project.basedir}/modules/dm4-box-renderer-dom/target
+                        ${project.basedir}/modules/dm4-box-renderer-dom/target,
+                        ${project.basedir}/modules-external/dm4-kiezatlas/target
                     ]]>
                     <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
                     <!-- hot-deployed. It can not be statically deployed (via 3rd-party-bundles) because it        -->
