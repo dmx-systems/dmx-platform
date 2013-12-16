@@ -307,9 +307,9 @@ dm4c = new function() {
 
     // ---
 
-    this.do_retype_topic = function(topic, type_uri) {
+    this.do_retype_topic = function(topic_id, type_uri) {
         // update DB, client model, and GUI
-        dm4c.restc.update_topic({id: topic.id, type_uri: type_uri})
+        dm4c.restc.update_topic({id: topic_id, type_uri: type_uri})
     }
 
     // ---
@@ -318,18 +318,18 @@ dm4c = new function() {
      * Deletes a topic (including its associations) from the DB and the GUI.
      * Fires the "post_delete_topic" event and the "post_delete_association" event (for each association).
      */
-    this.do_delete_topic = function(topic) {
+    this.do_delete_topic = function(topic_id) {
         // update DB, client model, and GUI
-        dm4c.restc.delete_topic(topic.id)
+        dm4c.restc.delete_topic(topic_id)
     }
 
     /**
      * Deletes an association from the DB and the GUI.
      * Fires the "post_delete_association" event.
      */
-    this.do_delete_association = function(assoc) {
+    this.do_delete_association = function(assoc_id) {
         // update DB, client model, and GUI
-        dm4c.restc.delete_association(assoc.id)
+        dm4c.restc.delete_association(assoc_id)
     }
 
 

@@ -48,10 +48,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.add_listener("init", function() {
 
         var login_widget
-        var login_dialog
 
         create_login_widget()
-        create_login_dialog()
 
         function create_login_widget() {
             login_widget = new LoginWidget()
@@ -102,14 +100,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 }
 
                 function show_login() {
-                    dom.append(dm4c.render.link("Login", function() {
-                        login_dialog.open()
-                    }))
+                    dom.append(dm4c.render.link("Login", do_open_login_dialog))
                 }
             }
         }
 
-        function create_login_dialog() {
+        function do_open_login_dialog() {
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
@@ -120,7 +116,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 .add(message_div)
             // Note: as of jQuery 1.9 you can't add objects to a disconnected (not in a document)
             // jQuery object with the after() method. Use add() instead.
-            login_dialog = dm4c.ui.dialog({
+            var login_dialog = dm4c.ui.dialog({
                 title: "Login",
                 content: dialog_content,
                 button_label: "OK",

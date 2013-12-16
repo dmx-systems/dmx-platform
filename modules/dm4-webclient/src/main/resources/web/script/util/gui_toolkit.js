@@ -94,8 +94,9 @@ function GUIToolkit(config) {
             }
             //
             var options = {
-                modal: true, autoOpen: false, draggable: false, resizable: false, width: width,
-                title: title, buttons: buttons
+                title: title, buttons: buttons, width: width,
+                modal: true, draggable: false, resizable: false,
+                close: destroy
             }
             // Note: a dialog without a close button could be created by setting 2 more options
             // dialog.dialog("option", "dialogClass",    no_close_button ? "no-close-button" : "")
@@ -108,10 +109,6 @@ function GUIToolkit(config) {
             //
             $("body").append(dialog)
             dialog.dialog(options)
-
-            this.open = function() {
-                dialog.dialog("open")
-            }
 
             /**
              * @paran   duration    Optional: determines how long the fade out animation will run (in milliseconds).
@@ -126,15 +123,7 @@ function GUIToolkit(config) {
                 })
             }
 
-            this.empty = function() {
-                dialog.empty()
-            }
-
-            this.append = function(element) {
-                dialog.append(element)
-            }
-
-            this.destroy = function() {
+            function destroy() {
                 // Note: "destroy" leaves the sole dialog content element in the DOM and returns it.
                 // We remove it afterwards. We want the dialog to be completely removed from the DOM.
                 dialog.dialog("destroy").remove()
@@ -158,10 +147,9 @@ function GUIToolkit(config) {
             button_label: button_label,
             button_handler: do_submit
         })
-        dialog.open()
 
         function do_submit() {
-            dialog.destroy()
+            dialog.close()
             callback(input.val())   // Note: obviously the value can still be the read after destroying the dialog
         }
     }

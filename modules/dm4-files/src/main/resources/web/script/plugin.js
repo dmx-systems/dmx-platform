@@ -220,26 +220,22 @@ dm4c.add_plugin("de.deepamehta.files", function() {
      *                          topic_id    -- the ID of the File topic created
      */
     this.open_upload_dialog = (function() {
-
-        // 1) install upload target
+        // create upload target
+        // Note: we bind no load handler here. It would fire prematureley.
         var upload_target = $("<iframe>", {name: "upload-target"}).hide()
         $("body").append(upload_target)
 
-        // 2) create upload dialog
-        var upload_form = $("<form>", {
-            method:  "post",
-            enctype: "multipart/form-data",
-            target:  "upload-target"
-        })
-        .append($('<input type="file">').attr({name: "file", size: 60}))    // Note: attr() must be used here.
-        .append($('<input type="submit">').attr({value: "Upload"}))         // An attr object as 2nd param doesn't work!
-        //
-        var upload_dialog = dm4c.ui.dialog({title: "Upload File", content: upload_form})
-
-        // 3) create dialog handler
         return function(path, callback) {
-            upload_form.attr("action", "/files/" + path)
-            upload_dialog.open()
+            var content = $("<form>", {
+                action:  "/files/" + path,
+                method:  "post",
+                enctype: "multipart/form-data",
+                target:  "upload-target"
+            })
+            .append($('<input type="file">').attr({name: "file", size: 60}))    // Note: attr() must be used here.
+            .append($('<input type="submit">').attr({value: "Upload"}))     // An attr object as 2nd param doesn't work!
+            //
+            var upload_dialog = dm4c.ui.dialog({title: "Upload File", content: content})
             // bind handler
             upload_target.unbind("load")    // Note: the previous handler must be removed
             upload_target.load(upload_complete)
@@ -256,7 +252,6 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             }
         }
     })()
-
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

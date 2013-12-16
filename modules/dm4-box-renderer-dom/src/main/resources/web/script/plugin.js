@@ -51,7 +51,6 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
                 title: "Set Color",
                 content: content
             })
-            color_dialog.open()
 
             function add_color_row(saturation, light) {
                 for (var i = 4; i < 12; i++) {
@@ -61,16 +60,15 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             }
 
             function add_color_box(color) {
-                var color_box = $("<div>").addClass("color-box").css("background-color", color).click(function() {
+                content = content.add($("<div>").addClass("color-box").toggleClass("selected", color == current_color)
+                    .css("background-color", color).click(on_click))
+
+                function on_click() {
                     var view_props = {}
                     view_props[PROP_COLOR] = color
                     canvas_view.set_view_properties(topic.id, view_props)
-                    color_dialog.destroy()
-                })
-                if (color == current_color) {
-                    color_box.addClass("selected")
+                    color_dialog.close()
                 }
-                content = content.add(color_box)
             }
         }
     })

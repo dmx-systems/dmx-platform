@@ -9,11 +9,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     dm4c.add_listener("init", function() {
 
-        var workspace_dialog
         var workspaces = get_all_workspaces()
 
         create_workspace_menu()
-        create_workspace_dialog()
 
         function create_workspace_menu() {
             // build workspace widget
@@ -32,7 +30,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
                 var workspace_id = menu_item.value
                 update_cookie()
                 if (workspace_id == "_new") {
-                    workspace_dialog.open()
+                    do_open_workspace_dialog()
                 } else {
                     var workspace = dm4c.fetch_topic(workspace_id)
                     dm4c.show_topic(workspace, "show", undefined, true)     // coordinates=undefined, do_center=true
@@ -40,12 +38,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             }
         }
 
-        function create_workspace_dialog() {
+        function do_open_workspace_dialog() {
             var name_input = dm4c.render.input(undefined, 30)
             var dialog_content = $("<form>").attr("action", "#").submit(do_create_workspace)
                 .append($("<div>").addClass("field-label").text("Name"))
                 .append(name_input)
-            workspace_dialog = dm4c.ui.dialog({
+            var workspace_dialog = dm4c.ui.dialog({
                 title: "New Workspace",
                 content: dialog_content,
                 button_label: "Create",
