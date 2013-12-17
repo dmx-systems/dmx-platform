@@ -11,7 +11,6 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
         parent_element.addClass("iconpicker")
             .append(image)
             .append(dm4c.ui.button({on_click: open_choose_icon_dialog, label: "Choose"}))
-        
         //
         return function() {
             // prevent the field from being updated if no icon has been selected
