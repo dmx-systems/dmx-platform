@@ -2,62 +2,21 @@
 CKEditor DeepaMehta Customization
 =================================
 
-Within the Webclient bundle CKEditor is located at /src/main/resources/web/script/vendor/ckeditor/
+Inside the Webclient module CKEditor is located at /src/main/resources/web/script/vendor/ckeditor/
+This is CKEditor 4.3.1
 
-The following files are customized by DeepaMehta and must be preserved when updating CKEditor:
+This is a custom build as configured via http://ckeditor.com/builder
+The purpose for the custom build is we don't need all the languages.
+On the builder page we can proceed with the defaults:
 
-    ckeditor-deepamehta-customization.txt       # this file
-    ckeditor_config.js                          # referenced from DM's html_renderer
-    css/
-        ckeditor_contents.css                   # these styles must match with webclient.css
-    skins/
-        kama_dm/                                # see following update instructions
+    - Preset: Standard
+    - Plugins: no changes against preset
+    - Skin: "Moono"
+    - Languages: English
+    - Source: optimized
 
 
-CKEditor Update Instructions
-----------------------------
+CKEditor Configuration
+----------------------
 
-DeepaMehta uses a CKEditor custom skin "kama_dm".
-This is based on the "kama" skin of CKEditor 3.6.2
-
-Perform these steps when updating CKEditor:
-
-1) Move the original "kama" skin folder to /src/main/resources/web/script/vendor/ckeditor/skins/
-   and rename it to "kama_dm"
-
-2) In 4 files globally replace "kama" by "kama_dm":
-
-    skin.js
-    dialog.css
-    editor.css
-    templates.css
-
-3) In editor.css:
-
-    3a) Purpose: remove a) radius, b) border, c) padding
-        Original (CKEditor 3.6.2) rule:
-
-        span.cke_skin_kama_dm {                 <= Remove entire rule
-            -moz-border-radius: 5px;
-            -webkit-border-radius: 5px;
-            border-radius: 5px;
-            border: 1px solid #D3D3D3;
-            padding: 5px;
-        }
-
-    3b) Purpose: remove radius
-        Original (CKEditor 3.6.2) rule:
-
-        .cke_skin_kama_dm .cke_wrapper {
-            -moz-border-radius: 5px;            <= Remove this
-            -webkit-border-radius: 5px;         <= Remove this
-            -webkit-touch-callout: none;
-            border-radius: 5px;                 <= Remove this
-            background-color: #d3d3d3;
-            background-image: url(images/sprites.png);
-            background-repeat: repeat-x;
-            background-position: 0 -1950px;
-            display: block;
-            _display: inline-block;
-            padding: 5px;
-        }
+No DeepaMehta specific configurations so far.
