@@ -2,15 +2,21 @@
 CKEditor DeepaMehta Customization
 =================================
 
-Inside the Webclient module CKEditor is located at /src/main/resources/web/script/vendor/ckeditor/
-This is CKEditor 4.3.1
-
-This is a custom build as configured via http://ckeditor.com/builder
-The purpose for the custom build is we don't need all the languages.
-On the builder page we can proceed with the defaults:
+This is a custom build of CKEditor 4.3.1 as configured via http://ckeditor.com/builder
 
     - Preset: Standard
-    - Plugins: no changes against preset
+    - Remove plugins:
+        - About CKEditor (about)
+        - Accessibility Help (a11yhelp)
+        - Editor Resize
+        - Elements Path
+        - IFrame Editing Area
+        - Maximize
+        - Source Editing Area
+        - Special Characters (specialchar)
+        - SpellCheckAsYouType (scayt)
+        - Styles Combo
+        - WebSpellChecker (wsc)
     - Skin: "Moono"
     - Languages: English
     - Source: optimized
