@@ -76,6 +76,10 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
         // the Time API and in turn the Core Service API by ID-based property getter methods.
         DeepaMehtaObject object = requestObject(request);
         if (object != null) {
+            if (timeService == null) {
+                throw new RuntimeException("Time service is not available");
+            }
+            //
             long time = timeService.getModificationTime(object);
             Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
             if (response != null) {
@@ -128,8 +132,8 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
         return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
     }
 
-    private void setCacheControlHeader(ContainerResponse response, String directives) {
-        setHeader(response, HEADER_CACHE_CONTROL, directives);
+    private void setCacheControlHeader(ContainerResponse response, String value) {
+        setHeader(response, HEADER_CACHE_CONTROL, value);
     }
 
     // ### FIXME: copy in TimePlugin

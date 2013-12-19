@@ -22,9 +22,10 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
                     modified = page_panel_object_timestamp()
                     //
                     if (modified == undefined) {
+                        var displayed_object = dm4c.page_panel.get_displayed_object()
                         throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
                             "(uri=\"" + request.uri + "\", data=" + JSON.stringify(request.data) +
-                            ", page panel object=" + dm4c.page_panel.get_displayed_object().id + ")"
+                            ", page panel object=" + (displayed_object && displayed_object.id) + ")"
                     }
                 }
                 //
@@ -49,7 +50,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
 
         function page_panel_object_timestamp() {
             var displayed_object = dm4c.page_panel.get_displayed_object()
-            if (object_id == displayed_object.id) {
+            if (displayed_object && displayed_object.id == object_id) {
                 return displayed_object.composite[PROP_URI_MODIFIED].value
             }
         }

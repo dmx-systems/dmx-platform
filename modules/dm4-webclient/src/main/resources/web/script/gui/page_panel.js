@@ -103,6 +103,10 @@ function PagePanel() {
         form_processing_function()
     }
 
+    /**
+     * @return  the object displayed in the page panel (a Topic object, or an Association object),
+     *          or null if nothing is displayed.
+     */
     this.get_displayed_object = function() {
         return displayed_object
     }
