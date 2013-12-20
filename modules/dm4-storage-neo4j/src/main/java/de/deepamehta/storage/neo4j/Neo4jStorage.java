@@ -2,6 +2,7 @@ package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -150,6 +151,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeTopic(TopicModel topicModel) {
+        setDefaults(topicModel);
         String uri = topicModel.getUri();
         checkUriUniqueness(uri);
         //
@@ -239,6 +241,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeAssociation(AssociationModel assocModel) {
+        setDefaults(assocModel);
         String uri = assocModel.getUri();
         checkUriUniqueness(uri);
         //
@@ -1035,9 +1038,19 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
+    // ### TODO: a principal copy exists in DeepaMehtaObjectModel
+    private void setDefaults(DeepaMehtaObjectModel model) {
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
+    }
+
     /**
-     * Checks if a topic with the given URI exists in the database, and if so, throws an exception.
-     * If an empty string is given no check is performed. ### FIXDOC
+     * Checks if a topic or an association with the given URI exists in the DB, and
+     * throws an exception if so. If an empty URI ("") is given no check is performed.
      *
      * @param   uri     The URI to check. Must not be null.
      */

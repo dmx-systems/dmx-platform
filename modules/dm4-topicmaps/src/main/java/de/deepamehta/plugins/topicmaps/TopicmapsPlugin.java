@@ -219,11 +219,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     .put("dm4.topicmaps.translation", new CompositeValueModel()
                         .put("dm4.topicmaps.translation_x", transX)
                         .put("dm4.topicmaps.translation_y", transY)));
-            TopicModel model = new TopicModel(topicmapId, topicmapState);
-            // workaround the "lost URI" problem (see #311) ### FIXME
-            model.setUri(dms.getTopic(topicmapId, false).getUri());
-            //
-            dms.updateTopic(model, null);
+            dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
                 transX + ", transY=" + transY + ")", e);

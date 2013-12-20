@@ -32,6 +32,21 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    /**
+     * Stores a rudimentary topic in the DB.
+     * <p>
+     * Only the topic URI and the topic type URI are stored.
+     * The topic value (simple or composite) is <i>not</i> stored.
+     * The "Instantiation" association is <i>not</i> stored.
+     * <p>
+     * An URI uniqueness check is performed. If the DB already contains a topic or an association with
+     * the URI passed, an exception is thrown and nothing is stored.
+     *
+     * @param   topicModel  The topic to store. Once the method returns the topic model contains:
+     *                          - the ID of the stored topic.
+     *                          - an empty URI ("") in case <code>null</code> was passed.
+     *                          - an empty simple value ("") in case <code>null</code> was passed.
+     */
     void storeTopic(TopicModel topicModel);
 
     void storeTopicUri(long topicId, String uri);

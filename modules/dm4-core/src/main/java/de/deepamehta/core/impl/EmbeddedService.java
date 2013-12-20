@@ -744,7 +744,6 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private Topic topicFactory(TopicModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
-        setDefaults(model);
         storageDecorator.storeTopic(model);
         valueStorage.storeValue(model, clientState, directives);
         createTopicInstantiation(model.getId(), model.getTypeUri());
@@ -759,7 +758,6 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private Association associationFactory(AssociationModel model, ClientState clientState, Directives directives) {
         // 1) store in DB
-        setDefaults(model);
         storageDecorator.storeAssociation(model);
         valueStorage.storeValue(model, clientState, directives);
         createAssociationInstantiation(model.getId(), model.getTypeUri());
@@ -803,16 +801,6 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     // ---
-
-    // ### TODO: differentiate between a model and an update model and then drop this method
-    private void setDefaults(DeepaMehtaObjectModel model) {
-        if (model.getUri() == null) {
-            model.setUri("");
-        }
-        if (model.getSimpleValue() == null) {
-            model.setSimpleValue("");
-        }
-    }
 
     private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
         Topic typeTopic = topicFactory(model, null, null);   // ### FIXME: clientState, directives

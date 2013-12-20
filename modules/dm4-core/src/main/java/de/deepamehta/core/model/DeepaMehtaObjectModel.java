@@ -7,8 +7,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-// ### TODO: differentiate between a model and an update model.
-// ### The latter's constructor must set no default values (see #311).
 public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled, Cloneable {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -55,12 +53,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(id, null, null);
     }
 
-    public DeepaMehtaObjectModel(long id, String typeUri) {
-        this(id, typeUri, null);
-    }
-
     public DeepaMehtaObjectModel(long id, CompositeValueModel composite) {
         this(id, null, composite);
+    }
+
+    public DeepaMehtaObjectModel(long id, String typeUri) {
+        this(id, typeUri, null);
     }
 
     public DeepaMehtaObjectModel(long id, String typeUri, CompositeValueModel composite) {
@@ -68,17 +66,19 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     }
 
     /**
-     * @param   uri         If <code>null</code> an empty string is set. This is OK. ### FIXDOC
-     * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null). ### FIXDOC
-     * @param   value       If <code>null</code> an empty string value is set. This is OK. ### FIXDOC
-     * @param   composite   If <code>null</code> an empty composite is set. This is OK. ### FIXDOC
+     * @param   id          Optional (-1 is a valid value and represents "not set").
+     * @param   uri         Optional (<code>null</code> is a valid value).
+     * @param   typeUri     Mandatory in the context of a create operation.
+     *                      Optional (<code>null</code> is a valid value) in the context of an update opereation.
+     * @param   value       Optional (<code>null</code> is a valid value).
+     * @param   composite   Optional (<code>null</code> is a valid value and is transformed into an empty composite).
      */
     public DeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                       CompositeValueModel composite) {
         this.id = id;
-        this.uri = uri != null ? uri : "";                          // ### FIXME: don't set default at this level
+        this.uri = uri;
         this.typeUri = typeUri;
-        this.value = value != null ? value : new SimpleValue("");   // ### FIXME: don't set default at this level
+        this.value = value;
         this.composite = composite != null ? composite : new CompositeValueModel();
     }
 
@@ -209,6 +209,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     @Override
     public JSONObject toJSON() {
         try {
+            // Note: for models used for topic/association enrichment (e.g. timestamps, permissions)
+            // default values must be set in case they are not fully initialized.
+            setDefaults();
+            //
             JSONObject o = new JSONObject();
             o.put("id", id);
             o.put("uri", uri);
@@ -250,5 +254,20 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", typeUri=\"" + typeUri + "\", value=\"" + value +
             "\", composite=" + composite;
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // ### TODO: a principal copy exists in Neo4jStorage.
+    // Should this be public? It is not meant to be called by the user.
+    private void setDefaults() {
+        if (getUri() == null) {
+            setUri("");
+        }
+        if (getSimpleValue() == null) {
+            setSimpleValue("");
+        }
     }
 }
