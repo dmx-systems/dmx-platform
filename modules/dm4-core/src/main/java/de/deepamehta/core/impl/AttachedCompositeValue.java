@@ -73,7 +73,7 @@ class AttachedCompositeValue implements CompositeValue {
     @Override
     public Topic getTopic(String childTypeUri, Topic defaultTopic) {
         loadChildTopics(childTypeUri);
-        return _getTopic(childTypeUri, defaultTopic);
+        return _getTopic(childTypeUri, (AttachedTopic) defaultTopic);
     }
 
     // ---
@@ -328,8 +328,8 @@ class AttachedCompositeValue implements CompositeValue {
         return topic;
     }
 
-    private Topic _getTopic(String childTypeUri, Topic defaultTopic) {
-        Topic topic = (Topic) childTopics.get(childTypeUri);
+    private AttachedTopic _getTopic(String childTypeUri, AttachedTopic defaultTopic) {
+        AttachedTopic topic = (AttachedTopic) childTopics.get(childTypeUri);
         return topic != null ? topic : defaultTopic;
     }
 
@@ -376,13 +376,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     private void updateCompositionOne(TopicModel newChildTopic, AssociationDefinition assocDef,
                                                                 ClientState clientState, Directives directives) {
-        Topic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (childTopic != null) {
             // == update child ==
             // update DB
-            childTopic.update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, clientState, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             // == create child ==
@@ -492,10 +492,10 @@ class AttachedCompositeValue implements CompositeValue {
 
     private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
                                                                                                Directives directives) {
-        RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
+        AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
             // update DB
-            childTopic.update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, clientState, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -505,10 +505,10 @@ class AttachedCompositeValue implements CompositeValue {
 
     private void updateChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
                                                                                                 Directives directives) {
-        Topic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
+        AttachedTopic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
         if (childTopic != null) {
             // update DB
-            childTopic.update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, clientState, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -671,11 +671,11 @@ class AttachedCompositeValue implements CompositeValue {
 
     // === Helper ===
 
-    private RelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
+    private AttachedRelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
         List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
         for (Topic childTopic : childTopics) {
             if (childTopic.getId() == childTopicId) {
-                return (RelatedTopic) childTopic;
+                return (AttachedRelatedTopic) childTopic;
             }
         }
         return null;

@@ -117,6 +117,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     private void updateAssocTypeUri(AssociationDefinitionModel newModel, ClientState clientState,
                                                                          Directives directives) {
         String newTypeUri = newModel.getTypeUri();
+        // abort if no update is requested
         if (newTypeUri == null) {
             return;
         }
@@ -131,6 +132,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private void updateParentCardinality(String newParentCardinalityUri, ClientState clientState,
                                                                          Directives directives) {
+        // abort if no update is requested
         if (newParentCardinalityUri == null) {
             return;
         }
@@ -145,6 +147,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private void updateChildCardinality(String newChildCardinalityUri, ClientState clientState,
                                                                        Directives directives) {
+        // abort if no update is requested
         if (newChildCardinalityUri == null) {
             return;
         }

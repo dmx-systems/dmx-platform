@@ -219,7 +219,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting the creator of object " + object.getId() + " failed", e);
+            throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
+                e);
         } finally {
             tx.finish();
         }
@@ -242,7 +243,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting the owner of object " + object.getId() + " failed", e);
+            throw new RuntimeException("Setting the owner of " + info(object) + " failed (username=" + username + ")",
+                e);
         } finally {
             tx.finish();
         }
@@ -261,7 +263,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 return new AccessControlList();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the ACL of object " + object.getId() + " failed", e);
+            throw new RuntimeException("Fetching the ACL of " + info(object) + " failed", e);
         }
     }
 
@@ -273,7 +275,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Setting the ACL of object " + object.getId() + " failed", e);
+            throw new RuntimeException("Setting the ACL of " + info(object) + " failed", e);
         } finally {
             tx.finish();
         }
@@ -801,6 +803,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    /**
+     * @param   username    must not be null.
+     */
     private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
         setCreator(object, username);
         setOwner(object, username);

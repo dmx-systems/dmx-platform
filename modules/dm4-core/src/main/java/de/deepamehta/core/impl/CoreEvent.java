@@ -99,6 +99,15 @@ enum CoreEvent {
         }
     },
 
+    POST_UPDATE_TOPIC_REQUEST(PostUpdateTopicRequestListener.class) {
+        @Override
+        void deliver(Listener listener, Object... params) {
+            ((PostUpdateTopicRequestListener) listener).postUpdateTopicRequest(
+                (Topic) params[0]
+            );
+        }
+    },
+
     PRE_DELETE_ASSOCIATION(PreDeleteAssociationListener.class) {
         @Override
         void deliver(Listener listener, Object... params) {

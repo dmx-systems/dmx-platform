@@ -87,16 +87,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public void update(TopicModel model, ClientState clientState, Directives directives) {
-        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        _update(model, clientState, directives);
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
-        //
-        TopicModel oldModel = getModel().clone();
-        super.update(model, clientState, directives);
-        //
-        addUpdateDirective(directives);
-        //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
 
 
@@ -195,6 +188,25 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         return (TopicType) getType();
     }
 
+    /**
+     * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
+     * <p>
+     * Called multiple times while updating a composite value (see AttachedCompositeValue).
+     * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
+     */
+    void _update(TopicModel model, ClientState clientState, Directives directives) {
+        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        //
+        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
+        //
+        TopicModel oldModel = getModel().clone();
+        super.update(model, clientState, directives);
+        //
+        addUpdateDirective(directives);
+        //
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+    }
+
 
 
     // === Implementation of the abstract methods ===
@@ -231,8 +243,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                          String othersRoleTypeUri, String othersTopicTypeUri,
-                                                          int maxResultSize) {
+                                                           String othersRoleTypeUri, String othersTopicTypeUri,
+                                                           int maxResultSize) {
         return dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);
     }

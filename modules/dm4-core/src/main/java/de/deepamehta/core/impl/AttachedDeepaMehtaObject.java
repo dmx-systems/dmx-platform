@@ -181,12 +181,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     public void update(DeepaMehtaObjectModel newModel, ClientState clientState, Directives directives) {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
-        //
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getCompositeValue().update(newModel.getCompositeValueModel(), clientState, directives);
-        } else {
-            updateSimpleValue(newModel.getSimpleValue());
-        }
+        updateValue(newModel, clientState, directives);
     }
 
     // ---
@@ -364,6 +359,14 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             logger.info("### Changing type URI of " + className() + " " + getId() +
                 " from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
             setTypeUri(newTypeUri);
+        }
+    }
+
+    private void updateValue(DeepaMehtaObjectModel newModel, ClientState clientState, Directives directives) {
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            getCompositeValue().update(newModel.getCompositeValueModel(), clientState, directives);
+        } else {
+            updateSimpleValue(newModel.getSimpleValue());
         }
     }
 
