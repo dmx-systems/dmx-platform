@@ -15,6 +15,7 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PostUpdateTopicRequestListener;
 import de.deepamehta.core.service.event.PreSendAssociationListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.service.event.ServiceResponseFilterListener;
@@ -23,10 +24,6 @@ import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.POST;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -36,8 +33,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
@@ -49,6 +48,7 @@ import java.util.logging.Logger;
 public class TimePlugin extends PluginActivator implements TimeService, PostCreateTopicListener,
                                                                         PostCreateAssociationListener,
                                                                         PostUpdateTopicListener,
+                                                                        PostUpdateTopicRequestListener,
                                                                         PostUpdateAssociationListener,
                                                                         PreSendTopicListener,
                                                                         PreSendAssociationListener,
@@ -178,6 +178,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     @Override
+    public void postUpdateTopicRequest(Topic topic) {
+        storeParentsTimestamp(topic);
+    }
+
+    // ---
+
+    @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
         enrichWithTimestamp(topic);
     }
@@ -211,6 +218,14 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     private void storeTimestamp(DeepaMehtaObject object) {
         long time = System.currentTimeMillis();
         storeModificationTime(object, time);
+    }
+
+    // ---
+
+    private void storeParentsTimestamp(Topic topic) {
+        for (DeepaMehtaObject object : getParents(topic)) {
+            storeTimestamp(object);
+        }
     }
 
     // ---
@@ -261,5 +276,29 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         }
         //
         headers.putSingle(header, value);
+    }
+
+    // ---
+
+    /**
+     * Returns all parent topics/associations of the given topic (recursively).
+     * Traversal is informed by the "parent" and "child" role types.
+     * Traversal stops when no parent exists or when an association is met.
+     */
+    private Set<DeepaMehtaObject> getParents(Topic topic) {
+        Set<DeepaMehtaObject> parents = new LinkedHashSet();
+        //
+        List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
+            "dm4.core.parent", null, false, false, 0).getItems();
+        List<? extends Association> parentAssocs = topic.getRelatedAssociations(null, "dm4.core.child",
+            "dm4.core.parent", null, false, false);
+        parents.addAll(parentTopics);
+        parents.addAll(parentAssocs);
+        //
+        for (Topic parentTopic : parentTopics) {
+            parents.addAll(getParents(parentTopic));
+        }
+        //
+        return parents;
     }
 }
