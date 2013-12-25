@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Listener;
 
 import javax.ws.rs.WebApplicationException;
@@ -16,13 +17,21 @@ class EventManager {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * The registered listeners, hashed by event name (name of CoreEvent enum constant, e.g. "POST_CREATE_TOPIC").
+     * The registered listeners (key: event class name, value: listeners).
      */
     private Map<String, List<Listener>> listenerRegistry = new HashMap();
 
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
+    EventManager() {
+        // Note: actually the class CoreEvent does not need to be instantiated as it contains only statics.
+        // But if not instantiated OSGi apparently does not load the class at all.
+        new CoreEvent();
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void addListener(CoreEvent event, Listener listener) {
+    void addListener(DeepaMehtaEvent event, Listener listener) {
         List<Listener> listeners = getListeners(event);
         if (listeners == null) {
             listeners = new ArrayList();
@@ -31,7 +40,7 @@ class EventManager {
         listeners.add(listener);
     }
 
-    void removeListener(CoreEvent event, Listener listener) {
+    void removeListener(DeepaMehtaEvent event, Listener listener) {
         List<Listener> listeners = getListeners(event);
         if (!listeners.remove(listener)) {
             throw new RuntimeException("Removing " + listener + " from " +
@@ -41,7 +50,7 @@ class EventManager {
 
     // ---
 
-    void fireEvent(CoreEvent event, Object... params) {
+    void fireEvent(DeepaMehtaEvent event, Object... params) {
         List<Listener> listeners = getListeners(event);
         if (listeners != null) {
             // ### FIXME: ConcurrentModificationException might occur. Still true?
@@ -51,7 +60,7 @@ class EventManager {
         }
     }
 
-    void deliverEvent(Listener listener, CoreEvent event, Object... params) {
+    void deliverEvent(Listener listener, DeepaMehtaEvent event, Object... params) {
         try {
             event.deliver(listener, params);
         } catch (WebApplicationException e) {
@@ -66,11 +75,11 @@ class EventManager {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private List<Listener> getListeners(CoreEvent event) {
-        return listenerRegistry.get(event.name());
+    private List<Listener> getListeners(DeepaMehtaEvent event) {
+        return listenerRegistry.get(event.getClass().getName());
     }
 
-    private void putListeners(CoreEvent event, List<Listener> listeners) {
-        listenerRegistry.put(event.name(), listeners);
+    private void putListeners(DeepaMehtaEvent event, List<Listener> listeners) {
+        listenerRegistry.put(event.getClass().getName(), listeners);
     }
 }

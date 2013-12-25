@@ -50,11 +50,10 @@ function PagePanel() {
         // update view
         render_form()
         // set focus
-        $("#page-content input, #page-content iframe").eq(0).focus()
-        // FIXME: "iframe" is TinyMCE specific. Another WYSIWYG editor plugin might be in use.
-        // FIXME: multiline plain text fields (<textarea>) should be considered too. Omitted for the
-        // moment because a TinyMCE's textarea is hidden ("display: none") and can't be focused.
-        // ### Update: TinyMCE is replaced by CKEditor meanwhile.
+        $("#page-content input, #page-content div[contenteditable=true]").eq(0).focus()
+        // ### FIXME: focusing a CKEditor instance doesn't work this way (instance not yet ready?)
+        // ### FIXME: multiline plain text fields (<textarea>) should be considered too. Note: for the
+        // moment a CKEditor instance underlies a <textarea> too (display=none), see HTML Renderer.
     }
 
     this.render_form_if_selected = function(topic_or_association) {

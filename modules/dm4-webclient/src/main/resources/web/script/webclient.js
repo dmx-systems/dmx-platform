@@ -426,6 +426,20 @@ dm4c = new function() {
 
     // ---
 
+    /**
+     * @param   topic_or_association    A Topic object or an Association object.
+     *
+     * Note: because of the Webclient's intrinsic UI logic -- the page panel displays nothing but the selected
+     * object -- no argument should be required here (it should always be dm4c.selected_object). However, custom
+     * topicmap renderers may break this principle.
+     * In fact the Geomaps renderer does: the selection model contains the sole "Geo Coordinate" topic while
+     * the page panel displays the geo-aware topic, e.g. a Person.
+     */
+    this.enter_edit_mode = function(topic_or_association) {
+        // update GUI
+        dm4c.page_panel.render_form(topic_or_association)
+    }
+
     this.restore_selection = function() {
         if (dm4c.selected_object instanceof Topic) {
             dm4c.do_select_topic(dm4c.selected_object.id)
@@ -1169,22 +1183,6 @@ dm4c = new function() {
         if (menu.dom.parents("#page-content").length == 0) {
             dm4c.page_panel.save()
         }
-    }
-
-    // ---
-
-    /**
-     * @param   topic_or_association    A Topic object or an Association object.
-     *
-     * Note: because of the Webclient's intrinsic UI logic -- the page panel displays nothing but the selected
-     * object -- no argument should be required here (it should always be dm4c.selected_object). However, custom
-     * topicmap renderers may break this principle.
-     * In fact the Geomaps renderer does: the selection model contains the sole "Geo Coordinate" topic while
-     * the page panel displays the geo-aware topic, e.g. a Person.
-     */
-    this.enter_edit_mode = function(topic_or_association) {
-        // update GUI
-        dm4c.page_panel.render_form(topic_or_association)
     }
 
     // ---

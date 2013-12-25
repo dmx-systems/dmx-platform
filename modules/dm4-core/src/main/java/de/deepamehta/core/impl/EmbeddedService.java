@@ -20,6 +20,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Plugin;
@@ -594,7 +595,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Events ===
 
-    void fireEvent(CoreEvent event, Object... params) {
+    void fireEvent(DeepaMehtaEvent event, Object... params) {
         eventManager.fireEvent(event, params);
     }
 
