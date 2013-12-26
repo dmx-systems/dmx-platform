@@ -547,6 +547,15 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
+    // === Events ===
+
+    @Override
+    public void fireEvent(DeepaMehtaEvent event, Object... params) {
+        eventManager.fireEvent(event, params);
+    }
+
+
+
     // === Properties ===
 
     @Override
@@ -590,14 +599,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === Events ===
-
-    void fireEvent(DeepaMehtaEvent event, Object... params) {
-        eventManager.fireEvent(event, params);
-    }
 
 
 

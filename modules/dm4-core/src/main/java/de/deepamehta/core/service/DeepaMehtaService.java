@@ -167,6 +167,12 @@ public interface DeepaMehtaService {
 
 
 
+    // === Events ===
+
+    void fireEvent(DeepaMehtaEvent event, Object... params);
+
+
+
     // === Properties ===
 
     List<Topic> getTopicsByProperty(String propUri, Object propValue);
