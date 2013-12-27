@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
+import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
+import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
 import de.deepamehta.plugins.accesscontrol.model.ACLEntry;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
@@ -22,7 +24,9 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.Listener;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -113,6 +117,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static String URI_OWNER = "dm4.accesscontrol.owner";
     private static String URI_ACL = "dm4.accesscontrol.acl";
 
+    // Events
+    private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
+        @Override
+        public void deliver(Listener listener, Object... params) {
+            ((PostLoginUserListener) listener).postLoginUser(
+                (String) params[0]
+            );
+        }
+    };
+    private static DeepaMehtaEvent POST_LOGOUT_USER = new DeepaMehtaEvent(PostLogoutUserListener.class) {
+        @Override
+        public void deliver(Listener listener, Object... params) {
+            ((PostLogoutUserListener) listener).postLogoutUser(
+                (String) params[0]
+            );
+        }
+    };
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private WorkspacesService wsService;
@@ -145,9 +167,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/logout")
     @Override
     public void logout() {
-        HttpSession session = request.getSession(false);        // create=false
-        logger.info("##### Logging out from " + info(session));
-        session.invalidate();
+        _logout(request);
         //
         // For a "private" DeepaMehta installation: emulate a HTTP logout by forcing the webbrowser to bring up its
         // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
@@ -652,18 +672,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks weather the credentials are valid and if so creates a session.
+     * Checks weather the credentials are valid and if so logs the user in.
      *
      * @return  true if the credentials are valid.
      */
     private boolean tryLogin(Credentials cred, HttpServletRequest request) {
+        String username = cred.username;
         if (checkCredentials(cred)) {
-            HttpSession session = createSession(cred.username, request);
-            logger.info("##### Logging in as \"" + cred.username + "\" => SUCCESSFUL!" +
-                "\n      ##### Creating new " + info(session));
+            logger.info("##### Logging in as \"" + username + "\" => SUCCESSFUL!");
+            _login(username, request);
             return true;
         } else {
-            logger.info("##### Logging in as \"" + cred.username + "\" => FAILED!");
+            logger.info("##### Logging in as \"" + username + "\" => FAILED!");
             return false;
         }
     }
@@ -676,10 +696,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return matches(username, cred.password);
     }
 
-    private HttpSession createSession(String username, HttpServletRequest request) {
+    // ---
+
+    private void _login(String username, HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.setAttribute("username", username);
-        return session;
+        logger.info("##### Creating new " + info(session));
+        //
+        dms.fireEvent(POST_LOGIN_USER, username);
+    }
+
+    private void _logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);    // create=false
+        String username = username(session);                // save username before invalidating
+        logger.info("##### Logging out from " + info(session));
+        //
+        session.invalidate();
+        //
+        dms.fireEvent(POST_LOGOUT_USER, username);
     }
 
     // ---
