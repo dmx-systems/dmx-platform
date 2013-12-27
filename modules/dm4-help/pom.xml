@@ -17,6 +17,15 @@
         <relativePath>../dm4-parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <!-- Note: ${maven.build.timestamp} is not substituted in filtered resources. This is a Maven bug.          -->
+        <!-- http://jira.codehaus.org/browse/MRESOURCES-99                                                          -->
+        <!-- A workaround is to put it in a property and access the property from the filtered resource.            -->
+        <!-- http://stackoverflow.com/questions/13228472/how-to-acces-maven-build-timestamp-for-resource-filtering  -->
+        <build.date>${maven.build.timestamp}</build.date>
+        <maven.build.timestamp.format>MMM d, yyyy</maven.build.timestamp.format> <!-- default is "yyyyMMdd-HHmm"    -->
+    </properties>        
+
     <build>
         <resources>
             <resource>
