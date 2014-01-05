@@ -20,7 +20,7 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
     },
 
     render_form: function(page_models, parent_element, level) {
-        var topics = option_topics(page_models[0])
+        var topics = dm4c.render.get_option_topics(page_models[0])
         var checkboxes = {}
         dm4c.render.field_label(page_models[0], parent_element)
         // render checkboxes
@@ -49,22 +49,6 @@ dm4c.add_multi_renderer("dm4.webclient.checkbox_renderer", {
                 }
             }
             return values
-        }
-
-        // ### TODO: there is a copy in TextRenderer
-        function option_topics(page_model) {
-            var result = dm4c.fire_event("option_topics", page_model)
-            var topic_type_uri = page_model.object_type.uri
-            switch (result.length) {
-            case 0:
-                // fetch all instances                        // fetch_composite=false, sort=true
-                return dm4c.restc.get_topics(topic_type_uri, false, true).items
-            case 1:
-                return result[0]
-            default:
-                throw "CheckboxRendererError: " + result.length + " plugins are competing with " +
-                    "providing the option topics for \"" + topic_type_uri + "\""
-            }
         }
 
         function is_checked(topic) {

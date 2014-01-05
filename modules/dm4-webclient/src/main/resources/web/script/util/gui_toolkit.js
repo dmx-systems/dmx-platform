@@ -667,9 +667,13 @@ function GUIToolkit(config) {
              * To examine which case occured the caller uses "typeof" on the returned value.
              */
             this.get_selection = function() {
-                var text = $.trim(input.val())
+                var text = this.val()
                 var item = menu.find_item_by_label(text)
                 return item || text
+            }
+
+            this.val = function() {
+                return $.trim(input.val())
             }
 
             function do_select_item(item) {

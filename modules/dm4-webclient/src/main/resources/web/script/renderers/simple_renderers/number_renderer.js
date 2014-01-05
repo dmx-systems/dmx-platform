@@ -6,19 +6,16 @@ dm4c.add_simple_renderer("dm4.webclient.number_renderer", {
     },
 
     render_form: function(page_model, parent_element) {
-        var input = dm4c.render.input(page_model)
-        parent_element.append(input)
+        var form_element = dm4c.render.form_element(page_model, parent_element)
         //
         return function() {
-            var val = $.trim(input.val())
-            var value = Number(val)
-            if (isNaN(value)) {
-                alert("WARNING: \"" + val + "\" is not a number.\n" +
-                    "(field \"" + page_model.label + "\")\n\n" +
+            var val = form_element.val()
+            if (isNaN(Number(val))) {
+                alert("\"" + val + "\" is not a number.\n(field \"" + page_model.label + "\")\n\n" +
                     "The old value is restored.")
                 return null     // prevent this field from being updated
             }
-            return value
+            return dm4c.render.form_element_function(form_element)()
         }
     }
 })

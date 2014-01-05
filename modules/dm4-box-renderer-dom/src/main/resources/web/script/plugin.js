@@ -41,7 +41,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
 
         function do_open_color_dialog() {
             // Note: topics added to a topicmap while the Box Renderer is not active have no stored color
-            var current_color = canvas_view.get_topic(topic.id).view_props[PROP_COLOR] || DEFAULT_TOPIC_COLOR
+            var current_color = canvas_view.get_topic(topic.id).view_props[PROP_COLOR] || DEFAULT_TOPIC_COLOR
             var content = $()
             add_color_row("100%", "90%")
             add_color_row( "80%", "80%")
