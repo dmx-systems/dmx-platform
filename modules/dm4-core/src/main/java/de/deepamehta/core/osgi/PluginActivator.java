@@ -61,6 +61,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     public void stop(BundleContext context) {
         try {
             logger.info("========== Stopping " + this + " ==========");
+            shutdown();
             plugin.stop();
         } catch (Exception e) {
             logger.severe("Stopping " + this + " failed:");
@@ -79,6 +80,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     @Override
     public void init() {
+    }
+
+    @Override
+    public void shutdown() {
     }
 
     @Override

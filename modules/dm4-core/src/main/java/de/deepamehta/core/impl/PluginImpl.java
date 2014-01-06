@@ -121,8 +121,8 @@ public class PluginImpl implements Plugin, EventHandler {
             registerEventListener();
         }
         //
-        createCoreServiceTrackers();    // ### FIXME: move to constructor?
-        createPluginServiceTrackers();  // ### FIXME: move to constructor?
+        createCoreServiceTrackers();    // ### TODO: move to constructor?
+        createPluginServiceTrackers();  // ### TODO: move to constructor?
         //
         openCoreServiceTrackers();
     }
