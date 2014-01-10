@@ -1,6 +1,8 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Listener;
 
 import javax.ws.rs.WebApplicationException;
@@ -21,9 +23,12 @@ class EventManager {
      */
     private Map<String, List<Listener>> listenerRegistry = new HashMap();
 
+    private DeepaMehtaService dms;
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    EventManager() {
+    EventManager(DeepaMehtaService dms) {
+        this.dms = dms;
         // Note: actually the class CoreEvent does not need to be instantiated as it contains only statics.
         // But if not instantiated OSGi apparently does not load the class at all.
         new CoreEvent();
@@ -53,14 +58,38 @@ class EventManager {
     void fireEvent(DeepaMehtaEvent event, Object... params) {
         List<Listener> listeners = getListeners(event);
         if (listeners != null) {
-            // ### FIXME: ConcurrentModificationException might occur. Still true?
             for (Listener listener : listeners) {
                 deliverEvent(listener, event, params);
             }
         }
     }
 
-    void deliverEvent(Listener listener, DeepaMehtaEvent event, Object... params) {
+    // ---
+
+    /**
+     * Checks weather the given plugin is a listener for the given event, and if so, delivers the event to the plugin.
+     * Otherwise nothing is performed.
+     */
+    void deliverEvent(PluginImpl plugin, DeepaMehtaEvent event, Object... params) {
+        PluginContext pluginContext = plugin.getContext();
+        if (!isListener(pluginContext, event)) {
+            return;
+        }
+        //
+        deliverEvent((Listener) pluginContext, event, params);
+    }
+
+    /**
+     * Convenience method to check weather the specified plugin is a listener for the given event, and if so,
+     * delivers the event to the plugin. Otherwise nothing is performed.
+     */
+    void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
+        deliverEvent((PluginImpl) dms.getPlugin(pluginUri), event, params);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void deliverEvent(Listener listener, DeepaMehtaEvent event, Object... params) {
         try {
             event.deliver(listener, params);
         } catch (WebApplicationException e) {
@@ -73,7 +102,16 @@ class EventManager {
         }
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
+
+    /**
+     * Returns true if the given plugin is a listener for the given event.
+     */
+    private boolean isListener(PluginContext pluginContext, DeepaMehtaEvent event) {
+        return event.getListenerInterface().isAssignableFrom(pluginContext.getClass());
+    }
+
+    // ---
 
     private List<Listener> getListeners(DeepaMehtaEvent event) {
         return listenerRegistry.get(event.getClass().getName());

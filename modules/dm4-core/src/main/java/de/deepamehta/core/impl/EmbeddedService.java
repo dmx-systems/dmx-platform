@@ -70,7 +70,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.bundleContext = bundleContext;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.eventManager = new EventManager();
+        this.eventManager = new EventManager(this);
         this.typeCache = new TypeCache(this);
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
@@ -552,6 +552,11 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void fireEvent(DeepaMehtaEvent event, Object... params) {
         eventManager.fireEvent(event, params);
+    }
+
+    @Override
+    public void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
+        eventManager.deliverEvent(pluginUri, event, params);
     }
 
 

@@ -171,6 +171,8 @@ public interface DeepaMehtaService {
 
     void fireEvent(DeepaMehtaEvent event, Object... params);
 
+    void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params);
+
 
 
     // === Properties ===

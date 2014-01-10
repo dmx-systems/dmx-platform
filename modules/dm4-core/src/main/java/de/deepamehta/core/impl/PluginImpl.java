@@ -188,6 +188,10 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginInfo;
     }
 
+    PluginContext getContext() {
+        return pluginContext;
+    }
+
     Topic getPluginTopic() {
         return pluginTopic;
     }
@@ -552,7 +556,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 }
                 //
                 TopicType topicType = dms.getTopicType(topicTypeUri);
-                fireEventLocally(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
@@ -563,7 +567,7 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             for (String assocTypeUri : dms.getAssociationTypeUris()) {
                 AssociationType assocType = dms.getAssociationType(assocTypeUri);
-                fireEventLocally(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);
@@ -627,21 +631,14 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     /**
-     * Fires an event locally, that is it is delivered only to this plugin itself.
-     * If this plugin is not a listener for that event nothing is performed.
+     * Checks weather this plugin is a listener for the given event, and if so, delivers the event to this plugin.
+     * Otherwise nothing is performed.
      * <p>
-     * Called internally to fire the INTRODUCE_TOPIC_TYPE event.
+     * Called internally to deliver the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
-    private void fireEventLocally(DeepaMehtaEvent event, Object... params) {
-        if (!isListener(event)) {
-            return;
-        }
-        //
-        logger.fine("### Firing " + event + " locally from/to " + this);
-        dms.eventManager.deliverEvent((Listener) pluginContext, event, params);
+    private void deliverEvent(DeepaMehtaEvent event, Object... params) {
+        dms.eventManager.deliverEvent(this, event, params);
     }
-
-    // ---
 
     /**
      * Returns true if the specified interface is a listener interface.
@@ -649,13 +646,6 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private boolean isListenerInterface(Class interfaze) {
         return Listener.class.isAssignableFrom(interfaze);
-    }
-
-    /**
-     * Returns true if this plugin is a listener for the specified event.
-     */
-    private boolean isListener(DeepaMehtaEvent event) {
-        return event.getListenerInterface().isAssignableFrom(pluginContext.getClass());
     }
 
 

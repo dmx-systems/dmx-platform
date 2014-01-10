@@ -318,6 +318,8 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // --- Access this attached object cache ---
+
     private Topic _getTopic(String childTypeUri) {
         Topic topic = (Topic) childTopics.get(childTypeUri);
         // error check
