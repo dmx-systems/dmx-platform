@@ -151,6 +151,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
+    public String getUri() {
+        return pluginUri;
+    }
+
     /**
      * Uses the plugin bundle's class loader to find a resource.
      *
@@ -179,10 +183,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    String getUri() {
-        return pluginUri;
-    }
 
     PluginInfo getInfo() {
         return pluginInfo;

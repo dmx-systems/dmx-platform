@@ -114,6 +114,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     // ===
 
+    @Override
     public String toString() {
         return plugin.toString();
     }
@@ -121,6 +122,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
+
+    protected String getUri() {
+        return plugin.getUri();
+    }
 
     /**
      * @param   securityHandler     Optional. If null no security is provided.
