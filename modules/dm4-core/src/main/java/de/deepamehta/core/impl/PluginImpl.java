@@ -12,7 +12,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
@@ -590,14 +590,14 @@ public class PluginImpl implements Plugin, EventHandler {
         List<DeepaMehtaEvent> events = getEvents();
         //
         if (events.size() == 0) {
-            logger.info("Registering listeners of " + this + " at DeepaMehta 4 core service ABORTED " +
-                "-- no listeners implemented");
+            logger.info("Registering event listeners of " + this + " at DeepaMehta 4 core service ABORTED " +
+                "-- no event listeners implemented");
             return;
         }
         //
-        logger.info("Registering " + events.size() + " listeners of " + this + " at DeepaMehta 4 core service");
+        logger.info("Registering " + events.size() + " event listeners of " + this + " at DeepaMehta 4 core service");
         for (DeepaMehtaEvent event : events) {
-            dms.eventManager.addListener(event, (Listener) pluginContext);
+            dms.eventManager.addListener(event, (EventListener) pluginContext);
         }
     }
 
@@ -607,9 +607,9 @@ public class PluginImpl implements Plugin, EventHandler {
             return;
         }
         //
-        logger.info("Unregistering listeners of " + this + " at DeepaMehta 4 core service");
+        logger.info("Unregistering event listeners of " + this + " at DeepaMehta 4 core service");
         for (DeepaMehtaEvent event : events) {
-            dms.eventManager.removeListener(event, (Listener) pluginContext);
+            dms.eventManager.removeListener(event, (EventListener) pluginContext);
         }
     }
 
@@ -623,7 +623,7 @@ public class PluginImpl implements Plugin, EventHandler {
         for (Class interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
                 DeepaMehtaEvent event = DeepaMehtaEvent.getEvent(interfaze);
-                logger.fine("### Listener Interface: " + interfaze + ", event=" + event);
+                logger.fine("### EventListener Interface: " + interfaze + ", event=" + event);
                 events.add(event);
             }
         }
@@ -641,11 +641,11 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     /**
-     * Returns true if the specified interface is a listener interface.
-     * A listener interface is a sub-interface of {@link Listener}.
+     * Returns true if the specified interface is an event listener interface.
+     * A event listener interface is a sub-interface of {@link EventListener}.
      */
     private boolean isListenerInterface(Class interfaze) {
-        return Listener.class.isAssignableFrom(interfaze);
+        return EventListener.class.isAssignableFrom(interfaze);
     }
 
 

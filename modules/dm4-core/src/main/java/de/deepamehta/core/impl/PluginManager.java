@@ -54,8 +54,8 @@ class PluginManager {
      * <p>
      * Note: this method is synchronized. While a plugin is activated no other plugin must be activated. Otherwise
      * the "type introduction" mechanism might miss some types. Consider this unsynchronized scenario: plugin B
-     * starts running its migrations just in the moment between plugin A's type introduction and listener registration.
-     * Plugin A might miss some of the types created by plugin B.
+     * starts running its migrations just in the moment between plugin A's type introduction and event listener
+     * registration. Plugin A might miss some of the types created by plugin B.
      */
     synchronized void activatePlugin(PluginImpl plugin) {
         // Note: we must not activate a plugin twice.
@@ -114,7 +114,7 @@ class PluginManager {
      * Activation comprises:
      *   - install the plugin in the database (includes migrations, post-install event, type introduction)
      *   - initialize the plugin
-     *   - register the plugin's listeners
+     *   - register the plugin's event listeners
      *   - register the plugin's OSGi service
      *   - add the plugin to the pool of activated plugins
      */
@@ -126,7 +126,7 @@ class PluginManager {
             plugin.initializePlugin();
             plugin.registerListeners();
             plugin.registerPluginService();
-            // Note: the listeners must be registered *after* the plugin is installed in the database and its
+            // Note: the event listeners must be registered *after* the plugin is installed in the database and its
             // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
             addToActivatedPlugins(plugin);

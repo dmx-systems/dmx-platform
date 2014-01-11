@@ -1,10 +1,10 @@
 package de.deepamehta.plugins.accesscontrol.event;
 
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 
 
 
-public interface PostLogoutUserListener extends Listener {
+public interface PostLogoutUserListener extends EventListener {
 
     void postLogoutUser(String username);
 }

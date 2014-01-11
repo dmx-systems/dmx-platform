@@ -1,10 +1,10 @@
 package de.deepamehta.core.service.event;
 
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 
 
 
-public interface AllPluginsActiveListener extends Listener {
+public interface AllPluginsActiveListener extends EventListener {
 
     void allPluginsActive();
 }

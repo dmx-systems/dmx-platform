@@ -38,7 +38,7 @@ public abstract class DeepaMehtaEvent {
     /**
      * Delivers this event to the given listener.
      */
-    public abstract void deliver(Listener listener, Object... params);
+    public abstract void deliver(EventListener listener, Object... params);
 
     /**
      * Returns the corresponding listener interface for this event.

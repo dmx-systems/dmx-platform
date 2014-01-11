@@ -3,7 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -19,9 +19,9 @@ class EventManager {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * The registered listeners (key: event class name, value: listeners).
+     * The registered event listeners (key: event class name, value: event listeners).
      */
-    private Map<String, List<Listener>> listenerRegistry = new HashMap();
+    private Map<String, List<EventListener>> listenerRegistry = new HashMap();
 
     private DeepaMehtaService dms;
 
@@ -36,8 +36,8 @@ class EventManager {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void addListener(DeepaMehtaEvent event, Listener listener) {
-        List<Listener> listeners = getListeners(event);
+    void addListener(DeepaMehtaEvent event, EventListener listener) {
+        List<EventListener> listeners = getListeners(event);
         if (listeners == null) {
             listeners = new ArrayList();
             putListeners(event, listeners);
@@ -45,20 +45,20 @@ class EventManager {
         listeners.add(listener);
     }
 
-    void removeListener(DeepaMehtaEvent event, Listener listener) {
-        List<Listener> listeners = getListeners(event);
+    void removeListener(DeepaMehtaEvent event, EventListener listener) {
+        List<EventListener> listeners = getListeners(event);
         if (!listeners.remove(listener)) {
             throw new RuntimeException("Removing " + listener + " from " +
-                event + " listeners failed: not found in " + listeners);
+                event + " event listeners failed: not found in " + listeners);
         }
     }
 
     // ---
 
     void fireEvent(DeepaMehtaEvent event, Object... params) {
-        List<Listener> listeners = getListeners(event);
+        List<EventListener> listeners = getListeners(event);
         if (listeners != null) {
-            for (Listener listener : listeners) {
+            for (EventListener listener : listeners) {
                 deliverEvent(listener, event, params);
             }
         }
@@ -76,7 +76,7 @@ class EventManager {
             return;
         }
         //
-        deliverEvent((Listener) pluginContext, event, params);
+        deliverEvent((EventListener) pluginContext, event, params);
     }
 
     /**
@@ -89,7 +89,7 @@ class EventManager {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void deliverEvent(Listener listener, DeepaMehtaEvent event, Object... params) {
+    private void deliverEvent(EventListener listener, DeepaMehtaEvent event, Object... params) {
         try {
             event.deliver(listener, params);
         } catch (WebApplicationException e) {
@@ -113,11 +113,11 @@ class EventManager {
 
     // ---
 
-    private List<Listener> getListeners(DeepaMehtaEvent event) {
+    private List<EventListener> getListeners(DeepaMehtaEvent event) {
         return listenerRegistry.get(event.getClass().getName());
     }
 
-    private void putListeners(DeepaMehtaEvent event, List<Listener> listeners) {
+    private void putListeners(DeepaMehtaEvent event, List<EventListener> listeners) {
         listenerRegistry.put(event.getClass().getName(), listeners);
     }
 }

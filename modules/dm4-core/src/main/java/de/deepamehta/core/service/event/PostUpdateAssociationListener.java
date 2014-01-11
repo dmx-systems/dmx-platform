@@ -4,11 +4,11 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 
 
 
-public interface PostUpdateAssociationListener extends Listener {
+public interface PostUpdateAssociationListener extends EventListener {
 
     void postUpdateAssociation(Association assoc, AssociationModel oldModel, ClientState clientState,
                                                                              Directives directives);

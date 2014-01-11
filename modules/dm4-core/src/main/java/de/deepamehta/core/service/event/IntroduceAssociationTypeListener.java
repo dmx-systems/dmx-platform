@@ -2,7 +2,7 @@ package de.deepamehta.core.service.event;
 
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 
 
 
@@ -36,7 +36,7 @@ import de.deepamehta.core.service.Listener;
  *                      particular the underlying type topic has an ID already. That is, the type is ready for
  *                      e.g. being related to other topics.
  */
-public interface IntroduceAssociationTypeListener extends Listener {
+public interface IntroduceAssociationTypeListener extends EventListener {
 
     void introduceAssociationType(AssociationType assocType, ClientState clientState);
 }

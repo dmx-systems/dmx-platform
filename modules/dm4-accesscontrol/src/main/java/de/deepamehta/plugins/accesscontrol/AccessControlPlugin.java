@@ -26,7 +26,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.Listener;
+import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -120,7 +120,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
         @Override
-        public void deliver(Listener listener, Object... params) {
+        public void deliver(EventListener listener, Object... params) {
             ((PostLoginUserListener) listener).postLoginUser(
                 (String) params[0]
             );
@@ -128,7 +128,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     };
     private static DeepaMehtaEvent POST_LOGOUT_USER = new DeepaMehtaEvent(PostLogoutUserListener.class) {
         @Override
-        public void deliver(Listener listener, Object... params) {
+        public void deliver(EventListener listener, Object... params) {
             ((PostLogoutUserListener) listener).postLogoutUser(
                 (String) params[0]
             );
