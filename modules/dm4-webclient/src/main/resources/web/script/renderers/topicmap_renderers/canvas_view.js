@@ -52,7 +52,7 @@ function CanvasView() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.set_topicmap = function(topicmap_viewmodel) {
+    this.display_topicmap = function(topicmap_viewmodel) {
         // reset canvas translation
         if (topicmap) {
             ctx.translate(-topicmap.trans_x, -topicmap.trans_y)
@@ -123,28 +123,28 @@ function CanvasView() {
 
     // ---
 
-    this.remove_topic = function(id) {
-        var topic_view = get_topic(id)
+    this.remove_topic = function(topic_id) {
+        var topic_view = get_topic(topic_id)
         if (topic_view) {
             // update view
-            delete topics[id]
+            delete topics[topic_id]
             // render
             refresh()                                       // canvas
             DOM_FLAVOR && remove_topic_dom(topic_view)      // topic layer DOM
         }
     }
 
-    this.remove_association = function(id) {
-        var assoc_view = get_association(id)
+    this.remove_association = function(assoc_id) {
+        var assoc_view = get_association(assoc_id)
         if (assoc_view) {
             // update view
-            delete assocs[id]
+            delete assocs[assoc_id]
             // render
             refresh()
         }
     }
 
-    //
+    // ---
 
     this.update_topic_type = function(topic_type) {
         // render
@@ -785,23 +785,7 @@ function CanvasView() {
      * @param   event       The mouse event that triggered the context menu.
      */
     function open_context_menu(commands, event) {
-        if (commands.length) {
-            var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
-            for (var i = 0, cmd; cmd = commands[i]; i++) {
-                if (cmd.is_separator) {
-                    context_menu.add_separator()
-                } else {
-                    context_menu.add_item({
-                        label:    cmd.label,
-                        icon:     cmd.icon,
-                        handler:  cmd.handler,
-                        disabled: cmd.disabled
-                    })
-                }
-            }
-            var p = pos(event, Coord.WINDOW)
-            context_menu.open(p.x, p.y)
-        }
+        dm4c.open_context_menu(commands, pos(event, Coord.WINDOW))
     }
 
 

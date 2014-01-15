@@ -12,7 +12,7 @@ var js = {
 
 
     /**
-     * Filters array elements that match a filter function.
+     * Keeps array elements that match a filter function.
      * The array is manipulated in-place.
      */
     filter: function(array, fn) {
@@ -24,6 +24,16 @@ var js = {
             }
             i++
         }
+    },
+
+    /**
+     * Deletes array elements that match a filter function.
+     * The array is manipulated in-place.
+     */
+    delete: function(array, fn) {
+        this.filter(array, function(e) {
+            return !fn(e)
+        })
     },
 
     /**

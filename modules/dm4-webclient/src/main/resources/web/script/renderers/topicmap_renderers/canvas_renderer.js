@@ -11,12 +11,12 @@ function CanvasRenderer() {
         .append($("<canvas>").attr("id", "canvas"))
         .append($("<div>").attr("id", "topic-layer"))
 
-    // View (HTML5 Canvas)
-    var canvas = new CanvasView()
-
     // Viewmodel
     var topicmap    // the topicmap currently rendered (a TopicmapViewmodel). Initialized by display_topicmap().
     var viewmodel_customizers = []
+
+    // View (HTML5 Canvas)
+    var canvas = new CanvasView()
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -64,7 +64,7 @@ function CanvasRenderer() {
 
         function display_topicmap() {
 
-            canvas.set_topicmap(topicmap)
+            canvas.display_topicmap(topicmap)
             restore_selection()
 
             function restore_selection() {
@@ -280,9 +280,12 @@ function CanvasRenderer() {
     // === Left SplitPanel Component Implementation ===
 
     /**
-     * Called in 2 situations:
-     * 1) The user resizes the main window.
-     * 2) The user moves the split panel's slider.
+     * Called in 3 situations:
+     * 1) Initialization: the topicmap renderer is added to the split panel.
+     * 2) The user resizes the main window.
+     * 3) The user moves the split panel's slider.
+     *
+     * @param   size    an object with "width" and "height" properties.
      */
     this.resize = function(size) {
         canvas.resize(size)
@@ -313,6 +316,8 @@ function CanvasRenderer() {
     /**
      * Iterates through all topicmaps and calls the given function with the given argument on them.
      * Returns the function call's return value for the topicmap that is currently displayed.
+     *
+     * ### TODO: updating *all* topicmaps should not be the responsibility of the topicmap renderer.
      */
     function for_all_topicmaps(topicmap_func, arg) {
         var return_value

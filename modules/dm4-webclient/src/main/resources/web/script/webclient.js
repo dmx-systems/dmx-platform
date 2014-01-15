@@ -1188,6 +1188,34 @@ dm4c = new function() {
     // ---
 
     /**
+     * Builds a context menu from a set of commands and opens it.
+     *
+     * @param   commands    Array of commands. May be empty. Must not null/undefined.
+     * @param   pos         The position where the context menu appears (an object with x and y properties).
+     */
+    this.open_context_menu = function(commands, pos) {
+        if (commands.length) {
+            var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
+            for (var i = 0, cmd; cmd = commands[i]; i++) {
+                if (cmd.is_separator) {
+                    context_menu.add_separator()
+                } else {
+                    context_menu.add_item({
+                        label:    cmd.label,
+                        icon:     cmd.icon,
+                        handler:  cmd.handler,
+                        disabled: cmd.disabled
+                    })
+                }
+            }
+            //
+            context_menu.open(pos.x, pos.y)
+        }
+    }
+
+    // ---
+
+    /**
      * Refreshes a type menu.
      * <p>
      * Callable by plugins to reflect an updated type cache (after adding/removing/renaming a type).

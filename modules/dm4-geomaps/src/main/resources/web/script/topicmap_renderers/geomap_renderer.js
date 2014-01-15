@@ -11,12 +11,11 @@ function GeomapRenderer() {
 
     this.dom = $("<div>").attr("id", "geomap-renderer")
 
+    // Viewmodel
+    var geomap      // the geomap currently rendered (a GeomapViewmodel). Initialized by display_topicmap().
+
     // View (OpenLayers based)
     var ol_view = new OpenLayersView({move_handler: on_move})
-
-    // Viewmodel
-    var geomap      // the geomap currently rendered (a GeomapViewmodel).
-                    // Initialized by display_topicmap().
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -37,8 +36,8 @@ function GeomapRenderer() {
         return new GeomapViewmodel(topicmap_id, config)
     }
 
-    this.display_topicmap = function(topicmap, no_history_update) {
-        geomap = topicmap
+    this.display_topicmap = function(geomap_viewmodel, no_history_update) {
+        geomap = geomap_viewmodel
         //
         ol_view.remove_all_features()
         ol_view.set_center(geomap.center, geomap.zoom)
