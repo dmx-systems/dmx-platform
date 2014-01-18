@@ -1099,6 +1099,9 @@ dm4c = new function() {
         return get_commands(dm4c.fire_event("association_commands", assoc), context)
     }
 
+    /**
+     * @param   cx, cy  The position where the canvas was clicked, in TOPICMAP coordinate space.
+     */
     this.get_canvas_commands = function(cx, cy, context) {
         return get_commands(dm4c.fire_event("canvas_commands", cx, cy), context)
     }
@@ -1185,15 +1188,49 @@ dm4c = new function() {
         }
     }
 
-    // ---
+    // --- Context Menus ---
+
+    /**
+     * @param   pos     The position where the context menu appears, in WINDOW coordinate space
+     *                  (object with x and y properties).
+     */
+    this.open_topic_contextmenu = function(topic_id, pos) {
+        dm4c.do_select_topic(topic_id)
+        // Note: only dm4c.selected_object has the composite value (the TopicView has not)
+        var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
+        open_context_menu(commands, pos)
+    }
+
+    /**
+     * @param   pos     The position where the context menu appears, in WINDOW coordinate space
+     *                  (object with x and y properties).
+     */
+    this.open_association_contextmenu = function(assoc_id, pos) {
+        dm4c.do_select_association(assoc_id)
+        // Note: only dm4c.selected_object has the composite value (the AssociationView has not)
+        var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
+        open_context_menu(commands, pos)
+    }
+
+    /**
+     * @param   pos     The position where the context menu appears, in WINDOW coordinate space
+     *                  (object with x and y properties).
+     * @param   p       The position where the context menu appears, in TOPICMAP coordinate space
+     *                  (object with x and y properties).
+     */
+    this.open_canvas_contextmenu = function(pos, p) {
+        var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
+        open_context_menu(commands, pos)
+    }
 
     /**
      * Builds a context menu from a set of commands and opens it.
      *
      * @param   commands    Array of commands. May be empty. Must not null/undefined.
-     * @param   pos         The position where the context menu appears (an object with x and y properties).
+     * @param   pos         The position where the context menu appears, in WINDOW coordinate space
+     *                      (object with x and y properties).
      */
-    this.open_context_menu = function(commands, pos) {
+    function open_context_menu(commands, pos) {
         if (commands.length) {
             var context_menu = dm4c.ui.context_menu($("#topicmap-panel"))
             for (var i = 0, cmd; cmd = commands[i]; i++) {

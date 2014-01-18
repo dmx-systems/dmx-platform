@@ -758,34 +758,18 @@ function CanvasView() {
     // === Context Menu Events ===
 
     function do_contextmenu(event) {
-        // 1) assemble commands
         var tv, av
+        var window_pos = pos(event, Coord.WINDOW)
+        //
         if (tv = detect_topic(event)) {
-            dm4c.do_select_topic(tv.id)
-            // Note: only dm4c.selected_object has the composite value (the TopicView has not)
-            var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
+            dm4c.open_topic_contextmenu(tv.id, window_pos)
         } else if (av = detect_association(event)) {
-            dm4c.do_select_association(av.id)
-            // Note: only dm4c.selected_object has the composite value (the AssociationView has not)
-            var commands = dm4c.get_association_commands(dm4c.selected_object, "context-menu")
+            dm4c.open_association_contextmenu(av.id, window_pos)
         } else {
-            var p = pos(event, Coord.TOPICMAP)
-            var commands = dm4c.get_canvas_commands(p.x, p.y, "context-menu")
+            dm4c.open_canvas_contextmenu(window_pos, pos(event, Coord.TOPICMAP))
         }
-        // 2) show menu
-        open_context_menu(commands, event)
         //
         return false
-    }
-
-    /**
-     * Builds a context menu from a set of commands and opens it.
-     *
-     * @param   commands    Array of commands. May be empty. Must not null/undefined.
-     * @param   event       The mouse event that triggered the context menu.
-     */
-    function open_context_menu(commands, event) {
-        dm4c.open_context_menu(commands, pos(event, Coord.WINDOW))
     }
 
 
@@ -1023,10 +1007,7 @@ function CanvasView() {
                     dm4c.fire_event("topic_doubleclicked", dm4c.selected_object)
                 })
                 .contextmenu(function(event) {
-                    dm4c.do_select_topic(topic_view.id)
-                    // Note: only dm4c.selected_object has the composite value (the TopicView has not)
-                    var commands = dm4c.get_topic_commands(dm4c.selected_object, "context-menu")
-                    open_context_menu(commands, event)
+                    dm4c.open_topic_contextmenu(topic_view.id, pos(event, Coord.WINDOW))
                     return false
                 })
             topic_dom.draggable({
