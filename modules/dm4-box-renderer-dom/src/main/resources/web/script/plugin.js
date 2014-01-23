@@ -204,7 +204,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
 
             function add_event_handler() {
                 type_icon.mousedown(function(event) {
-                    if (event.which == 1) {
+                    if (event.button == 0 && !event.ctrlKey) {  // ctrlKey: see comment in canvas_view.js do_mousedown()
                         var pos = canvas_view.pos(event)
                         dm4c.do_select_topic(topic_view.id)
                         dm4c.topicmap_renderer.begin_association(topic_view.id, pos.x, pos.y)

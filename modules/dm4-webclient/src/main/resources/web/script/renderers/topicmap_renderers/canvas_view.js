@@ -32,12 +32,12 @@ function CanvasView() {
     // Short-term interaction state
     var topic_move_in_progress      // true while topic move is in progress (boolean)
     var cluster_move_in_progress    // true while cluster move is in progress (boolean)
-    var canvas_move_in_progress     // true while canvas translation is in progress (boolean)
-    var association_in_progress     // true while new association is pulled (boolean)
+    var canvas_move_in_progress     // true while canvas move is in progress (boolean)
+    var association_in_progress     // true while new association is drawn (boolean)
+    var mousedown_on_canvas         // true while canvas click or canvas move (boolean)
     var action_topic                // the topic being selected/moved/associated (TopicView)
     var action_assoc                // the association being selected/cluster-moved (AssociationView)
     var cluster                     // the cluster being moved (ClusterView)
-    var mousedown_on_canvas
     var tmp_x, tmp_y                // coordinates while action is in progress
 
     // Coordinate systems (for mouse event interpretation)
@@ -576,10 +576,10 @@ function CanvasView() {
         if (association_in_progress) {
             return
         }
-        //
-        if (event.which == 1) {
+        // ignore right-button to not initiate canvas move along with context menu
+        if (event.button == 0) {
             // Note: on a Mac the ctrl key emulates the right mouse button. However, Safari and Chrome for Mac still
-            // return 1 in event.which (left mouse button) on a ctrl-click. We must prevent from interpreting this
+            // return 0 in event.button (left mouse button) on a ctrl-click. We must prevent from interpreting this
             // as a left-click.
             if (event.ctrlKey) {
                 return
@@ -993,7 +993,12 @@ function CanvasView() {
         function add_event_handlers() {
             var has_moved
             topic_dom
-                .mousedown(function() {
+                .mousedown(function(event) {
+                    // ### TODO: suppress a topic move when invoking a context menu. Can be solved by stopping
+                    // ### propagation immediately. However, this undermines menu stickyness. See GUITookit Menu.
+                    // if (event.button != 0 || event.ctrlKey) {
+                    //     event.stopImmediatePropagation()
+                    // }
                     has_moved = false
                 })
                 .mouseup(function() {
