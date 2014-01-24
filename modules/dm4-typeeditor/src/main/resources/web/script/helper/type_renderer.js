@@ -7,10 +7,6 @@ function TypeRenderer() {
         dm4c.render.field_label("URI")
         dm4c.render.page(type.uri)
         //
-        var data_type = dm4c.restc.get_topic_by_value("uri", type.data_type_uri)
-        dm4c.render.field_label("Data Type")
-        dm4c.render.page(data_type.value)
-        //
         dm4c.render.topic_associations(type.id)
     }
 
