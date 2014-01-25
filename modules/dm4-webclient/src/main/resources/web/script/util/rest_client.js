@@ -207,6 +207,10 @@ function RESTClient(config) {
         return request("PUT", "/core/topictype", topic_type_model)
     }
 
+    this.delete_topic_type = function(type_uri) {
+        return request("DELETE", "/core/topictype/" + type_uri)
+    }
+
 
 
     // === Association Types ===
@@ -229,6 +233,10 @@ function RESTClient(config) {
 
     this.update_association_type = function(assoc_type_model) {
         return request("PUT", "/core/assoctype", assoc_type_model)
+    }
+
+    this.delete_association_type = function(type_uri) {
+        return request("DELETE", "/core/assoctype/" + type_uri)
     }
 
 

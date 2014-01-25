@@ -332,6 +332,16 @@ dm4c = new function() {
         dm4c.restc.delete_association(assoc_id)
     }
 
+    this.do_delete_topic_type = function(type_uri) {
+        // update DB, client model, and GUI
+        dm4c.restc.delete_topic_type(type_uri)
+    }
+
+    this.do_delete_association_type = function(type_uri) {
+        // update DB, client model, and GUI
+        dm4c.restc.delete_association_type(type_uri)
+    }
+
 
 
     // *************************
@@ -475,13 +485,13 @@ dm4c = new function() {
                 update_topic_type(build_topic_type(directive.arg))
                 break
             case "DELETE_TOPIC_TYPE":
-                remove_topic_type(directive.arg.uri)
+                delete_topic_type(directive.arg.uri)
                 break
             case "UPDATE_ASSOCIATION_TYPE":
                 update_association_type(build_association_type(directive.arg))
                 break
             case "DELETE_ASSOCIATION_TYPE":
-                remove_association_type(directive.arg.uri)
+                delete_association_type(directive.arg.uri)
                 break
             default:
                 throw "WebclientError: \"" + directive.type + "\" is an unsupported directive"
@@ -505,7 +515,7 @@ dm4c = new function() {
         // update GUI
         dm4c.topicmap_renderer.update_topic(topic)
         dm4c.page_panel.render_page_if_selected(topic)
-        // fire event
+        //
         dm4c.fire_event("post_update_topic", topic)
     }
 
@@ -526,7 +536,7 @@ dm4c = new function() {
         dm4c.topicmap_renderer.update_association(assoc)
         stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
                             dm4c.page_panel.render_page_if_selected(assoc)
-        // fire event
+        //
         dm4c.fire_event("post_update_association", assoc)
     }
 
@@ -570,7 +580,7 @@ dm4c = new function() {
         dm4c.page_panel.clear_if_selected(topic)
         // update client model
         reset_selection_conditionally(topic.id)
-        // fire event
+        //
         dm4c.fire_event("post_hide_topic", topic)
     }
 
@@ -584,7 +594,7 @@ dm4c = new function() {
         dm4c.page_panel.clear_if_selected(assoc)
         // update client model
         reset_selection_conditionally(assoc.id)
-        // fire event
+        //
         dm4c.fire_event("post_hide_association", assoc)
     }
 
@@ -602,7 +612,7 @@ dm4c = new function() {
         dm4c.page_panel.clear_if_selected(topic)
         // update client model
         reset_selection_conditionally(topic.id)
-        // fire event
+        //
         dm4c.fire_event("post_delete_topic", topic)
     }
 
@@ -618,7 +628,7 @@ dm4c = new function() {
         dm4c.page_panel.clear_if_selected(assoc)
         // update client model
         reset_selection_conditionally(assoc.id)
-        // fire event
+        //
         dm4c.fire_event("post_delete_association", assoc)
     }
 
@@ -627,17 +637,23 @@ dm4c = new function() {
     /**
      * Processes a DELETE_TOPIC_TYPE directive.
      */
-    function remove_topic_type(topic_type_uri) {
+    function delete_topic_type(topic_type_uri) {
         // update client model (type cache)
         type_cache.remove_topic_type(topic_type_uri)
+        // update GUI
+        dm4c.refresh_create_menu()
+        //
+        dm4c.fire_event("post_delete_topic_type", topic_type_uri)
     }
 
     /**
      * Processes a DELETE_ASSOCIATION_TYPE directive.
      */
-    function remove_association_type(assoc_type_uri) {
+    function delete_association_type(assoc_type_uri) {
         // update client model (type cache)
         type_cache.remove_association_type(assoc_type_uri)
+        //
+        dm4c.fire_event("post_delete_association_type", assoc_type_uri)
     }
 
     // --- Client Model Update ---
@@ -1250,7 +1266,7 @@ dm4c = new function() {
         }
     }
 
-    // ---
+    // --- Menus ---
 
     /**
      * Refreshes a type menu.

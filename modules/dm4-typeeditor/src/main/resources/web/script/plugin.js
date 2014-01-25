@@ -33,7 +33,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     // === Webclient Listeners ===
 
     /**
-     * Once a topic type is created we must refresh the "Create" type menu.
+     * Once a topic type is created we refresh the "Create" type menu.
      *
      * @param   topic   The topic just created.
      *                  Note: in case the just created topic is a type, the entire type definition is passed.
@@ -45,7 +45,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     })
 
     /**
-     * Once a topic type is updated we must refresh the "Create" type menu.
+     * Once a topic type is updated we refresh the "Create" type menu.
      */
     dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {

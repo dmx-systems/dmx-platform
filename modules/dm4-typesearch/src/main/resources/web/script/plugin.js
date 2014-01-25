@@ -16,7 +16,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
             // enable search button
             dm4c.toolbar.search_button.button("enable")
             // create type menu
-            type_menu = dm4c.ui.menu(do_search_by_type)     // ### FIXME: had ID "search-type-menu", needed?
+            type_menu = dm4c.ui.menu(do_search_by_type)
             refresh_type_menu()
             //
             return type_menu.dom
@@ -30,7 +30,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     })
 
     /**
-     * Once a "Topic Type" topic is created we refresh the type menu.
+     * Once a topic type is created we refresh the type menu.
      */
     dm4c.add_listener("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
@@ -39,7 +39,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     })
 
     /**
-     * Once a "Topic Type" topic is updated we refresh the type menu.
+     * Once a topic type is updated we refresh the type menu.
      */
     dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
@@ -48,12 +48,10 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     })
 
     /**
-     * Once a "Topic Type" topic is deleted we refresh the type menu.
+     * Once a topic type is deleted we refresh the type menu.
      */
-    dm4c.add_listener("post_delete_topic", function(topic) {
-        if (topic.type_uri == "dm4.core.topic_type") {
-            refresh_type_menu()
-        }
+    dm4c.add_listener("post_delete_topic_type", function(type_uri) {
+        refresh_type_menu()
     })
 
     // ----------------------------------------------------------------------------------------------- Private Functions

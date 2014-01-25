@@ -43,7 +43,9 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Delete",
-                handler: open_delete_topic_dialog,
+                handler: topic.type_uri == "dm4.core.topic_type" ? open_delete_topic_type_dialog :
+                         topic.type_uri == "dm4.core.assoc_type" ? open_delete_association_type_dialog :
+                                                                   open_delete_topic_dialog,
                 context: "context-menu",
                 ui_icon: "trash"
             })
@@ -94,6 +96,8 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             }
         }
 
+        // ---
+
         function open_delete_topic_dialog() {
             var delete_topic_dialog = dm4c.ui.dialog({
                 title: "Delete Topic?",
@@ -102,6 +106,30 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 button_handler: function() {
                     delete_topic_dialog.close()
                     dm4c.do_delete_topic(topic.id)
+                }
+            })
+        }
+
+        function open_delete_topic_type_dialog() {
+            var delete_topic_type_dialog = dm4c.ui.dialog({
+                title: "Delete Topic Type?",
+                width: "300px",
+                button_label: "Delete",
+                button_handler: function() {
+                    delete_topic_type_dialog.close()
+                    dm4c.do_delete_topic_type(topic.uri)
+                }
+            })
+        }
+
+        function open_delete_association_type_dialog() {
+            var delete_assoc_type_dialog = dm4c.ui.dialog({
+                title: "Delete Association Type?",
+                width: "300px",
+                button_label: "Delete",
+                button_handler: function() {
+                    delete_assoc_type_dialog.close()
+                    dm4c.do_delete_association_type(topic.uri)
                 }
             })
         }

@@ -23,6 +23,8 @@ Client-side events
 "post_update_association"
 "post_delete_topic"
 "post_delete_association"
+"post_delete_topic_type"
+"post_delete_association_type"
 
 // Selection (client model updates)
 "post_select_topic"
