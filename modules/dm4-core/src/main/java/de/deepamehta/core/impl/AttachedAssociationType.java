@@ -80,7 +80,7 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     // ---
 
     @Override
-    final void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
-        directives.add(Directive.DELETE_ASSOCIATION_TYPE, arg);
+    final Directive getDeleteTypeDirective() {
+        return Directive.DELETE_ASSOCIATION_TYPE;
     }
 }

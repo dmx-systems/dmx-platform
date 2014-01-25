@@ -200,6 +200,35 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
 
 
+    // === Deletion ===
+
+    /**
+     * Deletes all sub-topics of this DeepaMehta object (associated via "dm4.core.composition", recursively) and
+     * deletes all the remaining direct associations of this DeepaMehta object.
+     * <p>
+     * Note: deletion of the object itself is up to the subclasses.
+     */
+    @Override
+    public void delete(Directives directives) {
+        // Note: directives must be not null.
+        // The subclass's delete() methods add DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
+        if (directives == null) {
+            throw new IllegalArgumentException("directives is null");
+        }
+        // 1) recursively delete sub-topics
+        ResultList<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
+            "dm4.core.parent", "dm4.core.child", null, false, false, 0);
+        for (Topic childTopic : childTopics) {
+            childTopic.delete(directives);
+        }
+        // 2) delete direct associations
+        for (Association assoc : getAssociations()) {       // getAssociations() is abstract
+            assoc.delete(directives);
+        }
+    }
+
+
+
     // === Traversal ===
 
     // --- Topic Retrieval ---
@@ -235,35 +264,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // Note: these methods are implemented in the subclasses (this is an abstract class):
     //     getAssociation(...);
     //     getAssociations();
-
-
-
-    // === Deletion ===
-
-    /**
-     * Deletes all sub-topics of this DeepaMehta object (associated via "dm4.core.composition", recursively) and
-     * deletes all the remaining direct associations of this DeepaMehta object.
-     * <p>
-     * Note: deletion of the object itself is up to the subclasses.
-     */
-    @Override
-    public void delete(Directives directives) {
-        // Note: directives must be not null.
-        // The subclass's delete() methods add DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
-        if (directives == null) {
-            throw new IllegalArgumentException("directives is null");
-        }
-        // 1) recursively delete sub-topics
-        ResultList<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", null, false, false, 0);
-        for (Topic childTopic : childTopics) {
-            childTopic.delete(directives);
-        }
-        // 2) delete direct associations
-        for (Association assoc : getAssociations()) {       // getAssociations() is abstract
-            assoc.delete(directives);
-        }
-    }
 
 
 

@@ -118,6 +118,10 @@ class CoreEvent {
         }
     };
 
+    // Note: a corresponding POST_UPDATE_ASSOCIATION_REQUEST event is not necessary.
+    // It would be equivalent to POST_UPDATE_ASSOCIATION.
+    // Per request exactly one association is updated. Its childs are topics (never associations).
+
     // ---
 
     static DeepaMehtaEvent PRE_DELETE_ASSOCIATION = new DeepaMehtaEvent(PreDeleteAssociationListener.class) {

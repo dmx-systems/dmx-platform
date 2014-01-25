@@ -408,6 +408,8 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    // ---
+
     @Override
     public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
@@ -442,6 +444,25 @@ public class EmbeddedService implements DeepaMehtaService {
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic type failed (" + model + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public Directives deleteTopicType(String topicTypeUri) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            TopicType topicType = getTopicType(topicTypeUri);
+            Directives directives = new Directives();
+            //
+            topicType.delete(directives);
+            //
+            tx.success();
+            return directives;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         } finally {
             tx.finish();
         }
@@ -491,6 +512,8 @@ public class EmbeddedService implements DeepaMehtaService {
         }
     }
 
+    // ---
+
     @Override
     public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
@@ -526,6 +549,25 @@ public class EmbeddedService implements DeepaMehtaService {
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating association type failed (" + model + ")", e);
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Override
+    public Directives deleteAssociationType(String assocTypeUri) {
+        DeepaMehtaTransaction tx = beginTx();
+        try {
+            AssociationType assocType = getAssociationType(assocTypeUri);
+            Directives directives = new Directives();
+            //
+            assocType.delete(directives);
+            //
+            tx.success();
+            return directives;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         } finally {
             tx.finish();
         }

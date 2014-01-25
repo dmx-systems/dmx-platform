@@ -46,6 +46,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
+    // === Updating ===
+
+    @Override
+    public void update(TopicModel model, ClientState clientState, Directives directives) {
+        _update(model, clientState, directives);
+        //
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
+    }
+
+
+
     // === Deletion ===
 
     @Override
@@ -79,17 +90,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public TopicModel getModel() {
         return (TopicModel) super.getModel();
-    }
-
-
-
-    // === Updating ===
-
-    @Override
-    public void update(TopicModel model, ClientState clientState, Directives directives) {
-        _update(model, clientState, directives);
-        //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
 
 

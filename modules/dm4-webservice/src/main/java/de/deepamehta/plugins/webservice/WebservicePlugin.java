@@ -196,6 +196,12 @@ public class WebservicePlugin extends PluginActivator {
         return dms.updateTopicType(model, clientState);
     }
 
+    @DELETE
+    @Path("/topictype/{uri}")
+    public Directives deleteTopicType(@PathParam("uri") String uri) {
+        return dms.deleteTopicType(uri);
+    }
+
 
 
     // === Association Types ===
@@ -230,6 +236,12 @@ public class WebservicePlugin extends PluginActivator {
     public Directives updateAssociationType(AssociationTypeModel model,
                                             @HeaderParam("Cookie") ClientState clientState) {
         return dms.updateAssociationType(model, clientState);
+    }
+
+    @DELETE
+    @Path("/assoctype/{uri}")
+    public Directives deleteAssociationType(@PathParam("uri") String uri) {
+        return dms.deleteAssociationType(uri);
     }
 
 

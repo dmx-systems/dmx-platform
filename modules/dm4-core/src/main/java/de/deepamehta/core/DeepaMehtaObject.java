@@ -74,6 +74,18 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
 
 
+    // === Deletion ===
+
+    /**
+     * Deletes the DeepaMehta object in its entirety, that is
+     * - the object itself (the <i>parent</i>)
+     * - all child topics associated via "dm4.core.composition", recusively
+     * - all the remaining direct associations, e.g. "dm4.core.instantiation"
+     */
+    void delete(Directives directives);
+
+
+
     // === Traversal ===
 
     // --- Topic Retrieval ---
@@ -120,18 +132,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
                                                                              long othersTopicId);
 
      List<Association> getAssociations();
-
-
-
-    // === Deletion ===
-
-    /**
-     * Deletes the DeepaMehta object in its entirety, that is
-     * - the object itself (the <i>parent</i>)
-     * - all child topics associated via "dm4.core.composition", recusively
-     * - all the remaining direct associations, e.g. "dm4.core.instantiation"
-     */
-    void delete(Directives directives);
 
 
 

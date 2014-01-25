@@ -60,6 +60,13 @@ public abstract class DeepaMehtaEvent {
         return event;
     }
 
+    // ===
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " (" + listenerInterface.getName() + ")";
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void putEvent(DeepaMehtaEvent event, Class listenerInterface) {

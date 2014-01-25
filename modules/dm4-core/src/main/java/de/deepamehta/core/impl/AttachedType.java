@@ -9,7 +9,9 @@ import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -41,6 +43,58 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    // ******************************************
+    // *** AttachedDeepaMehtaObject Overrides ***
+    // ******************************************
+
+
+
+    // === Updating ===
+
+    @Override
+    public void update(TypeModel model, ClientState clientState, Directives directives) {
+        boolean uriChanged = hasUriChanged(model.getUri());
+        if (uriChanged) {
+            removeFromTypeCache(directives);
+        }
+        //
+        super.update(model, clientState, directives);
+        //
+        if (uriChanged) {
+            putInTypeCache();   // abstract
+        }
+        //
+        updateDataTypeUri(model.getDataTypeUri(), directives);
+        updateAssocDefs(model.getAssocDefs(), clientState, directives);
+        updateSequence(model.getAssocDefs());
+        updateLabelConfig(model.getLabelConfig(), directives);
+    }
+
+
+
+    // === Deletion ===
+
+    @Override
+    public void delete(Directives directives) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            logger.info("Deleting " + className() + " \"" + getUri() + "\"");
+            //
+            super.delete(directives);   // delete type topic
+            //
+            removeFromTypeCache(directives);
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Deleting " + className() + " \"" + getUri() + "\" failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
 
 
 
@@ -172,28 +226,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
 
-    // === Updating ===
-
-    @Override
-    public void update(TypeModel model, ClientState clientState, Directives directives) {
-        boolean uriChanged = hasUriChanged(model.getUri());
-        if (uriChanged) {
-            removeFromTypeCache();                                                  // abstract
-            addDeleteTypeDirective(directives, new JSONWrapper("uri", getUri()));   // abstract
-        }
-        //
-        super.update(model, clientState, directives);
-        //
-        if (uriChanged) {
-            putInTypeCache();   // abstract
-        }
-        //
-        updateDataTypeUri(model.getDataTypeUri(), directives);
-        updateAssocDefs(model.getAssocDefs(), clientState, directives);
-        updateSequence(model.getAssocDefs());
-        updateLabelConfig(model.getLabelConfig(), directives);
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract void putInTypeCache();
@@ -202,7 +234,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    abstract void addDeleteTypeDirective(Directives directives, JSONEnabled arg);
+    abstract Directive getDeleteTypeDirective();
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -338,6 +370,21 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
 
+
+    // ===
+
+    /**
+     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
+     */
+    private void removeFromTypeCache(Directives directives) {
+        removeFromTypeCache();                      // abstract
+        addDeleteTypeDirective(directives);
+    }
+
+    private void addDeleteTypeDirective(Directives directives) {
+        Directive dir = getDeleteTypeDirective();   // abstract
+        directives.add(dir, new JSONWrapper("uri", getUri()));
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 

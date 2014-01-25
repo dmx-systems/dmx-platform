@@ -57,6 +57,35 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
+    // === Updating ===
+
+    /**
+     * @param   model   The data to update.
+     *                  If the type URI is <code>null</code> it is not updated.
+     *                  If role 1 is <code>null</code> it is not updated.
+     *                  If role 2 is <code>null</code> it is not updated.
+     */
+    @Override
+    public void update(AssociationModel model, ClientState clientState, Directives directives) {
+        // ### TODO: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
+        // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
+        // Per request exactly one association is updated. Its childs are topics (never associations).
+        logger.info("Updating association " + getId() + " (new " + model + ")");
+        //
+        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model, directives);
+        //
+        AssociationModel oldModel = getModel().clone();
+        super.update(model, clientState, directives);
+        updateRole(model.getRoleModel1(), 1);
+        updateRole(model.getRoleModel2(), 2);
+        //
+        addUpdateDirective(directives);
+        //
+        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, clientState, directives);
+    }
+
+
+
     // === Deletion ===
 
     @Override
@@ -166,32 +195,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public AssociationModel getModel() {
         return (AssociationModel) super.getModel();
-    }
-
-
-
-    // === Updating ===
-
-    /**
-     * @param   model   The data to update.
-     *                  If the type URI is <code>null</code> it is not updated.
-     *                  If role 1 is <code>null</code> it is not updated.
-     *                  If role 2 is <code>null</code> it is not updated.
-     */
-    @Override
-    public void update(AssociationModel model, ClientState clientState, Directives directives) {
-        logger.info("Updating association " + getId() + " (new " + model + ")");
-        //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model, directives);
-        //
-        AssociationModel oldModel = getModel().clone();
-        super.update(model, clientState, directives);
-        updateRole(model.getRoleModel1(), 1);
-        updateRole(model.getRoleModel2(), 2);
-        //
-        addUpdateDirective(directives);
-        //
-        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, clientState, directives);
     }
 
 

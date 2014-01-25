@@ -139,9 +139,13 @@ public interface DeepaMehtaService {
 
     List<TopicType> getAllTopicTypes();
 
+    // ---
+
     TopicType createTopicType(TopicTypeModel model, ClientState clientState);
 
     Directives updateTopicType(TopicTypeModel model, ClientState clientState);
+
+    Directives deleteTopicType(String topicTypeUri);
 
 
 
@@ -153,9 +157,13 @@ public interface DeepaMehtaService {
 
     List<AssociationType> getAllAssociationTypes();
 
+    // ---
+
     AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState);
 
     Directives updateAssociationType(AssociationTypeModel model, ClientState clientState);
+
+    Directives deleteAssociationType(String assocTypeUri);
 
 
 

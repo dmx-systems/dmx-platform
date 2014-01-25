@@ -80,7 +80,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
     // ---
 
     @Override
-    final void addDeleteTypeDirective(Directives directives, JSONEnabled arg) {
-        directives.add(Directive.DELETE_TOPIC_TYPE, arg);
+    final Directive getDeleteTypeDirective() {
+        return Directive.DELETE_TOPIC_TYPE;
     }
 }
