@@ -73,6 +73,9 @@ function GUIToolkit(config) {
      *                                        Note: the button label and button handler must be set together.
      *                      button_handler  - Optional: the button handler function. If not specified no button appears.
      *                                        Note: the button label and button handler must be set together.
+     *                      auto_close      - Optional: controls if the button closes the dialog (boolean). Default is
+     *                                        true. If false is specified the caller is responsible for closing the
+     *                                        dialog.
      */
     this.dialog = function(config) {
 
@@ -85,12 +88,14 @@ function GUIToolkit(config) {
             var width = config.width || "auto"
             var button_label = config.button_label
             var button_handler = config.button_handler
+            var auto_close = config.auto_close || config.auto_close == undefined    // default is true
             //
             var dialog = $("<div>", {id: id}).append(content)
             //
             var buttons = {}
             if (button_label && button_handler) {
-                buttons[button_label] = button_handler
+                buttons[button_label] = invoke_handler
+                dm4c.on_return_key(dialog, invoke_handler)
             }
             //
             var options = {
@@ -110,17 +115,25 @@ function GUIToolkit(config) {
             $("body").append(dialog)
             dialog.dialog(options)
 
+            // --- Public API ---
+
             /**
              * @paran   duration    Optional: determines how long the fade out animation will run (in milliseconds).
              *                      If not specified (or 0) no animation is run (the dialog disappears immediately).
-             * @paran   callback    Optional: function to be called once the animation is complete.
              */
-            this.close = function(duration, callback) {
-                duration = duration || 0
-                dialog.parent().fadeOut(duration, function() {
-                    dialog.dialog("close")
-                    callback && callback()
-                })
+            this.close = function(duration) {
+                dialog.parent().fadeOut(duration || 0, close)
+            }
+
+            // ---
+
+            function invoke_handler() {
+                auto_close && close()
+                button_handler()
+            }
+
+            function close() {
+                dialog.dialog("close")
             }
 
             function destroy() {
@@ -136,22 +149,15 @@ function GUIToolkit(config) {
     // === Prompt ===
 
     this.prompt = function(title, input_label, button_label, callback) {
-        var input = dm4c.render.input(undefined, 30).keyup(function(event) {    // ### TODO: remove dm4c dependency
-            if (event.which == 13) {
-                do_submit()
-            }
-        })
+        var input = dm4c.render.input(undefined, 30)    // ### TODO: remove dm4c dependency
         var dialog = this.dialog({
             title: title,
             content: $("<div>").addClass("field-label").text(input_label).add(input),
             button_label: button_label,
-            button_handler: do_submit
+            button_handler: function() {
+                callback(input.val())   // Note: obviously the value can still be the read after destroying the dialog
+            }
         })
-
-        function do_submit() {
-            dialog.close()
-            callback(input.val())   // Note: obviously the value can still be the read after destroying the dialog
-        }
     }
 
 

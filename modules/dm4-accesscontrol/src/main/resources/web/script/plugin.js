@@ -120,14 +120,13 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 title: "Login",
                 content: dialog_content,
                 button_label: "OK",
-                button_handler: do_try_login
+                button_handler: do_try_login,
+                auto_close: false
             })
             //
             dm4c.on_return_key(username_input, function() {
-                password_input.focus();
-            })
-            dm4c.on_return_key(password_input, function() {
-                do_try_login();
+                password_input.focus()
+                return false    // stop propagation to prevent the dialog from invoking the button handler
             })
 
             function do_try_login() {
@@ -156,12 +155,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             }
 
             function close_login_dialog() {
-                login_dialog.close(400, function() {
-                    // clear fields for next re-open
-                    username_input.val("")
-                    password_input.val("")
-                    message_div.text("")
-                })
+                login_dialog.close(400)
             }
         }
 

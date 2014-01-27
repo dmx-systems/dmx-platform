@@ -104,15 +104,14 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         function do_open_topicmap_dialog() {
             var title_input = dm4c.render.input(undefined, 30)
             var type_menu = create_maptype_menu()
-            var dialog_content = $("<form>").attr("action", "#").submit(do_create_topicmap)
-                .append($("<div>").addClass("field-label").text("Title"))
-                .append(title_input)
+            var dialog_content = $("<div>").addClass("field-label").text("Title")
+                .add(title_input)
             if (type_menu.get_item_count() > 1) {
-                dialog_content
-                    .append($("<div>").addClass("field-label").text("Type"))
-                    .append(type_menu.dom)
+                dialog_content = dialog_content
+                    .add($("<div>").addClass("field-label").text("Type"))
+                    .add(type_menu.dom)
             }
-            var topicmap_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "New Topicmap",
                 content: dialog_content,
                 button_label: "Create",
@@ -129,11 +128,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             }
 
             function do_create_topicmap() {
-                topicmap_dialog.close()
                 var name = title_input.val()
                 var topicmap_renderer_uri = type_menu.get_selection().value
                 create_topicmap(name, topicmap_renderer_uri)
-                return false
             }
         }
     })

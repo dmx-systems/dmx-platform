@@ -82,14 +82,13 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             open_retype_topic_dialog()
 
             function open_retype_topic_dialog() {
-                var retype_topic_dialog = dm4c.ui.dialog({
+                dm4c.ui.dialog({
                     title: "Retype Topic",
                     content: type_menu.dom,
                     width: "400px",
                     button_label: "Retype",
                     button_handler: function() {
                         var type_uri = type_menu.get_selection().value
-                        retype_topic_dialog.close()
                         dm4c.do_retype_topic(topic.id, type_uri)
                     }
                 })
@@ -99,36 +98,33 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         // ---
 
         function open_delete_topic_dialog() {
-            var delete_topic_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "Delete Topic?",
                 width: "300px",
                 button_label: "Delete",
                 button_handler: function() {
-                    delete_topic_dialog.close()
                     dm4c.do_delete_topic(topic.id)
                 }
             })
         }
 
         function open_delete_topic_type_dialog() {
-            var delete_topic_type_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "Delete Topic Type?",
                 width: "300px",
                 button_label: "Delete",
                 button_handler: function() {
-                    delete_topic_type_dialog.close()
                     dm4c.do_delete_topic_type(topic.uri)
                 }
             })
         }
 
         function open_delete_association_type_dialog() {
-            var delete_assoc_type_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "Delete Association Type?",
                 width: "300px",
                 button_label: "Delete",
                 button_handler: function() {
-                    delete_assoc_type_dialog.close()
                     dm4c.do_delete_association_type(topic.uri)
                 }
             })
@@ -182,12 +178,11 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
 
         function open_delete_association_dialog() {
-            var delete_association_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "Delete Association?",
                 width: "300px",
                 button_label: "Delete",
                 button_handler: function() {
-                    delete_association_dialog.close()
                     dm4c.do_delete_association(assoc.id)
                 }
             })

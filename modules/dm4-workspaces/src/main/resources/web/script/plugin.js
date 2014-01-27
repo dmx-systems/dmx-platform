@@ -40,22 +40,14 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
         function do_open_workspace_dialog() {
             var name_input = dm4c.render.input(undefined, 30)
-            var dialog_content = $("<form>").attr("action", "#").submit(do_create_workspace)
-                .append($("<div>").addClass("field-label").text("Name"))
-                .append(name_input)
-            var workspace_dialog = dm4c.ui.dialog({
+            dm4c.ui.dialog({
                 title: "New Workspace",
-                content: dialog_content,
+                content: $("<div>").addClass("field-label").text("Name").add(name_input),
                 button_label: "Create",
-                button_handler: do_create_workspace
+                button_handler: function() {
+                    create_workspace(name_input.val())
+                }
             })
-
-            function do_create_workspace() {
-                workspace_dialog.close()
-                var name = name_input.val()
-                create_workspace(name)
-                return false
-            }
         }
     })
 

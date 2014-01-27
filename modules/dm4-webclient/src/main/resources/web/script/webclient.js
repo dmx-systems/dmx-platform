@@ -1325,7 +1325,7 @@ dm4c = new function() {
     this.on_return_key = function(element, callback) {
         element.keyup(function(event) {
             if (event.which == 13) {
-                callback();
+                return callback();  // stop propagation if the callback returns false
             }
         })
     }
