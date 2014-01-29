@@ -133,8 +133,10 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 try {
                     var username = username_input.val()
                     var password = password_input.val()
-                    dm4c.restc.login(authorization())  // throws 401 if login fails
-                    show_message("Login OK", "ok", close_login_dialog)
+                    dm4c.restc.login(authorization())   // throws 401 if login fails
+                    show_message("Login OK", "ok", function() {
+                        login_dialog.close(400)
+                    })
                     update_gui_login(username)
                 } catch (e) {
                     show_message("Login failed", "failed")
@@ -152,10 +154,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 message_div.fadeOut(200, function() {
                     $(this).text(message).removeClass().addClass(css_class).fadeIn(1000, callback)
                 })
-            }
-
-            function close_login_dialog() {
-                login_dialog.close(400)
             }
         }
 

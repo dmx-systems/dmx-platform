@@ -49,7 +49,7 @@ class AttachedCompositeValue implements CompositeValue {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
-        initChildTopics(model);
+        initAttachedObjectCache();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -538,12 +538,21 @@ class AttachedCompositeValue implements CompositeValue {
         addToCompositeValue(childTopic, assocDef);
     }
 
-    // ---
+
+
+    // ===
+
+    void loadChildTopics() {
+        dms.valueStorage.fetchCompositeValue(parent.getModel());
+        initAttachedObjectCache();
+    }
 
     /**
-     * Lazy-loads child topics (model) and updates this attached object cache accordingly.
+     * Recursively loads child topics (model) and updates this attached object cache accordingly.
+     * If the child topics are loaded already nothing is performed.
      *
      * @param   assocDef    the child topics according to this association definition are loaded.
+     *                      <p>
      *                      Note: the association definition must not necessarily originate from this object's
      *                      type definition. It may originate from a facet definition as well.
      */
@@ -553,40 +562,54 @@ class AttachedCompositeValue implements CompositeValue {
             logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
                 parent.getId());
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef);
-            reinit(childTypeUri);
+            initAttachedObjectCache(childTypeUri);
         }
     }
 
-    // ---
 
-    private void initChildTopics(CompositeValueModel model) {
+
+    // === Attached Object Cache Initialization ===
+
+    /**
+     * Initializes this attached object cache. For all childs contained in the underlying model attached topics are
+     * created and put in the attached object cache (recursively).
+     */
+    private void initAttachedObjectCache() {
         for (String childTypeUri : model.keys()) {
-            initChildTopics(model, childTypeUri);
+            initAttachedObjectCache(childTypeUri);
         }
     }
 
-    private void initChildTopics(CompositeValueModel model, String childTypeUri) {
+    /**
+     * Initializes this attached object cache selectively (and recursively).
+     */
+    private void initAttachedObjectCache(String childTypeUri) {
         Object value = model.get(childTypeUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return;
         }
-        //
+        // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
+        // implies creating further attached composite values, which in turn calls this method again but for the next
+        // child-level. Finally attached topics are created for all child-levels.
         if (value instanceof TopicModel) {
             TopicModel childTopic = (TopicModel) value;
-            childTopics.put(childTypeUri, createTopic(childTopic));
+            childTopics.put(childTypeUri, createAttachedObject(childTopic));
         } else if (value instanceof List) {
             List<Topic> topics = new ArrayList();
             childTopics.put(childTypeUri, topics);
             for (TopicModel childTopic : (List<TopicModel>) value) {
-                topics.add(createTopic(childTopic));
+                topics.add(createAttachedObject(childTopic));
             }
         } else {
             throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
         }
     }
 
-    private Topic createTopic(TopicModel model) {
+    /**
+     * Creates an attached topic to be put in this attached object cache.
+     */
+    private Topic createAttachedObject(TopicModel model) {
         if (model instanceof RelatedTopicModel) {
             // Note: composite value models obtained through *fetching* contain *related topic models*.
             // We exploit the related topics when updating assignments (in conjunction with aggregations).
@@ -596,12 +619,6 @@ class AttachedCompositeValue implements CompositeValue {
             // Note: composite value models for *new topics* to be created contain sole *topic models*.
             return new AttachedTopic(model, dms);
         }
-    }
-
-    // ---
-
-    private void reinit(String childTypeUri) {
-        initChildTopics(model, childTypeUri);
     }
 
 

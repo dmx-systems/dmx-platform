@@ -47,8 +47,8 @@ class ValueStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Fetches the composite value (child topic models) of the specified parent object model and updates the parent
-     * object model.
+     * Recursively fetches the composite value (child topic models) of the given parent object model and updates it
+     * in-place.
      */
     void fetchCompositeValue(DeepaMehtaObjectModel parent) {
         try {
@@ -67,10 +67,11 @@ class ValueStorage {
     }
 
     /**
-     * Fetches the child topic models of the specified parent object model according to the specified
-     * association definition and updates the parent object model.
+     * Recursively fetches the child topic models of the given parent object model and updates it in-place.
      * <p>
      * Works for both, "one" and "many" association definitions.
+     *
+     * @param   assocDef    The child topic models according to this association definition are fetched.
      */
     void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
         CompositeValueModel comp = parent.getCompositeValueModel();

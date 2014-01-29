@@ -162,6 +162,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     @Override
+    public void loadChildTopics() {
+        getCompositeValue().loadChildTopics();
+    }
+
+    @Override
     public void loadChildTopics(String childTypeUri) {
         getCompositeValue().loadChildTopics(childTypeUri);
     }
