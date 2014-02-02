@@ -1,0 +1,16 @@
+body {
+    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;
+}
+
+p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 0.7em;
+    line-height: 1.6em;
+}
+
+pre {
+    /* Relative or no font-size results in different sizes in Safari and Firefox */
+    font-size: 16px;
+    line-height: 1.3em;
+    white-space: pre-wrap;
+}

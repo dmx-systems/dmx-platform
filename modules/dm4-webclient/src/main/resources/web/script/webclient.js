@@ -35,7 +35,7 @@ dm4c = new function() {
     })
     this.render = new RenderHelper()
     var pm = new PluginManager({
-        internal_plugins: ["default_plugin.js", "fulltext_plugin.js", "ckeditor_plugin.js"]
+        internal_plugins: ["default_plugin.js", "fulltext_plugin.js"]
     })
 
     // === REST Client Extension ===

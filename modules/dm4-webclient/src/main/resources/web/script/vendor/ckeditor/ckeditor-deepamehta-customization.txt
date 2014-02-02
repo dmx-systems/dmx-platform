@@ -10,13 +10,16 @@ This is a custom build of CKEditor 4.3.1 as configured via http://ckeditor.com/b
         - Accessibility Help (a11yhelp)
         - Editor Resize
         - Elements Path
-        - IFrame Editing Area
+        - Floating Space      *) Needed for inline editing
+        - IFrame Editing Area *) Needed for framed editing
         - Maximize
         - Source Editing Area
         - Special Characters (specialchar)
         - SpellCheckAsYouType (scayt)
         - Styles Combo
         - WebSpellChecker (wsc)
+    - Add plugins:
+        - AutoGrow            *) Useful with framed editing
     - Skin: "Moono"
     - Languages: English
     - Source: optimized

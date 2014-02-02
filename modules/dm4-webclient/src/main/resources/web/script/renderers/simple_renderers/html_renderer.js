@@ -10,7 +10,10 @@ dm4c.add_simple_renderer("dm4.webclient.html_renderer", {
             .attr({id: "field_" + page_model.uri, rows: page_model.input_field_rows})
             .text(page_model.value)
         )
-        CKEDITOR.inline("field_" + page_model.uri)
+        CKEDITOR.replace("field_" + page_model.uri, {
+            contentsCss: "/de.deepamehta.webclient/css/ckeditor-contents.css",
+            autoGrow_onStartup: true
+        })
         //
         return function() {
             return CKEDITOR.instances["field_" + page_model.uri].getData()
