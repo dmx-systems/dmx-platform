@@ -4,12 +4,13 @@
  *  - manipulating the topicmap by e.g. adding/removing topics and associations
  *
  * @param   config  an object with 2 properties:
- *                     "is_writable" (boolean) -- indicates weather changes to this model are supposed to be persistent.
+ *                     "is_writable" (boolean) -- if true changes to this model are written to be DB.
  *                     "customizers" (array of viewmodel customer instances) -- the registered viewmodel customizers.
+ * @param   restc   the REST client used for performing the DB updates.
  *
  * ### TODO: introduce common base class for TopicmapViewmodel and GeomapViewmodel (see dm4-geomaps module)
  */
-function TopicmapViewmodel(topicmap_id, config) {
+function TopicmapViewmodel(topicmap_id, config, restc) {
 
     var self = this
 
@@ -79,7 +80,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             _topic = add_topic(topic, view_props)
             // update DB
             if (is_writable()) {
-                dm4c.restc.add_topic_to_topicmap(topicmap_id, topic.id, view_props)
+                restc.add_topic_to_topicmap(topicmap_id, topic.id, view_props)
             }
             //
             return _topic
@@ -88,7 +89,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             _topic.set_visibility(true)
             // update DB
             if (is_writable()) {
-                dm4c.restc.set_topic_visibility(topicmap_id, topic.id, true)
+                restc.set_topic_visibility(topicmap_id, topic.id, true)
             }
             //
             return _topic
@@ -117,7 +118,7 @@ function TopicmapViewmodel(topicmap_id, config) {
             _assoc = add_association(assoc)
             // update DB
             if (is_writable()) {
-                dm4c.restc.add_association_to_topicmap(topicmap_id, assoc.id)
+                restc.add_association_to_topicmap(topicmap_id, assoc.id)
             }
             //
             return _assoc
@@ -134,7 +135,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         topic.set_view_properties(view_props)
         // update DB
         if (is_writable()) {
-            dm4c.restc.set_view_properties(topicmap_id, topic_id, view_props)
+            restc.set_view_properties(topicmap_id, topic_id, view_props)
         }
     }
 
@@ -144,7 +145,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         topic.set_position(x, y)
         // update DB
         if (is_writable()) {
-            dm4c.restc.set_topic_position(topicmap_id, id, x, y)
+            restc.set_topic_position(topicmap_id, id, x, y)
         }
     }
 
@@ -156,7 +157,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         topic.set_visibility(false)
         // update DB
         if (is_writable()) {
-            dm4c.restc.set_topic_visibility(topicmap_id, id, false)
+            restc.set_topic_visibility(topicmap_id, id, false)
         }
     }
 
@@ -166,7 +167,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         assoc.delete()  // Note: a hidden association is removed from the viewmodel, just like a deleted association
         // update DB
         if (is_writable()) {
-            dm4c.restc.remove_association_from_topicmap(topicmap_id, id)
+            restc.remove_association_from_topicmap(topicmap_id, id)
         }
     }
 
@@ -305,7 +306,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         this.trans_y = trans_y
         // update DB
         if (is_writable()) {
-            dm4c.restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
+            restc.set_topicmap_translation(topicmap_id, trans_x, trans_y)
         }
     }
 
@@ -346,7 +347,7 @@ function TopicmapViewmodel(topicmap_id, config) {
         })
         // update DB
         if (is_writable()) {
-            dm4c.restc.set_cluster_position(topicmap_id, cluster_coords())
+            restc.set_cluster_position(topicmap_id, cluster_coords())
         }
 
         function cluster_coords() {
@@ -376,7 +377,7 @@ function TopicmapViewmodel(topicmap_id, config) {
 
     function load() {
 
-        var topicmap = dm4c.restc.get_topicmap(topicmap_id)
+        var topicmap = restc.get_topicmap(topicmap_id)
         info = new Topic(topicmap.info)
         //
         init_topics()

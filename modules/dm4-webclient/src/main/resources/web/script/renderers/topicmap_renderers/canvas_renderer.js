@@ -35,7 +35,7 @@ function CanvasRenderer() {
 
     this.load_topicmap = function(topicmap_id, config) {
         config.customizers = viewmodel_customizers
-        return new TopicmapViewmodel(topicmap_id, config)
+        return new TopicmapViewmodel(topicmap_id, config, dm4c.restc)
     }
 
     this.display_topicmap = function(topicmap_viewmodel, no_history_update) {
