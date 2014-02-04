@@ -227,6 +227,7 @@ function GUIToolkit(config) {
         })
         .off("focus")               // unbinding "focus" prevents auto focusing the first item when the menu gets focus
         .mousedown(consume_event)   // avoid mousedown on scrollbar parts to close the menu prematurely
+        .mouseup(consume_event)     // avoid mouseup   on scrollbar parts to close the menu prematurely
 
         // ---
 
