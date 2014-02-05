@@ -65,6 +65,7 @@ function ToolbarPanel() {
     }
 
     function do_create_note() {
+        dm4c.page_panel.save()
         dm4c.do_create_topic(TYPE_URI_NOTE)
     }
 
