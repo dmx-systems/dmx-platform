@@ -435,8 +435,8 @@ class AttachedCompositeValue implements CompositeValue {
                 // == create assignment ==
             }
             // update DB
-            Topic topic = dms.valueStorage.associateChildTopic((TopicReferenceModel) newChildTopic,
-                parent.getModel(), assocDef, clientState);
+            Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
+                (TopicReferenceModel) newChildTopic, assocDef, clientState);
             // update memory
             putInCompositeValue(topic, assocDef);
         } else if (newChildTopic.getId() != -1) {
@@ -476,8 +476,8 @@ class AttachedCompositeValue implements CompositeValue {
                 }
                 // == create assignment ==
                 // update DB
-                Topic topic = dms.valueStorage.associateChildTopic((TopicReferenceModel) newChildTopic,
-                    parent.getModel(), assocDef, clientState);
+                Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
+                    (TopicReferenceModel) newChildTopic, assocDef, clientState);
                 // update memory
                 addToCompositeValue(topic, assocDef);
             } else if (childTopicId != -1) {
@@ -524,7 +524,7 @@ class AttachedCompositeValue implements CompositeValue {
                                                                                                Directives directives) {
         // update DB
         Topic childTopic = dms.createTopic(newChildTopic, clientState);
-        dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef, clientState);
         // update memory
         putInCompositeValue(childTopic, assocDef);
     }
@@ -533,7 +533,7 @@ class AttachedCompositeValue implements CompositeValue {
                                                                                                Directives directives) {
         // update DB
         Topic childTopic = dms.createTopic(newChildTopic, clientState);
-        dms.valueStorage.associateChildTopic(childTopic.getId(), parent.getModel(), assocDef, clientState);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef, clientState);
         // update memory
         addToCompositeValue(childTopic, assocDef);
     }
