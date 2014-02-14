@@ -344,9 +344,7 @@ public class EmbeddedService implements DeepaMehtaService {
             //
             Directives directives = new Directives();
             //
-            fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, assoc, directives);
             assoc.delete(directives);
-            fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, assoc, directives);
             //
             tx.success();
             return directives;

@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Helper for storing and fetching type models.
+ * Storage-impl agnostic support for fetching/storing type models.
  */
 class TypeStorageImpl implements TypeStorage {
 
@@ -444,7 +444,11 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    List<RelatedAssociationModel> fetchSequence(Topic typeTopic) {
+    // Note: the sequence is fetched in 2 situations:
+    // 1) When fetching a type's association definitions.
+    //    In this situation we don't have a Type object at hand but a sole type topic.
+    // 2) When deleting a sequence in order to rebuild it.
+    private List<RelatedAssociationModel> fetchSequence(Topic typeTopic) {
         try {
             List<RelatedAssociationModel> sequence = new ArrayList();
             // find sequence start
@@ -469,7 +473,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Store ---
 
     private void storeSequence(String typeUri, Collection<AssociationDefinitionModel> assocDefs) {
-        logger.fine("Storing " + assocDefs.size() + " sequence segments for type \"" + typeUri + "\"");
+        logger.info("### Storing " + assocDefs.size() + " sequence segments for type \"" + typeUri + "\"");
         AssociationDefinitionModel predecessor = null;
         for (AssociationDefinitionModel assocDef : assocDefs) {
             appendToSequence(typeUri, assocDef, predecessor);

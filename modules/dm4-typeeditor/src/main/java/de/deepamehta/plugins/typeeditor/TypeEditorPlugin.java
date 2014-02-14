@@ -9,15 +9,15 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.event.PostDeleteAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
+import de.deepamehta.core.service.event.PreDeleteAssociationListener;
 
 import java.util.logging.Logger;
 
 
 
 public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssociationListener,
-                                                                 PostDeleteAssociationListener {
+                                                                 PreDeleteAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -47,8 +47,11 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         }
     }
 
+    // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
+    // interrupted, which would result in a corrupted sequence once rebuild. (Due to the interruption, while
+    // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
     @Override
-    public void postDeleteAssociation(Association assoc, Directives directives) {
+    public void preDeleteAssociation(Association assoc, Directives directives) {
         if (isAssocDef(assoc.getModel())) {
             removeAssocDef(assoc, directives);
         }
@@ -121,6 +124,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         return true;
     }
 
+    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The Type interface's
+    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter.
     private void addUpdateTypeDirective(Type type, Directives directives) {
         if (type.getTypeUri().equals("dm4.core.topic_type")) {
             directives.add(Directive.UPDATE_TOPIC_TYPE, type);

@@ -92,6 +92,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     public void delete(Directives directives) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
+            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this, directives);
+            //
             // delete sub-topics and associations
             super.delete(directives);
             // delete association itself
@@ -100,6 +102,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             dms.storageDecorator.deleteAssociation(getId());
             //
             tx.success();
+            //
+            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this, directives);
         } catch (IllegalStateException e) {
             // Note: getAssociations() might throw IllegalStateException and is no problem.
             // This can happen when this object is an association which is already deleted.
