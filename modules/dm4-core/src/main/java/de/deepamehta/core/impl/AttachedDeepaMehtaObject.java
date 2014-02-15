@@ -312,6 +312,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     abstract String className();
 
+    // ### TODO: Directive getUpdateDirective()
     abstract void addUpdateDirective(Directives directives);
 
     abstract void storeUri();

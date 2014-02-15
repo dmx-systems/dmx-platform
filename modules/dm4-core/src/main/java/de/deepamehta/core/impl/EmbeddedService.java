@@ -171,10 +171,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateTopic(TopicModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Topic topic = getTopic(model.getId(), true);    // fetchComposite=true
             Directives directives = new Directives();
             //
-            topic.update(model, clientState, directives);
+            getTopic(model.getId(), true).update(model, clientState, directives);   // fetchComposite=true
             //
             tx.success();
             return directives;
@@ -189,19 +188,16 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Directives deleteTopic(long topicId) {
         DeepaMehtaTransaction tx = beginTx();
-        Topic topic = null;
         try {
-            topic = getTopic(topicId, true);    // fetchComposite=true ### FIXME: false?
-            //
             Directives directives = new Directives();
             //
-            topic.delete(directives);
+            getTopic(topicId, false).delete(directives);    // fetchComposite=false
             //
             tx.success();
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting topic " + topicId + " failed (" + topic + ")", e);
+            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -320,10 +316,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public Directives updateAssociation(AssociationModel model, ClientState clientState) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Association assoc = getAssociation(model.getId(), true);    // fetchComposite=true
             Directives directives = new Directives();
             //
-            assoc.update(model, clientState, directives);
+            getAssociation(model.getId(), true).update(model, clientState, directives);     // fetchComposite=true
             //
             tx.success();
             return directives;
@@ -338,19 +333,16 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Directives deleteAssociation(long assocId) {
         DeepaMehtaTransaction tx = beginTx();
-        Association assoc = null;
         try {
-            assoc = getAssociation(assocId, false);     // fetchComposite=false
-            //
             Directives directives = new Directives();
             //
-            assoc.delete(directives);
+            getAssociation(assocId, false).delete(directives);  // fetchComposite=false
             //
             tx.success();
             return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            throw new RuntimeException("Deleting association " + assocId + " failed (" + assoc + ")", e);
+            throw new RuntimeException("Deleting association " + assocId + " failed", e);
         } finally {
             tx.finish();
         }
