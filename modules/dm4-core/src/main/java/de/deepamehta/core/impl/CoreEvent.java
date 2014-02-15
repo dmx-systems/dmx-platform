@@ -124,11 +124,31 @@ class CoreEvent {
 
     // ---
 
+    static DeepaMehtaEvent PRE_DELETE_TOPIC = new DeepaMehtaEvent(PreDeleteTopicListener.class) {
+        @Override
+        public void deliver(EventListener listener, Object... params) {
+            ((PreDeleteTopicListener) listener).preDeleteTopic(
+                (Topic) params[0], (Directives) params[1]
+            );
+        }
+    };
+
     static DeepaMehtaEvent PRE_DELETE_ASSOCIATION = new DeepaMehtaEvent(PreDeleteAssociationListener.class) {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreDeleteAssociationListener) listener).preDeleteAssociation(
                 (Association) params[0], (Directives) params[1]
+            );
+        }
+    };
+
+    // ---
+
+    static DeepaMehtaEvent POST_DELETE_TOPIC = new DeepaMehtaEvent(PostDeleteTopicListener.class) {
+        @Override
+        public void deliver(EventListener listener, Object... params) {
+            ((PostDeleteTopicListener) listener).postDeleteTopic(
+                (Topic) params[0], (Directives) params[1]
             );
         }
     };

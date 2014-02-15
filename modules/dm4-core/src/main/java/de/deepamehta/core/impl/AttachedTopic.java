@@ -63,6 +63,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     public void delete(Directives directives) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
+            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this, directives);
+            //
             // delete sub-topics and associations
             super.delete(directives);
             // delete topic itself
@@ -71,6 +73,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
             dms.storageDecorator.deleteTopic(getId());
             //
             tx.success();
+            //
+            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this, directives);
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic failed (" + this + ")", e);
