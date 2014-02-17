@@ -137,12 +137,8 @@ dm4c = new function() {
     this.do_search = function(searchmode) {
         dm4c.page_panel.save()
         //
-        try {
-            var search_topic = build_topic(dm4c.fire_event("search", searchmode)[0])
-            dm4c.show_topic(search_topic, "show", undefined, true)      // coordinates=undefined, do_center=true
-        } catch (e) {
-            alert("ERROR while searching:\n\n" + JSON.stringify(e))
-        }
+        var search_topic = build_topic(dm4c.fire_event("search", searchmode)[0])
+        dm4c.show_topic(search_topic, "show", undefined, true)      // coordinates=undefined, do_center=true
     }
 
     // ---
