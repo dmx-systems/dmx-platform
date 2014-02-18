@@ -12,27 +12,27 @@
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/1.3.2_5</bundle>
         <bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/2.2.2</bundle>
         <!-- DeepaMehta Standard Distribution -->
-        <bundle>mvn:de.deepamehta/deepamehta-core/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-webservice/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-webclient/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-webbrowser/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-notes/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-contacts/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-workspaces/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-typeeditor/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-iconpicker/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-typesearch/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-topicmaps/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-files/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-filemanager/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-help/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-accesscontrol/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-facets/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-geomaps/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-time/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-caching/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/4.2-SNAPSHOT</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/4.2-SNAPSHOT</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-core/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webservice/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webclient/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webbrowser/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-notes/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-contacts/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-workspaces/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-typeeditor/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-iconpicker/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-typesearch/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-topicmaps/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-files/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-filemanager/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-help/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-accesscontrol/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-facets/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-geomaps/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-time/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-caching/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/4.2</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/4.2</bundle>
     </feature>
 
     <feature name="dm4-webconsole" description="Karaf WebConsole for administration and monitoring" version="2.2.9">

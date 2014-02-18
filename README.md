@@ -5,8 +5,8 @@ DeepaMehta 4
 DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after your desktop computer or laptop has booted up.
 
 Technically DeepaMehta 4 is made of  
-Server-side: Java, Neo4j, Felix (OSGi), Jetty, Lucene, Jersey, Thymeleaf (optional), Karaf (optional).  
-Client-side: Javascript, jQuery, jQuery-UI, HTML5 Canvas, CKEditor, OpenLayers (optional).
+Server-side: Java, Neo4j, Felix (OSGi), Jetty, Lucene, Jersey, Thymeleaf (optional), Jetty WebSocket (optional), Karaf (optional).  
+Client-side: Javascript, jQuery, jQuery-UI, HTML5 Canvas, CKEditor, OpenLayers (optional), D3.js (optional).
 
 DeepaMehta 4 is a rewrite of DeepaMehta 2.  
 (DeepaMehta 3 was a research & development effort.)
@@ -68,11 +68,11 @@ To install and use DeepaMehta follow 5 mandatory steps:
 
 There are 2 distributions to suit different needs:
 
-* The **DeepaMehta Standard Distribution** focuses on small download size and easy setup for single users.  
-  <http://download.deepamehta.de/deepamehta-4.1.3.zip> (6.5 MB)
+* The **DeepaMehta Standard Distribution** focuses on small download size and easy setup.  
+  <http://download.deepamehta.de/deepamehta-4.2.zip> (6.9 MB)
 
 * The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
-  <http://download.deepamehta.de/deepamehta-4.1.3-karaf.tar.gz> (13.4 MB)
+  <http://download.deepamehta.de/deepamehta-4.2-karaf.tar.gz> (13.8 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
@@ -82,7 +82,7 @@ For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/
 ---------------------
 
 Unzip the downloaded file.  
-A folder `deepamehta-4.1.3` is created.
+A folder `deepamehta-4.2` is created.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
@@ -90,7 +90,7 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 4. Start DeepaMehta
 -------------------
 
-Open the `deepamehta-4.1.3` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.2` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -124,11 +124,11 @@ Auxiliary tasks follow:
 Updating DeepaMehta
 -------------------
 
-You can update from DeepaMehta 4.1 or newer to 4.1.3 while keeping your data:
+You can update from DeepaMehta 4.1 or newer to 4.2 while keeping your data:
 
-1. Install DeepaMehta 4.1.3 (see steps 2. and 3. above).
-2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.1.3 if already started.)
-3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.1.3` folder.
+1. Install DeepaMehta 4.2 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.2 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.2` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
 
@@ -160,7 +160,7 @@ Uninstall DeepaMehta
 --------------------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.1.3` folder.
+2. Delete the entire `deepamehta-4.2` folder.
 
 This removes DeepaMehta completely from your computer, including all your data.
 
@@ -176,6 +176,19 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.2** -- Feb 18, 2014
+
+* Compatible with 2 new plugins (optional install):
+    * DM4 WebSockets 0.2: allows plugins to push messages and to react on messages received from clients.
+    * DM4 D3.js Renderer 0.1: a topicmap renderer based on D3/SVG that utilizes an animated force layout.
+* Plugin development framework:
+    * Custom Events: a plugin can define its own specific event types.
+* Updated 3rd-party components:
+    * Jetty 6.1.2 -> 7.6.13
+    * CKEditor 3.6.2 -> 4.3.2
+* More changes are in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.1.3** -- Dec 10, 2013
 
@@ -506,4 +519,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Dec 10, 2013
+Feb 18, 2014

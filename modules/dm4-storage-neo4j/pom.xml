@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Storage - Neo4j</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-storage-neo4j</artifactId>
-    <version>4.2-SNAPSHOT</version>
+    <version>4.2</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.2-SNAPSHOT</version>
+            <version>4.2</version>
         </dependency>
         <!-- Neo4j -->
         <dependency>
