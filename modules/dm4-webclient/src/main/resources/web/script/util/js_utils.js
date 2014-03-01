@@ -381,7 +381,7 @@ var js = {
     },
 
     get_cookie: function(key) {
-        // Note: document.cookie contains all cookies as one string, e.g. "username=jri; workspace_id=83".
+        // Note: document.cookie contains all cookies as one string, e.g. "dm4_workspace_id=123; dm4_topicmap_id=234"
         if (document.cookie.match(new RegExp("\\b" + key + "=(\\w*)"))) {
             return RegExp.$1
         }

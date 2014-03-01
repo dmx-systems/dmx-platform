@@ -15,14 +15,14 @@ public class ClientState {
 
     /**
       * Converts a "Cookie" header value (String) to a map (key=String, value=String).
-      * E.g. "user=jri; workspace_id=123" => {"user"="jri", "workspace_id"="123"}
+      * E.g. "dm4_workspace_id=123; dm4_topicmap_id=234" => {"dm4_workspace_id"="123", "dm4_topicmap_id"="234"}
       * <p>
       * Called by JAX-RS container to create a ClientState from a "Cookie" @HeaderParam
       */
     public ClientState(String cookie) {
         if (cookie != null) {
             for (String value : cookie.split("; ")) {
-                String[] val = value.split("=");
+                String[] val = value.split("=", 2);     // Limit 2 ensures 2nd element in case of empty value
                 values.put(val[0], val[1]);
             }
         }
