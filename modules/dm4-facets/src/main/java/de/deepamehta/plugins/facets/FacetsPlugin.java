@@ -13,12 +13,25 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
+@Path("/facet")
+@Consumes("application/json")
+@Produces("application/json")
 public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -35,10 +48,11 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
 
 
+    @GET
+    @Path("/{facet_type_uri}/topic/{id}")
     @Override
-    public Topic getFacet(long topicId, String facetTypeUri) {
-        Topic topic = dms.getTopic(topicId, false);                         // fetchComposite=false
-        return getFacet(topic, facetTypeUri);
+    public Topic getFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
+        return getFacet(dms.getTopic(topicId, false), facetTypeUri);        // fetchComposite=false
     }
 
     @Override
@@ -49,6 +63,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---
 
+    @GET
+    @Path("/multi/{facet_type_uri}/topic/{id}")
+    @Override
+    public List<RelatedTopic> getFacets(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri)
+                                                                                                                {
+        return getFacets(dms.getTopic(topicId, false), facetTypeUri);       // fetchComposite=false
+    }
+
     @Override
     public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
@@ -57,8 +79,10 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---
 
+    @POST
+    @Path("/{facet_type_uri}/topic/{id}")
     @Override
-    public void addFacetTypeToTopic(long topicId, String facetTypeUri) {
+    public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dms.createAssociation(new AssociationModel("dm4.core.instantiation",
             new TopicRoleModel(topicId,      "dm4.core.instance"),
             new TopicRoleModel(facetTypeUri, "dm4.facets.facet")), null);   // clientState=null
@@ -66,17 +90,45 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---
 
+    @PUT
+    @Path("/{facet_type_uri}/topic/{id}")
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
-                                                     ClientState clientState, Directives directives) {
-        // ### TODO: incorporate the Facets module into the DeepaMehta core?
-        object.updateChildTopic(facetValue, getAssocDef(facetTypeUri), clientState, directives);
+    public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
+                                     TopicModel facetValue, @HeaderParam("Cookie") ClientState clientState) {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            updateFacet(dms.getTopic(topicId, false), facetTypeUri, facetValue, clientState, new Directives());
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK!");
+            throw new RuntimeException("Updating facet \"" + facetTypeUri + "\" of topic " + topicId +
+                " failed (facetValue=" + facetValue + ")", e);
+        } finally {
+            tx.finish();
+        }
     }
 
     @Override
-    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<? extends TopicModel> facetValues,
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
+                                                     ClientState clientState, Directives directives) {
+        object.updateChildTopic(facetValue, getAssocDef(facetTypeUri), clientState, directives);
+    }
+
+    // ---
+
+    @PUT
+    @Path("/multi/{facet_type_uri}/topic/{id}")
+    @Override
+    public void updateFacets(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
+                                                            List<TopicModel> facetValues,
+                                                            @HeaderParam("Cookie") ClientState clientState) {
+        updateFacets(dms.getTopic(topicId, false), facetTypeUri, facetValues, clientState, new Directives());
+    }
+
+    @Override
+    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
                                                       ClientState clientState, Directives directives) {
-        // ### TODO: incorporate the Facets module into the DeepaMehta core?
         object.updateChildTopics(facetValues, getAssocDef(facetTypeUri), clientState, directives);
     }
 

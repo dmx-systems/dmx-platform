@@ -147,7 +147,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setCompositeValue(CompositeValueModel comp, ClientState clientState, Directives directives) {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### FIXME: all other writing API methods need transaction as well
+        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
             getCompositeValue().update(comp, clientState, directives);
             tx.success();
@@ -193,13 +193,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                                    ClientState clientState, Directives directives) {
+                                                           ClientState clientState, Directives directives) {
         getCompositeValue().updateChildTopics(newChildTopic, null, assocDef, clientState, directives);
     }
 
     @Override
-    public void updateChildTopics(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                    ClientState clientState, Directives directives) {
+    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                                   ClientState clientState, Directives directives) {
         getCompositeValue().updateChildTopics(null, newChildTopics, assocDef, clientState, directives);
     }
 

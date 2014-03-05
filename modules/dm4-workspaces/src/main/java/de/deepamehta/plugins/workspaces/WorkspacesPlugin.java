@@ -24,7 +24,7 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 
-import static java.util.Arrays.asList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -272,8 +272,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         // Note 1: workspace_facet is a multi-facet. So we must pass a (one-element) list.
         // Note 2: we are refering to an existing workspace. So we must pass a topic reference.
-        facetsService.updateFacets(object, "dm4.workspaces.workspace_facet",
-            asList(new TopicReferenceModel(workspaceId)), null, new Directives());      // clientState=null
+        List<TopicModel> facetValues = new ArrayList();
+        facetValues.add(new TopicReferenceModel(workspaceId));
+        //
+        facetsService.updateFacets(object, "dm4.workspaces.workspace_facet", facetValues, null, new Directives());
+        // clientState=null
     }
 
     // --- Helper ---

@@ -61,7 +61,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public void delete(Directives directives) {
-        DeepaMehtaTransaction tx = dms.beginTx();
+        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
             dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this, directives);
             //

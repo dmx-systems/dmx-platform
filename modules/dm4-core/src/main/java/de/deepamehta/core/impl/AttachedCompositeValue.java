@@ -286,8 +286,8 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    void updateChildTopics(TopicModel newChildTopic, List<? extends TopicModel> newChildTopics,
-                                   AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+    void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                                      ClientState clientState, Directives directives) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
         //
@@ -392,8 +392,8 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    private void updateCompositionMany(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                       ClientState clientState, Directives directives) {
+    private void updateCompositionMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                        ClientState clientState, Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
@@ -452,8 +452,8 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    private void updateAggregationMany(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                       ClientState clientState, Directives directives) {
+    private void updateAggregationMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
+                                                        ClientState clientState, Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {

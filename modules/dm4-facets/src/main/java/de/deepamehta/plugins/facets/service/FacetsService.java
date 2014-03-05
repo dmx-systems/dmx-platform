@@ -14,10 +14,12 @@ import java.util.List;
 
 public interface FacetsService extends PluginService {
 
+    // ### TODO: rename to getFacetValue
     Topic getFacet(long topicId, String facetTypeUri);
 
     /**
-     * Retrieves a facet.
+     * Retrieves a facet value.
+     * ### TODO: rename to getFacetValue
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
@@ -28,8 +30,12 @@ public interface FacetsService extends PluginService {
 
     // ---
 
+    // ### TODO: rename to getFacetValues
+    List<RelatedTopic> getFacets(long topicId, String facetTypeUri);
+
     /**
-     * Retrieves a multi-facet.
+     * Retrieves the values of a multi-facet.
+     * ### TODO: rename to getFacetValues
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
@@ -44,6 +50,8 @@ public interface FacetsService extends PluginService {
 
     // ---
 
+    void updateFacet(long topicId, String facetTypeUri, TopicModel facetValue, ClientState clientState);
+
     /**
      * Updates a facet.
      *
@@ -52,18 +60,24 @@ public interface FacetsService extends PluginService {
      * @param   facetValue      The new facet value.
      * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
-    void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
-                                                                   ClientState clientState, Directives directives);
+    void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue, ClientState clientState,
+                                                                                          Directives directives);
+
+    // ---
+
+    // ### TODO: rename to updateMultiFacet
+    void updateFacets(long topicId, String facetTypeUri, List<TopicModel> facetValues, ClientState clientState);
 
     /**
      * Updates a multi-facet.
+     * ### TODO: rename to updateMultiFacet
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      * @param   facetValues     The new facet values.
      * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
-    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<? extends TopicModel> facetValues,
+    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
                                                                     ClientState clientState, Directives directives);
 
     // ---

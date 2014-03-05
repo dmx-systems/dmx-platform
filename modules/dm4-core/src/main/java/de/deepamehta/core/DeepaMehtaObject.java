@@ -69,9 +69,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
                                                                                     Directives directives);
-    void updateChildTopics(List<? extends TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                                    ClientState clientState,
-                                                                                    Directives directives);
+    void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef, ClientState clientState,
+                                                                                            Directives directives);
 
 
 
