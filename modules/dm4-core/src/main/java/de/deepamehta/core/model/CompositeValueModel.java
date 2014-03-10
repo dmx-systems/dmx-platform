@@ -321,6 +321,8 @@ public class CompositeValueModel implements Iterable<String> {
         }
     }
 
+    // ---
+
     /**
      * Convenience method to put a *simple* value in a single-valued child.
      * An existing value is overwritten.

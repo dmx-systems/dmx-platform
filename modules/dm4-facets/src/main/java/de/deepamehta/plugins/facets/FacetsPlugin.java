@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.facets;
 
-import de.deepamehta.plugins.facets.model.FacetValues;
+import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
@@ -95,41 +95,30 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Path("/{facet_type_uri}/topic/{id}")
     @Override
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
-                                     TopicModel facetValue, @HeaderParam("Cookie") ClientState clientState) {
+                                             FacetValue value, @HeaderParam("Cookie") ClientState clientState) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            updateFacet(dms.getTopic(topicId, false), facetTypeUri, facetValue, clientState, new Directives());
+            updateFacet(dms.getTopic(topicId, false), facetTypeUri, value, clientState, new Directives());
             //
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating facet \"" + facetTypeUri + "\" of topic " + topicId +
-                " failed (facetValue=" + facetValue + ")", e);
+                " failed (value=" + value + ")", e);
         } finally {
             tx.finish();
         }
     }
 
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, TopicModel facetValue,
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value,
                                                      ClientState clientState, Directives directives) {
-        object.updateChildTopic(facetValue, getAssocDef(facetTypeUri), clientState, directives);
-    }
-
-    // ---
-
-    @PUT
-    @Path("/multi/{facet_type_uri}/topic/{id}")
-    @Override
-    public void updateFacets(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
-                                   FacetValues facetValues, @HeaderParam("Cookie") ClientState clientState) {
-        updateFacets(dms.getTopic(topicId, false), facetTypeUri, facetValues, clientState, new Directives());
-    }
-
-    @Override
-    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, FacetValues facetValues,
-                                                      ClientState clientState, Directives directives) {
-        object.updateChildTopics(facetValues.getValues(), getAssocDef(facetTypeUri), clientState, directives);
+        AssociationDefinition assocDef = getAssocDef(facetTypeUri);
+        if (!isMultiFacet(facetTypeUri)) {
+            object.updateChildTopic(value.getTopic(), assocDef, clientState, directives);
+        } else {
+            object.updateChildTopics(value.getTopics(), assocDef, clientState, directives);
+        }
     }
 
     // ---
@@ -180,6 +169,10 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     // ---
+
+    private boolean isMultiFacet(String facetTypeUri) {
+        return getAssocDef(facetTypeUri).getChildCardinalityUri().equals("dm4.core.many");
+    }
 
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
