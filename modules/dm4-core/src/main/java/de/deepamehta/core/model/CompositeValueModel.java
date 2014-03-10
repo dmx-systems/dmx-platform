@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * Keys are strings, values are non-null atomic (string, int, long, double, boolean)
  * or again a <code>CompositeValueModel</code>. ### FIXDOC
  */
-public class CompositeValueModel {
+public class CompositeValueModel implements Iterable<String> {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -143,14 +143,6 @@ public class CompositeValueModel {
      */
     public Object get(String childTypeUri) {
         return values.get(childTypeUri);
-    }
-
-    /**
-     * Returns the type URIs of all childs directly contained in this composite value.
-     * ### TODO: could be renamed to "getChildTypeURIs()"
-     */
-    public Iterable<String> keys() {
-        return values.keySet();
     }
 
     /**
@@ -447,12 +439,24 @@ public class CompositeValueModel {
 
 
 
+    // === Iterable Implementation ===
+
+    /**
+     * Returns an interator which iterates this composite value's child type URIs.
+     */
+    @Override
+    public Iterator<String> iterator() {
+        return values.keySet().iterator();
+    }
+
+
+
     // ===
 
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
-            for (String childTypeUri : keys()) {
+            for (String childTypeUri : this) {
                 Object value = get(childTypeUri);
                 if (value instanceof TopicModel) {
                     json.put(childTypeUri, ((TopicModel) value).toJSON());
@@ -479,7 +483,7 @@ public class CompositeValueModel {
     @Override
     public CompositeValueModel clone() {
         CompositeValueModel clone = new CompositeValueModel();
-        for (String childTypeUri : keys()) {
+        for (String childTypeUri : this) {
             Object value = get(childTypeUri);
             if (value instanceof TopicModel) {
                 TopicModel model = (TopicModel) value;

@@ -26,7 +26,7 @@ public class FacetValues extends CompositeValueModel {
                 throw new RuntimeException("There are " + size() + " child type entries (expected is 1)");
             }
             //
-            this.childTypeUri = keys().iterator().next();
+            this.childTypeUri = iterator().next();
         } catch (Exception e) {
             throw new RuntimeException("Parsing FacetValues failed (JSONObject=" + obj + ")", e);
         }

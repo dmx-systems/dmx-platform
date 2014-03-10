@@ -575,7 +575,7 @@ class AttachedCompositeValue implements CompositeValue {
      * created and put in the attached object cache (recursively).
      */
     private void initAttachedObjectCache() {
-        for (String childTypeUri : model.keys()) {
+        for (String childTypeUri : model) {
             initAttachedObjectCache(childTypeUri);
         }
     }
