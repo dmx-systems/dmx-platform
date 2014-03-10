@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.facets.model.FacetValues;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
@@ -270,10 +271,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        // Note 1: workspace_facet is a multi-facet. So we must pass a (one-element) list.
-        // Note 2: we are refering to an existing workspace. So we must pass a topic reference.
-        List<TopicModel> facetValues = new ArrayList();
-        facetValues.add(new TopicReferenceModel(workspaceId));
+        // Note 1: workspace_facet is a multi-facet. So we must call updateFacets().
+        // Note 2: we are refering to an existing workspace. So we must add a topic reference.
+        FacetValues facetValues = new FacetValues("dm4.workspaces.workspace").addRef(workspaceId);
         //
         facetsService.updateFacets(object, "dm4.workspaces.workspace_facet", facetValues, null, new Directives());
         // clientState=null

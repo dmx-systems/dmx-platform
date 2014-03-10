@@ -44,7 +44,7 @@ public class ObjectProvider implements MessageBodyReader<Object> {
             String json = JavaUtils.readText(entityStream);
             return getJSONConstructor(type).newInstance(new JSONObject(json));
         } catch (Exception e) {
-            throw new RuntimeException("Creating Object from message body failed", e);
+            throw new RuntimeException("Creating a " + type.getName() + " object from message body failed", e);
         }
     }
 

@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.facets;
 
+import de.deepamehta.plugins.facets.model.FacetValues;
 import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
@@ -121,15 +122,14 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Path("/multi/{facet_type_uri}/topic/{id}")
     @Override
     public void updateFacets(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
-                                                            List<TopicModel> facetValues,
-                                                            @HeaderParam("Cookie") ClientState clientState) {
+                                   FacetValues facetValues, @HeaderParam("Cookie") ClientState clientState) {
         updateFacets(dms.getTopic(topicId, false), facetTypeUri, facetValues, clientState, new Directives());
     }
 
     @Override
-    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+    public void updateFacets(DeepaMehtaObject object, String facetTypeUri, FacetValues facetValues,
                                                       ClientState clientState, Directives directives) {
-        object.updateChildTopics(facetValues, getAssocDef(facetTypeUri), clientState, directives);
+        object.updateChildTopics(facetValues.getValues(), getAssocDef(facetTypeUri), clientState, directives);
     }
 
     // ---

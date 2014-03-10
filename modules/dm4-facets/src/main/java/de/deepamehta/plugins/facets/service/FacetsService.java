@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.facets.service;
 
+import de.deepamehta.plugins.facets.model.FacetValues;
+
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -66,7 +68,7 @@ public interface FacetsService extends PluginService {
     // ---
 
     // ### TODO: rename to updateMultiFacet
-    void updateFacets(long topicId, String facetTypeUri, List<TopicModel> facetValues, ClientState clientState);
+    void updateFacets(long topicId, String facetTypeUri, FacetValues facetValues, ClientState clientState);
 
     /**
      * Updates a multi-facet.
@@ -77,7 +79,7 @@ public interface FacetsService extends PluginService {
      * @param   facetValues     The new facet values.
      * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
-    void updateFacets(DeepaMehtaObject object, String facetTypeUri, List<TopicModel> facetValues,
+    void updateFacets(DeepaMehtaObject object, String facetTypeUri, FacetValues facetValues,
                                                                     ClientState clientState, Directives directives);
 
     // ---
