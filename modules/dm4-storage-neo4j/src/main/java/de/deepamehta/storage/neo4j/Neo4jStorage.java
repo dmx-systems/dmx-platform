@@ -512,6 +512,11 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         neo4j.shutdown();
     }
 
+    @Override
+    public Object getDatabaseVendorObject() {
+        return neo4j;
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 

@@ -200,4 +200,6 @@ public interface DeepaMehtaService {
     DeepaMehtaTransaction beginTx();
 
     TypeStorage getTypeStorage();
+
+    Object getDatabaseVendorObject();
 }

@@ -636,4 +636,8 @@ public class StorageDecorator {
     void storeMigrationNr(int migrationNr) {
         storage.storeTopicProperty(0, "core_migration_nr", migrationNr, false);     // addToIndex=false
     }
+
+    Object getDatabaseVendorObject() {
+        return storage.getDatabaseVendorObject();
+    }
 }

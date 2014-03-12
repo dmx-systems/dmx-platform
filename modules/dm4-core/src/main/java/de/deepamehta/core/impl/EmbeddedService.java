@@ -633,6 +633,11 @@ public class EmbeddedService implements DeepaMehtaService {
         return typeStorage;
     }
 
+    @Override
+    public Object getDatabaseVendorObject() {
+        return storageDecorator.getDatabaseVendorObject();
+    }
+
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

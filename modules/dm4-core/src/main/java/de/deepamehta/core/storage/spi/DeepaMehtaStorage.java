@@ -211,4 +211,6 @@ public interface DeepaMehtaStorage {
     boolean setupRootNode();
 
     void shutdown();
+
+    Object getDatabaseVendorObject();
 }

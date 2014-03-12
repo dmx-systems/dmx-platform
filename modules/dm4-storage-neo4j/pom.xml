@@ -63,6 +63,9 @@
                         <Import-Package>
                             !ch.qos.logback.*, !org.slf4j.*, !com.sun.*, !sun.misc.*, *
                         </Import-Package>
+                        <_exportcontents><!-- export package without inlining the class files (we embed the jars) -->
+                            org.neo4j.graphdb
+                        </_exportcontents>
                         <Embed-Dependency>
                             neo4j-kernel, neo4j-lucene-index, geronimo-jta_1.1_spec, lucene-core
                         </Embed-Dependency>
