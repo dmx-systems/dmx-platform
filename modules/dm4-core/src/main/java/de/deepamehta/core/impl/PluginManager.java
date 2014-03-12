@@ -132,7 +132,11 @@ class PluginManager {
             addToActivatedPlugins(plugin);
             //
             logger.info("----- Activation of " + plugin + " complete -----");
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // Note: we want catch a NoClassDefFoundError here (so we state Throwable instead of Exception).
+            // This might happen in initializePlugin() when the plugin's init() hook instantiates a class
+            // from a 3rd-party library which can't be loaded.
+            // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
             throw new RuntimeException("Activation of " + plugin + " failed", e);
         }
     }
