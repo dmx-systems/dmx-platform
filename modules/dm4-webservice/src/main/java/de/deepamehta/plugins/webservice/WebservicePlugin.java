@@ -64,6 +64,13 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @GET
+    @Path("/topic/multi/by_value/{key}/{value}")
+    public List<Topic> getTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value,
+                                 @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite) {
+        return dms.getTopics(key, value, fetchComposite);
+    }
+
+    @GET
     @Path("/topic/by_type/{type_uri}")
     public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,

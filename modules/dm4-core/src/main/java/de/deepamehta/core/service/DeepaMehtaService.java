@@ -45,13 +45,18 @@ public interface DeepaMehtaService {
      * If no such topic exists <code>null</code> is returned.
      * If more than one topic is found a runtime exception is thrown.
      * <p>
+     * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
+     * Compare to {@link #getTopics(String,SimpleValue,boolean)}
+     * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
     Topic getTopic(String key, SimpleValue value, boolean fetchComposite);
 
     /**
-     * Looks up topics by key and value. String values can contain wildcards like "*".
+     * Looks up topics by key and value.
+     * <p>
+     * Wildcards like "*" in String values <i>are</i> interpreted.
      * <p>
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.

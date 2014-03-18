@@ -129,6 +129,9 @@ class PluginManager {
             // Note: the event listeners must be registered *after* the plugin is installed in the database and its
             // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
+            //
+            // ### TODO: if initialization fails the plugin's listeners are not registered.
+            // Then, when stopping the plugin unregistering its listeners fails.
             addToActivatedPlugins(plugin);
             //
             logger.info("----- Activation of " + plugin + " complete -----");
