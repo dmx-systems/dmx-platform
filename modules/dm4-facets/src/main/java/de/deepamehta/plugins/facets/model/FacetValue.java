@@ -55,6 +55,15 @@ public class FacetValue extends CompositeValueModel {
     // ---
 
     /**
+     * Puts a value in a single-valued facet.
+     */
+    public FacetValue put(TopicModel value) {
+        return (FacetValue) put(childTypeUri, value);
+    }
+
+    // ---
+
+    /**
      * Convenience method to put a *simple* value in a single-valued facet.
      */
     public FacetValue put(Object value) {
@@ -66,6 +75,15 @@ public class FacetValue extends CompositeValueModel {
      */
     public FacetValue put(CompositeValueModel value) {
         return (FacetValue) put(childTypeUri, value);
+    }
+
+    // ---
+
+    /**
+     * Adds all the values to a multiple-valued facet.
+     */
+    public FacetValue addAll(List<TopicModel> values) {
+        return (FacetValue) addAll(childTypeUri, values);
     }
 
     // ---
