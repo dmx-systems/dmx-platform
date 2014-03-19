@@ -405,6 +405,16 @@ public class CompositeValueModel implements Iterable<String> {
     }
 
     /**
+     * Adds all the values to a multiple-valued child.
+     */
+    public CompositeValueModel addAll(String childTypeUri, List<TopicModel> values) {
+        for (TopicModel value : values) {
+            add(childTypeUri, value);
+        }
+        return this;
+    }
+
+    /**
      * Removes a value from a multiple-valued child.
      */
     public CompositeValueModel remove(String childTypeUri, TopicModel value) {
