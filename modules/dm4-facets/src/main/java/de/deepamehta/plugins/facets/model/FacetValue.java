@@ -101,4 +101,13 @@ public class FacetValue extends CompositeValueModel {
     public FacetValue addRef(String refTopicUri) {
         return (FacetValue) addRef(childTypeUri, refTopicUri);
     }
+
+    // ---
+
+    /**
+     * Adds a by-ID topic deletion reference to a multiple-valued facet.
+     */
+    public FacetValue addDeletionRef(long refTopicId) {
+        return (FacetValue) addDeletionRef(childTypeUri, refTopicId);
+    }
 }
