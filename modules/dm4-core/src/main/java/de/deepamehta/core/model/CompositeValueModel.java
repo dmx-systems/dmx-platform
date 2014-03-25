@@ -449,6 +449,19 @@ public class CompositeValueModel implements Iterable<String> {
         return this;
     }
 
+    // ---
+
+    /**
+     * Adds a by-ID topic deletion reference to a multiple-valued child.
+     *
+     * Used to maintain the assigments of *aggregated* childs.
+     * Not applicable for *compositioned* childs.
+     */
+    public CompositeValueModel addDeletionRef(String childTypeUri, long refTopicId) {
+        add(childTypeUri, new TopicDeletionModel(refTopicId));
+        return this;
+    }
+
 
 
     // === Iterable Implementation ===

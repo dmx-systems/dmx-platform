@@ -135,6 +135,7 @@ public class DeepaMehtaUtils {
 
     // ---
 
+    // ### TODO: drop this method? There is a JSONArray(Collection) constructor.
     public static JSONArray stringsToJson(Collection<String> strings) {
         JSONArray array = new JSONArray();
         for (String string : strings) {
@@ -145,6 +146,7 @@ public class DeepaMehtaUtils {
 
     // === DeepaMehta specific ===
 
+    // ### TODO: rename to toJSONArray()
     public static JSONArray objectsToJSON(Collection<? extends JSONEnabled> objects) {
         JSONArray array = new JSONArray();
         for (JSONEnabled object : objects) {
