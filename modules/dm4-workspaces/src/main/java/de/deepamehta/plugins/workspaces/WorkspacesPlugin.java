@@ -243,12 +243,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return -1;
         }
         //
-        String workspaceId = clientState.get("dm4_workspace_id");
-        if (workspaceId == null) {
+        if (!clientState.has("dm4_workspace_id")) {
             return -1;
         }
         //
-        return Long.parseLong(workspaceId);
+        return clientState.getLong("dm4_workspace_id");
     }
 
     private long workspaceIdForType(Type type, ClientState clientState) {
