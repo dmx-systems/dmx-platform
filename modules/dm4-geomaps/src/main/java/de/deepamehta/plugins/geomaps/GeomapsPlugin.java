@@ -35,6 +35,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
 
 import java.net.URL;
 import java.util.List;
@@ -53,10 +56,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     private static final String GEOCODER_URL = "http://maps.googleapis.com/maps/api/geocode/json?" +
         "address=%s&sensor=false";
 
+    private static final String COOKIE_NO_GEOCODING = "dm4_no_geocoding";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicmapsService topicmapsService;
     private FacetsService facetsService;
+
+    @Context
+    private HttpHeaders httpHeaders;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -231,8 +239,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    /**
+     * Geocodes the given address and stores the resulting coordinate as a facet value of the given Address topic.
+     * If geocoding (or storing the coordinate) fails a warning is logged; no exception is thrown.
+     *
+     * @param   topic   the Address topic to be facetted.
+     */
     private void geocodeAndStoreFacet(Address address, Topic topic, ClientState clientState, Directives directives) {
         try {
+            if (abortGeocoding()) {
+                logger.info("### Geocoding ABORTED -- \"" + COOKIE_NO_GEOCODING + "\" cookie detected");
+                return;
+            }
+            //
             LonLat geoCoordinate = address.geocode();
             storeGeoCoordinate(topic, geoCoordinate, clientState, directives);
         } catch (Exception e) {
@@ -256,6 +275,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }
+    }
+
+    private boolean abortGeocoding() {
+        Cookie cookie = httpHeaders.getCookies().get(COOKIE_NO_GEOCODING);
+        if (cookie == null) {
+            return false;
+        }
+        String value = cookie.getValue();
+        if (!value.equals("false") && !value.equals("true")) {
+            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
+                "\" cookie (expected are \"false\" or \"true\")");
+        }
+        return value.equals("true");
     }
 
     // ---
