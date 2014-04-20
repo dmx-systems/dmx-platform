@@ -185,15 +185,17 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            //
-            facetsService.addFacetTypeToTopic(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
-            //
-            Address address = new Address(topic.getCompositeValue().getModel());
-            if (!address.isEmpty()) {
-                logger.info("### New " + address);
-                geocodeAndStoreFacet(address, topic, clientState, directives);
-            } else {
-                logger.info("### New empty address");
+            if (!abortGeocoding()) {
+                //
+                facetsService.addFacetTypeToTopic(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
+                //
+                Address address = new Address(topic.getCompositeValue().getModel());
+                if (!address.isEmpty()) {
+                    logger.info("### New " + address);
+                    geocodeAndStoreFacet(address, topic, clientState, directives);
+                } else {
+                    logger.info("### New empty address");
+                }
             }
         }
     }
@@ -202,13 +204,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
                                                                                        Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            Address address    = new Address(topic.getCompositeValue().getModel());
-            Address oldAddress = new Address(oldModel.getCompositeValueModel());
-            if (!address.equals(oldAddress)) {
-                logger.info("### Address changed:" + address.changeReport(oldAddress));
-                geocodeAndStoreFacet(address, topic, clientState, directives);
-            } else {
-                logger.info("### Address not changed");
+            if (!abortGeocoding()) {
+                Address address    = new Address(topic.getCompositeValue().getModel());
+                Address oldAddress = new Address(oldModel.getCompositeValueModel());
+                if (!address.equals(oldAddress)) {
+                    logger.info("### Address changed:" + address.changeReport(oldAddress));
+                    geocodeAndStoreFacet(address, topic, clientState, directives);
+                } else {
+                    logger.info("### Address not changed");
+                }
             }
         }
     }
@@ -247,11 +251,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      */
     private void geocodeAndStoreFacet(Address address, Topic topic, ClientState clientState, Directives directives) {
         try {
-            if (abortGeocoding()) {
-                logger.info("### Geocoding ABORTED -- \"" + COOKIE_NO_GEOCODING + "\" cookie detected");
-                return;
-            }
-            //
             LonLat geoCoordinate = address.geocode();
             storeGeoCoordinate(topic, geoCoordinate, clientState, directives);
         } catch (Exception e) {
@@ -275,19 +274,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }
-    }
-
-    private boolean abortGeocoding() {
-        Cookie cookie = httpHeaders.getCookies().get(COOKIE_NO_GEOCODING);
-        if (cookie == null) {
-            return false;
-        }
-        String value = cookie.getValue();
-        if (!value.equals("false") && !value.equals("true")) {
-            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
-                "\" cookie (expected are \"false\" or \"true\")");
-        }
-        return value.equals("true");
     }
 
     // ---
@@ -340,6 +326,25 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             }
         }
         return null;
+    }
+
+    // ---
+
+    private boolean abortGeocoding() {
+        Cookie cookie = httpHeaders.getCookies().get(COOKIE_NO_GEOCODING);
+        if (cookie == null) {
+            return false;
+        }
+        String value = cookie.getValue();
+        if (!value.equals("false") && !value.equals("true")) {
+            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
+                "\" cookie (expected are \"false\" or \"true\")");
+        }
+        boolean abort = value.equals("true");
+        if (abort) {
+            logger.info("### Geocoding ABORTED -- \"" + COOKIE_NO_GEOCODING + "\" cookie detected");
+        }
+        return abort;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
