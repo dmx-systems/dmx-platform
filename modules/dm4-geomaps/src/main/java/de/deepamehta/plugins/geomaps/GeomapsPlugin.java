@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.geomaps;
 
+import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geomaps.model.Geomap;
 import de.deepamehta.plugins.geomaps.service.GeomapsService;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
@@ -102,6 +103,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             throw new RuntimeException("Finding the geo coordinate's domain topic failed (geoCoordId=" +
                 geoCoordId + ")", e);
         }
+    }
+
+    @Override
+    public GeoCoordinate getGeoCoordinate(Topic geoTopic) {
+        CompositeValue comp = getGeoCoordinateTopic(geoTopic).getCompositeValue();
+        return new GeoCoordinate(
+            comp.getDouble("dm4.geomaps.longitude"),
+            comp.getDouble("dm4.geomaps.latitude")
+        );
     }
 
     @PUT
@@ -223,10 +233,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             return;
         }
         //
-        Topic geoCoord = facetsService.getFacet(address, "dm4.geomaps.geo_coordinate_facet");
-        if (geoCoord != null) {
+        Topic geoCoordTopic = getGeoCoordinateTopic(address);
+        if (geoCoordTopic != null) {
             logger.info("### Enriching address " + address.getId() + " with its geo coordinate");
-            address.getCompositeValue().getModel().put("dm4.geomaps.geo_coordinate", geoCoord.getModel());
+            address.getCompositeValue().getModel().put("dm4.geomaps.geo_coordinate", geoCoordTopic.getModel());
         } else {
             logger.info("### Enriching address " + address.getId() + " with its geo coordinate ABORTED " +
                 "-- no geo coordinate in DB");
@@ -237,6 +247,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private Topic getGeoCoordinateTopic(Topic geoTopic) {
+        return facetsService.getFacet(geoTopic, "dm4.geomaps.geo_coordinate_facet");
+    }
+
+    // ---
+
     /**
      * Geocodes the given address and stores the resulting coordinate as a facet value of the given Address topic.
      * If geocoding (or storing the coordinate) fails a warning is logged; no exception is thrown.
@@ -245,8 +261,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      */
     private void geocodeAndStoreFacet(Address address, Topic topic, ClientState clientState, Directives directives) {
         try {
-            LonLat geoCoordinate = address.geocode();
-            storeGeoCoordinate(topic, geoCoordinate, clientState, directives);
+            GeoCoordinate geoCoord = address.geocode();
+            storeGeoCoordinate(topic, geoCoord, clientState, directives);
         } catch (Exception e) {
             // ### TODO: show to the user?
             logger.log(Level.WARNING, "Adding geo coordinate to " + address + " failed", e);
@@ -256,13 +272,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     /**
      * Stores a geo coordinate for an address topic in the DB.
      */
-    private void storeGeoCoordinate(Topic address, LonLat geoCoordinate, ClientState clientState,
-                                                                         Directives directives) {
+    private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord, ClientState clientState,
+                                                                           Directives directives) {
         try {
-            logger.info("Storing geo coordinate (" + geoCoordinate + ") of address " + address);
+            logger.info("Storing geo coordinate (" + geoCoord + ") of address " + address);
             FacetValue value = new FacetValue("dm4.geomaps.geo_coordinate").put(new CompositeValueModel()
-                .put("dm4.geomaps.longitude", geoCoordinate.lon)
-                .put("dm4.geomaps.latitude",  geoCoordinate.lat)
+                .put("dm4.geomaps.longitude", geoCoord.lon)
+                .put("dm4.geomaps.latitude",  geoCoord.lat)
             );
             facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value, clientState, directives);
         } catch (Exception e) {
@@ -360,7 +376,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
         // ---
 
-        LonLat geocode() {
+        GeoCoordinate geocode() {
             URL url = null;
             try {
                 // perform request
@@ -379,9 +395,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 double lng = location.getDouble("lng");
                 double lat = location.getDouble("lat");
                 // create result
-                LonLat geoCoordinate = new LonLat(lng, lat);
-                logger.info("=> " + geoCoordinate);
-                return geoCoordinate;
+                GeoCoordinate geoCoord = new GeoCoordinate(lng, lat);
+                logger.info("=> " + geoCoord);
+                return geoCoord;
             } catch (Exception e) {
                 throw new RuntimeException("Geocoding failed (url=\"" + url + "\")", e);
             }
@@ -429,20 +445,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         public String toString() {
             return "address (street=\"" + street + "\", postalCode=\"" + postalCode +
                 "\", city=\"" + city + "\", country=\"" + country + "\")";
-        }
-    }
-
-    private class LonLat {
-
-        double lon, lat;
-
-        LonLat(double lon, double lat) {
-            this.lon = lon;
-            this.lat = lat;
-        }
-
-        public String toString() {
-            return "long=" + lon + ", lat=" + lat;
         }
     }
 }

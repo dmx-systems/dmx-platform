@@ -25,7 +25,7 @@ public interface FacetsService extends PluginService {
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
-     * @return  The retrieved facet.
+     * @return  The retrieved facet value or <code>null</code> if no such topic extists.
      */
     Topic getFacet(DeepaMehtaObject object, String facetTypeUri);
 
@@ -41,7 +41,7 @@ public interface FacetsService extends PluginService {
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
-     * @return  The retrieved multi-facet.
+     * @return  The retrieved facet values. The list may be empty.
      */
     List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
