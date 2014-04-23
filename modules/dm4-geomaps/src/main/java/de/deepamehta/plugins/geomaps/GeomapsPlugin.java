@@ -8,6 +8,7 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.CompositeValue;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -88,38 +89,31 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @GET
     @Path("/topic/{id}")
     @Override
-    public Topic getGeoTopic(@PathParam("id") long topicId) {
+    public Topic getDomainTopic(@PathParam("id") long geoCoordId) {
         try {
-            Topic topic = dms.getTopic(topicId, true);
+            Topic topic = dms.getTopic(geoCoordId, true);
             RelatedTopic parentTopic;
             while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null,
-                    true, false)) != null) {
+                    true, false)) != null) {    // ### TODO: optimization. Don't fetch composite of intermediate topics.
                 topic = parentTopic;
             }
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Finding the geo coordinate's parent topic failed (topicId=" + topicId + ")", e);
+            throw new RuntimeException("Finding the geo coordinate's domain topic failed (geoCoordId=" +
+                geoCoordId + ")", e);
         }
     }
 
-    @GET
-    @Path("/{id}/topics")
-    @Override
-    public ResultList<RelatedTopic> getGeomapTopics(@PathParam("id") long geomapId) {
-        return Geomap.fetchGeomapTopics(geomapId, dms);
-    }
-
     @PUT
-    @Path("/{id}/topic/{topic_id}")
+    @Path("/{id}/topic/{geo_coord_id}")
     @Override
-    public void addTopicToGeomap(@PathParam("id") long geomapId, @PathParam("topic_id") long topicId) {
-        logger.info("### Adding topic " + topicId + " to geomap " + geomapId);
+    public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
+        logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
         AssociationModel model = new AssociationModel("dm4.geomaps.geotopic_mapcontext",
-            new TopicRoleModel(geomapId, "dm4.core.default"),
-            new TopicRoleModel(topicId,  "dm4.topicmaps.topicmap_topic")
+            new TopicRoleModel(geomapId,   "dm4.core.default"),
+            new TopicRoleModel(geoCoordId, "dm4.topicmaps.topicmap_topic")
         );
-        Association refAssoc = dms.createAssociation(model, null);     // FIXME: clientState=null
-        // ### return refAssoc.getId();
+        dms.createAssociation(model, null);     // FIXME: clientState=null
     }
 
     @PUT
@@ -224,15 +218,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      */
     @Override
     public void preSendTopic(Topic topic, ClientState clientState) {
-        TopicModel address = findAddress(topic);
+        Topic address = findAddress(topic);
         if (address == null) {
             return;
         }
         //
-        Topic geoFacet = facetsService.getFacet(address.getId(), "dm4.geomaps.geo_coordinate_facet");
-        if (geoFacet != null) {
+        Topic geoCoord = facetsService.getFacet(address, "dm4.geomaps.geo_coordinate_facet");
+        if (geoCoord != null) {
             logger.info("### Enriching address " + address.getId() + " with its geo coordinate");
-            address.getCompositeValueModel().put("dm4.geomaps.geo_coordinate", geoFacet.getModel());
+            address.getCompositeValue().getModel().put("dm4.geomaps.geo_coordinate", geoCoord.getModel());
         } else {
             logger.info("### Enriching address " + address.getId() + " with its geo coordinate ABORTED " +
                 "-- no geo coordinate in DB");
@@ -278,8 +272,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ---
 
-    private TopicModel findAddress(Topic topic) {
-        return findChildTopic(topic.getModel(), "dm4.contacts.address");
+    private Topic findAddress(Topic topic) {
+        return findChildTopic(topic, "dm4.contacts.address");
     }
 
     /**
@@ -293,22 +287,22 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      * <p>
      * TODO: make this a generally available method by adding it to the Topic interface?
      */
-    private TopicModel findChildTopic(TopicModel topic, String topicTypeUri) {
+    private Topic findChildTopic(Topic topic, String topicTypeUri) {
         String typeUri = topic.getTypeUri();
         if (typeUri.equals(topicTypeUri)) {
             return topic;
         }
         //
-        CompositeValueModel comp = topic.getCompositeValueModel();
+        CompositeValue comp = topic.getCompositeValue();
         TopicType topicType = dms.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
             String childTypeUri   = assocDef.getChildTypeUri();
             String cardinalityUri = assocDef.getChildCardinalityUri();
-            TopicModel childTopic = null;
+            Topic childTopic = null;
             if (cardinalityUri.equals("dm4.core.one")) {
                 childTopic = comp.getTopic(childTypeUri, null);
             } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<TopicModel> childTopics = comp.getTopics(childTypeUri, null);
+                List<Topic> childTopics = comp.getTopics(childTypeUri, null);
                 if (childTopics != null && !childTopics.isEmpty()) {
                     childTopic = childTopics.get(0);
                 }

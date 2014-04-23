@@ -15,11 +15,11 @@ dm4c.add_plugin("de.deepamehta.geomaps", function() {
     dm4c.restc.get_geomap = function(geomap_id) {
         return this.request("GET", "/geomap/" + geomap_id)
     }
-    dm4c.restc.get_geotopic = function(topic_id) {
-        return this.request("GET", "/geomap/topic/" + topic_id)
+    dm4c.restc.get_domain_topic = function(geo_coord_id) {
+        return this.request("GET", "/geomap/topic/" + geo_coord_id)
     }
-    dm4c.restc.add_topic_to_geomap = function(geomap_id, topic_id) {
-        return this.request("PUT", "/geomap/" + geomap_id + "/topic/" + topic_id)
+    dm4c.restc.add_coordinate_to_geomap = function(geomap_id, geo_coord_id) {
+        return this.request("PUT", "/geomap/" + geomap_id + "/topic/" + geo_coord_id)
     }
     dm4c.restc.set_geomap_state = function(geomap_id, center, zoom) {
         return this.request("PUT", "/geomap/" + geomap_id + "/center/" + center.lon + "/" + center.lat +

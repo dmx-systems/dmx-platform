@@ -13,19 +13,14 @@ public interface GeomapsService extends PluginService {
     Geomap getGeomap(long geomapId);
 
     /**
-     * Retrieves the domain topic that corresponds to a Geo Coordinate topic.
-     * ### TODO: rename method and argument
+     * Finds the domain topic that corresponds to a Geo Coordinate topic.
      */
-    Topic getGeoTopic(long topicId);
-
-    // ### TODO: drop this
-    ResultList<RelatedTopic> getGeomapTopics(long geomapId);
+    Topic getDomainTopic(long geoCoordId);
 
     /**
      * Adds a Geo Coordinate topic to a geomap.
-     * ### TODO: rename method and argument
      */
-    void addTopicToGeomap(long geomapId, long topicId);
+    void addCoordinateToGeomap(long geomapId, long geoCoordId);
 
     void setGeomapState(long geomapId, double lon, double lat, int zoom);
 }

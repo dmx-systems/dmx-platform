@@ -11,24 +11,25 @@ import de.deepamehta.core.util.DeepaMehtaUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
 
 
 /**
- * A geomap model: a collection of Geo Coordinate topics.
+ * A geomap model: a collection of Geo Coordinate topic models.
  * <p>
  * Features:
  * - load from DB (by constructor).
  * - Serialization to JSON.
  */
-public class Geomap implements JSONEnabled {
+public class Geomap implements Iterable<TopicModel>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected Topic geomapTopic;
-    protected Map<Long, TopicModel> topics = new HashMap();
+    protected Map<Long, TopicModel> geoCoords = new HashMap();
 
     protected DeepaMehtaService dms;
 
@@ -44,7 +45,7 @@ public class Geomap implements JSONEnabled {
         this.dms = dms;
         //
         logger.info("Loading geomap " + getId());
-        loadTopics();
+        fetchGeoCoordinates();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -53,15 +54,9 @@ public class Geomap implements JSONEnabled {
         return geomapTopic.getId();
     }
 
-    // ---
-
-    public static ResultList<RelatedTopic> fetchGeomapTopics(long geomapId, DeepaMehtaService dms) {
-        Topic geomapTopic = dms.getTopic(geomapId, false);      // fetchComposite=false
-        return fetchGeomapTopics(geomapTopic, false);           // fetchComposite=false
-    }
-
-    public boolean containsTopic(long topicId) {
-        return topics.get(topicId) != null;
+    // ### TODO: needed?
+    public boolean containsTopic(long geoCoordId) {
+        return geoCoords.get(geoCoordId) != null;
     }
 
     // ---
@@ -71,11 +66,16 @@ public class Geomap implements JSONEnabled {
         try {
             JSONObject topicmap = new JSONObject();
             topicmap.put("info", geomapTopic.toJSON());
-            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics.values()));
+            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(geoCoords.values()));
             return topicmap;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
+    }
+
+    @Override
+    public Iterator<TopicModel> iterator() {
+        return geoCoords.values().iterator();
     }
 
     @Override
@@ -85,20 +85,15 @@ public class Geomap implements JSONEnabled {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void loadTopics() {
-        ResultList<RelatedTopic> mapTopics = fetchGeomapTopics(geomapTopic, true);     // fetchComposite=true
-        for (RelatedTopic mapTopic : mapTopics) {
-            addTopic(mapTopic.getModel());
+    private void fetchGeoCoordinates() {
+        for (Topic geoCoord : fetchGeoCoordinates(geomapTopic, true)) {   // fetchComposite=true
+            geoCoords.put(geoCoord.getId(), geoCoord.getModel());
         }
     }
 
-    private static ResultList<RelatedTopic> fetchGeomapTopics(Topic geomapTopic, boolean fetchComposite) {
+    private ResultList<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic, boolean fetchComposite) {
         return geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext", "dm4.core.default",
             "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate", fetchComposite, false, 0);
             // fetchRelatingComposite=false, maxResultSize=0, clientContext=null
-    }
-
-    private void addTopic(TopicModel topic) {
-        topics.put(topic.getId(), topic);
     }
 }

@@ -92,7 +92,7 @@ function GeomapRenderer() {
     this.select_topic = function(topic_id) {
         // fetch from DB
         var topic_select = dm4c.fetch_topic(topic_id)
-        var topic_display = new Topic(dm4c.restc.get_geotopic(topic_id))
+        var topic_display = new Topic(dm4c.restc.get_domain_topic(topic_id))
         // update viewmodel
         geomap.set_topic_selection(topic_id)
         // update view

@@ -159,7 +159,7 @@ function GeomapViewmodel(topicmap_id, config) {
         topics[geo_coordinate.id] = geo_topic
         // update DB
         if (is_writable()) {
-            dm4c.restc.add_topic_to_geomap(topicmap_id, geo_coordinate.id)
+            dm4c.restc.add_coordinate_to_geomap(topicmap_id, geo_coordinate.id)
         }
         //
         return geo_topic
