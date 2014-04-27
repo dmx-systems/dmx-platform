@@ -78,6 +78,7 @@ Client-side events
 
 === Topicmaps plugin ===
 "topicmap_renderer"
+"post_refresh_topicmap_menu"
 
 === Files plugin ===
 "process_files_drop"

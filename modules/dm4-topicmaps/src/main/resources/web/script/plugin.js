@@ -510,6 +510,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
         //
         select_menu_item(topicmap_id)
+        //
+        dm4c.fire_event("post_refresh_topicmap_menu", topicmap_menu)
     }
 
     /**
