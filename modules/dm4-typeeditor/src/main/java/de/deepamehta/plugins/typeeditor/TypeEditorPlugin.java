@@ -96,7 +96,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         logger.info("### Removing association definition \"" + childTypeUri + "\" from type \"" + parentType.getUri() +
             "\"");
         //
-        parentType.removeAssocDef(childTypeUri);
+        dms.getTypeStorage().removeAssociationDefinitionFromMemoryAndRebuildSequence(parentType, childTypeUri);
         //
         addUpdateTypeDirective(parentType, directives);
     }

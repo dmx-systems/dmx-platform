@@ -236,6 +236,11 @@ class TypeStorageImpl implements TypeStorage {
 
     // === Association Definitions ===
 
+    @Override
+    public void removeAssociationDefinitionFromMemoryAndRebuildSequence(Type type, String childTypeUri) {
+        ((AttachedType) type).removeAssocDefFromMemoryAndRebuildSequence(childTypeUri);
+    }
+
     // --- Fetch ---
 
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(Topic typeTopic) {

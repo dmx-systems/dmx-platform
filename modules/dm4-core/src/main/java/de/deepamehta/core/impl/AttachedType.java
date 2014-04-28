@@ -163,8 +163,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // Note: the predecessor must be determined *before* the memory is updated
         AssociationDefinitionModel predecessor = lastAssocDef();
         // update memory
-        getModel().addAssocDef(model);                                          // update model
-        _addAssocDef(model);                                                    // update attached object cache
+        getModel().addAssocDef(model);      // update model
+        _addAssocDef(model);                // update attached object cache
         // update DB
         dms.typeStorage.storeAssociationDefinition(model);
         dms.typeStorage.appendToSequence(getUri(), model, predecessor);
@@ -173,8 +173,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     @Override
     public void updateAssocDef(AssociationDefinitionModel model) {
         // update memory
-        getModel().updateAssocDef(model);                                       // update model
-        _addAssocDef(model);                                                    // update attached object cache
+        getModel().updateAssocDef(model);   // update model
+        _addAssocDef(model);                // update attached object cache
         // update DB
         // ### Note: the DB is not updated here! In case of interactive assoc type change the association is
         // already updated in DB. => See interface comment.
@@ -182,11 +182,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void removeAssocDef(String childTypeUri) {
-        // update memory
-        getModel().removeAssocDef(childTypeUri);                                // update model
-        AttachedAssociationDefinition assocDef = _removeAssocDef(childTypeUri); // update attached object cache
-        // update DB
-        dms.typeStorage.rebuildSequence(this);
+        // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
+        // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
+        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
+        // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
+        // deletes an association), and 2) programmatical deletion (e.g. from a migration).
+        getAssocDef(childTypeUri).delete(new Directives());     // ### FIXME: directives are not passed on
     }
 
     // --- Label Configuration ---
@@ -235,6 +236,16 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     abstract Directive getDeleteTypeDirective();
+
+    // ---
+
+    void removeAssocDefFromMemoryAndRebuildSequence(String childTypeUri) {
+        // update memory
+        getModel().removeAssocDef(childTypeUri);    // update model
+        _removeAssocDef(childTypeUri);              // update attached object cache
+        // update DB
+        dms.typeStorage.rebuildSequence(this);
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -355,11 +366,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
         assocDefs.put(assocDef.getChildTypeUri(), assocDef);
     }
 
-    private AttachedAssociationDefinition _removeAssocDef(String childTypeUri) {
+    private void _removeAssocDef(String childTypeUri) {
         // error check
         getAssocDef(childTypeUri);
         //
-        return (AttachedAssociationDefinition) assocDefs.remove(childTypeUri);
+        assocDefs.remove(childTypeUri);
     }
 
     // ---
