@@ -17,9 +17,10 @@ public interface GeomapsService extends PluginService {
     Topic getDomainTopic(long geoCoordId);
 
     /**
-     * Returns the geo coordinate of a geo-facetted topic (e.g. an Address).
+     * Returns the geo coordinate of a geo-facetted topic (e.g. an Address),
+     * or <code>null</code> if no geo coordinate is stored.
      *
-     * @return  the geo coordinate, or <code>null</code> if no geo-facet is stored.
+     * @return  the geo coordinate, or <code>null</code>.
      */
     GeoCoordinate getGeoCoordinate(Topic geoTopic);
 

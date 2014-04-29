@@ -107,11 +107,20 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @Override
     public GeoCoordinate getGeoCoordinate(Topic geoTopic) {
-        CompositeValue comp = getGeoCoordinateTopic(geoTopic).getCompositeValue();
-        return new GeoCoordinate(
-            comp.getDouble("dm4.geomaps.longitude"),
-            comp.getDouble("dm4.geomaps.latitude")
-        );
+        try {
+            Topic geoCoordTopic = getGeoCoordinateTopic(geoTopic);
+            if (geoCoordTopic != null) {
+                CompositeValue comp = geoCoordTopic.getCompositeValue();
+                return new GeoCoordinate(
+                    comp.getDouble("dm4.geomaps.longitude"),
+                    comp.getDouble("dm4.geomaps.latitude")
+                );
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the geo coordinate failed (geoTopic=" + geoTopic + ")", e);
+        }
     }
 
     @PUT
@@ -247,6 +256,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    /**
+     * Returns the Geo Coordinate topic of a geo-facetted topic (e.g. an Address),
+     * or <code>null</code> if no geo coordinate is stored.
+     */
     private Topic getGeoCoordinateTopic(Topic geoTopic) {
         return facetsService.getFacet(geoTopic, "dm4.geomaps.geo_coordinate_facet");
     }
