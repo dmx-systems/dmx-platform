@@ -54,10 +54,15 @@ public interface DeepaMehtaStorage {
     void storeTopicTypeUri(long topicId, String topicTypeUri);
 
     /**
+     * Stores and indexes a topic value.
+     *
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
     void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
                                                                                       SimpleValue indexValue);
+
+    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue);
+
     // ---
 
     void deleteTopic(long topicId);
@@ -85,10 +90,14 @@ public interface DeepaMehtaStorage {
     void storeAssociationTypeUri(long assocId, String assocTypeUri);
 
     /**
+     * Stores and indexes an association value.
+     *
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
     void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
                                                                                             SimpleValue indexValue);
+
+    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 

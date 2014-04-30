@@ -187,8 +187,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
-        storeAndIndexTopicValue(fetchTopicNode(topicId), value.value(), indexModes, indexKey,
-            getIndexValue(value, indexValue));
+        Node topicNode = fetchTopicNode(topicId);
+        // store
+        topicNode.setProperty(KEY_VALUE, value.value());
+        // index
+        indexTopicNodeValue(topicNode, indexModes, indexKey, getIndexValue(value, indexValue));
+    }
+
+    @Override
+    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        indexTopicNodeValue(fetchTopicNode(topicId), asList(indexMode), indexKey, indexValue.value());
     }
 
     // ---
@@ -286,8 +294,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
                                                                        String indexKey, SimpleValue indexValue) {
-        storeAndIndexAssociationValue(fetchAssociationNode(assocId), value.value(), indexModes, indexKey,
-            getIndexValue(value, indexValue));
+        Node assocNode = fetchAssociationNode(assocId);
+        // store
+        assocNode.setProperty(KEY_VALUE, value.value());
+        // index
+        indexAssociationNodeValue(assocNode, indexModes, indexKey, getIndexValue(value, indexValue));
+    }
+
+    @Override
+    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        indexAssociationNodeValue(fetchAssociationNode(assocId), asList(indexMode), indexKey, indexValue.value());
     }
 
     @Override
@@ -567,19 +583,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private void storeAndIndexTopicValue(Node topicNode, Object value, List<IndexMode> indexModes,
-                                                                       String indexKey, Object indexValue) {
-        // store
-        topicNode.setProperty(KEY_VALUE, value);
-        // index
+    private void indexTopicNodeValue(Node topicNode, List<IndexMode> indexModes, String indexKey, Object indexValue) {
         indexNodeValue(topicNode, indexValue, indexModes, indexKey, topicContentExact, topicContentFulltext);
     }
 
-    private void storeAndIndexAssociationValue(Node assocNode, Object value, List<IndexMode> indexModes,
-                                                                             String indexKey, Object indexValue) {
-        // store
-        assocNode.setProperty(KEY_VALUE, value);
-        // index
+    private void indexAssociationNodeValue(Node assocNode, List<IndexMode> indexModes, String indexKey,
+                                                                                       Object indexValue) {
         indexNodeValue(assocNode, indexValue, indexModes, indexKey, assocContentExact, assocContentFulltext);
     }
 

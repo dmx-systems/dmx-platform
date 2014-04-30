@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -7,6 +8,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -82,5 +84,10 @@ class AttachedTopicType extends AttachedType implements TopicType {
     @Override
     final Directive getDeleteTypeDirective() {
         return Directive.DELETE_TOPIC_TYPE;
+    }
+
+    @Override
+    final List<? extends DeepaMehtaObject> getAllInstances() {
+        return dms.getTopics(getUri(), false, 0).getItems();
     }
 }

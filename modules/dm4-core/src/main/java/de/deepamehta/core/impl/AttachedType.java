@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
@@ -129,11 +130,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void setIndexModes(List<IndexMode> indexModes) {
+    public void addIndexMode(IndexMode indexMode) {
         // update memory
-        getModel().setIndexModes(indexModes);
+        getModel().addIndexMode(indexMode);
         // update DB
-        dms.typeStorage.storeIndexModes(getUri(), indexModes);
+        dms.typeStorage.storeIndexMode(getUri(), indexMode);
+        indexAllInstances(indexMode);
     }
 
     // --- Association Definitions ---
@@ -237,6 +239,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     abstract Directive getDeleteTypeDirective();
 
+    abstract List<? extends DeepaMehtaObject> getAllInstances();
+
     // ---
 
     void removeAssocDefFromMemoryAndRebuildSequence(String childTypeUri) {
@@ -275,6 +279,27 @@ abstract class AttachedType extends AttachedTopic implements Type {
             false, false).getRelatingAssociation().delete(directives);
         // create new assignment
         dms.typeStorage.storeDataType(getUri(), dataTypeUri);
+    }
+
+    // ---
+
+    private void indexAllInstances(IndexMode indexMode) {
+        List<? extends DeepaMehtaObject> objects = getAllInstances();
+        //
+        String str = "\"" + getSimpleValue() + "\" (" + getUri() + ") instances";
+        if (getIndexModes().size() > 0) {
+            if (objects.size() > 0) {
+                logger.info("### Indexing " + objects.size() + " " + str + " (indexMode=" + indexMode + ")");
+            } else {
+                logger.info("### Indexing " + str + " ABORTED -- no instances in DB");
+            }
+        } else {
+            logger.info("### Indexing " + str + " ABORTED -- no index mode set");
+        }
+        //
+        for (DeepaMehtaObject obj : objects) {
+            dms.valueStorage.indexSimpleValue(obj.getModel(), indexMode);
+        }
     }
 
     // ---

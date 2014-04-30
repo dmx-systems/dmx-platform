@@ -83,8 +83,8 @@ public abstract class TypeModel extends TopicModel {
         return indexModes;
     }
 
-    public void setIndexModes(List<IndexMode> indexModes) {
-        this.indexModes = indexModes;
+    public void addIndexMode(IndexMode indexMode) {
+        indexModes.add(indexMode);
     }
 
     // === Association Definitions ===

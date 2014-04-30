@@ -224,12 +224,16 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    void storeIndexModes(String typeUri, List<IndexMode> indexModes) {
+    private void storeIndexModes(String typeUri, List<IndexMode> indexModes) {
         for (IndexMode indexMode : indexModes) {
-            dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(typeUri,           "dm4.core.type"),
-                new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
+            storeIndexMode(typeUri, indexMode);
         }
+    }
+
+    void storeIndexMode(String typeUri, IndexMode indexMode) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(typeUri,           "dm4.core.type"),
+            new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
     }
 
 

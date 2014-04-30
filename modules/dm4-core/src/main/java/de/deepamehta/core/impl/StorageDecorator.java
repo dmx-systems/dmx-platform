@@ -120,15 +120,15 @@ public class StorageDecorator {
     }
 
     /**
-     * Stores the topic's value.
-     * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexTopicValue} method. ### FIXDOC
-     *
-     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
+     * Stores and indexes the topic's value. ### TODO: separate storing/indexing?
      */
     void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
                                                                                       SimpleValue indexValue) {
         storage.storeTopicValue(topicId, value, indexModes, indexKey, indexValue);
+    }
+
+    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        storage.indexTopicValue(topicId, indexMode, indexKey, indexValue);
     }
 
     // ---
@@ -247,15 +247,15 @@ public class StorageDecorator {
     }
 
     /**
-     * Stores the association's value.
-     * <p>
-     * Note: the value is not indexed automatically. Use the {@link indexAssociationValue} method. ### FIXDOC
-     *
-     * @return  The previous value, or <code>null</code> if no value was stored before. ### FIXDOC
+     * Stores and indexes the association's value. ### TODO: separate storing/indexing?
      */
     void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
                                                                                             SimpleValue indexValue) {
         storage.storeAssociationValue(assocId, value, indexModes, indexKey, indexValue);
+    }
+
+    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        storage.indexAssociationValue(assocId, indexMode, indexKey, indexValue);
     }
 
     // ---

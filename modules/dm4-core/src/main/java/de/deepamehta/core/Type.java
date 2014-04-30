@@ -27,7 +27,7 @@ public interface Type extends Topic {
 
     List<IndexMode> getIndexModes();
 
-    void setIndexModes(List<IndexMode> indexModes);
+    void addIndexMode(IndexMode indexMode);
 
     // --- Association Definitions ---
 

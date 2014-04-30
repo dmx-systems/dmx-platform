@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationTypeModel;
@@ -7,6 +8,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -82,5 +84,10 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     @Override
     final Directive getDeleteTypeDirective() {
         return Directive.DELETE_ASSOCIATION_TYPE;
+    }
+
+    @Override
+    final List<? extends DeepaMehtaObject> getAllInstances() {
+        return dms.getAssociations(getUri());
     }
 }

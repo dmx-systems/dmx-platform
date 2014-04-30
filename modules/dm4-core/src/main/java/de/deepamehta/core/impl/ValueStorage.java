@@ -6,6 +6,7 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -108,6 +109,29 @@ class ValueStorage {
             refreshLabel(model);
         } else {
             storeSimpleValue(model);
+        }
+    }
+
+    /**
+     * Indexes the simple value of the given object model according to the given index mode.
+     * <p>
+     * Called to index existing topics/associations once an index mode has been added to a type definition.
+     */
+    void indexSimpleValue(DeepaMehtaObjectModel model, IndexMode indexMode) {
+        if (model instanceof TopicModel) {
+            dms.storageDecorator.indexTopicValue(
+                model.getId(),
+                indexMode,
+                model.getTypeUri(),
+                getIndexValue(model)
+            );
+        } else if (model instanceof AssociationModel) {
+            dms.storageDecorator.indexAssociationValue(
+                model.getId(),
+                indexMode,
+                model.getTypeUri(),
+                getIndexValue(model)
+            );
         }
     }
 
