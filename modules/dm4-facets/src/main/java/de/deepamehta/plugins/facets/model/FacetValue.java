@@ -82,8 +82,8 @@ public class FacetValue extends CompositeValueModel {
     /**
      * Adds all the values to a multiple-valued facet.
      */
-    public FacetValue addAll(List<TopicModel> values) {
-        return (FacetValue) addAll(childTypeUri, values);
+    public FacetValue put(List<TopicModel> values) {
+        return (FacetValue) put(childTypeUri, values);
     }
 
     // ---
