@@ -34,7 +34,7 @@ public class CompositeValueModel implements Iterable<String> {
      * Internal representation.
      * Key: String, value: TopicModel or List<TopicModel>
      */
-    private Map<String, Object> values = new HashMap();
+    private Map<String, Object> childTopics = new HashMap();
     // Note: it must be List<TopicModel>, not Set<TopicModel> (like before).
     // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
@@ -142,7 +142,7 @@ public class CompositeValueModel implements Iterable<String> {
      * @return  A TopicModel or List<TopicModel>, or null if there is no such child.
      */
     public Object get(String childTypeUri) {
-        return values.get(childTypeUri);
+        return childTopics.get(childTypeUri);
     }
 
     /**
@@ -150,7 +150,7 @@ public class CompositeValueModel implements Iterable<String> {
      * ### TODO: could be renamed to "contains()"
      */
     public boolean has(String childTypeUri) {
-        return values.containsKey(childTypeUri);
+        return childTopics.containsKey(childTypeUri);
     }
 
     /**
@@ -158,7 +158,7 @@ public class CompositeValueModel implements Iterable<String> {
      * Multiple-valued childs count as one.
      */
     public int size() {
-        return values.size();
+        return childTopics.size();
     }
 
 
@@ -313,7 +313,7 @@ public class CompositeValueModel implements Iterable<String> {
                 throw new IllegalArgumentException("Tried to put null in a CompositeValueModel");
             }
             //
-            values.put(childTypeUri, value);
+            childTopics.put(childTypeUri, value);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a CompositeValueModel failed (childTypeUri=\"" +
@@ -333,7 +333,7 @@ public class CompositeValueModel implements Iterable<String> {
      */
     public CompositeValueModel put(String childTypeUri, Object value) {
         try {
-            values.put(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+            childTopics.put(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a CompositeValueModel failed (childTypeUri=\"" +
@@ -348,7 +348,7 @@ public class CompositeValueModel implements Iterable<String> {
      * @return  this CompositeValueModel.
      */
     public CompositeValueModel put(String childTypeUri, CompositeValueModel value) {
-        values.put(childTypeUri, new TopicModel(childTypeUri, value));
+        childTopics.put(childTypeUri, new TopicModel(childTypeUri, value));
         return this;
     }
 
@@ -388,29 +388,20 @@ public class CompositeValueModel implements Iterable<String> {
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
-            values.put(childTypeUri, topics);
+            childTopics.put(childTypeUri, topics);
         }
-        // Note 1: we must not add a topic twice.
-        // This would happen e.g. when updating multi-facets: the facet values are added while updating, and
-        // would be added again through the PRE_SEND event (Kiezatlas plugin).
         //
-        // Note 2: we must not add a topic twice *unless* its ID is -1.
-        // This happens when adding a couple of new child topics at once e.g. by pressing the "Add" button
-        // serveral times in a webclient form. These new topic models have no ID yet (-1).
-        if (value.getId() == -1 || !topics.contains(value)) {
-            topics.add(value);
-        }
+        topics.add(value);
         //
         return this;
     }
 
     /**
-     * Adds all the values to a multiple-valued child.
+     * Sets the values of a multiple-valued child.
+     * Existing values are overwritten.
      */
-    public CompositeValueModel addAll(String childTypeUri, List<TopicModel> values) {
-        for (TopicModel value : values) {
-            add(childTypeUri, value);
-        }
+    public CompositeValueModel put(String childTypeUri, List<TopicModel> values) {
+        childTopics.put(childTypeUri, values);
         return this;
     }
 
@@ -471,7 +462,7 @@ public class CompositeValueModel implements Iterable<String> {
      */
     @Override
     public Iterator<String> iterator() {
-        return values.keySet().iterator();
+        return childTopics.keySet().iterator();
     }
 
 
@@ -526,7 +517,7 @@ public class CompositeValueModel implements Iterable<String> {
 
     @Override
     public String toString() {
-        return values.toString();
+        return childTopics.toString();
     }
 
 

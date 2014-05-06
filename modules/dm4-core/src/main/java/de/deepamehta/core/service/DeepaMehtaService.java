@@ -69,9 +69,10 @@ public interface DeepaMehtaService {
      * Performs a fulltext search.
      * <p>
      * IMPORTANT: Searching topics this way requires the corresponding type to be indexed with indexing mode
-     * <code>dm4.core.fulltext</code> or <code>dm4.core.fulltext_key</code>.
+     * <code>dm4.core.fulltext</code> or <code>dm4.core.fulltext_key</code>. ### FIXDOC
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
+     *                      ### TODO: rename parameter to "key"?
      */
     List<Topic> searchTopics(String searchTerm, String fieldUri);
 
