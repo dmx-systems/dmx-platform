@@ -73,7 +73,10 @@
                         ${project.basedir}/modules/dm4-time/target,
                         ${project.basedir}/modules/dm4-caching/target,
                         ${project.basedir}/modules/dm4-storage-neo4j/target,
-                        ${project.basedir}/modules/dm4-box-renderer-dom/target
+                        ${project.basedir}/modules/dm4-box-renderer-dom/target,
+                        ${project.basedir}/modules-external/dm4-kiezatlas/target,
+                        ${project.basedir}/modules-external/dm4-kiezatlas-etl/target,
+                        ${project.basedir}/modules-external/dm4-kiezatlas-famportal/target
                     ]]>
                     <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
                     <!-- hot-deployed. It can not be statically deployed (via 3rd-party-bundles) because it        -->

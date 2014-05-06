@@ -9,12 +9,14 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,6 +24,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
@@ -79,6 +82,28 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     // ---
+
+    @GET
+    @Path("/topic/{id}")
+    @Override
+    public Topic getFacettedTopic(@PathParam("id") long topicId,
+                                  @QueryParam("facet_type_uri") List<String> facetTypeUris) {
+        Topic topic = dms.getTopic(topicId, true);
+        CompositeValueModel comp = topic.getCompositeValue().getModel();
+        for (String facetTypeUri : facetTypeUris) {
+            String childTypeUri = getChildTypeUri(facetTypeUri);
+            if (!isMultiFacet(facetTypeUri)) {
+                Topic value = getFacet(topic, facetTypeUri);
+                if (value != null) {
+                    comp.put(childTypeUri, value.getModel());
+                }
+            } else {
+                List<RelatedTopic> values = getFacets(topic, facetTypeUri);
+                comp.put(childTypeUri, DeepaMehtaUtils.toTopicModels(values));
+            }
+        }
+        return topic;
+    }
 
     @POST
     @Path("/{facet_type_uri}/topic/{id}")
@@ -172,6 +197,10 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     private boolean isMultiFacet(String facetTypeUri) {
         return getAssocDef(facetTypeUri).getChildCardinalityUri().equals("dm4.core.many");
+    }
+
+    private String getChildTypeUri(String facetTypeUri) {
+        return getAssocDef(facetTypeUri).getChildTypeUri();
     }
 
     private AssociationDefinition getAssocDef(String facetTypeUri) {

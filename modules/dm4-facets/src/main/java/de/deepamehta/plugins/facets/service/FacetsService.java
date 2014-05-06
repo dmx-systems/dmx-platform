@@ -47,6 +47,8 @@ public interface FacetsService extends PluginService {
 
     // ---
 
+    Topic getFacettedTopic(long topicId, List<String> facetTypeUris);
+
     void addFacetTypeToTopic(long topicId, String facetTypeUri);
 
     // ---
