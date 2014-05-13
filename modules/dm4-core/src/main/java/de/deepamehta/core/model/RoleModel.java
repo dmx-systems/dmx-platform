@@ -18,7 +18,7 @@ public abstract class RoleModel implements Cloneable {
     }
 
     protected RoleModel(long playerId, String roleTypeUri) {
-        this.playerId = playerId;
+        setPlayerId(playerId);
         setRoleTypeUri(roleTypeUri);
     }
 
@@ -33,6 +33,10 @@ public abstract class RoleModel implements Cloneable {
     }
 
     // ---
+
+    public void setPlayerId(long playerId) {
+        this.playerId = playerId;
+    }
 
     public final void setRoleTypeUri(String roleTypeUri) {
         if (roleTypeUri == null) {
