@@ -18,8 +18,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === REST Client Extension ===
 
-    dm4c.restc.get_topicmap = function(topicmap_id) {
-        return this.request("GET", "/topicmap/" + topicmap_id)
+    /**
+     * @param   fetch_composite (boolean)   Optional: if true the topics contained in the returned topicmap will
+     *                                      include their child topics. Default is false.
+     */
+    dm4c.restc.get_topicmap = function(topicmap_id, fetch_composite) {
+        var params = this.createRequestParameter({fetch_composite: fetch_composite})
+        return this.request("GET", "/topicmap/" + topicmap_id + params.to_query_string())
     }
     dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
         return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)

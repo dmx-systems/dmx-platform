@@ -26,6 +26,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
@@ -84,11 +85,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId) {
+    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId,
+                                         @QueryParam("fetch_composite") boolean fetchComposite) {
         try {
-            logger.info("Loading topicmap " + topicmapId);
+            logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
             Topic topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
-            List<TopicViewmodel> topics = fetchTopics(topicmapTopic);
+            List<TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
             List<AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
             return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
@@ -300,11 +302,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch ---
 
-    private List<TopicViewmodel> fetchTopics(Topic topicmapTopic) {
+    private List<TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
         List<TopicViewmodel> topics = new ArrayList();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0).getItems();
-            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, fetchComposite, true, 0).getItems();
+            // othersTopicTypeUri=null, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic topic : relTopics) {
             CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
             invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
