@@ -11,7 +11,7 @@ public class AssociationViewmodel extends AssociationModel {
 
     // --- Constructors ---
 
-    AssociationViewmodel(AssociationModel assoc) {
+    public AssociationViewmodel(AssociationModel assoc) {
         super(assoc);
     }
 }

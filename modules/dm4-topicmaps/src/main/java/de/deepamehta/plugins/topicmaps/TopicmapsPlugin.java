@@ -1,9 +1,13 @@
 package de.deepamehta.plugins.topicmaps;
 
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
+import de.deepamehta.plugins.topicmaps.model.TopicViewmodel;
+import de.deepamehta.plugins.topicmaps.model.AssociationViewmodel;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
@@ -82,7 +86,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId) {
         try {
-            return new TopicmapViewmodel(topicmapId, dms, viewmodelCustomizers);
+            logger.info("Loading topicmap " + topicmapId);
+            Topic topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
+            List<TopicViewmodel> topics = fetchTopics(topicmapTopic);
+            List<AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
+            //
+            return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
@@ -289,13 +298,30 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
-    }                                                                           // clientState=null
+    // --- Fetch ---
 
-    // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
-    private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        invokeViewmodelCustomizers(topicId, viewProps);
+    private List<TopicViewmodel> fetchTopics(Topic topicmapTopic) {
+        List<TopicViewmodel> topics = new ArrayList();
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0).getItems();
+            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
+        for (RelatedTopic topic : relTopics) {
+            CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
+            invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
+            topics.add(new TopicViewmodel(topic.getModel(), viewProps));
+        }
+        return topics;
+    }
+
+    private List<AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
+        List<AssociationViewmodel> assocs = new ArrayList();
+        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
+            "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null,
+            false, false);  // fetchComposite=false, fetchRelatingComposite=false
+        for (RelatedAssociation assoc : relAssocs) {
+            assocs.add(new AssociationViewmodel(assoc.getModel()));
+        }
+        return assocs;
     }
 
     // ---
@@ -310,27 +336,43 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);  // fetchComposite=false
     }
 
-    // ---
+    // --- Store ---
 
-    // ### There is a copy in TopicmapViewmodel
-    private void invokeViewmodelCustomizers(long topicId, CompositeValueModel viewProps) {
-        Topic topic = dms.getTopic(topicId, false);             // fetchComposite=false
+    private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
+    }                                                                           // clientState=null
+
+    // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
+    private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+        invokeViewmodelCustomizers("storeViewProperties", dms.getTopic(topicId, false), viewProps);
+    }
+
+    // --- Viewmodel Customizers ---
+
+    private void invokeViewmodelCustomizers(String method, Topic topic, CompositeValueModel viewProps) {
         for (ViewmodelCustomizer customizer : viewmodelCustomizers) {
-            invokeViewmodelCustomizer(customizer, topic, viewProps);
+            invokeViewmodelCustomizer(customizer, method, topic, viewProps);
         }
     }
 
-    // ### There is a principal copy in TopicmapViewmodel
-    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, CompositeValueModel viewProps) {
+    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, String method,
+                                                    Topic topic, CompositeValueModel viewProps) {
         try {
-            customizer.storeViewProperties(topic, viewProps);
+            // we don't want use reflection here for performance reasons
+            if (method.equals("enrichViewProperties")) {
+                customizer.enrichViewProperties(topic, viewProps);
+            } else if (method.equals("storeViewProperties")) {
+                customizer.storeViewProperties(topic, viewProps);
+            } else {
+                throw new RuntimeException("\"" + method + "\" is an unexpected method");
+            }
         } catch (Exception e) {
             throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed " +
-                "(customizer=\"" + customizer.getClass().getName() + "\", method=\"storeViewProperties\")", e);
+                "(customizer=\"" + customizer.getClass().getName() + "\", method=\"" + method + "\")", e);
         }
     }
 
-    // ---
+    // --- Topicmap Renderers ---
 
     private TopicmapRenderer getTopicmapRenderer(String rendererUri) {
         TopicmapRenderer renderer = topicmapRenderers.get(rendererUri);

@@ -19,7 +19,7 @@ public class TopicViewmodel extends TopicModel {
 
     // --- Constructors ---
 
-    TopicViewmodel(TopicModel topic, CompositeValueModel viewProps) {
+    public TopicViewmodel(TopicModel topic, CompositeValueModel viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }

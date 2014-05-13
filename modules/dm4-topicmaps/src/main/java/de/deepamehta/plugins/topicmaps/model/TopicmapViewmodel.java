@@ -1,23 +1,14 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
-
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
-import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -26,35 +17,24 @@ import java.util.logging.Logger;
  * A topicmap viewmodel: a collection of topics and associations plus their view properties.
  * <p>
  * Features:
- * - load from DB (by constructor).
  * - Serialization to JSON.
  */
 public class TopicmapViewmodel implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Topic topicmapTopic;
-    private Map<Long, TopicViewmodel> topics = new HashMap();
-    private Map<Long, AssociationViewmodel> assocs = new HashMap();
-
-    private DeepaMehtaService dms;
-    private List<ViewmodelCustomizer> customizers;
+    private TopicModel topicmapTopic;
+    private List<TopicViewmodel> topics;
+    private List<AssociationViewmodel> assocs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    /**
-     * Loads a topicmap from the DB.
-     */
-    public TopicmapViewmodel(long topicmapId, DeepaMehtaService dms, List<ViewmodelCustomizer> customizers) {
-        this.topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
-        this.dms = dms;
-        this.customizers = customizers;
-        //
-        logger.info("Loading topicmap " + getId());
-        loadTopics();
-        loadAssociations();
+    public TopicmapViewmodel(TopicModel topicmapTopic, List<TopicViewmodel> topics, List<AssociationViewmodel> assocs) {
+        this.topicmapTopic = topicmapTopic;
+        this.topics = topics;
+        this.assocs = assocs;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -66,11 +46,11 @@ public class TopicmapViewmodel implements JSONEnabled {
     // ---
 
     public Iterable<TopicViewmodel> getTopics() {
-        return topics.values();
+        return topics;
     }
 
     public Iterable<AssociationViewmodel> getAssociations() {
-        return assocs.values();
+        return assocs;
     }
 
     // ---
@@ -80,8 +60,8 @@ public class TopicmapViewmodel implements JSONEnabled {
         try {
             JSONObject topicmap = new JSONObject();
             topicmap.put("info", topicmapTopic.toJSON());
-            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics.values()));
-            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs.values()));
+            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics));
+            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs));
             return topicmap;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -135,7 +115,7 @@ public class TopicmapViewmodel implements JSONEnabled {
 
         private Point findStartPostition() {
             int maxY = MIN_Y;
-            for (TopicViewmodel topic : topics.values()) {
+            for (TopicViewmodel topic : topics) {
                 if (topic.getY() > maxY) {
                     maxY = topic.getY();
                 }
@@ -153,55 +133,5 @@ public class TopicmapViewmodel implements JSONEnabled {
                 gridX += GRID_DIST_X;
             }
         }
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void loadTopics() {
-        ResultList<RelatedTopic> topics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, false, true, 0);
-            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=true, maxResultSize=0
-        for (RelatedTopic topic : topics) {
-            CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
-            invokeViewmodelCustomizers(topic, viewProps);
-            addTopic(new TopicViewmodel(topic.getModel(), viewProps));
-        }
-    }
-
-    private void loadAssociations() {
-        List<RelatedAssociation> assocs = topicmapTopic.getRelatedAssociations("dm4.topicmaps.association_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_association", null, false, false);
-        for (RelatedAssociation assoc : assocs) {
-            addAssociation(new AssociationViewmodel(assoc.getModel()));
-        }
-    }
-
-    // ---
-
-    // ### There is a copy in TopicmapsPlugin
-    private void invokeViewmodelCustomizers(Topic topic, CompositeValueModel viewProps) {
-        for (ViewmodelCustomizer customizer : customizers) {
-            invokeViewmodelCustomizer(customizer, topic, viewProps);
-        }
-    }
-
-    // ### There is a principal copy in TopicmapsPlugin
-    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, CompositeValueModel viewProps) {
-        try {
-            customizer.enrichViewProperties(topic, viewProps);
-        } catch (Exception e) {
-            throw new RuntimeException("Invoking viewmodel customizer for topic " + topic.getId() + " failed " +
-                "(customizer=\"" + customizer.getClass().getName() + "\", method=\"enrichViewProperties\")", e);
-        }
-    }
-
-    // ---
-
-    private void addTopic(TopicViewmodel topic) {
-        topics.put(topic.getId(), topic);
-    }
-
-    private void addAssociation(AssociationViewmodel assoc) {
-        assocs.put(assoc.getId(), assoc);
     }
 }
