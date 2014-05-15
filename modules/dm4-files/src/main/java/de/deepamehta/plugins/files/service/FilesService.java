@@ -43,9 +43,13 @@ public interface FilesService extends PluginService {
     // === File Repository ===
 
     /**
-     * @param   path    The directory where to store the file. Relative to the file repository root path.
-     *                  Must begin with slash ('/'), no slash at the end.
-     *                  The directory must exist.
+     * Receives an uploaded file, stores it in the DeepaMehta file repository, and creates a corresponding File topic.
+     *
+     * @param   path    The directory where to store the uploaded file. Relative to the file repository root path.
+     *                  Must begin with slash ('/'), no slash at the end. The directory must exist.
+     *
+     * @return  a StoredFile object which holds 2 information: the name of the uploaded file, and the ID
+     *          of the created File topic.
      */
     StoredFile storeFile(UploadedFile file, String path, ClientState clientState);
 

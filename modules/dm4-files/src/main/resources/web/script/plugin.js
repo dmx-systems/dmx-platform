@@ -154,7 +154,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
 
         function do_open_upload_dialog() {
-            self.open_upload_dialog(topic.get("dm4.files.path"), dm4c.page_panel.refresh)
+            self.open_upload_dialog("/files/" + topic.get("dm4.files.path"), dm4c.page_panel.refresh)
         }
     })
 
@@ -210,14 +210,11 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     // ---
 
     /**
-     * Opens a dialog to allow the user to choose a local file and upload it to the server. At server side
-     * the file is stored in the DeepaMehta file repository. A corresponding File topic is created.
+     * Opens a dialog to allow the user to choose a local file and upload it to the server.
      *
-     * @param   path        the file repository path (a string) to upload the selected file to. Must begin with "/".
+     * @param   upload_url  the URL where the selected file is uploaded to (via POST).
      * @param   callback    the function invoked once the file has been uploaded and processed at server-side.
-     *                      One argument is passed: an object with 2 properties:
-     *                          file_name   -- the name of the uploaded file
-     *                          topic_id    -- the ID of the File topic created
+     *                      One argument is passed: the object returned by the server-side processing method.
      */
     this.open_upload_dialog = (function() {
         // create upload target
@@ -225,9 +222,9 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         var upload_target = $("<iframe>", {name: "upload-target"}).hide()
         $("body").append(upload_target)
 
-        return function(path, callback) {
+        return function(upload_url, callback) {
             var content = $("<form>", {
-                action:  "/files/" + path,
+                action:  upload_url,
                 method:  "post",
                 enctype: "multipart/form-data",
                 target:  "upload-target"

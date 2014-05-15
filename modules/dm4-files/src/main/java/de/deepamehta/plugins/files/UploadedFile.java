@@ -9,15 +9,12 @@ import java.io.File;
 /**
  * An uploaded file.
  * <p>
- * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to the <code>/files</code>
- * resource.
+ * Files are uploaded via the REST API by POSTing <code>multipart/form-data</code> to a resource method
+ * which consumes <code>multipart/form-data</code> and has UploadedFile as the entity parameter.
  * <p>
- * Client-side support: the public API of the <code>deepamehta-files</code> plugin provides a method
+ * Client-side support: the public API of the <code>de.deepamehta.files</code> plugin provides a method
  * <code>dm4c.get_plugin("de.deepamehta.files").open_upload_dialog()</code> that allows the user to
  * choose and upload a file.</p>
- * <p>
- * At server-side a plugin accesses the upload file via the
- * {@link de.deepamehta.core.service.Plugin#executeCommandHook}. ### FIXDOC</p>
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
