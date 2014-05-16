@@ -266,17 +266,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         return get_topicmap_renderer(renderer_uri)
     }
 
-
-
-    // ******************
-    // *** Controller ***
-    // ******************
-
-
-
     /**
      * Selects a topicmap programmatically.
-     * The respective item from the topicmap menu is selected and the topicmap is displayed on the canvas.
+     * The respective item from the topicmap menu is selected and the topicmap is displayed.
      *
      * @param   no_history_update   Optional: boolean.
      */
@@ -302,6 +294,15 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         return create_topicmap(name, topicmap_renderer_uri)
     }
 
+    /**
+     * Puts a new topicmap in the topicmap menu, selects and displays it.
+     * Plugins call this method when they have created a topicmap (at server-side) and now want display it.
+     */
+    this.add_topicmap = function(topicmap_id) {
+        add_topicmap(topicmap_id)
+    }
+    
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
@@ -313,7 +314,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
-     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays the topicmap.
+     * Creates a topicmap with the given name, puts it in the topicmap menu, and displays it.
      *
      * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
      *                                  Default is "dm4.webclient.default_topicmap_renderer".
@@ -322,15 +323,34 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function create_topicmap(name, topicmap_renderer_uri) {
         var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
-        //
+        add_topicmap(topicmap_topic.id)
+        return topicmap_topic
+    }
+
+    /**
+     * Creates an empty topicmap (a topic of type "Topicmap") in the DB.
+     *
+     * @param   name                    The name of the topicmap
+     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
+     *                                  Default is "dm4.webclient.default_topicmap_renderer".
+     *
+     * @return  The created Topicmap topic.
+     */
+    function create_topicmap_topic(name, topicmap_renderer_uri) {
+        return dm4c.restc.create_topicmap(name, topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer")
+    }
+
+    /**
+     * Puts a new topicmap in the topicmap menu, selects and displays it.
+     * This is called when a new topicmap is created at server-side and now should be displayed.
+     */
+    function add_topicmap(topicmap_id) {
         fetch_topicmap_topics_and_refresh_menu()
         // update model
-        set_selected_topicmap(topicmap_topic.id)
+        set_selected_topicmap(topicmap_id)
         // update view
-        select_menu_item(topicmap_topic.id)
+        select_menu_item(topicmap_id)
         display_topicmap()
-        //
-        return topicmap_topic
     }
 
     /**
@@ -362,19 +382,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
-     * Returns a topicmap from the cache.
-     * If not in cache, the topicmap is loaded and cached before.
-     */
-    function get_topicmap(topicmap_id) {
-        var topicmap = topicmap_cache[topicmap_id]
-        if (!topicmap) {
-            topicmap = load_topicmap(topicmap_id)
-        }
-        return topicmap
-    }
-
-    /**
      * Updates the model to reflect the given topicmap is now selected.
+     *
+     * Prerequisite: the topicmap topic for the specified topicmap is already loaded/up-to-date.
      */
     function set_selected_topicmap(topicmap_id) {
         // 1) update cookie
@@ -392,10 +402,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         topicmap = get_topicmap(topicmap_id)
     }
 
-    function fetch_topicmap_topics() {
-        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // fetch_composite=true
-        topicmap_topics = dm4c.hash_by_id(dm4c.build_topics(topics))
-        // ### FIXME: object properties are not sorted
+    /**
+     * Returns a topicmap from the cache.
+     * If not in cache, the topicmap is loaded and cached before.
+     */
+    function get_topicmap(topicmap_id) {
+        var topicmap = topicmap_cache[topicmap_id]
+        if (!topicmap) {
+            topicmap = load_topicmap(topicmap_id)
+        }
+        return topicmap
     }
 
     /**
@@ -415,18 +431,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         return topicmap
     }
 
-    /**
-     * Creates a Topicmap topic in the DB.
-     *
-     * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
-     *                                  Default is "dm4.webclient.default_topicmap_renderer".
-     *
-     * @return  The created topic.
-     */
-    function create_topicmap_topic(name, topicmap_renderer_uri) {
-        topicmap_renderer_uri = topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer"
-        var topicmap_topic = dm4c.restc.create_topicmap(name, topicmap_renderer_uri)
-        return topicmap_topic
+    // ---
+
+    function fetch_topicmap_topics() {
+        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // fetch_composite=true
+        topicmap_topics = dm4c.hash_by_id(dm4c.build_topics(topics))
+        // ### FIXME: object properties are not sorted
     }
 
 
@@ -474,7 +484,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
-     * Displays the selected topicmap on the canvas.
+     * Displays the selected topicmap.
      *
      * Prerequisite: the topicmap is already selected in the topicmap menu.
      *
