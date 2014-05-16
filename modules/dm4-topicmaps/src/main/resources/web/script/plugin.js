@@ -98,10 +98,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 if (topicmap_id == "_new") {
                     do_open_topicmap_dialog()
                 } else {
-                    // update model
-                    set_selected_topicmap(topicmap_id)
-                    // update view
-                    display_topicmap()
+                    select_topicmap(topicmap_id)
                 }
             }
         }
@@ -192,8 +189,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                     create_topicmap_topic("untitled")
                 }
                 fetch_topicmap_topics_and_refresh_menu()
-                set_selected_topicmap(get_topicmap_id_from_menu())
-                display_topicmap()
+                select_topicmap(get_topicmap_id_from_menu())
             } else {
                 // the deleted topic was ANOTHER topicmap:
                 // update the topicmap menu and restore the selection
@@ -210,7 +206,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("pre_pop_history", function(state) {
         if (state.topicmap_id != topicmap.get_id()) {
             // switch topicmap
-            self.do_select_topicmap(state.topicmap_id, true)    // no_history_update=true
+            self.select_topicmap(state.topicmap_id, true)       // no_history_update=true
             return false
         } else if (!state.topic_id) {
             // topicmap not changed and no topic in popstate
@@ -272,12 +268,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * @param   no_history_update   Optional: boolean.
      */
-    this.do_select_topicmap = function(topicmap_id, no_history_update) {
-        // update model
-        set_selected_topicmap(topicmap_id)
-        // update view
+    this.select_topicmap = function(topicmap_id, no_history_update) {
         select_menu_item(topicmap_id)
-        display_topicmap(no_history_update)
+        select_topicmap(topicmap_id, no_history_update)
     }
 
     // ---
@@ -290,7 +283,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * @return  the topicmap topic.
      */
-    this.do_create_topicmap = function(name, topicmap_renderer_uri) {
+    this.create_topicmap = function(name, topicmap_renderer_uri) {
         return create_topicmap(name, topicmap_renderer_uri)
     }
 
@@ -302,7 +295,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         add_topicmap(topicmap_id)
     }
     
-
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
@@ -314,6 +306,20 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
+     * Updates the model to reflect the given topicmap is now selected, and displays it.
+     *
+     * Prerequisite: the topicmap menu already shows the selected topicmap.
+     *
+     * @param   no_history_update   Optional: boolean.
+     */
+    function select_topicmap(topicmap_id, no_history_update) {
+        // update model
+        set_selected_topicmap(topicmap_id)
+        // update view
+        display_topicmap(no_history_update)
+    }
+
+    /**
      * Creates a topicmap with the given name, puts it in the topicmap menu, and displays it.
      *
      * @param   topicmap_renderer_uri   Optional: the topicmap renderer to attach to the topicmap.
@@ -322,8 +328,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @return  the topicmap topic.
      */
     function create_topicmap(name, topicmap_renderer_uri) {
+        // update DB
         var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
+        // update model + view
         add_topicmap(topicmap_topic.id)
+        //
         return topicmap_topic
     }
 
@@ -345,12 +354,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * This is called when a new topicmap is created at server-side and now should be displayed.
      */
     function add_topicmap(topicmap_id) {
-        fetch_topicmap_topics_and_refresh_menu()
-        // update model
-        set_selected_topicmap(topicmap_id)
-        // update view
-        select_menu_item(topicmap_id)
-        display_topicmap()
+        fetch_topicmap_topics_and_refresh_menu()    // model + view
+        self.select_topicmap(topicmap_id)           // model + view
     }
 
     /**
@@ -382,7 +387,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
-     * Updates the model to reflect the given topicmap is now selected.
+     * Updates the model to reflect the given topicmap is now selected ("topicmap", "topicmap_renderer").
      *
      * Prerequisite: the topicmap topic for the specified topicmap is already loaded/up-to-date.
      */
@@ -484,9 +489,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     /**
-     * Displays the selected topicmap.
+     * Displays the selected topicmap based on the model ("topicmap", "topicmap_renderer").
      *
-     * Prerequisite: the topicmap is already selected in the topicmap menu.
+     * Prerequisite: the topicmap menu already shows the selected topicmap.
      *
      * @param   no_history_update   Optional: boolean.
      */
@@ -508,7 +513,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Topicmap Menu ===
 
     /**
-     * Rebuilds the topicmaps menu based on the model ("topicmap_topics").
+     * Refreshes the topicmap menu based on the model ("topicmap_topics").
      */
     function refresh_topicmap_menu() {
         var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
