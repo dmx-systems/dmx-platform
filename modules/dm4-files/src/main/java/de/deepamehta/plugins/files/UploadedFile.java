@@ -61,38 +61,38 @@ public class UploadedFile {
     // === File Content ===
 
     /**
-     * Returns the contents of the file item as a String, using the default character encoding.
+     * Returns the contents of the uploaded file as a String, using the default character encoding.
      */
     public String getString() {
         return fileItem.getString();
     }
 
     /**
-     * Returns the contents of the file item as a String, using the specified encoding.
+     * Returns the contents of the uploaded file as a String, using the specified encoding.
      */
     public String getString(String encoding) {
         try {
             return fileItem.getString(encoding);    // throws UnsupportedEncodingException
         } catch (Exception e) {
-            throw new RuntimeException("Getting the content of upload file failed (" + this + ")", e);
+            throw new RuntimeException("Getting contents of uploaded file failed (" + this + ")", e);
         }
     }
 
     /**
-     * Returns the contents of the file item as an array of bytes.
+     * Returns the contents of the uploaded file as an array of bytes.
      */
     public byte[] getBytes() {
         return fileItem.get();
     }
 
     /**
-     * Returns an InputStream that can be used to retrieve the contents of the file.
+     * Returns an InputStream that can be used to retrieve the contents of the uploaded file.
      */
     public InputStream getInputStream() {
         try {
             return fileItem.getInputStream();       // throws IOException
         } catch (Exception e) {
-            throw new RuntimeException("Getting input stream of upload file failed (" + this + ")", e);
+            throw new RuntimeException("Getting input stream of uploaded file failed (" + this + ")", e);
         }
     }
 
@@ -105,7 +105,7 @@ public class UploadedFile {
         try {
             fileItem.write(file);                   // throws Exception
         } catch (Exception e) {
-            throw new RuntimeException("Writing upload file to disk failed (" + this + ")", e);
+            throw new RuntimeException("Writing uploaded file to disk failed (" + this + ")", e);
         }
     }
 

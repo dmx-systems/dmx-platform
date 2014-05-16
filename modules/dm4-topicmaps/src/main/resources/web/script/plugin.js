@@ -91,7 +91,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 dm4c.toolbar.dom.prepend(topicmap_widget)
             }
             //
-            refresh_topicmap_menu()
+            fetch_topicmap_topics_and_refresh_menu()
 
             function do_select_topicmap(menu_item) {
                 var topicmap_id = menu_item.value
@@ -170,7 +170,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("post_update_topic", function(topic) {
         // update the topicmap menu
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
-            refresh_topicmap_menu()
+            fetch_topicmap_topics_and_refresh_menu()
         }
     })
 
@@ -191,13 +191,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 if (!js.size(topicmap_topics)) {
                     create_topicmap_topic("untitled")
                 }
-                refresh_topicmap_menu()
+                fetch_topicmap_topics_and_refresh_menu()
                 set_selected_topicmap(get_topicmap_id_from_menu())
                 display_topicmap()
             } else {
                 // the deleted topic was ANOTHER topicmap:
                 // update the topicmap menu and restore the selection
-                refresh_topicmap_menu()
+                fetch_topicmap_topics_and_refresh_menu()
             }
         }
     })
@@ -230,7 +230,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Access Control Listeners ===
 
     dm4c.add_listener("logged_in", function(username) {
-        refresh_topicmap_menu()
+        fetch_topicmap_topics_and_refresh_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
         //
         clear_topicmap_cache()
@@ -238,7 +238,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     })
 
     dm4c.add_listener("logged_out", function() {
-        refresh_topicmap_menu()
+        fetch_topicmap_topics_and_refresh_menu()
         // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
         //
         clear_topicmap_cache()
@@ -322,10 +322,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function create_topicmap(name, topicmap_renderer_uri) {
         var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
-        refresh_topicmap_menu(topicmap_topic.id)
+        //
+        fetch_topicmap_topics_and_refresh_menu()
         // update model
         set_selected_topicmap(topicmap_topic.id)
         // update view
+        select_menu_item(topicmap_topic.id)
         display_topicmap()
         //
         return topicmap_topic
@@ -342,6 +344,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         topicmap = get_topicmap(topicmap_id)
         // 2) update view
         display_topicmap()
+    }
+
+    function fetch_topicmap_topics_and_refresh_menu() {
+        // update model
+        fetch_topicmap_topics()
+        // update view
+        refresh_topicmap_menu()
     }
 
 
@@ -489,20 +498,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Topicmap Menu ===
 
     /**
-     * Re-fetches the topicmap topics and re-populates the topicmap menu.
-     *
-     * @param   topicmap_id     Optional: ID of the topicmap to select.
-     *                          If not given, the current selection is preserved.
+     * Rebuilds the topicmaps menu based on the model ("topicmap_topics").
      */
-    function refresh_topicmap_menu(topicmap_id) {
-        if (!topicmap_id) {
-            topicmap_id = get_topicmap_id_from_menu()
-        }
-        //
-        fetch_topicmap_topics()
-        //
-        topicmap_menu.empty()
+    function refresh_topicmap_menu() {
         var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
+        var topicmap_id = get_topicmap_id_from_menu()   // save selection
+        topicmap_menu.empty()
         // add topicmaps to menu
         for (var id in topicmap_topics) {
             var topicmap = topicmap_topics[id]
@@ -513,7 +514,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             topicmap_menu.add_separator()
             topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }
-        //
+        // restore selection
         select_menu_item(topicmap_id)
         //
         dm4c.fire_event("post_refresh_topicmap_menu", topicmap_menu)
