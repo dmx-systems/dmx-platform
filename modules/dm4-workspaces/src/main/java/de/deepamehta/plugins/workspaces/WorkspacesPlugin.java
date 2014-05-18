@@ -39,7 +39,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String DEFAULT_WORKSPACE_NAME = "DeepaMehta";
-    private static final String DEFAULT_WORKSPACE_URI = "de.workspaces.deepamehta";
+    private static final String DEFAULT_WORKSPACE_URI = "de.workspaces.deepamehta";     // ### TODO: "dm4.workspaces..."
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -180,14 +180,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     /**
-     * Every created topic is assigned to the current workspace.
+     * Assigns every created topic to the current workspace.
      */
     @Override
     public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
         long workspaceId = -1;
         try {
-            // Note: we do not assign Workspaces to a workspace
-            if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            // Note: we must avoid vicious circles
+            if (isWorkspacesPluginTopic(topic)) {
                 return;
             }
             //
@@ -210,7 +210,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Every created association is assigned to the current workspace.
+     * Assigns every created association to the current workspace.
      */
     @Override
     public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
@@ -279,12 +279,18 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // --- Helper ---
 
-    private Topic fetchDefaultWorkspace() {
-        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false);      // fetchComposite=false
-    }
-
     private boolean isDeepaMehtaStandardType(Type type) {
         return type.getUri().startsWith("dm4.");
+    }
+
+    private boolean isWorkspacesPluginTopic(Topic topic) {
+        return topic.getTypeUri().startsWith("dm4.workspaces.");
+    }
+
+    // ---
+
+    private Topic fetchDefaultWorkspace() {
+        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false);      // fetchComposite=false
     }
 
     /**
