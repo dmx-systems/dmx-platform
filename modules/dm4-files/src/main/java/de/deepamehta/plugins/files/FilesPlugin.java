@@ -71,8 +71,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
-            // 1) enforce security
+            // 1) pre-checks
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(file);
@@ -101,8 +102,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             // For the moment we just strip a possible drive letter to be compatible with the Files module.
             path = JavaUtils.stripDriveLetter(path);
             //
-            // 1) enforce security
+            // 1) pre-checks
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(file);
@@ -154,8 +156,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         String operation = "Storing " + file + " at repository path \"" + path + "\"";
         try {
             logger.info(operation);
-            // 1) enforce security
+            // 1) pre-checks
             File directory = enforeSecurity(path);
+            checkFileExistence(directory);  // throws FileRepositoryException
             //
             // 2) store file
             File repoFile = repoFile(directory, file);
@@ -178,8 +181,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         String operation = "Creating folder \"" + folderName + "\" at repository path \"" + path + "\"";
         try {
             logger.info(operation);
-            // 1) enforce security
+            // 1) pre-checks
             File directory = enforeSecurity(path);
+            checkFileExistence(directory);  // throws FileRepositoryException
             //
             // 2) create directory
             File repoFile = repoFile(directory, folderName);
@@ -210,6 +214,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             //
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             //
             return new ResourceInfo(file);
         } catch (FileRepositoryException e) {
@@ -228,6 +233,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             //
             File folder = enforeSecurity(path);
+            checkFileExistence(folder);     // throws FileRepositoryException
             //
             return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
@@ -271,6 +277,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             //
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -287,6 +294,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             //
             String path = repoPath(fileTopicId);
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -305,6 +313,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             //
             String path = repoPath(fileTopicId);
             File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
@@ -330,7 +339,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
             path = JavaUtils.decodeURIComponent(path);
             logger.info("### repository path=\"" + path + "\"");
-            enforeSecurity(path);
+            File file = enforeSecurity(path);
+            checkFileExistence(file);       // throws FileRepositoryException
             return true;
         } catch (FileRepositoryException e) {
             response.setStatus(e.getStatusCode());
@@ -431,27 +441,27 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // === File Repository ===
 
     /**
-     * Maps a repository path to a repository file.
+     * Constructs an absolute path from a repository path.
+     *
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
      */
     private File repoFile(String path) {
-        try {
-            File file = new File(FILE_REPOSITORY_PATH, path);
-            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
-            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
-            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
-            return file.getCanonicalFile();     // throws IOException
-        } catch (Exception e) {
-            throw new RuntimeException("Mapping repository path \"" + path + "\" to repository file failed", e);
-        }
+        return new File(FILE_REPOSITORY_PATH, path);
     }
 
     /**
      * Calculates the storage location for the uploaded file.
+     *
+     * @param   directory   An absolute path.
      */
     private File repoFile(File directory, UploadedFile file) {
         return JavaUtils.findUnusedFile(repoFile(directory, file.getName()));
     }
 
+    /**
+     * @param   directory   An absolute path.
+     */
     private File repoFile(File directory, String fileName) {
         return new File(directory, fileName);
     }
@@ -459,7 +469,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // ---
 
     /**
-     * Maps a repository file to a repository path.
+     * Returns the repository path that corresponds to the given absolute path.
+     *
+     * @param   file    An absolute path.
      */
     private String repoPath(File file) {
         String path = file.getPath().substring(FILE_REPOSITORY_PATH.length());
@@ -482,12 +494,26 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === Security ===
 
+    /**
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     *
+     * @return  An absolute path.
+     */
     private File enforeSecurity(String path) throws FileRepositoryException {
-        File file = repoFile(path);
-        checkFilePath(file);
-        checkFileExistence(file);
-        //
-        return file;
+        try {
+            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
+            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
+            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
+            File file = repoFile(path).getCanonicalFile();  // throws IOException
+            checkFilePath(file);                            // throws FileRepositoryException
+            //
+            return file;
+        } catch (FileRepositoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Enforcing security for repository path \"" + path + "\" failed", e);
+        }
     }
 
     // --- File Access ---

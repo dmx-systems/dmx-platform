@@ -21,14 +21,20 @@ public interface FilesService extends PluginService {
     // === File System Representation ===
 
     /**
-     * Creates a File topic for a given path.
-     * If a File topic for that path exists already that topic is returned.
+     * Creates and returns a File topic representing the file at a given repository path.
+     * If such a File topic exists already that topic is returned.
+     *
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
      */
     Topic createFileTopic(String path, ClientState clientState);
 
     /**
-     * Creates a Folder topic for a given path.
-     * If a Folder topic for that path exists already that topic is returned.
+     * Creates and returns a Folder topic representing the folder at a given repository path.
+     * If such a Folder topic exists already that topic is returned.
+     *
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
      */
     Topic createFolderTopic(String path, ClientState clientState);
 
@@ -43,16 +49,26 @@ public interface FilesService extends PluginService {
     // === File Repository ===
 
     /**
-     * Receives an uploaded file, stores it in the DeepaMehta file repository, and creates a corresponding File topic.
+     * Receives an uploaded file, stores it in the file repository, and creates a corresponding File topic.
      *
-     * @param   path    The directory where to store the uploaded file. Relative to the file repository root path.
-     *                  Must begin with slash ('/'), no slash at the end. The directory must exist.
+     * @param   path    The directory where to store the uploaded file.
+     *                  A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     *                  The directory must exist.
      *
      * @return  a StoredFile object which holds 2 information: the name of the uploaded file, and the ID
      *          of the created File topic.
      */
     StoredFile storeFile(UploadedFile file, String path, ClientState clientState);
 
+    /**
+     * Creates a folder in the file repository.
+     * Note: to corresponding Folder topic is created.
+     *
+     * @param   path    The directory where to create the folder.
+     *                  A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     */
     void createFolder(String folderName, String path);
 
     // ---
@@ -72,10 +88,11 @@ public interface FilesService extends PluginService {
     // ---
 
     /**
-     * Accesses a file/directory in the file repository by its path.
+     * Accesses a file/directory in the file repository by the given repository path.
      * Note: this method doesn't require the corresponding File/Folder topic to exist.
      *
-     * @param   path    a file repository path. Must begin with slash ('/'), no slash at the end.
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
      */
     File getFile(String path);
 
