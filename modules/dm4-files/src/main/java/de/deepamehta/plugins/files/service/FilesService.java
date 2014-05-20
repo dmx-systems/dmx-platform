@@ -10,6 +10,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 
 
@@ -60,6 +61,19 @@ public interface FilesService extends PluginService {
      *          of the created File topic.
      */
     StoredFile storeFile(UploadedFile file, String path, ClientState clientState);
+
+    /**
+     * Creates a file in the file repository, and creates a corresponding File topic.
+     *
+     * @param   in      The input stream the file content is read from.
+     * @param   path    The path and filename of the file to be created.
+     *                  A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     *                  If that file exists already it is overwritten. ### TODO: rethink overwriting
+     *
+     * @return  the File topic that corresponds to the created file.
+     */
+    Topic createFile(InputStream in, String path);
 
     /**
      * Creates a folder in the file repository.

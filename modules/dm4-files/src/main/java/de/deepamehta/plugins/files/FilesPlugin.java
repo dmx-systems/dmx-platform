@@ -14,6 +14,8 @@ import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
+import org.apache.commons.io.IOUtils;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -28,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -72,8 +76,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(file);
@@ -103,8 +107,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(file);
@@ -157,8 +161,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = enforeSecurity(path);
-            checkFileExistence(directory);  // throws FileRepositoryException
+            File directory = enforeSecurity(path);  // throws FileRepositoryException
+            checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) store file
             File repoFile = repoFile(directory, file);
@@ -174,6 +178,30 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         }
     }
 
+    // Note: this is not a resource method. So we don't throw a WebApplicationException here.
+    @Override
+    public Topic createFile(InputStream in, String path) {
+        String operation = "Creating file (from input stream) at repository path \"" + path + "\"";
+        try {
+            logger.info(operation);
+            // 1) pre-checks
+            File file = enforeSecurity(path);       // throws FileRepositoryException
+            //
+            // 2) store file
+            FileOutputStream out = new FileOutputStream(file);
+            IOUtils.copy(in, out);
+            in.close();
+            out.close();
+            //
+            // 3) create topic
+            // ### TODO: think about overwriting an existing file.
+            // ### FIXME: in this case the existing file topic is not updated and might reflect e.g. the wrong size.
+            return createFileTopic(path, null);     // clientState=null
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
     @POST
     @Path("/{path:.+}/folder/{folder_name}") // Note: we also match slashes as they are already decoded by an apache ...
     @Override
@@ -182,8 +210,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = enforeSecurity(path);
-            checkFileExistence(directory);  // throws FileRepositoryException
+            File directory = enforeSecurity(path);  // throws FileRepositoryException
+            checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) create directory
             File repoFile = repoFile(directory, folderName);
@@ -213,8 +241,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             //
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             //
             return new ResourceInfo(file);
         } catch (FileRepositoryException e) {
@@ -232,8 +260,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             //
-            File folder = enforeSecurity(path);
-            checkFileExistence(folder);     // throws FileRepositoryException
+            File folder = enforeSecurity(path); // throws FileRepositoryException
+            checkFileExistence(folder);         // throws FileRepositoryException
             //
             return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
@@ -268,7 +296,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ---
 
-    // Note: this is not a resource method.
+    // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(String path) {
@@ -276,15 +304,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         try {
             logger.info(operation);
             //
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
     }
 
-    // Note: this is not a resource method.
+    // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(long fileTopicId) {
@@ -293,8 +321,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             //
             String path = repoPath(fileTopicId);
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -312,8 +340,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             logger.info(operation);
             //
             String path = repoPath(fileTopicId);
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
@@ -339,8 +367,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
             path = JavaUtils.decodeURIComponent(path);
             logger.info("### repository path=\"" + path + "\"");
-            File file = enforeSecurity(path);
-            checkFileExistence(file);       // throws FileRepositoryException
+            File file = enforeSecurity(path);   // throws FileRepositoryException
+            checkFileExistence(file);           // throws FileRepositoryException
             return true;
         } catch (FileRepositoryException e) {
             response.setStatus(e.getStatusCode());
@@ -370,22 +398,37 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // === File System Representation ===
 
+    /**
+     * Fetches the File topic representing the file at a given absolute path.
+     * If no such File topic exists <code>null</code> is returned.
+     *
+     * @param   file   An absolute path.
+     */
     private Topic fetchFileTopic(File file) {
-        String path = repoPath(file);
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);   // fetchComposite=false
-        if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-                "dm4.files.file", true, false);
-        }
-        return null;
+        return fetchTopic(file, "dm4.files.file");
     }
 
+    /**
+     * Fetches the Folder topic representing the folder at a given absolute path.
+     * If no such Folder topic exists <code>null</code> is returned.
+     *
+     * @param   file   An absolute path.
+     */
     private Topic fetchFolderTopic(File file) {
+        return fetchTopic(file, "dm4.files.folder");
+    }
+
+    // ---
+
+    /**
+     * @param   file   An absolute path.
+     */
+    private Topic fetchTopic(File file, String parentTypeUri) {
         String path = repoPath(file);
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);   // fetchComposite=false
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-                "dm4.files.folder", true, false);
+                parentTypeUri, true, false);
         }
         return null;
     }
@@ -485,6 +528,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         // ### FIXME: Windows drive letter? See DirectoryListing
     }
 
+    /**
+     * Returns the repository path of the given File/Folder topic.
+     */
     private String repoPath(long fileTopicId) {
         Topic fileTopic = dms.getTopic(fileTopicId, true);    // fetchComposite=true
         return fileTopic.getCompositeValue().getString("dm4.files.path");
