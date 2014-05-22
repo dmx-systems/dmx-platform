@@ -5,13 +5,13 @@
 
     <groupId>de.deepamehta.assemblies.server</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>4.3-SNAPSHOT</version>
+    <version>4.3</version>
     <name>DeepaMehta 4 Assemblies :: Server :: Distribution</name>
 
     <parent>
         <groupId>de.deepamehta.assemblies</groupId>
         <artifactId>deepamehta-server</artifactId>
-        <version>4.3-SNAPSHOT</version>
+        <version>4.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

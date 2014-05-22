@@ -33,9 +33,7 @@ Source code:
 <https://github.com/jri/deepamehta>
 
 Mailing lists:  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-users>  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-devel>  
-<https://lists.berlios.de/mailman/listinfo/deepamehta-german>
+<http://lists.deepamehta.de/>
 
 Licensed under GNU General Public License, version 3.
 
@@ -69,10 +67,10 @@ To install and use DeepaMehta follow 5 mandatory steps:
 There are 2 distributions to suit different needs:
 
 * The **DeepaMehta Standard Distribution** focuses on small download size and easy setup.  
-  <http://download.deepamehta.de/deepamehta-4.2.zip> (6.9 MB)
+  <http://download.deepamehta.de/deepamehta-4.3.zip> (6.9 MB)
 
 * The **DeepaMehta Karaf Distribution** focuses on client-server setup and supports remote administration.  
-  <http://download.deepamehta.de/deepamehta-4.2-karaf.tar.gz> (13.8 MB)
+  <http://download.deepamehta.de/deepamehta-4.3-karaf.tar.gz> (13.8 MB)
 
 Note: the remainder of this README applies to the Standard Distribution.  
 For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/KarafDistribution>.
@@ -82,7 +80,7 @@ For setting up the Karaf Distribution refer to <https://trac.deepamehta.de/wiki/
 ---------------------
 
 Unzip the downloaded file.  
-A folder `deepamehta-4.2` is created.
+A folder `deepamehta-4.3` is created.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
@@ -90,7 +88,7 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 4. Start DeepaMehta
 -------------------
 
-Open the `deepamehta-4.2` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.3` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -124,11 +122,11 @@ Auxiliary tasks follow:
 Updating DeepaMehta
 -------------------
 
-You can update from DeepaMehta 4.1 or newer to 4.2 while keeping your data:
+You can update from DeepaMehta 4.1 or newer to 4.3 while keeping your data:
 
-1. Install DeepaMehta 4.2 (see steps 2. and 3. above).
-2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.2 if already started.)
-3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.2` folder.
+1. Install DeepaMehta 4.3 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.3 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.3` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
 
@@ -160,7 +158,7 @@ Uninstall DeepaMehta
 --------------------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.2` folder.
+2. Delete the entire `deepamehta-4.3` folder.
 
 This removes DeepaMehta completely from your computer, including all your data.
 
@@ -176,6 +174,18 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.3** -- May 22, 2014
+
+* Plugin development framework:
+    * More flexible file upload.
+    * Adding index modes afterwards.
+    * RESTful Facets service.
+* Compatible with 2 new plugins (optional install):
+    * DM4 Wikidata browser.
+    * DM4 Topicmap Import/Export.
+* More changes are in the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.2** -- Feb 18, 2014
 
@@ -519,4 +529,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Feb 18, 2014
+May 22, 2014
