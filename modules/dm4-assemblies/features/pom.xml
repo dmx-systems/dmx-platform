@@ -6,14 +6,14 @@
 
     <groupId>de.deepamehta.assemblies</groupId>
     <artifactId>deepamehta-features</artifactId>
-    <version>4.3</version>
+    <version>4.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>DeepaMehta 4 Assemblies :: Features</name>
 
     <parent>
         <groupId>de.deepamehta.assemblies</groupId>
         <artifactId>deepamehta-assemblies</artifactId>
-        <version>4.3</version>
+        <version>4.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
