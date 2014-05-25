@@ -76,9 +76,9 @@ public class PluginImpl implements Plugin, EventHandler {
     private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Consumed plugin services
-    //      key: service interface name,
+    //      key: service interface (a class object),
     //      value: service object. Is null if the service is not yet available.
-    private Map<String, Object> pluginServices = new HashMap();
+    private Map<Class<? extends PluginService>, Object> pluginServices = new HashMap();
 
     // Provided OSGi service
     private ServiceRegistration registration;
@@ -280,7 +280,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void createPluginServiceTrackers() {
-        String[] serviceInterfaces = consumedServiceInterfaces();
+        Class<? extends PluginService>[] serviceInterfaces = consumedServiceInterfaces();
         //
         if (serviceInterfaces == null) {
             logger.info("Tracking plugin services for " + this + " ABORTED -- no consumed services declared");
@@ -289,7 +289,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Tracking " + serviceInterfaces.length + " plugin services for " + this + " " +
             asList(serviceInterfaces));
-        for (String serviceInterface : serviceInterfaces) {
+        for (Class<? extends PluginService> serviceInterface : serviceInterfaces) {
             pluginServices.put(serviceInterface, null);
             pluginServiceTrackers.add(createServiceTracker(serviceInterface));
         }
@@ -297,7 +297,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private String[] consumedServiceInterfaces() {
+    private Class<? extends PluginService>[] consumedServiceInterfaces() {
         try {
             // Note: the generic PluginActivator *has* a serviceArrived() method but no ConsumesService annotation
             if (isGenericPlugin()) {
@@ -319,7 +319,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private boolean pluginServicesAvailable() {
-        for (String serviceInterface : pluginServices.keySet()) {
+        for (Class<? extends PluginService> serviceInterface : pluginServices.keySet()) {
             if (pluginServices.get(serviceInterface) == null) {
                 return false;
             }
@@ -333,13 +333,9 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private ServiceTracker createServiceTracker(Class serviceInterface) {
-        return createServiceTracker(serviceInterface.getName());
-    }
-
-    private ServiceTracker createServiceTracker(final String serviceInterface) {
+    private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //
-        return new ServiceTracker(bundleContext, serviceInterface, null) {
+        return new ServiceTracker(bundleContext, serviceInterface.getName(), null) {
 
             @Override
             public Object addingService(ServiceReference serviceRef) {
@@ -403,7 +399,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private void addService(Object service, String serviceInterface) {
+    private void addService(Object service, Class serviceInterface) {
         if (service instanceof DeepaMehtaService) {
             logger.info("Adding DeepaMehta 4 core service to " + this);
             setCoreService((EmbeddedService) service);
@@ -421,14 +417,14 @@ public class PluginImpl implements Plugin, EventHandler {
             eventService = (EventAdmin) service;
             checkRequirementsForActivation();
         } else if (service instanceof PluginService) {
-            logger.info("Adding \"" + serviceInterface + "\" to " + this);
+            logger.info("Adding \"" + serviceInterface.getName() + "\" to " + this);
             pluginServices.put(serviceInterface, service);
             pluginContext.serviceArrived((PluginService) service);
             checkRequirementsForActivation();
         }
     }
 
-    private void removeService(Object service, String serviceInterface) {
+    private void removeService(Object service, Class serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
             closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
@@ -445,7 +441,7 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Removing Event Admin service from " + this);
             eventService = null;
         } else if (service instanceof PluginService) {
-            logger.info("Removing plugin service \"" + serviceInterface + "\" from " + this);
+            logger.info("Removing plugin service \"" + serviceInterface.getName() + "\" from " + this);
             pluginServices.put(serviceInterface, null);
             pluginContext.serviceGone((PluginService) service);
         }
