@@ -29,7 +29,7 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** Hook Implementations ***
 
     @Override
-    @ConsumesService("de.deepamehta.plugins.topicmaps.service.TopicmapsService")
+    @ConsumesService(TopicmapsService.class)
     public void serviceArrived(PluginService service) {
         ((TopicmapsService) service).registerViewmodelCustomizer(this);
     }

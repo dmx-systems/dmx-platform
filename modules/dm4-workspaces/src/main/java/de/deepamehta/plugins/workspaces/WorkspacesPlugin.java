@@ -127,7 +127,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     @Override
-    @ConsumesService("de.deepamehta.plugins.facets.service.FacetsService")
+    @ConsumesService(FacetsService.class)
     public void serviceArrived(PluginService service) {
         facetsService = (FacetsService) service;
     }

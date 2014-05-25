@@ -385,7 +385,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    @ConsumesService("de.deepamehta.plugins.workspaces.service.WorkspacesService")
+    @ConsumesService(WorkspacesService.class)
     public void serviceArrived(PluginService service) {
         wsService = (WorkspacesService) service;
     }

@@ -166,10 +166,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     // ---
 
     @Override
-    @ConsumesService({
-        "de.deepamehta.plugins.topicmaps.service.TopicmapsService",
-        "de.deepamehta.plugins.facets.service.FacetsService"
-    })
+    @ConsumesService({TopicmapsService.class, FacetsService.class})
     public void serviceArrived(PluginService service) {
         if (service instanceof FacetsService) {
             facetsService = (FacetsService) service;

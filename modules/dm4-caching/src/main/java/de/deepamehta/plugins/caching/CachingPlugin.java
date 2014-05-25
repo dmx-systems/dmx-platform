@@ -51,7 +51,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
 
     @Override
-    @ConsumesService("de.deepamehta.plugins.time.service.TimeService")
+    @ConsumesService(TimeService.class)
     public void serviceArrived(PluginService service) {
         timeService = (TimeService) service;
     }
