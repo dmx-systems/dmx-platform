@@ -8,7 +8,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.awt.Point;
 
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -24,14 +24,15 @@ public class TopicmapViewmodel implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicModel topicmapTopic;
-    private List<TopicViewmodel> topics;
-    private List<AssociationViewmodel> assocs;
+    private Map<Long, TopicViewmodel> topics;
+    private Map<Long, AssociationViewmodel> assocs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicmapViewmodel(TopicModel topicmapTopic, List<TopicViewmodel> topics, List<AssociationViewmodel> assocs) {
+    public TopicmapViewmodel(TopicModel topicmapTopic, Map<Long, TopicViewmodel> topics,
+                                                       Map<Long, AssociationViewmodel> assocs) {
         this.topicmapTopic = topicmapTopic;
         this.topics = topics;
         this.assocs = assocs;
@@ -46,11 +47,11 @@ public class TopicmapViewmodel implements JSONEnabled {
     // ---
 
     public Iterable<TopicViewmodel> getTopics() {
-        return topics;
+        return topics.values();
     }
 
     public Iterable<AssociationViewmodel> getAssociations() {
-        return assocs;
+        return assocs.values();
     }
 
     // ---
@@ -60,8 +61,8 @@ public class TopicmapViewmodel implements JSONEnabled {
         try {
             JSONObject topicmap = new JSONObject();
             topicmap.put("info", topicmapTopic.toJSON());
-            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics));
-            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs));
+            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics.values()));
+            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs.values()));
             return topicmap;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -115,7 +116,7 @@ public class TopicmapViewmodel implements JSONEnabled {
 
         private Point findStartPostition() {
             int maxY = MIN_Y;
-            for (TopicViewmodel topic : topics) {
+            for (TopicViewmodel topic : topics.values()) {
                 if (topic.getY() > maxY) {
                     maxY = topic.getY();
                 }

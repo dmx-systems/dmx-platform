@@ -90,8 +90,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
             Topic topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
-            List<TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
-            List<AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
+            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
+            Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
             return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
         } catch (Exception e) {
@@ -302,26 +302,26 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch ---
 
-    private List<TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
-        List<TopicViewmodel> topics = new ArrayList();
+    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
+        Map<Long, TopicViewmodel> topics = new HashMap();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, fetchComposite, true, 0).getItems();
             // othersTopicTypeUri=null, fetchRelatingComposite=true, maxResultSize=0
         for (RelatedTopic topic : relTopics) {
             CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
             invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
-            topics.add(new TopicViewmodel(topic.getModel(), viewProps));
+            topics.put(topic.getId(), new TopicViewmodel(topic.getModel(), viewProps));
         }
         return topics;
     }
 
-    private List<AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
-        List<AssociationViewmodel> assocs = new ArrayList();
+    private Map<Long, AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
+        Map<Long, AssociationViewmodel> assocs = new HashMap();
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
             "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null,
             false, false);  // fetchComposite=false, fetchRelatingComposite=false
         for (RelatedAssociation assoc : relAssocs) {
-            assocs.add(new AssociationViewmodel(assoc.getModel()));
+            assocs.put(assoc.getId(), new AssociationViewmodel(assoc.getModel()));
         }
         return assocs;
     }
