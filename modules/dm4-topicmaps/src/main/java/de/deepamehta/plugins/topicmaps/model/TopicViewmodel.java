@@ -26,6 +26,10 @@ public class TopicViewmodel extends TopicModel {
 
     // --- Public Methods ---
 
+    public CompositeValueModel getViewProperties() {
+        return viewProps;
+    }
+
     @Override
     public JSONObject toJSON() {
         try {
