@@ -56,6 +56,16 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     // ---
 
+    public TopicViewmodel getTopic(long id) {
+        return topics.get(id);
+    }
+
+    public AssociationViewmodel getAssociation(long id) {
+        return assocs.get(id);
+    }
+
+    // ---
+
     @Override
     public JSONObject toJSON() {
         try {
