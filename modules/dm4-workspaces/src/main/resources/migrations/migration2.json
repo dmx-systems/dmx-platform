@@ -1,0 +1,40 @@
+{
+    "topic_types": [
+
+        ### Workspace Type ###
+
+        {
+            "value":            "Workspace Type",
+            "uri":              "dm4.workspaces.type",
+            "data_type_uri":    "dm4.core.text"
+        }
+    ],
+
+    "topics": [
+        {
+            "value":    "Private",
+            "uri":      "dm4.workspaces.type.private",
+            "type_uri": "dm4.workspaces.type"
+        },
+        {
+            "value":    "Confidential",
+            "uri":      "dm4.workspaces.type.confidential",
+            "type_uri": "dm4.workspaces.type"
+        },
+        {
+            "value":    "Collaborative",
+            "uri":      "dm4.workspaces.type.collaborative",
+            "type_uri": "dm4.workspaces.type"
+        },
+        {
+            "value":    "Public",
+            "uri":      "dm4.workspaces.type.public",
+            "type_uri": "dm4.workspaces.type"
+        },
+        {
+            "value":    "Common",
+            "uri":      "dm4.workspaces.type.common",
+            "type_uri": "dm4.workspaces.type"
+        }
+    ]
+}
