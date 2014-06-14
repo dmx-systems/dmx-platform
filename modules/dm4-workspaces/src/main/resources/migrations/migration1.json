@@ -1,56 +1,56 @@
 {
-    topic_types: [
+    "topic_types": [
 
         ### Workspace ###
 
         {
-            value:           "Name",
-            uri:             "dm4.workspaces.name",
-            data_type_uri:   "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+            "value":            "Name",
+            "uri":              "dm4.workspaces.name",
+            "data_type_uri":    "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
-            value:           "Description",
-            uri:             "dm4.workspaces.description",
-            data_type_uri:   "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value":            "Description",
+            "uri":              "dm4.workspaces.description",
+            "data_type_uri":    "dm4.core.html",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value:           "Workspace",
-            uri:             "dm4.workspaces.workspace",
-            data_type_uri:   "dm4.core.composite",
-            assoc_defs: [
+            "value":           "Workspace",
+            "uri":             "dm4.workspaces.workspace",
+            "data_type_uri":   "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.workspaces.name",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.workspaces.name",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.workspaces.description",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.workspaces.description",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.icon: "/de.deepamehta.workspaces/images/star.png",
-                        dm4.webclient.searchable_as_unit: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.icon": "/de.deepamehta.workspaces/images/star.png",
+                        "dm4.webclient.searchable_as_unit": true
                     }
                 }
             ]
         },
         {
-            value: "Workspace Facet",
-            uri: "dm4.workspaces.workspace_facet",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value":         "Workspace Facet",
+            "uri":           "dm4.workspaces.workspace_facet",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:         "dm4.workspaces.workspace",
-                    child_cardinality_uri:  "dm4.core.many",
-                    parent_cardinality_uri: "dm4.core.many",
-                    assoc_type_uri:         "dm4.core.aggregation_def"
+                    "child_type_uri":         "dm4.workspaces.workspace",
+                    "child_cardinality_uri":  "dm4.core.many",
+                    "parent_cardinality_uri": "dm4.core.many",
+                    "assoc_type_uri":         "dm4.core.aggregation_def"
                 }
             ]
         }
