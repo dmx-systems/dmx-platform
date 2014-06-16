@@ -6,31 +6,6 @@ function RenderHelper() {
     var self = this
 
     /**
-     * @param   page_model      a TopicRenderer.PageModel object or a string.
-     * @param   parent_element  Optional: the parent element the label is rendered to.
-     *                          If not specified the label is rendered directly to the page panel.
-     */
-    this.field_label = function(page_model, parent_element, result_set) {
-        parent_element = parent_element || $("#page-content")
-        //
-        if (typeof(page_model) == "string") {
-            var label = page_model
-        } else {
-            var label = page_model.label
-        }
-        //
-        if (result_set) {
-            var c = result_set.items.length
-            var tc = result_set.total_count
-            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
-        }
-        //
-        parent_element.append($("<div>").addClass("field-label").text(label))
-    }
-
-    // ---
-
-    /**
      * Renders a clickable list of topics. Each list item consist of the topic's icon and the topic's label.
      *
      * @param   topics          Topics to render (array of Topic objects).
@@ -182,6 +157,10 @@ function RenderHelper() {
     }
 
     // ---
+
+    this.label = function(label) {
+        return $("<div>").addClass("field-label").text(label)
+    }
 
     /**
      * Renders a link.
@@ -420,6 +399,29 @@ function RenderHelper() {
     }
 
     // ---
+
+    /**
+     * @param   page_model      a TopicRenderer.PageModel object or a string.
+     * @param   parent_element  Optional: the parent element the label is rendered to.
+     *                          If not specified the label is rendered directly to the page panel.
+     */
+    this.field_label = function(page_model, parent_element, result_set) {
+        parent_element = parent_element || $("#page-content")
+        //
+        if (typeof(page_model) == "string") {
+            var label = page_model
+        } else {
+            var label = page_model.label
+        }
+        //
+        if (result_set) {
+            var c = result_set.items.length
+            var tc = result_set.total_count
+            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
+        }
+        //
+        parent_element.append(this.label(label))
+    }
 
     this.page = function(html) {
         $("#page-content").append(html)
