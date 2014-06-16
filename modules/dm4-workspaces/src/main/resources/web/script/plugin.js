@@ -72,8 +72,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
             function do_create_workspace() {
                 var name = name_input.val()
-                var type = type_selector.find(":checked").val() // ### TODO
-                create_workspace(name)
+                var type_uri = type_selector.find(":checked").val()
+                create_workspace(name, type_uri)
             }
         }
     })
@@ -128,18 +128,24 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // ---
 
     /**
-     * Creates a workspace with the given name and puts it in the workspace menu.
+     * Creates a workspace with the given name and type and puts it in the workspace menu.
+     *
+     * @param   type_uri    The URI of the workspace type ("dm4.workspaces.type.private",
+     *                      "dm4.workspaces.type.confidential", ...)
      */
-    function create_workspace(name) {
-        var workspace = create_workspace_topic(name)
+    function create_workspace(name, type_uri) {
+        var workspace = create_workspace_topic(name, type_uri)
         refresh_workspace_menu(workspace.id)
     }
 
     /**
      * Creates a new workspace in the DB.
      */
-    function create_workspace_topic(name) {
-        return dm4c.create_topic("dm4.workspaces.workspace", {"dm4.workspaces.name": name})
+    function create_workspace_topic(name, type_uri) {
+        return dm4c.create_topic("dm4.workspaces.workspace", {
+            "dm4.workspaces.name": name,
+            "dm4.workspaces.type": "ref_uri:" + type_uri
+        })
     }
 
     // ---
