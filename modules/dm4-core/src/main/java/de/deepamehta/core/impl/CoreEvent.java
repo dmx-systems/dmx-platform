@@ -28,6 +28,26 @@ import javax.servlet.http.HttpServletRequest;
  */
 class CoreEvent {
 
+    static DeepaMehtaEvent POST_GET_TOPIC = new DeepaMehtaEvent(PostGetTopicListener.class) {
+        @Override
+        public void deliver(EventListener listener, Object... params) {
+            ((PostGetTopicListener) listener).postGetTopic(
+                (Topic) params[0]
+            );
+        }
+    };
+
+    static DeepaMehtaEvent POST_GET_ASSOCIATION = new DeepaMehtaEvent(PostGetAssociationListener.class) {
+        @Override
+        public void deliver(EventListener listener, Object... params) {
+            ((PostGetAssociationListener) listener).postGetAssociation(
+                (Association) params[0]
+            );
+        }
+    };
+
+    // ---
+
     static DeepaMehtaEvent PRE_CREATE_TOPIC = new DeepaMehtaEvent(PreCreateTopicListener.class) {
         @Override
         public void deliver(EventListener listener, Object... params) {
