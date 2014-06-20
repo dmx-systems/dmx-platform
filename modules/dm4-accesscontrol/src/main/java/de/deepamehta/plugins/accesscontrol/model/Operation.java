@@ -4,6 +4,7 @@ package de.deepamehta.plugins.accesscontrol.model;
 
 public enum Operation {
 
+    READ("dm4.accesscontrol.operation.read"),
     WRITE("dm4.accesscontrol.operation.write"),
     CREATE("dm4.accesscontrol.operation.create");
 

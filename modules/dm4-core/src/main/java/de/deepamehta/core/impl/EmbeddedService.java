@@ -699,7 +699,11 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     Topic instantiateTopic(TopicModel model, boolean fetchComposite) {
         fetchCompositeValue(model, fetchComposite);
-        return new AttachedTopic(model, this);
+        Topic topic = new AttachedTopic(model, this);
+        //
+        fireEvent(CoreEvent.POST_GET_TOPIC, topic);
+        //
+        return topic;
     }
 
     private List<Topic> instantiateTopics(List<TopicModel> models, boolean fetchComposite) {
@@ -715,7 +719,11 @@ public class EmbeddedService implements DeepaMehtaService {
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model, boolean fetchComposite,
                                                                   boolean fetchRelatingComposite) {
         fetchCompositeValue(model, fetchComposite, fetchRelatingComposite);
-        return new AttachedRelatedTopic(model, this);
+        RelatedTopic topic = new AttachedRelatedTopic(model, this);
+        //
+        fireEvent(CoreEvent.POST_GET_TOPIC, topic);
+        //
+        return topic;
     }
 
     ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models,

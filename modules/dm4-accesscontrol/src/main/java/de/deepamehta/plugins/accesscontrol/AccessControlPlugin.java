@@ -9,6 +9,7 @@ import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.workspaces.WorkspaceType;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
@@ -34,6 +35,8 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.PostGetAssociationListener;
+import de.deepamehta.core.service.event.PostGetTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
@@ -76,6 +79,8 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
+                                                                                       PostGetTopicListener,
+                                                                                       PostGetAssociationListener,
                                                                                        PostCreateTopicListener,
                                                                                        PostCreateAssociationListener,
                                                                                        PostUpdateTopicListener,
@@ -422,6 +427,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // 3) setup access control for default topicmap
             setupAccessControlForDefaultTopicmap(defaultTopicmap);
         }
+    }
+
+    // ---
+
+    @Override
+    public void postGetTopic(Topic topic) {
+        hasPermission(getUsername(), Operation.READ, topic);
+    }
+
+    @Override
+    public void postGetAssociation(Association assoc) {
+        // ### TODO
     }
 
     // ---
@@ -850,6 +867,109 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Determine Permissions ===
 
+    /**
+     * Checks if a user is permitted to perform an operation on an object (topic or association).
+     * If so, <code>true</code> is returned.
+     *
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     */
+    private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
+        try {
+            List<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
+            //
+            if (workspaces.size() > 1) {
+                throw new RuntimeException(info(object) + " is assigned to " + workspaces.size() + " workspaces");
+            }
+            //
+            if (workspaces.size() == 0) {
+                switch (operation) {
+                case READ:
+                    logger.warning(info(object) + " has no workspace assignment -- READ permission is granted");
+                    return true;
+                case WRITE:
+                    logger.warning(info(object) + " has no workspace assignment -- WRITE permission is refused");
+                    return false;
+                default:
+                    throw new RuntimeException(operation + " is an unsupported operation");
+                }
+            }
+            //
+            Topic workspace = workspaces.get(0);
+            WorkspaceType workspaceType = workspaceType(workspace);
+            logger.info("##### " + info(object) + " is assigned to a " + workspaceType + " workspace (" + workspace +
+                ")");
+            //
+            switch (operation) {
+            case READ:
+                return hasReadPermission(username, workspace);
+            case WRITE:
+                return hasWritePermission(username, workspace);
+            default:
+                throw new RuntimeException(operation + " is an unsupported operation");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Checking permission for " + info(object) + " failed (" +
+                userInfo(username) + ", operation=" + operation + ")", e);
+        }
+    }
+
+    private boolean hasReadPermission(String username, Topic workspace) {
+        WorkspaceType workspaceType = workspaceType(workspace);
+        switch (workspaceType) {
+        case PRIVATE:
+            return isWorkspaceOwner(username, workspace);
+        case CONFIDENTIAL:
+            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+        case COLLABORATIVE:
+            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+        case PUBLIC:
+            return true;
+        case COMMON:
+            return true;
+        default:
+            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
+        }
+    }
+
+    private boolean hasWritePermission(String username, Topic workspace) {
+        WorkspaceType workspaceType = workspaceType(workspace);
+        switch (workspaceType) {
+        case PRIVATE:
+            return isWorkspaceOwner(username, workspace);
+        case CONFIDENTIAL:
+            return isWorkspaceOwner(username, workspace);
+        case COLLABORATIVE:
+            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+        case PUBLIC:
+            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+        case COMMON:
+            return true;
+        default:
+            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
+        }
+    }
+
+    private boolean isWorkspaceOwner(String username, Topic workspace) {
+        return username != null && userIsOwner(username, workspace);
+    }
+
+    private boolean isWorkspaceMember(String username, Topic workspace) {
+        return username != null && userIsMember(username, workspace);
+    }
+
+    // ---
+
+    private WorkspaceType workspaceType(Topic workspace) {
+        try {
+            return WorkspaceType.fromUri(workspace.getCompositeValue().getTopic("dm4.workspaces.type").getUri());
+        } catch (Exception e) {
+            throw new RuntimeException("Determining the workspace type of workspace \"" + workspace.getSimpleValue() +
+                "\" failed", e);
+        }
+    }
+
+    // ########## Legacy code follows ...
+
     private Permissions getPermissions(DeepaMehtaObject object) {
         return createPermissions(hasPermission(getUsername(), Operation.WRITE, object));
     }
@@ -866,10 +986,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * Checks if a user is allowed to perform an operation on an object (topic or association).
      * If so, <code>true</code> is returned.
      *
-     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *                      or <code>null</code> if no user is logged in.
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
      */
-    private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
+    /* ### private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
         try {
             logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
             UserRole[] userRoles = getACL(object).getUserRoles(operation);
@@ -886,7 +1005,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("Determining permission for " + info(object) + " failed (" +
                 userInfo(username) + ", operation=" + operation + ")", e);
         }
-    }
+    } */
 
     /**
      * Checks if a user occupies a role with regard to the specified object.
@@ -895,7 +1014,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
      *                      or <code>null</code> if no user is logged in.
      */
-    private boolean userOccupiesRole(String username, UserRole userRole, DeepaMehtaObject object) {
+    /* ### private boolean userOccupiesRole(String username, UserRole userRole, DeepaMehtaObject object) {
         switch (userRole) {
         case EVERYONE:
             return true;
@@ -910,7 +1029,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         default:
             throw new RuntimeException(userRole + " is an unsupported user role");
         }
-    }
+    } */
 
     // ---
 

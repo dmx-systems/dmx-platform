@@ -16,32 +16,36 @@ import java.util.List;
 public interface FacetsService extends PluginService {
 
     // ### TODO: rename to getFacetValue
+    // ### TODO: add fetchComposite parameter
     Topic getFacet(long topicId, String facetTypeUri);
 
     /**
      * Retrieves a facet value.
      * ### TODO: rename to getFacetValue
+     * ### TODO: add fetchComposite parameter
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
-     * @return  The retrieved facet value or <code>null</code> if no such topic extists.
+     * @return  The retrieved facet value (including its child topics) or <code>null</code> if no such topic extists.
      */
     Topic getFacet(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 
     // ### TODO: rename to getFacetValues
+    // ### TODO: add fetchComposite parameter
     List<RelatedTopic> getFacets(long topicId, String facetTypeUri);
 
     /**
      * Retrieves the values of a multi-facet.
      * ### TODO: rename to getFacetValues
+     * ### TODO: add fetchComposite parameter
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
      *
-     * @return  The retrieved facet values. The list may be empty.
+     * @return  The retrieved facet values (including their child topics). The list may be empty.
      */
     List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
