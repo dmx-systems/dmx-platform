@@ -1,74 +1,74 @@
 {
-    topic_types: [
+    "topic_types": [
 
         ### User Account ###
 
         {
-            value: "Username",
-            uri: "dm4.accesscontrol.username",
-            data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.key", "dm4.core.fulltext"],
-            view_config_topics: [
+            "value":            "Username",
+            "uri":              "dm4.accesscontrol.username",
+            "data_type_uri":    "dm4.core.text",
+            "index_mode_uris": ["dm4.core.key", "dm4.core.fulltext"],
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.locked: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.locked": true
                     }
                 }
             ]
         },
         {
-            value: "Password",
-            uri: "dm4.accesscontrol.password",
-            data_type_uri: "dm4.core.text",
-            view_config_topics: [
+            "value":         "Password",
+            "uri":           "dm4.accesscontrol.password",
+            "data_type_uri": "dm4.core.text",
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.hidden: true,
-                        dm4.webclient.locked: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.hidden": true,
+                        "dm4.webclient.locked": true
                     }
                 }
             ]
         },
         {
-            value: "User Account",
-            uri: "dm4.accesscontrol.user_account",
-            data_type_uri: "dm4.core.composite",
-            index_mode_uris: ["dm4.core.key"],
-            assoc_defs: [
+            "value":            "User Account",
+            "uri":              "dm4.accesscontrol.user_account",
+            "data_type_uri":    "dm4.core.composite",
+            "index_mode_uris": ["dm4.core.key"],
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.accesscontrol.username",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def",
-                    view_config_topics: [
+                    "child_type_uri":        "dm4.accesscontrol.username",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "view_config_topics": [
                         {
-                            type_uri: "dm4.webclient.view_config",
-                            composite: {
-                                dm4.webclient.locked: false
+                            "type_uri": "dm4.webclient.view_config",
+                            "composite": {
+                                "dm4.webclient.locked": false
                             }
                         }
                     ]
                 },
                 {
-                    child_type_uri:        "dm4.accesscontrol.password",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def",
-                    view_config_topics: [
+                    "child_type_uri":        "dm4.accesscontrol.password",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "view_config_topics": [
                         {
-                            type_uri: "dm4.webclient.view_config",
-                            composite: {
-                                dm4.webclient.locked: false
+                            "type_uri": "dm4.webclient.view_config",
+                            "composite": {
+                                "dm4.webclient.locked": false
                             }
                         }
                     ]
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.icon: "/de.deepamehta.accesscontrol/images/top-hat.png"
+                    "type_uri": "dm4.webclient.view_config",
+                    "composite": {
+                        "dm4.webclient.icon": "/de.deepamehta.accesscontrol/images/top-hat.png"
                     }
                 }
             ]
