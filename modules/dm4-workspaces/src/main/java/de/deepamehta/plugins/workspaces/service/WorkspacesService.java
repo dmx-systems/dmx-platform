@@ -13,9 +13,12 @@ import java.util.List;
 public interface WorkspacesService extends PluginService {
 
     /**
-     * Fetches the workspaces the specified object is assigned to.
+     * Returns the workspace the specified object is assigned to.
+     *
+     * @return  The assigned workspace (a topic of type "Workspace" / "dm4.workspaces.workspace"),
+     *          or <code>null</code> if no workspace is assigned.
      */
-    List<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object);
+    Topic getAssignedWorkspace(DeepaMehtaObject object);
 
     /**
      * Checks weather the specified topic is assigned to the specified workspace

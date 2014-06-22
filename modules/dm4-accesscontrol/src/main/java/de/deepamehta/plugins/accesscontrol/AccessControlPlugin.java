@@ -20,9 +20,11 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
@@ -103,6 +105,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // Default user account
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
+
+    // Associations
+    private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
 
     // Default ACLs
     private static final AccessControlList DEFAULT_INSTANCE_ACL = new AccessControlList(
@@ -313,16 +318,30 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @POST
     @Path("/user/{username}/workspace/{workspace_id}")
     @Override
-    public void joinWorkspace(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
-        joinWorkspace(getUsername(username), workspaceId);
+    public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
+        try {
+            dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
+                new TopicRoleModel(getUsernameOrThrow(username).getId(), "dm4.core.default"),
+                new TopicRoleModel(workspaceId, "dm4.core.default")), null);   // clientState=null
+        } catch (Exception e) {
+            throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
     }
 
     @Override
-    public void joinWorkspace(Topic username, long workspaceId) {
+    public boolean isMember(String username, long workspaceId) {
         try {
-            wsService.assignToWorkspace(username, workspaceId);
+            if (username == null) {
+                return false;
+            }
+            //
+            Association assoc = dms.getAssociation(MEMBERSHIP_TYPE, getUsernameOrThrow(username).getId(), workspaceId,
+                "dm4.core.default", "dm4.core.default", false); // fetchComposite=false
+            return assoc != null;
         } catch (Exception e) {
-            throw new RuntimeException("Joining user " + username + " to workspace " + workspaceId + " failed", e);
+            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
         }
     }
 
@@ -410,20 +429,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     /**
      * Setup access control for the default user and the default topicmap.
-     *   1) assign default user     to default workspace
+     *   1) create membership for default user and default workspace
      *   2) assign default topicmap to default workspace
      *   3) setup access control for default topicmap
      */
     @Override
     public void allPluginsActive() {
-        // 1) assign default user to default workspace
-        Topic defaultUser = fetchDefaultUser();
-        assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
+        Topic defaultWorkspace = wsService.getDefaultWorkspace();
+        //
+        // 1) create membership for default user and default workspace
+        createDefaultMembership(defaultWorkspace);
         //
         Topic defaultTopicmap = fetchDefaultTopicmap();
         if (defaultTopicmap != null) {
             // 2) assign default topicmap to default workspace
-            assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
+            assignDefaultTopicmapToDefaultWorkspace(defaultTopicmap, defaultWorkspace);
             // 3) setup access control for default topicmap
             setupAccessControlForDefaultTopicmap(defaultTopicmap);
         }
@@ -563,9 +583,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
-    private Topic fetchDefaultUser() {
+    /* ### private Topic fetchDefaultUser() {
         return getUsernameOrThrow(DEFAULT_USERNAME);
-    }
+    } */
 
     private Topic getUsernameOrThrow(String username) {
         Topic usernameTopic = getUsername(username);
@@ -581,7 +601,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Note: when the default workspace is created there is no user logged in yet.
             // The default user is assigned to the default workspace later on (see allPluginsActive()).
             if (username != null) {
-                joinWorkspace(username, topic.getId());
+                createMembership(username, topic.getId());
             }
         }
     }
@@ -590,20 +610,35 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === All Plugins Activated ===
 
-    private void assignToDefaultWorkspace(Topic topic, String info) {
-        String operation = "### Assigning the " + info + " to the default workspace (\"DeepaMehta\")";
+    private void createDefaultMembership(Topic defaultWorkspace) {
+        String operation = "Creating membership for default user (\"admin\") and default workspace (\"DeepaMehta\")";
         try {
-            // abort if already assigned
-            List<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(topic);
-            if (workspaces.size() != 0) {
-                logger.info("### Assigning the " + info + " to a workspace ABORTED -- " +
-                    "already assigned (" + DeepaMehtaUtils.topicNames(workspaces) + ")");
+            // abort if membership already exists
+            if (isMember(DEFAULT_USERNAME, defaultWorkspace.getId())) {
+                logger.info("### " + operation + " ABORTED -- membership already exists");
                 return;
             }
             //
-            logger.info(operation);
-            Topic defaultWorkspace = wsService.getDefaultWorkspace();
-            wsService.assignToWorkspace(topic, defaultWorkspace.getId());
+            logger.info("### " + operation);
+            createMembership(DEFAULT_USERNAME, defaultWorkspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    private void assignDefaultTopicmapToDefaultWorkspace(Topic defaultTopicmap, Topic defaultWorkspace) {
+        String operation = "Assigning the default topicmap (\"untitled\") to the default workspace (\"DeepaMehta\")";
+        try {
+            // abort if already assigned
+            Topic workspace = wsService.getAssignedWorkspace(defaultTopicmap);
+            if (workspace != null) {
+                logger.info("### Assigning the default topicmap (\"untitled\") to a workspace ABORTED -- " +
+                    "already assigned to workspace \"" + workspace.getSimpleValue() + "\"");
+                return;
+            }
+            //
+            logger.info("### " + operation);
+            wsService.assignToWorkspace(defaultTopicmap, defaultWorkspace.getId());
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -875,13 +910,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
         try {
-            List<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
+            Topic workspace = wsService.getAssignedWorkspace(object);
             //
-            if (workspaces.size() > 1) {
-                throw new RuntimeException(info(object) + " is assigned to " + workspaces.size() + " workspaces");
-            }
-            //
-            if (workspaces.size() == 0) {
+            if (workspace == null) {
                 switch (operation) {
                 case READ:
                     logger.warning(info(object) + " has no workspace assignment -- READ permission is granted");
@@ -889,12 +920,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 case WRITE:
                     logger.warning(info(object) + " has no workspace assignment -- WRITE permission is refused");
                     return false;
+                case CREATE:
+                    return true;    // ### TODO
                 default:
                     throw new RuntimeException(operation + " is an unsupported operation");
                 }
             }
             //
-            Topic workspace = workspaces.get(0);
             WorkspaceType workspaceType = workspaceType(workspace);
             logger.info("##### " + info(object) + " is assigned to a " + workspaceType + " workspace (" + workspace +
                 ")");
@@ -904,6 +936,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 return hasReadPermission(username, workspace);
             case WRITE:
                 return hasWritePermission(username, workspace);
+            case CREATE:
+                return true;    // ### TODO
             default:
                 throw new RuntimeException(operation + " is an unsupported operation");
             }
@@ -913,15 +947,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    /**
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     */
     private boolean hasReadPermission(String username, Topic workspace) {
         WorkspaceType workspaceType = workspaceType(workspace);
         switch (workspaceType) {
         case PRIVATE:
             return isWorkspaceOwner(username, workspace);
         case CONFIDENTIAL:
-            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
         case COLLABORATIVE:
-            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
         case PUBLIC:
             return true;
         case COMMON:
@@ -931,6 +968,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    /**
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     */
     private boolean hasWritePermission(String username, Topic workspace) {
         WorkspaceType workspaceType = workspaceType(workspace);
         switch (workspaceType) {
@@ -939,9 +979,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         case CONFIDENTIAL:
             return isWorkspaceOwner(username, workspace);
         case COLLABORATIVE:
-            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
         case PUBLIC:
-            return isWorkspaceOwner(username, workspace) || isWorkspaceMember(username, workspace);
+            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
         case COMMON:
             return true;
         default:
@@ -951,10 +991,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean isWorkspaceOwner(String username, Topic workspace) {
         return username != null && userIsOwner(username, workspace);
-    }
-
-    private boolean isWorkspaceMember(String username, Topic workspace) {
-        return username != null && userIsMember(username, workspace);
     }
 
     // ---
@@ -1039,23 +1075,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
      *
-     * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>). ### FIXDOC
+     * @param   username    the logged in user.
      * @param   object      the object in question.
      */
-    private boolean userIsMember(String username, DeepaMehtaObject object) {
+    /* ### private boolean userIsMember(String username, DeepaMehtaObject object) {
         Topic usernameTopic = getUsernameOrThrow(username);
-        List<RelatedTopic> workspaces = wsService.getAssignedWorkspaces(object);
-        logger.fine(info(object) + " is assigned to " + workspaces.size() + " workspaces");
-        for (RelatedTopic workspace : workspaces) {
-            if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {
-                logger.fine(userInfo(username) + " IS member of workspace " + workspace);
-                return true;
-            } else {
-                logger.fine(userInfo(username) + " is NOT member of workspace " + workspace);
-            }
+        Topic workspace = wsService.getAssignedWorkspace(object);
+        logger.fine(info(object) + " is assigned to workspace \"" + workspace.getSimpleValue() + "\"");
+        if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {    // ### TODO: use Membership
+            logger.fine(userInfo(username) + " IS member of workspace " + workspace);
+            return true;
+        } else {
+            logger.fine(userInfo(username) + " is NOT member of workspace " + workspace);
+            return false;
         }
-        return false;
-    }
+    } */
 
     /**
      * Checks if a user is the owner of the object.

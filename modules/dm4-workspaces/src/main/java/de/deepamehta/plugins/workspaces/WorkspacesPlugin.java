@@ -58,8 +58,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     @Override
-    public List<RelatedTopic> getAssignedWorkspaces(DeepaMehtaObject object) {
-        return facetsService.getFacets(object, "dm4.workspaces.workspace_facet");
+    public Topic getAssignedWorkspace(DeepaMehtaObject object) {
+        return facetsService.getFacet(object, "dm4.workspaces.workspace_facet");
+        // ### TODO: change model from multi-facet to single-facet
     }
 
     @Override
