@@ -472,7 +472,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
     function add_association(assoc) {
         // error check
         if (!get_topic(assoc.role_1.topic_id) || !get_topic(assoc.role_2.topic_id)) {
-            throw "TopicmapViewmodelError: can't add association " + assoc.id + " to topicmap " + self.get_id() +
+            throw "TopicmapViewmodelError: can't add association " + assoc.id + " to topicmap " + topicmap_id +
                 " because a player topic is missing (player IDs=" + assoc.role_1.topic_id + ", " +
                 assoc.role_2.topic_id + ")"
         }

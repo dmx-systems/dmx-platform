@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.PluginContext;
+import de.deepamehta.core.service.AccessControlException;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.EventListener;
@@ -67,8 +68,8 @@ class EventManager {
     // ---
 
     /**
-     * Checks weather the given plugin is a listener for the given event, and if so, delivers the event to the plugin.
-     * Otherwise nothing is performed.
+     * Delivers an event to a particular plugin.
+     * If the plugin is not a listener for that event nothing is performed.
      */
     void deliverEvent(PluginImpl plugin, DeepaMehtaEvent event, Object... params) {
         PluginContext pluginContext = plugin.getContext();
@@ -80,8 +81,10 @@ class EventManager {
     }
 
     /**
-     * Convenience method to check weather the specified plugin is a listener for the given event, and if so,
-     * delivers the event to the plugin. Otherwise nothing is performed.
+     * Delivers an event to a particular plugin.
+     * If the plugin is not a listener for that event nothing is performed.
+     * <p>
+     * Convenience method that takes a plugin URI.
      */
     void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
         deliverEvent((PluginImpl) dms.getPlugin(pluginUri), event, params);
@@ -96,6 +99,10 @@ class EventManager {
             // Note: a WebApplicationException thrown by a event listener must reach Jersey. So we re-throw here.
             // This allow plugins to produce specific HTTP responses by throwing a WebApplicationException.
             // Consider the Caching plugin: it produces a possible 304 (Not Modified) response this way.
+            throw e;
+        } catch (AccessControlException e) {
+            // Note: an AccessControlException thrown by a event listener must reach the caller in order to
+            // recover.
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Processing event " + event + " by " + listener + " failed", e);

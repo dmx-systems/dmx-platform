@@ -26,6 +26,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.AccessControlException;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
@@ -453,12 +454,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postGetTopic(Topic topic) {
-        hasPermission(getUsername(), Operation.READ, topic);
+        checkReadPermission(topic);
     }
 
     @Override
     public void postGetAssociation(Association assoc) {
-        // ### TODO
+        checkReadPermission(assoc);
     }
 
     // ---
@@ -902,6 +903,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Determine Permissions ===
 
+    private void checkReadPermission(DeepaMehtaObject object) {
+        String username = getUsername();
+        if (!hasPermission(username, Operation.READ, object)) {
+            throw new AccessControlException(userInfo(username) + " has no READ permission for " + info(object));
+        }
+    }
+
+    // ---
+
     /**
      * Checks if a user is permitted to perform an operation on an object (topic or association).
      * If so, <code>true</code> is returned.
@@ -910,42 +920,58 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
         try {
-            Topic workspace = wsService.getAssignedWorkspace(object);
+            // ### TODO: remove endless recursion when checking the permission for these types
+            if (operation == Operation.READ && (object.getTypeUri().equals("dm4.workspaces.workspace")   ||
+                                                object.getTypeUri().equals("dm4.accesscontrol.username") ||
+                                                object.getTypeUri().equals("dm4.topicmaps.topicmap")     ||
+                                                object.getTypeUri().equals("dm4.core.topic_type")        ||
+                                                object.getTypeUri().equals("dm4.webclient.view_config"))) {
+                return true;    // ### FIXME
+            }
             //
-            if (workspace == null) {
-                switch (operation) {
-                case READ:
-                    logger.warning(info(object) + " has no workspace assignment -- READ permission is granted");
-                    return true;
-                case WRITE:
-                    logger.warning(info(object) + " has no workspace assignment -- WRITE permission is refused");
-                    return false;
-                case CREATE:
-                    return true;    // ### TODO
-                default:
-                    throw new RuntimeException(operation + " is an unsupported operation");
+            Topic workspace;
+            if (object.getTypeUri().equals("dm4.workspaces.workspace")) {
+                workspace = (Topic) object;
+            } else {
+                workspace = wsService.getAssignedWorkspace(object);
+                //
+                if (workspace == null) {
+                    switch (operation) {
+                    case READ:
+                        logger.warning(info(object) + " has no workspace assignment -- READ permission is granted");
+                        return true;
+                    case WRITE:
+                        logger.warning(info(object) + " has no workspace assignment -- WRITE permission is refused");
+                        return false;
+                    case CREATE:
+                        return true;    // ### TODO
+                    default:
+                        throw new RuntimeException(operation + " is an unsupported operation");
+                    }
                 }
             }
             //
-            WorkspaceType workspaceType = workspaceType(workspace);
-            logger.info("##### " + info(object) + " is assigned to a " + workspaceType + " workspace (" + workspace +
-                ")");
-            //
-            switch (operation) {
-            case READ:
-                return hasReadPermission(username, workspace);
-            case WRITE:
-                return hasWritePermission(username, workspace);
-            case CREATE:
-                return true;    // ### TODO
-            default:
-                throw new RuntimeException(operation + " is an unsupported operation");
-            }
+            return _hasPermission(username, operation, workspace);
         } catch (Exception e) {
             throw new RuntimeException("Checking permission for " + info(object) + " failed (" +
                 userInfo(username) + ", operation=" + operation + ")", e);
         }
     }
+
+    private boolean _hasPermission(String username, Operation operation, Topic workspace) {
+        switch (operation) {
+        case READ:
+            return hasReadPermission(username, workspace);
+        case WRITE:
+            return hasWritePermission(username, workspace);
+        case CREATE:
+            return true;    // ### TODO
+        default:
+            throw new RuntimeException(operation + " is an unsupported operation");
+        }
+    }
+
+    // ---
 
     /**
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
@@ -989,11 +1015,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
     private boolean isWorkspaceOwner(String username, Topic workspace) {
         return username != null && userIsOwner(username, workspace);
     }
-
-    // ---
 
     private WorkspaceType workspaceType(Topic workspace) {
         try {

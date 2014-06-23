@@ -8,7 +8,7 @@
                 {
                     "type_uri": "dm4.webclient.view_config",
                     "composite": {
-                        "dm4.webclient.color": "#e68f45"
+                        "dm4.webclient.color": "#f69949"
                     }
                 }
             ]
