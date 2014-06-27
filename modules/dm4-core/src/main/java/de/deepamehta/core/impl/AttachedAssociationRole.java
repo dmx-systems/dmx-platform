@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationRole;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.AssociationRoleModel;
 
 
@@ -21,11 +22,20 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
 
 
-    // === Implementation of the abstract methods ===
+    // === Role Implementation ===
 
     @Override
-    void storeRoleTypeUri() {
-        dms.storageDecorator.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
+    public DeepaMehtaObject getPlayer() {
+        return dms.getAssociation(getPlayerId(), false);    // fetchComposite=false
+    }
+
+
+
+    // === AssociationRole Implementation ===
+
+    @Override
+    public Association getAssociation() {
+        return (Association) getPlayer();
     }
 
 

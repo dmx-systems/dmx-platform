@@ -1,23 +1,21 @@
 package de.deepamehta.core;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.RoleModel;
-import org.codehaus.jettison.json.JSONObject;
 
 
 
 public interface Role extends JSONEnabled {
 
+    String getRoleTypeUri();
+
     long getPlayerId();
 
-    String getRoleTypeUri();
+    DeepaMehtaObject getPlayer();
 
     // ---
 
     void setRoleTypeUri(String roleTypeUri);
-
-    // ---
-
-    Association getAssociation();
 
     // ---
 

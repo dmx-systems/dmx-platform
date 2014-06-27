@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.SimpleValue;
@@ -29,6 +30,19 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
 
 
+    // === Role Implementation ===
+
+    @Override
+    public DeepaMehtaObject getPlayer() {
+        if (topicIdentifiedByUri()) {
+            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false);  // fetchComposite=false
+        } else {
+            return dms.getTopic(getPlayerId(), false);                          // fetchComposite=false
+        }
+    }
+
+
+
     // === TopicRole Implementation ===
 
     @Override
@@ -45,20 +59,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     @Override
     public Topic getTopic() {
-        if (topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false);  // fetchComposite=false
-        } else {
-            return dms.getTopic(getPlayerId(), false);                          // fetchComposite=false
-        }
-    }
-
-
-
-    // === Implementation of the abstract methods ===
-
-    @Override
-    void storeRoleTypeUri() {
-        dms.storageDecorator.storeRoleTypeUri(getAssociation().getId(), getPlayerId(), getRoleTypeUri());
+        return (Topic) getPlayer();
     }
 
 

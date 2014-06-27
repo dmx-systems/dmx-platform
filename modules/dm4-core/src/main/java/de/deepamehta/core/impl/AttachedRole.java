@@ -13,7 +13,7 @@ abstract class AttachedRole implements Role {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private RoleModel model;
-    private Association assoc;
+    private Association assoc;  // the association this role is involved in
 
     protected final EmbeddedService dms;
 
@@ -32,14 +32,16 @@ abstract class AttachedRole implements Role {
     // === Role Implementation ===
 
     @Override
+    public String getRoleTypeUri() {
+        return model.getRoleTypeUri();
+    }
+
+    @Override
     public long getPlayerId() {
         return model.getPlayerId();
     }
 
-    @Override
-    public String getRoleTypeUri() {
-        return model.getRoleTypeUri();
-    }
+    // Note: getPlayer() remains abstract
 
     // ---
 
@@ -48,14 +50,7 @@ abstract class AttachedRole implements Role {
         // update memory
         model.setRoleTypeUri(roleTypeUri);
         // update DB
-        storeRoleTypeUri();     // abstract
-    }
-
-    // ---
-
-    @Override
-    public Association getAssociation() {
-        return assoc;
+        storeRoleTypeUri();
     }
 
     // ---
@@ -72,7 +67,9 @@ abstract class AttachedRole implements Role {
         return getModel().toJSON();
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
-    abstract void storeRoleTypeUri();
+    private void storeRoleTypeUri() {
+        dms.storageDecorator.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
+    }
 }
