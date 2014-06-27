@@ -27,6 +27,12 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
+    DeepaMehtaObject getPlayer1();
+
+    DeepaMehtaObject getPlayer2();
+
+    // ---
+
     /**
      * @teturn  this association's topic which plays the given role.
      *          If there is no such topic, null is returned.

@@ -586,12 +586,11 @@ public class PluginImpl implements Plugin, EventHandler {
         List<DeepaMehtaEvent> events = getEvents();
         //
         if (events.size() == 0) {
-            logger.info("Registering event listeners of " + this + " at DeepaMehta 4 core service ABORTED " +
-                "-- no event listeners implemented");
+            logger.info("Registering event listeners of " + this + " ABORTED -- no event listeners implemented");
             return;
         }
         //
-        logger.info("Registering " + events.size() + " event listeners of " + this + " at DeepaMehta 4 core service");
+        logger.info("Registering " + events.size() + " event listeners of " + this);
         for (DeepaMehtaEvent event : events) {
             dms.eventManager.addListener(event, (EventListener) pluginContext);
         }
@@ -603,7 +602,7 @@ public class PluginImpl implements Plugin, EventHandler {
             return;
         }
         //
-        logger.info("Unregistering event listeners of " + this + " at DeepaMehta 4 core service");
+        logger.info("Unregistering event listeners of " + this);
         for (DeepaMehtaEvent event : events) {
             dms.eventManager.removeListener(event, (EventListener) pluginContext);
         }

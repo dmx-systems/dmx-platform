@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
@@ -150,6 +151,18 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public Role getRole2() {
         return role2;
+    }
+
+    // ---
+
+    @Override
+    public DeepaMehtaObject getPlayer1() {
+        return getRole1().getPlayer();
+    }
+
+    @Override
+    public DeepaMehtaObject getPlayer2() {
+        return getRole2().getPlayer();
     }
 
     // ---
