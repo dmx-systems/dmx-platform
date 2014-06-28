@@ -1,24 +1,23 @@
 package de.deepamehta.plugins.workspaces.service;
 
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.service.PluginService;
-
-import java.util.List;
 
 
 
 public interface WorkspacesService extends PluginService {
 
     /**
-     * Returns the workspace the specified object is assigned to.
+     * Returns the workspace a topic or association is assigned to.
      *
-     * @return  The assigned workspace (a topic of type "Workspace" / "dm4.workspaces.workspace"),
+     * @param   id  a topic ID, or an association ID
+     *
+     * @return  The assigned workspace (a "Workspace" topic, including its child topics),
      *          or <code>null</code> if no workspace is assigned.
      */
-    Topic getAssignedWorkspace(DeepaMehtaObject object);
+    Topic getAssignedWorkspace(long id);
 
     /**
      * Checks weather the specified topic is assigned to the specified workspace
@@ -30,7 +29,7 @@ public interface WorkspacesService extends PluginService {
     /**
      * Fetches the default workspace ("DeepaMehta").
      *
-     * @return  The default workspace (a topic of type "Workspace" / "dm4.workspaces.workspace"),
+     * @return  The default workspace (a topic of type "Workspace"),
      *          or <code>null</code> if it doesn't exist.
      *          Note: the default workspace is NOT required to exist ### TODO: think about it
      */
@@ -50,7 +49,8 @@ public interface WorkspacesService extends PluginService {
 
     // ---
 
-    Topic createWorkspace(String name);
-
-    Topic createWorkspace(String name, String uri);
+    /**
+     * @param   uri     may be null
+     */
+    Topic createWorkspace(String name, String uri, String workspaceTypeUri);
 }

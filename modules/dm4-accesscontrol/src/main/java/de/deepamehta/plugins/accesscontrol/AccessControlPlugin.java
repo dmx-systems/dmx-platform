@@ -123,7 +123,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER)
     );
 
-    // Property names
+    // Property URIs
     private static String URI_CREATOR = "dm4.accesscontrol.creator";
     private static String URI_OWNER = "dm4.accesscontrol.owner";
     private static String URI_ACL = "dm4.accesscontrol.acl";
@@ -631,7 +631,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String operation = "Assigning the default topicmap (\"untitled\") to the default workspace (\"DeepaMehta\")";
         try {
             // abort if already assigned
-            Topic workspace = wsService.getAssignedWorkspace(defaultTopicmap);
+            Topic workspace = wsService.getAssignedWorkspace(defaultTopicmap.getId());
             if (workspace != null) {
                 logger.info("### Assigning the default topicmap (\"untitled\") to a workspace ABORTED -- " +
                     "already assigned to workspace \"" + workspace.getSimpleValue() + "\"");
@@ -933,7 +933,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             if (object.getTypeUri().equals("dm4.workspaces.workspace")) {
                 workspace = (Topic) object;
             } else {
-                workspace = wsService.getAssignedWorkspace(object);
+                workspace = wsService.getAssignedWorkspace(object.getId());
                 //
                 if (workspace == null) {
                     switch (operation) {

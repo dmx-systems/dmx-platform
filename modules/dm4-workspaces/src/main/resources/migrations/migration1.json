@@ -48,7 +48,7 @@
             "assoc_defs": [
                 {
                     "child_type_uri":         "dm4.workspaces.workspace",
-                    "child_cardinality_uri":  "dm4.core.many",
+                    "child_cardinality_uri":  "dm4.core.many",      ### TODO: change to "one"
                     "parent_cardinality_uri": "dm4.core.many",
                     "assoc_type_uri":         "dm4.core.aggregation_def"
                 }
