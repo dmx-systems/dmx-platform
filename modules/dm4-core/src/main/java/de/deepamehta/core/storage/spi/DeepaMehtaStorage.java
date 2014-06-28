@@ -179,9 +179,9 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
-    Object fetchTopicProperty(long topicId, String propUri);
+    Object fetchProperty(long id, String propUri);
 
-    Object fetchAssociationProperty(long assocId, String propUri);
+    boolean hasProperty(long id, String propUri);
 
     // ---
 
@@ -198,12 +198,6 @@ public interface DeepaMehtaStorage {
     void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex);
 
     void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex);
-
-    // ---
-
-    boolean hasTopicProperty(long topicId, String propUri);
-
-    boolean hasAssociationProperty(long assocId, String propUri);
 
     // ---
 

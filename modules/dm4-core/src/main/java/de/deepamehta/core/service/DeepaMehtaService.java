@@ -38,7 +38,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    Topic getTopic(long id, boolean fetchComposite);
+    Topic getTopic(long topicId, boolean fetchComposite);
 
     /**
      * Looks up a single topic by exact value.
@@ -190,6 +190,18 @@ public interface DeepaMehtaService {
 
 
     // === Properties ===
+
+    /**
+     * @param   id  a topic ID, or an association ID
+     */
+    Object getProperty(long id, String propUri);
+
+    /**
+     * @param   id  a topic ID, or an association ID
+     */
+    boolean hasProperty(long id, String propUri);
+
+    // ---
 
     List<Topic> getTopicsByProperty(String propUri, Object propValue);
 

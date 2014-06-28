@@ -420,13 +420,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Properties ===
 
     @Override
-    public Object fetchTopicProperty(long topicId, String propUri) {
-        return fetchTopicNode(topicId).getProperty(propUri);
+    public Object fetchProperty(long id, String propUri) {
+        return fetchNode(id).getProperty(propUri);
     }
 
     @Override
-    public Object fetchAssociationProperty(long assocId, String propUri) {
-        return fetchAssociationNode(assocId).getProperty(propUri);
+    public boolean hasProperty(long id, String propUri) {
+        return fetchNode(id).hasProperty(propUri);
     }
 
     // ---
@@ -463,18 +463,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     public void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
         Index<Node> exactIndex = addToIndex ? assocContentExact : null;
         storeAndIndexExactValue(fetchAssociationNode(assocId), propUri, propValue, exactIndex);
-    }
-
-    // ---
-
-    @Override
-    public boolean hasTopicProperty(long topicId, String propUri) {
-        return fetchTopicNode(topicId).hasProperty(propUri);
-    }
-
-    @Override
-    public boolean hasAssociationProperty(long assocId, String propUri) {
-        return fetchAssociationNode(assocId).hasProperty(propUri);
     }
 
     // ---

@@ -139,9 +139,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     Object getProperty(String propUri);
 
-    void setProperty(String propUri, Object propValue, boolean addToIndex);
-
     boolean hasProperty(String propUri);
+
+    void setProperty(String propUri, Object propValue, boolean addToIndex);
 
     void removeProperty(String propUri);
 }

@@ -267,8 +267,26 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- Association Retrieval ---
 
     // Note: these methods are implemented in the subclasses (this is an abstract class):
-    //     getAssociation(...);
-    //     getAssociations();
+    //     getAssociation(...)
+    //     getAssociations()
+
+
+
+    // === Properties ===
+
+    @Override
+    public Object getProperty(String propUri) {
+        return dms.getProperty(getId(), propUri);
+    }
+
+    @Override
+    public boolean hasProperty(String propUri) {
+        return dms.hasProperty(getId(), propUri);
+    }
+
+    // Note: these methods are implemented in the subclasses:
+    //     setProperty(...)
+    //     removeProperty(...)
 
 
 

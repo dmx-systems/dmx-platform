@@ -162,18 +162,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Properties ===
 
     @Override
-    public Object getProperty(String propUri) {
-        return dms.storageDecorator.fetchTopicProperty(getId(), propUri);
-    }
-
-    @Override
     public void setProperty(String propUri, Object propValue, boolean addToIndex) {
         dms.storageDecorator.storeTopicProperty(getId(), propUri, propValue, addToIndex);
-    }
-
-    @Override
-    public boolean hasProperty(String propUri) {
-        return dms.storageDecorator.hasTopicProperty(getId(), propUri);
     }
 
     @Override

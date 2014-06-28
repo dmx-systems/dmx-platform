@@ -546,12 +546,12 @@ public class StorageDecorator {
 
     // === Properties ===
 
-    Object fetchTopicProperty(long topicId, String propUri) {
-        return storage.fetchTopicProperty(topicId, propUri);
+    Object fetchProperty(long id, String propUri) {
+        return storage.fetchProperty(id, propUri);
     }
 
-    Object fetchAssociationProperty(long assocId, String propUri) {
-        return storage.fetchAssociationProperty(assocId, propUri);
+    boolean hasProperty(long id, String propUri) {
+        return storage.hasProperty(id, propUri);
     }
 
     // ---
@@ -580,16 +580,6 @@ public class StorageDecorator {
 
     void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
         storage.storeAssociationProperty(assocId, propUri, propValue, addToIndex);
-    }
-
-    // ---
-
-    boolean hasTopicProperty(long topicId, String propUri) {
-        return storage.hasTopicProperty(topicId, propUri);
-    }
-
-    boolean hasAssociationProperty(long assocId, String propUri) {
-        return storage.hasAssociationProperty(assocId, propUri);
     }
 
     // ---
@@ -632,7 +622,7 @@ public class StorageDecorator {
     // ---
 
     int fetchMigrationNr() {
-        return (Integer) storage.fetchTopicProperty(0, "core_migration_nr");
+        return (Integer) storage.fetchProperty(0, "core_migration_nr");
     }
 
     void storeMigrationNr(int migrationNr) {

@@ -597,6 +597,18 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Properties ===
 
     @Override
+    public Object getProperty(long id, String propUri) {
+        return storageDecorator.fetchProperty(id, propUri);
+    }
+
+    @Override
+    public boolean hasProperty(long id, String propUri) {
+        return storageDecorator.hasProperty(id, propUri);
+    }
+
+    // ---
+
+    @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
         return instantiateTopics(storageDecorator.fetchTopicsByProperty(propUri, propValue), false);
             // fetchComposite=false
