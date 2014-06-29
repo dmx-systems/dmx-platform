@@ -223,8 +223,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
                                                                          String othersRoleTypeUri) {
         RelatedAssociationModel assoc = dms.storageDecorator.fetchAssociationRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, null); // othersAssocTypeUri=null
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc, false, false) : null; 
-                                                                   // fetchComposite=false, fetchRelatingComposite=false
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc, false, false, true) : null; 
+        // fetchComposite=false, fetchRelatingComposite=false, checkAccess=true
     }
 
 
@@ -255,7 +255,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
                                                                                    long othersTopicId) {
         AssociationModel assoc = dms.storageDecorator.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
             othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
-        return assoc != null ? dms.instantiateAssociation(assoc, false) : null;     // fetchComposite=false
+        return assoc != null ? dms.instantiateAssociation(assoc, false, true) : null;   // fetchComposite=false
+                                                                                        // checkAccess=true
     }
 
     @Override

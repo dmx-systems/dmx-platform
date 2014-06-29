@@ -108,7 +108,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                     boolean fetchComposite, boolean fetchRelatingComposite) {
         RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(), assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc, fetchComposite, fetchRelatingComposite) : null;
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc, fetchComposite, fetchRelatingComposite, true)
+            : null;     // checkAccess=true
     }
 
     @Override
@@ -148,13 +149,14 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                                                    long othersTopicId) {
         AssociationModel assoc = dms.storageDecorator.fetchAssociation(assocTypeUri, getId(), othersTopicId,
             myRoleTypeUri, othersRoleTypeUri);
-        return assoc != null ? dms.instantiateAssociation(assoc, false) : null;     // fetchComposite=false
+        return assoc != null ? dms.instantiateAssociation(assoc, false, true) : null;   // fetchComposite=false
+                                                                                        // checkAccess=true
     }
 
     @Override
     public List<Association> getAssociations() {
         return dms.instantiateAssociations(dms.storageDecorator.fetchTopicAssociations(getId()), false);
-                                                                                    // fetchComposite=false
+                                                                                        // fetchComposite=false
     }
 
 

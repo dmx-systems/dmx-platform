@@ -244,7 +244,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                                                 boolean fetchRelatingComposite) {
         RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         // fetchRelatedTopic() is abstract
-        return topic != null ? dms.instantiateRelatedTopic(topic, fetchComposite, fetchRelatingComposite) : null;
+        return topic != null ? dms.instantiateRelatedTopic(topic, fetchComposite, fetchRelatingComposite, true) : null;
+        // checkAccess=true
     }
 
     @Override

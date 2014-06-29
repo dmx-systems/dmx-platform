@@ -38,9 +38,9 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
-import de.deepamehta.core.service.event.PostGetAssociationListener;
-import de.deepamehta.core.service.event.PostGetTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreGetAssociationListener;
+import de.deepamehta.core.service.event.PreGetTopicListener;
 import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
 import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -82,8 +82,8 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
-                                                                                       PostGetTopicListener,
-                                                                                       PostGetAssociationListener,
+                                                                                       PreGetTopicListener,
+                                                                                       PreGetAssociationListener,
                                                                                        PostCreateTopicListener,
                                                                                        PostCreateAssociationListener,
                                                                                        PostUpdateTopicListener,
@@ -453,13 +453,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void postGetTopic(Topic topic) {
-        checkReadPermission(topic);
+    public void preGetTopic(long topicId) {
+        checkReadPermission(topicId);
     }
 
     @Override
-    public void postGetAssociation(Association assoc) {
-        checkReadPermission(assoc);
+    public void preGetAssociation(long assocId) {
+        checkReadPermission(assocId);
     }
 
     // ---
@@ -903,10 +903,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Determine Permissions ===
 
-    private void checkReadPermission(DeepaMehtaObject object) {
+    /**
+     * @param   objectId    a topic ID, or an association ID
+     */
+    private void checkReadPermission(long objectId) {
         String username = getUsername();
-        if (!hasPermission(username, Operation.READ, object)) {
-            throw new AccessControlException(userInfo(username) + " has no READ permission for " + info(object));
+        if (!hasPermission(username, Operation.READ, objectId)) {
+            throw new AccessControlException(userInfo(username) + " has no READ permission for object " + objectId);
         }
     }
 
@@ -917,31 +920,36 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * If so, <code>true</code> is returned.
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     * @param   objectId    a topic ID, or an association ID.
      */
-    private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
+    private boolean hasPermission(String username, Operation operation, long objectId) {
+        String typeUri = null;
         try {
+            typeUri = typeUri(objectId);
             // ### TODO: remove endless recursion when checking the permission for these types
-            if (operation == Operation.READ && (object.getTypeUri().equals("dm4.workspaces.workspace")   ||
-                                                object.getTypeUri().equals("dm4.accesscontrol.username") ||
-                                                object.getTypeUri().equals("dm4.topicmaps.topicmap")     ||
-                                                object.getTypeUri().equals("dm4.core.topic_type")        ||
-                                                object.getTypeUri().equals("dm4.webclient.view_config"))) {
+            if (operation == Operation.READ && (typeUri.equals("dm4.workspaces.workspace")   ||
+                                                typeUri.equals("dm4.topicmaps.topicmap")     ||
+                                                typeUri.equals("dm4.core.topic_type")        ||
+                                                typeUri.equals("dm4.webclient.view_config"))) {
+                                                // typeUri.equals("dm4.accesscontrol.username") ||
                 return true;    // ### FIXME
             }
             //
             Topic workspace;
-            if (object.getTypeUri().equals("dm4.workspaces.workspace")) {
-                workspace = (Topic) object;
+            if (typeUri.equals("dm4.workspaces.workspace")) {
+                workspace = dms.getTopic(objectId, true);   // fetchComposite=true
             } else {
-                workspace = wsService.getAssignedWorkspace(object.getId());
+                workspace = wsService.getAssignedWorkspace(objectId);
                 //
                 if (workspace == null) {
                     switch (operation) {
                     case READ:
-                        logger.warning(info(object) + " has no workspace assignment -- READ permission is granted");
+                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
+                            "\") has no workspace assignment -- READ permission is granted");
                         return true;
                     case WRITE:
-                        logger.warning(info(object) + " has no workspace assignment -- WRITE permission is refused");
+                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
+                            "\") has no workspace assignment -- WRITE permission is refused");
                         return false;
                     case CREATE:
                         return true;    // ### TODO
@@ -953,8 +961,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             //
             return _hasPermission(username, operation, workspace);
         } catch (Exception e) {
-            throw new RuntimeException("Checking permission for " + info(object) + " failed (" +
-                userInfo(username) + ", operation=" + operation + ")", e);
+            throw new RuntimeException("Checking permission for object " + objectId + " (typeUri=\"" + typeUri +
+                "\") failed (" + userInfo(username) + ", operation=" + operation + ")", e);
         }
     }
 
@@ -1030,16 +1038,22 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
+    private String typeUri(long objectId) {
+        return (String) dms.getProperty(objectId, "type_uri");
+    }
+
     // ########## Legacy code follows ...
 
     private Permissions getPermissions(DeepaMehtaObject object) {
-        return createPermissions(hasPermission(getUsername(), Operation.WRITE, object));
+        return createPermissions(hasPermission(getUsername(), Operation.WRITE, object.getId()));
     }
 
     private Permissions getPermissions(Type type) {
         String username = getUsername();
-        return createPermissions(hasPermission(username, Operation.WRITE, type),
-                                 hasPermission(username, Operation.CREATE, type));
+        return createPermissions(hasPermission(username, Operation.WRITE, type.getId()),
+                                 hasPermission(username, Operation.CREATE, type.getId()));
     }
 
     // ---

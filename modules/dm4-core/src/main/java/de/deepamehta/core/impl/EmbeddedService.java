@@ -93,8 +93,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic getTopic(long topicId, boolean fetchComposite) {
+        fireEvent(CoreEvent.PRE_GET_TOPIC, topicId);     // throws AccessControlException
         try {
-            return instantiateTopic(storageDecorator.fetchTopic(topicId), fetchComposite);
+            return instantiateTopic(storageDecorator.fetchTopic(topicId), fetchComposite, false);   // checkAccess=false
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -104,7 +105,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Topic getTopic(String key, SimpleValue value, boolean fetchComposite) {
         try {
             TopicModel topic = storageDecorator.fetchTopic(key, value);
-            return topic != null ? instantiateTopic(topic, fetchComposite) : null;
+            return topic != null ? instantiateTopic(topic, fetchComposite, true) : null;            // checkAccess=true
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -211,8 +212,10 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Association getAssociation(long assocId, boolean fetchComposite) {
         logger.info("assocId=" + assocId + ", fetchComposite=" + fetchComposite);
+        fireEvent(CoreEvent.PRE_GET_ASSOCIATION, assocId);      // throws AccessControlException
         try {
-            return instantiateAssociation(storageDecorator.fetchAssociation(assocId), fetchComposite);
+            return instantiateAssociation(storageDecorator.fetchAssociation(assocId), fetchComposite, false);
+            // checkAccess=false
         } catch (Exception e) {
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
         }
@@ -228,7 +231,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             AssociationModel assoc = storageDecorator.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1,
                 roleTypeUri2);
-            return assoc != null ? instantiateAssociation(assoc, fetchComposite) : null;
+            return assoc != null ? instantiateAssociation(assoc, fetchComposite, true) : null;  // checkAccess=true
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -245,7 +248,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             AssociationModel assoc = storageDecorator.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
                 topicId, assocId, topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? instantiateAssociation(assoc, fetchComposite) : null;
+            return assoc != null ? instantiateAssociation(assoc, fetchComposite, true) : null;  // checkAccess=true
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -357,7 +360,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public List<String> getTopicTypeUris() {
         try {
             Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
-                new SimpleValue("dm4.core.topic_type")), false);
+                new SimpleValue("dm4.core.topic_type")), false, false);     // fetchComposite=false, checkAccess=false
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type", false, false, 0);
             List<String> topicTypeUris = new ArrayList();
@@ -467,7 +470,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public List<String> getAssociationTypeUris() {
         try {
             Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
-                new SimpleValue("dm4.core.assoc_type")), false);
+                new SimpleValue("dm4.core.assoc_type")), false, false);     // fetchComposite=false, checkAccess=false
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type", false, false, 0);
             List<String> assocTypeUris = new ArrayList();
@@ -710,21 +713,17 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to a topic model fetched from storage layer.
      * Optionally fetches the topic's composite value from storage layer.
      */
-    Topic instantiateTopic(TopicModel model, boolean fetchComposite) {
+    Topic instantiateTopic(TopicModel model, boolean fetchComposite, boolean checkAccess) {
+        checkAccess(model, checkAccess);
         fetchCompositeValue(model, fetchComposite);
-        Topic topic = new AttachedTopic(model, this);
-        //
-        fireEvent(CoreEvent.POST_GET_TOPIC, topic);     // throws AccessControlException
-        // ### TODO: Optimization. Load the composite value after firing the event
-        //
-        return topic;
+        return new AttachedTopic(model, this);
     }
 
     private List<Topic> instantiateTopics(List<TopicModel> models, boolean fetchComposite) {
         List<Topic> topics = new ArrayList();
         for (TopicModel model : models) {
             try {
-                topics.add(instantiateTopic(model, fetchComposite));
+                topics.add(instantiateTopic(model, fetchComposite, true));      // checkAccess=true
             } catch (AccessControlException e) {
                 // don't add topic to result and continue
             }
@@ -735,14 +734,11 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model, boolean fetchComposite,
-                                                                  boolean fetchRelatingComposite) {
+                                                                  boolean fetchRelatingComposite,
+                                                                  boolean checkAccess) {
+        checkAccess(model, checkAccess);
         fetchCompositeValue(model, fetchComposite, fetchRelatingComposite);
-        RelatedTopic topic = new AttachedRelatedTopic(model, this);
-        //
-        fireEvent(CoreEvent.POST_GET_TOPIC, topic);     // throws AccessControlException
-        // ### TODO: Optimization. Load the composite value after firing the event
-        //
-        return topic;
+        return new AttachedRelatedTopic(model, this);
     }
 
     ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models,
@@ -750,7 +746,8 @@ public class EmbeddedService implements DeepaMehtaService {
         List<RelatedTopic> relTopics = new ArrayList();
         for (RelatedTopicModel model : models) {
             try {
-                relTopics.add(instantiateRelatedTopic(model, fetchComposite, fetchRelatingComposite));
+                relTopics.add(instantiateRelatedTopic(model, fetchComposite, fetchRelatingComposite, true));
+                // checkAccess=true
             } catch (AccessControlException e) {
                 // don't add topic to result and continue
             }
@@ -764,23 +761,19 @@ public class EmbeddedService implements DeepaMehtaService {
      * Attaches this core service to an association model fetched from storage layer.
      * Optionally fetches the association's composite value from storage layer.
      */
-    Association instantiateAssociation(AssociationModel model, boolean fetchComposite) {
+    Association instantiateAssociation(AssociationModel model, boolean fetchComposite, boolean checkAccess) {
+        checkAccess(model, checkAccess);
         fetchCompositeValue(model, fetchComposite);
-        Association assoc = new AttachedAssociation(model, this);
-        //
-        fireEvent(CoreEvent.POST_GET_ASSOCIATION, assoc);   // throws AccessControlException
-        // ### TODO: Optimization. Load the composite value after firing the event
-        //
-        return assoc;
+        return new AttachedAssociation(model, this);
     }
 
     List<Association> instantiateAssociations(List<AssociationModel> models, boolean fetchComposite) {
         List<Association> assocs = new ArrayList();
         for (AssociationModel model : models) {
             try {
-                assocs.add(instantiateAssociation(model, fetchComposite));
+                assocs.add(instantiateAssociation(model, fetchComposite, true));    // checkAccess=true
             } catch (AccessControlException e) {
-                // don't add topic to result and continue
+                // don't add association to result and continue
             }
         }
         return assocs;
@@ -789,17 +782,14 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model, boolean fetchComposite,
-                                                                                    boolean fetchRelatingComposite) {
+                                                                                    boolean fetchRelatingComposite,
+                                                                                    boolean checkAccess) {
+        checkAccess(model, checkAccess);
         if (fetchComposite || fetchRelatingComposite) {
             // ### TODO
             throw new RuntimeException("not yet implemented");
         }
-        RelatedAssociation assoc = new AttachedRelatedAssociation(model, this);
-        //
-        fireEvent(CoreEvent.POST_GET_ASSOCIATION, assoc);   // throws AccessControlException
-        // ### TODO: Optimization. Load the composite value after firing the event
-        //
-        return assoc;
+        return new AttachedRelatedAssociation(model, this);
     }
 
     List<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models,
@@ -807,15 +797,30 @@ public class EmbeddedService implements DeepaMehtaService {
         List<RelatedAssociation> relAssocs = new ArrayList();
         for (RelatedAssociationModel model : models) {
             try {
-                relAssocs.add(instantiateRelatedAssociation(model, fetchComposite, fetchRelatingComposite));
+                relAssocs.add(instantiateRelatedAssociation(model, fetchComposite, fetchRelatingComposite, true));
+                // checkAccess=true
             } catch (AccessControlException e) {
-                // don't add topic to result and continue
+                // don't add association to result and continue
             }
         }
         return relAssocs;
     }
 
     // ===
+
+    private void checkAccess(TopicModel model, boolean checkAccess) {
+        if (checkAccess) {
+            fireEvent(CoreEvent.PRE_GET_TOPIC, model.getId());          // throws AccessControlException
+        }
+    }
+
+    private void checkAccess(AssociationModel model, boolean checkAccess) {
+        if (checkAccess) {
+            fireEvent(CoreEvent.PRE_GET_ASSOCIATION, model.getId());    // throws AccessControlException
+        }
+    }
+
+    // ---
 
     private void fetchCompositeValue(DeepaMehtaObjectModel model, boolean fetchComposite) {
         if (fetchComposite) {

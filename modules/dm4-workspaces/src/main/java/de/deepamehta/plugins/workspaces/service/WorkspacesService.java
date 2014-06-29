@@ -12,7 +12,7 @@ public interface WorkspacesService extends PluginService {
     /**
      * Returns the workspace a topic or association is assigned to.
      *
-     * @param   id  a topic ID, or an association ID
+     * @param   id      a topic ID, or an association ID
      *
      * @return  The assigned workspace (a "Workspace" topic, including its child topics),
      *          or <code>null</code> if no workspace is assigned.

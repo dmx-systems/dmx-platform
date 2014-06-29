@@ -11,6 +11,9 @@ import java.util.Iterator;
 
 
 
+/**
+ * An iterable over all topics stored in the DB.
+ */
 class TopicIterable implements Iterable<Topic> {
 
     private Iterator<Topic> topics;
@@ -25,6 +28,9 @@ class TopicIterable implements Iterable<Topic> {
     }
 }
 
+/**
+ * An iterable over all associations stored in the DB.
+ */
 class AssociationIterable implements Iterable<Association> {
 
     private Iterator<Association> assocs;
@@ -58,7 +64,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
     @Override
     Topic instantiateObject(TopicModel model) {
-        return dms.instantiateTopic(model, false);          // fetchComnposite=false
+        return dms.instantiateTopic(model, false, true);            // fetchComnposite=false, checkAccess=true
     }
 }
 
@@ -77,13 +83,13 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModel> 
 
     @Override
     Association instantiateObject(AssociationModel model) {
-        return dms.instantiateAssociation(model, false);    // fetchComnposite=false
+        return dms.instantiateAssociation(model, false, true);      // fetchComnposite=false, checkAccess=true
     }
 }
 
 
 
-abstract class ObjectIterator<E extends DeepaMehtaObject, M extends DeepaMehtaObjectModel> implements Iterator<E> {
+abstract class ObjectIterator<O extends DeepaMehtaObject, M extends DeepaMehtaObjectModel> implements Iterator<O> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -105,7 +111,7 @@ abstract class ObjectIterator<E extends DeepaMehtaObject, M extends DeepaMehtaOb
     }
 
     @Override
-    public E next() {
+    public O next() {
         return instantiateObject(objects.next());
     }
 
@@ -118,5 +124,5 @@ abstract class ObjectIterator<E extends DeepaMehtaObject, M extends DeepaMehtaOb
 
     abstract Iterator<M> fetchObjects();
 
-    abstract E instantiateObject(M model);
+    abstract O instantiateObject(M model);
 }
