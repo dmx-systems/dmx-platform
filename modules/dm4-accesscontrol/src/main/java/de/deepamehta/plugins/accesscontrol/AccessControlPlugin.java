@@ -460,6 +460,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preGetAssociation(long assocId) {
         checkReadPermission(assocId);
+        //
+        long[] playerIds = dms.getPlayerIds(assocId);
+        checkReadPermission(playerIds[0]);
+        checkReadPermission(playerIds[1]);
     }
 
     // ---
