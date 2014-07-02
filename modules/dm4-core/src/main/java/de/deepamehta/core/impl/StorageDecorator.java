@@ -220,6 +220,10 @@ public class StorageDecorator {
         return storage.fetchAllAssociations();
     }
 
+    long[] fetchPlayerIds(long assocId) {
+        return storage.fetchPlayerIds(assocId);
+    }
+
     // ---
 
     /**

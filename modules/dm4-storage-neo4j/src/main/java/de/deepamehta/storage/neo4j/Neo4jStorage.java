@@ -245,6 +245,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return new AssociationModelIterator(this);
     }
 
+    @Override
+    public long[] fetchPlayerIds(long assocId) {
+        List<Relationship> rels = fetchRelationships(fetchAssociationNode(assocId));
+        long[] playerIds = {
+            playerId(rels.get(0)),
+            playerId(rels.get(1))
+        };
+        return playerIds;
+    }
+
     // ---
 
     @Override
@@ -911,8 +921,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     private Relationship fetchRelationship(Node assocNode, long playerId) {
         List<Relationship> rels = fetchRelationships(assocNode);
-        boolean match1 = rels.get(0).getEndNode().getId() == playerId;
-        boolean match2 = rels.get(1).getEndNode().getId() == playerId;
+        boolean match1 = playerId(rels.get(0)) == playerId;
+        boolean match2 = playerId(rels.get(1)) == playerId;
         if (match1 && match2) {
             throw new RuntimeException("Ambiguity: both players have ID " + playerId + " in association " +
                 assocNode.getId());
@@ -938,6 +948,10 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         }
         //
         return rels;
+    }
+
+    private long playerId(Relationship rel) {
+        return rel.getEndNode().getId();
     }
 
     // ---

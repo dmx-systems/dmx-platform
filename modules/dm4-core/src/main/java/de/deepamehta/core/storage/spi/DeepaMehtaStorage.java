@@ -18,7 +18,7 @@ public interface DeepaMehtaStorage {
 
     // === Topics ===
 
-    TopicModel fetchTopic(long id);
+    TopicModel fetchTopic(long topicId);
 
     TopicModel fetchTopic(String key, Object value);
 
@@ -71,7 +71,7 @@ public interface DeepaMehtaStorage {
 
     // === Associations ===
 
-    AssociationModel fetchAssociation(long id);
+    AssociationModel fetchAssociation(long assocId);
 
     List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                                 String roleTypeUri2);
@@ -80,6 +80,8 @@ public interface DeepaMehtaStorage {
                                                                       String topicRoleTypeUri, String assocRoleTypeUri);
 
     Iterator<AssociationModel> fetchAllAssociations();
+
+    long[] fetchPlayerIds(long assocId);
 
     // ---
 
@@ -179,8 +181,14 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
+    /**
+     * @param   id                  id of a topic or an association
+     */
     Object fetchProperty(long id, String propUri);
 
+    /**
+     * @param   id                  id of a topic or an association
+     */
     boolean hasProperty(long id, String propUri);
 
     // ---

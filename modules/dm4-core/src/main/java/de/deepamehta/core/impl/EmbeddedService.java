@@ -293,6 +293,11 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AssociationIterable(this);
     }
 
+    @Override
+    public long[] getPlayerIds(long assocId) {
+        return storageDecorator.fetchPlayerIds(assocId);
+    }
+
     // ---
 
     @Override

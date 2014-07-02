@@ -127,6 +127,8 @@ public interface DeepaMehtaService {
 
     Iterable<Association> getAllAssociations();
 
+    long[] getPlayerIds(long assocId);
+
     // ---
 
     Association createAssociation(AssociationModel model, ClientState clientState);
