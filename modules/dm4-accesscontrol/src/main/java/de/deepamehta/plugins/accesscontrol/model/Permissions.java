@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.accesscontrol.model;
 
 import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;

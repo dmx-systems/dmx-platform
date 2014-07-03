@@ -512,7 +512,7 @@ public class StorageDecorator {
      *          Note: its composite value is not initialized.
      */
     RelatedTopicModel fetchRelatedTopic(long id, String assocTypeUri, String myRoleTypeUri,
-                                               String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                 String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = fetchRelatedTopics(id, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         switch (topics.getSize()) {
@@ -538,7 +538,7 @@ public class StorageDecorator {
      *          Note: their composite values are not initialized.
      */
     ResultList<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
         List<RelatedTopicModel> relTopics = storage.fetchRelatedTopics(id, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         return new ResultList(relTopics.size(), relTopics);

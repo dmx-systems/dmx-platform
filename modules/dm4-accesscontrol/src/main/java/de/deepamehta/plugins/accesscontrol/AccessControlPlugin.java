@@ -5,11 +5,9 @@ import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
 import de.deepamehta.plugins.accesscontrol.model.ACLEntry;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
-import de.deepamehta.plugins.accesscontrol.model.Operation;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.workspaces.WorkspaceType;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
@@ -26,12 +24,13 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.AccessControlException;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.AccessControlException;
+import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -124,9 +123,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     );
 
     // Property URIs
-    private static String URI_CREATOR = "dm4.accesscontrol.creator";
-    private static String URI_OWNER = "dm4.accesscontrol.owner";
-    private static String URI_ACL = "dm4.accesscontrol.acl";
+    private static String PROP_CREATOR = "dm4.accesscontrol.creator";
+    private static String PROP_OWNER   = "dm4.accesscontrol.owner";
+    private static String PROP_ACL     = "dm4.accesscontrol.acl";
 
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
@@ -239,14 +238,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getCreator(DeepaMehtaObject object) {
-        return object.hasProperty(URI_CREATOR) ? (String) object.getProperty(URI_CREATOR) : null;
+        return object.hasProperty(PROP_CREATOR) ? (String) object.getProperty(PROP_CREATOR) : null;
     }
 
     @Override
     public void setCreator(DeepaMehtaObject object, String username) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            object.setProperty(URI_CREATOR, username, true);    // addToIndex=true
+            object.setProperty(PROP_CREATOR, username, true);    // addToIndex=true
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -263,14 +262,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public String getOwner(DeepaMehtaObject object) {
-        return object.hasProperty(URI_OWNER) ? (String) object.getProperty(URI_OWNER) : null;
+        // ### TODO: delegate to Core's AccessControl.owner()?
+        return object.hasProperty(PROP_OWNER) ? (String) object.getProperty(PROP_OWNER) : null;
     }
 
     @Override
     public void setOwner(DeepaMehtaObject object, String username) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            object.setProperty(URI_OWNER, username, true);      // addToIndex=true
+            object.setProperty(PROP_OWNER, username, true);      // addToIndex=true
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -288,8 +288,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public AccessControlList getACL(DeepaMehtaObject object) {
         try {
-            if (object.hasProperty(URI_ACL)) {
-                return new AccessControlList(new JSONObject((String) object.getProperty(URI_ACL)));
+            if (object.hasProperty(PROP_ACL)) {
+                return new AccessControlList(new JSONObject((String) object.getProperty(PROP_ACL)));
             } else {
                 return new AccessControlList();
             }
@@ -302,7 +302,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void setACL(DeepaMehtaObject object, AccessControlList acl) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            object.setProperty(URI_ACL, acl.toJSON().toString(), false);    // addToIndex=false
+            object.setProperty(PROP_ACL, acl.toJSON().toString(), false);    // addToIndex=false
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -332,18 +332,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public boolean isMember(String username, long workspaceId) {
-        try {
-            if (username == null) {
-                return false;
-            }
-            //
-            Association assoc = dms.getAssociation(MEMBERSHIP_TYPE, getUsernameOrThrow(username).getId(), workspaceId,
-                "dm4.core.default", "dm4.core.default", false); // fetchComposite=false
-            return assoc != null;
-        } catch (Exception e) {
-            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
-                workspaceId + " failed", e);
-        }
+        return dms.getAccessControl().isMember(username, workspaceId);
     }
 
 
@@ -354,28 +343,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(URI_CREATOR, username);
+        return dms.getTopicsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(URI_OWNER, username);
+        return dms.getTopicsByProperty(PROP_OWNER, username);
     }
 
     @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(URI_CREATOR, username);
+        return dms.getAssociationsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(URI_OWNER, username);
+        return dms.getAssociationsByProperty(PROP_OWNER, username);
     }
 
 
@@ -927,125 +916,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   objectId    a topic ID, or an association ID.
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
-        String typeUri = null;
-        try {
-            typeUri = typeUri(objectId);
-            // ### TODO: remove endless recursion when checking the permission for these types
-            if (operation == Operation.READ && (typeUri.equals("dm4.workspaces.workspace")   ||
-                                                typeUri.equals("dm4.topicmaps.topicmap")     ||
-                                                typeUri.equals("dm4.core.topic_type")        ||
-                                                typeUri.equals("dm4.webclient.view_config"))) {
-                                                // typeUri.equals("dm4.accesscontrol.username") ||
-                return true;    // ### FIXME
-            }
-            //
-            Topic workspace;
-            if (typeUri.equals("dm4.workspaces.workspace")) {
-                workspace = dms.getTopic(objectId, true);   // fetchComposite=true
-            } else {
-                workspace = wsService.getAssignedWorkspace(objectId);
-                //
-                if (workspace == null) {
-                    switch (operation) {
-                    case READ:
-                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") has no workspace assignment -- READ permission is granted");
-                        return true;
-                    case WRITE:
-                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") has no workspace assignment -- WRITE permission is refused");
-                        return false;
-                    case CREATE:
-                        return true;    // ### TODO
-                    default:
-                        throw new RuntimeException(operation + " is an unsupported operation");
-                    }
-                }
-            }
-            //
-            return _hasPermission(username, operation, workspace);
-        } catch (Exception e) {
-            throw new RuntimeException("Checking permission for object " + objectId + " (typeUri=\"" + typeUri +
-                "\") failed (" + userInfo(username) + ", operation=" + operation + ")", e);
-        }
-    }
-
-    private boolean _hasPermission(String username, Operation operation, Topic workspace) {
-        switch (operation) {
-        case READ:
-            return hasReadPermission(username, workspace);
-        case WRITE:
-            return hasWritePermission(username, workspace);
-        case CREATE:
-            return true;    // ### TODO
-        default:
-            throw new RuntimeException(operation + " is an unsupported operation");
-        }
-    }
-
-    // ---
-
-    /**
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     */
-    private boolean hasReadPermission(String username, Topic workspace) {
-        WorkspaceType workspaceType = workspaceType(workspace);
-        switch (workspaceType) {
-        case PRIVATE:
-            return isWorkspaceOwner(username, workspace);
-        case CONFIDENTIAL:
-            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
-        case COLLABORATIVE:
-            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
-        case PUBLIC:
-            return true;
-        case COMMON:
-            return true;
-        default:
-            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
-        }
-    }
-
-    /**
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     */
-    private boolean hasWritePermission(String username, Topic workspace) {
-        WorkspaceType workspaceType = workspaceType(workspace);
-        switch (workspaceType) {
-        case PRIVATE:
-            return isWorkspaceOwner(username, workspace);
-        case CONFIDENTIAL:
-            return isWorkspaceOwner(username, workspace);
-        case COLLABORATIVE:
-            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
-        case PUBLIC:
-            return isWorkspaceOwner(username, workspace) || isMember(username, workspace.getId());
-        case COMMON:
-            return true;
-        default:
-            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
-        }
-    }
-
-    // ---
-
-    private boolean isWorkspaceOwner(String username, Topic workspace) {
-        return username != null && userIsOwner(username, workspace);
-    }
-
-    private WorkspaceType workspaceType(Topic workspace) {
-        try {
-            return WorkspaceType.fromUri(workspace.getCompositeValue().getTopic("dm4.workspaces.type").getUri());
-        } catch (Exception e) {
-            throw new RuntimeException("Determining the workspace type of workspace \"" + workspace.getSimpleValue() +
-                "\" failed", e);
-        }
-    }
-
-    // ---
-
-    private String typeUri(long objectId) {
-        return (String) dms.getProperty(objectId, "type_uri");
+        return dms.getAccessControl().hasPermission(username, operation, objectId);
     }
 
     // ########## Legacy code follows ...
@@ -1143,11 +1014,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>). ### FIXDOC
      */
-    private boolean userIsOwner(String username, DeepaMehtaObject object) {
+    /* ### private boolean userIsOwner(String username, DeepaMehtaObject object) {
         String owner = getOwner(object);
         logger.fine("The owner is " + userInfo(owner));
         return owner != null && owner.equals(username);
-    }
+    } */
 
     /**
      * Checks if a user is the creator of the object.

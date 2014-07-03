@@ -123,12 +123,13 @@ public interface AccessControlService extends PluginService {
 
     /**
      * Checks if a user is a member of the given workspace.
-     * If so, <code>true</code> is returned.
      *
      * @param   username        the user.
      *                          If <code>null</code> is passed, <code>false</code> is returned.
      *                          If an unknown username is passed an exception is thrown.
      * @param   workspaceId     the workspace.
+     *
+     * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
      */
     boolean isMember(String username, long workspaceId);
 

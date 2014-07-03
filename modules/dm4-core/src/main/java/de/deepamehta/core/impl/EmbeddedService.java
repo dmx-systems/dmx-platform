@@ -19,7 +19,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.AccessControlException;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -28,6 +27,8 @@ import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.TypeStorage;
+import de.deepamehta.core.service.accesscontrol.AccessControl;
+import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.BundleContext;
@@ -58,6 +59,7 @@ public class EmbeddedService implements DeepaMehtaService {
     TypeCache typeCache;
     TypeStorageImpl typeStorage;
     ValueStorage valueStorage;
+    AccessControl accessControl;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -75,6 +77,8 @@ public class EmbeddedService implements DeepaMehtaService {
         this.typeCache = new TypeCache(this);
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
+        this.accessControl = new AccessControlImpl(this);
+        //
         bootstrapTypeCache();
         setupDB();
     }
@@ -652,6 +656,11 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public TypeStorage getTypeStorage() {
         return typeStorage;
+    }
+
+    @Override
+    public AccessControl getAccessControl() {
+        return accessControl;
     }
 
     @Override

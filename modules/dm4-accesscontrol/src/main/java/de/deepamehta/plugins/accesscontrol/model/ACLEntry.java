@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.accesscontrol.model;
 
+import de.deepamehta.core.service.accesscontrol.Operation;
+
 
 
 public class ACLEntry {

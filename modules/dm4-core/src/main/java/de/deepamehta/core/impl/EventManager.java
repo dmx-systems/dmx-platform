@@ -1,10 +1,10 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.AccessControlException;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.EventListener;
+import de.deepamehta.core.service.accesscontrol.AccessControlException;
 
 import javax.ws.rs.WebApplicationException;
 

@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.workspaces;
+package de.deepamehta.core.service.accesscontrol;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +7,7 @@ import java.util.Map;
 
 public enum WorkspaceType {
 
+    // ### TODO: move to dm4.core namespace?
     PRIVATE("dm4.workspaces.type.private"),
     CONFIDENTIAL("dm4.workspaces.type.confidential"),
     COLLABORATIVE("dm4.workspaces.type.collaborative"),

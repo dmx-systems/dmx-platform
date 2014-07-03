@@ -12,6 +12,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.List;
@@ -219,7 +220,8 @@ public interface DeepaMehtaService {
 
     DeepaMehtaTransaction beginTx();
 
-    TypeStorage getTypeStorage();
+    TypeStorage getTypeStorage();       // ### TODO: drop this
+    AccessControl getAccessControl();   // ### TODO: drop this
 
     Object getDatabaseVendorObject();
 }
