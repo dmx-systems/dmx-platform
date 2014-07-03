@@ -420,8 +420,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * Setup access control for the default user and the default topicmap.
      *   1) create membership for default user and default workspace
-     *   2) assign default topicmap to default workspace
-     *   3) setup access control for default topicmap
+     *   2) setup access control for default workspace
+     *   3) assign default topicmap to default workspace
+     *   4) setup access control for default topicmap
      */
     @Override
     public void allPluginsActive() {
@@ -429,13 +430,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         // 1) create membership for default user and default workspace
         createDefaultMembership(defaultWorkspace);
+        // 2) setup access control for default workspace
+        setupDefaultAccessControl(defaultWorkspace, "default workspace (\"DeepaMehta\")");
         //
         Topic defaultTopicmap = fetchDefaultTopicmap();
         if (defaultTopicmap != null) {
-            // 2) assign default topicmap to default workspace
+            // 3) assign default topicmap to default workspace
             assignDefaultTopicmapToDefaultWorkspace(defaultTopicmap, defaultWorkspace);
-            // 3) setup access control for default topicmap
-            setupAccessControlForDefaultTopicmap(defaultTopicmap);
+            // 4) setup access control for default topicmap
+            setupDefaultAccessControl(defaultTopicmap, "default topicmap (\"untitled\")");
         }
     }
 
@@ -638,18 +641,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private void setupAccessControlForDefaultTopicmap(Topic defaultTopicmap) {
-        String operation = "### Setup access control for the default topicmap (\"untitled\")";
+    private void setupDefaultAccessControl(Topic topic, String topicInfo) {
+        String operation = "Setup access control for the " + topicInfo;
         try {
             // Note: we only check for creator assignment.
             // If an object has a creator assignment it is expected to have an ACL entry as well.
-            if (getCreator(defaultTopicmap) != null) {
-                logger.info(operation + " ABORTED -- already setup");
+            if (getCreator(topic) != null) {
+                logger.info("### " + operation + " ABORTED -- already setup");
                 return;
             }
             //
-            logger.info(operation);
-            setupAccessControl(defaultTopicmap, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+            logger.info("### " + operation);
+            setupAccessControl(topic, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
