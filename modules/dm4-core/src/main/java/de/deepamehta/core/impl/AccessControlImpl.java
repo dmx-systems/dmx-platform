@@ -54,8 +54,7 @@ class AccessControlImpl implements AccessControl {
         try {
             typeUri = typeUri(objectId);
             // ### TODO: remove endless recursion when checking the permission for these types
-            if (operation == Operation.READ && (/* typeUri.equals("dm4.workspaces.workspace")   || */
-                                                typeUri.equals("dm4.topicmaps.topicmap")     ||
+            if (operation == Operation.READ && (/* typeUri.equals("dm4.topicmaps.topicmap")     || */
                                                 typeUri.equals("dm4.core.topic_type")        ||
                                                 typeUri.equals("dm4.webclient.view_config"))) {
                                                 // typeUri.equals("dm4.accesscontrol.username") ||
