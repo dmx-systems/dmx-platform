@@ -3,7 +3,11 @@ dm4c.add_plugin("de.deepamehta.filemanager", function() {
     // === Webclient Listeners ===
 
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
-        if (!dm4c.has_create_permission("dm4.files.folder")) {
+        // Note: the toolbar's Create menu is only refreshed when the login status changes, not when a workspace is
+        // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
+        // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
+        // WRITEability of the selected workspace.)
+        if (!dm4c.has_read_permission("dm4.files.folder")) {
             return
         }
         //

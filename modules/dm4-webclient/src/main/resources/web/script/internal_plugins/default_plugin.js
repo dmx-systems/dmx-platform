@@ -191,7 +191,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     dm4c.add_listener("canvas_commands", function(cx, cy) {
         var commands = []
-        var topic_types = dm4c.topic_type_list()
+        var topic_types = dm4c.topic_type_list(dm4c.has_create_permission)
         if (topic_types.length) {
             commands.push({
                 label: "Create",

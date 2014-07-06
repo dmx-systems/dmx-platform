@@ -110,6 +110,17 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
 
 
+    // ------------------------------------------------------------------------------------------------------ Public API
+
+    /**
+     * @return  The ID of the selected workspace
+     */
+    this.get_workspace_id = function() {
+        return get_workspace_id_from_menu()
+    }
+
+
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_workspaces() {

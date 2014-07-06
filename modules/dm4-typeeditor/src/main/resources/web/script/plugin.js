@@ -54,8 +54,12 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     })
 
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
-        var tt = dm4c.has_create_permission("dm4.core.topic_type")
-        var at = dm4c.has_create_permission("dm4.core.assoc_type")
+        // Note: the toolbar's Create menu is only refreshed when the login status changes, not when a workspace is
+        // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
+        // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
+        // WRITEability of the selected workspace.)
+        var tt = dm4c.has_read_permission("dm4.core.topic_type")
+        var at = dm4c.has_read_permission("dm4.core.assoc_type")
         //
         if (tt || at) {
             type_menu.add_separator()

@@ -25,6 +25,16 @@ function TypeCache() {
 
     // ---
 
+    this.has_topic_type = function(topic_type_uri) {
+        return topic_types[topic_type_uri] != undefined
+    }
+
+    this.has_assoc_type = function(assoc_type_uri) {
+        return assoc_types[assoc_type_uri] != undefined
+    }
+
+    // ---
+
     /**
      * Returns a sorted list of all available topic types, possibly filtered through an indicator function.
      *

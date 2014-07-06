@@ -113,11 +113,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final AccessControlList DEFAULT_INSTANCE_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
     );
-    private static final AccessControlList DEFAULT_TYPE_ACL = new AccessControlList(
-        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER),
-        new ACLEntry(Operation.CREATE, UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
-    );
-    //
     private static final AccessControlList DEFAULT_USER_ACCOUNT_ACL = new AccessControlList(
         new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER)
     );
@@ -222,14 +217,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/topic/{id}")
     @Override
     public Permissions getTopicPermissions(@PathParam("id") long topicId) {
-        return getPermissions(dms.getTopic(topicId, false));
+        return getPermissions(topicId);
     }
 
     @GET
     @Path("/association/{id}")
     @Override
     public Permissions getAssociationPermissions(@PathParam("id") long assocId) {
-        return getPermissions(dms.getAssociation(assocId, false));
+        return getPermissions(assocId);
     }
 
 
@@ -544,16 +539,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Note: the permissions for "Meta Meta Type" must be set manually.
         // This type doesn't exist in DB. Fetching its ACL entries would fail.
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-            enrichWithPermissions(topicType, createPermissions(false, false));  // write=false, create=false
+            enrichWithPermissions(topicType, createPermissions(false));     // write=false
             return;
         }
         //
-        enrichWithPermissions(topicType, getPermissions(topicType));
+        enrichWithPermissions(topicType, getPermissions(topicType.getId()));
     }
 
     @Override
     public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
-        enrichWithPermissions(assocType, getPermissions(assocType));
+        enrichWithPermissions(assocType, getPermissions(assocType.getId()));
     }
 
 
@@ -850,7 +845,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 setupViewConfigAccessControl(type.getViewConfig());
             }
             //
-            setupAccessControl(type, DEFAULT_TYPE_ACL, username);
+            setupAccessControl(type, DEFAULT_INSTANCE_ACL, username);
         } catch (Exception e) {
             throw new RuntimeException("Setting up access control for " + info(type) + " failed (" + type + ")", e);
         }
@@ -928,14 +923,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ########## Legacy code follows ...
 
-    private Permissions getPermissions(DeepaMehtaObject object) {
-        return createPermissions(hasPermission(getUsername(), Operation.WRITE, object.getId()));
-    }
-
-    private Permissions getPermissions(Type type) {
-        String username = getUsername();
-        return createPermissions(hasPermission(username, Operation.WRITE, type.getId()),
-                                 hasPermission(username, Operation.CREATE, type.getId()));
+    /**
+     * @param   objectId    a topic ID, or an association ID.
+     */
+    private Permissions getPermissions(long objectId) {
+        return createPermissions(hasPermission(getUsername(), Operation.WRITE, objectId));
     }
 
     // ---
@@ -1035,20 +1027,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>). ### FIXDOC
      */
-    private boolean userIsCreator(String username, DeepaMehtaObject object) {
+    /* ### private boolean userIsCreator(String username, DeepaMehtaObject object) {
         String creator = getCreator(object);
         logger.fine("The creator is " + userInfo(creator));
         return creator != null && creator.equals(username);
-    }
+    } */
 
     // ---
 
     private void enrichWithPermissions(Type type, Permissions permissions) {
         // Note: we must extend/override possibly existing permissions.
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
+        // ### TODO: rethink this and possibly simplify the code. Meanwhile CREATE is dropped and we enrich with
+        // only *one* permission (WRITE).
         CompositeValueModel typePermissions = permissions(type);
         typePermissions.put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri));
-        typePermissions.put(Operation.CREATE.uri, permissions.get(Operation.CREATE.uri));
     }
 
     private CompositeValueModel permissions(DeepaMehtaObject object) {
@@ -1076,10 +1069,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Permissions createPermissions(boolean write) {
         return new Permissions().add(Operation.WRITE, write);
-    }
-
-    private Permissions createPermissions(boolean write, boolean create) {
-        return createPermissions(write).add(Operation.CREATE, create);
     }
 
 

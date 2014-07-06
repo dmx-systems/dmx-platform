@@ -942,6 +942,16 @@ dm4c = new function() {
 
     // ---
 
+    this.has_topic_type = function(topic_type_uri) {
+        return type_cache.has_topic_type(topic_type_uri)
+    }
+
+    this.has_assoc_type = function(assoc_type_uri) {
+        return type_cache.has_assoc_type(assoc_type_uri)
+    }
+
+    // ---
+
     /**
      * Convenience method that returns the topic type's name.
      */
@@ -1150,7 +1160,13 @@ dm4c = new function() {
         return !js.contains(result, false)
     }
 
-    // ### TODO: handle association types as well
+    // ### TODO: add the same for association types
+    this.has_read_permission = function(type_uri) {
+        var result = dm4c.fire_event("has_read_permission", dm4c.get_topic_type(type_uri))
+        return !js.contains(result, false)
+    }
+
+    // ### TODO: add the same for association types
     this.has_create_permission = function(type_uri) {
         var result = dm4c.fire_event("has_create_permission", dm4c.get_topic_type(type_uri))
         return !js.contains(result, false)
@@ -1300,7 +1316,7 @@ dm4c = new function() {
      */
     this.refresh_create_menu = function() {
         var type_menu = dm4c.toolbar.create_menu
-        dm4c.refresh_type_menu(type_menu, this.topic_type_list())
+        dm4c.refresh_type_menu(type_menu, this.topic_type_list(dm4c.has_read_permission))
         dm4c.fire_event("post_refresh_create_menu", type_menu)
     }
 
@@ -1309,9 +1325,9 @@ dm4c = new function() {
      *
      * @return  the list of topic types.
      */
-    this.topic_type_list = function() {
+    this.topic_type_list = function(permission_function) {
         return type_cache.get_topic_types(function(topic_type) {
-            return dm4c.has_create_permission(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
+            return permission_function(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
         })
     }
 

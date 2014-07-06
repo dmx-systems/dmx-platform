@@ -195,7 +195,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     })
 
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
-        if (!dm4c.has_create_permission("dm4.accesscontrol.user_account")) {
+        // Note: the toolbar's Create menu is only refreshed when the login status changes, not when a workspace is
+        // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
+        // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
+        // WRITEability of the selected workspace.)
+        if (!dm4c.has_read_permission("dm4.accesscontrol.user_account")) {
             return
         }
         //
@@ -220,36 +224,29 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // ---
 
     dm4c.add_listener("has_write_permission_for_topic", function(topic) {
-        return get_topic_permissions(topic)["dm4.accesscontrol.operation.write"]
+        return get_topic_permissions(topic.id)["dm4.accesscontrol.operation.write"]
     })
 
     dm4c.add_listener("has_write_permission_for_association", function(assoc) {
-        return get_association_permissions(assoc)["dm4.accesscontrol.operation.write"]
+        return get_association_permissions(assoc.id)["dm4.accesscontrol.operation.write"]
     })
 
     // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
     // with the types (in the composite value). Instead let the client request the permissions separately.
 
+    // ### TODO: add the same for association types
+    dm4c.add_listener("has_read_permission", function(topic_type) {
+        return is_topic_type_readable(topic_type.uri)
+    })
+
+    // ### TODO: add the same for association types
     dm4c.add_listener("has_create_permission", function(topic_type) {
-        var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
-        // error check
-        if (!permissions) {
-            throw "AccessControlError: topic type \"" + topic_type.uri + "\" has no permissions info"
-        }
-        //
-        return permissions.composite["dm4.accesscontrol.operation.create"].value
+        return is_topic_type_readable(topic_type.uri) && is_workspace_writable()
     })
 
 
 
     // ------------------------------------------------------------------------------------------------------ Public API
-
-    this.create_user_account = function(username, password) {
-        return dm4c.create_topic("dm4.accesscontrol.user_account", {
-            "dm4.accesscontrol.username": username,
-            "dm4.accesscontrol.password": encrypt_password(password)
-        })
-    }
 
     /**
      * Returns the username (string) of the logged in user, or null if no user is logged in.
@@ -258,44 +255,65 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return dm4c.restc.get_username()
     }
 
+    this.create_user_account = function(username, password) {
+        return dm4c.create_topic("dm4.accesscontrol.user_account", {
+            "dm4.accesscontrol.username": username,
+            "dm4.accesscontrol.password": encrypt_password(password)
+        })
+    }
+
+    this.is_workspace_writable = function() {
+        return is_workspace_writable()
+    }
+
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function is_topic_type_readable(topic_type_uri) {
+        // Note: at startup the webclient loads all readable types into the type cache
+        return dm4c.has_topic_type(topic_type_uri)
+    }
+
+    function is_workspace_writable() {
+        var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
+        return get_topic_permissions(workspace_id)["dm4.accesscontrol.operation.write"]
+    }
+
+    // ---
 
     function encrypt_password(password) {
         return ENCRYPTED_PASSWORD_PREFIX + SHA256(password)
     }
 
-
-
     // === Permissions Cache ===
 
+    /**
+     * Key is a topic/association ID.
+     * Value is an object:
+     *     {
+     *         "dm4.accesscontrol.operation.write": true
+     *     }
+     */
     var permissions_cache = {}
 
-    function get_topic_permissions(topic) {
-        var permissions = permissions_cache[topic.id]
-        if (!permissions) {
-            permissions = dm4c.restc.get_topic_permissions(topic.id)
-            // error check
-            if (!permissions || permissions["dm4.accesscontrol.operation.write"] == undefined) {
-                throw "AccessControlError: invalid permissions info for topic " + topic.id +
-                    " (type_uri=\"" + topic.type_uri + "\")"
-            }
-            permissions_cache[topic.id] = permissions
-        }
-        return permissions
+    function get_topic_permissions(topic_id) {
+        return get_permissions(topic_id, dm4c.restc.get_topic_permissions, "topic")
     }
 
-    function get_association_permissions(assoc) {
-        var permissions = permissions_cache[assoc.id]
+    function get_association_permissions(assoc_id) {
+        return get_permissions(assoc_id, dm4c.restc.get_association_permissions, "association")
+    }
+
+    function get_permissions(object_id, retrieve_function, object_info) {
+        var permissions = permissions_cache[object_id]
         if (!permissions) {
-            permissions = dm4c.restc.get_association_permissions(assoc.id)
+            permissions = retrieve_function.call(dm4c.restc, object_id)
             // error check
             if (!permissions || permissions["dm4.accesscontrol.operation.write"] == undefined) {
-                throw "AccessControlError: invalid permissions info for association " + assoc.id +
-                    " (type_uri=\"" + assoc.type_uri + "\")"
+                throw "AccessControlError: invalid permissions info for " + object_info + " " + object_id
             }
-            permissions_cache[assoc.id] = permissions
+            permissions_cache[object_id] = permissions
         }
         return permissions
     }

@@ -53,14 +53,6 @@ class AccessControlImpl implements AccessControl {
         String typeUri = null;
         try {
             typeUri = typeUri(objectId);
-            // ### TODO: remove endless recursion when checking the permission for these types
-            if (operation == Operation.READ && (/* typeUri.equals("dm4.topicmaps.topicmap")     || */
-                                                typeUri.equals("dm4.core.topic_type")        ||
-                                                typeUri.equals("dm4.webclient.view_config"))) {
-                                                // typeUri.equals("dm4.accesscontrol.username") ||
-                return true;    // ### FIXME
-            }
-            //
             long workspaceId;
             if (typeUri.equals("dm4.workspaces.workspace")) {
                 workspaceId = objectId;
@@ -77,8 +69,6 @@ class AccessControlImpl implements AccessControl {
                         logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
                             "\") has no workspace assignment -- WRITE permission is refused");
                         return false;
-                    case CREATE:
-                        return true;    // ### TODO
                     default:
                         throw new RuntimeException(operation + " is an unsupported operation");
                     }
@@ -105,8 +95,6 @@ class AccessControlImpl implements AccessControl {
             return hasReadPermission(username, workspaceId);
         case WRITE:
             return hasWritePermission(username, workspaceId);
-        case CREATE:
-            return true;    // ### TODO
         default:
             throw new RuntimeException(operation + " is an unsupported operation");
         }
