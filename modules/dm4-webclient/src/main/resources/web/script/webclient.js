@@ -997,15 +997,20 @@ dm4c = new function() {
 
     // ---
 
+    /**
+     * Clears the type cache and loads all types. Once complete calls the callback function.
+     *
+     * Note: this is a utility function callable by plugins (see Access Control plugin).
+     * It is not used for the the initial type loading (see document-ready function below).
+     */
     this.reload_types = function(callback) {
-        // setup tracker
-        var tracker = new LoadTracker(2, function() {   // 2 loads: topic types and association types
-            adjust_create_widget()
-            callback()
-        })
-        // reload types
         type_cache.clear()
-        type_cache.load_types(tracker)
+        type_cache.load_types(new LoadTracker(2, function() {   // 2 loads: topic types and association types
+            callback()
+            // Note: adjust_create_widget() must be called *after* the callback.
+            // Adjusting the create widget relies on an updated permission cache (see Access Control plugin).
+            adjust_create_widget()
+        }))
     }
 
     // === View Configuration ===
@@ -1179,12 +1184,7 @@ dm4c = new function() {
      * Note: the types are already loaded as well.
      */
     function setup_gui() {
-        // 1) Setting up the create widget
-        // Note: the create menu must be popularized *after* the plugins are loaded.
-        // Two events are involved: "post_refresh_create_menu" and "has_create_permission".
-        adjust_create_widget()
-        //
-        // 2) Initialize plugins
+        // 1) Initialize plugins
         // Note: in order to let a plugin provide the initial canvas rendering (the deepamehta-topicmaps plugin
         // does!) the "init" event is fired *after* creating the canvas.
         // Note: for displaying an initial topic (the deepamehta-topicmaps plugin does!) the "init" event must
@@ -1192,12 +1192,19 @@ dm4c = new function() {
         dm4c.fire_event("init")
         dm4c.fire_event("init_2")
         dm4c.fire_event("init_3")
+        //
+        // 2) Setting up the create widget
+        // Note: the create menu must be popularized *after* the plugins are loaded.
+        // Two events are involved: "post_refresh_create_menu" and "has_create_permission".
+        // Note: adjust_create_widget() must be called *after* firing the "init" events.
+        // Adjusting the create widget relies on a initialized Workspaces plugin, in particular a current workspace.
+        adjust_create_widget()
     }
 
     function adjust_create_widget() {
         dm4c.refresh_create_menu()
-        //
-        if (dm4c.toolbar.create_menu.get_item_count()) {
+        // Note: factually the Access Control plugin is a webclient dependency
+        if (dm4c.get_plugin("de.deepamehta.accesscontrol").is_workspace_writable()) {
             dm4c.toolbar.create_widget.show()
         } else {
             dm4c.toolbar.create_widget.hide()

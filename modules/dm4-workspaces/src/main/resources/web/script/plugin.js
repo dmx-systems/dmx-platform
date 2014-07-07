@@ -162,6 +162,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // ---
 
     /**
+     * ### TODO: refactor this method. Currently all 3 aspects are mixed-up: DB-update, viewmodel update,
+     * and view update. Compare to refresh_topicmap_menu() in Topicmaps plugin.
+     *
      * @param   workspace_id    Optional: ID of the workspace to select.
      *                          If not given, the current selection is preserved.
      */
