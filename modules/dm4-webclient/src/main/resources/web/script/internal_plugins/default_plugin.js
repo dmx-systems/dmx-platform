@@ -228,6 +228,10 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         }
     })
 
+    dm4c.add_listener("post_select_workspace", function(workspace_id) {
+        dm4c.adjust_create_menu_visibility()
+    })
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function is_topic_changable(topic) {

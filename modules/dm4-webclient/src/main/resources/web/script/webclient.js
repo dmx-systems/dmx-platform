@@ -1203,12 +1203,7 @@ dm4c = new function() {
 
     function adjust_create_widget() {
         dm4c.refresh_create_menu()
-        // Note: factually the Access Control plugin is a webclient dependency
-        if (dm4c.get_plugin("de.deepamehta.accesscontrol").is_workspace_writable()) {
-            dm4c.toolbar.create_widget.show()
-        } else {
-            dm4c.toolbar.create_widget.hide()
-        }
+        dm4c.adjust_create_menu_visibility()
     }
 
     /**
@@ -1317,7 +1312,7 @@ dm4c = new function() {
     }
 
     /**
-     * Refreshes the create menu to reflect the updated type cache (after adding/removing/renaming a type).
+     * Refreshes the create menu to reflect an updated type cache (after adding/removing/renaming a type).
      * <p>
      * Utility method for plugin developers.
      */
@@ -1325,6 +1320,15 @@ dm4c = new function() {
         var type_menu = dm4c.toolbar.create_menu
         dm4c.refresh_type_menu(type_menu, this.topic_type_list(dm4c.has_read_permission))
         dm4c.fire_event("post_refresh_create_menu", type_menu)
+    }
+
+    this.adjust_create_menu_visibility = function() {
+        // Note: factually this makes the Access Control plugin a webclient dependency. ### TODO: should we avoid that?
+        if (dm4c.get_plugin("de.deepamehta.accesscontrol").is_workspace_writable()) {
+            dm4c.toolbar.create_widget.show()
+        } else {
+            dm4c.toolbar.create_widget.hide()
+        }
     }
 
     /**

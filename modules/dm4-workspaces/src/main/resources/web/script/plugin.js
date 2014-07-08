@@ -92,9 +92,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
-            // ### TODO: possible optimization: in case the deleted workspace is not the selected one
-            // we could save the set_selected_workspace() call. Compare to Topicmaps plugin.
-            init_model()
+            // update the workspace menu
+            fetch_workspaces_and_refresh_menu()
+            // if the deleted workspace was the selected workspace select another one
+            if (topic.id == selected_workspace_id) {
+                select_workspace(get_workspace_id_from_menu())
+            }
         }
     })
 
