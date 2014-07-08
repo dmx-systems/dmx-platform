@@ -156,6 +156,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         // update view
         var workspace = dm4c.fetch_topic(workspace_id)
         dm4c.show_topic(workspace, "show", undefined, true)     // coordinates=undefined, do_center=true
+        //
+        dm4c.fire_event("post_select_workspace", workspace_id)
     }
 
     /**

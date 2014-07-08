@@ -4,7 +4,9 @@ Client-side events
 
 ### TODO: move to wiki documentation.
 
-=== Webclient ===
+
+Webclient
+---------
 
 // Plugin
 "init"
@@ -73,18 +75,36 @@ Client-side events
 // REST Client
 "pre_send_request"
 
-=== Access Control plugin ===
+
+Access Control plugin
+---------------------
+
 "logged_in"
 "logged_out"
 
-=== Topicmaps plugin ===
+
+Topicmaps plugin
+----------------
+
 "topicmap_renderer"
 "post_refresh_topicmap_menu"
 
-=== Files plugin ===
+
+Workspaces plugin
+-----------------
+
+"post_select_workspace"
+
+
+Files plugin
+------------
+
 "process_files_drop"
 
-=== Mail plugin (3rd party) ===
+
+Mail plugin (3rd party)
+-----------------------
+
 "show_mail"
 "send_mail"
 "copy_mail"
