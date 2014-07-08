@@ -62,6 +62,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
         register_topicmap_renderers()
         create_topicmap_menu()
+        init_model()    // Note: the topicmap menu must already be created
 
         function register_topicmap_renderers() {
             // default renderer
@@ -90,8 +91,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             } else {
                 dm4c.toolbar.dom.prepend(topicmap_widget)
             }
-            //
-            fetch_topicmap_topics_and_refresh_menu()
 
             function do_select_topicmap(menu_item) {
                 var topicmap_id = menu_item.value
@@ -144,20 +143,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Displaying the initial topicmap at init_3 ensures all customizers are registered already.
      */
     dm4c.add_listener("init_3", function() {
-        var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
-        if (groups) {
-            var topicmap_id = groups[1]
-            var topic_id    = groups[3]
-            select_menu_item(topicmap_id)
-        } else {
-            var topicmap_id = get_topicmap_id_from_menu()
-        }
-        // update model
-        set_selected_topicmap(topicmap_id)
-        if (topic_id) {
-            topicmap.set_topic_selection(topic_id)
-        }
-        // update view
         display_topicmap()                  // ### FIXME: rethink about history update
     })
 
@@ -354,8 +339,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * This is called when a new topicmap is created at server-side and now should be displayed.
      */
     function add_topicmap(topicmap_id) {
-        fetch_topicmap_topics_and_refresh_menu()    // model + view
-        self.select_topicmap(topicmap_id)           // model + view
+        fetch_topicmap_topics_and_refresh_menu()    // update model + view
+        self.select_topicmap(topicmap_id)           // update model + view
     }
 
     /**
@@ -385,6 +370,24 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // *************
 
 
+
+    function init_model() {
+        fetch_topicmap_topics_and_refresh_menu()
+        //
+        var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
+        if (groups) {
+            var topicmap_id = groups[1]
+            var topic_id    = groups[3]
+            select_menu_item(topicmap_id)
+        } else {
+            var topicmap_id = get_topicmap_id_from_menu()
+        }
+        // update model
+        set_selected_topicmap(topicmap_id)
+        if (topic_id) {
+            topicmap.set_topic_selection(topic_id)
+        }
+    }
 
     /**
      * Updates the model to reflect the given topicmap is now selected ("topicmap", "topicmap_renderer").
