@@ -8,13 +8,13 @@ class RestResource {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    List<Object> resources;
+    List<Object> singletons;
     List<Class<?>> providerClasses;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResource(List<Object> resources, List<Class<?>> providerClasses) {
-        this.resources = resources;
+    RestResource(List<Object> singletons, List<Class<?>> providerClasses) {
+        this.singletons = singletons;
         this.providerClasses = providerClasses;
     }
 }

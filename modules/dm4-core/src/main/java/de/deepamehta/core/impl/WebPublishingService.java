@@ -118,36 +118,47 @@ public class WebPublishingService {
     // === REST Resources ===
 
     /**
+     * Adds root resource and provider classes/singletons to the Jersey application.
+     * <p>
      * Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
      * initialization.
      *
-     * @param   resources           the set of root resource and provider singletons, may be empty.
+     * @param   singletons          the set of root resource and provider singletons, may be empty.
      * @param   providerClasses     the set of root resource and provider classes, may be empty.
      */
-    synchronized RestResource addRestResource(List<Object> resources, List<Class<?>> providerClasses) {
-        addSingletons(resources);
-        addClasses(providerClasses);
-        logResourceInfo();
-        //
-        // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
-        // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
-        // The ResourceConfig instance does not contain any root resource classes).
-        if (!isJerseyServletRegistered) {
-            // Note: we must not register the servlet as long as no root resources are added yet.
-            // A plugin may contain just provider classes.
-            if (hasRootResources()) {
-                registerJerseyServlet();
+    synchronized RestResource addRestResource(List<Object> singletons, List<Class<?>> providerClasses) {
+        try {
+            addSingletons(singletons);
+            addClasses(providerClasses);
+            logResourceInfo();
+            //
+            // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
+            // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+            // The ResourceConfig instance does not contain any root resource classes).
+            if (!isJerseyServletRegistered) {
+                // Note: we must not register the servlet as long as no root resources are added yet.
+                // A plugin may contain just provider classes.
+                if (hasRootResources()) {
+                    registerJerseyServlet();
+                }
+            } else {
+                reloadJerseyServlet();
             }
-        } else {
-            reloadJerseyServlet();
+            //
+            return new RestResource(singletons, providerClasses);
+        } catch (Exception e) {
+            removeRestResource(singletons, providerClasses);
+            throw new RuntimeException("Adding classes/singletons to Jersey application failed", e);
         }
-        //
-        return new RestResource(resources, providerClasses);
     }
 
     synchronized void removeRestResource(RestResource restResource) {
-        removeSingletons(restResource.resources);
-        removeClasses(restResource.providerClasses);
+        removeRestResource(restResource.singletons, restResource.providerClasses);
+    }
+
+    private void removeRestResource(List<Object> singletons, List<Class<?>> providerClasses) {
+        removeSingletons(singletons);
+        removeClasses(providerClasses);
         logResourceInfo();
         //
         // Note: once all root resources are removed we must unregister the Jersey servlet.
