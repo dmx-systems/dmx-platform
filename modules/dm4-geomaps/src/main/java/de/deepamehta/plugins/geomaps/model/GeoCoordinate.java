@@ -15,6 +15,15 @@ public class GeoCoordinate {
         this.lat = lat;
     }
 
+    /**
+     * Called by JAX-RS container to create a GeoCoordinate from a @QueryParam
+     */
+    public GeoCoordinate(String lonLat) {
+        String[] str = lonLat.split(",");
+        this.lon = Double.valueOf(str[0]);
+        this.lat = Double.valueOf(str[1]);
+    }
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override

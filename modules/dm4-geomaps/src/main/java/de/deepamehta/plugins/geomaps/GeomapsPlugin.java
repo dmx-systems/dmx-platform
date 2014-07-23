@@ -35,6 +35,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.Context;
@@ -59,6 +60,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         "address=%s&sensor=false";
 
     private static final String COOKIE_NO_GEOCODING = "dm4_no_geocoding";
+
+    private static final double EARTH_RADIUS_KM = 6371.009;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -148,6 +151,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 "dm4.topicmaps.zoom_level", zoom)
         );
         dms.updateTopic(new TopicModel(geomapId, geomapState), null);
+    }
+
+    @GET
+    @Path("/distance")
+    @Override
+    public double getDistance(@QueryParam("coord1") GeoCoordinate coord1,
+                              @QueryParam("coord2") GeoCoordinate coord2) {
+        // calculate distance by the flat-surface formula for a "Spherical Earth projected to a plane"
+        // http://en.wikipedia.org/wiki/Geographical_distance#Flat-surface_formulae
+        double lonDiff = Math.toRadians(coord2.lon - coord1.lon);
+        double latDiff = Math.toRadians(coord2.lat - coord1.lat);
+        double latMean = Math.toRadians((coord1.lat + coord2.lat) / 2);
+        return EARTH_RADIUS_KM * Math.sqrt(Math.pow(latDiff, 2) + Math.pow(Math.cos(latMean) * lonDiff, 2));
     }
 
 
