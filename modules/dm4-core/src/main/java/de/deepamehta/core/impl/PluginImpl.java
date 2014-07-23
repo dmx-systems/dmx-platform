@@ -84,9 +84,9 @@ public class PluginImpl implements Plugin, EventHandler {
     private ServiceRegistration registration;
 
     // Provided resources
-    private WebResources webResources;
-    private WebResources directoryResource;
-    private RestResource restResource;
+    private StaticResources staticResources;
+    private StaticResources directoryResource;
+    private RestResources restResources;
 
     // ### TODO: rethink service tracking. Is the distinction between core services and plugin services still required?
     // ### The core service is not required anymore to deliver the PLUGIN_SERVICE_GONE event. It's a hook now.
@@ -142,7 +142,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     "only one per plugin is supported");
             }
             //
-            directoryResource = webPublishingService.addWebResources(directoryPath, uriNamespace, securityHandler);
+            directoryResource = webPublishingService.publishStaticResources(directoryPath, uriNamespace,
+                securityHandler);
         } catch (Exception e) {
             throw new RuntimeException("Publishing directory \"" + directoryPath + "\" at URI namespace \"" +
                 uriNamespace + "\" failed", e);
@@ -409,8 +410,8 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
             webPublishingService = (WebPublishingService) service;
-            registerWebResources();
-            registerRestResources();
+            publishStaticResources();
+            publishRestResources();
             checkRequirementsForActivation();
         } else if (service instanceof EventAdmin) {
             logger.info("Adding Event Admin service to " + this);
@@ -433,9 +434,9 @@ public class PluginImpl implements Plugin, EventHandler {
             setCoreService(null);
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
-            unregisterRestResources();
-            unregisterWebResources();
-            unregisterDirectoryResource();
+            unpublishRestResources();
+            unpublishStaticResources();
+            unpublishDirectoryResource();
             webPublishingService = null;
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
@@ -681,39 +682,39 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
-    // === Web Resources ===
+    // === Static Resources ===
 
     /**
-     * Registers this plugin's web resources at the Web Publishing service.
-     * If the plugin doesn't provide web resources nothing is performed.
+     * Publishes this plugin's static resources (via Web Publishing service).
+     * If the plugin doesn't provide static resources nothing is performed.
      */
-    private void registerWebResources() {
+    private void publishStaticResources() {
         String uriNamespace = null;
         try {
-            uriNamespace = getWebResourcesNamespace();
+            uriNamespace = getStaticResourcesNamespace();
             if (uriNamespace == null) {
-                logger.info("Registering Web resources of " + this + " ABORTED -- no Web resources provided");
+                logger.info("Publishing static resources of " + this + " ABORTED -- no static resources provided");
                 return;
             }
             //
-            logger.info("Registering Web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            webResources = webPublishingService.addWebResources(pluginBundle, uriNamespace);
+            logger.info("Publishing static resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            staticResources = webPublishingService.publishStaticResources(pluginBundle, uriNamespace);
         } catch (Exception e) {
-            throw new RuntimeException("Registering Web resources of " + this + " failed " +
+            throw new RuntimeException("Publishing static resources of " + this + " failed " +
                 "(uriNamespace=\"" + uriNamespace + "\")", e);
         }
     }
 
-    private void unregisterWebResources() {
-        if (webResources != null) {
-            logger.info("Unregistering Web resources of " + this);
-            webPublishingService.removeWebResources(webResources);
+    private void unpublishStaticResources() {
+        if (staticResources != null) {
+            logger.info("Unpublishing static resources of " + this);
+            webPublishingService.unpublishStaticResources(staticResources);
         }
     }
 
     // ---
 
-    private String getWebResourcesNamespace() {
+    private String getStaticResourcesNamespace() {
         return pluginBundle.getEntry("/web") != null ? "/" + pluginUri : null;
     }
 
@@ -723,10 +724,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // Note: registration is performed by public method publishDirectory()
 
-    private void unregisterDirectoryResource() {
+    private void unpublishDirectoryResource() {
         if (directoryResource != null) {
-            logger.info("Unregistering Directory resource of " + this);
-            webPublishingService.removeWebResources(directoryResource);
+            logger.info("Unpublishing directory resource of " + this);
+            webPublishingService.unpublishStaticResources(directoryResource);
         }
     }
 
@@ -735,18 +736,18 @@ public class PluginImpl implements Plugin, EventHandler {
     // === REST Resources ===
 
     /**
-     * Registers this plugin's REST resources at the Web Publishing service.
+     * Publishes this plugin's REST resources (via Web Publishing service).
      * If the plugin doesn't provide REST resources nothing is performed.
      */
-    private void registerRestResources() {
+    private void publishRestResources() {
         try {
             // root resources
             List<Object> rootResources = getRootResources();
             if (rootResources.size() != 0) {
                 String uriNamespace = webPublishingService.getUriNamespace(pluginContext);
-                logger.info("Registering REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+                logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
             } else {
-                logger.info("Registering REST resources of " + this + " ABORTED -- no REST resources provided");
+                logger.info("Publishing REST resources of " + this + " ABORTED -- no REST resources provided");
             }
             // provider classes
             List<Class<?>> providerClasses = getProviderClasses();
@@ -757,18 +758,19 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
-                restResource = webPublishingService.addRestResource(rootResources, providerClasses);
+                restResources = webPublishingService.publishRestResources(rootResources, providerClasses);
             }
         } catch (Exception e) {
-            unregisterWebResources();
-            throw new RuntimeException("Registering REST resources and/or provider classes of " + this + " failed", e);
+            unpublishStaticResources();
+            throw new RuntimeException("Publishing REST resources (including provider classes) of " + this +
+                " failed", e);
         }
     }
 
-    private void unregisterRestResources() {
-        if (restResource != null) {
-            logger.info("Unregistering REST resources and/or provider classes of " + this);
-            webPublishingService.removeRestResource(restResource);
+    private void unpublishRestResources() {
+        if (restResources != null) {
+            logger.info("Unpublishing REST resources (including provider classes) of " + this);
+            webPublishingService.unpublishRestResources(restResources);
         }
     }
 

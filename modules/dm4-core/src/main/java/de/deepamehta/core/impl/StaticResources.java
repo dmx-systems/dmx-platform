@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 
 
-class WebResources {
+class StaticResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -10,7 +10,7 @@ class WebResources {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebResources(String uriNamespace) {
+    StaticResources(String uriNamespace) {
         this.uriNamespace = uriNamespace;
     }
 }

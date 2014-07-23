@@ -4,17 +4,17 @@ import java.util.List;
 
 
 
-class RestResource {
+class RestResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     List<Object> singletons;
-    List<Class<?>> providerClasses;
+    List<Class<?>> classes;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResource(List<Object> singletons, List<Class<?>> providerClasses) {
+    RestResources(List<Object> singletons, List<Class<?>> classes) {
         this.singletons = singletons;
-        this.providerClasses = providerClasses;
+        this.classes = classes;
     }
 }
