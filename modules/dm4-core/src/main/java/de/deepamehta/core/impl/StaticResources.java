@@ -1,20 +1,16 @@
 package de.deepamehta.core.impl;
 
-import java.util.List;
 
 
-
-class RestResource {
+class StaticResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    List<Object> resources;
-    List<Class<?>> providerClasses;
+    String uriNamespace;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResource(List<Object> resources, List<Class<?>> providerClasses) {
-        this.resources = resources;
-        this.providerClasses = providerClasses;
+    StaticResources(String uriNamespace) {
+        this.uriNamespace = uriNamespace;
     }
 }

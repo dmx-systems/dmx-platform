@@ -1,16 +1,20 @@
 package de.deepamehta.core.impl;
 
+import java.util.List;
 
 
-class WebResources {
+
+class RestResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    String uriNamespace;
+    List<Object> singletons;
+    List<Class<?>> classes;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebResources(String uriNamespace) {
-        this.uriNamespace = uriNamespace;
+    RestResources(List<Object> singletons, List<Class<?>> classes) {
+        this.singletons = singletons;
+        this.classes = classes;
     }
 }

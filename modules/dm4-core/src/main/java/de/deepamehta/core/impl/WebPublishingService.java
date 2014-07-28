@@ -36,7 +36,7 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ResourceConfig rootApplication;
+    private ResourceConfig jerseyApplication;
     private int classCount = 0;         // counts DM root resource and provider classes
     private int singletonCount = 0;     // counts DM root resource and provider singletons
     // Note: we count DM resources separately as Jersey adds its own ones to the application.
@@ -58,16 +58,16 @@ public class WebPublishingService {
             logger.info("Setting up the Web Publishing service");
             this.dms = dms;
             //
-            // create web application
-            this.rootApplication = new DefaultResourceConfig();
+            // create Jersey application
+            this.jerseyApplication = new DefaultResourceConfig();
             //
             // setup container filters
-            Map<String, Object> properties = rootApplication.getProperties();
+            Map<String, Object> properties = jerseyApplication.getProperties();
             properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(dms));
             properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(dms));
             //
-            // deploy web application in container
-            this.jerseyServlet = new ServletContainer(rootApplication);
+            // deploy Jersey application in container
+            this.jerseyServlet = new ServletContainer(jerseyApplication);
             this.httpService = httpService;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
@@ -79,35 +79,35 @@ public class WebPublishingService {
 
 
 
-    // === Web Resources ===
+    // === Static Resources ===
 
     /**
-     * Publishes the /web resources directory of the given bundle to the web.
+     * Publishes the static resources of the given bundle's /web directory.
      */
-    WebResources addWebResources(Bundle bundle, String uriNamespace) {
+    StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
             httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
-            return new WebResources(uriNamespace);
+            return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    void removeWebResources(WebResources webResources) {
-        httpService.unregister(webResources.uriNamespace);
+    void unpublishStaticResources(StaticResources staticResources) {
+        httpService.unregister(staticResources.uriNamespace);
     }
 
     // ---
 
     /**
-     * Publishes a directory of the server's file system to the web.
+     * Publishes a directory of the server's file system.
      */
-    WebResources addWebResources(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
+    StaticResources publishStaticResources(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
             httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath, securityHandler));
-            return new WebResources(uriNamespace);
+            return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -118,37 +118,42 @@ public class WebPublishingService {
     // === REST Resources ===
 
     /**
+     * Publishes REST resources. This is done by adding JAX-RS root resource and provider classes/singletons
+     * to the Jersey application and reloading the Jersey servlet.
+     * <p>
      * Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
      * initialization.
      *
-     * @param   resources           the set of root resource and provider singletons, may be empty.
-     * @param   providerClasses     the set of root resource and provider classes, may be empty.
+     * @param   singletons  the set of root resource and provider singletons, may be empty.
+     * @param   classes     the set of root resource and provider classes, may be empty.
      */
-    synchronized RestResource addRestResource(List<Object> resources, List<Class<?>> providerClasses) {
-        addSingletons(resources);
-        addClasses(providerClasses);
-        logResourceInfo();
-        //
-        // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
-        // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
-        // The ResourceConfig instance does not contain any root resource classes).
-        if (!isJerseyServletRegistered) {
-            // Note: we must not register the servlet as long as no root resources are added yet.
-            // A plugin may contain just provider classes.
-            if (hasRootResources()) {
-                registerJerseyServlet();
+    synchronized RestResources publishRestResources(List<Object> singletons, List<Class<?>> classes) {
+        RestResources restResources = new RestResources(singletons, classes);
+        try {
+            addToApplication(restResources);
+            //
+            // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
+            // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
+            // The ResourceConfig instance does not contain any root resource classes).
+            if (!isJerseyServletRegistered) {
+                // Note: we must not register the servlet as long as no root resources are added yet.
+                // A plugin may contain just provider classes.
+                if (hasRootResources()) {
+                    registerJerseyServlet();
+                }
+            } else {
+                reloadJerseyServlet();
             }
-        } else {
-            reloadJerseyServlet();
+            //
+            return restResources;
+        } catch (Exception e) {
+            unpublishRestResources(restResources);
+            throw new RuntimeException("Adding classes/singletons to Jersey application failed", e);
         }
-        //
-        return new RestResource(resources, providerClasses);
     }
 
-    synchronized void removeRestResource(RestResource restResource) {
-        removeSingletons(restResource.resources);
-        removeClasses(restResource.providerClasses);
-        logResourceInfo();
+    synchronized void unpublishRestResources(RestResources restResources) {
+        removeFromApplication(restResources);
         //
         // Note: once all root resources are removed we must unregister the Jersey servlet.
         // Reloading it with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
@@ -175,38 +180,26 @@ public class WebPublishingService {
 
 
 
-    // === Jersey Servlet ===
+    // === Jersey application ===
 
-    private Set<Class<?>> getClasses() {
-        return rootApplication.getClasses();
+    private void addToApplication(RestResources restResources) {
+        getClasses().addAll(restResources.classes);
+        getSingletons().addAll(restResources.singletons);
+        //
+        classCount     += restResources.classes.size();
+        singletonCount += restResources.singletons.size();
+        //
+        logResourceInfo();
     }
 
-    private Set<Object> getSingletons() {
-        return rootApplication.getSingletons();
-    }
-
-    // ---
-
-    private void addClasses(List<Class<?>> classes) {
-        getClasses().addAll(classes);
-        classCount += classes.size();
-    }
-
-    private void addSingletons(List<Object> singletons) {
-        getSingletons().addAll(singletons);
-        singletonCount += singletons.size();
-    }
-
-    // ---
-
-    private void removeClasses(List<Class<?>> classes) {
-        getClasses().removeAll(classes);
-        classCount -= classes.size();
-    }
-
-    private void removeSingletons(List<Object> singletons) {
-        getSingletons().removeAll(singletons);
-        singletonCount -= singletons.size();
+    private void removeFromApplication(RestResources restResources) {
+        getClasses().removeAll(restResources.classes);
+        getSingletons().removeAll(restResources.singletons);
+        //
+        classCount -= restResources.classes.size();
+        singletonCount -= restResources.singletons.size();
+        //
+        logResourceInfo();
     }
 
     // ---
@@ -222,6 +215,18 @@ public class WebPublishingService {
     }
 
     // ---
+
+    private Set<Class<?>> getClasses() {
+        return jerseyApplication.getClasses();
+    }
+
+    private Set<Object> getSingletons() {
+        return jerseyApplication.getSingletons();
+    }
+
+
+
+    // === Jersey Servlet ===
 
     private void registerJerseyServlet() {
         try {
