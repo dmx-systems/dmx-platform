@@ -322,7 +322,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      * Searches a topic's composite value for a topic of a given type.
      * The search is driven by the topic's type definition. In other words, composite value entries which do not
      * adhere to the topic's type definition are not found.
-     * Note: this is an in-memory search; the DB is not accessed.
+     * Note: this is an in-memory search; the DB is not accessed. ### Not true anymore! See source code comment.
      * <p>
      * The first topic found is returned, according to a depth-first search.
      * For multiple-value fields only the first topic is returned.
@@ -335,6 +335,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             return topic;
         }
         //
+        // ### FIXME: all topics going over the wire include all their child topics, regardless if requested or not!
+        // ### This is since we have on-demand child topic loading. Possible options: 1) don't operate on the
+        // ### attached composite value here, but on the composite value model, or 2) rethink on-demand loading.
         CompositeValue comp = topic.getCompositeValue();
         TopicType topicType = dms.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {

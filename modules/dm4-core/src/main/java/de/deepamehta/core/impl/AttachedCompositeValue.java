@@ -125,11 +125,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public String getString(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getString(childTypeUri);
     }
 
     @Override
     public String getString(String childTypeUri, String defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getString(childTypeUri, defaultValue);
     }
 
@@ -137,11 +139,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public int getInt(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getInt(childTypeUri);
     }
 
     @Override
     public int getInt(String childTypeUri, int defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getInt(childTypeUri, defaultValue);
     }
 
@@ -149,11 +153,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public long getLong(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getLong(childTypeUri);
     }
 
     @Override
     public long getLong(String childTypeUri, long defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getLong(childTypeUri, defaultValue);
     }
 
@@ -161,11 +167,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public double getDouble(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getDouble(childTypeUri);
     }
 
     @Override
     public double getDouble(String childTypeUri, double defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getDouble(childTypeUri, defaultValue);
     }
 
@@ -173,11 +181,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public boolean getBoolean(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getBoolean(childTypeUri);
     }
 
     @Override
     public boolean getBoolean(String childTypeUri, boolean defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getBoolean(childTypeUri, defaultValue);
     }
 
@@ -185,11 +195,13 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public Object getObject(String childTypeUri) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getObject(childTypeUri);
     }
 
     @Override
     public Object getObject(String childTypeUri, Object defaultValue) {
+        // ### FIXME: must load child topic on-demand
         return getModel().getObject(childTypeUri, defaultValue);
     }
 
