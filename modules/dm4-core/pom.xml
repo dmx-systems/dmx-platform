@@ -65,7 +65,7 @@
                             de.deepamehta.core.service.event,
                             de.deepamehta.core.storage.spi,
                             de.deepamehta.core.util,
-                            org.osgi.service.log        <!-- required when running without Gogo Shell -->
+                            org.osgi.service.log    <!-- required when running without Gogo Shell ### TODO: check -->
                         </Export-Package>
                         <Bundle-Activator>
                             de.deepamehta.core.osgi.CoreActivator

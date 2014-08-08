@@ -38,7 +38,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    Topic getTopic(long id, boolean fetchComposite);
+    Topic getTopic(long topicId, boolean fetchComposite);
 
     /**
      * Looks up a single topic by exact value.

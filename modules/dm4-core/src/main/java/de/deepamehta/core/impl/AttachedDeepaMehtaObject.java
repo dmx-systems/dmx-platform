@@ -272,6 +272,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
 
 
+    // === Misc ===
+
+    @Override
+    public Object getDatabaseVendorObject() {
+        return dms.storageDecorator.getDatabaseVendorObject(getId());
+    }
+
+
+
     // **********************************
     // *** JSONEnabled Implementation ***
     // **********************************

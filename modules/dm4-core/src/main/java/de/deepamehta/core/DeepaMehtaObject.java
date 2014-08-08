@@ -144,4 +144,10 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     boolean hasProperty(String propUri);
 
     void removeProperty(String propUri);
+
+
+
+    // === Misc ===
+
+    Object getDatabaseVendorObject();
 }
