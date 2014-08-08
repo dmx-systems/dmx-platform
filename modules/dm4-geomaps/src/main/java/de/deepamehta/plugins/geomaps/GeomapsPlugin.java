@@ -113,17 +113,22 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         try {
             Topic geoCoordTopic = getGeoCoordinateTopic(geoTopic);
             if (geoCoordTopic != null) {
-                CompositeValue comp = geoCoordTopic.getCompositeValue();
-                return new GeoCoordinate(
-                    comp.getDouble("dm4.geomaps.longitude"),
-                    comp.getDouble("dm4.geomaps.latitude")
-                );
+                return geoCoordinate(geoCoordTopic);
             } else {
                 return null;
             }
         } catch (Exception e) {
             throw new RuntimeException("Getting the geo coordinate failed (geoTopic=" + geoTopic + ")", e);
         }
+    }
+
+    @Override
+    public GeoCoordinate geoCoordinate(Topic geoCoordTopic) {
+        CompositeValue comp = geoCoordTopic.getCompositeValue();
+        return new GeoCoordinate(
+            comp.getDouble("dm4.geomaps.longitude"),
+            comp.getDouble("dm4.geomaps.latitude")
+        );
     }
 
     @PUT

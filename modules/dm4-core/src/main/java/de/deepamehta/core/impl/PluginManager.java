@@ -77,11 +77,12 @@ class PluginManager {
     }
 
     synchronized void deactivatePlugin(PluginImpl plugin) {
-        // Note: when plugin activation failed its listeners are not registered and it is not in the pool of activated
+        // Note: if plugin activation failed its listeners are not registered and it is not in the pool of activated
         // plugins. Unregistering the listeners and removing from pool would fail.
-        if (_isPluginActivated(plugin.getUri())) {
+        String pluginUri = plugin.getUri();
+        if (_isPluginActivated(pluginUri)) {
             plugin.unregisterListeners();
-            removeFromActivatedPlugins(plugin.getUri());
+            removeFromActivatedPlugins(pluginUri);
         } else {
             logger.info("Deactivation of " + plugin + " ABORTED -- it was not successfully activated");
         }
@@ -192,7 +193,7 @@ class PluginManager {
 
     private void removeFromActivatedPlugins(String pluginUri) {
         if (activatedPlugins.remove(pluginUri) == null) {
-            throw new RuntimeException("Removing plugin \"" + pluginUri + "\" from map of activated plugins failed: " +
+            throw new RuntimeException("Removing plugin \"" + pluginUri + "\" from pool of activated plugins failed: " +
                 "not found in " + activatedPlugins);
         }
     }
