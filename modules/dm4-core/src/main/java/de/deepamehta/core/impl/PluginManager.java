@@ -63,6 +63,8 @@ class PluginManager {
             //
             _activatePlugin(plugin);
             //
+            addToActivatedPlugins(plugin);
+            //
             plugin.postPluginActivatedEvent();
             //
             if (checkAllPluginsActivated()) {
@@ -71,13 +73,18 @@ class PluginManager {
             }
         } else {
             logger.info("Activation of " + plugin + " ABORTED -- already activated");
-            return;
         }
     }
 
     synchronized void deactivatePlugin(PluginImpl plugin) {
-        plugin.unregisterListeners();
-        removeFromActivatedPlugins(plugin.getUri());
+        // Note: when plugin activation failed its listeners are not registered and it is not in the pool of activated
+        // plugins. Unregistering the listeners and removing from pool would fail.
+        if (_isPluginActivated(plugin.getUri())) {
+            plugin.unregisterListeners();
+            removeFromActivatedPlugins(plugin.getUri());
+        } else {
+            logger.info("Deactivation of " + plugin + " ABORTED -- it was not successfully activated");
+        }
     }
 
     // ---
@@ -116,7 +123,6 @@ class PluginManager {
      *   - initialize the plugin
      *   - register the plugin's event listeners
      *   - register the plugin's OSGi service
-     *   - add the plugin to the pool of activated plugins
      */
     private void _activatePlugin(PluginImpl plugin) {
         try {
@@ -129,10 +135,6 @@ class PluginManager {
             // Note: the event listeners must be registered *after* the plugin is installed in the database and its
             // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
-            //
-            // ### TODO: if initialization fails the plugin's listeners are not registered.
-            // Then, when stopping the plugin unregistering its listeners fails.
-            addToActivatedPlugins(plugin);
             //
             logger.info("----- Activation of " + plugin + " complete -----");
         } catch (Throwable e) {
@@ -189,7 +191,10 @@ class PluginManager {
     }
 
     private void removeFromActivatedPlugins(String pluginUri) {
-        activatedPlugins.remove(pluginUri);
+        if (activatedPlugins.remove(pluginUri) == null) {
+            throw new RuntimeException("Removing plugin \"" + pluginUri + "\" from map of activated plugins failed: " +
+                "not found in " + activatedPlugins);
+        }
     }
 
     private boolean _isPluginActivated(String pluginUri) {
