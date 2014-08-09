@@ -961,10 +961,20 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
+    /**
+     * Fetches all associations the given topic or association is involved in.
+     *
+     * @param   node    a topic node or an association node.
+     */
     private List<AssociationModel> fetchAssociations(Node node) {
         List<AssociationModel> assocs = new ArrayList();
         for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
             Node assocNode = rel.getStartNode();
+            // skip non-DM nodes stored by 3rd-party components (e.g. Neo4j Spatial)
+            if (!assocNode.hasProperty(KEY_NODE_TYPE)) {
+                continue;
+            }
+            //
             assocs.add(buildAssociation(assocNode));
         }
         return assocs;
