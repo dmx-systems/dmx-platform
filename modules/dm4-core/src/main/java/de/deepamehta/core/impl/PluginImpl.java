@@ -462,7 +462,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *
      * The requirements:
      *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
-     *   - the plugin services (according to the "consumedServiceInterfaces" config property) are available.
+     *   - the plugin services (according to the "ConsumesService" annotation) are available.
      *   - the plugin dependencies (according to the "importModels" config property) are active.
      *
      * Note: The Web Publishing service is not strictly required for activation, but we must ensure
@@ -472,6 +472,44 @@ public class PluginImpl implements Plugin, EventHandler {
         if (dms != null && webPublishingService != null && eventService != null && pluginServicesAvailable()
                                                                                 && dependenciesAvailable()) {
             dms.pluginManager.activatePlugin(this);
+        }
+    }
+
+
+
+    // === Activation ===
+
+    /**
+     * Activates this plugin and then posts the PLUGIN_ACTIVATED OSGi event.
+     *
+     * Activation comprises:
+     *   - install the plugin in the database (includes migrations, post-install event, type introduction)
+     *   - initialize the plugin
+     *   - register the plugin's event listeners
+     *   - register the plugin's OSGi service
+     */
+    void activate() {
+        try {
+            logger.info("----- Activating " + this + " -----");
+            //
+            installPluginInDB();
+            initializePlugin();
+            registerListeners();
+            registerPluginService();
+            // Note: the event listeners must be registered *after* the plugin is installed in the database and its
+            // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
+            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
+            //
+            logger.info("----- Activation of " + this + " complete -----");
+            //
+            postPluginActivatedEvent();
+            //
+        } catch (Throwable e) {
+            // Note: we want catch a NoClassDefFoundError here (so we state Throwable instead of Exception).
+            // This might happen in initializePlugin() when the plugin's init() hook instantiates a class
+            // from a 3rd-party library which can't be loaded.
+            // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
+            throw new RuntimeException("Activation of " + this + " failed", e);
         }
     }
 
@@ -487,7 +525,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *   4) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
-    void installPluginInDB() {
+    private void installPluginInDB() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             // 1) create "Plugin" topic
@@ -575,7 +613,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // === Initialization ===
 
-    void initializePlugin() {
+    private void initializePlugin() {
         pluginContext.init();
     }
 
@@ -583,7 +621,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // === Events ===
 
-    void registerListeners() {
+    private void registerListeners() {
         List<DeepaMehtaEvent> events = getEvents();
         //
         if (events.size() == 0) {
@@ -652,7 +690,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Registers this plugin's OSGi service at the OSGi framework.
      * If the plugin doesn't provide an OSGi service nothing is performed.
      */
-    void registerPluginService() {
+    private void registerPluginService() {
         try {
             String serviceInterface = providedServiceInterface();
             //
@@ -840,7 +878,7 @@ public class PluginImpl implements Plugin, EventHandler {
         bundleContext.registerService(EventHandler.class.getName(), this, properties);
     }
 
-    void postPluginActivatedEvent() {
+    private void postPluginActivatedEvent() {
         Properties properties = new Properties();
         properties.put(EventConstants.BUNDLE_SYMBOLICNAME, pluginUri);
         eventService.postEvent(new Event(PLUGIN_ACTIVATED, properties));

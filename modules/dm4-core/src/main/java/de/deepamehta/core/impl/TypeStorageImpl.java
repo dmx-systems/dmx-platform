@@ -482,7 +482,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Store ---
 
     private void storeSequence(String typeUri, Collection<AssociationDefinitionModel> assocDefs) {
-        logger.info("### Storing " + assocDefs.size() + " sequence segments for type \"" + typeUri + "\"");
+        logger.fine("### Storing " + assocDefs.size() + " sequence segments for type \"" + typeUri + "\"");
         AssociationDefinitionModel predecessor = null;
         for (AssociationDefinitionModel assocDef : assocDefs) {
             appendToSequence(typeUri, assocDef, predecessor);

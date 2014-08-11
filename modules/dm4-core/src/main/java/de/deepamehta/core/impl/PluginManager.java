@@ -44,13 +44,13 @@ class PluginManager {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Activates a plugin and fires activation events.
+     * Activates a plugin.
      * Called once the plugin's requirements are met (see PluginImpl.checkRequirementsForActivation()).
      * <p>
-     * After activation posts the PLUGIN_ACTIVATED OSGi event. Then checks if all installed plugins are active, and if
-     * so, fires the {@link CoreEvent.ALL_PLUGINS_ACTIVE} core event.
+     * Once the plugin is activated checks if <i>all</i> installed plugins are activated now, and if so, fires the
+     * {@link CoreEvent.ALL_PLUGINS_ACTIVE} core event.
      * <p>
-     * If the plugin is already activated, performs nothing. This happens e.g. when a dependent plugin is redeployed.
+     * If the plugin is already activated, nothing is performed. This happens e.g. when a dependent plugin is redeployed.
      * <p>
      * Note: this method is synchronized. While a plugin is activated no other plugin must be activated. Otherwise
      * the "type introduction" mechanism might miss some types. Consider this unsynchronized scenario: plugin B
@@ -60,12 +60,8 @@ class PluginManager {
     synchronized void activatePlugin(PluginImpl plugin) {
         // Note: we must not activate a plugin twice.
         if (!_isPluginActivated(plugin.getUri())) {
-            //
-            _activatePlugin(plugin);
-            //
+            plugin.activate();
             addToActivatedPlugins(plugin);
-            //
-            plugin.postPluginActivatedEvent();
             //
             if (checkAllPluginsActivated()) {
                 logger.info("########## All Plugins Active ##########");
@@ -117,38 +113,7 @@ class PluginManager {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Activates a plugin.
-     *
-     * Activation comprises:
-     *   - install the plugin in the database (includes migrations, post-install event, type introduction)
-     *   - initialize the plugin
-     *   - register the plugin's event listeners
-     *   - register the plugin's OSGi service
-     */
-    private void _activatePlugin(PluginImpl plugin) {
-        try {
-            logger.info("----- Activating " + plugin + " -----");
-            //
-            plugin.installPluginInDB();
-            plugin.initializePlugin();
-            plugin.registerListeners();
-            plugin.registerPluginService();
-            // Note: the event listeners must be registered *after* the plugin is installed in the database and its
-            // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
-            // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
-            //
-            logger.info("----- Activation of " + plugin + " complete -----");
-        } catch (Throwable e) {
-            // Note: we want catch a NoClassDefFoundError here (so we state Throwable instead of Exception).
-            // This might happen in initializePlugin() when the plugin's init() hook instantiates a class
-            // from a 3rd-party library which can't be loaded.
-            // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
-            throw new RuntimeException("Activation of " + plugin + " failed", e);
-        }
-    }
-
-    /**
-     * Checks if all plugins are activated.
+     * Checks if all installed plugins are activated.
      */
     private boolean checkAllPluginsActivated() {
         Bundle[] bundles = dms.bundleContext.getBundles();
