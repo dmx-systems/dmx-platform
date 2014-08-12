@@ -77,7 +77,7 @@ class PluginManager {
         // plugins. Unregistering the listeners and removing from pool would fail.
         String pluginUri = plugin.getUri();
         if (_isPluginActivated(pluginUri)) {
-            plugin.unregisterListeners();
+            plugin.deactivate();
             removeFromActivatedPlugins(pluginUri);
         } else {
             logger.info("Deactivation of " + plugin + " ABORTED -- it was not successfully activated");

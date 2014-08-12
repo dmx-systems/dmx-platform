@@ -60,25 +60,28 @@ public class PluginImpl implements Plugin, EventHandler {
     private BundleContext bundleContext;
 
     private Bundle       pluginBundle;
-    private String       pluginUri;          // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
-    private String       pluginName;         // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
+    private String       pluginUri;             // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
+    private String       pluginName;            // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
     private String       pluginClass;
 
-    private Properties   pluginProperties;   // Read from file "plugin.properties"
+    private Properties   pluginProperties;      // Read from file "plugin.properties"
     private String       pluginPackage;
     private PluginInfo   pluginInfo;
-    private List<String> pluginDependencies; // plugin URIs as read from "importModels" property
-    private Topic        pluginTopic;        // Represents this plugin in DB. Holds plugin migration number.
+    private List<String> pluginDependencies;    // plugin URIs as read from "importModels" property
+    private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DeepaMehta Core and OSGi)
     private EmbeddedService dms;
     private WebPublishingService webPublishingService;
-    private EventAdmin eventService;        // needed to post the PLUGIN_ACTIVATED OSGi event
+    private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Consumed plugin services
     //      key: service interface (a class object),
     //      value: service object. Is null if the service is not yet available.
     private Map<Class<? extends PluginService>, Object> pluginServices = new HashMap();
+
+    // Trackers for the consumed services (DeepaMehta Core, OSGi, and plugin services)
+    private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     // Provided OSGi service
     private ServiceRegistration registration;
@@ -87,11 +90,6 @@ public class PluginImpl implements Plugin, EventHandler {
     private StaticResources staticResources;
     private StaticResources directoryResource;
     private RestResources restResources;
-
-    // ### TODO: rethink service tracking. Is the distinction between core services and plugin services still required?
-    // ### The core service is not required anymore to deliver the PLUGIN_SERVICE_GONE event. It's a hook now.
-    private List<ServiceTracker> coreServiceTrackers = new ArrayList();
-    private List<ServiceTracker> pluginServiceTrackers = new ArrayList();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -118,17 +116,17 @@ public class PluginImpl implements Plugin, EventHandler {
 
     public void start() {
         if (pluginDependencies.size() > 0) {
-            registerEventListener();
+            registerPluginActivatedEventListener();
         }
         //
-        createCoreServiceTrackers();    // ### TODO: move to constructor?
-        createPluginServiceTrackers();  // ### TODO: move to constructor?
+        createCoreServiceTrackers();
+        createPluginServiceTrackers();
         //
-        openCoreServiceTrackers();
+        openServiceTrackers();
     }
 
     public void stop() {
-        closeCoreServiceTrackers();
+        closeServiceTrackers();
     }
 
     // ---
@@ -275,9 +273,9 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Service Tracking ===
 
     private void createCoreServiceTrackers() {
-        coreServiceTrackers.add(createServiceTracker(DeepaMehtaService.class));
-        coreServiceTrackers.add(createServiceTracker(WebPublishingService.class));
-        coreServiceTrackers.add(createServiceTracker(EventAdmin.class));
+        serviceTrackers.add(createServiceTracker(DeepaMehtaService.class));
+        serviceTrackers.add(createServiceTracker(WebPublishingService.class));
+        serviceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
     private void createPluginServiceTrackers() {
@@ -292,7 +290,7 @@ public class PluginImpl implements Plugin, EventHandler {
             asList(serviceInterfaces));
         for (Class<? extends PluginService> serviceInterface : serviceInterfaces) {
             pluginServices.put(serviceInterface, null);
-            pluginServiceTrackers.add(createServiceTracker(serviceInterface));
+            serviceTrackers.add(createServiceTracker(serviceInterface));
         }
     }
 
@@ -368,31 +366,13 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private void openCoreServiceTrackers() {
-        openServiceTrackers(coreServiceTrackers);
-    }
-
-    private void closeCoreServiceTrackers() {
-        closeServiceTrackers(coreServiceTrackers);
-    }
-
-    private void openPluginServiceTrackers() {
-        openServiceTrackers(pluginServiceTrackers);
-    }
-
-    private void closePluginServiceTrackers() {
-        closeServiceTrackers(pluginServiceTrackers);
-    }
-
-    // ---
-
-    private void openServiceTrackers(List<ServiceTracker> serviceTrackers) {
+    private void openServiceTrackers() {
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.open();
         }
     }
 
-    private void closeServiceTrackers(List<ServiceTracker> serviceTrackers) {
+    private void closeServiceTrackers() {
         for (ServiceTracker serviceTracker : serviceTrackers) {
             serviceTracker.close();
         }
@@ -404,8 +384,6 @@ public class PluginImpl implements Plugin, EventHandler {
         if (service instanceof DeepaMehtaService) {
             logger.info("Adding DeepaMehta 4 core service to " + this);
             setCoreService((EmbeddedService) service);
-            openPluginServiceTrackers();
-            // Note: activating the plugin is deferred until its requirements are met
             checkRequirementsForActivation();
         } else if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
@@ -428,9 +406,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void removeService(Object service, Class serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
-            closePluginServiceTrackers();   // core service is needed to deliver the PLUGIN_SERVICE_GONE events
-                                            // ### TODO: not true anymore. See comment at coreServiceTrackers.
-            dms.pluginManager.deactivatePlugin(this);
+            dms.pluginManager.deactivatePlugin(this);  // use core service's plugin manager before core service is removed
             setCoreService(null);
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
@@ -511,6 +487,10 @@ public class PluginImpl implements Plugin, EventHandler {
             // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
             throw new RuntimeException("Activation of " + this + " failed", e);
         }
+    }
+
+    void deactivate() {
+        unregisterListeners();
     }
 
 
@@ -635,7 +615,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
-    void unregisterListeners() {
+    private void unregisterListeners() {
         List<DeepaMehtaEvent> events = getEvents();
         if (events.size() == 0) {
             return;
@@ -871,7 +851,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // PLUGIN_ACTIVATED is not supposed to be listened by plugins.
     // It is a solely used internally (to track plugin availability).
 
-    private void registerEventListener() {
+    private void registerPluginActivatedEventListener() {
         String[] topics = new String[] {PLUGIN_ACTIVATED};
         Hashtable properties = new Hashtable();
         properties.put(EventConstants.EVENT_TOPIC, topics);
