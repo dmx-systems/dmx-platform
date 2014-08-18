@@ -125,84 +125,84 @@ class AttachedCompositeValue implements CompositeValue {
 
     @Override
     public String getString(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getString(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().toString();
     }
 
     @Override
     public String getString(String childTypeUri, String defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getString(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
 
     // ---
 
     @Override
     public int getInt(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getInt(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().intValue();
     }
 
     @Override
     public int getInt(String childTypeUri, int defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getInt(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
 
     // ---
 
     @Override
     public long getLong(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getLong(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().longValue();
     }
 
     @Override
     public long getLong(String childTypeUri, long defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getLong(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
 
     // ---
 
     @Override
     public double getDouble(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getDouble(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().doubleValue();
     }
 
     @Override
     public double getDouble(String childTypeUri, double defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getDouble(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
 
     // ---
 
     @Override
     public boolean getBoolean(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getBoolean(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().booleanValue();
     }
 
     @Override
     public boolean getBoolean(String childTypeUri, boolean defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getBoolean(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
     // ---
 
     @Override
     public Object getObject(String childTypeUri) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getObject(childTypeUri);
+        return getTopic(childTypeUri).getSimpleValue().value();
     }
 
     @Override
     public Object getObject(String childTypeUri, Object defaultValue) {
-        // ### FIXME: must load child topic on-demand
-        return getModel().getObject(childTypeUri, defaultValue);
+        // ### FIXME: drop this method.
+        Topic topic = getTopic(childTypeUri, null);
+        return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
     // ---
