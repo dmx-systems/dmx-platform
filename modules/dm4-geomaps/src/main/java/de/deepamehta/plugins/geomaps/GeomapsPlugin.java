@@ -327,7 +327,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      * Searches a topic's composite value for a topic of a given type.
      * The search is driven by the topic's type definition. In other words, composite value entries which do not
      * adhere to the topic's type definition are not found.
-     * Note: this is an in-memory search; the DB is not accessed. ### Not true anymore! See source code comment.
+     * Note: this is an in-memory search; the DB is not accessed.
      * <p>
      * The first topic found is returned, according to a depth-first search.
      * For multiple-value fields only the first topic is returned.
@@ -340,9 +340,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             return topic;
         }
         //
-        // ### FIXME: all topics going over the wire include all their child topics, regardless if requested or not!
-        // ### This is since we have on-demand child topic loading. Possible options: 1) don't operate on the
-        // ### attached composite value here, but on the composite value model, or 2) rethink on-demand loading.
         CompositeValue comp = topic.getCompositeValue();
         TopicType topicType = dms.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
@@ -350,11 +347,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             String cardinalityUri = assocDef.getChildCardinalityUri();
             Topic childTopic = null;
             if (cardinalityUri.equals("dm4.core.one")) {
-                childTopic = comp.getTopic(childTypeUri, null);
+                // Note: we don't want load child topics from DB. So we use has() before getTopic().
+                // The latter would load the child topic on-demand.
+                if (comp.has(childTypeUri)) {
+                    childTopic = comp.getTopic(childTypeUri);
+                }
             } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<Topic> childTopics = comp.getTopics(childTypeUri, null);
-                if (childTopics != null && !childTopics.isEmpty()) {
-                    childTopic = childTopics.get(0);
+                // Note: we don't want load child topics from DB. So we use has() before getTopics().
+                // The latter would load the child topics on-demand.
+                if (comp.has(childTypeUri)) {
+                    List<Topic> childTopics = comp.getTopics(childTypeUri);
+                    if (!childTopics.isEmpty()) {
+                        childTopic = childTopics.get(0);
+                    }
                 }
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
