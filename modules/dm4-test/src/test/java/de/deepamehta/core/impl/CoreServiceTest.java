@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.CompositeValue;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -99,6 +100,35 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
+    }
+
+    // ---
+
+    @Test
+    public void onDemandChildTopicLoading() {
+        dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
+            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
+        //
+        Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+        CompositeValue comp = topic.getCompositeValue();
+        assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
+        //
+        Topic childTopic = comp.getTopic("dm4.core.plugin_migration_nr");
+        assertEquals(23, childTopic.getSimpleValue().intValue());           // child topic is loaded on-demand
+        assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
+    }
+
+    @Test
+    public void onDemandChildTopicLoadingWithConvenienceAccessor() {
+        dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
+            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
+        //
+        Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+        CompositeValue comp = topic.getCompositeValue();
+        assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
+        //
+        assertEquals(23, comp.getInt("dm4.core.plugin_migration_nr"));      // child topic is loaded on-demand
+        assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
     }
 
     // ---
