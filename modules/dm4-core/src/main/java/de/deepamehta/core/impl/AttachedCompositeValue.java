@@ -71,23 +71,9 @@ class AttachedCompositeValue implements CompositeValue {
     }
 
     @Override
-    public Topic getTopic(String childTypeUri, Topic defaultTopic) {
-        loadChildTopics(childTypeUri);
-        return _getTopic(childTypeUri, (AttachedTopic) defaultTopic);
-    }
-
-    // ---
-
-    @Override
     public List<Topic> getTopics(String childTypeUri) {
         loadChildTopics(childTypeUri);
         return _getTopics(childTypeUri);
-    }
-
-    @Override
-    public List<Topic> getTopics(String childTypeUri, List<Topic> defaultValue) {
-        loadChildTopics(childTypeUri);
-        return _getTopics(childTypeUri, defaultValue);
     }
 
     // ---
@@ -129,27 +115,9 @@ class AttachedCompositeValue implements CompositeValue {
     }
 
     @Override
-    public String getString(String childTypeUri, String defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().toString() : defaultValue;
-    }
-
-    // ---
-
-    @Override
     public int getInt(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().intValue();
     }
-
-    @Override
-    public int getInt(String childTypeUri, int defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
-    }
-
-    // ---
 
     @Override
     public long getLong(String childTypeUri) {
@@ -157,27 +125,9 @@ class AttachedCompositeValue implements CompositeValue {
     }
 
     @Override
-    public long getLong(String childTypeUri, long defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
-    }
-
-    // ---
-
-    @Override
     public double getDouble(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().doubleValue();
     }
-
-    @Override
-    public double getDouble(String childTypeUri, double defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
-    }
-
-    // ---
 
     @Override
     public boolean getBoolean(String childTypeUri) {
@@ -185,24 +135,8 @@ class AttachedCompositeValue implements CompositeValue {
     }
 
     @Override
-    public boolean getBoolean(String childTypeUri, boolean defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
-    }
-
-    // ---
-
-    @Override
     public Object getObject(String childTypeUri) {
         return getTopic(childTypeUri).getSimpleValue().value();
-    }
-
-    @Override
-    public Object getObject(String childTypeUri, Object defaultValue) {
-        // ### FIXME: drop this method.
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
     // ---
@@ -210,12 +144,6 @@ class AttachedCompositeValue implements CompositeValue {
     @Override
     public CompositeValue getCompositeValue(String childTypeUri) {
         return getTopic(childTypeUri).getCompositeValue();
-    }
-
-    @Override
-    public CompositeValue getCompositeValue(String childTypeUri, CompositeValue defaultValue) {
-        Topic topic = getTopic(childTypeUri, null);
-        return topic != null ? topic.getCompositeValue() : defaultValue;
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.

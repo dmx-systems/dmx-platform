@@ -23,26 +23,10 @@ public interface CompositeValue {
     Topic getTopic(String childTypeUri);
 
     /**
-     * Accesses a single-valued child.
-     * Returns a default value if there is no such child.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    Topic getTopic(String childTypeUri, Topic defaultTopic);
-
-    // ---
-
-    /**
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
     List<Topic> getTopics(String childTypeUri);
-
-    /**
-     * Accesses a multiple-valued child.
-     * Returns a default value if there is no such child.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    List<Topic> getTopics(String childTypeUri, List<Topic> defaultValue);
 
     // ---
 
@@ -70,27 +54,9 @@ public interface CompositeValue {
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    String getString(String childTypeUri, String defaultValue);
-
-    // ---
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     int getInt(String childTypeUri);
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    int getInt(String childTypeUri, int defaultValue);
-
-    // ---
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -100,27 +66,9 @@ public interface CompositeValue {
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    long getLong(String childTypeUri, long defaultValue);
-
-    // ---
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     double getDouble(String childTypeUri);
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    double getDouble(String childTypeUri, double defaultValue);
-
-    // ---
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -130,25 +78,9 @@ public interface CompositeValue {
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    boolean getBoolean(String childTypeUri, boolean defaultValue);
-
-    // ---
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     Object getObject(String childTypeUri);
-
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    Object getObject(String childTypeUri, Object defaultValue);
 
     // ---
 
@@ -157,13 +89,6 @@ public interface CompositeValue {
      * Throws if the child doesn't exist.
      */
     CompositeValue getCompositeValue(String childTypeUri);
-
-    /**
-     * Convenience accessor for the *composite* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     * ### TODO: rethink default values. Are they still useful? Meanwhile we load child topics on-demand.
-     */
-    CompositeValue getCompositeValue(String childTypeUri, CompositeValue defaultValue);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
