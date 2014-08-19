@@ -158,23 +158,23 @@ public interface DeepaMehtaStorage {
     // ---
 
     /**
-     * @param   id                  id of a topic or an association
+     * @param   objectId            id of a topic or an association
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri,
+    List<RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
-     * @param   id                  id of a topic or an association
+     * @param   objectId            id of a topic or an association
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri,
+    List<RelatedAssociationModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
 
@@ -223,5 +223,9 @@ public interface DeepaMehtaStorage {
 
     void shutdown();
 
+    // ---
+
     Object getDatabaseVendorObject();
+
+    Object getDatabaseVendorObject(long objectId);
 }

@@ -113,17 +113,22 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         try {
             Topic geoCoordTopic = getGeoCoordinateTopic(geoTopic);
             if (geoCoordTopic != null) {
-                CompositeValue comp = geoCoordTopic.getCompositeValue();
-                return new GeoCoordinate(
-                    comp.getDouble("dm4.geomaps.longitude"),
-                    comp.getDouble("dm4.geomaps.latitude")
-                );
+                return geoCoordinate(geoCoordTopic);
             } else {
                 return null;
             }
         } catch (Exception e) {
             throw new RuntimeException("Getting the geo coordinate failed (geoTopic=" + geoTopic + ")", e);
         }
+    }
+
+    @Override
+    public GeoCoordinate geoCoordinate(Topic geoCoordTopic) {
+        CompositeValue comp = geoCoordTopic.getCompositeValue();
+        return new GeoCoordinate(
+            comp.getDouble("dm4.geomaps.longitude"),
+            comp.getDouble("dm4.geomaps.latitude")
+        );
     }
 
     @PUT
@@ -342,11 +347,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             String cardinalityUri = assocDef.getChildCardinalityUri();
             Topic childTopic = null;
             if (cardinalityUri.equals("dm4.core.one")) {
-                childTopic = comp.getTopic(childTypeUri, null);
+                // Note: we don't want load child topics from DB. So we use has() before getTopic().
+                // The latter would load the child topic on-demand.
+                if (comp.has(childTypeUri)) {
+                    childTopic = comp.getTopic(childTypeUri);
+                }
             } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<Topic> childTopics = comp.getTopics(childTypeUri, null);
-                if (childTopics != null && !childTopics.isEmpty()) {
-                    childTopic = childTopics.get(0);
+                // Note: we don't want load child topics from DB. So we use has() before getTopics().
+                // The latter would load the child topics on-demand.
+                if (comp.has(childTypeUri)) {
+                    List<Topic> childTopics = comp.getTopics(childTypeUri);
+                    if (!childTopics.isEmpty()) {
+                        childTopic = childTopics.get(0);
+                    }
                 }
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");

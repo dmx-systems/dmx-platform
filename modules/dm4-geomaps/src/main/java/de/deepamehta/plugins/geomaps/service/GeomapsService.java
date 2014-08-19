@@ -25,6 +25,11 @@ public interface GeomapsService extends PluginService {
     GeoCoordinate getGeoCoordinate(Topic geoTopic);
 
     /**
+     * Returns the geo coordinate encoded in a Geo Coordinate topic.
+     */
+    GeoCoordinate geoCoordinate(Topic geoCoordTopic);
+
+    /**
      * Adds a Geo Coordinate topic to a geomap.
      */
     void addCoordinateToGeomap(long geomapId, long geoCoordId);
