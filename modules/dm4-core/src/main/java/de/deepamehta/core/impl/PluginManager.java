@@ -50,7 +50,8 @@ class PluginManager {
      * Once the plugin is activated checks if <i>all</i> installed plugins are activated now, and if so, fires the
      * {@link CoreEvent.ALL_PLUGINS_ACTIVE} core event.
      * <p>
-     * If the plugin is already activated, nothing is performed. This happens e.g. when a dependent plugin is redeployed.
+     * If the plugin is already activated, nothing is performed. This happens e.g. when a dependent plugin is
+     * redeployed.
      * <p>
      * Note: this method is synchronized. While a plugin is activated no other plugin must be activated. Otherwise
      * the "type introduction" mechanism might miss some types. Consider this unsynchronized scenario: plugin B

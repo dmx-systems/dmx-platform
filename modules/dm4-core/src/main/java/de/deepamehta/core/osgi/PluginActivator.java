@@ -26,6 +26,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     private BundleContext bundleContext;
     private PluginImpl plugin;
+    private String pluginName;  // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -41,13 +42,14 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     @Override
     public void start(BundleContext context) {
-        this.bundleContext = context;
-        this.bundle = context.getBundle();
-        this.plugin = new PluginImpl(this);
-        //
         try {
-            // Note: logging "this" requires "plugin" to be initialzed already
+            // Note: logging "this" requires "pluginName" to be initialzed already
+            this.bundleContext = context;
+            this.bundle = context.getBundle();
+            this.pluginName = (String) bundle.getHeaders().get("Bundle-Name");
+            //
             logger.info("========== Starting " + this + " ==========");
+            plugin = new PluginImpl(this);
             plugin.start();
         } catch (Exception e) {
             logger.severe("Starting " + this + " failed:");
@@ -60,8 +62,12 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public void stop(BundleContext context) {
         try {
+            if (plugin == null) {
+                logger.info("Stopping " + this + " ABORTED -- it was not successfully started");
+                return;
+            }
+            //
             logger.info("========== Stopping " + this + " ==========");
-            shutdown();
             plugin.stop();
         } catch (Exception e) {
             logger.severe("Stopping " + this + " failed:");
@@ -101,12 +107,17 @@ public class PluginActivator implements BundleActivator, PluginContext {
     // ---
 
     @Override
-    public BundleContext getBundleContext() {
+    public final String getPluginName() {
+        return pluginName;
+    }
+
+    @Override
+    public final BundleContext getBundleContext() {
         return bundleContext;
     }
 
     @Override
-    public void setCoreService(DeepaMehtaService dms) {
+    public final void setCoreService(DeepaMehtaService dms) {
         this.dms = dms;
     }
 
@@ -116,7 +127,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     @Override
     public String toString() {
-        return plugin.toString();
+        return "plugin \"" + pluginName + "\"";
     }
 
 

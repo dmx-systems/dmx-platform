@@ -61,7 +61,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private Bundle       pluginBundle;
     private String       pluginUri;             // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
-    private String       pluginName;            // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
     private String       pluginClass;
 
     private Properties   pluginProperties;      // Read from file "plugin.properties"
@@ -103,7 +102,6 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         this.pluginBundle = bundleContext.getBundle();
         this.pluginUri = pluginBundle.getSymbolicName();
-        this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
         this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
         //
         this.pluginProperties = readConfigFile();
@@ -126,6 +124,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     public void stop() {
+        pluginContext.shutdown();
         closeServiceTrackers();
     }
 
@@ -176,7 +175,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     @Override
     public String toString() {
-        return "plugin \"" + pluginName + "\"";
+        return pluginContext.toString();
     }
 
 
@@ -343,7 +342,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
                 } catch (Exception e) {
-                    logger.severe("Adding service " + service + " to plugin \"" + pluginName + "\" failed:");
+                    logger.severe("Adding service " + service + " to plugin \"" + pluginName() + "\" failed:");
                     e.printStackTrace();
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
@@ -356,7 +355,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
                 } catch (Exception e) {
-                    logger.severe("Removing service " + service + " from plugin \"" + pluginName + "\" failed:");
+                    logger.severe("Removing service " + service + " from plugin \"" + pluginName() + "\" failed:");
                     e.printStackTrace();
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
@@ -406,7 +405,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void removeService(Object service, Class serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
-            dms.pluginManager.deactivatePlugin(this);  // use core service's plugin manager before core service is removed
+            dms.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
             setCoreService(null);
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
@@ -550,7 +549,7 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private Topic createPluginTopic() {
         return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValueModel()
-            .put("dm4.core.plugin_name", pluginName)
+            .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
         ), null);   // clientState=null
@@ -891,6 +890,12 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
     // === Helper ===
+
+    private String pluginName() {
+        return pluginContext.getPluginName();
+    }
+
+    // ---
 
     private List<String> scanPackage(String relativePath) {
         List<String> classNames = new ArrayList();
