@@ -23,12 +23,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import static java.util.Arrays.asList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -324,9 +320,8 @@ public class Neo4jStorageTest {
             f.delete();
             new File(n).mkdir();
             return n;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating temporary directory failed", e);
         }
     }
 }

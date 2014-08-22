@@ -42,6 +42,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -342,8 +343,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
                 } catch (Exception e) {
-                    logger.severe("Adding service " + service + " to plugin \"" + pluginName() + "\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Adding service " + service + " to plugin \"" + pluginName() +
+                        "\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
                 return service;
@@ -355,8 +356,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
                 } catch (Exception e) {
-                    logger.severe("Removing service " + service + " from plugin \"" + pluginName() + "\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Removing service " + service + " from plugin \"" + pluginName() +
+                        "\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
             }
@@ -881,8 +882,8 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
         } catch (Exception e) {
-            logger.severe("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this + " failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this +
+                " failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }

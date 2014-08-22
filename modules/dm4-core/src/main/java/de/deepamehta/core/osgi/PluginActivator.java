@@ -9,6 +9,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -16,6 +17,7 @@ import java.util.logging.Logger;
 /**
  * Base class for all DeepaMehta plugins.
  * All DeepaMehta plugins are derived from this class, directly or indirectly.
+ * ### FIXDOC: subclassing is not required if the plugin has no server-side part.
  */
 public class PluginActivator implements BundleActivator, PluginContext {
 
@@ -52,8 +54,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
             plugin = new PluginImpl(this);
             plugin.start();
         } catch (Exception e) {
-            logger.severe("Starting " + this + " failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Starting " + this + " failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
         }
@@ -70,8 +71,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
             logger.info("========== Stopping " + this + " ==========");
             plugin.stop();
         } catch (Exception e) {
-            logger.severe("Stopping " + this + " failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Stopping " + this + " failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }

@@ -5,6 +5,7 @@ import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -40,8 +41,7 @@ public class Neo4jStorageActivator implements BundleActivator {
             logger.info("Registering DeepaMehta 4 storage service - Neo4j - at OSGi framework");
             context.registerService(DeepaMehtaStorage.class.getName(), storage, null);
         } catch (Exception e) {
-            logger.severe("Starting \"DeepaMehta 4 Storage - Neo4j\" failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Starting \"DeepaMehta 4 Storage - Neo4j\" failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
         }
@@ -55,8 +55,7 @@ public class Neo4jStorageActivator implements BundleActivator {
                 storage.shutdown();
             }
         } catch (Exception e) {
-            logger.severe("Stopping \"DeepaMehta 4 Storage - Neo4j\" failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Stopping \"DeepaMehta 4 Storage - Neo4j\" failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
