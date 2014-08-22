@@ -389,11 +389,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private InputStream invokeWebclient() {
-        try {
-            return dms.getPlugin("de.deepamehta.webclient").getResourceAsStream("web/index.html");
-        } catch (Exception e) {
-            throw new RuntimeException("Invoking the webclient failed", e);
-        }
+        return dms.getPlugin("de.deepamehta.webclient").getStaticResource("/web/index.html");
     }
 
     // --------------------------------------------------------------------------------------------- Private Inner Class

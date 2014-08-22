@@ -154,22 +154,29 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginUri;
     }
 
-    /**
-     * Uses the plugin bundle's class loader to find a resource.
-     *
-     * @return  A InputStream object or null if no resource with this name is found.
-     */
+    // --- Plugin Implementation ---
+
     @Override
-    public InputStream getResourceAsStream(String name) throws IOException {
-        // We always use the plugin bundle's class loader to access the resource.
-        // getClass().getResource() would fail for generic plugins (plugin bundles not containing a plugin
-        // subclass) because the core bundle's class loader would be used and it has no access.
-        URL url = pluginBundle.getResource(name);
-        if (url != null) {
-            return url.openStream();
-        } else {
-            return null;
+    public InputStream getStaticResource(String name) {
+        try {
+            // We always use the plugin bundle's class loader to access the resource.
+            // getClass().getResource() would fail for generic plugins (plugin bundles not containing a plugin
+            // subclass) because the core bundle's class loader would be used and it has no access.
+            URL url = pluginBundle.getResource(name);
+            //
+            if (url == null) {
+                throw new RuntimeException("Resource \"" + name + "\" not found");
+            }
+            //
+            return url.openStream();    // throws IOException
+        } catch (Exception e) {
+            throw new RuntimeException("Accessing a static resource of " + this + " failed", e);
         }
+    }
+
+    @Override
+    public boolean hasStaticResource(String name) {
+        return getBundleEntry(name) != null;
     }
 
     // ---
@@ -254,14 +261,15 @@ public class PluginImpl implements Plugin, EventHandler {
     private Properties readConfigFile() {
         try {
             Properties properties = new Properties();
-            InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
-            if (in != null) {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
-                properties.load(in);
-            } else {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this +
-                    " ABORTED -- file does not exist");
+            //
+            if (!hasStaticResource(PLUGIN_CONFIG_FILE)) {
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " ABORTED " +
+                    "-- file does not exist");
+                return properties;
             }
+            //
+            logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
+            properties.load(getStaticResource(PLUGIN_CONFIG_FILE));
             return properties;
         } catch (Exception e) {
             throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
@@ -733,7 +741,11 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private String getStaticResourcesNamespace() {
-        return pluginBundle.getEntry("/web") != null ? "/" + pluginUri : null;
+        return getBundleEntry("/web") != null ? "/" + pluginUri : null;
+    }
+
+    private URL getBundleEntry(String path) {
+        return pluginBundle.getEntry(path);
     }
 
 

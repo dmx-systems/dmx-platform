@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.InputStream;
@@ -182,8 +183,8 @@ class MigrationManager {
                     migrationClass = loadClass(migrationClassName);
                 } else {
                     migrationInfo = "migration " + migrationNr + " of " + plugin;
-                    configIn     = plugin.getResourceAsStream(configFile);
-                    migrationIn  = plugin.getResourceAsStream(migrationFile);
+                    configIn     = getStaticResourceOrNull(plugin, configFile);
+                    migrationIn  = getStaticResourceOrNull(plugin, migrationFile);
                     migrationClassName = plugin.getMigrationClassName(migrationNr);
                     if (migrationClassName != null) {
                         migrationClass = plugin.loadClass(migrationClassName);
@@ -237,7 +238,15 @@ class MigrationManager {
             return CORE_MIGRATIONS_PACKAGE + ".Migration" + migrationNr;
         }
 
-        // --- Generic Utilities ---
+        // --- Helper ---
+
+        private InputStream getStaticResourceOrNull(Plugin plugin, String resourceName) {
+            if (plugin.hasStaticResource(resourceName)) {
+                return plugin.getStaticResource(resourceName);
+            } else {
+                return null;
+            }
+        }
 
         /**
          * Uses the core bundle's class loader to load a class by name.
