@@ -12,6 +12,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -57,8 +58,7 @@ public class CoreActivator implements BundleActivator {
             storageServiceTracker.open();
             httpServiceTracker.open();
         } catch (Exception e) {
-            logger.severe("Starting \"DeepaMehta 4 Core\" failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Starting \"DeepaMehta 4 Core\" failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
         }
@@ -74,8 +74,7 @@ public class CoreActivator implements BundleActivator {
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.
         } catch (Exception e) {
-            logger.severe("Stopping \"DeepaMehta 4 Core\" failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Stopping \"DeepaMehta 4 Core\" failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
@@ -99,8 +98,7 @@ public class CoreActivator implements BundleActivator {
                     service = super.addingService(serviceRef);
                     addService(service);
                 } catch (Exception e) {
-                    logger.severe("Adding service " + service + " to \"DeepaMehta 4 Core\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Adding service " + service + " to \"DeepaMehta 4 Core\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
                 return service;
@@ -112,8 +110,7 @@ public class CoreActivator implements BundleActivator {
                     removeService(service);
                     super.removedService(ref, service);
                 } catch (Exception e) {
-                    logger.severe("Removing service " + service + " from \"DeepaMehta 4 Core\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Removing service " + service + " from \"DeepaMehta 4 Core\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
             }

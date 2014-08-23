@@ -42,6 +42,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -61,7 +62,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private Bundle       pluginBundle;
     private String       pluginUri;             // This bundle's symbolic name, e.g. "de.deepamehta.webclient"
-    private String       pluginName;            // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
     private String       pluginClass;
 
     private Properties   pluginProperties;      // Read from file "plugin.properties"
@@ -103,7 +103,6 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         this.pluginBundle = bundleContext.getBundle();
         this.pluginUri = pluginBundle.getSymbolicName();
-        this.pluginName = (String) pluginBundle.getHeaders().get("Bundle-Name");
         this.pluginClass = (String) pluginBundle.getHeaders().get("Bundle-Activator");
         //
         this.pluginProperties = readConfigFile();
@@ -126,6 +125,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     public void stop() {
+        pluginContext.shutdown();
         closeServiceTrackers();
     }
 
@@ -154,29 +154,36 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginUri;
     }
 
-    /**
-     * Uses the plugin bundle's class loader to find a resource.
-     *
-     * @return  A InputStream object or null if no resource with this name is found.
-     */
+    // --- Plugin Implementation ---
+
     @Override
-    public InputStream getResourceAsStream(String name) throws IOException {
-        // We always use the plugin bundle's class loader to access the resource.
-        // getClass().getResource() would fail for generic plugins (plugin bundles not containing a plugin
-        // subclass) because the core bundle's class loader would be used and it has no access.
-        URL url = pluginBundle.getResource(name);
-        if (url != null) {
-            return url.openStream();
-        } else {
-            return null;
+    public InputStream getStaticResource(String name) {
+        try {
+            // We always use the plugin bundle's class loader to access the resource.
+            // getClass().getResource() would fail for generic plugins (plugin bundles not containing a plugin
+            // subclass) because the core bundle's class loader would be used and it has no access.
+            URL url = pluginBundle.getResource(name);
+            //
+            if (url == null) {
+                throw new RuntimeException("Resource \"" + name + "\" not found");
+            }
+            //
+            return url.openStream();    // throws IOException
+        } catch (Exception e) {
+            throw new RuntimeException("Accessing a static resource of " + this + " failed", e);
         }
+    }
+
+    @Override
+    public boolean hasStaticResource(String name) {
+        return getBundleEntry(name) != null;
     }
 
     // ---
 
     @Override
     public String toString() {
-        return "plugin \"" + pluginName + "\"";
+        return pluginContext.toString();
     }
 
 
@@ -254,14 +261,15 @@ public class PluginImpl implements Plugin, EventHandler {
     private Properties readConfigFile() {
         try {
             Properties properties = new Properties();
-            InputStream in = getResourceAsStream(PLUGIN_CONFIG_FILE);
-            if (in != null) {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
-                properties.load(in);
-            } else {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this +
-                    " ABORTED -- file does not exist");
+            //
+            if (!hasStaticResource(PLUGIN_CONFIG_FILE)) {
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " ABORTED " +
+                    "-- file does not exist");
+                return properties;
             }
+            //
+            logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this);
+            properties.load(getStaticResource(PLUGIN_CONFIG_FILE));
             return properties;
         } catch (Exception e) {
             throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
@@ -343,8 +351,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
                 } catch (Exception e) {
-                    logger.severe("Adding service " + service + " to plugin \"" + pluginName + "\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Adding service " + service + " to plugin \"" + pluginName() +
+                        "\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
                 return service;
@@ -356,8 +364,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
                 } catch (Exception e) {
-                    logger.severe("Removing service " + service + " from plugin \"" + pluginName + "\" failed:");
-                    e.printStackTrace();
+                    logger.log(Level.SEVERE, "Removing service " + service + " from plugin \"" + pluginName() +
+                        "\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
             }
@@ -406,7 +414,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void removeService(Object service, Class serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
-            dms.pluginManager.deactivatePlugin(this);  // use core service's plugin manager before core service is removed
+            dms.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
             setCoreService(null);
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
@@ -550,7 +558,7 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private Topic createPluginTopic() {
         return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValueModel()
-            .put("dm4.core.plugin_name", pluginName)
+            .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
         ), null);   // clientState=null
@@ -733,7 +741,11 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private String getStaticResourcesNamespace() {
-        return pluginBundle.getEntry("/web") != null ? "/" + pluginUri : null;
+        return getBundleEntry("/web") != null ? "/" + pluginUri : null;
+    }
+
+    private URL getBundleEntry(String path) {
+        return pluginBundle.getEntry(path);
     }
 
 
@@ -882,8 +894,8 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
         } catch (Exception e) {
-            logger.severe("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this + " failed:");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this +
+                " failed", e);
             // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
         }
     }
@@ -891,6 +903,12 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
     // === Helper ===
+
+    private String pluginName() {
+        return pluginContext.getPluginName();
+    }
+
+    // ---
 
     private List<String> scanPackage(String relativePath) {
         List<String> classNames = new ArrayList();

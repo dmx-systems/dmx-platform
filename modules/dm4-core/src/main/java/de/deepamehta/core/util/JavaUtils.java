@@ -2,8 +2,6 @@ package de.deepamehta.core.util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
@@ -145,9 +143,8 @@ public class JavaUtils {
             f = new File(n);
             f.mkdir();
             return f;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating temporary directory failed", e);
         }
     }
 

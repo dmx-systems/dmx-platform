@@ -9,6 +9,8 @@ import org.osgi.framework.BundleContext;
 
 public interface PluginContext {
 
+    // --- Hooks to be overridden by the plugin developer ---
+
     void init();
 
     void shutdown();
@@ -19,7 +21,9 @@ public interface PluginContext {
 
     void serviceGone(PluginService service);
 
-    // ---
+    // --- Internal ---
+
+    String getPluginName();
 
     BundleContext getBundleContext();
 
