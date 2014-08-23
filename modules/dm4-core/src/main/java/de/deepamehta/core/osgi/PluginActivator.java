@@ -9,6 +9,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -134,14 +135,18 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     // ----------------------------------------------------------------------------------------------- Protected Methods
 
-    protected String getUri() {
+    protected final String getUri() {
         return plugin.getUri();
+    }
+
+    protected final InputStream getStaticResource(String name) {
+        return plugin.getStaticResource(name);
     }
 
     /**
      * @param   securityHandler     Optional. If null no security is provided.
      */
-    protected void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
+    protected final void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
         plugin.publishDirectory(directoryPath, uriNamespace, securityHandler);
     }
 }
