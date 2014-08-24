@@ -61,7 +61,6 @@
                             de.deepamehta.core.model,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
-                            de.deepamehta.core.service.annotation,
                             de.deepamehta.core.service.event,
                             de.deepamehta.core.storage.spi,
                             de.deepamehta.core.util,
