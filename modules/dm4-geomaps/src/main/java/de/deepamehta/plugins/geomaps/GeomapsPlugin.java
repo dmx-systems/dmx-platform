@@ -20,9 +20,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
@@ -65,8 +64,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private TopicmapsService topicmapsService;
-    private FacetsService facetsService;
+    @Inject private TopicmapsService topicmapsService;
+    @Inject private FacetsService facetsService;
 
     @Context
     private HttpHeaders httpHeaders;
@@ -182,27 +181,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void init() {
         topicmapsService.registerTopicmapRenderer(new GeomapRenderer());
-    }
-
-    // ---
-
-    @Override
-    @ConsumesService({TopicmapsService.class, FacetsService.class})
-    public void serviceArrived(PluginService service) {
-        if (service instanceof FacetsService) {
-            facetsService = (FacetsService) service;
-        } else if (service instanceof TopicmapsService) {
-            topicmapsService = (TopicmapsService) service;
-        }
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        if (service == facetsService) {
-            facetsService = null;
-        } else if (service == topicmapsService) {
-            topicmapsService = null;
-        }
     }
 
 

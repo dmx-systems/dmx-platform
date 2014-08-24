@@ -6,8 +6,7 @@ import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.Inject;
 
 import java.util.logging.Logger;
 
@@ -22,6 +21,9 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @Inject
+    private TopicmapsService topicmapsService;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -29,17 +31,17 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** Hook Implementations ***
 
     @Override
-    @ConsumesService(TopicmapsService.class)
-    public void serviceArrived(PluginService service) {
-        ((TopicmapsService) service).registerViewmodelCustomizer(this);
+    public void init() {
+        topicmapsService.registerViewmodelCustomizer(this);
     }
 
     @Override
-    public void serviceGone(PluginService service) {
+    public void shutdown() {
         // Note: unregistering is important. Otherwise the Topicmaps plugin would hold a viewmodel
         // customizer with a stale dms instance as soon as the Box Renderer is redeployed.
         // A subsequent storeViewProperties() call (see below) would fail.
-        ((TopicmapsService) service).unregisterViewmodelCustomizer(this);
+        // ### FIXME: was called at serviceGone() which is obsolete.
+        topicmapsService.unregisterViewmodelCustomizer(this);
     }
 
     // *** ViewmodelCustomizer Implementation ***

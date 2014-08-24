@@ -27,8 +27,7 @@ import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
-import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
@@ -137,6 +136,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @Inject
     private WorkspacesService wsService;
 
     @Context
@@ -380,19 +380,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
             "\n    dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
             "\n    dm4.security.subnet_filter=\""+ SUBNET_FILTER + "\"");
-    }
-
-    // ---
-
-    @Override
-    @ConsumesService(WorkspacesService.class)
-    public void serviceArrived(PluginService service) {
-        wsService = (WorkspacesService) service;
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        wsService = null;
     }
 
 

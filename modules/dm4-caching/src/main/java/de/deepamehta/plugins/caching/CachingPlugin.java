@@ -4,8 +4,7 @@ import de.deepamehta.plugins.time.service.TimeService;
 
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 
@@ -35,31 +34,14 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @Inject
     private TimeService timeService;
+
     private Pattern cachablePath = Pattern.compile(CACHABLE_PATH);
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
-
-
-
-    @Override
-    @ConsumesService(TimeService.class)
-    public void serviceArrived(PluginService service) {
-        timeService = (TimeService) service;
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        timeService = null;
-    }
 
 
 

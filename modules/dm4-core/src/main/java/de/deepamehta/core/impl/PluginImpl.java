@@ -33,7 +33,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
