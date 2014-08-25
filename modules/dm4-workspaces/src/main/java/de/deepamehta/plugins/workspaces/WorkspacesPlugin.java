@@ -16,8 +16,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
@@ -44,6 +43,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    @Inject
     private FacetsService facetsService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -125,19 +125,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void postInstall() {
         createWorkspace(DEFAULT_WORKSPACE_NAME, DEFAULT_WORKSPACE_URI, DEFAULT_WORKSPACE_TYPE_URI);
-    }
-
-    // ---
-
-    @Override
-    @ConsumesService(FacetsService.class)
-    public void serviceArrived(PluginService service) {
-        facetsService = (FacetsService) service;
-    }
-
-    @Override
-    public void serviceGone(PluginService service) {
-        facetsService = null;
     }
 
 

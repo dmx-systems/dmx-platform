@@ -83,7 +83,7 @@ public class CoreActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private ServiceTracker createServiceTracker(Class serviceInterface) {
+    private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //
         return new ServiceTracker(bundleContext, serviceInterface.getName(), null) {
 
@@ -98,7 +98,8 @@ public class CoreActivator implements BundleActivator {
                     service = super.addingService(serviceRef);
                     addService(service);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Adding service " + service + " to \"DeepaMehta 4 Core\" failed", e);
+                    logger.log(Level.SEVERE, "Adding service " + serviceInterface.getName() +
+                        " to \"DeepaMehta 4 Core\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
                 return service;
@@ -110,7 +111,8 @@ public class CoreActivator implements BundleActivator {
                     removeService(service);
                     super.removedService(ref, service);
                 } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Removing service " + service + " from \"DeepaMehta 4 Core\" failed", e);
+                    logger.log(Level.SEVERE, "Removing service " + serviceInterface.getName() +
+                        " from \"DeepaMehta 4 Core\" failed", e);
                     // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
                 }
             }
