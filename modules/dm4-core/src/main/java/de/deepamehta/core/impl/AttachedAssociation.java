@@ -14,7 +14,6 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
@@ -67,7 +66,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                  If role 2 is <code>null</code> it is not updated.
      */
     @Override
-    public void update(AssociationModel model, ClientState clientState, Directives directives) {
+    public void update(AssociationModel model, Directives directives) {
         // ### TODO: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
         // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
         // Per request exactly one association is updated. Its childs are topics (never associations).
@@ -76,13 +75,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model, directives);
         //
         AssociationModel oldModel = getModel().clone();
-        super.update(model, clientState, directives);
+        super.update(model, directives);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
         addUpdateDirective(directives);
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, clientState, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, directives);
     }
 
 

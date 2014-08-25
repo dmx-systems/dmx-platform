@@ -8,7 +8,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
@@ -231,7 +230,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, null, new Directives());
+        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, new Directives());
     }
 
     // ---
@@ -552,7 +551,7 @@ public class PluginImpl implements Plugin, EventHandler {
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
-        ), null);   // clientState=null
+        ));
     }
 
     private Topic fetchPluginTopic() {
@@ -570,7 +569,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 }
                 //
                 TopicType topicType = dms.getTopicType(topicTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
@@ -581,7 +580,7 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             for (String assocTypeUri : dms.getAssociationTypeUris()) {
                 AssociationType assocType = dms.getAssociationType(assocTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);

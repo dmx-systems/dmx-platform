@@ -134,6 +134,8 @@ public class PluginActivator implements BundleActivator, PluginContext {
         return plugin.getStaticResource(name);
     }
 
+    // ---
+
     /**
      * @param   securityHandler     Optional. If null no security is provided.
      */

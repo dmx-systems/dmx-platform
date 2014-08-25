@@ -1,7 +1,6 @@
 package de.deepamehta.core.service.event;
 
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.EventListener;
 
 
@@ -38,5 +37,5 @@ import de.deepamehta.core.service.EventListener;
  */
 public interface IntroduceAssociationTypeListener extends EventListener {
 
-    void introduceAssociationType(AssociationType assocType, ClientState clientState);
+    void introduceAssociationType(AssociationType assocType);
 }

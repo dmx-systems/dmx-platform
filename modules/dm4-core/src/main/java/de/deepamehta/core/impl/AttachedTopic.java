@@ -10,7 +10,6 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
@@ -49,8 +48,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Updating ===
 
     @Override
-    public void update(TopicModel model, ClientState clientState, Directives directives) {
-        _update(model, clientState, directives);
+    public void update(TopicModel model, Directives directives) {
+        _update(model, directives);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
@@ -198,17 +197,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
      * Called multiple times while updating a composite value (see AttachedCompositeValue).
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
-    void _update(TopicModel model, ClientState clientState, Directives directives) {
+    void _update(TopicModel model, Directives directives) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
         dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
         //
         TopicModel oldModel = getModel().clone();
-        super.update(model, clientState, directives);
+        super.update(model, directives);
         //
         addUpdateDirective(directives);
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, clientState, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, directives);
     }
 
 

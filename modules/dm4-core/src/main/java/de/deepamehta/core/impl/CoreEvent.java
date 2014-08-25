@@ -6,7 +6,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
@@ -52,7 +51,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreCreateTopicListener) listener).preCreateTopic(
-                (TopicModel) params[0], (ClientState) params[1]
+                (TopicModel) params[0]
             );
         }
     };
@@ -61,7 +60,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreCreateAssociationListener) listener).preCreateAssociation(
-                (AssociationModel) params[0], (ClientState) params[1]
+                (AssociationModel) params[0]
             );
         }
     };
@@ -72,7 +71,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostCreateTopicListener) listener).postCreateTopic(
-                (Topic) params[0], (ClientState) params[1], (Directives) params[2]
+                (Topic) params[0], (Directives) params[1]
             );
         }
     };
@@ -81,7 +80,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostCreateAssociationListener) listener).postCreateAssociation(
-                (Association) params[0], (ClientState) params[1], (Directives) params[2]
+                (Association) params[0], (Directives) params[1]
             );
         }
     };
@@ -112,8 +111,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostUpdateTopicListener) listener).postUpdateTopic(
-                (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2], (ClientState) params[3],
-                (Directives) params[4]
+                (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2], (Directives) params[3]
             );
         }
     };
@@ -122,7 +120,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostUpdateAssociationListener) listener).postUpdateAssociation(
-                (Association) params[0], (AssociationModel) params[1], (ClientState) params[2], (Directives) params[3]
+                (Association) params[0], (AssociationModel) params[1], (Directives) params[2]
             );
         }
     };
@@ -217,7 +215,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreSendTopicListener) listener).preSendTopic(
-                (Topic) params[0], (ClientState) params[1]
+                (Topic) params[0]
             );
         }
     };
@@ -226,7 +224,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreSendAssociationListener) listener).preSendAssociation(
-                (Association) params[0], (ClientState) params[1]
+                (Association) params[0]
             );
         }
     };
@@ -235,7 +233,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreSendTopicTypeListener) listener).preSendTopicType(
-                (TopicType) params[0], (ClientState) params[1]
+                (TopicType) params[0]
             );
         }
     };
@@ -244,7 +242,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreSendAssociationTypeListener) listener).preSendAssociationType(
-                (AssociationType) params[0], (ClientState) params[1]
+                (AssociationType) params[0]
             );
         }
     };
@@ -267,7 +265,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((IntroduceTopicTypeListener) listener).introduceTopicType(
-                (TopicType) params[0], (ClientState) params[1]
+                (TopicType) params[0]
             );
         }
     };
@@ -279,7 +277,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((IntroduceAssociationTypeListener) listener).introduceAssociationType(
-                (AssociationType) params[0], (ClientState) params[1]
+                (AssociationType) params[0]
             );
         }
     };

@@ -1,7 +1,6 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 
@@ -15,5 +14,5 @@ public interface TopicType extends Type {
 
     // === Updating ===
 
-    void update(TopicTypeModel model, ClientState clientState, Directives directives);
+    void update(TopicTypeModel model, Directives directives);
 }

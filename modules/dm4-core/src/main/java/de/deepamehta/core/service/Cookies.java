@@ -1,14 +1,17 @@
 package de.deepamehta.core.service;
 
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
+
 import java.util.HashMap;
 import java.util.Map;
 
 
 
 /**
- * Cookies sent by a client.
+ * Cookies obtained from the request headers.
  */
-public class ClientState {
+public class Cookies {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -16,18 +19,13 @@ public class ClientState {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    /**
-      * Converts a "Cookie" header value (String) to a map (key=String, value=String).
-      * E.g. "dm4_workspace_id=123; dm4_topicmap_id=234" => {"dm4_workspace_id"="123", "dm4_topicmap_id"="234"}
-      * <p>
-      * Called by JAX-RS container to create a ClientState from a "Cookie" @HeaderParam
-      */
-    public ClientState(String cookie) {
-        if (cookie != null) {
-            for (String value : cookie.split("; ")) {
-                String[] val = value.split("=", 2);     // Limit 2 ensures 2nd element in case of empty value
-                values.put(val[0], val[1]);
+    public Cookies(HttpHeaders httpHeaders) {
+        try {
+            for (Cookie cookie : httpHeaders.getCookies().values()) {
+                values.put(cookie.getName(), cookie.getValue());
             }
+        } catch (IllegalStateException e) {
+            // happens if getCookies() is called outside the scope of a request
         }
     }
 
@@ -40,7 +38,7 @@ public class ClientState {
         String value = values.get(name);
         //
         if (value == null) {
-            throw new RuntimeException("Missing \"" + name + "\" cookie (clientState=" + this + ")");
+            throw new RuntimeException("Missing \"" + name + "\" cookie (cookies=" + this + ")");
         }
         //
         return value;

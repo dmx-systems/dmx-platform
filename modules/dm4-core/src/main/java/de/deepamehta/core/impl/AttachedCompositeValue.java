@@ -11,7 +11,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import java.util.ArrayList;
@@ -153,46 +152,44 @@ class AttachedCompositeValue implements CompositeValue {
     // === Manipulators ===
 
     @Override
-    public CompositeValue set(String childTypeUri, TopicModel value, ClientState clientState, Directives directives) {
-        return _update(childTypeUri, value, clientState, directives);
+    public CompositeValue set(String childTypeUri, TopicModel value, Directives directives) {
+        return _update(childTypeUri, value, directives);
     }
 
     @Override
-    public CompositeValue set(String childTypeUri, Object value, ClientState clientState, Directives directives) {
-        return _update(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)), clientState, directives);
+    public CompositeValue set(String childTypeUri, Object value, Directives directives) {
+        return _update(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)), directives);
     }
 
     @Override
-    public CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState,
-                                                                              Directives directives) {
-        return _update(childTypeUri, new TopicModel(childTypeUri, value), clientState, directives);
-    }
-
-    // ---
-
-    @Override
-    public CompositeValue setRef(String childTypeUri, long refTopicId, ClientState clientState, Directives directives) {
-        return _update(childTypeUri, new TopicReferenceModel(refTopicId), clientState, directives);
-    }
-
-    @Override
-    public CompositeValue setRef(String childTypeUri, String refTopicUri, ClientState clientState,
-                                                                          Directives directives) {
-        return _update(childTypeUri, new TopicReferenceModel(refTopicUri), clientState, directives);
+    public CompositeValue set(String childTypeUri, CompositeValueModel value, Directives directives) {
+        return _update(childTypeUri, new TopicModel(childTypeUri, value), directives);
     }
 
     // ---
 
     @Override
-    public CompositeValue remove(String childTypeUri, long topicId, ClientState clientState, Directives directives) {
-        return _update(childTypeUri, new TopicDeletionModel(topicId), clientState, directives);
+    public CompositeValue setRef(String childTypeUri, long refTopicId, Directives directives) {
+        return _update(childTypeUri, new TopicReferenceModel(refTopicId), directives);
+    }
+
+    @Override
+    public CompositeValue setRef(String childTypeUri, String refTopicUri, Directives directives) {
+        return _update(childTypeUri, new TopicReferenceModel(refTopicUri), directives);
+    }
+
+    // ---
+
+    @Override
+    public CompositeValue remove(String childTypeUri, long topicId, Directives directives) {
+        return _update(childTypeUri, new TopicDeletionModel(topicId), directives);
     }
 
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(CompositeValueModel newComp, ClientState clientState, Directives directives) {
+    void update(CompositeValueModel newComp, Directives directives) {
         try {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
                 String childTypeUri   = assocDef.getChildTypeUri();
@@ -215,7 +212,7 @@ class AttachedCompositeValue implements CompositeValue {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
                 //
-                updateChildTopics(newChildTopic, newChildTopics, assocDef, clientState, directives);
+                updateChildTopics(newChildTopic, newChildTopics, assocDef, directives);
             }
             //
             dms.valueStorage.refreshLabel(parent.getModel());
@@ -227,7 +224,7 @@ class AttachedCompositeValue implements CompositeValue {
     }
 
     void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                      ClientState clientState, Directives directives) {
+                                                                                      Directives directives) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
         //
@@ -235,15 +232,15 @@ class AttachedCompositeValue implements CompositeValue {
         boolean one = newChildTopic != null;
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             if (one) {
-                updateCompositionOne(newChildTopic, assocDef, clientState, directives);
+                updateCompositionOne(newChildTopic, assocDef, directives);
             } else {
-                updateCompositionMany(newChildTopics, assocDef, clientState, directives);
+                updateCompositionMany(newChildTopics, assocDef, directives);
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             if (one) {
-                updateAggregationOne(newChildTopic, assocDef, clientState, directives);
+                updateAggregationOne(newChildTopic, assocDef, directives);
             } else {
-                updateAggregationMany(newChildTopics, assocDef, clientState, directives);
+                updateAggregationMany(newChildTopics, assocDef, directives);
             }
         } else {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
@@ -304,36 +301,35 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private CompositeValue _update(String childTypeUri, TopicModel newChildTopic, ClientState clientState,
-                                                                                  Directives directives) {
+    private CompositeValue _update(String childTypeUri, TopicModel newChildTopic, Directives directives) {
         // regard parent object as updated
         parent.addUpdateDirective(directives);
         //
-        updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri), clientState, directives);
-        dms.valueStorage.refreshLabel(parent.getModel());                         // newChildTopics=null
+        updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri), directives);  // newChildTopics=null
+        dms.valueStorage.refreshLabel(parent.getModel());
         return this;
     }
 
     // --- Composition ---
 
     private void updateCompositionOne(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                                ClientState clientState, Directives directives) {
+                                                                Directives directives) {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (childTopic != null) {
             // == update child ==
             // update DB
-            childTopic._update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             // == create child ==
-            createChildTopicOne(newChildTopic, assocDef, clientState, directives);
+            createChildTopicOne(newChildTopic, assocDef, directives);
         }
     }
 
     private void updateCompositionMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                        ClientState clientState, Directives directives) {
+                                                                        Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
@@ -350,10 +346,10 @@ class AttachedCompositeValue implements CompositeValue {
                 removeFromCompositeValue(childTopic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
-                updateChildTopicMany(newChildTopic, assocDef, clientState, directives);
+                updateChildTopicMany(newChildTopic, assocDef, directives);
             } else {
                 // == create child ==
-                createChildTopicMany(newChildTopic, assocDef, clientState, directives);
+                createChildTopicMany(newChildTopic, assocDef, directives);
             }
         }
     }
@@ -361,7 +357,7 @@ class AttachedCompositeValue implements CompositeValue {
     // --- Aggregation ---
 
     private void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                                ClientState clientState, Directives directives) {
+                                                                Directives directives) {
         RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
         if (newChildTopic instanceof TopicReferenceModel) {
             if (childTopic != null) {
@@ -376,24 +372,24 @@ class AttachedCompositeValue implements CompositeValue {
             }
             // update DB
             Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
-                (TopicReferenceModel) newChildTopic, assocDef, clientState);
+                (TopicReferenceModel) newChildTopic, assocDef);
             // update memory
             putInCompositeValue(topic, assocDef);
         } else if (newChildTopic.getId() != -1) {
             // == update child ==
-            updateChildTopicOne(newChildTopic, assocDef, clientState, directives);
+            updateChildTopicOne(newChildTopic, assocDef, directives);
         } else {
             // == create child ==
             // update DB
             if (childTopic != null) {
                 childTopic.getRelatingAssociation().delete(directives);
             }
-            createChildTopicOne(newChildTopic, assocDef, clientState, directives);
+            createChildTopicOne(newChildTopic, assocDef, directives);
         }
     }
 
     private void updateAggregationMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                        ClientState clientState, Directives directives) {
+                                                                        Directives directives) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
@@ -417,27 +413,26 @@ class AttachedCompositeValue implements CompositeValue {
                 // == create assignment ==
                 // update DB
                 Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
-                    (TopicReferenceModel) newChildTopic, assocDef, clientState);
+                    (TopicReferenceModel) newChildTopic, assocDef);
                 // update memory
                 addToCompositeValue(topic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
-                updateChildTopicMany(newChildTopic, assocDef, clientState, directives);
+                updateChildTopicMany(newChildTopic, assocDef, directives);
             } else {
                 // == create child ==
-                createChildTopicMany(newChildTopic, assocDef, clientState, directives);
+                createChildTopicMany(newChildTopic, assocDef, directives);
             }
         }
     }
 
     // ---
 
-    private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
-                                                                                               Directives directives) {
+    private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, Directives directives) {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
             // update DB
-            childTopic._update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -445,12 +440,11 @@ class AttachedCompositeValue implements CompositeValue {
         }
     }
 
-    private void updateChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
-                                                                                                Directives directives) {
+    private void updateChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, Directives directives) {
         AttachedTopic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
         if (childTopic != null) {
             // update DB
-            childTopic._update(newChildTopic, clientState, directives);
+            childTopic._update(newChildTopic, directives);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -460,20 +454,18 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
-                                                                                               Directives directives) {
+    private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef, Directives directives) {
         // update DB
-        Topic childTopic = dms.createTopic(newChildTopic, clientState);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef, clientState);
+        Topic childTopic = dms.createTopic(newChildTopic);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
         // update memory
         putInCompositeValue(childTopic, assocDef);
     }
 
-    private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
-                                                                                               Directives directives) {
+    private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef, Directives directives) {
         // update DB
-        Topic childTopic = dms.createTopic(newChildTopic, clientState);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef, clientState);
+        Topic childTopic = dms.createTopic(newChildTopic);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
         // update memory
         addToCompositeValue(childTopic, assocDef);
     }
