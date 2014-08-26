@@ -343,10 +343,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 try {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.log(Level.SEVERE, "Adding service " + serviceInterface.getName() + " to " +
                         pluginContext + " failed", e);
-                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
                 }
                 return service;
             }
@@ -356,10 +357,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 try {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.log(Level.SEVERE, "Removing service " + serviceInterface.getName() + " from " +
                         pluginContext + " failed", e);
-                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
                 }
             }
         };
@@ -479,11 +481,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             postPluginActivatedEvent();
             //
-        } catch (Throwable e) {
-            // Note: we want catch a NoClassDefFoundError here (so we state Throwable instead of Exception).
-            // This might happen in initializePlugin() when the plugin's init() hook instantiates a class
-            // from a 3rd-party library which can't be loaded.
-            // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
+        } catch (Exception e) {
             throw new RuntimeException("Activation of " + this + " failed", e);
         }
     }
@@ -884,10 +882,11 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.log(Level.SEVERE, "Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this +
                 " failed", e);
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
         }
     }
 
