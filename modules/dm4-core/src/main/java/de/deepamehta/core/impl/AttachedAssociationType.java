@@ -4,7 +4,6 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
@@ -44,14 +43,14 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
     }
 
     @Override
-    public void update(AssociationTypeModel model, ClientState clientState, Directives directives) {
+    public void update(AssociationTypeModel model, Directives directives) {
         logger.info("Updating association type \"" + getUri() + "\" (new " + model + ")");
         // Note: the UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC directive (added
         // by super.update()). In case of a changed type URI the webclient's type cache must be updated *before*
         // the AssociationTypeRenderer can render the type.
         directives.add(Directive.UPDATE_ASSOCIATION_TYPE, this);
         //
-        super.update(model, clientState, directives);
+        super.update(model, directives);
     } 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

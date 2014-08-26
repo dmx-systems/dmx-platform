@@ -192,28 +192,28 @@ public class DeepaMehtaUtils {
     public static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topicTypes.length(); i++) {
             TopicTypeModel topicTypeModel = new TopicTypeModel(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeModel, null);          // clientState=null
+            dms.createTopicType(topicTypeModel);
         }
     }
 
     public static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocTypes.length(); i++) {
             AssociationTypeModel assocTypeModel = new AssociationTypeModel(assocTypes.getJSONObject(i));
-            dms.createAssociationType(assocTypeModel, null);    // clientState=null
+            dms.createAssociationType(assocTypeModel);
         }
     }
 
     public static void createTopics(JSONArray topics, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < topics.length(); i++) {
             TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
-            dms.createTopic(topicModel, null);                  // clientState=null
+            dms.createTopic(topicModel);
         }
     }
 
     public static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws Exception {
         for (int i = 0; i < assocs.length(); i++) {
             AssociationModel assocModel = new AssociationModel(assocs.getJSONObject(i));
-            dms.createAssociation(assocModel, null);            // clientState=null
+            dms.createAssociation(assocModel);
         }
     }
 }

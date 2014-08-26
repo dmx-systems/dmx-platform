@@ -9,7 +9,6 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
@@ -154,24 +153,22 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
     @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, Directives directives) {
         storeTimestamps(topic);
     }
 
     @Override
-    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+    public void postCreateAssociation(Association assoc, Directives directives) {
         storeTimestamps(assoc);
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
         storeTimestamp(topic);
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, ClientState clientState,
-                                                                                    Directives directives) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, Directives directives) {
         storeTimestamp(assoc);
     }
 
@@ -185,12 +182,12 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     @Override
-    public void preSendTopic(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic) {
         enrichWithTimestamp(topic);
     }
 
     @Override
-    public void preSendAssociation(Association assoc, ClientState clientState) {
+    public void preSendAssociation(Association assoc) {
         enrichWithTimestamp(assoc);
     }
 

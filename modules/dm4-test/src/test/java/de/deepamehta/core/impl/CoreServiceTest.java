@@ -61,14 +61,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new SimpleValue("DeepaMehta 4 Notes")), null);  // clientState=null
+                new SimpleValue("DeepaMehta 4 Notes")));
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 23, null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 23, new Directives());
             //
             int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, new Directives());
             //
             nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
@@ -84,14 +84,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
+                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+            ));
             //
             assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
             //
             int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42, new Directives());
             //
             nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
@@ -107,7 +108,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void onDemandChildTopicLoading() {
         dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
+            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+        ));
         //
         Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
         CompositeValue comp = topic.getCompositeValue();
@@ -121,7 +123,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void onDemandChildTopicLoadingWithConvenienceAccessor() {
         dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)), null);
+            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+        ));
         //
         Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
         CompositeValue comp = topic.getCompositeValue();
@@ -137,11 +140,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithSetCompositeValue() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
             topic.setCompositeValue(new CompositeValueModel().put("dm4.core.plugin_name", "My Plugin"),
-                null, new Directives());
+                new Directives());
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -158,10 +161,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithCompositeValueSet() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.getCompositeValue().set("dm4.core.plugin_name", "My Plugin", null, new Directives());
+            topic.getCompositeValue().set("dm4.core.plugin_name", "My Plugin", new Directives());
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -421,7 +424,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void deleteTopic() {
-        dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
+        dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
         //
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
@@ -466,21 +469,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private void setupTestTopics() {
-        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
-        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
-        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
-        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
+        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"));
         createAssociation(t0, t1);
         createAssociation(t0, t2);
         createAssociation(t0, t3);
     }
 
     private void setupTestAssociations() {
-        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"), null);
-        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
-        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
-        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
-        Topic t4 = dms.createTopic(new TopicModel("dm4.core.plugin"), null);
+        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
+        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t4 = dms.createTopic(new TopicModel("dm4.core.plugin"));
         Association a1 = createAssociation(t1, t2);
         Association a2 = createAssociation(t2, t3);
         Association a3 = createAssociation(t3, t4);
@@ -494,13 +497,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     private Association createAssociation(Topic topic1, Topic topic2) {
         return dms.createAssociation(new AssociationModel("dm4.core.association",
             new TopicRoleModel(topic1.getId(), "dm4.core.default"),
-            new TopicRoleModel(topic2.getId(), "dm4.core.default")), null);
+            new TopicRoleModel(topic2.getId(), "dm4.core.default")
+        ));
     }
 
     private Association createAssociation(Topic topic, Association assoc) {
         return dms.createAssociation(new AssociationModel("dm4.core.association",
             new TopicRoleModel(topic.getId(), "dm4.core.default"),
-            new AssociationRoleModel(assoc.getId(), "dm4.core.default")), null);
+            new AssociationRoleModel(assoc.getId(), "dm4.core.default")
+        ));
     }
 
     // ---

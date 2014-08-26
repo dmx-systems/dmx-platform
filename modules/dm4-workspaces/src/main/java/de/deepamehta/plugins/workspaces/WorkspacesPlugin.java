@@ -15,7 +15,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
@@ -23,11 +23,16 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
+@Path("/workspace")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssociationTypeListener,
                                                                                     PostCreateTopicListener,
@@ -42,6 +47,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Inject
     private FacetsService facetsService;
+
+    @Context
+    private HttpHeaders httpHeaders;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -103,7 +111,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         logger.info("Creating workspace \"" + name + "\"");
         return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new CompositeValueModel()
             .put("dm4.workspaces.name", name)
-        ), null);   // FIXME: clientState=null
+        ));
     }
 
 
@@ -131,10 +139,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     @Override
-    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+    public void introduceTopicType(TopicType topicType) {
         long workspaceId = -1;
         try {
-            workspaceId = workspaceIdForType(topicType, clientState);
+            workspaceId = workspaceIdForType(topicType);
             if (workspaceId == -1) {
                 return;
             }
@@ -147,10 +155,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     @Override
-    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+    public void introduceAssociationType(AssociationType assocType) {
         long workspaceId = -1;
         try {
-            workspaceId = workspaceIdForType(assocType, clientState);
+            workspaceId = workspaceIdForType(assocType);
             if (workspaceId == -1) {
                 return;
             }
@@ -168,15 +176,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created topic to the current workspace.
      */
     @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, Directives directives) {
         long workspaceId = -1;
         try {
             // Note: we must avoid vicious circles
-            if (isWorkspacesPluginTopic(topic)) {
+            if (isOwnTopic(topic)) {
                 return;
             }
             //
-            workspaceId = workspaceId(clientState);
+            workspaceId = workspaceId();
             // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
             // the default workspace. This would not help in gaining data consistency because the topics created so far
             // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
@@ -198,10 +206,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created association to the current workspace.
      */
     @Override
-    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+    public void postCreateAssociation(Association assoc, Directives directives) {
         long workspaceId = -1;
         try {
-            workspaceId = workspaceId(clientState);
+            // Note: we must avoid vicious circles
+            if (isOwnAssociation(assoc)) {
+                return;
+            }
+            //
+            workspaceId = workspaceId();
             // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
             // the default workspace. This would not help in gaining data consistency because the associations created
             // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
@@ -223,20 +236,18 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private long workspaceId(ClientState clientState) {
-        if (clientState == null) {
+    private long workspaceId() {
+        Cookies cookies = new Cookies(httpHeaders);
+        //
+        if (!cookies.has("dm4_workspace_id")) {
             return -1;
         }
         //
-        if (!clientState.has("dm4_workspace_id")) {
-            return -1;
-        }
-        //
-        return clientState.getLong("dm4_workspace_id");
+        return cookies.getLong("dm4_workspace_id");
     }
 
-    private long workspaceIdForType(Type type, ClientState clientState) {
-        long workspaceId = workspaceId(clientState);
+    private long workspaceIdForType(Type type) {
+        long workspaceId = workspaceId();
         if (workspaceId != -1) {
             return workspaceId;
         } else {
@@ -258,8 +269,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note 1: we are refering to an existing workspace. So we must add a topic reference.
         // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
         FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value, null, new Directives());
-        // clientState=null
+        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value, new Directives());
     }
 
     // --- Helper ---
@@ -268,8 +278,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dm4.");
     }
 
-    private boolean isWorkspacesPluginTopic(Topic topic) {
+    // ---
+
+    private boolean isOwnTopic(Topic topic) {
         return topic.getTypeUri().startsWith("dm4.workspaces.");
+    }
+
+    private boolean isOwnAssociation(Association assoc) {
+        if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
+            Topic topic = assoc.getTopic("dm4.core.child");
+            if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ---
