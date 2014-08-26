@@ -180,7 +180,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         long workspaceId = -1;
         try {
             // Note: we must avoid vicious circles
-            if (isWorkspacesPluginTopic(topic)) {
+            if (isOwnTopic(topic)) {
                 return;
             }
             //
@@ -209,6 +209,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void postCreateAssociation(Association assoc, Directives directives) {
         long workspaceId = -1;
         try {
+            // Note: we must avoid vicious circles
+            if (isOwnAssociation(assoc)) {
+                return;
+            }
+            //
             workspaceId = workspaceId();
             // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
             // the default workspace. This would not help in gaining data consistency because the associations created
@@ -273,8 +278,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dm4.");
     }
 
-    private boolean isWorkspacesPluginTopic(Topic topic) {
+    // ---
+
+    private boolean isOwnTopic(Topic topic) {
         return topic.getTypeUri().startsWith("dm4.workspaces.");
+    }
+
+    private boolean isOwnAssociation(Association assoc) {
+        if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
+            Topic topic = assoc.getTopic("dm4.core.child");
+            if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ---
