@@ -6,7 +6,6 @@ import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
@@ -34,8 +33,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, ClientState clientState,
-                                                                                    Directives directives) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, Directives directives) {
         if (isAssocDef(assoc.getModel())) {
             if (isAssocDef(oldModel)) {
                 updateAssocDef(assoc, directives);

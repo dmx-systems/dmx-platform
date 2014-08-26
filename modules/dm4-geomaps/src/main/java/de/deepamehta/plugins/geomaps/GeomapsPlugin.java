@@ -18,7 +18,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
@@ -139,7 +138,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             new TopicRoleModel(geomapId,   "dm4.core.default"),
             new TopicRoleModel(geoCoordId, "dm4.topicmaps.topicmap_topic")
         );
-        dms.createAssociation(model, null);     // FIXME: clientState=null
+        dms.createAssociation(model);
     }
 
     @PUT
@@ -154,7 +153,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     "dm4.topicmaps.translation_y", lat)).put(
                 "dm4.topicmaps.zoom_level", zoom)
         );
-        dms.updateTopic(new TopicModel(geomapId, geomapState), null);
+        dms.updateTopic(new TopicModel(geomapId, geomapState));
     }
 
     @GET
@@ -192,7 +191,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
     @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             if (!abortGeocoding()) {
                 //
@@ -201,7 +200,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 Address address = new Address(topic.getCompositeValue().getModel());
                 if (!address.isEmpty()) {
                     logger.info("### New " + address);
-                    geocodeAndStoreFacet(address, topic, clientState, directives);
+                    geocodeAndStoreFacet(address, topic, directives);
                 } else {
                     logger.info("### New empty address");
                 }
@@ -210,15 +209,14 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             if (!abortGeocoding()) {
                 Address address    = new Address(topic.getCompositeValue().getModel());
                 Address oldAddress = new Address(oldModel.getCompositeValueModel());
                 if (!address.equals(oldAddress)) {
                     logger.info("### Address changed:" + address.changeReport(oldAddress));
-                    geocodeAndStoreFacet(address, topic, clientState, directives);
+                    geocodeAndStoreFacet(address, topic, directives);
                 } else {
                     logger.info("### Address not changed");
                 }
@@ -232,7 +230,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      * Enriches an Address topic with its geo coordinate.
      */
     @Override
-    public void preSendTopic(Topic topic, ClientState clientState) {
+    public void preSendTopic(Topic topic) {
         Topic address = findAddress(topic);
         if (address == null) {
             return;
@@ -268,10 +266,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      *
      * @param   topic   the Address topic to be facetted.
      */
-    private void geocodeAndStoreFacet(Address address, Topic topic, ClientState clientState, Directives directives) {
+    private void geocodeAndStoreFacet(Address address, Topic topic, Directives directives) {
         try {
             GeoCoordinate geoCoord = address.geocode();
-            storeGeoCoordinate(topic, geoCoord, clientState, directives);
+            storeGeoCoordinate(topic, geoCoord, directives);
         } catch (Exception e) {
             // ### TODO: show to the user?
             logger.log(Level.WARNING, "Adding geo coordinate to " + address + " failed", e);
@@ -281,15 +279,14 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     /**
      * Stores a geo coordinate for an address topic in the DB.
      */
-    private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord, ClientState clientState,
-                                                                           Directives directives) {
+    private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord, Directives directives) {
         try {
             logger.info("Storing geo coordinate (" + geoCoord + ") of address " + address);
             FacetValue value = new FacetValue("dm4.geomaps.geo_coordinate").put(new CompositeValueModel()
                 .put("dm4.geomaps.longitude", geoCoord.lon)
                 .put("dm4.geomaps.latitude",  geoCoord.lat)
             );
-            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value, clientState, directives);
+            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value, directives);
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }

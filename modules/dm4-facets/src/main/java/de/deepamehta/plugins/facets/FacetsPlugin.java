@@ -13,7 +13,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -111,7 +110,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dms.createAssociation(new AssociationModel("dm4.core.instantiation",
             new TopicRoleModel(topicId,      "dm4.core.instance"),
-            new TopicRoleModel(facetTypeUri, "dm4.facets.facet")), null);   // clientState=null
+            new TopicRoleModel(facetTypeUri, "dm4.facets.facet")
+        ));
     }
 
     // ---
@@ -120,10 +120,10 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Path("/{facet_type_uri}/topic/{id}")
     @Override
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
-                                             FacetValue value, @HeaderParam("Cookie") ClientState clientState) {
+                                                                                        FacetValue value) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            updateFacet(dms.getTopic(topicId, false), facetTypeUri, value, clientState, new Directives());
+            updateFacet(dms.getTopic(topicId, false), facetTypeUri, value, new Directives());
             //
             tx.success();
         } catch (Exception e) {
@@ -136,13 +136,12 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value,
-                                                     ClientState clientState, Directives directives) {
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value, Directives directives) {
         AssociationDefinition assocDef = getAssocDef(facetTypeUri);
         if (!isMultiFacet(facetTypeUri)) {
-            object.updateChildTopic(value.getTopic(), assocDef, clientState, directives);
+            object.updateChildTopic(value.getTopic(), assocDef, directives);
         } else {
-            object.updateChildTopics(value.getTopics(), assocDef, clientState, directives);
+            object.updateChildTopics(value.getTopics(), assocDef, directives);
         }
     }
 

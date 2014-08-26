@@ -12,7 +12,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ResultList;
@@ -86,19 +85,18 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/topic")
-    public Topic createTopic(TopicModel model, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.createTopic(model, clientState);
+    public Topic createTopic(TopicModel model) {
+        return dms.createTopic(model);
     }
 
     @PUT
     @Path("/topic/{id}")
-    public Directives updateTopic(@PathParam("id") long topicId, TopicModel model,
-                                  @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateTopic(@PathParam("id") long topicId, TopicModel model) {
         if (model.getId() != -1 && topicId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(topicId);
-        return dms.updateTopic(model, clientState);
+        return dms.updateTopic(model);
     }
 
     @DELETE
@@ -148,19 +146,18 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/association")
-    public Association createAssociation(AssociationModel model, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.createAssociation(model, clientState);
+    public Association createAssociation(AssociationModel model) {
+        return dms.createAssociation(model);
     }
 
     @PUT
     @Path("/association/{id}")
-    public Directives updateAssociation(@PathParam("id") long assocId, AssociationModel model,
-                                        @HeaderParam("Cookie") ClientState clientState) {
+    public Directives updateAssociation(@PathParam("id") long assocId, AssociationModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(assocId);
-        return dms.updateAssociation(model, clientState);
+        return dms.updateAssociation(model);
     }
 
     @DELETE
@@ -193,14 +190,14 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/topictype")
-    public TopicType createTopicType(TopicTypeModel topicTypeModel, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.createTopicType(topicTypeModel, clientState);
+    public TopicType createTopicType(TopicTypeModel topicTypeModel) {
+        return dms.createTopicType(topicTypeModel);
     }
 
     @PUT
     @Path("/topictype")
-    public Directives updateTopicType(TopicTypeModel model, @HeaderParam("Cookie") ClientState clientState) {
-        return dms.updateTopicType(model, clientState);
+    public Directives updateTopicType(TopicTypeModel model) {
+        return dms.updateTopicType(model);
     }
 
     @DELETE
@@ -233,16 +230,14 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/assoctype")
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel,
-                                                 @HeaderParam("Cookie") ClientState clientState) {
-        return dms.createAssociationType(assocTypeModel, clientState);
+    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel) {
+        return dms.createAssociationType(assocTypeModel);
     }
 
     @PUT
     @Path("/assoctype")
-    public Directives updateAssociationType(AssociationTypeModel model,
-                                            @HeaderParam("Cookie") ClientState clientState) {
-        return dms.updateAssociationType(model, clientState);
+    public Directives updateAssociationType(AssociationTypeModel model) {
+        return dms.updateAssociationType(model);
     }
 
     @DELETE

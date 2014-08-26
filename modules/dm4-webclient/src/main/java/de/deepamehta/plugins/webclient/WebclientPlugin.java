@@ -13,7 +13,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -79,17 +78,15 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @GET
     @Path("/search")
-    public Topic searchTopics(@QueryParam("search") String searchTerm,
-                              @QueryParam("field")  String fieldUri,
-                              @HeaderParam("Cookie") ClientState clientState) {
+    public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\", clientState=" + clientState);
+            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
             List<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
             Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
-            Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
+            Topic searchTopic = createSearchTopic(searchTerm, topics);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -109,9 +106,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @GET
     @Path("/search/by_type/{type_uri}")
-    public Topic getTopics(@PathParam("type_uri") String typeUri,
-                           @QueryParam("max_result_size") int maxResultSize,
-                           @HeaderParam("Cookie") ClientState clientState) {
+    public Topic getTopics(@PathParam("type_uri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
@@ -119,7 +114,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             List<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize).getItems();
             // fetchComposite=false
             //
-            Topic searchTopic = createSearchTopic(searchTerm, topics, clientState);
+            Topic searchTopic = createSearchTopic(searchTerm, topics);
             tx.success();
             return searchTopic;
         } catch (Exception e) {
@@ -192,8 +187,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             updateType(topic, directives);
             setConfigTopicLabel(topic);
@@ -203,12 +197,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     @Override
-    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+    public void introduceTopicType(TopicType topicType) {
         setViewConfigLabel(topicType.getViewConfig());
     }
 
     @Override
-    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+    public void introduceAssociationType(AssociationType assocType) {
         setViewConfigLabel(assocType.getViewConfig());
     }
 
@@ -240,11 +234,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Creates a "Search" topic.
      */
-    private Topic createSearchTopic(String searchTerm, Collection<? extends Topic> resultItems,
-                                                                                   ClientState clientState) {
+    private Topic createSearchTopic(String searchTerm, Collection<? extends Topic> resultItems) {
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValueModel()
             .put("dm4.webclient.search_term", searchTerm)
-        ), clientState);
+        ));
         //
         // associate result items
         logger.fine("Associating " + resultItems.size() + " result items to search (ID " + searchTopic.getId() + ")");
@@ -253,7 +246,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
                 new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
                 new TopicRoleModel(resultItem.getId(), "dm4.core.default")
-            ), clientState);
+            ));
         }
         return searchTopic;
     }

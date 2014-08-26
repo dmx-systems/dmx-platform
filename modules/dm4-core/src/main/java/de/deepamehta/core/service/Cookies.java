@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 /**
- * Cookies obtained from the request headers.
+ * Cookies obtained from request headers.
  */
 public class Cookies {
 
