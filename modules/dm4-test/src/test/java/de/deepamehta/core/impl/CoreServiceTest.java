@@ -431,7 +431,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic t0 = getTopicByUri("dm4.test.t0");
             assertNotNull(t0);
             //
-            t0.delete(new Directives());
+            t0.delete();
             t0 = getTopicByUri("dm4.test.t0");
             assertNull(t0);
             //

@@ -58,7 +58,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     public void update(TypeModel model, Directives directives) {
         boolean uriChanged = hasUriChanged(model.getUri());
         if (uriChanged) {
-            removeFromTypeCache(directives);
+            _removeFromTypeCache();
         }
         //
         super.update(model, directives);
@@ -78,14 +78,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // === Deletion ===
 
     @Override
-    public void delete(Directives directives) {
+    public void delete() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("Deleting " + className() + " \"" + getUri() + "\"");
             //
-            super.delete(directives);   // delete type topic
+            super.delete();   // delete type topic
             //
-            removeFromTypeCache(directives);
+            _removeFromTypeCache();
             //
             tx.success();
         } catch (Exception e) {
@@ -188,7 +188,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
-        getAssocDef(childTypeUri).delete(new Directives());     // ### FIXME: directives are not passed on
+        getAssocDef(childTypeUri).delete();
     }
 
     // --- Label Configuration ---
@@ -275,7 +275,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void storeDataTypeUri(String dataTypeUri, Directives directives) {
         // remove current assignment
         getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type",
-            false, false).getRelatingAssociation().delete(directives);
+            false, false).getRelatingAssociation().delete();
         // create new assignment
         dms.typeStorage.storeDataType(getUri(), dataTypeUri);
     }
@@ -410,14 +410,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
      */
-    private void removeFromTypeCache(Directives directives) {
+    private void _removeFromTypeCache() {
         removeFromTypeCache();                      // abstract
-        addDeleteTypeDirective(directives);
+        addDeleteTypeDirective();
     }
 
-    private void addDeleteTypeDirective(Directives directives) {
+    private void addDeleteTypeDirective() {
         Directive dir = getDeleteTypeDirective();   // abstract
-        directives.add(dir, new JSONWrapper("uri", getUri()));
+        Directives.get().add(dir, new JSONWrapper("uri", getUri()));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes

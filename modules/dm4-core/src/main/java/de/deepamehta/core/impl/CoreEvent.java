@@ -146,7 +146,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreDeleteTopicListener) listener).preDeleteTopic(
-                (Topic) params[0], (Directives) params[1]
+                (Topic) params[0]
             );
         }
     };
@@ -155,7 +155,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PreDeleteAssociationListener) listener).preDeleteAssociation(
-                (Association) params[0], (Directives) params[1]
+                (Association) params[0]
             );
         }
     };
@@ -166,7 +166,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostDeleteTopicListener) listener).postDeleteTopic(
-                (Topic) params[0], (Directives) params[1]
+                (Topic) params[0]
             );
         }
     };
@@ -175,7 +175,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostDeleteAssociationListener) listener).postDeleteAssociation(
-                (Association) params[0], (Directives) params[1]
+                (Association) params[0]
             );
         }
     };

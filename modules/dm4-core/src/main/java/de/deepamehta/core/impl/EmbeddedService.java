@@ -185,15 +185,11 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives deleteTopic(long topicId) {
+    public void deleteTopic(long topicId) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Directives directives = new Directives();
-            //
-            getTopic(topicId, false).delete(directives);    // fetchComposite=false
-            //
+            getTopic(topicId, false).delete();    // fetchComposite=false
             tx.success();
-            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic " + topicId + " failed", e);
@@ -330,15 +326,11 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives deleteAssociation(long assocId) {
+    public void deleteAssociation(long assocId) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            Directives directives = new Directives();
-            //
-            getAssociation(assocId, false).delete(directives);  // fetchComposite=false
-            //
+            getAssociation(assocId, false).delete();  // fetchComposite=false
             tx.success();
-            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association " + assocId + " failed", e);
@@ -439,16 +431,11 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives deleteTopicType(String topicTypeUri) {
+    public void deleteTopicType(String topicTypeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            TopicType topicType = getTopicType(topicTypeUri);
-            Directives directives = new Directives();
-            //
-            topicType.delete(directives);
-            //
+            getTopicType(topicTypeUri).delete();
             tx.success();
-            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
@@ -544,16 +531,11 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives deleteAssociationType(String assocTypeUri) {
+    public void deleteAssociationType(String assocTypeUri) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            AssociationType assocType = getAssociationType(assocTypeUri);
-            Directives directives = new Directives();
-            //
-            assocType.delete(directives);
-            //
+            getAssociationType(assocTypeUri).delete();
             tx.success();
-            return directives;
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);

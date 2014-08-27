@@ -341,7 +341,7 @@ class AttachedCompositeValue implements CompositeValue {
                 }
                 // == delete child ==
                 // update DB
-                childTopic.delete(directives);
+                childTopic.delete();
                 // update memory
                 removeFromCompositeValue(childTopic, assocDef);
             } else if (childTopicId != -1) {
@@ -366,7 +366,7 @@ class AttachedCompositeValue implements CompositeValue {
                 }
                 // == update assignment ==
                 // update DB
-                childTopic.getRelatingAssociation().delete(directives);
+                childTopic.getRelatingAssociation().delete();
             } else {
                 // == create assignment ==
             }
@@ -382,7 +382,7 @@ class AttachedCompositeValue implements CompositeValue {
             // == create child ==
             // update DB
             if (childTopic != null) {
-                childTopic.getRelatingAssociation().delete(directives);
+                childTopic.getRelatingAssociation().delete();
             }
             createChildTopicOne(newChildTopic, assocDef, directives);
         }
@@ -401,7 +401,7 @@ class AttachedCompositeValue implements CompositeValue {
                 }
                 // == delete assignment ==
                 // update DB
-                childTopic.getRelatingAssociation().delete(directives);
+                childTopic.getRelatingAssociation().delete();
                 // update memory
                 removeFromCompositeValue(childTopic, assocDef);
             } else if (newChildTopic instanceof TopicReferenceModel) {

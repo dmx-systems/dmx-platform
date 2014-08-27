@@ -79,7 +79,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * - all child topics associated via "dm4.core.composition", recusively
      * - all the remaining direct associations, e.g. "dm4.core.instantiation"
      */
-    void delete(Directives directives);
+    void delete();
 
 
 

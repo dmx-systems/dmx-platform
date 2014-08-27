@@ -206,7 +206,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/association/{assoc_id}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        fetchAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
+        fetchAssociationRefAssociation(topicmapId, assocId).delete();
     }
 
     // ---

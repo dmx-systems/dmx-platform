@@ -59,21 +59,21 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Deletion ===
 
     @Override
-    public void delete(Directives directives) {
+    public void delete() {
         DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this, directives);
+            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this);
             //
             // delete sub-topics and associations
-            super.delete(directives);
+            super.delete();
             // delete topic itself
             logger.info("Deleting " + this);
-            directives.add(Directive.DELETE_TOPIC, this);
+            Directives.get().add(Directive.DELETE_TOPIC, this);
             dms.storageDecorator.deleteTopic(getId());
             //
             tx.success();
             //
-            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this, directives);
+            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this);
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic failed (" + this + ")", e);
@@ -258,7 +258,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     private void reassignInstantiation() {
         // remove current assignment
-        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        fetchInstantiation().delete();
         // create new assignment
         dms.createTopicInstantiation(getId(), getTypeUri());
     }

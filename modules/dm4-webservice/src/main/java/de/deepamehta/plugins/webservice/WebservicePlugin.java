@@ -102,7 +102,8 @@ public class WebservicePlugin extends PluginActivator {
     @DELETE
     @Path("/topic/{id}")
     public Directives deleteTopic(@PathParam("id") long topicId) {
-        return dms.deleteTopic(topicId);
+        dms.deleteTopic(topicId);
+        return Directives.get();
     }
 
 
@@ -163,7 +164,8 @@ public class WebservicePlugin extends PluginActivator {
     @DELETE
     @Path("/association/{id}")
     public Directives deleteAssociation(@PathParam("id") long assocId) {
-        return dms.deleteAssociation(assocId);
+        dms.deleteAssociation(assocId);
+        return Directives.get();
     }
 
 
@@ -203,7 +205,8 @@ public class WebservicePlugin extends PluginActivator {
     @DELETE
     @Path("/topictype/{uri}")
     public Directives deleteTopicType(@PathParam("uri") String uri) {
-        return dms.deleteTopicType(uri);
+        dms.deleteTopicType(uri);
+        return Directives.get();
     }
 
 
@@ -243,7 +246,8 @@ public class WebservicePlugin extends PluginActivator {
     @DELETE
     @Path("/assoctype/{uri}")
     public Directives deleteAssociationType(@PathParam("uri") String uri) {
-        return dms.deleteAssociationType(uri);
+        dms.deleteAssociationType(uri);
+        return Directives.get();
     }
 
 

@@ -89,21 +89,21 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // === Deletion ===
 
     @Override
-    public void delete(Directives directives) {
+    public void delete() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this, directives);
+            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this);
             //
             // delete sub-topics and associations
-            super.delete(directives);
+            super.delete();
             // delete association itself
             logger.info("Deleting " + this);
-            directives.add(Directive.DELETE_ASSOCIATION, this);
+            Directives.get().add(Directive.DELETE_ASSOCIATION, this);
             dms.storageDecorator.deleteAssociation(getId());
             //
             tx.success();
             //
-            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this, directives);
+            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this);
         } catch (IllegalStateException e) {
             // Note: getAssociations() might throw IllegalStateException and is no problem.
             // This can happen when this object is an association which is already deleted.
@@ -386,7 +386,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     private void reassignInstantiation() {
         // remove current assignment
-        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        fetchInstantiation().delete();
         // create new assignment
         dms.createAssociationInstantiation(getId(), getTypeUri());
     }
