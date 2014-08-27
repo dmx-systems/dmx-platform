@@ -18,6 +18,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
@@ -36,9 +37,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
 
 import java.net.URL;
 import java.util.List;
@@ -65,9 +63,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @Inject private TopicmapsService topicmapsService;
     @Inject private FacetsService facetsService;
-
-    @Context
-    private HttpHeaders httpHeaders;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -355,11 +350,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     // ---
 
     private boolean abortGeocoding() {
-        Cookie cookie = httpHeaders.getCookies().get(COOKIE_NO_GEOCODING);
-        if (cookie == null) {
+        Cookies cookies = Cookies.get();
+        if (!cookies.has(COOKIE_NO_GEOCODING)) {
             return false;
         }
-        String value = cookie.getValue();
+        String value = cookies.get(COOKIE_NO_GEOCODING);
         if (!value.equals("false") && !value.equals("true")) {
             throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
                 "\" cookie (expected are \"false\" or \"true\")");

@@ -23,16 +23,11 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
-@Path("/workspace")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssociationTypeListener,
                                                                                     PostCreateTopicListener,
@@ -47,9 +42,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Inject
     private FacetsService facetsService;
-
-    @Context
-    private HttpHeaders httpHeaders;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -237,12 +229,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private long workspaceId() {
-        Cookies cookies = new Cookies(httpHeaders);
-        //
+        Cookies cookies = Cookies.get();
         if (!cookies.has("dm4_workspace_id")) {
             return -1;
         }
-        //
         return cookies.getLong("dm4_workspace_id");
     }
 
