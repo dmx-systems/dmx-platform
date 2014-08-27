@@ -15,7 +15,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -105,18 +104,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{name}/{topicmap_renderer_uri}")
     @Override
     public Topic createTopicmap(@PathParam("name") String name,
-                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri,
-                                @HeaderParam("Cookie") ClientState clientState) {
-        return createTopicmap(name, null, topicmapRendererUri, clientState);
+                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
+        return createTopicmap(name, null, topicmapRendererUri);
     }
 
     @Override
-    public Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState) {
+    public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
         CompositeValueModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
         return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.state", topicmapState)), clientState);
+            .put("dm4.topicmaps.state", topicmapState)
+        ));
     }
 
     // ---
@@ -130,7 +129,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
                 new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-                new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), viewProps), null); // FIXME: clientState=null
+                new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), viewProps
+            ));
             storeCustomViewProperties(topicmapId, topicId, viewProps);
             //
             tx.success();
@@ -153,7 +153,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
             new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)), null);       // FIXME: clientState=null
+            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+        ));
     }
 
     // ---
@@ -230,7 +231,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     .put("dm4.topicmaps.translation", new CompositeValueModel()
                         .put("dm4.topicmaps.translation_x", transX)
                         .put("dm4.topicmaps.translation_y", transY)));
-            dms.updateTopic(new TopicModel(topicmapId, topicmapState), null);
+            dms.updateTopic(new TopicModel(topicmapId, topicmapState));
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
                 transX + ", transY=" + transY + ")", e);
@@ -291,8 +292,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void postInstall() {
-        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER, null);
-        // Note: null is passed as clientState. On post-install we have no clientState.
+        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER);
+        // Note: On post-install we have no workspace cookie.
         // The workspace assignment is made by the Access Control plugin on all-plugins-active.
     }
 
@@ -341,8 +342,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Store ---
 
     private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, null, new Directives());
-    }                                                                           // clientState=null
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, new Directives());
+    }
 
     // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
     private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {

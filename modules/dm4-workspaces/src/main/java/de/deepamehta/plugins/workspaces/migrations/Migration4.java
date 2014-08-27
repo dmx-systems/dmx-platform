@@ -15,6 +15,7 @@ public class Migration4 extends Migration {
         // set type "Public" for workspace "DeepaMehta"
         dms.getTopic("uri", new SimpleValue("de.workspaces.deepamehta"), false).update(
             new TopicModel(null, new CompositeValueModel().putRef("dm4.workspaces.type", "dm4.workspaces.type.public")),
-            null, new Directives());
+            new Directives()
+        );
     }
 }

@@ -3,7 +3,6 @@ package de.deepamehta.core;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import java.util.Collection;
@@ -82,5 +81,5 @@ public interface Type extends Topic {
 
     // === Updating ===
 
-    void update(TypeModel model, ClientState clientState, Directives directives);
+    void update(TypeModel model, Directives directives);
 }

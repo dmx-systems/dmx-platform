@@ -8,7 +8,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
@@ -231,7 +230,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, null, new Directives());
+        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, new Directives());
     }
 
     // ---
@@ -343,10 +342,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 try {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.log(Level.SEVERE, "Adding service " + serviceInterface.getName() + " to " +
                         pluginContext + " failed", e);
-                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
                 }
                 return service;
             }
@@ -356,10 +356,11 @@ public class PluginImpl implements Plugin, EventHandler {
                 try {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     logger.log(Level.SEVERE, "Removing service " + serviceInterface.getName() + " from " +
                         pluginContext + " failed", e);
-                    // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
                 }
             }
         };
@@ -479,11 +480,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             postPluginActivatedEvent();
             //
-        } catch (Throwable e) {
-            // Note: we want catch a NoClassDefFoundError here (so we state Throwable instead of Exception).
-            // This might happen in initializePlugin() when the plugin's init() hook instantiates a class
-            // from a 3rd-party library which can't be loaded.
-            // If not catched File Install would retry to deploy the bundle every 2 seconds (endlessly).
+        } catch (Exception e) {
             throw new RuntimeException("Activation of " + this + " failed", e);
         }
     }
@@ -552,7 +549,7 @@ public class PluginImpl implements Plugin, EventHandler {
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
-        ), null);   // clientState=null
+        ));
     }
 
     private Topic fetchPluginTopic() {
@@ -570,7 +567,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 }
                 //
                 TopicType topicType = dms.getTopicType(topicTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, null);          // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
@@ -581,7 +578,7 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             for (String assocTypeUri : dms.getAssociationTypeUris()) {
                 AssociationType assocType = dms.getAssociationType(assocTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, null);    // clientState=null
+                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);
@@ -884,10 +881,11 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.log(Level.SEVERE, "Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this +
                 " failed", e);
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
         }
     }
 

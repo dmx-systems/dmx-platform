@@ -9,7 +9,6 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
@@ -56,20 +55,20 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // === Updating ===
 
     @Override
-    public void update(TypeModel model, ClientState clientState, Directives directives) {
+    public void update(TypeModel model, Directives directives) {
         boolean uriChanged = hasUriChanged(model.getUri());
         if (uriChanged) {
             removeFromTypeCache(directives);
         }
         //
-        super.update(model, clientState, directives);
+        super.update(model, directives);
         //
         if (uriChanged) {
             putInTypeCache();   // abstract
         }
         //
         updateDataTypeUri(model.getDataTypeUri(), directives);
-        updateAssocDefs(model.getAssocDefs(), clientState, directives);
+        updateAssocDefs(model.getAssocDefs(), directives);
         updateSequence(model.getAssocDefs());
         updateLabelConfig(model.getLabelConfig(), directives);
     }
@@ -304,10 +303,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, ClientState clientState,
-                                                                                      Directives directives) {
+    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, Directives directives) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            getAssocDef(assocDef.getChildTypeUri()).update(assocDef, clientState, directives);
+            getAssocDef(assocDef.getChildTypeUri()).update(assocDef, directives);
         }
     }
 

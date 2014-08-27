@@ -6,7 +6,6 @@ import de.deepamehta.plugins.files.StoredFile;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 import java.io.File;
@@ -28,7 +27,7 @@ public interface FilesService extends PluginService {
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
      */
-    Topic createFileTopic(String path, ClientState clientState);
+    Topic createFileTopic(String path);
 
     /**
      * Creates and returns a Folder topic representing the folder at a given repository path.
@@ -37,13 +36,13 @@ public interface FilesService extends PluginService {
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
      */
-    Topic createFolderTopic(String path, ClientState clientState);
+    Topic createFolderTopic(String path);
 
     // ---
 
-    Topic createChildFileTopic(long folderTopicId, String path, ClientState clientState);
+    Topic createChildFileTopic(long folderTopicId, String path);
 
-    Topic createChildFolderTopic(long folderTopicId, String path, ClientState clientState);
+    Topic createChildFolderTopic(long folderTopicId, String path);
 
 
 
@@ -60,7 +59,7 @@ public interface FilesService extends PluginService {
      * @return  a StoredFile object which holds 2 information: the name of the uploaded file, and the ID
      *          of the created File topic.
      */
-    StoredFile storeFile(UploadedFile file, String path, ClientState clientState);
+    StoredFile storeFile(UploadedFile file, String path);
 
     /**
      * Creates a file in the file repository, and creates a corresponding File topic.

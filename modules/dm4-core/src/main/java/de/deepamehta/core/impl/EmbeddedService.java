@@ -19,7 +19,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
@@ -153,15 +152,15 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public Topic createTopic(TopicModel model, ClientState clientState) {
+    public Topic createTopic(TopicModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model, clientState);
+            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Topic topic = topicFactory(model, clientState, directives);
+            Topic topic = topicFactory(model, directives);
             //
-            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, clientState, directives);
+            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic, directives);
             //
             tx.success();
             return topic;
@@ -174,12 +173,12 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives updateTopic(TopicModel model, ClientState clientState) {
+    public Directives updateTopic(TopicModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Directives directives = new Directives();
             //
-            getTopic(model.getId(), true).update(model, clientState, directives);   // fetchComposite=true
+            getTopic(model.getId(), true).update(model, directives);   // fetchComposite=true
             //
             tx.success();
             return directives;
@@ -305,15 +304,15 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public Association createAssociation(AssociationModel model, ClientState clientState) {
+    public Association createAssociation(AssociationModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
-            fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model, clientState);
+            fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
             Directives directives = new Directives();   // ### FIXME: directives are ignored
-            Association assoc = associationFactory(model, clientState, directives);
+            Association assoc = associationFactory(model, directives);
             //
-            fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, clientState, directives);
+            fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc, directives);
             //
             tx.success();
             return assoc;
@@ -326,12 +325,12 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives updateAssociation(AssociationModel model, ClientState clientState) {
+    public Directives updateAssociation(AssociationModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             Directives directives = new Directives();
             //
-            getAssociation(model.getId(), true).update(model, clientState, directives);     // fetchComposite=true
+            getAssociation(model.getId(), true).update(model, directives);     // fetchComposite=true
             //
             tx.success();
             return directives;
@@ -414,12 +413,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public TopicType createTopicType(TopicTypeModel model, ClientState clientState) {
+    public TopicType createTopicType(TopicTypeModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             TopicType topicType = topicTypeFactory(model);
             //
-            fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType, clientState);
+            fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             //
             tx.success();
             return topicType;
@@ -432,7 +431,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives updateTopicType(TopicTypeModel model, ClientState clientState) {
+    public Directives updateTopicType(TopicTypeModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
@@ -440,7 +439,7 @@ public class EmbeddedService implements DeepaMehtaService {
             TopicType topicType = getTopicType(topicTypeUri);
             Directives directives = new Directives();
             //
-            topicType.update(model, clientState, directives);
+            topicType.update(model, directives);
             //
             tx.success();
             return directives;
@@ -518,12 +517,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public AssociationType createAssociationType(AssociationTypeModel model, ClientState clientState) {
+    public AssociationType createAssociationType(AssociationTypeModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             AssociationType assocType = associationTypeFactory(model);
             //
-            fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType, clientState);
+            fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             //
             tx.success();
             return assocType;
@@ -537,7 +536,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public Directives updateAssociationType(AssociationTypeModel model, ClientState clientState) {
+    public Directives updateAssociationType(AssociationTypeModel model) {
         DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
@@ -545,7 +544,7 @@ public class EmbeddedService implements DeepaMehtaService {
             AssociationType assocType = getAssociationType(assocTypeUri);
             Directives directives = new Directives();
             //
-            assocType.update(model, clientState, directives);
+            assocType.update(model, directives);
             //
             tx.success();
             return directives;
@@ -709,14 +708,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Convenience method. ### to be dropped?
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        return createAssociation(typeUri, roleModel1, roleModel2, null);    // ### FIXME: clientState=null
-    }
-
-    /**
-     * Convenience method. ### to be dropped?
-     */
-    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2, ClientState clientState) {
-        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2), clientState);
+        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2));
     }
 
 
@@ -854,10 +846,10 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method: creates a new topic in the DB according to the given topic model and returns a topic instance.
      */
-    private Topic topicFactory(TopicModel model, ClientState clientState, Directives directives) {
+    private Topic topicFactory(TopicModel model, Directives directives) {
         // 1) store in DB
         storageDecorator.storeTopic(model);
-        valueStorage.storeValue(model, clientState, directives);
+        valueStorage.storeValue(model, directives);
         createTopicInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
@@ -868,10 +860,10 @@ public class EmbeddedService implements DeepaMehtaService {
      * Factory method: creates a new association in the DB according to the given association model and returns an
      * association instance.
      */
-    private Association associationFactory(AssociationModel model, ClientState clientState, Directives directives) {
+    private Association associationFactory(AssociationModel model, Directives directives) {
         // 1) store in DB
         storageDecorator.storeAssociation(model);
-        valueStorage.storeValue(model, clientState, directives);
+        valueStorage.storeValue(model, directives);
         createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) create application object
@@ -915,7 +907,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
-        Topic typeTopic = topicFactory(model, null, null);   // ### FIXME: clientState, directives
+        Topic typeTopic = topicFactory(model, null);   // ### FIXME: directives
         // If no URI is set the type gets a default URI based on its ID.
         // Note: this must be done *after* the topic is created. The ID is not known before.
         if (typeTopic.getUri().equals("")) {

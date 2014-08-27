@@ -4,7 +4,6 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 
@@ -44,14 +43,14 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     @Override
-    public void update(TopicTypeModel model, ClientState clientState, Directives directives) {
+    public void update(TopicTypeModel model, Directives directives) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         // Note: the UPDATE_TOPIC_TYPE directive must be added *before* a possible UPDATE_TOPIC directive (added
         // by super.update()). In case of a changed type URI the webclient's type cache must be updated *before*
         // the TopicTypeRenderer can render the type.
         directives.add(Directive.UPDATE_TOPIC_TYPE, this);
         //
-        super.update(model, clientState, directives);
+        super.update(model, directives);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

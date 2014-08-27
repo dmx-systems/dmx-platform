@@ -3,7 +3,6 @@ package de.deepamehta.core;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 
 import java.util.List;
@@ -100,7 +99,7 @@ public interface CompositeValue {
      * Sets a child.
      * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
-    CompositeValue set(String childTypeUri, TopicModel value,          ClientState clientState, Directives directives);
+    CompositeValue set(String childTypeUri, TopicModel value,          Directives directives);
 
     /**
      * Convenience method to set the simple value of a child.
@@ -109,21 +108,21 @@ public interface CompositeValue {
      * @param   value   The simple value.
      *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
      */
-    CompositeValue set(String childTypeUri, Object value,              ClientState clientState, Directives directives);
+    CompositeValue set(String childTypeUri, Object value,              Directives directives);
 
     /**
      * Convenience method to set the composite value of a child.
      * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
-    CompositeValue set(String childTypeUri, CompositeValueModel value, ClientState clientState, Directives directives);
+    CompositeValue set(String childTypeUri, CompositeValueModel value, Directives directives);
 
     // ---
 
-    CompositeValue setRef(String childTypeUri, long refTopicId,        ClientState clientState, Directives directives);
+    CompositeValue setRef(String childTypeUri, long refTopicId,        Directives directives);
 
-    CompositeValue setRef(String childTypeUri, String refTopicUri,     ClientState clientState, Directives directives);
+    CompositeValue setRef(String childTypeUri, String refTopicUri,     Directives directives);
 
     // ---
 
-    CompositeValue remove(String childTypeUri, long topicId,           ClientState clientState, Directives directives);
+    CompositeValue remove(String childTypeUri, long topicId,           Directives directives);
 }

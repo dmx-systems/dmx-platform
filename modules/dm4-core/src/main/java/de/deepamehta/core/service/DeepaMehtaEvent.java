@@ -64,7 +64,7 @@ public abstract class DeepaMehtaEvent {
 
     @Override
     public String toString() {
-        return getClass().getName() + " (" + listenerInterface.getName() + ")";
+        return getClass().getName() + " (listener interface=" + listenerInterface.getName() + ")";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

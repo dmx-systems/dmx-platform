@@ -1,33 +1,33 @@
 package de.deepamehta.core.service;
 
+import com.sun.jersey.spi.container.ContainerRequest;
+
+import javax.ws.rs.core.Cookie;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 
 
 /**
- * Cookies sent by a client.
+ * Cookies obtained from request headers.
  */
-public class ClientState {
+public class Cookies {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, String> values = new HashMap();
 
+    // ------------------------------------------------------------------------------------------------- Class Variables
+
+    private static final ThreadLocal<ContainerRequest> threadLocalRequest = new ThreadLocal();
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    /**
-      * Converts a "Cookie" header value (String) to a map (key=String, value=String).
-      * E.g. "dm4_workspace_id=123; dm4_topicmap_id=234" => {"dm4_workspace_id"="123", "dm4_topicmap_id"="234"}
-      * <p>
-      * Called by JAX-RS container to create a ClientState from a "Cookie" @HeaderParam
-      */
-    public ClientState(String cookie) {
-        if (cookie != null) {
-            for (String value : cookie.split("; ")) {
-                String[] val = value.split("=", 2);     // Limit 2 ensures 2nd element in case of empty value
-                values.put(val[0], val[1]);
-            }
+    private Cookies(Collection<Cookie> cookies) {
+        for (Cookie cookie : cookies) {
+            values.put(cookie.getName(), cookie.getValue());
         }
     }
 
@@ -40,7 +40,7 @@ public class ClientState {
         String value = values.get(name);
         //
         if (value == null) {
-            throw new RuntimeException("Missing \"" + name + "\" cookie (clientState=" + this + ")");
+            throw new RuntimeException("Missing \"" + name + "\" cookie (cookies=" + this + ")");
         }
         //
         return value;
@@ -65,6 +65,18 @@ public class ClientState {
      */
     public boolean has(String name) {
         return values.get(name) != null;
+    }
+
+    // ---
+
+    public static Cookies get() {
+        return new Cookies(threadLocalRequest.get().getCookies().values());
+        // ### FIXME: get() returns null if called outside the scope of a request
+    }
+
+    // ### TODO: define public Cookies interface and hide this internal method
+    public static void set(ContainerRequest request) {
+        threadLocalRequest.set(request);
     }
 
     // ---

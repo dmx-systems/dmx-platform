@@ -4,7 +4,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 
@@ -48,7 +47,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     CompositeValue getCompositeValue();
 
-    void setCompositeValue(CompositeValueModel comp, ClientState clientState, Directives directives);
+    void setCompositeValue(CompositeValueModel comp, Directives directives);
 
     // ---
 
@@ -63,14 +62,12 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // === Updating ===
 
-    void update(DeepaMehtaObjectModel model, ClientState clientState, Directives directives);
+    void update(DeepaMehtaObjectModel model, Directives directives);
 
     // ---
 
-    void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef, ClientState clientState,
-                                                                                    Directives directives);
-    void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef, ClientState clientState,
-                                                                                            Directives directives);
+    void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef, Directives directives);
+    void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef, Directives directives);
 
 
 

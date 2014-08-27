@@ -65,7 +65,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
             long time = timeService.getModificationTime(object);
             Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
             if (response != null) {
-                logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
+                logger.fine("### Precondition of " + request.getMethod() + " request failed (object " +
                     object.getId() + ")");
                 throw new WebApplicationException(response.build());
             }

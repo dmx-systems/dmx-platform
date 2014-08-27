@@ -271,7 +271,7 @@ class TypeStorageImpl implements TypeStorage {
         // of topic types.
         ResultList<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, false, false, 0);
-            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, clientState=null
+            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, maxResultSize=0
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
@@ -338,7 +338,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: creating the underlying association is conditional. It exists already for
             // an interactively created association definition. Its ID is already set.
             if (assocDef.getId() == -1) {
-                dms.createAssociation(assocDef, null);      // clientState=null
+                dms.createAssociation(assocDef);
             }
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
@@ -555,7 +555,7 @@ class TypeStorageImpl implements TypeStorage {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
             new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
-                .set("dm4.core.include_in_label", includeInLabel, null, directives);    // clientState=null
+                .set("dm4.core.include_in_label", includeInLabel, directives);
         }
     }
 
@@ -630,9 +630,7 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
-        // Note: null is passed as clientState. Called only (indirectly) from a migration ### FIXME: is this true?
-        // and in a migration we have no clientState anyway.
-        Topic topic = dms.createTopic(configTopic, null);   // clientState=null
+        Topic topic = dms.createTopic(configTopic);
         dms.createAssociation("dm4.core.aggregation", configurable,
             new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
     }
@@ -646,7 +644,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
             // ### TODO: do not create an attached topic here. Can we use the value storage?
-            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, null, new Directives());
+            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, new Directives());
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +

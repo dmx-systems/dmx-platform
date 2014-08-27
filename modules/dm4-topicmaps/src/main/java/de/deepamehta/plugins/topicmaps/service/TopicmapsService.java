@@ -7,7 +7,6 @@ import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
 
 
@@ -21,8 +20,8 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    Topic createTopicmap(String name,             String topicmapRendererUri, ClientState clientState);
-    Topic createTopicmap(String name, String uri, String topicmapRendererUri, ClientState clientState);
+    Topic createTopicmap(String name,             String topicmapRendererUri);
+    Topic createTopicmap(String name, String uri, String topicmapRendererUri);
 
     // ---
 

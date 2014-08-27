@@ -24,7 +24,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
@@ -318,7 +317,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
                 new TopicRoleModel(getUsernameOrThrow(username).getId(), "dm4.core.default"),
-                new TopicRoleModel(workspaceId, "dm4.core.default")), null);   // clientState=null
+                new TopicRoleModel(workspaceId, "dm4.core.default")
+            ));
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -443,7 +443,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void postCreateTopic(Topic topic, ClientState clientState, Directives directives) {
+    public void postCreateTopic(Topic topic, Directives directives) {
         if (isUserAccount(topic)) {
             setupUserAccountAccessControl(topic);
         } else {
@@ -455,15 +455,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postCreateAssociation(Association assoc, ClientState clientState, Directives directives) {
+    public void postCreateAssociation(Association assoc, Directives directives) {
         setupDefaultAccessControl(assoc);
     }
 
     // ---
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, ClientState clientState,
-                                                                                       Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
             Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");
@@ -493,12 +492,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void introduceTopicType(TopicType topicType, ClientState clientState) {
+    public void introduceTopicType(TopicType topicType) {
         setupDefaultAccessControl(topicType);
     }
 
     @Override
-    public void introduceAssociationType(AssociationType assocType, ClientState clientState) {
+    public void introduceAssociationType(AssociationType assocType) {
         setupDefaultAccessControl(assocType);
     }
 
@@ -522,7 +521,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // with the types (don't use the preSend{}Type hooks). Instead let the client request the permissions separately.
 
     @Override
-    public void preSendTopicType(TopicType topicType, ClientState clientState) {
+    public void preSendTopicType(TopicType topicType) {
         // Note: the permissions for "Meta Meta Type" must be set manually.
         // This type doesn't exist in DB. Fetching its ACL entries would fail.
         if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
@@ -534,7 +533,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void preSendAssociationType(AssociationType assocType, ClientState clientState) {
+    public void preSendAssociationType(AssociationType assocType) {
         enrichWithPermissions(assocType, getPermissions(assocType.getId()));
     }
 
@@ -545,7 +544,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private Topic createUserAccount(Credentials cred) {
         return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValueModel()
             .put("dm4.accesscontrol.username", cred.username)
-            .put("dm4.accesscontrol.password", cred.password)), null);  // clientState=null
+            .put("dm4.accesscontrol.password", cred.password)));
     }
 
     private boolean isUserAccount(Topic topic) {

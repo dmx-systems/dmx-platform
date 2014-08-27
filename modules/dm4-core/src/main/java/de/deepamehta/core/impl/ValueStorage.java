@@ -12,7 +12,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
@@ -103,9 +102,9 @@ class ValueStorage {
      * <p>
      * Called to store the initial value of a newly created topic/association.
      */
-    void storeValue(DeepaMehtaObjectModel model, ClientState clientState, Directives directives) {
+    void storeValue(DeepaMehtaObjectModel model, Directives directives) {
         if (getType(model).getDataTypeUri().equals("dm4.core.composite")) {
-            storeCompositeValue(model, clientState, directives);
+            storeCompositeValue(model, directives);
             refreshLabel(model);
         } else {
             storeSimpleValue(model);
@@ -170,16 +169,16 @@ class ValueStorage {
      * @return  the resolved child topic, including its composite values.
      */
     Topic associateReferencedChildTopic(DeepaMehtaObjectModel parent, TopicReferenceModel childTopicRef,
-                                                              AssociationDefinition assocDef, ClientState clientState) {
+                                                                      AssociationDefinition assocDef) {
         if (childTopicRef.isReferenceById()) {
             long childTopicId = childTopicRef.getId();
-            associateChildTopic(parent, childTopicId, assocDef, clientState);
+            associateChildTopic(parent, childTopicId, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
             return dms.getTopic(childTopicId, true);                            // fetchComposite=true
         } else if (childTopicRef.isReferenceByUri()) {
             String childTopicUri = childTopicRef.getUri();
-            associateChildTopic(parent, childTopicUri, assocDef, clientState);
+            associateChildTopic(parent, childTopicUri, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
             return dms.getTopic("uri", new SimpleValue(childTopicUri), true);   // fetchComposite=true
@@ -188,14 +187,12 @@ class ValueStorage {
         }
     }
 
-    void associateChildTopic(DeepaMehtaObjectModel parent, long childTopicId, AssociationDefinition assocDef,
-                                                                              ClientState clientState) {
-        associateChildTopic(parent, new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef, clientState);
+    void associateChildTopic(DeepaMehtaObjectModel parent, long childTopicId, AssociationDefinition assocDef) {
+        associateChildTopic(parent, new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef);
     }
 
-    void associateChildTopic(DeepaMehtaObjectModel parent, String childTopicUri, AssociationDefinition assocDef,
-                                                                                 ClientState clientState) {
-        associateChildTopic(parent, new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef, clientState);
+    void associateChildTopic(DeepaMehtaObjectModel parent, String childTopicUri, AssociationDefinition assocDef) {
+        associateChildTopic(parent, new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef);
     }
 
     // ---
@@ -249,7 +246,7 @@ class ValueStorage {
      * Note: the given model can contain childs not defined in the type definition.
      * Only the childs defined in the type definition are stored.
      */
-    private void storeCompositeValue(DeepaMehtaObjectModel parent, ClientState clientState, Directives directives) {
+    private void storeCompositeValue(DeepaMehtaObjectModel parent, Directives directives) {
         CompositeValueModel model = null;
         try {
             model = parent.getCompositeValueModel();
@@ -274,7 +271,7 @@ class ValueStorage {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
                 //
-                storeChildTopics(childTopic, childTopics, parent, assocDef, clientState, directives);
+                storeChildTopics(childTopic, childTopics, parent, assocDef, directives);
             }
         } catch (Exception e) {
             throw new RuntimeException("Storing composite value of object " + parent.getId() + " failed (" +
@@ -285,20 +282,20 @@ class ValueStorage {
     // ---
 
     private void storeChildTopics(TopicModel childTopic, List<TopicModel> childTopics, DeepaMehtaObjectModel parent,
-                                       AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                                         AssociationDefinition assocDef, Directives directives) {
         String assocTypeUri = assocDef.getTypeUri();
         boolean one = childTopic != null;
         if (assocTypeUri.equals("dm4.core.composition_def")) {
             if (one) {
-                storeCompositionOne(childTopic, parent, assocDef, clientState, directives);
+                storeCompositionOne(childTopic, parent, assocDef, directives);
             } else {
-                storeCompositionMany(childTopics, parent, assocDef, clientState, directives);
+                storeCompositionMany(childTopics, parent, assocDef, directives);
             }
         } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
             if (one) {
-                storeAggregationOne(childTopic, parent, assocDef, clientState, directives);
+                storeAggregationOne(childTopic, parent, assocDef, directives);
             } else {
-                storeAggregationMany(childTopics, parent, assocDef, clientState, directives);
+                storeAggregationMany(childTopics, parent, assocDef, directives);
             }
         } else {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
@@ -308,21 +305,21 @@ class ValueStorage {
     // --- Composition ---
 
     private void storeCompositionOne(TopicModel model, DeepaMehtaObjectModel parent,
-                                     AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                     AssociationDefinition assocDef, Directives directives) {
         // == create child ==
         // update DB
-        Topic childTopic = dms.createTopic(model, clientState);
-        associateChildTopic(parent, childTopic.getId(), assocDef, clientState);
+        Topic childTopic = dms.createTopic(model);
+        associateChildTopic(parent, childTopic.getId(), assocDef);
         // Note: memory is already up-to-date. The child topic ID is updated in-place.
     }
 
     private void storeCompositionMany(List<TopicModel> models, DeepaMehtaObjectModel parent,
-                                      AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                      AssociationDefinition assocDef, Directives directives) {
         for (TopicModel model : models) {
             // == create child ==
             // update DB
-            Topic childTopic = dms.createTopic(model, clientState);
-            associateChildTopic(parent, childTopic.getId(), assocDef, clientState);
+            Topic childTopic = dms.createTopic(model);
+            associateChildTopic(parent, childTopic.getId(), assocDef);
             // Note: memory is already up-to-date. The child topic ID is updated in-place.
         }
     }
@@ -330,38 +327,36 @@ class ValueStorage {
     // --- Aggregation ---
 
     private void storeAggregationOne(TopicModel model, DeepaMehtaObjectModel parent,
-                                     AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                     AssociationDefinition assocDef, Directives directives) {
         if (model instanceof TopicReferenceModel) {
             // == create assignment ==
             // update DB
-            Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef,
-                clientState);
+            Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef);
             // update memory
             putInCompositeValue(parent, childTopic, assocDef);
         } else {
             // == create child ==
             // update DB
-            Topic childTopic = dms.createTopic(model, clientState);
-            associateChildTopic(parent, childTopic.getId(), assocDef, clientState);
+            Topic childTopic = dms.createTopic(model);
+            associateChildTopic(parent, childTopic.getId(), assocDef);
             // Note: memory is already up-to-date. The child topic ID is updated in-place.
         }
     }
 
     private void storeAggregationMany(List<TopicModel> models, DeepaMehtaObjectModel parent,
-                                      AssociationDefinition assocDef, ClientState clientState, Directives directives) {
+                                      AssociationDefinition assocDef, Directives directives) {
         for (TopicModel model : models) {
             if (model instanceof TopicReferenceModel) {
                 // == create assignment ==
                 // update DB
-                Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef,
-                    clientState);
+                Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef);
                 // update memory
                 replaceReference(model, childTopic);
             } else {
                 // == create child ==
                 // update DB
-                Topic childTopic = dms.createTopic(model, clientState);
-                associateChildTopic(parent, childTopic.getId(), assocDef, clientState);
+                Topic childTopic = dms.createTopic(model);
+                associateChildTopic(parent, childTopic.getId(), assocDef);
                 // Note: memory is already up-to-date. The child topic ID is updated in-place.
             }
         }
@@ -486,11 +481,10 @@ class ValueStorage {
 
     // ---
 
-    private void associateChildTopic(DeepaMehtaObjectModel parent, TopicRoleModel child, AssociationDefinition assocDef,
-                                                                                         ClientState clientState) {
-        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            parent.createRoleModel("dm4.core.parent"), child, clientState
-        );
+    private void associateChildTopic(DeepaMehtaObjectModel parent, TopicRoleModel child,
+                                                                   AssociationDefinition assocDef) {
+        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(), parent.createRoleModel("dm4.core.parent"),
+            child);
     }
 
     // ---

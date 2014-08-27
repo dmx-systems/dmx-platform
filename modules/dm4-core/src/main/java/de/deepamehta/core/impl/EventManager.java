@@ -104,8 +104,10 @@ class EventManager {
             // Note: an AccessControlException thrown by a event listener must reach the caller in order to
             // recover.
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Processing event " + event + " by " + listener + " failed", e);
+        } catch (Throwable e) {
+            // Note: here we also catch errors like NoSuchMethodError or AbstractMethodError.
+            // These occur when plugins are not yet adapted to changed Core API.
+            throw new RuntimeException("Processing event by " + listener + " failed (event=" + event + ")", e);
         }
     }
 

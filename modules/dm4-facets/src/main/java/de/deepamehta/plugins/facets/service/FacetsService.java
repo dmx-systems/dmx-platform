@@ -5,7 +5,6 @@ import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 
@@ -57,7 +56,7 @@ public interface FacetsService extends PluginService {
 
     // ---
 
-    void updateFacet(long topicId, String facetTypeUri, FacetValue value, ClientState clientState);
+    void updateFacet(long topicId, String facetTypeUri, FacetValue value);
 
     /**
      * Updates a facet.
@@ -67,8 +66,7 @@ public interface FacetsService extends PluginService {
      * @param   facetValue      The new facet value.
      * @param   directives      Must be not null at least for aggregated facets ### FIXME: directives are ignored
      */
-    void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value, ClientState clientState,
-                                                                                     Directives directives);
+    void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value, Directives directives);
 
     // ---
 

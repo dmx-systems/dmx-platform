@@ -53,9 +53,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
             logger.info("========== Starting " + this + " ==========");
             plugin = new PluginImpl(this);
             plugin.start();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.log(Level.SEVERE, "Starting " + this + " failed", e);
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
         }
     }
@@ -70,9 +71,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
             //
             logger.info("========== Stopping " + this + " ==========");
             plugin.stop();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.log(Level.SEVERE, "Stopping " + this + " failed", e);
-            // Note: we don't throw through the OSGi container here. It would not print out the stacktrace.
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
         }
     }
 
@@ -133,6 +135,8 @@ public class PluginActivator implements BundleActivator, PluginContext {
     protected final InputStream getStaticResource(String name) {
         return plugin.getStaticResource(name);
     }
+
+    // ---
 
     /**
      * @param   securityHandler     Optional. If null no security is provided.
