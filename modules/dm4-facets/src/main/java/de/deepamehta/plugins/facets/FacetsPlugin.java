@@ -13,7 +13,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -123,7 +122,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                                                                                         FacetValue value) {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            updateFacet(dms.getTopic(topicId, false), facetTypeUri, value, new Directives());
+            updateFacet(dms.getTopic(topicId, false), facetTypeUri, value);
             //
             tx.success();
         } catch (Exception e) {
@@ -136,12 +135,12 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value, Directives directives) {
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value) {
         AssociationDefinition assocDef = getAssocDef(facetTypeUri);
         if (!isMultiFacet(facetTypeUri)) {
-            object.updateChildTopic(value.getTopic(), assocDef, directives);
+            object.updateChildTopic(value.getTopic(), assocDef);
         } else {
-            object.updateChildTopics(value.getTopics(), assocDef, directives);
+            object.updateChildTopics(value.getTopics(), assocDef);
         }
     }
 

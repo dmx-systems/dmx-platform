@@ -16,7 +16,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -176,7 +175,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created topic to the current workspace.
      */
     @Override
-    public void postCreateTopic(Topic topic, Directives directives) {
+    public void postCreateTopic(Topic topic) {
         long workspaceId = -1;
         try {
             // Note: we must avoid vicious circles
@@ -206,7 +205,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Assigns every created association to the current workspace.
      */
     @Override
-    public void postCreateAssociation(Association assoc, Directives directives) {
+    public void postCreateAssociation(Association assoc) {
         long workspaceId = -1;
         try {
             // Note: we must avoid vicious circles
@@ -269,7 +268,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note 1: we are refering to an existing workspace. So we must add a topic reference.
         // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
         FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value, new Directives());
+        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value);
     }
 
     // --- Helper ---

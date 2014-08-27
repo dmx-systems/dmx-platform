@@ -9,7 +9,6 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
@@ -153,22 +152,22 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
     @Override
-    public void postCreateTopic(Topic topic, Directives directives) {
+    public void postCreateTopic(Topic topic) {
         storeTimestamps(topic);
     }
 
     @Override
-    public void postCreateAssociation(Association assoc, Directives directives) {
+    public void postCreateAssociation(Association assoc) {
         storeTimestamps(assoc);
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         storeTimestamp(topic);
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, Directives directives) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
         storeTimestamp(assoc);
     }
 

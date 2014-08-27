@@ -175,7 +175,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     @Override
-    public void preUpdateTopic(Topic topic, TopicModel newModel, Directives directives) {
+    public void preUpdateTopic(Topic topic, TopicModel newModel) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
             String iconUrl = "/filerepo/" + topic.getCompositeValue().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
@@ -187,9 +187,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
-            updateType(topic, directives);
+            updateType(topic);
             setConfigTopicLabel(topic);
         }
     }
@@ -277,15 +277,15 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === View Configuration ===
 
-    private void updateType(Topic viewConfig, Directives directives) {
+    private void updateType(Topic viewConfig) {
         Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null,
             false, false);
         if (type != null) {
             String typeUri = type.getTypeUri();
             if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.meta_type")) {
-                updateTopicType(type, viewConfig, directives);
+                updateTopicType(type, viewConfig);
             } else if (typeUri.equals("dm4.core.assoc_type")) {
-                updateAssociationType(type, viewConfig, directives);
+                updateAssociationType(type, viewConfig);
             } else {
                 throw new RuntimeException("View Configuration " + viewConfig.getId() + " is associated to an " +
                     "unexpected topic (type=" + type + "\nviewConfig=" + viewConfig + ")");
@@ -297,20 +297,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // ---
 
-    private void updateTopicType(Topic type, Topic viewConfig, Directives directives) {
+    private void updateTopicType(Topic type, Topic viewConfig) {
         logger.info("### Updating view configuration of topic type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
         TopicType topicType = dms.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
-        directives.add(Directive.UPDATE_TOPIC_TYPE, topicType);
+        Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);
     }
 
-    private void updateAssociationType(Topic type, Topic viewConfig, Directives directives) {
+    private void updateAssociationType(Topic type, Topic viewConfig) {
         logger.info("### Updating view configuration of association type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
         AssociationType assocType = dms.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
-        directives.add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
+        Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
     }
 
     // ---

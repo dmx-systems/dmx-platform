@@ -24,7 +24,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -413,7 +412,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void postCreateTopic(Topic topic, Directives directives) {
+    public void postCreateTopic(Topic topic) {
         if (isUserAccount(topic)) {
             setupUserAccountAccessControl(topic);
         } else {
@@ -425,14 +424,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postCreateAssociation(Association assoc, Directives directives) {
+    public void postCreateAssociation(Association assoc) {
         setupDefaultAccessControl(assoc);
     }
 
     // ---
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
             Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");

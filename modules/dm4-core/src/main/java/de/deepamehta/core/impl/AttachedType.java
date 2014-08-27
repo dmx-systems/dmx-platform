@@ -55,22 +55,22 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // === Updating ===
 
     @Override
-    public void update(TypeModel model, Directives directives) {
+    public void update(TypeModel model) {
         boolean uriChanged = hasUriChanged(model.getUri());
         if (uriChanged) {
             _removeFromTypeCache();
         }
         //
-        super.update(model, directives);
+        super.update(model);
         //
         if (uriChanged) {
             putInTypeCache();   // abstract
         }
         //
-        updateDataTypeUri(model.getDataTypeUri(), directives);
-        updateAssocDefs(model.getAssocDefs(), directives);
+        updateDataTypeUri(model.getDataTypeUri());
+        updateAssocDefs(model.getAssocDefs());
         updateSequence(model.getAssocDefs());
-        updateLabelConfig(model.getLabelConfig(), directives);
+        updateLabelConfig(model.getLabelConfig());
     }
 
 
@@ -114,11 +114,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void setDataTypeUri(String dataTypeUri, Directives directives) {
+    public void setDataTypeUri(String dataTypeUri) {
         // update memory
         getModel().setDataTypeUri(dataTypeUri);
         // update DB
-        storeDataTypeUri(dataTypeUri, directives);
+        storeDataTypeUri(dataTypeUri);
     }
 
     // --- Index Modes ---
@@ -199,11 +199,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void setLabelConfig(List<String> labelConfig, Directives directives) {
+    public void setLabelConfig(List<String> labelConfig) {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs(), directives);
+        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
     // --- View Configuration ---
@@ -262,17 +262,17 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateDataTypeUri(String newDataTypeUri, Directives directives) {
+    private void updateDataTypeUri(String newDataTypeUri) {
         if (newDataTypeUri != null) {
             String dataTypeUri = getDataTypeUri();
             if (!dataTypeUri.equals(newDataTypeUri)) {
                 logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
-                setDataTypeUri(newDataTypeUri, directives);
+                setDataTypeUri(newDataTypeUri);
             }
         }
     }
 
-    private void storeDataTypeUri(String dataTypeUri, Directives directives) {
+    private void storeDataTypeUri(String dataTypeUri) {
         // remove current assignment
         getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type",
             false, false).getRelatingAssociation().delete();
@@ -303,9 +303,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs, Directives directives) {
+    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            getAssocDef(assocDef.getChildTypeUri()).update(assocDef, directives);
+            getAssocDef(assocDef.getChildTypeUri()).update(assocDef);
         }
     }
 
@@ -345,10 +345,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    private void updateLabelConfig(List<String> newLabelConfig, Directives directives) {
+    private void updateLabelConfig(List<String> newLabelConfig) {
         if (!getLabelConfig().equals(newLabelConfig)) {
             logger.info("### Changing label configuration");
-            setLabelConfig(newLabelConfig, directives);
+            setLabelConfig(newLabelConfig);
         }
     }
 

@@ -96,7 +96,8 @@ public class WebservicePlugin extends PluginActivator {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(topicId);
-        return dms.updateTopic(model);
+        dms.updateTopic(model);
+        return Directives.get();
     }
 
     @DELETE
@@ -158,7 +159,8 @@ public class WebservicePlugin extends PluginActivator {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(assocId);
-        return dms.updateAssociation(model);
+        dms.updateAssociation(model);
+        return Directives.get();
     }
 
     @DELETE
@@ -199,7 +201,8 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/topictype")
     public Directives updateTopicType(TopicTypeModel model) {
-        return dms.updateTopicType(model);
+        dms.updateTopicType(model);
+        return Directives.get();
     }
 
     @DELETE
@@ -240,7 +243,8 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/assoctype")
     public Directives updateAssociationType(AssociationTypeModel model) {
-        return dms.updateAssociationType(model);
+        dms.updateAssociationType(model);
+        return Directives.get();
     }
 
     @DELETE

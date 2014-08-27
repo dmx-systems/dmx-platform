@@ -33,12 +33,12 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, Directives directives) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
         if (isAssocDef(assoc.getModel())) {
             if (isAssocDef(oldModel)) {
-                updateAssocDef(assoc, directives);
+                updateAssocDef(assoc);
             } else {
-                createAssocDef(assoc, directives);
+                createAssocDef(assoc);
             }
         } else if (isAssocDef(oldModel)) {
             removeAssocDef(assoc);
@@ -59,7 +59,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void createAssocDef(Association assoc, Directives directives) {
+    private void createAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         String childTypeUri = fetchChildType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
@@ -77,7 +77,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef(Association assoc, Directives directives) {
+    private void updateAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
         logger.info("### Updating association definition \"" + assocDef.getChildTypeUri() + "\" of type \"" +

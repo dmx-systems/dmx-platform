@@ -43,14 +43,14 @@ class AttachedTopicType extends AttachedType implements TopicType {
     }
 
     @Override
-    public void update(TopicTypeModel model, Directives directives) {
+    public void update(TopicTypeModel model) {
         logger.info("Updating topic type \"" + getUri() + "\" (new " + model + ")");
         // Note: the UPDATE_TOPIC_TYPE directive must be added *before* a possible UPDATE_TOPIC directive (added
         // by super.update()). In case of a changed type URI the webclient's type cache must be updated *before*
         // the TopicTypeRenderer can render the type.
-        directives.add(Directive.UPDATE_TOPIC_TYPE, this);
+        Directives.get().add(Directive.UPDATE_TOPIC_TYPE, this);
         //
-        super.update(model, directives);
+        super.update(model);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

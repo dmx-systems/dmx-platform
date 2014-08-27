@@ -11,7 +11,6 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -145,10 +144,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setCompositeValue(CompositeValueModel comp, Directives directives) {
+    public void setCompositeValue(CompositeValueModel comp) {
         DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
-            getCompositeValue().update(comp, directives);
+            getCompositeValue().update(comp);
             tx.success();
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
@@ -182,24 +181,22 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public void update(DeepaMehtaObjectModel newModel, Directives directives) {
+    public void update(DeepaMehtaObjectModel newModel) {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
-        updateValue(newModel, directives);
+        updateValue(newModel);
     }
 
     // ---
 
     @Override
-    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                           Directives directives) {
-        getCompositeValue().updateChildTopics(newChildTopic, null, assocDef, directives);
+    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
+        getCompositeValue().updateChildTopics(newChildTopic, null, assocDef);
     }
 
     @Override
-    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                   Directives directives) {
-        getCompositeValue().updateChildTopics(null, newChildTopics, assocDef, directives);
+    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+        getCompositeValue().updateChildTopics(null, newChildTopics, assocDef);
     }
 
 
@@ -316,7 +313,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     abstract String className();
 
     // ### TODO: Directive getUpdateDirective()
-    abstract void addUpdateDirective(Directives directives);
+    abstract void addUpdateDirective();
 
     abstract void storeUri();
 
@@ -371,9 +368,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateValue(DeepaMehtaObjectModel newModel, Directives directives) {
+    private void updateValue(DeepaMehtaObjectModel newModel) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getCompositeValue().update(newModel.getCompositeValueModel(), directives);
+            getCompositeValue().update(newModel.getCompositeValueModel());
         } else {
             updateSimpleValue(newModel.getSimpleValue());
         }

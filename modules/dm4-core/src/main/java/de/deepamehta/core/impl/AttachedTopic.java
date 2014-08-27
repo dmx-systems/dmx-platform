@@ -48,8 +48,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Updating ===
 
     @Override
-    public void update(TopicModel model, Directives directives) {
-        _update(model, directives);
+    public void update(TopicModel model) {
+        _update(model);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
@@ -197,17 +197,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
      * Called multiple times while updating a composite value (see AttachedCompositeValue).
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
-    void _update(TopicModel model, Directives directives) {
+    void _update(TopicModel model) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
+        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
         //
         TopicModel oldModel = getModel().clone();
-        super.update(model, directives);
+        super.update(model);
         //
-        addUpdateDirective(directives);
+        addUpdateDirective();
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
     }
 
 
@@ -220,8 +220,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    void addUpdateDirective(Directives directives) {
-        directives.add(Directive.UPDATE_TOPIC, this);
+    void addUpdateDirective() {
+        Directives.get().add(Directive.UPDATE_TOPIC, this);
     }
 
     @Override

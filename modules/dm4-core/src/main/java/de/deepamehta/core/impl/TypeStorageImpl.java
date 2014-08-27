@@ -22,7 +22,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -172,7 +171,7 @@ class TypeStorageImpl implements TypeStorage {
         storeDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getUri(), type.getAssocDefs());
-        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs(), new Directives());
+        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
         storeViewConfig(createConfigurableType(type.getId()), type.getViewConfigModel());
     }
 
@@ -550,12 +549,11 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs,
-                                                                                Directives directives) {
+    void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
             new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
-                .set("dm4.core.include_in_label", includeInLabel, directives);
+                .set("dm4.core.include_in_label", includeInLabel);
         }
     }
 
@@ -644,7 +642,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
             // ### TODO: do not create an attached topic here. Can we use the value storage?
-            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value, new Directives());
+            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value);
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +
