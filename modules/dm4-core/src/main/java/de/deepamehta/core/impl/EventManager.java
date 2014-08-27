@@ -97,8 +97,10 @@ class EventManager {
             // This allow plugins to produce specific HTTP responses by throwing a WebApplicationException.
             // Consider the Caching plugin: it produces a possible 304 (Not Modified) response this way.
             throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Processing event " + event + " by " + listener + " failed", e);
+        } catch (Throwable e) {
+            // Note: here we also catch errors like NoSuchMethodError or AbstractMethodError.
+            // These occur when plugins are not yet adapted to changed Core API.
+            throw new RuntimeException("Processing event by " + listener + " failed (event=" + event + ")", e);
         }
     }
 
