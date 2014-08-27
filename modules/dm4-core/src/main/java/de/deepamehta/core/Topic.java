@@ -1,7 +1,6 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 
@@ -24,7 +23,7 @@ public interface Topic extends DeepaMehtaObject {
 
     // === Updating ===
 
-    void update(TopicModel model, Directives directives);
+    void update(TopicModel model);
 
 
 

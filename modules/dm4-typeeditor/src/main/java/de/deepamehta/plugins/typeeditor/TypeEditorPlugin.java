@@ -33,15 +33,15 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel, Directives directives) {
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
         if (isAssocDef(assoc.getModel())) {
             if (isAssocDef(oldModel)) {
-                updateAssocDef(assoc, directives);
+                updateAssocDef(assoc);
             } else {
-                createAssocDef(assoc, directives);
+                createAssocDef(assoc);
             }
         } else if (isAssocDef(oldModel)) {
-            removeAssocDef(assoc, directives);
+            removeAssocDef(assoc);
         }
     }
 
@@ -49,9 +49,9 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // interrupted, which would result in a corrupted sequence once rebuild. (Due to the interruption, while
     // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
     @Override
-    public void preDeleteAssociation(Association assoc, Directives directives) {
+    public void preDeleteAssociation(Association assoc) {
         if (isAssocDef(assoc.getModel())) {
-            removeAssocDef(assoc, directives);
+            removeAssocDef(assoc);
         }
     }
 
@@ -59,7 +59,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void createAssocDef(Association assoc, Directives directives) {
+    private void createAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         String childTypeUri = fetchChildType(assoc).getUri();
         // Note: the assoc def's ID is already known. Setting it explicitely
@@ -74,10 +74,10 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         //
         parentType.addAssocDef(assocDef);
         //
-        addUpdateTypeDirective(parentType, directives);
+        addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef(Association assoc, Directives directives) {
+    private void updateAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
         logger.info("### Updating association definition \"" + assocDef.getChildTypeUri() + "\" of type \"" +
@@ -85,10 +85,10 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         //
         parentType.updateAssocDef(assocDef);
         //
-        addUpdateTypeDirective(parentType, directives);
+        addUpdateTypeDirective(parentType);
     }
 
-    private void removeAssocDef(Association assoc, Directives directives) {
+    private void removeAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         String childTypeUri = fetchChildType(assoc).getUri();
         logger.info("### Removing association definition \"" + childTypeUri + "\" from type \"" + parentType.getUri() +
@@ -96,7 +96,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         //
         dms.getTypeStorage().removeAssociationDefinitionFromMemoryAndRebuildSequence(parentType, childTypeUri);
         //
-        addUpdateTypeDirective(parentType, directives);
+        addUpdateTypeDirective(parentType);
     }
 
 
@@ -124,11 +124,11 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ### TODO: adding the UPDATE directive should be the responsibility of a type. The Type interface's
     // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter.
-    private void addUpdateTypeDirective(Type type, Directives directives) {
+    private void addUpdateTypeDirective(Type type) {
         if (type.getTypeUri().equals("dm4.core.topic_type")) {
-            directives.add(Directive.UPDATE_TOPIC_TYPE, type);
+            Directives.get().add(Directive.UPDATE_TOPIC_TYPE, type);
         } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
-            directives.add(Directive.UPDATE_ASSOCIATION_TYPE, type);
+            Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, type);
         }
         // Note: no else here as error check already performed in fetchParentType()
     }

@@ -15,7 +15,6 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
@@ -206,7 +205,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/association/{assoc_id}")
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        fetchAssociationRefAssociation(topicmapId, assocId).delete(new Directives());
+        fetchAssociationRefAssociation(topicmapId, assocId).delete();
     }
 
     // ---
@@ -342,7 +341,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Store ---
 
     private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps, new Directives());
+        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps);
     }
 
     // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.

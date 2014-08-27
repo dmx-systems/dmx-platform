@@ -8,6 +8,7 @@ import org.codehaus.jettison.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 
@@ -17,10 +18,32 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
 
     private List<Entry> directives = new ArrayList();
 
+    // ------------------------------------------------------------------------------------------------- Class Variables
+
+    private static Logger logger = Logger.getLogger("de.deepamehta.core.service.Directives");
+
+    private static final ThreadLocal<Directives> threadLocalDirectives = new ThreadLocal() {
+        @Override
+        protected Directives initialValue() {
+            logger.info("############################################################ Creating tread-local directives");
+            return new Directives();
+        }
+    };
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public void add(Directive dir, JSONEnabled arg) {
         directives.add(new Entry(dir, arg));
+    }
+
+    // ---
+
+    public static Directives get() {
+        return threadLocalDirectives.get();
+    }
+
+    public static void remove() {
+        threadLocalDirectives.remove();
     }
 
     // *** JSONEnabled Implementation ***

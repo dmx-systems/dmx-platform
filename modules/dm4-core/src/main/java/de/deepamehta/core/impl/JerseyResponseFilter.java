@@ -60,6 +60,10 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSendTopics((Iterable<Topic>) entity);
                 }
             }
+            //
+            logger.info("############################## Removing tread-local directives");
+            Directives.remove();
+            //
             return response;
         } catch (Exception e) {
             throw new RuntimeException("Jersey response filtering failed", e);

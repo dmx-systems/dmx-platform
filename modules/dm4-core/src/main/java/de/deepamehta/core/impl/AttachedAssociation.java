@@ -66,22 +66,22 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      *                  If role 2 is <code>null</code> it is not updated.
      */
     @Override
-    public void update(AssociationModel model, Directives directives) {
+    public void update(AssociationModel model) {
         // ### TODO: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
         // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
         // Per request exactly one association is updated. Its childs are topics (never associations).
         logger.info("Updating association " + getId() + " (new " + model + ")");
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model, directives);
+        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
         //
         AssociationModel oldModel = getModel().clone();
-        super.update(model, directives);
+        super.update(model);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
-        addUpdateDirective(directives);
+        addUpdateDirective();
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel);
     }
 
 
@@ -89,21 +89,21 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // === Deletion ===
 
     @Override
-    public void delete(Directives directives) {
+    public void delete() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this, directives);
+            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this);
             //
             // delete sub-topics and associations
-            super.delete(directives);
+            super.delete();
             // delete association itself
             logger.info("Deleting " + this);
-            directives.add(Directive.DELETE_ASSOCIATION, this);
+            Directives.get().add(Directive.DELETE_ASSOCIATION, this);
             dms.storageDecorator.deleteAssociation(getId());
             //
             tx.success();
             //
-            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this, directives);
+            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this);
         } catch (IllegalStateException e) {
             // Note: getAssociations() might throw IllegalStateException and is no problem.
             // This can happen when this object is an association which is already deleted.
@@ -308,8 +308,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    void addUpdateDirective(Directives directives) {
-        directives.add(Directive.UPDATE_ASSOCIATION, this);
+    void addUpdateDirective() {
+        Directives.get().add(Directive.UPDATE_ASSOCIATION, this);
     }
 
     @Override
@@ -386,7 +386,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     private void reassignInstantiation() {
         // remove current assignment
-        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        fetchInstantiation().delete();
         // create new assignment
         dms.createAssociationInstantiation(getId(), getTypeUri());
     }
