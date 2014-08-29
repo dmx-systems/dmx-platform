@@ -17,7 +17,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +89,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public void delete() {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this);
             //
@@ -100,8 +98,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             logger.info("Deleting " + this);
             Directives.get().add(Directive.DELETE_ASSOCIATION, this);
             dms.storageDecorator.deleteAssociation(getId());
-            //
-            tx.success();
             //
             dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this);
         } catch (IllegalStateException e) {
@@ -122,15 +118,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
             if (e.getMessage().equals("Node[" + getId() + "] has been deleted in this tx")) {
                 logger.info("### Association " + getId() + " has already been deleted in this transaction. This can " +
                     "happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" + this + ")");
-                tx.success();
             } else {
                 throw e;
             }
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association failed (" + this + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 

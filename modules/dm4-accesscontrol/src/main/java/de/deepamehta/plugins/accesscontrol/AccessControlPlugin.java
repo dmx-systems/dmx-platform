@@ -26,6 +26,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
@@ -231,16 +232,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setCreator(DeepaMehtaObject object, String username) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(URI_CREATOR, username, true);    // addToIndex=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -255,16 +251,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setOwner(DeepaMehtaObject object, String username) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(URI_OWNER, username, true);      // addToIndex=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the owner of " + info(object) + " failed (username=" + username + ")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -287,15 +278,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setACL(DeepaMehtaObject object, AccessControlList acl) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(URI_ACL, acl.toJSON().toString(), false);    // addToIndex=false
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the ACL of " + info(object) + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -305,6 +291,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/user/{username}/workspace/{workspace_id}")
+    @Transactional
     @Override
     public void joinWorkspace(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         joinWorkspace(getUsername(username), workspaceId);
@@ -396,16 +383,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     @Override
     public void allPluginsActive() {
-        // 1) assign default user to default workspace
-        Topic defaultUser = fetchDefaultUser();
-        assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
-        //
-        Topic defaultTopicmap = fetchDefaultTopicmap();
-        if (defaultTopicmap != null) {
-            // 2) assign default topicmap to default workspace
-            assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
-            // 3) setup access control for default topicmap
-            setupAccessControlForDefaultTopicmap(defaultTopicmap);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // 1) assign default user to default workspace
+            Topic defaultUser = fetchDefaultUser();
+            assignToDefaultWorkspace(defaultUser, "default user (\"admin\")");
+            //
+            Topic defaultTopicmap = fetchDefaultTopicmap();
+            if (defaultTopicmap != null) {
+                // 2) assign default topicmap to default workspace
+                assignToDefaultWorkspace(defaultTopicmap, "default topicmap (\"untitled\")");
+                // 3) setup access control for default topicmap
+                setupAccessControlForDefaultTopicmap(defaultTopicmap);
+            }
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK! (" + this + ")");
+            throw new RuntimeException("Setting up " + this + " failed", e);
+        } finally {
+            tx.finish();
         }
     }
 

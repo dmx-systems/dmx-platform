@@ -11,7 +11,6 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -79,20 +78,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void delete() {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("Deleting " + className() + " \"" + getUri() + "\"");
             //
             super.delete();   // delete type topic
             //
             _removeFromTypeCache();
-            //
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting " + className() + " \"" + getUri() + "\" failed", e);
-        } finally {
-            tx.finish();
         }
     }
 

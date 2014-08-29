@@ -21,7 +21,7 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -78,8 +78,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @GET
     @Path("/search")
+    @Transactional
     public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
             List<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
@@ -87,13 +87,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics);
-            tx.success();
             return searchTopic;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Searching topics failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -106,8 +102,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @GET
     @Path("/search/by_type/{type_uri}")
+    @Transactional
     public Topic getTopics(@PathParam("type_uri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
@@ -115,13 +111,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             // fetchComposite=false
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics);
-            tx.success();
             return searchTopic;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Searching topics failed", e);
-        } finally {
-            tx.finish();
         }
     }
 

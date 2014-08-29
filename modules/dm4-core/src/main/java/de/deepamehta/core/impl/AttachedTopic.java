@@ -13,7 +13,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -60,7 +59,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public void delete() {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
             dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this);
             //
@@ -71,14 +69,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
             Directives.get().add(Directive.DELETE_TOPIC, this);
             dms.storageDecorator.deleteTopic(getId());
             //
-            tx.success();
-            //
             dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic failed (" + this + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 

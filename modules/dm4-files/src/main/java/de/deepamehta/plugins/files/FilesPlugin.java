@@ -10,6 +10,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.SecurityHandler;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -64,6 +65,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @POST
     @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Transactional
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
         String operation = "Creating file topic for repository path \"" + path + "\"";
@@ -95,6 +97,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @POST
     @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Transactional
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
         String operation = "Creating folder topic for repository path \"" + path + "\"";
@@ -128,6 +131,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @POST
     @Path("/parent/{id}/file/{path:.+}")    // Note: we also match slashes as they are already decoded by an apache ...
+    @Transactional
     @Override
     public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFileTopic(path);
@@ -137,6 +141,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @POST
     @Path("/parent/{id}/folder/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache ...
+    @Transactional
     @Override
     public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
         Topic childTopic = createFolderTopic(path);
@@ -151,6 +156,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     @POST
     @Path("/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
     @Consumes("multipart/form-data")
+    @Transactional
     @Override
     public StoredFile storeFile(UploadedFile file, @PathParam("path") String path) {
         String operation = "Storing " + file + " at repository path \"" + path + "\"";

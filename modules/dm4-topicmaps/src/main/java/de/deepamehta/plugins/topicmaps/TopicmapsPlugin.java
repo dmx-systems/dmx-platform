@@ -15,7 +15,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -101,6 +101,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @POST
     @Path("/{name}/{topicmap_renderer_uri}")
+    @Transactional
     @Override
     public Topic createTopicmap(@PathParam("name") String name,
                                 @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
@@ -121,23 +122,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @POST
     @Path("/{id}/topic/{topic_id}")
+    @Transactional
     @Override
     public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                    CompositeValueModel viewProps) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
                 new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
                 new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC), viewProps
             ));
             storeCustomViewProperties(topicmapId, topicId, viewProps);
-            //
-            tx.success();
         } catch (Exception e) {
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -148,6 +145,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @POST
     @Path("/{id}/association/{assoc_id}")
+    @Transactional
     @Override
     public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
@@ -167,26 +165,23 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @PUT
     @Path("/{id}/topic/{topic_id}")
+    @Transactional
     @Override
     public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                     CompositeValueModel viewProps) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             storeStandardViewProperties(topicmapId, topicId, viewProps);
             storeCustomViewProperties(topicmapId, topicId, viewProps);
-            //
-            tx.success();
         } catch (Exception e) {
             throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
 
     @PUT
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
+    @Transactional
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
@@ -195,6 +190,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @PUT
     @Path("/{id}/topic/{topic_id}/{visibility}")
+    @Transactional
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
@@ -203,6 +199,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @DELETE
     @Path("/{id}/association/{assoc_id}")
+    @Transactional
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         fetchAssociationRefAssociation(topicmapId, assocId).delete();
@@ -212,6 +209,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @PUT
     @Path("/{id}")
+    @Transactional
     @Override
     public void setClusterPosition(@PathParam("id") long topicmapId, ClusterCoords coords) {
         for (ClusterCoords.Entry entry : coords) {
@@ -221,6 +219,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @PUT
     @Path("/{id}/translation/{x}/{y}")
+    @Transactional
     @Override
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
