@@ -13,7 +13,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.GET;
@@ -105,6 +105,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @POST
     @Path("/{facet_type_uri}/topic/{id}")
+    @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dms.createAssociation(new AssociationModel("dm4.core.instantiation",
@@ -117,20 +118,15 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @PUT
     @Path("/{facet_type_uri}/topic/{id}")
+    @Transactional
     @Override
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
                                                                                         FacetValue value) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             updateFacet(dms.getTopic(topicId, false), facetTypeUri, value);
-            //
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating facet \"" + facetTypeUri + "\" of topic " + topicId +
                 " failed (value=" + value + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 

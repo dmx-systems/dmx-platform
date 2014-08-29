@@ -106,31 +106,45 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void onDemandChildTopicLoading() {
-        dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
-        ));
-        //
-        Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
-        CompositeValue comp = topic.getCompositeValue();
-        assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
-        //
-        Topic childTopic = comp.getTopic("dm4.core.plugin_migration_nr");
-        assertEquals(23, childTopic.getSimpleValue().intValue());           // child topic is loaded on-demand
-        assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
+                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+            ));
+            //
+            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+            CompositeValue comp = topic.getCompositeValue();
+            assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
+            //
+            Topic childTopic = comp.getTopic("dm4.core.plugin_migration_nr");
+            assertEquals(23, childTopic.getSimpleValue().intValue());           // child topic is loaded on-demand
+            assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 
     @Test
     public void onDemandChildTopicLoadingWithConvenienceAccessor() {
-        dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-            new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
-        ));
-        //
-        Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
-        CompositeValue comp = topic.getCompositeValue();
-        assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
-        //
-        assertEquals(23, comp.getInt("dm4.core.plugin_migration_nr"));      // child topic is loaded on-demand
-        assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
+                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+            ));
+            //
+            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+            CompositeValue comp = topic.getCompositeValue();
+            assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
+            //
+            assertEquals(23, comp.getInt("dm4.core.plugin_migration_nr"));      // child topic is loaded on-demand
+            assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 
     // ---
@@ -305,17 +319,19 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeTopicAndTraverse() {
-        setupTestTopics();
-        //
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic t0;
         ResultList<RelatedTopic> topics;
         try {
-            t0 = getTopicByUri("dm4.test.t0");
-            topics = getTestTopics(t0);
-            assertEquals(3, topics.getSize());
+            setupTestTopics();
             //
-            // retype topic
+            t0 = getTopicByUri("dm4.test.t0");
+            //
+            // execute query
+            topics = getTestTopics(t0);
+            assertEquals(3, topics.getSize());  // we have 3 topics
+            //
+            // retype the first topic
             Topic topic = topics.getItems().get(0);
             assertEquals("dm4.core.plugin", topic.getTypeUri());
             topic.setTypeUri("dm4.core.data_type");
@@ -325,10 +341,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             topics = getTestTopics(t0);
-            assertEquals(3, topics.getSize());
-            // ### Note: the Lucene index update is not visible within the transaction!
-            // ### That's contradictory to the Neo4j documentation!
-            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+            assertEquals(2, topics.getSize());  // now we have 2 topics
+            // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
+            // ### created within the same transaction!
             //
             tx.success();
         } finally {
@@ -336,25 +351,24 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         topics = getTestTopics(t0);
-        assertEquals(2, topics.getSize());
-        // ### Note: the Lucene index update is only visible once the transaction is committed!
-        // ### That's contradictory to the Neo4j documentation!
-        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        assertEquals(2, topics.getSize());      // we still have 2 topics
     }
 
     @Test
     public void retypeAssociationAndTraverse() {
-        setupTestAssociations();
-        //
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic t0;
         List<RelatedAssociation> assocs;
         try {
-            t0 = getTopicByUri("dm4.test.t0");
-            assocs = getTestAssociations(t0);
-            assertEquals(3, assocs.size());
+            setupTestAssociations();
             //
-            // retype topic
+            t0 = getTopicByUri("dm4.test.t0");
+            //
+            // execute query
+            assocs = getTestAssociations(t0);
+            assertEquals(3, assocs.size());     // we have 3 associations
+            //
+            // retype the first association
             Association assoc = assocs.get(0);
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
@@ -364,10 +378,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             assocs = getTestAssociations(t0);
-            assertEquals(3, assocs.size());
-            // ### Note: the Lucene index update is not visible within the transaction!
-            // ### That's contradictory to the Neo4j documentation!
-            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+            assertEquals(2, assocs.size());     // now we have 2 associations
+            // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
+            // ### created within the same transaction!
             //
             tx.success();
         } finally {
@@ -375,10 +388,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         assocs = getTestAssociations(t0);
-        assertEquals(2, assocs.size());
-        // ### Note: the Lucene index update is only visible once the transaction is committed!
-        // ### That's contradictory to the Neo4j documentation!
-        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        assertEquals(2, assocs.size());         // we still have 2 associations
     }
 
     @Test
@@ -408,6 +418,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ###     index.remove(entity, key) operation is *not* visible within the transaction
             // ### For the moment this seems to be a Neo4j oddity. Needs to be confirmed.
             //
+            // ### Update: meanwhile that hypothesis is falsified.
+            // ### Actually the latter 3 test are in contrast to the former 2 ones.
+            // ### One possible difference is whether the test content is created in the same transaction or not.
+            //
             tx.success();
         } finally {
             tx.finish();
@@ -422,10 +436,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void deleteTopic() {
-        dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
-        //
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
+            dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
+            //
             Topic t0 = getTopicByUri("dm4.test.t0");
             assertNotNull(t0);
             //

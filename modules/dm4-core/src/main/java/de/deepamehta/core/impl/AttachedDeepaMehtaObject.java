@@ -12,7 +12,6 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -145,15 +144,10 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void setCompositeValue(CompositeValueModel comp) {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
         try {
             getCompositeValue().update(comp);
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting composite value failed (" + comp + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 

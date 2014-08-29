@@ -21,6 +21,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
@@ -125,6 +126,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @PUT
     @Path("/{id}/topic/{geo_coord_id}")
+    @Transactional
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
@@ -137,6 +139,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @PUT
     @Path("/{id}/center/{lon}/{lat}/zoom/{zoom}")
+    @Transactional
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {

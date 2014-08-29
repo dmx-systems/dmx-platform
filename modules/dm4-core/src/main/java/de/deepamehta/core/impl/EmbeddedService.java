@@ -146,46 +146,31 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic createTopic(TopicModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             Topic topic = topicFactory(model);
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
-            tx.success();
             return topic;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void updateTopic(TopicModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getTopic(model.getId(), true).update(model);   // fetchComposite=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void deleteTopic(long topicId) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getTopic(topicId, false).delete();    // fetchComposite=false
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic " + topicId + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -279,46 +264,31 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association createAssociation(AssociationModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             Association assoc = associationFactory(model);
             fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
-            tx.success();
             return assoc;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating association failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void updateAssociation(AssociationModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getAssociation(model.getId(), true).update(model);     // fetchComposite=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating association failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void deleteAssociation(long assocId) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getAssociation(assocId, false).delete();  // fetchComposite=false
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association " + assocId + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -376,49 +346,32 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType createTopicType(TopicTypeModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             TopicType topicType = topicTypeFactory(model);
-            //
             fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
-            //
-            tx.success();
             return topicType;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void updateTopicType(TopicTypeModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             String topicTypeUri = getTopic(model.getId(), false).getUri();     // fetchComposite=false
             getTopicType(topicTypeUri).update(model);
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating topic type failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getTopicType(topicTypeUri).delete();
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -470,50 +423,33 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             AssociationType assocType = associationTypeFactory(model);
-            //
             fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
-            //
-            tx.success();
             return assocType;
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void updateAssociationType(AssociationTypeModel model) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             String assocTypeUri = getTopic(model.getId(), false).getUri();     // fetchComposite=false
             getAssociationType(assocTypeUri).update(model);
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Updating association type failed (" + model + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
     @Override
     public void deleteAssociationType(String assocTypeUri) {
-        DeepaMehtaTransaction tx = beginTx();
         try {
             getAssociationType(assocTypeUri).delete();
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -811,8 +747,6 @@ public class EmbeddedService implements DeepaMehtaService {
      *   1) initializes the database.
      *   2) in case of a clean install: sets up the bootstrap content.
      *   3) runs the core migrations.
-     * <p>
-     * Called from {@link CoreActivator#start}.
      */
     private void setupDB() {
         DeepaMehtaTransaction tx = beginTx();
