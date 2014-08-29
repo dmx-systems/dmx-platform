@@ -61,7 +61,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 }
             }
             //
-            logger.info("############################## Removing tread-local directives");
+            logger.fine("### Removing tread-local directives");
             Directives.remove();
             //
             return response;

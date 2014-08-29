@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.Cookies;
+import de.deepamehta.core.service.DeepaMehtaService;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -11,11 +12,11 @@ class JerseyRequestFilter implements ContainerRequestFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private EmbeddedService dms;
+    private DeepaMehtaService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyRequestFilter(EmbeddedService dms) {
+    JerseyRequestFilter(DeepaMehtaService dms) {
         this.dms = dms;
     }
 

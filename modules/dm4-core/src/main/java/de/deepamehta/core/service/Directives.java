@@ -25,7 +25,7 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
     private static final ThreadLocal<Directives> threadLocalDirectives = new ThreadLocal() {
         @Override
         protected Directives initialValue() {
-            logger.info("############################################################ Creating tread-local directives");
+            logger.fine("### Creating tread-local directives");
             return new Directives();
         }
     };
