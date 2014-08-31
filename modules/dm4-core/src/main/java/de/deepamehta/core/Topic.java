@@ -39,7 +39,7 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersAssocTypeUri  may be null
      */
     RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                     String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+                                             String othersAssocTypeUri);
 
     // ### TODO: move to DeepaMehtaObject
     /**
@@ -49,5 +49,5 @@ public interface Topic extends DeepaMehtaObject {
      * @param   othersAssocTypeUri  may be null
      */
     List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                     String othersAssocTypeUri, boolean fetchComposite, boolean fetchRelatingComposite);
+                                                    String othersAssocTypeUri);
 }

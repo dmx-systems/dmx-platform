@@ -58,7 +58,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
     @Override
     Topic instantiateObject(TopicModel model) {
-        return dms.instantiateTopic(model, false);          // fetchComnposite=false
+        return dms.instantiateTopic(model);
     }
 }
 
@@ -77,7 +77,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModel> 
 
     @Override
     Association instantiateObject(AssociationModel model) {
-        return dms.instantiateAssociation(model, false);    // fetchComnposite=false
+        return dms.instantiateAssociation(model);
     }
 }
 

@@ -89,7 +89,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ### TODO: unify with next method
     private TopicTypeModel fetchTopicType(String topicTypeUri) {
-        Topic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri), false);
+        Topic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri));
         checkTopicType(topicTypeUri, typeTopic);
         //
         // 1) fetch type components
@@ -111,7 +111,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ### TODO: unify with previous method
     private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
-        Topic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri), false);
+        Topic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri));
         checkAssociationType(assocTypeUri, typeTopic);
         //
         // 1) fetch type components
@@ -264,13 +264,13 @@ class TypeStorageImpl implements TypeStorage {
         // 1) fetch child topic types
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
-        // Composition Definition itself (child types "Include in Label", "Ordered").
+        // Composition Definition itself (child types "Include in Label", "Ordered"). ### FIXDOC: this is obsolete
         // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
         // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
         // of topic types.
         ResultList<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, false, false, 0);
-            // othersTopicTypeUri=null, fetchComposite=false, fetchRelatingComposite=false, maxResultSize=0
+            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, 0);
+            // othersTopicTypeUri=null, maxResultSize=0
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
@@ -461,7 +461,7 @@ class TypeStorageImpl implements TypeStorage {
             List<RelatedAssociationModel> sequence = new ArrayList();
             // find sequence start
             RelatedAssociation assocDef = typeTopic.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.sequence_start", null, false, false);     // othersAssocTypeUri=null
+                "dm4.core.sequence_start", null);     // othersAssocTypeUri=null
             // fetch sequence segments
             if (assocDef != null) {
                 sequence.add(assocDef.getModel());
@@ -567,7 +567,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.type", "dm4.core.view_config", null, true, false, 0);
+                "dm4.core.type", "dm4.core.view_config", null, 0);      // ### FIXME: had fetchCompositeValue=true
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
@@ -579,7 +579,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.assoc_def", "dm4.core.view_config", null, true, false, 0);
+                "dm4.core.assoc_def", "dm4.core.view_config", null, 0); // ### FIXME: had fetchCompositeValue=true
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +

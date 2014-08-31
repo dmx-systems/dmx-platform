@@ -38,7 +38,7 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
-    Topic getTopic(long topicId, boolean fetchComposite);
+    Topic getTopic(long topicId);
 
     /**
      * Looks up a single topic by exact value.
@@ -51,7 +51,7 @@ public interface DeepaMehtaService {
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    Topic getTopic(String key, SimpleValue value, boolean fetchComposite);
+    Topic getTopic(String key, SimpleValue value);
 
     /**
      * Looks up topics by key and value.
@@ -61,9 +61,9 @@ public interface DeepaMehtaService {
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    List<Topic> getTopics(String key, SimpleValue value, boolean fetchComposite);
+    List<Topic> getTopics(String key, SimpleValue value);
 
-    ResultList<RelatedTopic> getTopics(String topicTypeUri, boolean fetchComposite, int maxResultSize);
+    ResultList<RelatedTopic> getTopics(String topicTypeUri, int maxResultSize);
 
     /**
      * Performs a fulltext search.
@@ -90,7 +90,7 @@ public interface DeepaMehtaService {
 
     // === Associations ===
 
-    Association getAssociation(long assocId, boolean fetchComposite);
+    Association getAssociation(long assocId);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
@@ -100,12 +100,10 @@ public interface DeepaMehtaService {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
     Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                    String roleTypeUri1, String roleTypeUri2,
-                                                    boolean fetchComposite);
+                                                    String roleTypeUri1, String roleTypeUri2);
 
     Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                    String topicRoleTypeUri, String assocRoleTypeUri,
-                                                    boolean fetchComposite);
+                                                    String topicRoleTypeUri, String assocRoleTypeUri);
 
     // ---
 

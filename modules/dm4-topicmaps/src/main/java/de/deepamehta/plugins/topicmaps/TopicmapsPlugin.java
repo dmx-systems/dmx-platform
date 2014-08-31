@@ -87,7 +87,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                          @QueryParam("fetch_composite") boolean fetchComposite) {
         try {
             logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
-            Topic topicmapTopic = dms.getTopic(topicmapId, true);    // fetchComposite=true
+            Topic topicmapTopic = dms.getTopic(topicmapId);     // ### FIXME: had fetchCompositeValue=true
             Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
             Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
@@ -304,8 +304,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
         Map<Long, TopicViewmodel> topics = new HashMap();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, fetchComposite, true, 0).getItems();
-            // othersTopicTypeUri=null, fetchRelatingComposite=true, maxResultSize=0
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0).getItems();
+            // othersTopicTypeUri=null, maxResultSize=0
+            // ### FIXME: had fetchCompositeValue=fetchComposite
+            // ### FIXME: had fetchRelatingCompositeValue=true
         for (RelatedTopic topic : relTopics) {
             CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
             invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
@@ -317,8 +319,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<Long, AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewmodel> assocs = new HashMap();
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
-            "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null,
-            false, false);  // fetchComposite=false, fetchRelatingComposite=false
+            "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), new AssociationViewmodel(assoc.getModel()));
         }
@@ -328,13 +329,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
-        return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, false);        // fetchComposite=false
+        return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
     }
 
     private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
         return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, false);  // fetchComposite=false
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION);
     }
 
     // --- Store ---
@@ -345,7 +345,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
     private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        invokeViewmodelCustomizers("storeViewProperties", dms.getTopic(topicId, false), viewProps);
+        invokeViewmodelCustomizers("storeViewProperties", dms.getTopic(topicId), viewProps);
     }
 
     // --- Viewmodel Customizers ---

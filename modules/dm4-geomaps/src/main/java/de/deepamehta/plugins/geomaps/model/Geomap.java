@@ -41,7 +41,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
      * Loads a topicmap from the DB.
      */
     public Geomap(long geomapId, DeepaMehtaService dms) {
-        this.geomapTopic = dms.getTopic(geomapId, true);        // fetchComposite=true
+        this.geomapTopic = dms.getTopic(geomapId);  // ### FIXME: had fetchCompositeValue=true
         this.dms = dms;
         //
         logger.info("Loading geomap " + getId());
@@ -86,14 +86,13 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void fetchGeoCoordinates() {
-        for (Topic geoCoord : fetchGeoCoordinates(geomapTopic, true)) {   // fetchComposite=true
+        for (Topic geoCoord : fetchGeoCoordinates(geomapTopic)) {   // ### FIXME: had fetchCompositeValue=true
             geoCoords.put(geoCoord.getId(), geoCoord.getModel());
         }
     }
 
-    private ResultList<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic, boolean fetchComposite) {
+    private ResultList<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic) {
         return geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext", "dm4.core.default",
-            "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate", fetchComposite, false, 0);
-            // fetchRelatingComposite=false, maxResultSize=0, clientContext=null
+            "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate", 0);   // maxResultSize=0
     }
 }

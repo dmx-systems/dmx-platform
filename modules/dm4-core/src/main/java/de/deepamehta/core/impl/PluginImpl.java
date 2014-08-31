@@ -552,7 +552,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private Topic fetchPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginUri), false);      // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(pluginUri));
     }
 
     // ---

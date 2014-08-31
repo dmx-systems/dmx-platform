@@ -49,33 +49,37 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Topics ===
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/topic/{id}")
     public Topic getTopic(@PathParam("id") long topicId,
                           @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getTopic(topicId, fetchComposite);
+        return dms.getTopic(topicId);
     }
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
                           @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getTopic(key, value, fetchComposite);
+        return dms.getTopic(key, value);
     }
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> getTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value,
                                  @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite) {
-        return dms.getTopics(key, value, fetchComposite);
+        return dms.getTopics(key, value);
     }
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/topic/by_type/{type_uri}")
     public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
                                       @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
                                       @QueryParam("max_result_size") int maxResultSize) {
-        return dms.getTopics(typeUri, fetchComposite, maxResultSize);
+        return dms.getTopics(typeUri, maxResultSize);
     }
 
     @GET
@@ -115,20 +119,22 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Associations ===
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/association/{id}")
     public Association getAssociation(@PathParam("id") long assocId,
                                       @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getAssociation(assocId, fetchComposite);
+        return dms.getAssociation(assocId);
     }
 
+    // ### FIXME: "fetchComposite" paramter not processed
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2,
                    @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2, fetchComposite);
+        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
@@ -295,7 +301,7 @@ public class WebservicePlugin extends PluginActivator {
                                                  @QueryParam("fetch_composite")          boolean fetchComposite,
                                                  @QueryParam("fetch_relating_composite") boolean fetchRelatingComposite,
                                                  @QueryParam("max_result_size")          int maxResultSize) {
-        Topic topic = dms.getTopic(topicId, false);
+        Topic topic = dms.getTopic(topicId);
         return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, fetchComposite, fetchRelatingComposite, maxResultSize);
     }
@@ -318,7 +324,7 @@ public class WebservicePlugin extends PluginActivator {
                                                  @QueryParam("fetch_composite")          boolean fetchComposite,
                                                  @QueryParam("fetch_relating_composite") boolean fetchRelatingComposite,
                                                  @QueryParam("max_result_size")          int maxResultSize) {
-        Association assoc = dms.getAssociation(assocId, false);
+        Association assoc = dms.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, fetchComposite, fetchRelatingComposite, maxResultSize);
     }
@@ -327,6 +333,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // ### FIXME: "fetchComposite" and "fetchRelatingComposite" paramters not processed
     private ResultList<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri,
                                             boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
@@ -338,7 +345,7 @@ public class WebservicePlugin extends PluginActivator {
         try {
             logger.info(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                fetchComposite, fetchRelatingComposite, maxResultSize);
+                maxResultSize);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

@@ -286,14 +286,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     private Topic fetchDefaultWorkspace() {
-        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI), false);      // fetchComposite=false
+        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI));
     }
 
     /**
      * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
      */
     private void checkArgument(long topicId) {
-        String typeUri = dms.getTopic(topicId, false).getTypeUri();     // fetchComposite=false
+        String typeUri = dms.getTopic(topicId).getTypeUri();
         if (!typeUri.equals("dm4.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
                 "\")");

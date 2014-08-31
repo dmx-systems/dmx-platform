@@ -35,9 +35,9 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
     @Override
     public DeepaMehtaObject getPlayer() {
         if (topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(getTopicUri()), false);  // fetchComposite=false
+            return dms.getTopic("uri", new SimpleValue(getTopicUri()));
         } else {
-            return dms.getTopic(getPlayerId(), false);                          // fetchComposite=false
+            return dms.getTopic(getPlayerId());
         }
     }
 

@@ -26,7 +26,7 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        return dms.getAssociation(getPlayerId(), false);    // fetchComposite=false
+        return dms.getAssociation(getPlayerId());
     }
 
 

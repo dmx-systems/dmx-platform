@@ -285,9 +285,9 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         Set<DeepaMehtaObject> parents = new LinkedHashSet();
         //
         List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-            "dm4.core.parent", null, false, false, 0).getItems();
+            "dm4.core.parent", null, 0).getItems();
         List<? extends Association> parentAssocs = topic.getRelatedAssociations(null, "dm4.core.child",
-            "dm4.core.parent", null, false, false);
+            "dm4.core.parent", null);
         parents.addAll(parentTopics);
         parents.addAll(parentAssocs);
         //

@@ -112,7 +112,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
-            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
             CompositeValue comp = topic.getCompositeValue();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
@@ -134,7 +134,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
-            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"), false);   // fetchComposite=false
+            Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
             CompositeValue comp = topic.getCompositeValue();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
@@ -160,7 +160,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            Topic fetchedTopic = dms.getTopic(topic.getId(), false);
+            Topic fetchedTopic = dms.getTopic(topic.getId());
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
@@ -180,7 +180,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
-            Topic fetchedTopic = dms.getTopic(topic.getId(), false);
+            Topic fetchedTopic = dms.getTopic(topic.getId());
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
@@ -197,7 +197,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         //
         // find assoc def 1/3
         RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
-            "dm4.core.sequence_start", null, false, false);     // othersAssocTypeUri=null
+            "dm4.core.sequence_start", null);     // othersAssocTypeUri=null
         logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
             ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
         assertNotNull(assocDef);
@@ -261,7 +261,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
             assertEquals("dm4.core.association", assoc.getTypeUri());
-            assoc = dms.getAssociation(assoc.getId(), false);
+            assoc = dms.getAssociation(assoc.getId());
             assertEquals("dm4.core.association", assoc.getTypeUri());
             //
             // re-execute query
@@ -336,7 +336,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.plugin", topic.getTypeUri());
             topic.setTypeUri("dm4.core.data_type");
             assertEquals("dm4.core.data_type", topic.getTypeUri());
-            topic = dms.getTopic(topic.getId(), false);
+            topic = dms.getTopic(topic.getId());
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             //
             // re-execute query
@@ -373,7 +373,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
             assertEquals("dm4.core.composition", assoc.getTypeUri());
-            assoc = dms.getAssociation(assoc.getId(), false);
+            assoc = dms.getAssociation(assoc.getId());
             assertEquals("dm4.core.composition", assoc.getTypeUri());
             //
             // re-execute query
@@ -406,7 +406,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             topic.setTypeUri("dm4.core.index_mode");
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
-            topic = dms.getTopic(topic.getId(), false);
+            topic = dms.getTopic(topic.getId());
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
             //
             // re-execute query
@@ -456,26 +456,26 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getTopicByUri(String uri) {
-        return dms.getTopic("uri", new SimpleValue(uri), false);
+        return dms.getTopic("uri", new SimpleValue(uri));
     }
 
     private List<Topic> getTopicInstances(String topicTypeUri) {
-        return dms.getTopics("type_uri", new SimpleValue(topicTypeUri), false);
+        return dms.getTopics("type_uri", new SimpleValue(topicTypeUri));
     }
 
     private ResultList<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", type.getUri(), false, false, 0);
+            "dm4.core.type", "dm4.core.instance", type.getUri(), 0);
     }
 
     private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
         return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", assocTypeUri, false, false);
+            "dm4.core.type", "dm4.core.instance", assocTypeUri);
     }
 
     private ResultList<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", false, false, 0);
+            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", 0);
     }
 
     // ---
@@ -524,11 +524,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultList<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
-            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", false, false, 0);
+            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", 0);
     }
 
     private List<RelatedAssociation> getTestAssociations(Topic topic) {
         return topic.getRelatedAssociations("dm4.core.association",
-            "dm4.core.default", "dm4.core.default", "dm4.core.association", false, false);
+            "dm4.core.default", "dm4.core.default", "dm4.core.association");
     }
 }
