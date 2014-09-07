@@ -60,7 +60,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public Topic getFacet(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
-        return fetchChildTopic(object, getAssocDef(facetTypeUri));      // ### FIXME: had fetchCompositeValue=true
+        return fetchChildTopic(object, getAssocDef(facetTypeUri));      // ### FIXME: had fetchComposite=true
     }
 
     // ---
@@ -76,7 +76,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
-        return fetchChildTopics(object, getAssocDef(facetTypeUri));     // ### FIXME: had fetchCompositeValue=true
+        return fetchChildTopics(object, getAssocDef(facetTypeUri));     // ### FIXME: had fetchComposite=true
     }
 
     // ---
@@ -86,7 +86,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public Topic getFacettedTopic(@PathParam("id") long topicId,
                                   @QueryParam("facet_type_uri") List<String> facetTypeUris) {
-        Topic topic = dms.getTopic(topicId);    // ### FIXME: had fetchCompositeValue=true
+        Topic topic = dms.getTopic(topicId);    // ### FIXME: had fetchComposite=true
         CompositeValueModel comp = topic.getCompositeValue().getModel();
         for (String facetTypeUri : facetTypeUris) {
             String childTypeUri = getChildTypeUri(facetTypeUri);

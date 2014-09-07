@@ -88,11 +88,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public Topic getDomainTopic(@PathParam("id") long geoCoordId) {
         try {
-            Topic topic = dms.getTopic(geoCoordId);     // ### FIXME: had fetchCompositeValue=true
+            Topic topic = dms.getTopic(geoCoordId);     // ### FIXME: had fetchComposite=true
             RelatedTopic parentTopic;
             while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null)) != null) {
                 // ### TODO: optimization. Don't fetch composite of intermediate topics.
-                // ### FIXME: had fetchCompositeValue=true
+                // ### FIXME: had fetchComposite=true
                 topic = parentTopic;
             }
             return topic;

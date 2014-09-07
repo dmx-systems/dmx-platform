@@ -175,13 +175,13 @@ class ValueStorage {
             associateChildTopic(parent, childTopicId, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
-            return dms.getTopic(childTopicId);                          // ### FIXME: had fetchCompositeValue=true
+            return dms.getTopic(childTopicId);                          // ### FIXME: had fetchComposite=true
         } else if (childTopicRef.isReferenceByUri()) {
             String childTopicUri = childTopicRef.getUri();
             associateChildTopic(parent, childTopicUri, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
-            return dms.getTopic("uri", new SimpleValue(childTopicUri)); // ### FIXME: had fetchCompositeValue=true
+            return dms.getTopic("uri", new SimpleValue(childTopicUri)); // ### FIXME: had fetchComposite=true
         } else {
             throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");
         }

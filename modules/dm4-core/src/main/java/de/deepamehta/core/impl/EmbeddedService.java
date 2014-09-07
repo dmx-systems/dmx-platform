@@ -158,7 +158,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateTopic(TopicModel model) {
         try {
-            getTopic(model.getId()).update(model);  // ### FIXME: had fetchCompositeValue=true
+            getTopic(model.getId()).update(model);  // ### FIXME: had fetchComposite=true
         } catch (Exception e) {
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
         }
@@ -270,7 +270,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateAssociation(AssociationModel model) {
         try {
-            getAssociation(model.getId()).update(model);    // ### FIXME: had fetchCompositeValue=true
+            getAssociation(model.getId()).update(model);    // ### FIXME: had fetchComposite=true
         } catch (Exception e) {
             throw new RuntimeException("Updating association failed (" + model + ")", e);
         }

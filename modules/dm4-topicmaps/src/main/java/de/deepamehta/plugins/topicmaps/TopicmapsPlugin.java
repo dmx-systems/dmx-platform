@@ -87,7 +87,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                          @QueryParam("fetch_composite") boolean fetchComposite) {
         try {
             logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
-            Topic topicmapTopic = dms.getTopic(topicmapId);     // ### FIXME: had fetchCompositeValue=true
+            Topic topicmapTopic = dms.getTopic(topicmapId);
+            // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
+            // child topic loading is not applied. We must load the child topics manually here.
+            topicmapTopic.loadChildTopics();
             Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
             Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
@@ -304,12 +307,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
         Map<Long, TopicViewmodel> topics = new HashMap();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0).getItems();
-            // othersTopicTypeUri=null, maxResultSize=0
-            // ### FIXME: had fetchCompositeValue=fetchComposite
-            // ### FIXME: had fetchRelatingCompositeValue=true
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0).getItems();    // othersTopicTypeUri=null
+                                                                                        // maxResultSize=0
+            // ### FIXME: had fetchComposite=fetchComposite
         for (RelatedTopic topic : relTopics) {
-            CompositeValueModel viewProps = topic.getRelatingAssociation().getCompositeValue().getModel();
+            Association assoc = topic.getRelatingAssociation();
+            assoc.loadChildTopics();
+            CompositeValueModel viewProps = assoc.getCompositeValue().getModel();
             invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
             topics.put(topic.getId(), new TopicViewmodel(topic.getModel(), viewProps));
         }

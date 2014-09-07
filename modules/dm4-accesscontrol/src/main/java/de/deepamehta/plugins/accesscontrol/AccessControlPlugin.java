@@ -713,7 +713,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private Topic fetchUserAccount(Topic username) {
         Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-            "dm4.accesscontrol.user_account");  // ### FIXME: had fetchCompositeValue=true
+            "dm4.accesscontrol.user_account");  // ### FIXME: had fetchComposite=true
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
                 username.getSimpleValue() + "\" (username=" + username + ")");

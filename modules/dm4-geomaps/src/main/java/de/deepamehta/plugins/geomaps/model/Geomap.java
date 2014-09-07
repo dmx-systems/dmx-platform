@@ -41,7 +41,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
      * Loads a topicmap from the DB.
      */
     public Geomap(long geomapId, DeepaMehtaService dms) {
-        this.geomapTopic = dms.getTopic(geomapId);  // ### FIXME: had fetchCompositeValue=true
+        this.geomapTopic = dms.getTopic(geomapId);  // ### FIXME: had fetchComposite=true
         this.dms = dms;
         //
         logger.info("Loading geomap " + getId());
@@ -86,7 +86,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void fetchGeoCoordinates() {
-        for (Topic geoCoord : fetchGeoCoordinates(geomapTopic)) {   // ### FIXME: had fetchCompositeValue=true
+        for (Topic geoCoord : fetchGeoCoordinates(geomapTopic)) {   // ### FIXME: had fetchComposite=true
             geoCoords.put(geoCoord.getId(), geoCoord.getModel());
         }
     }

@@ -247,11 +247,35 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
+    void loadChildTopics() {
+        dms.valueStorage.fetchCompositeValue(parent.getModel());
+        initAttachedObjectCache();
+    }
+
     void loadChildTopics(String childTypeUri) {
         loadChildTopics(getAssocDef(childTypeUri));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Recursively loads child topics (model) and updates this attached object cache accordingly.
+     * If the child topics are loaded already nothing is performed.
+     *
+     * @param   assocDef    the child topics according to this association definition are loaded.
+     *                      <p>
+     *                      Note: the association definition must not necessarily originate from this object's
+     *                      type definition. It may originate from a facet definition as well.
+     */
+    private void loadChildTopics(AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        if (!has(childTypeUri)) {
+            logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
+                parent.getId());
+            dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef);
+            initAttachedObjectCache(childTypeUri);
+        }
+    }
 
     // --- Access this attached object cache ---
 
@@ -462,34 +486,6 @@ class AttachedCompositeValue implements CompositeValue {
         dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
         // update memory
         addToCompositeValue(childTopic, assocDef);
-    }
-
-
-
-    // ===
-
-    void loadChildTopics() {
-        dms.valueStorage.fetchCompositeValue(parent.getModel());
-        initAttachedObjectCache();
-    }
-
-    /**
-     * Recursively loads child topics (model) and updates this attached object cache accordingly.
-     * If the child topics are loaded already nothing is performed.
-     *
-     * @param   assocDef    the child topics according to this association definition are loaded.
-     *                      <p>
-     *                      Note: the association definition must not necessarily originate from this object's
-     *                      type definition. It may originate from a facet definition as well.
-     */
-    private void loadChildTopics(AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        if (!has(childTypeUri)) {
-            logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
-                parent.getId());
-            dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef);
-            initAttachedObjectCache(childTypeUri);
-        }
     }
 
 
