@@ -17,6 +17,11 @@ public interface Topic extends DeepaMehtaObject {
 
     // === Model ===
 
+    Topic loadChildTopics();
+    Topic loadChildTopics(String childTypeUri);
+
+    // ---
+
     TopicModel getModel();
 
 

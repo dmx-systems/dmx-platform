@@ -84,6 +84,18 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
     @Override
+    public Topic loadChildTopics() {
+        return (Topic) super.loadChildTopics();
+    }
+
+    @Override
+    public Topic loadChildTopics(String childTypeUri) {
+        return (Topic) super.loadChildTopics(childTypeUri);
+    }
+
+    // ---
+
+    @Override
     public TopicModel getModel() {
         return (TopicModel) super.getModel();
     }

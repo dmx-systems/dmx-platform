@@ -201,6 +201,18 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     // ---
 
     @Override
+    public Association loadChildTopics() {
+        return (Association) super.loadChildTopics();
+    }
+
+    @Override
+    public Association loadChildTopics(String childTypeUri) {
+        return (Association) super.loadChildTopics(childTypeUri);
+    }
+
+    // ---
+
+    @Override
     public AssociationModel getModel() {
         return (AssociationModel) super.getModel();
     }
