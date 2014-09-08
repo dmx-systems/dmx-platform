@@ -158,7 +158,9 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateTopic(TopicModel model) {
         try {
-            getTopic(model.getId()).update(model);  // ### FIXME: had fetchComposite=true
+            // Note: the child topics are not needed for the actual update operation but for refreshing the label.
+            // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
+            getTopic(model.getId()).loadChildTopics().update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
         }
@@ -270,7 +272,9 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateAssociation(AssociationModel model) {
         try {
-            getAssociation(model.getId()).update(model);    // ### FIXME: had fetchComposite=true
+            // Note: the child topics are not needed for the actual update operation but for refreshing the label.
+            // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
+            getAssociation(model.getId()).loadChildTopics().update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating association failed (" + model + ")", e);
         }
@@ -626,23 +630,6 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     // ===
-
-    // ### FIXME: not called anymore
-    private void fetchCompositeValue(DeepaMehtaObjectModel model, boolean fetchComposite) {
-        if (fetchComposite) {
-            valueStorage.fetchCompositeValue(model);
-        }
-    }
-
-    // ### FIXME: not called anymore
-    private void fetchCompositeValue(RelatedTopicModel model, boolean fetchComposite, boolean fetchRelatingComposite) {
-        fetchCompositeValue(model, fetchComposite);
-        if (fetchRelatingComposite) {
-            valueStorage.fetchCompositeValue(model.getRelatingAssociation());
-        }
-    }
-
-    // ---
 
     /**
      * Factory method: creates a new topic in the DB according to the given topic model and returns a topic instance.
