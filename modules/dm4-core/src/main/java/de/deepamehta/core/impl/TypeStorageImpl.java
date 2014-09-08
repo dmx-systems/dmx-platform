@@ -567,7 +567,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.type", "dm4.core.view_config", null, 0);      // ### FIXME: had fetchComposite=true
+                "dm4.core.type", "dm4.core.view_config", null, 0).loadChildTopics();
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
@@ -579,7 +579,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.assoc_def", "dm4.core.view_config", null, 0); // ### FIXME: had fetchComposite=true
+                "dm4.core.assoc_def", "dm4.core.view_config", null, 0).loadChildTopics();
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +
