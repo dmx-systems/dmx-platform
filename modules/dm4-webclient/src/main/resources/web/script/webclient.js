@@ -16,7 +16,8 @@ dm4c = new function() {
     this.DEL_PREFIX = "del_id:"
 
     // client model
-    this.selected_object = null     // a Topic or an Association object, or null if there is no selection ### needed?
+    this.selected_object = null     // A Topic or an Association object, or null if there is no selection ### needed?
+                                    // The child topics are included.
     var type_cache = new TypeCache()
 
     // GUI
