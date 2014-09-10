@@ -568,7 +568,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
                 "dm4.core.type", "dm4.core.view_config", null, 0).loadChildTopics();
-            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
+            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
                 "\" failed", e);
@@ -580,7 +580,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
                 "dm4.core.assoc_def", "dm4.core.view_config", null, 0).loadChildTopics();
-            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics.getItems()));
+            return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +
                 " failed", e);

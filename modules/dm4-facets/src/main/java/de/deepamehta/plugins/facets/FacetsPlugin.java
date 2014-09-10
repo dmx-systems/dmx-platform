@@ -13,6 +13,7 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -60,7 +61,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public Topic getFacet(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
-        return fetchChildTopic(object, getAssocDef(facetTypeUri));      // ### FIXME: had fetchComposite=true
+        return fetchChildTopic(object, getAssocDef(facetTypeUri));
     }
 
     // ---
@@ -68,15 +69,16 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @GET
     @Path("/multi/{facet_type_uri}/topic/{id}")
     @Override
-    public List<RelatedTopic> getFacets(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri)
+    public ResultList<RelatedTopic> getFacets(@PathParam("id") long topicId,
+                                              @PathParam("facet_type_uri") String facetTypeUri)
                                                                                                                 {
         return getFacets(dms.getTopic(topicId), facetTypeUri);
     }
 
     @Override
-    public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
+    public ResultList<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
-        return fetchChildTopics(object, getAssocDef(facetTypeUri));     // ### FIXME: had fetchComposite=true
+        return fetchChildTopics(object, getAssocDef(facetTypeUri));
     }
 
     // ---
@@ -86,7 +88,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public Topic getFacettedTopic(@PathParam("id") long topicId,
                                   @QueryParam("facet_type_uri") List<String> facetTypeUris) {
-        Topic topic = dms.getTopic(topicId);    // ### FIXME: had fetchComposite=true
+        Topic topic = dms.getTopic(topicId);
         CompositeValueModel comp = topic.getCompositeValue().getModel();
         for (String facetTypeUri : facetTypeUris) {
             String childTypeUri = getChildTypeUri(facetTypeUri);
@@ -96,7 +98,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                     comp.put(childTypeUri, value.getModel());
                 }
             } else {
-                List<RelatedTopic> values = getFacets(topic, facetTypeUri);
+                ResultList<RelatedTopic> values = getFacets(topic, facetTypeUri);
                 comp.put(childTypeUri, DeepaMehtaUtils.toTopicModels(values));
             }
         }
@@ -177,10 +179,10 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private List<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef) {
+    private ResultList<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
-        return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, 0).getItems();
+        return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri, 0);
     }
 
     // ---
