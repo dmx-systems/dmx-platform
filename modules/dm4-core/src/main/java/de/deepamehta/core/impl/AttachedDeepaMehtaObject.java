@@ -11,9 +11,7 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -145,16 +143,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setCompositeValue(CompositeValueModel comp, Directives directives) {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
+    public void setCompositeValue(CompositeValueModel comp) {
         try {
-            getCompositeValue().update(comp, directives);
-            tx.success();
+            getCompositeValue().update(comp);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting composite value failed (" + comp + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -182,24 +175,22 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public void update(DeepaMehtaObjectModel newModel, Directives directives) {
+    public void update(DeepaMehtaObjectModel newModel) {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
-        updateValue(newModel, directives);
+        updateValue(newModel);
     }
 
     // ---
 
     @Override
-    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef,
-                                                           Directives directives) {
-        getCompositeValue().updateChildTopics(newChildTopic, null, assocDef, directives);
+    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
+        getCompositeValue().updateChildTopics(newChildTopic, null, assocDef);
     }
 
     @Override
-    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef,
-                                                                   Directives directives) {
-        getCompositeValue().updateChildTopics(null, newChildTopics, assocDef, directives);
+    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+        getCompositeValue().updateChildTopics(null, newChildTopics, assocDef);
     }
 
 
@@ -213,21 +204,16 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
      * Note: deletion of the object itself is up to the subclasses.
      */
     @Override
-    public void delete(Directives directives) {
-        // Note: directives must be not null.
-        // The subclass's delete() methods add DELETE_TOPIC and DELETE_ASSOCIATION directives to it respectively.
-        if (directives == null) {
-            throw new IllegalArgumentException("directives is null");
-        }
+    public void delete() {
         // 1) recursively delete sub-topics
         ResultList<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
             "dm4.core.parent", "dm4.core.child", null, false, false, 0);
         for (Topic childTopic : childTopics) {
-            childTopic.delete(directives);
+            childTopic.delete();
         }
         // 2) delete direct associations
         for (Association assoc : getAssociations()) {       // getAssociations() is abstract
-            assoc.delete(directives);
+            assoc.delete();
         }
     }
 
@@ -340,7 +326,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     abstract String className();
 
     // ### TODO: Directive getUpdateDirective()
-    abstract void addUpdateDirective(Directives directives);
+    abstract void addUpdateDirective();
 
     abstract void storeUri();
 
@@ -395,9 +381,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         }
     }
 
-    private void updateValue(DeepaMehtaObjectModel newModel, Directives directives) {
+    private void updateValue(DeepaMehtaObjectModel newModel) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getCompositeValue().update(newModel.getCompositeValueModel(), directives);
+            getCompositeValue().update(newModel.getCompositeValueModel());
         } else {
             updateSimpleValue(newModel.getSimpleValue());
         }

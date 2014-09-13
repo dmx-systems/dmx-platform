@@ -5,7 +5,6 @@ import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directives;
 
 import java.util.logging.Logger;
 
@@ -79,7 +78,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // ---
 
     @Override
-    public void setParentCardinalityUri(String parentCardinalityUri, Directives directives) {
+    public void setParentCardinalityUri(String parentCardinalityUri) {
         // update memory
         getModel().setParentCardinalityUri(parentCardinalityUri);
         // update DB
@@ -87,7 +86,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     @Override
-    public void setChildCardinalityUri(String childCardinalityUri, Directives directives) {
+    public void setChildCardinalityUri(String childCardinalityUri) {
         // update memory
         getModel().setChildCardinalityUri(childCardinalityUri);
         // update DB
@@ -99,12 +98,12 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // === Updating ===
 
     @Override
-    public void update(AssociationDefinitionModel newModel, Directives directives) {
+    public void update(AssociationDefinitionModel newModel) {
         // assoc type
-        updateAssocTypeUri(newModel, directives);
+        updateAssocTypeUri(newModel);
         // cardinality
-        updateParentCardinality(newModel.getParentCardinalityUri(), directives);
-        updateChildCardinality(newModel.getChildCardinalityUri(), directives);
+        updateParentCardinality(newModel.getParentCardinalityUri());
+        updateChildCardinality(newModel.getChildCardinalityUri());
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -113,7 +112,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // === Update ===
 
-    private void updateAssocTypeUri(AssociationDefinitionModel newModel, Directives directives) {
+    private void updateAssocTypeUri(AssociationDefinitionModel newModel) {
         String newTypeUri = newModel.getTypeUri();
         // abort if no update is requested
         if (newTypeUri == null) {
@@ -122,13 +121,13 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         //
         String typeUri = getTypeUri();
         if (!typeUri.equals(newTypeUri)) {
-            super.update(newModel, directives);
+            super.update(newModel);
         }
     }
 
     // ---
 
-    private void updateParentCardinality(String newParentCardinalityUri, Directives directives) {
+    private void updateParentCardinality(String newParentCardinalityUri) {
         // abort if no update is requested
         if (newParentCardinalityUri == null) {
             return;
@@ -138,11 +137,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
             logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
                 newParentCardinalityUri + "\"");
-            setParentCardinalityUri(newParentCardinalityUri, directives);
+            setParentCardinalityUri(newParentCardinalityUri);
         }
     }
 
-    private void updateChildCardinality(String newChildCardinalityUri, Directives directives) {
+    private void updateChildCardinality(String newChildCardinalityUri) {
         // abort if no update is requested
         if (newChildCardinalityUri == null) {
             return;
@@ -152,7 +151,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         if (!childCardinalityUri.equals(newChildCardinalityUri)) {
             logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
                 newChildCardinalityUri + "\"");
-            setChildCardinalityUri(newChildCardinalityUri, directives);
+            setChildCardinalityUri(newChildCardinalityUri);
         }
     }
 

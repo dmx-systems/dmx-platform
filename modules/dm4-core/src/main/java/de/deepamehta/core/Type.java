@@ -3,7 +3,6 @@ package de.deepamehta.core;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.Directives;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,7 +19,7 @@ public interface Type extends Topic {
 
     String getDataTypeUri();
 
-    void setDataTypeUri(String dataTypeUri, Directives directives);
+    void setDataTypeUri(String dataTypeUri);
 
     // --- Index Modes ---
 
@@ -64,7 +63,7 @@ public interface Type extends Topic {
 
     List<String> getLabelConfig();
 
-    void setLabelConfig(List<String> labelConfig, Directives directives);
+    void setLabelConfig(List<String> labelConfig);
 
     // --- View Configuration ---
 
@@ -81,5 +80,5 @@ public interface Type extends Topic {
 
     // === Updating ===
 
-    void update(TypeModel model, Directives directives);
+    void update(TypeModel model);
 }

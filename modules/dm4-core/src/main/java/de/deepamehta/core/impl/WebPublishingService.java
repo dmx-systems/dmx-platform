@@ -65,6 +65,7 @@ public class WebPublishingService {
             Map<String, Object> properties = jerseyApplication.getProperties();
             properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(dms));
             properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(dms));
+            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(dms));
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);

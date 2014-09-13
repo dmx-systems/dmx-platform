@@ -25,9 +25,9 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -237,16 +237,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setCreator(DeepaMehtaObject object, String username) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(PROP_CREATOR, username, true);    // addToIndex=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -262,16 +257,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setOwner(DeepaMehtaObject object, String username) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(PROP_OWNER, username, true);      // addToIndex=true
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the owner of " + info(object) + " failed (username=" + username + ")",
                 e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -294,15 +284,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void setACL(DeepaMehtaObject object, AccessControlList acl) {
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             object.setProperty(PROP_ACL, acl.toJSON().toString(), false);    // addToIndex=false
-            tx.success();
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Setting the ACL of " + info(object) + " failed", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -312,6 +297,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/user/{username}/workspace/{workspace_id}")
+    @Transactional
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
@@ -408,19 +394,29 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     @Override
     public void allPluginsActive() {
-        Topic defaultWorkspace = wsService.getDefaultWorkspace();
-        //
-        // 1) create membership for default user and default workspace
-        createDefaultMembership(defaultWorkspace);
-        // 2) setup access control for default workspace
-        setupDefaultAccessControl(defaultWorkspace, "default workspace (\"DeepaMehta\")");
-        //
-        Topic defaultTopicmap = fetchDefaultTopicmap();
-        if (defaultTopicmap != null) {
-            // 3) assign default topicmap to default workspace
-            assignDefaultTopicmapToDefaultWorkspace(defaultTopicmap, defaultWorkspace);
-            // 4) setup access control for default topicmap
-            setupDefaultAccessControl(defaultTopicmap, "default topicmap (\"untitled\")");
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic defaultWorkspace = wsService.getDefaultWorkspace();
+            //
+            // 1) create membership for default user and default workspace
+            createDefaultMembership(defaultWorkspace);
+            // 2) setup access control for default workspace
+            setupDefaultAccessControl(defaultWorkspace, "default workspace (\"DeepaMehta\")");
+            //
+            Topic defaultTopicmap = fetchDefaultTopicmap();
+            if (defaultTopicmap != null) {
+                // 3) assign default topicmap to default workspace
+                assignDefaultTopicmapToDefaultWorkspace(defaultTopicmap, defaultWorkspace);
+                // 4) setup access control for default topicmap
+                setupDefaultAccessControl(defaultTopicmap, "default topicmap (\"untitled\")");
+            }
+            //
+            tx.success();
+        } catch (Exception e) {
+            logger.warning("ROLLBACK! (" + this + ")");
+            throw new RuntimeException("Setting up " + this + " failed", e);
+        } finally {
+            tx.finish();
         }
     }
 
@@ -443,7 +439,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void postCreateTopic(Topic topic, Directives directives) {
+    public void postCreateTopic(Topic topic) {
         if (isUserAccount(topic)) {
             setupUserAccountAccessControl(topic);
         } else {
@@ -455,14 +451,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postCreateAssociation(Association assoc, Directives directives) {
+    public void postCreateAssociation(Association assoc) {
         setupDefaultAccessControl(assoc);
     }
 
     // ---
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
             Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");

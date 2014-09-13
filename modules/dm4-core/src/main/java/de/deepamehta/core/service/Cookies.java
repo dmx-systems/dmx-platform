@@ -25,6 +25,9 @@ public class Cookies {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    private Cookies() {
+    }
+
     private Cookies(Collection<Cookie> cookies) {
         for (Cookie cookie : cookies) {
             values.put(cookie.getName(), cookie.getValue());
@@ -40,7 +43,7 @@ public class Cookies {
         String value = values.get(name);
         //
         if (value == null) {
-            throw new RuntimeException("Missing \"" + name + "\" cookie (cookies=" + this + ")");
+            throw new RuntimeException("Missing \"" + name + "\" cookie (cookies=" + values + ")");
         }
         //
         return value;
@@ -70,8 +73,12 @@ public class Cookies {
     // ---
 
     public static Cookies get() {
-        return new Cookies(threadLocalRequest.get().getCookies().values());
-        // ### FIXME: get() returns null if called outside the scope of a request
+        ContainerRequest request = threadLocalRequest.get();
+        if (request != null) {
+            return new Cookies(request.getCookies().values());
+        } else {
+            return new Cookies();
+        }
     }
 
     // ### TODO: define public Cookies interface and hide this internal method

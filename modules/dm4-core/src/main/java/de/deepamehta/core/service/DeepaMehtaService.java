@@ -83,9 +83,9 @@ public interface DeepaMehtaService {
 
     Topic createTopic(TopicModel model);
 
-    Directives updateTopic(TopicModel model);
+    void updateTopic(TopicModel model);
 
-    Directives deleteTopic(long topicId);
+    void deleteTopic(long topicId);
 
 
 
@@ -134,9 +134,9 @@ public interface DeepaMehtaService {
 
     Association createAssociation(AssociationModel model);
 
-    Directives updateAssociation(AssociationModel model);
+    void updateAssociation(AssociationModel model);
 
-    Directives deleteAssociation(long assocId);
+    void deleteAssociation(long assocId);
 
 
 
@@ -152,9 +152,9 @@ public interface DeepaMehtaService {
 
     TopicType createTopicType(TopicTypeModel model);
 
-    Directives updateTopicType(TopicTypeModel model);
+    void updateTopicType(TopicTypeModel model);
 
-    Directives deleteTopicType(String topicTypeUri);
+    void deleteTopicType(String topicTypeUri);
 
 
 
@@ -170,9 +170,9 @@ public interface DeepaMehtaService {
 
     AssociationType createAssociationType(AssociationTypeModel model);
 
-    Directives updateAssociationType(AssociationTypeModel model);
+    void updateAssociationType(AssociationTypeModel model);
 
-    Directives deleteAssociationType(String assocTypeUri);
+    void deleteAssociationType(String assocTypeUri);
 
 
 

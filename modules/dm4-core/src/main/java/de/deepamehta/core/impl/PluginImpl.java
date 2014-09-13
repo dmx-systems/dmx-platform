@@ -10,7 +10,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
@@ -230,7 +229,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr, new Directives());
+        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr);
     }
 
     // ---

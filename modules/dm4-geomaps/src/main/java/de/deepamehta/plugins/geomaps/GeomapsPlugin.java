@@ -19,9 +19,9 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
@@ -126,6 +126,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @PUT
     @Path("/{id}/topic/{geo_coord_id}")
+    @Transactional
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
@@ -138,6 +139,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @PUT
     @Path("/{id}/center/{lon}/{lat}/zoom/{zoom}")
+    @Transactional
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
@@ -186,7 +188,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
     @Override
-    public void postCreateTopic(Topic topic, Directives directives) {
+    public void postCreateTopic(Topic topic) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             if (!abortGeocoding()) {
                 //
@@ -195,7 +197,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 Address address = new Address(topic.getCompositeValue().getModel());
                 if (!address.isEmpty()) {
                     logger.info("### New " + address);
-                    geocodeAndStoreFacet(address, topic, directives);
+                    geocodeAndStoreFacet(address, topic);
                 } else {
                     logger.info("### New empty address");
                 }
@@ -204,14 +206,14 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel, Directives directives) {
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             if (!abortGeocoding()) {
                 Address address    = new Address(topic.getCompositeValue().getModel());
                 Address oldAddress = new Address(oldModel.getCompositeValueModel());
                 if (!address.equals(oldAddress)) {
                     logger.info("### Address changed:" + address.changeReport(oldAddress));
-                    geocodeAndStoreFacet(address, topic, directives);
+                    geocodeAndStoreFacet(address, topic);
                 } else {
                     logger.info("### Address not changed");
                 }
@@ -261,10 +263,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      *
      * @param   topic   the Address topic to be facetted.
      */
-    private void geocodeAndStoreFacet(Address address, Topic topic, Directives directives) {
+    private void geocodeAndStoreFacet(Address address, Topic topic) {
         try {
             GeoCoordinate geoCoord = address.geocode();
-            storeGeoCoordinate(topic, geoCoord, directives);
+            storeGeoCoordinate(topic, geoCoord);
         } catch (Exception e) {
             // ### TODO: show to the user?
             logger.log(Level.WARNING, "Adding geo coordinate to " + address + " failed", e);
@@ -274,14 +276,14 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     /**
      * Stores a geo coordinate for an address topic in the DB.
      */
-    private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord, Directives directives) {
+    private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord) {
         try {
             logger.info("Storing geo coordinate (" + geoCoord + ") of address " + address);
             FacetValue value = new FacetValue("dm4.geomaps.geo_coordinate").put(new CompositeValueModel()
                 .put("dm4.geomaps.longitude", geoCoord.lon)
                 .put("dm4.geomaps.latitude",  geoCoord.lat)
             );
-            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value, directives);
+            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value);
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }

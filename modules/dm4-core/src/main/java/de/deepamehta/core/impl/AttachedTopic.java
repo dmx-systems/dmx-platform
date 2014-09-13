@@ -13,7 +13,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -48,8 +47,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Updating ===
 
     @Override
-    public void update(TopicModel model, Directives directives) {
-        _update(model, directives);
+    public void update(TopicModel model) {
+        _update(model);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
@@ -59,26 +58,20 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // === Deletion ===
 
     @Override
-    public void delete(Directives directives) {
-        DeepaMehtaTransaction tx = dms.beginTx();   // ### TODO: only resource methods should create a transaction
+    public void delete() {
         try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this, directives);
+            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this);
             //
             // delete sub-topics and associations
-            super.delete(directives);
+            super.delete();
             // delete topic itself
             logger.info("Deleting " + this);
-            directives.add(Directive.DELETE_TOPIC, this);
+            Directives.get().add(Directive.DELETE_TOPIC, this);
             dms.storageDecorator.deleteTopic(getId());
             //
-            tx.success();
-            //
-            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this, directives);
+            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this);
         } catch (Exception e) {
-            logger.warning("ROLLBACK!");
             throw new RuntimeException("Deleting topic failed (" + this + ")", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -189,17 +182,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
      * Called multiple times while updating a composite value (see AttachedCompositeValue).
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
-    void _update(TopicModel model, Directives directives) {
+    void _update(TopicModel model) {
         logger.info("Updating topic " + getId() + " (new " + model + ")");
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model, directives);
+        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
         //
         TopicModel oldModel = getModel().clone();
-        super.update(model, directives);
+        super.update(model);
         //
-        addUpdateDirective(directives);
+        addUpdateDirective();
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel, directives);
+        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
     }
 
 
@@ -212,8 +205,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    void addUpdateDirective(Directives directives) {
-        directives.add(Directive.UPDATE_TOPIC, this);
+    void addUpdateDirective() {
+        Directives.get().add(Directive.UPDATE_TOPIC, this);
     }
 
     @Override
@@ -250,7 +243,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     private void reassignInstantiation() {
         // remove current assignment
-        fetchInstantiation().delete(new Directives());      // ### FIXME: receive directives as argument
+        fetchInstantiation().delete();
         // create new assignment
         dms.createTopicInstantiation(getId(), getTypeUri());
     }

@@ -1,7 +1,6 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.service.Directives;
 
 
 
@@ -31,11 +30,11 @@ public interface AssociationDefinition extends Association {
 
     // ---
 
-    void setParentCardinalityUri(String parentCardinalityUri, Directives directives);
+    void setParentCardinalityUri(String parentCardinalityUri);
 
-    void setChildCardinalityUri(String childCardinalityUri, Directives directives);
+    void setChildCardinalityUri(String childCardinalityUri);
 
     // === Updating ===
 
-    void update(AssociationDefinitionModel model, Directives directives);
+    void update(AssociationDefinitionModel model);
 }
