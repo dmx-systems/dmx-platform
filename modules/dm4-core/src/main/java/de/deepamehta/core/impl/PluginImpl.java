@@ -399,6 +399,7 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof PluginService) {
             logger.info("Adding service " + serviceInterface.getName() + " to " + this);
             consumedPluginServices.get(serviceInterface).injectService(service);
+            pluginContext.serviceArrived((PluginService) service);
             checkRequirementsForActivation();
         }
     }
@@ -419,6 +420,7 @@ public class PluginImpl implements Plugin, EventHandler {
             eventService = null;
         } else if (service instanceof PluginService) {
             logger.info("Removing service " + serviceInterface.getName() + " from " + this);
+            pluginContext.serviceGone((PluginService) service);
             consumedPluginServices.get(serviceInterface).injectNull();
         }
     }

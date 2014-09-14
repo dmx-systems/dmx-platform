@@ -7,6 +7,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.PluginService;
 
 import java.util.logging.Logger;
 
@@ -21,6 +22,8 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    // Note: this instance variable is not actually used but we must declare it in order to initiate service tracking.
+    // The service is utilized only in the serviceArrived() and serviceGone() hooks.
     @Inject
     private TopicmapsService topicmapsService;
 
@@ -31,17 +34,18 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** Hook Implementations ***
 
     @Override
-    public void init() {
-        topicmapsService.registerViewmodelCustomizer(this);
+    public void serviceArrived(PluginService service) {
+        ((TopicmapsService) service).registerViewmodelCustomizer(this);
     }
 
     @Override
-    public void shutdown() {
-        // Note: unregistering is important. Otherwise the Topicmaps plugin would hold a viewmodel
-        // customizer with a stale dms instance as soon as the Box Renderer is redeployed.
-        // A subsequent storeViewProperties() call (see below) would fail.
-        // ### FIXME: was called at serviceGone() which is obsolete.
-        topicmapsService.unregisterViewmodelCustomizer(this);
+    public void serviceGone(PluginService service) {
+        // Note 1: unregistering is crucial. Otherwise the Topicmaps plugin would hold a viewmodel customizer with
+        // a stale dms instance as soon as the Box Renderer is redeployed. A subsequent storeViewProperties() call
+        // (see below) would fail.
+        // Note 2: we must unregister via serviceGone() hook, that is immediately when the Topicmaps service is about
+        // to go away. Using the shutdown() instead would be too late as the Topicmaps service is already gone.
+        ((TopicmapsService) service).unregisterViewmodelCustomizer(this);
     }
 
     // *** ViewmodelCustomizer Implementation ***
