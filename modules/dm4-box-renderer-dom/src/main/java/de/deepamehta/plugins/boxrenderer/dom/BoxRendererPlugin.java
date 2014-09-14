@@ -22,8 +22,8 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // Note: this instance variable is not actually used but we must declare it in order to initiate service tracking.
-    // The service is utilized only in the serviceArrived() and serviceGone() hooks.
+    // Note: this instance variable is not used but we must declare it in order to initiate service tracking.
+    // The service is accessed only on-the-fly within the serviceArrived() and serviceGone() hooks.
     @Inject
     private TopicmapsService topicmapsService;
 
@@ -44,7 +44,7 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
         // a stale dms instance as soon as the Box Renderer is redeployed. A subsequent storeViewProperties() call
         // (see below) would fail.
         // Note 2: we must unregister via serviceGone() hook, that is immediately when the Topicmaps service is about
-        // to go away. Using the shutdown() instead would be too late as the Topicmaps service is already gone.
+        // to go away. Using the shutdown() hook instead would be too late as the Topicmaps service might already gone.
         ((TopicmapsService) service).unregisterViewmodelCustomizer(this);
     }
 

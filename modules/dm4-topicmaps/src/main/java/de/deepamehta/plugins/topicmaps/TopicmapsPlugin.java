@@ -15,13 +15,13 @@ import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -305,10 +305,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
         Map<Long, TopicViewmodel> topics = new HashMap();
-        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0).getItems();    // othersTopicTypeUri=null
-                                                                                        // maxResultSize=0
-            // ### FIXME: had fetchComposite=fetchComposite
+        ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0);   // othersTopicTypeUri=null, maxResultSize=0
+        if (fetchComposite) {
+            relTopics.loadChildTopics();
+        }
         for (RelatedTopic topic : relTopics) {
             Association assoc = topic.getRelatingAssociation().loadChildTopics();
             CompositeValueModel viewProps = assoc.getCompositeValue().getModel();
