@@ -1,17 +1,17 @@
 /**
  * @param   topic   a JavaScript object with these properties:
- *                      id        - mandatory, may be -1
- *                      uri       - mandatory, may be ""
- *                      type_uri  - mandatory
- *                      value     - mandatory, may be ""
- *                      composite - mandatory, may be {}
+ *                      id       - mandatory, may be -1
+ *                      uri      - mandatory, may be ""
+ *                      type_uri - mandatory
+ *                      value    - mandatory, may be ""
+ *                      childs   - mandatory, may be {}
  */
 function Topic(topic) {
     this.id        = topic.id
     this.uri       = topic.uri
     this.type_uri  = topic.type_uri
     this.value     = topic.value
-    this.composite = build_composite(topic.composite)
+    this.childs = build_composite(topic.childs)
     //
     this.assoc     = topic.assoc
 }
@@ -57,7 +57,7 @@ Topic.prototype.get_commands = function(context) {
  *          (in case of multiple values), or undefined if no such direct child topic exists.
  */
 Topic.prototype.get = function(child_type_uri) {
-    var child_topic = this.composite[child_type_uri]
+    var child_topic = this.childs[child_type_uri]
     if (child_topic) {
         if (js.is_array(child_topic)) {
             return child_topic
@@ -87,8 +87,8 @@ Topic.prototype.find_child_topic = function(type_uri) {
         if (topic.type_uri == type_uri) {
             return topic
         }
-        for (var child_type_uri in topic.composite) {
-            var child_topic = topic.composite[child_type_uri]
+        for (var child_type_uri in topic.childs) {
+            var child_topic = topic.childs[child_type_uri]
             if (js.is_array(child_topic)) {
                 child_topic = child_topic[0]
             }

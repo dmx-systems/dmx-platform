@@ -23,7 +23,7 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // Note: this instance variable is not used but we must declare it in order to initiate service tracking.
-    // The service is accessed only on-the-fly within the serviceArrived() and serviceGone() hooks.
+    // The Topicmaps service is accessed only on-the-fly within the serviceArrived() and serviceGone() hooks.
     @Inject
     private TopicmapsService topicmapsService;
 

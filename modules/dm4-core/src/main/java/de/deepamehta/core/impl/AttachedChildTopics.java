@@ -217,7 +217,7 @@ class AttachedChildTopics implements ChildTopics {
             dms.valueStorage.refreshLabel(parent.getModel());
             //
         } catch (Exception e) {
-            throw new RuntimeException("Updating composite value of " + parent.className() + " " + parent.getId() +
+            throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
                 " failed (newComp=" + newComp + ")", e);
         }
     }

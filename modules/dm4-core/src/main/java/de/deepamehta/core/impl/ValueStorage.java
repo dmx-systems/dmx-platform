@@ -60,7 +60,7 @@ class ValueStorage {
                 fetchChildTopics(parent, assocDef);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching composite value of object " + parent.getId() + " failed (" +
+            throw new RuntimeException("Fetching the child topics of object " + parent.getId() + " failed (" +
                 parent + ")", e);
         }
     }
@@ -274,7 +274,7 @@ class ValueStorage {
                 storeChildTopics(childTopic, childTopics, parent, assocDef);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Storing composite value of object " + parent.getId() + " failed (" +
+            throw new RuntimeException("Storing the child topics of object " + parent.getId() + " failed (" +
                 model + ")", e);
         }
     }

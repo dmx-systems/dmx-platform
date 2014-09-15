@@ -19,7 +19,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.hidden: true,
                         dm4.webclient.locked: true
                     }
@@ -54,7 +54,7 @@
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",
-                            composite: {
+                            childs: {
                                 dm4.webclient.hidden: true
                             }
                         }
@@ -64,7 +64,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/de.deepamehta.topicmaps/images/network.png"
                     }
                 }

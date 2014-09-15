@@ -147,7 +147,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         try {
             getChildTopics().update(comp);
         } catch (Exception e) {
-            throw new RuntimeException("Setting composite value failed (" + comp + ")", e);
+            throw new RuntimeException("Setting the child topics failed (" + comp + ")", e);
         }
     }
 

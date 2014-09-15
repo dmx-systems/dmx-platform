@@ -95,8 +95,8 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             this.uri       = model.optString("uri", null);
             this.typeUri   = model.optString("type_uri", null);
             this.value     = model.has("value") ? new SimpleValue(model.get("value")) : null;
-            this.composite = model.has("composite") ? new ChildTopicsModel(model.getJSONObject("composite"))
-                                                    : new ChildTopicsModel();
+            this.composite = model.has("childs") ? new ChildTopicsModel(model.getJSONObject("childs"))
+                                                 : new ChildTopicsModel();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + model + ")", e);
         }
@@ -218,7 +218,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             o.put("uri", uri);
             o.put("type_uri", typeUri);
             o.put("value", value.value());
-            o.put("composite", composite.toJSON());
+            o.put("childs", composite.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

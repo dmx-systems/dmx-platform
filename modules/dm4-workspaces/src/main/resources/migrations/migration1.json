@@ -34,7 +34,7 @@
             "view_config_topics": [
                 {
                     "type_uri": "dm4.webclient.view_config",
-                    "composite": {
+                    "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.workspaces/images/star.png",
                         "dm4.webclient.searchable_as_unit": true
                     }

@@ -8,7 +8,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         view_config_topics: [
             {
                 type_uri: "dm4.webclient.view_config",
-                composite: {
+                childs: {
                     "dm4.webclient.show_in_create_menu": true
                 }
             }
@@ -23,7 +23,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         view_config_topics: [
             {
                 type_uri: "dm4.webclient.view_config",
-                composite: {
+                childs: {
                     "dm4.webclient.show_in_create_menu": true    // ### TODO
                 }
             }

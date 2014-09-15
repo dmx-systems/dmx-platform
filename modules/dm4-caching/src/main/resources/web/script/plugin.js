@@ -42,7 +42,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
         }
 
         function request_object_timestamp() {
-            var comp = request.data.composite
+            var comp = request.data.childs
             return comp && comp[PROP_URI_MODIFIED] && comp[PROP_URI_MODIFIED].value
             // ### TODO: request.data.get(PROP_URI_MODIFIED) would be more comfortable
             // ### but is not supported for non-model values. See Topic.prototype.get()
@@ -51,7 +51,7 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
         function page_panel_object_timestamp() {
             var displayed_object = dm4c.page_panel.get_displayed_object()
             if (displayed_object && displayed_object.id == object_id) {
-                return displayed_object.composite[PROP_URI_MODIFIED].value
+                return displayed_object.childs[PROP_URI_MODIFIED].value
             }
         }
     })

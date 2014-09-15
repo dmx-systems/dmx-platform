@@ -717,17 +717,17 @@ dm4c = new function() {
      * Creates a topic in the DB.
      * Fires the "post_create_topic" event.
      *
-     * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
-     * @param   composite       Optional.
+     * @param   type_uri    The topic type URI, e.g. "dm4.notes.note".
+     * @param   childs      Optional.
      *
      * @return  The topic as stored in the DB.
      */
-    this.create_topic = function(type_uri, composite) {
+    this.create_topic = function(type_uri, childs) {
         // update DB
         var topic_model = {
-            // Note: "uri", "value", and "composite" are optional
+            // Note: "uri", "value", and "childs" are optional
             type_uri: type_uri,
-            composite: composite    // not serialized to request body if undefined
+            childs: childs    // not serialized to request body if undefined
         }
         var topic = build_topic(dm4c.restc.create_topic(topic_model))
         // fire event
@@ -917,7 +917,7 @@ dm4c = new function() {
      */
     this.empty_topic = function(topic_type_uri) {
         return new Topic({
-            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
+            id: -1, uri: "", type_uri: topic_type_uri, value: "", childs: {}
         })
     }
 

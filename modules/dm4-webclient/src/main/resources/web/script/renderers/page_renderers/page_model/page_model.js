@@ -214,13 +214,13 @@ dm4c.render.page_model = (function() {
             var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.child_type_uri
             var cardinality_uri = assoc_def.child_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
-                var child_topic = object.composite[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
+                var child_topic = object.childs[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
                 var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
                     page_model)
                 page_model.childs[assoc_def.child_type_uri] = child_model
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
-                var child_topics = object.composite[assoc_def.child_type_uri] || []
+                var child_topics = object.childs[assoc_def.child_type_uri] || []
                 if (!js.is_array(child_topics)) {
                     throw "PageModelError: field \"" + assoc_def.child_type_uri + "\" is defined as multi-value " +
                         "but appears as single-value in " + JSON.stringify(object)
@@ -380,18 +380,18 @@ dm4c.render.page_model = (function() {
                         "\" is an unexpected association definition type URI"
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
-                object_model.composite = {}
+                object_model.childs = {}
                 for (var child_type_uri in page_model.childs) {
                     var child_model = page_model.childs[child_type_uri]
                     if (child_model.type == PageModel.MULTI) {
                         // cardinality "many"
                         var values = child_model.read_form_values()
-                        object_model.composite[child_type_uri] = values
+                        object_model.childs[child_type_uri] = values
                     } else {
                         // cardinality "one"
                         var value = this.build_object_model(child_model)
                         if (value != null) {
-                            object_model.composite[child_type_uri] = value
+                            object_model.childs[child_type_uri] = value
                         }
                     }
                 }
