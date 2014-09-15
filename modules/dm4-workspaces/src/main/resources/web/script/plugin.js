@@ -86,7 +86,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function get_all_workspaces() {
-        return dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items  // fetch_composite=false, sort=true
+        return dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // include_childs=false, sort=true
     }
 
     /**

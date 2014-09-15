@@ -21,11 +21,11 @@ Association.prototype.get_commands = function(context) {
 // === Public API ===
 
 Association.prototype.get_topic_1 = function() {
-    return dm4c.fetch_topic(this.role_1.topic_id, false)    // fetch_composite=false
+    return dm4c.fetch_topic(this.role_1.topic_id)
 }
 
 Association.prototype.get_topic_2 = function() {
-    return dm4c.fetch_topic(this.role_2.topic_id, false)    // fetch_composite=false
+    return dm4c.fetch_topic(this.role_2.topic_id)
 }
 
 // ---

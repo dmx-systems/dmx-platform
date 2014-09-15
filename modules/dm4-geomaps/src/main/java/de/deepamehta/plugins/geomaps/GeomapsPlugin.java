@@ -83,7 +83,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         return new Geomap(geomapId, dms);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}")
     @Override

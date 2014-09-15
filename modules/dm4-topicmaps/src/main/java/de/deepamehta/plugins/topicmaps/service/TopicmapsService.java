@@ -14,9 +14,9 @@ import de.deepamehta.core.service.PluginService;
 public interface TopicmapsService extends PluginService {
 
     /**
-     * @param   fetchComposite  if true the topics contained in the topicmap will include their child topics.
+     * @param   includeChilds   if true the topics contained in the topicmap will include their child topics.
      */
-    TopicmapViewmodel getTopicmap(long topicmapId, boolean fetchComposite);
+    TopicmapViewmodel getTopicmap(long topicmapId, boolean includeChilds);
 
     // ---
 

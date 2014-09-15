@@ -19,11 +19,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === REST Client Extension ===
 
     /**
-     * @param   fetch_composite (boolean)   Optional: if true the topics contained in the returned topicmap will
+     * @param   include_childs (boolean)    Optional: if true the topics contained in the returned topicmap will
      *                                      include their child topics. Default is false.
      */
-    dm4c.restc.get_topicmap = function(topicmap_id, fetch_composite) {
-        var params = this.createRequestParameter({fetch_composite: fetch_composite})
+    dm4c.restc.get_topicmap = function(topicmap_id, include_childs) {
+        var params = this.createRequestParameter({include_childs: include_childs})
         return this.request("GET", "/topicmap/" + topicmap_id + params.to_query_string())
     }
     dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
@@ -439,7 +439,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // ---
 
     function fetch_topicmap_topics() {
-        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // fetch_composite=true
+        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // include_childs=true
         topicmap_topics = dm4c.hash_by_id(dm4c.build_topics(topics))
         // ### FIXME: object properties are not sorted
     }

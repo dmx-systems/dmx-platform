@@ -165,7 +165,7 @@ dm4c = new function() {
             throw "InvalidArgumentError: dm4c.do_reveal_related_topic() was called with -1 as topic_id"
         }
         // fetch from DB
-        var topic = dm4c.fetch_topic(topic_id, true)        // fetch_composite=true
+        var topic = dm4c.fetch_topic(topic_id, true)        // include_childs=true
         var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
         // update client model and GUI
         dm4c.show_topic(topic, action, undefined, true)     // coordinates=undefined, do_center=true
@@ -1443,13 +1443,21 @@ dm4c = new function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     // ### TODO: rename to get_topic()
-    this.fetch_topic = function(topic_id, fetch_composite) {
-        return build_topic(dm4c.restc.get_topic_by_id(topic_id, fetch_composite))
+    /**
+     * @param   include_childs  Optional (boolean): if true the fetched topic will include its child topics.
+     *                          Default is false.
+     */
+    this.fetch_topic = function(topic_id, include_childs) {
+        return build_topic(dm4c.restc.get_topic_by_id(topic_id, include_childs))
     }
 
     // ### TODO: rename to get_association()
-    this.fetch_association = function(assoc_id, fetch_composite) {
-        return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
+    /**
+     * @param   include_childs  Optional (boolean): if true the fetched association will include its child topics.
+     *                          Default is false.
+     */
+    this.fetch_association = function(assoc_id, include_childs) {
+        return build_association(dm4c.restc.get_association_by_id(assoc_id, include_childs))
     }
 
     // ---

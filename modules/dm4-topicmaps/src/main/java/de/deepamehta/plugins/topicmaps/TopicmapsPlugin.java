@@ -84,13 +84,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}")
     @Override
     public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId,
-                                         @QueryParam("fetch_composite") boolean fetchComposite) {
+                                         @QueryParam("include_childs") boolean includeChilds) {
         try {
-            logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
+            logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dms.getTopic(topicmapId).loadChildTopics();
-            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
+            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, includeChilds);
             Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
             return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
@@ -303,11 +303,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch ---
 
-    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
+    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewmodel> topics = new HashMap();
         ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0);   // othersTopicTypeUri=null, maxResultSize=0
-        if (fetchComposite) {
+        if (includeChilds) {
             relTopics.loadChildTopics();
         }
         for (RelatedTopic topic : relTopics) {

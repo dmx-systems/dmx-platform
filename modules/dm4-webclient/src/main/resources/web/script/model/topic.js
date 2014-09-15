@@ -7,13 +7,13 @@
  *                      childs   - mandatory, may be {}
  */
 function Topic(topic) {
-    this.id        = topic.id
-    this.uri       = topic.uri
-    this.type_uri  = topic.type_uri
-    this.value     = topic.value
-    this.childs = build_composite(topic.childs)
+    this.id       = topic.id
+    this.uri      = topic.uri
+    this.type_uri = topic.type_uri
+    this.value    = topic.value
+    this.childs   = build_composite(topic.childs)
     //
-    this.assoc     = topic.assoc
+    this.assoc    = topic.assoc
 }
 
 // ### TODO: create common base class (DeepaMehtaObject) for topics and associations.
