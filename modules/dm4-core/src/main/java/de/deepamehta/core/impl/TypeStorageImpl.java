@@ -552,7 +552,7 @@ class TypeStorageImpl implements TypeStorage {
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
-            new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
+            new AttachedAssociationDefinition(assocDef, dms).getChildTopics()
                 .set("dm4.core.include_in_label", includeInLabel);
         }
     }
@@ -642,7 +642,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
             // ### TODO: do not create an attached topic here. Can we use the value storage?
-            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value);
+            new AttachedTopic(configTopic, dms).getChildTopics().set(settingUri, value);
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +

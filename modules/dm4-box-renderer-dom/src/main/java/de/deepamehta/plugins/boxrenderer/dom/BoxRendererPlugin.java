@@ -4,7 +4,7 @@ import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.PluginService;
@@ -51,7 +51,7 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** ViewmodelCustomizer Implementation ***
 
     @Override
-    public void enrichViewProperties(Topic topic, CompositeValueModel viewProps) {
+    public void enrichViewProperties(Topic topic, ChildTopicsModel viewProps) {
         boolean expanded = _enrichViewProperties(topic, viewProps);
         if (expanded) {
             topic.loadChildTopics("dm4.notes.text");
@@ -59,14 +59,14 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     }
 
     @Override
-    public void storeViewProperties(Topic topic, CompositeValueModel viewProps) {
+    public void storeViewProperties(Topic topic, ChildTopicsModel viewProps) {
         storeColor(topic, viewProps);
         storeExpanded(topic, viewProps);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private boolean _enrichViewProperties(Topic topic, CompositeValueModel viewProps) {
+    private boolean _enrichViewProperties(Topic topic, ChildTopicsModel viewProps) {
         // 1) color
         if (topic.hasProperty(PROP_COLOR)) {
             String color = (String) topic.getProperty(PROP_COLOR);
@@ -85,14 +85,14 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
 
     // ---
 
-    private void storeColor(Topic topic, CompositeValueModel viewProps) {
+    private void storeColor(Topic topic, ChildTopicsModel viewProps) {
         if (viewProps.has(PROP_COLOR)) {
             String color = viewProps.getString(PROP_COLOR);
             topic.setProperty(PROP_COLOR, color, false);        // addToIndex = false
         }
     }
 
-    private void storeExpanded(Topic topic, CompositeValueModel viewProps) {
+    private void storeExpanded(Topic topic, ChildTopicsModel viewProps) {
         if (viewProps.has(PROP_EXPANDED)) {
             boolean expanded = viewProps.getBoolean(PROP_EXPANDED);
             topic.setProperty(PROP_EXPANDED, expanded, false);  // addToIndex = false

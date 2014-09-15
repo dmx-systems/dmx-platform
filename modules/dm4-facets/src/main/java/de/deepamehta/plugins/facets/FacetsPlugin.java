@@ -9,7 +9,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -89,7 +89,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public Topic getFacettedTopic(@PathParam("id") long topicId,
                                   @QueryParam("facet_type_uri") List<String> facetTypeUris) {
         Topic topic = dms.getTopic(topicId);
-        CompositeValueModel comp = topic.getCompositeValue().getModel();
+        ChildTopicsModel comp = topic.getChildTopics().getModel();
         for (String facetTypeUri : facetTypeUris) {
             String childTypeUri = getChildTypeUri(facetTypeUri);
             if (!isMultiFacet(facetTypeUri)) {

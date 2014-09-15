@@ -21,7 +21,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     protected SimpleValue value;        // is never null in models used for a create operation, may be constructed
                                         //                                                   on empty string. ### FIXDOC
                                         // may be null in models used for an update operation.
-    protected CompositeValueModel composite; // is never null, may be empty. ### FIXDOC
+    protected ChildTopicsModel composite; // is never null, may be empty. ### FIXDOC
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -33,7 +33,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(null, typeUri, value);
     }
 
-    public DeepaMehtaObjectModel(String typeUri, CompositeValueModel composite) {
+    public DeepaMehtaObjectModel(String typeUri, ChildTopicsModel composite) {
         this(null, typeUri, composite);
     }
 
@@ -45,7 +45,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(-1, uri, typeUri, value, null);
     }
 
-    public DeepaMehtaObjectModel(String uri, String typeUri, CompositeValueModel composite) {
+    public DeepaMehtaObjectModel(String uri, String typeUri, ChildTopicsModel composite) {
         this(-1, uri, typeUri, null, composite);
     }
 
@@ -53,7 +53,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(id, null, null);
     }
 
-    public DeepaMehtaObjectModel(long id, CompositeValueModel composite) {
+    public DeepaMehtaObjectModel(long id, ChildTopicsModel composite) {
         this(id, null, composite);
     }
 
@@ -61,7 +61,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this(id, typeUri, null);
     }
 
-    public DeepaMehtaObjectModel(long id, String typeUri, CompositeValueModel composite) {
+    public DeepaMehtaObjectModel(long id, String typeUri, ChildTopicsModel composite) {
         this(id, null, typeUri, null, composite);
     }
 
@@ -74,12 +74,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
      * @param   composite   Optional (<code>null</code> is a valid value and is transformed into an empty composite).
      */
     public DeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
-                                                                      CompositeValueModel composite) {
+                                                                      ChildTopicsModel composite) {
         this.id = id;
         this.uri = uri;
         this.typeUri = typeUri;
         this.value = value;
-        this.composite = composite != null ? composite : new CompositeValueModel();
+        this.composite = composite != null ? composite : new ChildTopicsModel();
     }
 
     public DeepaMehtaObjectModel(DeepaMehtaObjectModel model) {
@@ -95,8 +95,8 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             this.uri       = model.optString("uri", null);
             this.typeUri   = model.optString("type_uri", null);
             this.value     = model.has("value") ? new SimpleValue(model.get("value")) : null;
-            this.composite = model.has("composite") ? new CompositeValueModel(model.getJSONObject("composite"))
-                                                    : new CompositeValueModel();
+            this.composite = model.has("composite") ? new ChildTopicsModel(model.getJSONObject("composite"))
+                                                    : new ChildTopicsModel();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + model + ")", e);
         }
@@ -111,7 +111,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
             this.uri = typeModel.optString("uri");
             this.typeUri = typeUri;
             this.value = new SimpleValue(typeModel.get("value"));
-            this.composite = new CompositeValueModel();
+            this.composite = new ChildTopicsModel();
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + typeModel +
                 ", typeUri=\"" + typeUri + "\")", e);
@@ -178,13 +178,13 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this.value = value;
     }
 
-    // --- Composite Value ---
+    // --- Child Topics ---
 
-    public CompositeValueModel getCompositeValueModel() {
+    public ChildTopicsModel getChildTopicsModel() {
         return composite;
     }
 
-    public void setCompositeValue(CompositeValueModel comp) {
+    public void setChildTopicsModel(ChildTopicsModel comp) {
         this.composite = comp;
     }
 
@@ -195,7 +195,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         setUri(model.getUri());
         setTypeUri(model.getTypeUri());
         setSimpleValue(model.getSimpleValue());
-        setCompositeValue(model.getCompositeValueModel());
+        setChildTopicsModel(model.getChildTopicsModel());
     }
 
     // ---

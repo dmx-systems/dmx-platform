@@ -4,7 +4,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -49,7 +49,7 @@ class ValueStorage {
      * Recursively fetches the composite value (child topic models) of the given parent object model and updates it
      * in-place. ### FIXME: do recursively?
      */
-    void fetchCompositeValue(DeepaMehtaObjectModel parent) {
+    void fetchChildTopics(DeepaMehtaObjectModel parent) {
         try {
             Type type = getType(parent);
             if (!type.getDataTypeUri().equals("dm4.core.composite")) {
@@ -74,7 +74,7 @@ class ValueStorage {
      * @param   assocDef    The child topic models according to this association definition are fetched.
      */
     void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
-        CompositeValueModel comp = parent.getCompositeValueModel();
+        ChildTopicsModel comp = parent.getChildTopicsModel();
         String cardinalityUri = assocDef.getChildCardinalityUri();
         String childTypeUri   = assocDef.getChildTypeUri();
         if (cardinalityUri.equals("dm4.core.one")) {
@@ -82,12 +82,12 @@ class ValueStorage {
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
                 comp.put(childTypeUri, childTopic);
-                fetchCompositeValue(childTopic);    // recursion
+                fetchChildTopics(childTopic);    // recursion
             }
         } else if (cardinalityUri.equals("dm4.core.many")) {
             for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
                 comp.add(childTypeUri, childTopic);
-                fetchCompositeValue(childTopic);    // recursion
+                fetchChildTopics(childTopic);    // recursion
             }
         } else {
             throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -98,13 +98,13 @@ class ValueStorage {
 
     /**
      * Stores and indexes the specified model's value, either a simple value or a composite value (child topics).
-     * Depending on the model type's data type dispatches either to storeSimpleValue() or to storeCompositeValue().
+     * Depending on the model type's data type dispatches either to storeSimpleValue() or to storeChildTopics().
      * <p>
      * Called to store the initial value of a newly created topic/association.
      */
     void storeValue(DeepaMehtaObjectModel model) {
         if (getType(model).getDataTypeUri().equals("dm4.core.composite")) {
-            storeCompositeValue(model);
+            storeChildTopics(model);
             refreshLabel(model);
         } else {
             storeSimpleValue(model);
@@ -246,10 +246,10 @@ class ValueStorage {
      * Note: the given model can contain childs not defined in the type definition.
      * Only the childs defined in the type definition are stored.
      */
-    private void storeCompositeValue(DeepaMehtaObjectModel parent) {
-        CompositeValueModel model = null;
+    private void storeChildTopics(DeepaMehtaObjectModel parent) {
+        ChildTopicsModel model = null;
         try {
-            model = parent.getCompositeValueModel();
+            model = parent.getChildTopicsModel();
             for (AssociationDefinition assocDef : getType(parent).getAssocDefs()) {
                 String childTypeUri   = assocDef.getChildTypeUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
@@ -331,7 +331,7 @@ class ValueStorage {
             // update DB
             Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef);
             // update memory
-            putInCompositeValue(parent, childTopic, assocDef);
+            putInChildTopics(parent, childTopic, assocDef);
         } else {
             // == create child ==
             // update DB
@@ -365,8 +365,8 @@ class ValueStorage {
     /**
      * For single-valued childs
      */
-    private void putInCompositeValue(DeepaMehtaObjectModel parent, Topic childTopic, AssociationDefinition assocDef) {
-        parent.getCompositeValueModel().put(assocDef.getChildTypeUri(), childTopic.getModel());
+    private void putInChildTopics(DeepaMehtaObjectModel parent, Topic childTopic, AssociationDefinition assocDef) {
+        parent.getChildTopicsModel().put(assocDef.getChildTypeUri(), childTopic.getModel());
     }
 
     /**
@@ -423,7 +423,7 @@ class ValueStorage {
     // ---
 
     private String buildChildLabel(DeepaMehtaObjectModel parent, String childTypeUri) {
-        Object value = parent.getCompositeValueModel().get(childTypeUri);
+        Object value = parent.getChildTopicsModel().get(childTypeUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return "";
@@ -439,7 +439,7 @@ class ValueStorage {
             }
             return builder.toString();
         } else {
-            throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
+            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
         }
     }
 

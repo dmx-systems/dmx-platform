@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.CompositeValue;
+import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -10,7 +10,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -62,14 +62,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")));
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 23);
+            topic.getChildTopics().set("dm4.core.plugin_migration_nr", 23);
             //
-            int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
+            int nr = topic.getChildTopics().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42);
+            topic.getChildTopics().set("dm4.core.plugin_migration_nr", 42);
             //
-            nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
+            nr = topic.getChildTopics().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -83,17 +83,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
-            assertTrue(topic.getCompositeValue().has("dm4.core.plugin_migration_nr"));
+            assertTrue(topic.getChildTopics().has("dm4.core.plugin_migration_nr"));
             //
-            int nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
+            int nr = topic.getChildTopics().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(23, nr);
             //
-            topic.getCompositeValue().set("dm4.core.plugin_migration_nr", 42);
+            topic.getChildTopics().set("dm4.core.plugin_migration_nr", 42);
             //
-            nr = topic.getCompositeValue().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
+            nr = topic.getChildTopics().getTopic("dm4.core.plugin_migration_nr").getSimpleValue().intValue();
             assertEquals(42, nr);
             //
             tx.success();
@@ -109,11 +109,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
             Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
-            CompositeValue comp = topic.getCompositeValue();
+            ChildTopics comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
             Topic childTopic = comp.getTopic("dm4.core.plugin_migration_nr");
@@ -131,11 +131,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new CompositeValueModel().put("dm4.core.plugin_migration_nr", 23)
+                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
             Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
-            CompositeValue comp = topic.getCompositeValue();
+            ChildTopics comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
             assertEquals(23, comp.getInt("dm4.core.plugin_migration_nr"));      // child topic is loaded on-demand
@@ -150,14 +150,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void changeLabelWithSetCompositeValue() {
+    public void changeLabelWithSetChildTopics() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.setCompositeValue(new CompositeValueModel().put("dm4.core.plugin_name", "My Plugin"));
-            assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
+            topic.setChildTopics(new ChildTopicsModel().put("dm4.core.plugin_name", "My Plugin"));
+            assertEquals("My Plugin", topic.getChildTopics().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             Topic fetchedTopic = dms.getTopic(topic.getId());
@@ -170,14 +170,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void changeLabelWithCompositeValueSet() {
+    public void changeLabelWithChildTopicsSet() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.getCompositeValue().set("dm4.core.plugin_name", "My Plugin");
-            assertEquals("My Plugin", topic.getCompositeValue().getString("dm4.core.plugin_name"));
+            topic.getChildTopics().set("dm4.core.plugin_name", "My Plugin");
+            assertEquals("My Plugin", topic.getChildTopics().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
             Topic fetchedTopic = dms.getTopic(topic.getId());

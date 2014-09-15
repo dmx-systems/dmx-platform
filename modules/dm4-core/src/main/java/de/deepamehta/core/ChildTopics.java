@@ -1,6 +1,6 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 
 
-public interface CompositeValue {
+public interface ChildTopics {
 
 
 
@@ -38,7 +38,7 @@ public interface CompositeValue {
 
     // ---
 
-    CompositeValueModel getModel();
+    ChildTopicsModel getModel();
 
 
 
@@ -86,7 +86,7 @@ public interface CompositeValue {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    CompositeValue getCompositeValue(String childTypeUri);
+    ChildTopics getChildTopics(String childTypeUri);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
@@ -98,7 +98,7 @@ public interface CompositeValue {
      * Sets a child.
      * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
-    CompositeValue set(String childTypeUri, TopicModel value);
+    ChildTopics set(String childTypeUri, TopicModel value);
 
     /**
      * Convenience method to set the simple value of a child.
@@ -107,21 +107,21 @@ public interface CompositeValue {
      * @param   value   The simple value.
      *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
      */
-    CompositeValue set(String childTypeUri, Object value);
+    ChildTopics set(String childTypeUri, Object value);
 
     /**
      * Convenience method to set the composite value of a child.
      * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
-    CompositeValue set(String childTypeUri, CompositeValueModel value);
+    ChildTopics set(String childTypeUri, ChildTopicsModel value);
 
     // ---
 
-    CompositeValue setRef(String childTypeUri, long refTopicId);
+    ChildTopics setRef(String childTypeUri, long refTopicId);
 
-    CompositeValue setRef(String childTypeUri, String refTopicUri);
+    ChildTopics setRef(String childTypeUri, String refTopicUri);
 
     // ---
 
-    CompositeValue remove(String childTypeUri, long topicId);
+    ChildTopics remove(String childTypeUri, long topicId);
 }

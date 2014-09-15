@@ -16,7 +16,7 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(typeUri, value);
     }
 
-    public TopicModel(String typeUri, CompositeValueModel composite) {
+    public TopicModel(String typeUri, ChildTopicsModel composite) {
         super(typeUri, composite);
     }
 
@@ -28,7 +28,7 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(uri, typeUri, value);
     }
 
-    public TopicModel(String uri, String typeUri, CompositeValueModel composite) {
+    public TopicModel(String uri, String typeUri, ChildTopicsModel composite) {
         super(uri, typeUri, composite);
     }
 
@@ -40,7 +40,7 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(id, typeUri);
     }
 
-    public TopicModel(long id, CompositeValueModel composite) {
+    public TopicModel(long id, ChildTopicsModel composite) {
         super(id, composite);
     }
 
@@ -50,7 +50,7 @@ public class TopicModel extends DeepaMehtaObjectModel {
      * @param   value       If <code>null</code> an empty string value is set. This is OK.
      * @param   composite   If <code>null</code> an empty composite is set. This is OK.
      */
-    public TopicModel(long id, String uri, String typeUri, SimpleValue value, CompositeValueModel composite) {
+    public TopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel composite) {
         super(id, uri, typeUri, value, composite);
     }
 

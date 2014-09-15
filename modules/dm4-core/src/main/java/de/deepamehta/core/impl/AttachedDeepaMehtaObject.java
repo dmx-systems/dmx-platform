@@ -6,7 +6,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -36,9 +36,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModel model;            // underlying model
+    private DeepaMehtaObjectModel model;        // underlying model
 
-    private AttachedCompositeValue childTopics;     // attached object cache
+    private AttachedChildTopics childTopics;    // attached object cache
 
     protected final EmbeddedService dms;
 
@@ -49,7 +49,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
-        this.childTopics = new AttachedCompositeValue(model.getCompositeValueModel(), this, dms);
+        this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), this, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -135,17 +135,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         dms.valueStorage.setSimpleValue(getModel(), value);
     }
 
-    // --- Composite Value ---
+    // --- Child Topics ---
 
     @Override
-    public AttachedCompositeValue getCompositeValue() {
+    public AttachedChildTopics getChildTopics() {
         return childTopics;
     }
 
     @Override
-    public void setCompositeValue(CompositeValueModel comp) {
+    public void setChildTopics(ChildTopicsModel comp) {
         try {
-            getCompositeValue().update(comp);
+            getChildTopics().update(comp);
         } catch (Exception e) {
             throw new RuntimeException("Setting composite value failed (" + comp + ")", e);
         }
@@ -155,13 +155,13 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public DeepaMehtaObject loadChildTopics() {
-        getCompositeValue().loadChildTopics();
+        getChildTopics().loadChildTopics();
         return this;
     }
 
     @Override
     public DeepaMehtaObject loadChildTopics(String childTypeUri) {
-        getCompositeValue().loadChildTopics(childTypeUri);
+        getChildTopics().loadChildTopics(childTypeUri);
         return this;
     }
 
@@ -187,12 +187,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        getCompositeValue().updateChildTopics(newChildTopic, null, assocDef);
+        getChildTopics().updateChildTopics(newChildTopic, null, assocDef);
     }
 
     @Override
     public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
-        getCompositeValue().updateChildTopics(null, newChildTopics, assocDef);
+        getChildTopics().updateChildTopics(null, newChildTopics, assocDef);
     }
 
 
@@ -364,7 +364,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private void updateValue(DeepaMehtaObjectModel newModel) {
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getCompositeValue().update(newModel.getCompositeValueModel());
+            getChildTopics().update(newModel.getChildTopicsModel());
         } else {
             updateSimpleValue(newModel.getSimpleValue());
         }

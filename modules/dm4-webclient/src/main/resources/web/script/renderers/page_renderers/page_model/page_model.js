@@ -358,7 +358,7 @@ dm4c.render.page_model = (function() {
             var object_model = {
                 id: page_model.object.id,
                 type_uri: page_model.object.type_uri    // ### TODO: setting type_uri should not be required
-                                                        // ### see CompositeValueModel.createTopicModel()
+                                                        // ### see ChildTopicsModel.createTopicModel()
             }
             if (page_model.type == PageModel.SIMPLE) {
                 var value = page_model.read_form_value()

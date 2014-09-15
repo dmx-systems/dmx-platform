@@ -6,7 +6,7 @@ import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.service.PluginService;
 
 
@@ -25,7 +25,7 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    void addTopicToTopicmap(long topicmapId, long topicId, CompositeValueModel viewProps);
+    void addTopicToTopicmap(long topicmapId, long topicId, ChildTopicsModel viewProps);
 
     /**
      * Convenience method to add a topic with the standard view properties.
@@ -40,7 +40,7 @@ public interface TopicmapsService extends PluginService {
 
     // ---
 
-    void setViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps);
+    void setViewProperties(long topicmapId, long topicId, ChildTopicsModel viewProps);
 
     /**
      * Convenience method to update the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.

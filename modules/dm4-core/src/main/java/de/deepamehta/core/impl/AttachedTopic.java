@@ -195,7 +195,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     /**
      * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
      * <p>
-     * Called multiple times while updating a composite value (see AttachedCompositeValue).
+     * Called multiple times while updating a composite value (see AttachedChildTopics).
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
     void _update(TopicModel model) {
