@@ -21,11 +21,11 @@
         <!-- OSGi -->
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_core</artifactId>
+            <artifactId>org.osgi.core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_compendium</artifactId>
+            <artifactId>org.osgi.compendium</artifactId>
         </dependency>
         <!-- Jersey -->
         <dependency>
@@ -40,12 +40,7 @@
         <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-        <!-- Felix HTTP API -->
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.http.api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
     </dependencies>
 

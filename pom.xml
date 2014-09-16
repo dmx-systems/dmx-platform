@@ -38,6 +38,7 @@
         <java.util.logging.config.file>
             ${project.basedir}/modules/dm4-distribution/conf/logging.properties
         </java.util.logging.config.file>
+        <!-- To see any Felix logging set the level to at least 4. -->
         <felix.log.level>1</felix.log.level>
 
         <file.encoding>UTF-8</file.encoding>
@@ -51,30 +52,31 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <felix.fileinstall.dir>
-                    <![CDATA[
-                        ${project.basedir}/modules/dm4-core/target,
-                        ${project.basedir}/modules/dm4-webservice/target,
-                        ${project.basedir}/modules/dm4-webclient/target,
-                        ${project.basedir}/modules/dm4-webbrowser/target,
-                        ${project.basedir}/modules/dm4-notes/target,
-                        ${project.basedir}/modules/dm4-contacts/target,
-                        ${project.basedir}/modules/dm4-workspaces/target,
-                        ${project.basedir}/modules/dm4-typeeditor/target,
-                        ${project.basedir}/modules/dm4-iconpicker/target,
-                        ${project.basedir}/modules/dm4-typesearch/target,
-                        ${project.basedir}/modules/dm4-topicmaps/target,
-                        ${project.basedir}/modules/dm4-files/target,
-                        ${project.basedir}/modules/dm4-filemanager/target,
-                        ${project.basedir}/modules/dm4-help/target,
-                        ${project.basedir}/modules/dm4-accesscontrol/target,
-                        ${project.basedir}/modules/dm4-facets/target,
-                        ${project.basedir}/modules/dm4-geomaps/target,
-                        ${project.basedir}/modules/dm4-time/target,
-                        ${project.basedir}/modules/dm4-caching/target,
-                        ${project.basedir}/modules/dm4-storage-neo4j/target,
-                        ${project.basedir}/modules/dm4-box-renderer-dom/target
-                    ]]>
+                <!-- Note: The leading and trainling commas are important for Felix 4.               -->
+                <!-- Felix 4 surrounds the entire property value with double quotes (very strange!), -->
+                <!-- rendering the first and last directory entries invalid.                         -->
+                <felix.fileinstall.dir>,
+                    ${project.basedir}/modules/dm4-core/target,
+                    ${project.basedir}/modules/dm4-webservice/target,
+                    ${project.basedir}/modules/dm4-webclient/target,
+                    ${project.basedir}/modules/dm4-webbrowser/target,
+                    ${project.basedir}/modules/dm4-notes/target,
+                    ${project.basedir}/modules/dm4-contacts/target,
+                    ${project.basedir}/modules/dm4-workspaces/target,
+                    ${project.basedir}/modules/dm4-typeeditor/target,
+                    ${project.basedir}/modules/dm4-iconpicker/target,
+                    ${project.basedir}/modules/dm4-typesearch/target,
+                    ${project.basedir}/modules/dm4-topicmaps/target,
+                    ${project.basedir}/modules/dm4-files/target,
+                    ${project.basedir}/modules/dm4-filemanager/target,
+                    ${project.basedir}/modules/dm4-help/target,
+                    ${project.basedir}/modules/dm4-accesscontrol/target,
+                    ${project.basedir}/modules/dm4-facets/target,
+                    ${project.basedir}/modules/dm4-geomaps/target,
+                    ${project.basedir}/modules/dm4-time/target,
+                    ${project.basedir}/modules/dm4-caching/target,
+                    ${project.basedir}/modules/dm4-storage-neo4j/target,
+                    ${project.basedir}/modules/dm4-box-renderer-dom/target,
                     <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
                     <!-- hot-deployed. It can not be statically deployed (via 3rd-party-bundles) because it        -->
                     <!-- depends on Core and Core would be not yet available (as it is hot-deployed).              -->
@@ -97,7 +99,7 @@
                         <artifactId>maven-pax-plugin</artifactId>
                         <version>1.4</version>
                         <configuration>
-                            <runner>1.7.5</runner>
+                            <runner>1.8.6</runner>
                             <deployPoms>
                                 modules/dm4-provision/3rd-party-bundles/pom.xml,
                                 modules/dm4-provision/felix-bundles/pom.xml
