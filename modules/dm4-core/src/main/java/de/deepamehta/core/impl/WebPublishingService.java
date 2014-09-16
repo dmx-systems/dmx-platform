@@ -302,11 +302,15 @@ public class WebPublishingService {
 
         @Override
         public URL getResource(String name) {
-            // map resource name "/" to "/index.html"
-            if (name.equals("web/")) {
+            // map "/" to "/index.html"
+            //
+            // Note: for the bundle's root resource Felix HTTP Jetty 2.2.0 passes "web/" but version 2.3.0
+            // passes "/web/" (regardless whether the request URL has a slash at the end or not).
+            logger.info("######################### resource name \"" + name + "\"");
+            if (name.equals("/web/")) {
                 name = "/web/index.html";
             }
-            //
+            // access resource from context bundle
             return bundle.getResource(name);
         }
 
