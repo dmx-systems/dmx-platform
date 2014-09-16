@@ -15,6 +15,7 @@
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
+        <!-- ### TODO: adapt HTTPS settings to Pax Web -->
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
         <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
@@ -38,8 +39,7 @@
         <java.util.logging.config.file>
             ${project.basedir}/modules/dm4-distribution/conf/logging.properties
         </java.util.logging.config.file>
-        <!-- To see any Felix logging set the level to at least 4. -->
-        <felix.log.level>1</felix.log.level>
+        <felix.log.level>1</felix.log.level><!-- To see any Felix logging set the level to at least 4. -->
 
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,9 +52,10 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <!-- Note: The leading and trainling commas are important for Felix 4.               -->
-                <!-- Felix 4 surrounds the entire property value with double quotes (very strange!), -->
-                <!-- rendering the first and last directory entries invalid.                         -->
+                <!-- IMPORTANT: The leading and trailing commas represent a workaround for Felix 4 and must not     -->
+                <!-- be deleted (this was not required with Felix 3). Felix 4 apparently surrounds the entire       -->
+                <!-- property value with double quotes, rendering the first and last paths invalid (very strange!). -->
+                <!-- As a workaround we setup 2 (empty) bogus paths at the beginning and end.                       -->
                 <felix.fileinstall.dir>,
                     ${project.basedir}/modules/dm4-core/target,
                     ${project.basedir}/modules/dm4-webservice/target,

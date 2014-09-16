@@ -32,7 +32,8 @@ public class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String ROOT_APPLICATION_PATH = "/";
+    // Note: OPS4J Pax Web needs "/*". Felix HTTP Jetty in contrast needs "/".
+    private static final String ROOT_APPLICATION_PATH = "/*";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -302,15 +303,16 @@ public class WebPublishingService {
 
         @Override
         public URL getResource(String name) {
-            // map "/" to "/index.html"
+            // 1) map "/" to "/index.html"
             //
-            // Note: for the bundle's root resource Felix HTTP Jetty 2.2.0 passes "web/" but version 2.3.0
-            // passes "/web/" (regardless whether the request URL has a slash at the end or not).
-            logger.info("######################### resource name \"" + name + "\"");
-            if (name.equals("/web/")) {
+            // Note: for the bundle's web root resource Pax Web passes "/web/" or "/web",
+            // depending whether the request URL has a slash at the end or not.
+            // Felix HTTP Jetty 2.2.0 in contrast passes "web/" and version 2.3.0 passes "/web/"
+            // (regardless whether the request URL has a slash at the end or not).
+            if (name.equals("/web") || name.equals("/web/")) {
                 name = "/web/index.html";
             }
-            // access resource from context bundle
+            // 2) access resource from context bundle
             return bundle.getResource(name);
         }
 
