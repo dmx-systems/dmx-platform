@@ -60,6 +60,11 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
+    Association loadChildTopics();
+    Association loadChildTopics(String childTypeUri);
+
+    // ---
+
     AssociationModel getModel();
 
 

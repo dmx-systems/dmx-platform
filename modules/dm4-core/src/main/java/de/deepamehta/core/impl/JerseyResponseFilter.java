@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Directives;
@@ -39,25 +40,31 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             dms.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
+            boolean fetchComposite = getFetchComposite(request);
             if (entity != null) {
                 if (entity instanceof TopicType) {          // Note: must take precedence over topic
                     firePreSend((TopicType) entity);
                 } else if (entity instanceof AssociationType) {
                     firePreSend((AssociationType) entity);  // Note: must take precedence over topic
                 } else if (entity instanceof Topic) {
+                    loadChildTopics((Topic) entity, fetchComposite);
                     firePreSend((Topic) entity);
                 } else if (entity instanceof Association) {
+                    loadChildTopics((Association) entity, fetchComposite);
                     firePreSend((Association) entity);
                 } else if (entity instanceof Directives) {
                     // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
                     // E.g. the Access Control plugin must enrich updated objects with permission information.
+                    // ### TODO: check if this is still required. Meanwhile permissions are not an enrichment anymore.
                     firePreSend((Directives) entity);
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity);
                 } else if (isIterable(response, AssociationType.class)) {
                     firePreSendAssociationTypes((Iterable<AssociationType>) entity);
                 } else if (isIterable(response, Topic.class)) {
+                    loadChildTopics((Iterable<Topic>) entity, fetchComposite);
                     firePreSendTopics((Iterable<Topic>) entity);
+                // ### FIXME: Iterable<Association> responses not yet handled
                 }
             }
             //
@@ -71,6 +78,24 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // === Loading child topics ===
+
+    private void loadChildTopics(DeepaMehtaObject object, boolean fetchComposite) {
+        if (fetchComposite) {
+            object.loadChildTopics();
+        }
+    }
+
+    private void loadChildTopics(Iterable<Topic> topics, boolean fetchComposite) {
+        if (fetchComposite) {
+            for (Topic topic : topics) {
+                topic.loadChildTopics();
+            }
+        }
+    }
+
+    // === Firing PRE_SEND events ===
 
     private void firePreSend(Topic topic) {
         dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic);
@@ -125,7 +150,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    // ---
+    // === Helper ===
 
     private boolean isIterable(ContainerResponse response, Class elementType) {
         Type genericType = response.getEntityType();
@@ -138,5 +163,9 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
         }
         return false;
+    }
+
+    private boolean getFetchComposite(ContainerRequest request) {
+        return Boolean.parseBoolean(request.getQueryParameters().getFirst("fetch_composite"));
     }
 }

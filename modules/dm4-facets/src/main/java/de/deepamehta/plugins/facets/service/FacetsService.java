@@ -6,6 +6,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
 
@@ -32,8 +33,7 @@ public interface FacetsService extends PluginService {
     // ---
 
     // ### TODO: rename to getFacetValues
-    // ### TODO: add fetchComposite parameter
-    List<RelatedTopic> getFacets(long topicId, String facetTypeUri);
+    ResultList<RelatedTopic> getFacets(long topicId, String facetTypeUri);
 
     /**
      * Retrieves the values of a multi-facet.
@@ -45,7 +45,7 @@ public interface FacetsService extends PluginService {
      *
      * @return  The retrieved facet values (including their child topics). The list may be empty.
      */
-    List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
+    ResultList<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 

@@ -226,7 +226,7 @@ function CanvasRenderer() {
 
     this.select_topic = function(topic_id) {
         // fetch from DB
-        var topic = dm4c.fetch_topic(topic_id)
+        var topic = dm4c.fetch_topic(topic_id, true)    // fetch_composite=true
         // update viewmodel
         topicmap.set_topic_selection(topic_id)
         // update view

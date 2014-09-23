@@ -107,7 +107,7 @@ class EventManager {
         } catch (Throwable e) {
             // Note: here we also catch errors like NoSuchMethodError or AbstractMethodError.
             // These occur when plugins are not yet adapted to changed Core API.
-            throw new RuntimeException("Processing event by " + listener + " failed (event=" + event + ")", e);
+            throw new RuntimeException("Processing an event by " + listener + " failed (event=" + event + ")", e);
         }
     }
 

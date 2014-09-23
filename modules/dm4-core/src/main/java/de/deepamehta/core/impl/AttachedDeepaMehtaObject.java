@@ -154,13 +154,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     @Override
-    public void loadChildTopics() {
+    public DeepaMehtaObject loadChildTopics() {
         getCompositeValue().loadChildTopics();
+        return this;
     }
 
     @Override
-    public void loadChildTopics(String childTypeUri) {
+    public DeepaMehtaObject loadChildTopics(String childTypeUri) {
         getCompositeValue().loadChildTopics(childTypeUri);
+        return this;
     }
 
     // ---
@@ -207,7 +209,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     public void delete() {
         // 1) recursively delete sub-topics
         ResultList<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", null, false, false, 0);
+            "dm4.core.parent", "dm4.core.child", null, 0);
         for (Topic childTopic : childTopics) {
             childTopic.delete();
         }
@@ -225,26 +227,23 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                String othersTopicTypeUri, boolean fetchComposite,
-                                                boolean fetchRelatingComposite) {
+                                                                                   String othersTopicTypeUri) {
         RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         // fetchRelatedTopic() is abstract
-        return topic != null ? dms.instantiateRelatedTopic(topic, fetchComposite, fetchRelatingComposite, true) : null;
-        // checkAccess=true
+        return topic != null ? dms.instantiateRelatedTopic(topic, true) : null;     // checkAccess=true
     }
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize) {
-        return getRelatedTopics(assocTypeUri, null, null, null, false, false, maxResultSize);
+        return getRelatedTopics(assocTypeUri, null, null, null, maxResultSize);
     }
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                            String othersRoleTypeUri, String othersTopicTypeUri,
-                                            boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
+                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize) {
         ResultList<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);     // fetchRelatedTopics() is abstract
-        return dms.instantiateRelatedTopics(topics, fetchComposite, fetchRelatingComposite);
+        return dms.instantiateRelatedTopics(topics);
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):

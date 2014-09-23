@@ -47,7 +47,7 @@ class ValueStorage {
 
     /**
      * Recursively fetches the composite value (child topic models) of the given parent object model and updates it
-     * in-place.
+     * in-place. ### FIXME: do recursively?
      */
     void fetchCompositeValue(DeepaMehtaObjectModel parent) {
         try {
@@ -67,6 +67,7 @@ class ValueStorage {
 
     /**
      * Recursively fetches the child topic models of the given parent object model and updates it in-place.
+     * ### FIXME: do recursively?
      * <p>
      * Works for both, "one" and "many" association definitions.
      *
@@ -174,13 +175,13 @@ class ValueStorage {
             associateChildTopic(parent, childTopicId, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
-            return dms.getTopic(childTopicId, true);                            // fetchComposite=true
+            return dms.getTopic(childTopicId);                          // ### FIXME: had fetchComposite=true
         } else if (childTopicRef.isReferenceByUri()) {
             String childTopicUri = childTopicRef.getUri();
             associateChildTopic(parent, childTopicUri, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
             // It might be required at client-side.
-            return dms.getTopic("uri", new SimpleValue(childTopicUri), true);   // fetchComposite=true
+            return dms.getTopic("uri", new SimpleValue(childTopicUri)); // ### FIXME: had fetchComposite=true
         } else {
             throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");
         }

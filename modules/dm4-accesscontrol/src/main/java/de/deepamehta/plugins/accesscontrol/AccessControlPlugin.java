@@ -205,7 +205,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public Topic getUsername(String username) {
-        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username), false);
+        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
     }
 
 
@@ -642,7 +642,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
         // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
         // for its service only if installed.
-        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"), false);
+        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"));
     }
 
 
@@ -758,7 +758,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private Topic fetchUserAccount(Topic username) {
         Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-            "dm4.accesscontrol.user_account", true, false);     // fetchComposite=true, fetchRelatingComposite=false
+            "dm4.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
                 username.getSimpleValue() + "\" (username=" + username + ")");

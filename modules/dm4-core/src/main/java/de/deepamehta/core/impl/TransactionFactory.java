@@ -44,7 +44,7 @@ class TransactionFactory implements ResourceFilterFactory {
             return null;
         }
         //
-        logger.info("########## Adding transaction support to " + method);
+        logger.fine("### Adding transaction support to " + method);
         List<ResourceFilter> filters = new ArrayList();
         filters.add(new TransactionResourceFilter(method));
         return filters;
@@ -66,7 +66,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
-                    logger.info("########## Begining transaction of " + method);
+                    logger.fine("### Begining transaction of " + method);
                     DeepaMehtaTransaction tx = dms.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
@@ -83,10 +83,10 @@ class TransactionFactory implements ResourceFilterFactory {
                     boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
                     DeepaMehtaTransaction tx = threadLocalTransaction.get();
                     if (success) {
-                        logger.info("########## Comitting transaction of " + method);
+                        logger.fine("### Comitting transaction of " + method);
                         tx.success();
                     } else {
-                        logger.warning("########## Rollback transaction of " + method);
+                        logger.warning("### Rollback transaction of " + method);
                     }
                     tx.finish();
                     return response;

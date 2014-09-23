@@ -267,8 +267,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void storeDataTypeUri(String dataTypeUri) {
         // remove current assignment
-        getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type",
-            false, false).getRelatingAssociation().delete();
+        getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type")
+            .getRelatingAssociation().delete();
         // create new assignment
         dms.typeStorage.storeDataType(getUri(), dataTypeUri);
     }

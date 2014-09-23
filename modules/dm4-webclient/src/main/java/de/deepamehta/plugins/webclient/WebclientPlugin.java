@@ -107,8 +107,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<RelatedTopic> topics = dms.getTopics(typeUri, false, maxResultSize).getItems();
-            // fetchComposite=false
+            List<RelatedTopic> topics = dms.getTopics(typeUri, maxResultSize).getItems();
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics);
             return searchTopic;
@@ -122,7 +121,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @GET
     @Path("/topic/{id}/related_topics")
     public ResultList getRelatedTopics(@PathParam("id") long topicId) {
-        Topic topic = dms.getTopic(topicId, false);
+        Topic topic = dms.getTopic(topicId);
         ResultList<RelatedTopic> topics = topic.getRelatedTopics(null, 0);   // assocTypeUri=null, maxResultSize=0
         Iterator<RelatedTopic> i = topics.iterator();
         int removed = 0;
@@ -212,7 +211,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 searchableUnits.add(topic);
             } else {
                 List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-                    "dm4.core.parent", null, false, false, 0).getItems();
+                    "dm4.core.parent", null, 0).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -270,8 +269,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === View Configuration ===
 
     private void updateType(Topic viewConfig) {
-        Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null,
-            false, false);
+        Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null);
         if (type != null) {
             String typeUri = type.getTypeUri();
             if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.meta_type")) {

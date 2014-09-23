@@ -49,35 +49,36 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Topics ===
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}")
-    public Topic getTopic(@PathParam("id") long topicId,
-                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getTopic(topicId, fetchComposite);
+    public Topic getTopic(@PathParam("id") long topicId) {
+        return dms.getTopic(topicId);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_value/{key}/{value}")
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value,
-                          @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getTopic(key, value, fetchComposite);
+    public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dms.getTopic(key, value);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
-    public List<Topic> getTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value,
-                                 @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite) {
-        return dms.getTopics(key, value, fetchComposite);
+    public List<Topic> getTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dms.getTopics(key, value);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_type/{type_uri}")
     public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
-                                      @QueryParam("fetch_composite") @DefaultValue("false") boolean fetchComposite,
-                                      @QueryParam("max_result_size") int maxResultSize) {
-        return dms.getTopics(typeUri, fetchComposite, maxResultSize);
+                                              @QueryParam("max_result_size") int maxResultSize) {
+        return dms.getTopics(typeUri, maxResultSize);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
     public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
@@ -115,36 +116,38 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Associations ===
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}")
-    public Association getAssociation(@PathParam("id") long assocId,
-                                      @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getAssociation(assocId, fetchComposite);
+    public Association getAssociation(@PathParam("id") long assocId) {
+        return dms.getAssociation(assocId);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
-                   @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2,
-                   @QueryParam("fetch_composite") @DefaultValue("true") boolean fetchComposite) {
-        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2, fetchComposite);
+                   @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
+        return dms.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                            @PathParam("topic2_id") long topic2Id) {
+                                             @PathParam("topic2_id") long topic2Id) {
         return dms.getAssociations(topic1Id, topic2Id);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
-                                            @PathParam("topic2_id") long topic2Id,
-                                            @PathParam("assoc_type_uri") String assocTypeUri) {
+                                             @PathParam("topic2_id") long topic2Id,
+                                             @PathParam("assoc_type_uri") String assocTypeUri) {
         return dms.getAssociations(topic1Id, topic2Id, assocTypeUri);
     }
 
@@ -285,19 +288,18 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_topics")
-    public ResultList<RelatedTopic> getTopicRelatedTopics(@PathParam("id")               long topicId,
-                                                 @QueryParam("assoc_type_uri")           String assocTypeUri,
-                                                 @QueryParam("my_role_type_uri")         String myRoleTypeUri,
-                                                 @QueryParam("others_role_type_uri")     String othersRoleTypeUri,
-                                                 @QueryParam("others_topic_type_uri")    String othersTopicTypeUri,
-                                                 @QueryParam("fetch_composite")          boolean fetchComposite,
-                                                 @QueryParam("fetch_relating_composite") boolean fetchRelatingComposite,
-                                                 @QueryParam("max_result_size")          int maxResultSize) {
-        Topic topic = dms.getTopic(topicId, false);
+    public ResultList<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                    long topicId,
+                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
+                                                         @QueryParam("max_result_size")       int maxResultSize) {
+        Topic topic = dms.getTopic(topicId);
         return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, maxResultSize);
+            othersTopicTypeUri, maxResultSize);
     }
 
 
@@ -308,19 +310,18 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_topics")
-    public ResultList<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")         long assocId,
-                                                 @QueryParam("assoc_type_uri")           String assocTypeUri,
-                                                 @QueryParam("my_role_type_uri")         String myRoleTypeUri,
-                                                 @QueryParam("others_role_type_uri")     String othersRoleTypeUri,
-                                                 @QueryParam("others_topic_type_uri")    String othersTopicTypeUri,
-                                                 @QueryParam("fetch_composite")          boolean fetchComposite,
-                                                 @QueryParam("fetch_relating_composite") boolean fetchRelatingComposite,
-                                                 @QueryParam("max_result_size")          int maxResultSize) {
-        Association assoc = dms.getAssociation(assocId, false);
+    public ResultList<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")              long assocId,
+                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
+                                                         @QueryParam("max_result_size")       int maxResultSize) {
+        Association assoc = dms.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, fetchComposite, fetchRelatingComposite, maxResultSize);
+            othersTopicTypeUri, maxResultSize);
     }
 
 
@@ -328,17 +329,16 @@ public class WebservicePlugin extends PluginActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private ResultList<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri,
-                                            boolean fetchComposite, boolean fetchRelatingComposite, int maxResultSize) {
+                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                      String othersTopicTypeUri, int maxResultSize) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-            "\", fetchComposite=" + fetchComposite + ", fetchRelatingComposite=" + fetchRelatingComposite +
-            ", maxResultSize=" + maxResultSize + ")";
+            "\", maxResultSize=" + maxResultSize + ")";
         try {
             logger.info(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                fetchComposite, fetchRelatingComposite, maxResultSize);
+                maxResultSize);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

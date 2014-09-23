@@ -1,8 +1,8 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
@@ -63,23 +63,23 @@ public class DeepaMehtaUtils {
 
 
 
-    public static List<Long> idList(Collection objects) {
+    public static List<Long> idList(Iterable<? extends Identifiable> items) {
         List<Long> ids = new ArrayList();
-        for (Object object : objects) {
-            ids.add(((Identifiable) object).getId());
+        for (Identifiable item : items) {
+            ids.add(item.getId());
         }
         return ids;
     }
 
-    public static List<TopicModel> toTopicModels(List<RelatedTopic> relTopics) {
+    public static List<TopicModel> toTopicModels(Iterable<? extends Topic> topics) {
         List<TopicModel> topicModels = new ArrayList();
-        for (Topic topic : relTopics) {
+        for (Topic topic : topics) {
             topicModels.add(topic.getModel());
         }
         return topicModels;
     }
 
-    public static String topicNames(Collection<? extends Topic> topics) {
+    public static String topicNames(Iterable<? extends Topic> topics) {
         StringBuilder names = new StringBuilder();
         Iterator<? extends Topic> i = topics.iterator();
         while (i.hasNext()) {
@@ -147,10 +147,10 @@ public class DeepaMehtaUtils {
     // === DeepaMehta specific ===
 
     // ### TODO: rename to toJSONArray()
-    public static JSONArray objectsToJSON(Collection<? extends JSONEnabled> objects) {
+    public static JSONArray objectsToJSON(Iterable<? extends JSONEnabled> items) {
         JSONArray array = new JSONArray();
-        for (JSONEnabled object : objects) {
-            array.put(object.toJSON());
+        for (JSONEnabled item : items) {
+            array.put(item.toJSON());
         }
         return array;
     }

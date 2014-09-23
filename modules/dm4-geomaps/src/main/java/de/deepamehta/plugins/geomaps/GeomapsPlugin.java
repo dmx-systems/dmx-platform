@@ -83,15 +83,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         return new Geomap(geomapId, dms);
     }
 
+    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}")
     @Override
     public Topic getDomainTopic(@PathParam("id") long geoCoordId) {
         try {
-            Topic topic = dms.getTopic(geoCoordId, true);
+            Topic topic = dms.getTopic(geoCoordId);
             RelatedTopic parentTopic;
-            while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null,
-                    true, false)) != null) {    // ### TODO: optimization. Don't fetch composite of intermediate topics.
+            while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null)) != null) {
                 topic = parentTopic;
             }
             return topic;
@@ -229,17 +229,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void preSendTopic(Topic topic) {
         Topic address = findAddress(topic);
-        if (address == null) {
-            return;
-        }
-        //
-        Topic geoCoordTopic = getGeoCoordinateTopic(address);
-        if (geoCoordTopic != null) {
-            logger.info("### Enriching address " + address.getId() + " with its geo coordinate");
-            address.getCompositeValue().getModel().put("dm4.geomaps.geo_coordinate", geoCoordTopic.getModel());
-        } else {
-            logger.info("### Enriching address " + address.getId() + " with its geo coordinate ABORTED " +
-                "-- no geo coordinate in DB");
+        if (address != null) {
+            Topic geoCoordTopic = getGeoCoordinateTopic(address);
+            if (geoCoordTopic != null) {
+                logger.info("### Enriching address " + address.getId() + " with its geo coordinate");
+                address.getCompositeValue().getModel().put("dm4.geomaps.geo_coordinate", geoCoordTopic.getModel());
+            } else {
+                logger.info("### Enriching address " + address.getId() + " with its geo coordinate ABORTED " +
+                    "-- no geo coordinate in DB");
+            }
         }
     }
 
@@ -248,11 +246,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Returns the Geo Coordinate topic of a geo-facetted topic (e.g. an Address),
+     * Returns the Geo Coordinate topic (including its child topics) of a geo-facetted topic (e.g. an Address),
      * or <code>null</code> if no geo coordinate is stored.
      */
     private Topic getGeoCoordinateTopic(Topic geoTopic) {
-        return facetsService.getFacet(geoTopic, "dm4.geomaps.geo_coordinate_facet");
+        Topic geoCoordTopic = facetsService.getFacet(geoTopic, "dm4.geomaps.geo_coordinate_facet");
+        return geoCoordTopic != null ? geoCoordTopic.loadChildTopics() : null;
     }
 
     // ---

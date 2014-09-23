@@ -1,5 +1,6 @@
 package de.deepamehta.core.service;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -49,6 +50,16 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
     public void addAll(ResultList<T> result) {
         totalCount += result.getTotalCount();
         items.addAll(result.getItems());
+    }
+
+    // ---
+
+    public ResultList<T> loadChildTopics() {
+        for (T item : this) {
+            // Note: we store also models in a result list. So we need a cast here.
+            ((DeepaMehtaObject) item).loadChildTopics();
+        }
+        return this;
     }
 
     // *** Iterable Implementation ***

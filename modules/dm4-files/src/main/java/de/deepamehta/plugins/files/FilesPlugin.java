@@ -427,10 +427,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
      */
     private Topic fetchTopic(File file, String parentTypeUri) {
         String path = repoPath(file);
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path), false);   // fetchComposite=false
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path));
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-                parentTypeUri, true, false);
+                parentTypeUri);     // ### FIXME: had fetchComposite=true
         }
         return null;
     }
@@ -535,7 +535,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
      * Returns the repository path of the given File/Folder topic.
      */
     private String repoPath(long fileTopicId) {
-        Topic fileTopic = dms.getTopic(fileTopicId, true);    // fetchComposite=true
+        Topic fileTopic = dms.getTopic(fileTopicId);    // ### FIXME: had fetchComposite=true
         return fileTopic.getCompositeValue().getString("dm4.files.path");
     }
 

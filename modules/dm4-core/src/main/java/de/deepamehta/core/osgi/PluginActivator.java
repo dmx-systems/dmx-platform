@@ -1,6 +1,7 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.impl.PluginImpl;
 
@@ -96,6 +97,14 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     @Override
     public void postInstall() {
+    }
+
+    @Override
+    public void serviceArrived(PluginService service) {
+    }
+
+    @Override
+    public void serviceGone(PluginService service) {
     }
 
     // ---

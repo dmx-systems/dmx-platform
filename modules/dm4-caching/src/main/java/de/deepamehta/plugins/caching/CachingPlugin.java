@@ -65,7 +65,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
             long time = timeService.getModificationTime(object);
             Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
             if (response != null) {
-                logger.fine("### Precondition of " + request.getMethod() + " request failed (object " +
+                logger.info("### Precondition of " + request.getMethod() + " request failed (object " +
                     object.getId() + ")");
                 throw new WebApplicationException(response.build());
             }
@@ -95,9 +95,9 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
             String objectType = m.group(1);     // group 1 is "topic" or "association"
             long objectId = Long.parseLong(m.group(2));
             if (objectType.equals("topic")) {
-                return dms.getTopic(objectId, false);
+                return dms.getTopic(objectId);
             } else if (objectType.equals("association")) {
-                return dms.getAssociation(objectId, false);
+                return dms.getAssociation(objectId);
             } else {
                 throw new RuntimeException("Unexpected object type: \"" + objectType + "\"");
             }
