@@ -14,6 +14,8 @@
 
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.ops4j.pax.web.session.timeout>0</org.ops4j.pax.web.session.timeout>
+        <!-- HTTPS -->
         <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
         <!-- ### TODO: adapt HTTPS settings to Pax Web -->
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
