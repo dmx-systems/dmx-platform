@@ -440,15 +440,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     private Topic createFileTopic(File file) {
         String mediaType = JavaUtils.getFileType(file.getName());
         //
-        ChildTopicsModel comp = new ChildTopicsModel();
-        comp.put("dm4.files.file_name", file.getName());
-        comp.put("dm4.files.path",      repoPath(file));
+        ChildTopicsModel childTopics = new ChildTopicsModel();
+        childTopics.put("dm4.files.file_name", file.getName());
+        childTopics.put("dm4.files.path",      repoPath(file));
         if (mediaType != null) {
-            comp.put("dm4.files.media_type", mediaType);
+            childTopics.put("dm4.files.media_type", mediaType);
         }
-        comp.put("dm4.files.size",      file.length());
+        childTopics.put("dm4.files.size",      file.length());
         //
-        return dms.createTopic(new TopicModel("dm4.files.file", comp));
+        return dms.createTopic(new TopicModel("dm4.files.file", childTopics));
     }
 
     private Topic createFolderTopic(File file) {
@@ -460,11 +460,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             folderName = "";
         }
         //
-        ChildTopicsModel comp = new ChildTopicsModel();
-        comp.put("dm4.files.folder_name", folderName);
-        comp.put("dm4.files.path",        path);
+        ChildTopicsModel childTopics = new ChildTopicsModel();
+        childTopics.put("dm4.files.folder_name", folderName);
+        childTopics.put("dm4.files.path",        path);
         //
-        return dms.createTopic(new TopicModel("dm4.files.folder", comp));
+        return dms.createTopic(new TopicModel("dm4.files.folder", childTopics));
     }
 
     // ---

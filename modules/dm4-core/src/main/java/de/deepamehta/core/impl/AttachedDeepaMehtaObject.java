@@ -143,11 +143,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public void setChildTopics(ChildTopicsModel comp) {
+    public void setChildTopics(ChildTopicsModel childTopics) {
         try {
-            getChildTopics().update(comp);
+            getChildTopics().update(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Setting the child topics failed (" + comp + ")", e);
+            throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
         }
     }
 

@@ -317,7 +317,7 @@ public class ChildTopicsModel implements Iterable<String> {
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a ChildTopicsModel failed (childTypeUri=\"" +
-                childTypeUri + "\", value=" + value + ", composite=" + this + ")", e);
+                childTypeUri + "\", value=" + value + ")", e);
         }
     }
 
@@ -337,7 +337,7 @@ public class ChildTopicsModel implements Iterable<String> {
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a ChildTopicsModel failed (childTypeUri=\"" +
-                childTypeUri + "\", value=" + value + ", composite=" + this + ")", e);
+                childTypeUri + "\", value=" + value + ")", e);
         }
     }
 

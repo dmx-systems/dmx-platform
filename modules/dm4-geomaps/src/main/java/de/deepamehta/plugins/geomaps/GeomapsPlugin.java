@@ -117,10 +117,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @Override
     public GeoCoordinate geoCoordinate(Topic geoCoordTopic) {
-        ChildTopics comp = geoCoordTopic.getChildTopics();
+        ChildTopics childTopics = geoCoordTopic.getChildTopics();
         return new GeoCoordinate(
-            comp.getDouble("dm4.geomaps.longitude"),
-            comp.getDouble("dm4.geomaps.latitude")
+            childTopics.getDouble("dm4.geomaps.longitude"),
+            childTopics.getDouble("dm4.geomaps.latitude")
         );
     }
 

@@ -3,7 +3,7 @@ function Association(assoc) {
     this.uri      = assoc.uri
     this.type_uri = assoc.type_uri
     this.value    = assoc.value
-    this.childs   = build_composite(assoc.childs)   // build_composite is defined in topic.js
+    this.childs   = build_child_topics(assoc.childs)   // build_child_topics is defined in topic.js
     this.role_1   = assoc.role_1
     this.role_2   = assoc.role_2
 }

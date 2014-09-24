@@ -74,19 +74,19 @@ class ValueStorage {
      * @param   assocDef    The child topic models according to this association definition are fetched.
      */
     void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinition assocDef) {
-        ChildTopicsModel comp = parent.getChildTopicsModel();
+        ChildTopicsModel childTopics = parent.getChildTopicsModel();
         String cardinalityUri = assocDef.getChildCardinalityUri();
         String childTypeUri   = assocDef.getChildTypeUri();
         if (cardinalityUri.equals("dm4.core.one")) {
             RelatedTopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
             // Note: topics just created have no child topics yet
             if (childTopic != null) {
-                comp.put(childTypeUri, childTopic);
+                childTopics.put(childTypeUri, childTopic);
                 fetchChildTopics(childTopic);    // recursion
             }
         } else if (cardinalityUri.equals("dm4.core.many")) {
             for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
-                comp.add(childTypeUri, childTopic);
+                childTopics.add(childTypeUri, childTopic);
                 fetchChildTopics(childTopic);    // recursion
             }
         } else {

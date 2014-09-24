@@ -590,13 +590,13 @@ class TypeStorageImpl implements TypeStorage {
     // ---
 
     private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
-        // Note: the composite is not fetched as it is not needed
+        // Note: the child topics are not fetched as they are not needed
         return dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
     }
 
     private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
-        // Note: the composite is not fetched as it is not needed
+        // Note: the child topics are not fetched as they are not needed
         return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
     }

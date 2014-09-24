@@ -102,8 +102,8 @@ public class ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        ChildTopicsModel comp = configTopic.getChildTopicsModel();
-        return comp.has(settingUri) ? comp.getObject(settingUri) : null;
+        ChildTopicsModel childTopics = configTopic.getChildTopicsModel();
+        return childTopics.has(settingUri) ? childTopics.getObject(settingUri) : null;
     }
 
     // ---

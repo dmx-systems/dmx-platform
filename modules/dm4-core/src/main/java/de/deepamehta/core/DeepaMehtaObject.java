@@ -46,7 +46,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     ChildTopics getChildTopics();
 
-    void setChildTopics(ChildTopicsModel comp);
+    void setChildTopics(ChildTopicsModel childTopics);
 
     // ---
 

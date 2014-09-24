@@ -153,7 +153,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             topic_view.dom.find(".topic-label").text(topic_view.label)
             // content
             if (topic_view.type_uri == "dm4.notes.note") {
-                // Note: newly created topics have an empty composite
+                // Note: newly created topics have no child topics
                 var text = topic_view.childs["dm4.notes.text"]
                 text && topic_view.dom.find(".topic-content").html(text.value)
             }

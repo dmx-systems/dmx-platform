@@ -251,9 +251,9 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     private long enrichWithTimestamp(DeepaMehtaObject object) {
         long created = getCreationTime(object);
         long modified = getModificationTime(object);
-        ChildTopicsModel comp = object.getChildTopics().getModel();
-        comp.put(PROP_URI_CREATED, created);
-        comp.put(PROP_URI_MODIFIED, modified);
+        ChildTopicsModel childTopics = object.getChildTopics().getModel();
+        childTopics.put(PROP_URI_CREATED, created);
+        childTopics.put(PROP_URI_MODIFIED, modified);
         return modified;
     }
 
