@@ -19,8 +19,8 @@ function RESTClient(config) {
 
     // === Topics ===
 
-    this.get_topic_by_id = function(topic_id, fetch_composite) {
-        var params = new RequestParameter({fetch_composite: fetch_composite})
+    this.get_topic_by_id = function(topic_id, include_childs) {
+        var params = new RequestParameter({include_childs: include_childs})
         return request("GET", "/core/topic/" + topic_id + params.to_query_string())
     }
 
@@ -51,8 +51,8 @@ function RESTClient(config) {
      *              "items"       - array of topics, possibly empty.
      *              "total_count" - result set size before limitation.
      */
-    this.get_topics = function(type_uri, fetch_composite, sort, max_result_size) {
-        var params = new RequestParameter({fetch_composite: fetch_composite, max_result_size: max_result_size})
+    this.get_topics = function(type_uri, include_childs, sort, max_result_size) {
+        var params = new RequestParameter({include_childs: include_childs, max_result_size: max_result_size})
         var result = request("GET", "/core/topic/by_type/" + type_uri + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
@@ -108,8 +108,8 @@ function RESTClient(config) {
 
     // === Associations ===
 
-    this.get_association_by_id = function(assoc_id, fetch_composite) {
-        var params = new RequestParameter({fetch_composite: fetch_composite})
+    this.get_association_by_id = function(assoc_id, include_childs) {
+        var params = new RequestParameter({include_childs: include_childs})
         return request("GET", "/core/association/" + assoc_id + params.to_query_string())
     }
 
@@ -123,8 +123,8 @@ function RESTClient(config) {
      * @return  The association (a JavaScript object).
      */
     this.get_association = function(assoc_type_uri, topic1_id, topic2_id, role_type1_uri, role_type2_uri,
-                                                                                          fetch_composite) {
-        var params = new RequestParameter({fetch_composite: fetch_composite})
+                                                                                          include_childs) {
+        var params = new RequestParameter({include_childs: include_childs})
         return request("GET", "/core/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
             role_type1_uri + "/" + role_type2_uri + params.to_query_string())
     }

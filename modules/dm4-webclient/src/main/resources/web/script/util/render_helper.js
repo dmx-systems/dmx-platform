@@ -335,7 +335,7 @@ function RenderHelper() {
             throw "RendererHelperError: topic_menu(): illegal \"selected_id_or_uri\" argument"
         }
         // fetch all instances
-        var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // fetch_composite=false, sort=true
+        var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // include_childs=false, sort=true
         // build menu
         var menu = dm4c.ui.menu(handler)
         for (var i = 0, topic; topic = topics[i]; i++) {
@@ -351,8 +351,8 @@ function RenderHelper() {
         var topic_type_uri = page_model.object_type.uri
         switch (result.length) {
         case 0:
-            // fetch all instances                       // fetch_composite=false, sort=true
-            return dm4c.restc.get_topics(topic_type_uri, false, true).items
+            // fetch all instances
+            return dm4c.restc.get_topics(topic_type_uri, false, true).items     // include_childs=false, sort=true
         case 1:
             return result[0]
         default:

@@ -78,7 +78,7 @@ public class ViewConfigurationModel {
             created = true;
         }
         // make setting
-        configTopic.getCompositeValueModel().put(settingUri, value);
+        configTopic.getChildTopicsModel().put(settingUri, value);
         //
         return created ? configTopic : null;
     }
@@ -102,8 +102,8 @@ public class ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        CompositeValueModel comp = configTopic.getCompositeValueModel();
-        return comp.has(settingUri) ? comp.getObject(settingUri) : null;
+        ChildTopicsModel childTopics = configTopic.getChildTopicsModel();
+        return childTopics.has(settingUri) ? childTopics.getObject(settingUri) : null;
     }
 
     // ---

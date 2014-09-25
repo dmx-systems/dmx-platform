@@ -165,7 +165,7 @@ dm4c = new function() {
             throw "InvalidArgumentError: dm4c.do_reveal_related_topic() was called with -1 as topic_id"
         }
         // fetch from DB
-        var topic = dm4c.fetch_topic(topic_id, true)        // fetch_composite=true
+        var topic = dm4c.fetch_topic(topic_id, true)        // include_childs=true
         var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
         // update client model and GUI
         dm4c.show_topic(topic, action, undefined, true)     // coordinates=undefined, do_center=true
@@ -717,17 +717,17 @@ dm4c = new function() {
      * Creates a topic in the DB.
      * Fires the "post_create_topic" event.
      *
-     * @param   type_uri        The topic type URI, e.g. "dm4.notes.note".
-     * @param   composite       Optional.
+     * @param   type_uri    The topic type URI, e.g. "dm4.notes.note".
+     * @param   childs      Optional.
      *
      * @return  The topic as stored in the DB.
      */
-    this.create_topic = function(type_uri, composite) {
+    this.create_topic = function(type_uri, childs) {
         // update DB
         var topic_model = {
-            // Note: "uri", "value", and "composite" are optional
+            // Note: "uri", "value", and "childs" are optional
             type_uri: type_uri,
-            composite: composite    // not serialized to request body if undefined
+            childs: childs    // not serialized to request body if undefined
         }
         var topic = build_topic(dm4c.restc.create_topic(topic_model))
         // fire event
@@ -917,7 +917,7 @@ dm4c = new function() {
      */
     this.empty_topic = function(topic_type_uri) {
         return new Topic({
-            id: -1, uri: "", type_uri: topic_type_uri, value: "", composite: {}
+            id: -1, uri: "", type_uri: topic_type_uri, value: "", childs: {}
         })
     }
 
@@ -1443,13 +1443,21 @@ dm4c = new function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     // ### TODO: rename to get_topic()
-    this.fetch_topic = function(topic_id, fetch_composite) {
-        return build_topic(dm4c.restc.get_topic_by_id(topic_id, fetch_composite))
+    /**
+     * @param   include_childs  Optional (boolean): if true the fetched topic will include its child topics.
+     *                          Default is false.
+     */
+    this.fetch_topic = function(topic_id, include_childs) {
+        return build_topic(dm4c.restc.get_topic_by_id(topic_id, include_childs))
     }
 
     // ### TODO: rename to get_association()
-    this.fetch_association = function(assoc_id, fetch_composite) {
-        return build_association(dm4c.restc.get_association_by_id(assoc_id, fetch_composite))
+    /**
+     * @param   include_childs  Optional (boolean): if true the fetched association will include its child topics.
+     *                          Default is false.
+     */
+    this.fetch_association = function(assoc_id, include_childs) {
+        return build_association(dm4c.restc.get_association_by_id(assoc_id, include_childs))
     }
 
     // ---

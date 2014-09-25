@@ -6,7 +6,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
@@ -251,9 +251,9 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     private long enrichWithTimestamp(DeepaMehtaObject object) {
         long created = getCreationTime(object);
         long modified = getModificationTime(object);
-        CompositeValueModel comp = object.getCompositeValue().getModel();
-        comp.put(PROP_URI_CREATED, created);
-        comp.put(PROP_URI_MODIFIED, modified);
+        ChildTopicsModel childTopics = object.getChildTopics().getModel();
+        childTopics.put(PROP_URI_CREATED, created);
+        childTopics.put(PROP_URI_MODIFIED, modified);
         return modified;
     }
 

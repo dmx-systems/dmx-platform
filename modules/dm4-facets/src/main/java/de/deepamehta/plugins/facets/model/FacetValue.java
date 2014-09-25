@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.facets.model;
 
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -13,7 +13,7 @@ import java.util.List;
  * A facet value as used in update facet calls.
  * Used for both, single-valued facets and multiple-valued facets.
  */
-public class FacetValue extends CompositeValueModel {
+public class FacetValue extends ChildTopicsModel {
 
     private String childTypeUri;
 
@@ -73,7 +73,7 @@ public class FacetValue extends CompositeValueModel {
     /**
      * Convenience method to put a *composite* value in a single-valued facet.
      */
-    public FacetValue put(CompositeValueModel value) {
+    public FacetValue put(ChildTopicsModel value) {
         return (FacetValue) put(childTypeUri, value);
     }
 

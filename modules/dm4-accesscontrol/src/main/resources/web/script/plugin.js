@@ -210,7 +210,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             return
         }
         //
-        var password_topic = topic_model.composite["dm4.accesscontrol.password"]
+        var password_topic = topic_model.childs["dm4.accesscontrol.password"]
         var password = password_topic.value
         if (!js.begins_with(password, ENCRYPTED_PASSWORD_PREFIX)) {
             password_topic.value = encrypt_password(password)
@@ -228,16 +228,16 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     })
 
     // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
-    // with the types (in the composite value). Instead let the client request the permissions separately.
+    // with the types (in the child topics). Instead let the client request the permissions separately.
 
     dm4c.add_listener("has_create_permission", function(topic_type) {
-        var permissions = topic_type.composite["dm4.accesscontrol.permissions"]
+        var permissions = topic_type.childs["dm4.accesscontrol.permissions"]
         // error check
         if (!permissions) {
             throw "AccessControlError: topic type \"" + topic_type.uri + "\" has no permissions info"
         }
         //
-        return permissions.composite["dm4.accesscontrol.operation.create"].value
+        return permissions.childs["dm4.accesscontrol.operation.create"].value
     })
 
 

@@ -4,7 +4,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
@@ -229,7 +229,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getCompositeValue().set("dm4.core.plugin_migration_nr", migrationNr);
+        pluginTopic.getChildTopics().set("dm4.core.plugin_migration_nr", migrationNr);
     }
 
     // ---
@@ -546,7 +546,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private Topic createPluginTopic() {
-        return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new CompositeValueModel()
+        return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new ChildTopicsModel()
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)

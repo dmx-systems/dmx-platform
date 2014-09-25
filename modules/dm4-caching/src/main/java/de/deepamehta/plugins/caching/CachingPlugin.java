@@ -85,11 +85,11 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private DeepaMehtaObject requestObject(ContainerRequest request) {
-        // Example URL: "http://localhost:8080/core/topic/2695?fetch_composite=false"
+        // Example URL: "http://localhost:8080/core/topic/2695?include_childs=true"
         //   request.getBaseUri()="http://localhost:8080/"
         //   request.getPath()="core/topic/2695"
         //   request.getAbsolutePath()="http://localhost:8080/core/topic/2695"
-        //   request.getRequestUri()="http://localhost:8080/core/topic/2695?fetch_composite=false"
+        //   request.getRequestUri()="http://localhost:8080/core/topic/2695?include_childs=true"
         Matcher m = cachablePath.matcher(request.getPath());
         if (m.matches()) {
             String objectType = m.group(1);     // group 1 is "topic" or "association"

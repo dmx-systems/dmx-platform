@@ -129,7 +129,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.simple_renderer_uri: "dm4.webclient.search_result_renderer"
                     }
                 }
@@ -154,7 +154,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/de.deepamehta.webclient/images/balls.png",
                         dm4.webclient.locked: true
                     }
