@@ -19,13 +19,13 @@
             <!-- OSGi -->
             <dependency>
                 <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.core</artifactId>
-                <version>5.0.0</version>
+                <artifactId>osgi_R4_core</artifactId>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.osgi</groupId>
-                <artifactId>org.osgi.compendium</artifactId>
-                <version>5.0.0</version>
+                <artifactId>osgi_R4_compendium</artifactId>
+                <version>1.0</version>
             </dependency>
             <!-- Jersey -->
             <dependency>
@@ -66,9 +66,17 @@
             <!-- Servlet API -->
             <dependency>
                 <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>3.0.1</version>
-                <scope>provided</scope><!-- ### TODO: drop scope to let standard plugins inherit? -->
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+            <!-- Felix HTTP API -->
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.http.api</artifactId>
+                <version>2.2.0</version>
+                <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
             <!-- Testing -->
