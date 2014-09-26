@@ -14,14 +14,14 @@
 
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
+        <org.osgi.service.http.enabled>true</org.osgi.service.http.enabled>
         <org.ops4j.pax.web.session.timeout>0</org.ops4j.pax.web.session.timeout>
         <!-- HTTPS -->
-        <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
-        <!-- ### TODO: adapt HTTPS settings to Pax Web -->
-        <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
-        <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
-        <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
-        <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
+        <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
+        <org.ops4j.pax.web.ssl.keystore>/Users/jri/.keystore</org.ops4j.pax.web.ssl.keystore>
+        <org.ops4j.pax.web.ssl.password>keypw01</org.ops4j.pax.web.ssl.password>
+        <org.ops4j.pax.web.ssl.keypassword>kspw01</org.ops4j.pax.web.ssl.keypassword>
 
         <!-- Request Filter -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
