@@ -19,9 +19,9 @@
         <!-- HTTPS -->
         <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.osgi.service.http.secure.enabled>false</org.osgi.service.http.secure.enabled>
-        <org.ops4j.pax.web.ssl.keystore>/Users/jri/.keystore</org.ops4j.pax.web.ssl.keystore>
-        <org.ops4j.pax.web.ssl.password>keypw01</org.ops4j.pax.web.ssl.password>
-        <org.ops4j.pax.web.ssl.keypassword>kspw01</org.ops4j.pax.web.ssl.keypassword>
+        <org.ops4j.pax.web.ssl.keystore></org.ops4j.pax.web.ssl.keystore>
+        <org.ops4j.pax.web.ssl.password></org.ops4j.pax.web.ssl.password>
+        <org.ops4j.pax.web.ssl.keypassword></org.ops4j.pax.web.ssl.keypassword>
 
         <!-- Request Filter -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
