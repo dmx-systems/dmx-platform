@@ -27,8 +27,9 @@
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.eventadmin</include>
                 <include>org.apache.felix:org.apache.felix.gogo.*</include> <!-- FIXME: CAN'T RUN IN BACKGROUND -->
-                <include>org.apache.felix:org.apache.felix.http.jetty</include>
                 <include>org.apache.servicemix.bundles:*</include>
+                <include>org.ops4j.pax.web:*</include>
+                <include>org.slf4j:*</include>
                 <include>org.codehaus.jettison:*</include>
             </includes>
             <fileMode>0444</fileMode>

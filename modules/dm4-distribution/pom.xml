@@ -47,22 +47,22 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.main</artifactId>
-            <version>3.2.2</version>
+            <version>4.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.command</artifactId>
-            <version>0.8.0</version>
+            <version>0.12.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.runtime</artifactId>
-            <version>0.8.0</version>
+            <version>0.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.gogo.shell</artifactId>
-            <version>0.8.0</version>
+            <version>0.10.0</version>
         </dependency>
     </dependencies>
 
