@@ -42,15 +42,20 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             Object entity = response.getEntity();
             boolean includeChilds = getIncludeChilds(request);
             if (entity != null) {
+                // 1) Loading child topics
+                if (entity instanceof DeepaMehtaObject) {
+                    loadChildTopics((DeepaMehtaObject) entity, includeChilds);
+                } else if (isIterable(response, DeepaMehtaObject.class)) {
+                    loadChildTopics((Iterable<DeepaMehtaObject>) entity, includeChilds);
+                }
+                // 2) Firing PRE_SEND events
                 if (entity instanceof TopicType) {          // Note: must take precedence over topic
                     firePreSend((TopicType) entity);
                 } else if (entity instanceof AssociationType) {
                     firePreSend((AssociationType) entity);  // Note: must take precedence over topic
                 } else if (entity instanceof Topic) {
-                    loadChildTopics((Topic) entity, includeChilds);
                     firePreSend((Topic) entity);
                 } else if (entity instanceof Association) {
-                    loadChildTopics((Association) entity, includeChilds);
                     firePreSend((Association) entity);
                 } else if (entity instanceof Directives) {
                     // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
@@ -62,9 +67,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 } else if (isIterable(response, AssociationType.class)) {
                     firePreSendAssociationTypes((Iterable<AssociationType>) entity);
                 } else if (isIterable(response, Topic.class)) {
-                    loadChildTopics((Iterable<Topic>) entity, includeChilds);
                     firePreSendTopics((Iterable<Topic>) entity);
-                // ### FIXME: Iterable<Association> responses not yet handled
+                // ### FIXME: for Iterable<Association> no PRE_SEND_ASSOCIATION events are fired
                 }
             }
             //
@@ -87,10 +91,10 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    private void loadChildTopics(Iterable<Topic> topics, boolean includeChilds) {
+    private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds) {
         if (includeChilds) {
-            for (Topic topic : topics) {
-                topic.loadChildTopics();
+            for (DeepaMehtaObject object : objects) {
+                object.loadChildTopics();
             }
         }
     }
