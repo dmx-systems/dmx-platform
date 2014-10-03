@@ -16,6 +16,7 @@
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
+        <!-- ### TODO: adapt to Pax Web (see global pom.xml) -->
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
         <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>

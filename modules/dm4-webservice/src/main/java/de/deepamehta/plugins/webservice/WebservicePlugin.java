@@ -3,6 +3,7 @@ package de.deepamehta.plugins.webservice;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -302,6 +303,19 @@ public class WebservicePlugin extends PluginActivator {
             othersTopicTypeUri, maxResultSize);
     }
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/topic/{id}/related_assocs")
+    public List<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")            long topicId,
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+        Topic topic = dms.getTopic(topicId);
+        return getRelatedAssociations(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
+    }
+
 
 
     // ****************************
@@ -339,6 +353,22 @@ public class WebservicePlugin extends PluginActivator {
             logger.info(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
                 maxResultSize);
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed " + paramInfo, e);
+        }
+    }
+
+    private List<RelatedAssociation> getRelatedAssociations(DeepaMehtaObject object, String objectInfo,
+                                                            String assocTypeUri, String myRoleTypeUri,
+                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
+        String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
+        String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
+        try {
+            logger.info(operation + " " + paramInfo);
+            // ### TODO: move getRelatedAssociations() to DeepaMehtaObject. Remove cast then.
+            return ((Topic) object).getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }
