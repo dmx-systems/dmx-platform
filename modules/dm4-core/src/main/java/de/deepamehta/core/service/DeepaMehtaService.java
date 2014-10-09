@@ -107,7 +107,7 @@ public interface DeepaMehtaService {
 
     // ---
 
-    List<RelatedAssociation> getAssociations(String assocTypeUri);
+    ResultList<RelatedAssociation> getAssociations(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.

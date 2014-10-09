@@ -221,7 +221,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public List<RelatedAssociation> getAssociations(String assocTypeUri) {
+    public ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
         try {
             return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
                 "dm4.core.type", "dm4.core.instance", assocTypeUri);
@@ -621,8 +621,8 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedAssociation(model, this);
     }
 
-    List<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
-        List<RelatedAssociation> relAssocs = new ArrayList();
+    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
+        ResultList<RelatedAssociation> relAssocs = new ResultList();
         for (RelatedAssociationModel model : models) {
             relAssocs.add(instantiateRelatedAssociation(model));
         }

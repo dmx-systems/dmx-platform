@@ -107,7 +107,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   maxResultSize       Result size limit. Pass 0 for no limit.
      */
     ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, int maxResultSize);
+                                              String othersTopicTypeUri, int maxResultSize);
 
     /**
      * @param   assocTypeUris       may *not* be null
@@ -116,14 +116,33 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                    String othersTopicTypeUri, int maxResultSize);
+                                              String othersTopicTypeUri, int maxResultSize);
 
-     // --- Association Retrieval ---
+    // --- Association Retrieval ---
 
-     Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                             long othersTopicId);
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     */
+    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                             String othersAssocTypeUri);
 
-     List<Association> getAssociations();
+    /**
+     * @param   assocTypeUri        may be null
+     * @param   myRoleTypeUri       may be null
+     * @param   othersRoleTypeUri   may be null
+     * @param   othersAssocTypeUri  may be null
+     */
+    ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                          String othersRoleTypeUri, String othersAssocTypeUri);
+
+    // ---
+
+    Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
+
+    List<Association> getAssociations();
 
 
 

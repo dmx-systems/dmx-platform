@@ -102,28 +102,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
-    // === Traversal ===
-
-    // --- Association Retrieval ---
-
-    @Override
-    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(), assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
-    }
-
-    @Override
-    public List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModel> assocs = dms.storageDecorator.fetchTopicRelatedAssociations(getId(), assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return dms.instantiateRelatedAssociations(assocs);
-    }
-
-
-
     // ***************************************
     // *** DeepaMehtaObject Implementation ***
     // ***************************************
@@ -137,12 +115,30 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                      String othersTopicTypeUri, int maxResultSize) {
-        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUris,
-            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(),
+            assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
         return dms.instantiateRelatedTopics(topics);
     }
 
     // --- Association Retrieval ---
+
+    @Override
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
+    }
+
+    @Override
+    public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
+        ResultList<RelatedAssociationModel> assocs = dms.storageDecorator.fetchTopicRelatedAssociations(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return dms.instantiateRelatedAssociations(assocs);
+    }
+
+    // ---
 
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,

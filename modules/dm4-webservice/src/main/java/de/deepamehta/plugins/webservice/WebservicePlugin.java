@@ -306,7 +306,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_assocs")
-    public List<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")            long topicId,
+    public ResultList<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")      long topicId,
                                                        @QueryParam("assoc_type_uri")        String assocTypeUri,
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
@@ -358,17 +358,15 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
-    private List<RelatedAssociation> getRelatedAssociations(DeepaMehtaObject object, String objectInfo,
-                                                            String assocTypeUri, String myRoleTypeUri,
-                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
+    private ResultList<RelatedAssociation> getRelatedAssociations(DeepaMehtaObject object, String objectInfo,
+                                                                  String assocTypeUri, String myRoleTypeUri,
+                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
         try {
             logger.info(operation + " " + paramInfo);
-            // ### TODO: move getRelatedAssociations() to DeepaMehtaObject. Remove cast then.
-            return ((Topic) object).getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                othersAssocTypeUri);
+            return object.getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

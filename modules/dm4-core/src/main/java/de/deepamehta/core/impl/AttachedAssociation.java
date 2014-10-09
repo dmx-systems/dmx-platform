@@ -219,18 +219,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
-    // === Traversal ===
-
-    @Override
-    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                                         String othersRoleTypeUri) {
-        RelatedAssociationModel assoc = dms.storageDecorator.fetchAssociationRelatedAssociation(getId(),
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, null); // othersAssocTypeUri=null
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null; 
-    }
-
-
-
     // ***************************************
     // *** DeepaMehtaObject Implementation ***
     // ***************************************
@@ -250,6 +238,24 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     // --- Association Retrieval ---
+
+    @Override
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssociationModel assoc = dms.storageDecorator.fetchAssociationRelatedAssociation(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null; 
+    }
+
+    @Override
+    public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
+        ResultList<RelatedAssociationModel> assocs = dms.storageDecorator.fetchAssociationRelatedAssociations(getId(),
+            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return dms.instantiateRelatedAssociations(assocs); 
+    }
+
+    // ---
 
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,

@@ -321,7 +321,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewmodel> assocs = new HashMap();
-        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
+        ResultList<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
             "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), new AssociationViewmodel(assoc.getModel()));

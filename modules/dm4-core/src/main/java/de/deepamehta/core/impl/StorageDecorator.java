@@ -323,8 +323,8 @@ public class StorageDecorator {
      *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
+                                                          String myRoleTypeUri, String othersRoleTypeUri,
+                                                          String othersTopicTypeUri, int maxResultSize) {
         List<RelatedTopicModel> relTopics = storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
@@ -343,8 +343,8 @@ public class StorageDecorator {
      *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
+                                                          String myRoleTypeUri, String othersRoleTypeUri,
+                                                          String othersTopicTypeUri, int maxResultSize) {
         ResultList<RelatedTopicModel> result = new ResultList();
         for (String assocTypeUri : assocTypeUris) {
             ResultList<RelatedTopicModel> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
@@ -363,16 +363,16 @@ public class StorageDecorator {
      *          Note: its child topics are not fetched.
      */
     RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+                                                         String othersRoleTypeUri, String othersAssocTypeUri) {
+        ResultList<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.size()) {
+        switch (assocs.getSize()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
         }
@@ -387,10 +387,12 @@ public class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return storage.fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
+    ResultList<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                                      String othersAssocTypeUri) {
+        List<RelatedAssociationModel> relAssocs = storage.fetchTopicRelatedAssociations(topicId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return new ResultList(relAssocs.size(), relAssocs);
     }
 
     // ---
@@ -422,8 +424,8 @@ public class StorageDecorator {
      *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                                                      String myRoleTypeUri, String othersRoleTypeUri,
-                                                                      String othersTopicTypeUri, int maxResultSize) {
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
         List<RelatedTopicModel> relTopics = storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
@@ -442,8 +444,8 @@ public class StorageDecorator {
      *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
-                                                                      String myRoleTypeUri, String othersRoleTypeUri,
-                                                                      String othersTopicTypeUri, int maxResultSize) {
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
         ResultList<RelatedTopicModel> result = new ResultList();
         for (String assocTypeUri : assocTypeUris) {
             ResultList<RelatedTopicModel> res = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
@@ -463,15 +465,15 @@ public class StorageDecorator {
      */
     RelatedAssociationModel fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.size()) {
+        ResultList<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.getSize()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (assocId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri +
                 "\"),\nresult=" + assocs);
@@ -487,10 +489,12 @@ public class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
+    ResultList<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                                                         String myRoleTypeUri, String othersRoleTypeUri,
+                                                                         String othersAssocTypeUri) {
+        List<RelatedAssociationModel> relAssocs = storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return new ResultList(relAssocs.size(), relAssocs);
     }
 
     // ---

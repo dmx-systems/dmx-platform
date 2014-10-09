@@ -87,6 +87,6 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
     @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
-        return dms.getAssociations(getUri());
+        return dms.getAssociations(getUri()).getItems();
     }
 }

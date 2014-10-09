@@ -466,7 +466,7 @@ class TypeStorageImpl implements TypeStorage {
             if (assocDef != null) {
                 sequence.add(assocDef.getModel());
                 while ((assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor",
-                    "dm4.core.successor")) != null) {
+                    "dm4.core.successor", null)) != null) {
                     //
                     sequence.add(assocDef.getModel());
                 }

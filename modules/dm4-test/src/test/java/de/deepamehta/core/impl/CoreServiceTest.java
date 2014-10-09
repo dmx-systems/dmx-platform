@@ -197,25 +197,28 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         //
         // find assoc def 1/3
         RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
-            "dm4.core.sequence_start", null);     // othersAssocTypeUri=null
+            "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
         logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
             ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
         assertNotNull(assocDef);
         //
         // find assoc def 2/3
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+            null);                              // othersAssocTypeUri=null
         logger.info("### assoc def ID 2/3 = " + assocDef.getId() +
             ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
         assertNotNull(assocDef);
         //
         // find assoc def 3/3
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+            null);                              // othersAssocTypeUri=null
         logger.info("### assoc def ID 3/3 = " + assocDef.getId() +
             ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
         assertNotNull(assocDef);
         //
         // there is no other
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor");
+        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+            null);                              // othersAssocTypeUri=null
         assertNull(assocDef);
     }
 
@@ -232,16 +235,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getAssociationsByType() { 
-        List<RelatedAssociation> assocs;
+        ResultList<RelatedAssociation> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
-        assertEquals(48, assocs.size());
+        assertEquals(48, assocs.getSize());
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
-        assertEquals(5, assocs.size());
+        assertEquals(5, assocs.getSize());
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.aggregation_def");
-        assertEquals(0, assocs.size());
+        assertEquals(0, assocs.getSize());
     }
 
     // ---
@@ -358,7 +361,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociationAndTraverse() {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic t0;
-        List<RelatedAssociation> assocs;
+        ResultList<RelatedAssociation> assocs;
         try {
             setupTestAssociations();
             //
@@ -366,10 +369,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // execute query
             assocs = getTestAssociations(t0);
-            assertEquals(3, assocs.size());     // we have 3 associations
+            assertEquals(3, assocs.getSize());  // we have 3 associations
             //
             // retype the first association
-            Association assoc = assocs.get(0);
+            Association assoc = assocs.getItems().get(0);
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
             assertEquals("dm4.core.composition", assoc.getTypeUri());
@@ -378,7 +381,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             assocs = getTestAssociations(t0);
-            assertEquals(2, assocs.size());     // now we have 2 associations
+            assertEquals(2, assocs.getSize());  // now we have 2 associations
             // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
             // ### created within the same transaction!
             //
@@ -388,7 +391,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         assocs = getTestAssociations(t0);
-        assertEquals(2, assocs.size());         // we still have 2 associations
+        assertEquals(2, assocs.getSize());      // we still have 2 associations
     }
 
     @Test
@@ -468,7 +471,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dm4.core.type", "dm4.core.instance", type.getUri(), 0);
     }
 
-    private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
+    private ResultList<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
         return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", assocTypeUri);
     }
@@ -527,7 +530,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             "dm4.core.default", "dm4.core.default", "dm4.core.plugin", 0);
     }
 
-    private List<RelatedAssociation> getTestAssociations(Topic topic) {
+    private ResultList<RelatedAssociation> getTestAssociations(Topic topic) {
         return topic.getRelatedAssociations("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.association");
     }
