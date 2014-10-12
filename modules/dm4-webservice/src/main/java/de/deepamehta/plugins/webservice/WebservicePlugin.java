@@ -338,6 +338,19 @@ public class WebservicePlugin extends PluginActivator {
             othersTopicTypeUri, maxResultSize);
     }
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/association/{id}/related_assocs")
+    public ResultList<RelatedAssociation> getAssociationRelatedAssociations(@PathParam("id") long assocId,
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+        Association assoc = dms.getAssociation(assocId);
+        return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
