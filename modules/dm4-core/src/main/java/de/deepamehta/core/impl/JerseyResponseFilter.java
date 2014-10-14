@@ -61,6 +61,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
                     // E.g. the Access Control plugin must enrich updated objects with permission information.
                     // ### TODO: check if this is still required. Meanwhile permissions are not an enrichment anymore.
+                    // ### Update: Yes, it is still required, e.g. by the Time plugin when enriching with timestamps.
                     firePreSend((Directives) entity);
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity);

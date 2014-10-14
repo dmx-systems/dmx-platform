@@ -241,6 +241,14 @@ function RESTClient(config) {
 
 
 
+    // === Role Types ===
+
+    this.create_role_type = function(topic_model) {
+        return request("POST", "/core/roletype", topic_model)
+    }
+
+
+
     // === Plugins ===
 
     this.get_plugins = function() {

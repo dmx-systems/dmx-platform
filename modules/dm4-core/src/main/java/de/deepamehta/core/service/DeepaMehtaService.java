@@ -171,6 +171,12 @@ public interface DeepaMehtaService {
 
 
 
+    // === Role Types ===
+
+    Topic createRoleType(TopicModel model);
+
+
+
     // === Plugins ===
 
     Plugin getPlugin(String pluginUri);

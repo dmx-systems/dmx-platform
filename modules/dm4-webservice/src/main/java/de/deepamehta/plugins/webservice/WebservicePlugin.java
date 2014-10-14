@@ -206,8 +206,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/topictype")
     @Transactional
-    public TopicType createTopicType(TopicTypeModel topicTypeModel) {
-        return dms.createTopicType(topicTypeModel);
+    public TopicType createTopicType(TopicTypeModel model) {
+        return dms.createTopicType(model);
     }
 
     @PUT
@@ -251,8 +251,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/assoctype")
     @Transactional
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel) {
-        return dms.createAssociationType(assocTypeModel);
+    public AssociationType createAssociationType(AssociationTypeModel model) {
+        return dms.createAssociationType(model);
     }
 
     @PUT
@@ -269,6 +269,17 @@ public class WebservicePlugin extends PluginActivator {
     public Directives deleteAssociationType(@PathParam("uri") String uri) {
         dms.deleteAssociationType(uri);
         return Directives.get();
+    }
+
+
+
+    // === Role Types ===
+
+    @POST
+    @Path("/roletype")
+    @Transactional
+    public Topic createRoleType(TopicModel model) {
+        return dms.createRoleType(model);
     }
 
 

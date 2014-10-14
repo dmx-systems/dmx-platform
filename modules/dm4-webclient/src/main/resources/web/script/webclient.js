@@ -244,6 +244,13 @@ dm4c = new function() {
         dm4c.show_topic(assoc_type, "edit", undefined, true)    // coordinates=undefined, do_center=true
     }
 
+    this.do_create_role_type = function(topic_model) {
+        // update DB
+        var role_type = dm4c.create_role_type(topic_model)
+        // update client model and GUI
+        dm4c.show_topic(role_type, "edit", undefined, true)     // coordinates=undefined, do_center=true
+    }
+
     // ---
 
     /**
@@ -723,14 +730,14 @@ dm4c = new function() {
      * @return  The topic as stored in the DB.
      */
     this.create_topic = function(type_uri, childs) {
-        // update DB
+        // 1) update DB
         var topic_model = {
             // Note: "uri", "value", and "childs" are optional
             type_uri: type_uri,
             childs: childs    // not serialized to request body if undefined
         }
         var topic = build_topic(dm4c.restc.create_topic(topic_model))
-        // fire event
+        // 2) fire event
         dm4c.fire_event("post_create_topic", topic)
         //
         return topic
@@ -786,6 +793,15 @@ dm4c = new function() {
         dm4c.fire_event("post_create_topic", assoc_type)
         //
         return assoc_type
+    }
+
+    this.create_role_type = function(topic_model) {
+        // 1) update DB
+        var role_type = build_topic(dm4c.restc.create_role_type(topic_model))
+        // 2) fire event
+        dm4c.fire_event("post_create_topic", role_type)
+        //
+        return role_type
     }
 
 
