@@ -466,7 +466,7 @@ class TypeStorageImpl implements TypeStorage {
             if (assocDef != null) {
                 sequence.add(assocDef.getModel());
                 while ((assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor",
-                    "dm4.core.successor")) != null) {
+                    "dm4.core.successor", null)) != null) {
                     //
                     sequence.add(assocDef.getModel());
                 }
@@ -552,7 +552,7 @@ class TypeStorageImpl implements TypeStorage {
     void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
-            new AttachedAssociationDefinition(assocDef, dms).getCompositeValue()
+            new AttachedAssociationDefinition(assocDef, dms).getChildTopics()
                 .set("dm4.core.include_in_label", includeInLabel);
         }
     }
@@ -590,13 +590,13 @@ class TypeStorageImpl implements TypeStorage {
     // ---
 
     private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
-        // Note: the composite is not fetched as it is not needed
+        // Note: the child topics are not fetched as they are not needed
         return dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.view_config", configTypeUri);
     }
 
     private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
-        // Note: the composite is not fetched as it is not needed
+        // Note: the child topics are not fetched as they are not needed
         return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
             "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
     }
@@ -642,7 +642,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
             // ### TODO: do not create an attached topic here. Can we use the value storage?
-            new AttachedTopic(configTopic, dms).getCompositeValue().set(settingUri, value);
+            new AttachedTopic(configTopic, dms).getChildTopics().set(settingUri, value);
         } catch (Exception e) {
             throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
                 ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +

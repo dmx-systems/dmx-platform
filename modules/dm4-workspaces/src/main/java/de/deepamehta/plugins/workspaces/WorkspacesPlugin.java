@@ -10,7 +10,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -104,7 +104,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public Topic createWorkspace(String name, String uri, String workspaceTypeUri) {
         logger.info("Creating workspace \"" + name + "\"");
-        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new CompositeValueModel()
+        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
             .put("dm4.workspaces.name", name)
             .putRef("dm4.workspaces.type", workspaceTypeUri)
         ));

@@ -3,6 +3,7 @@ package de.deepamehta.plugins.webservice;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -49,28 +50,28 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Topics ===
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}")
     public Topic getTopic(@PathParam("id") long topicId) {
         return dms.getTopic(topicId);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dms.getTopic(key, value);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> getTopics(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dms.getTopics(key, value);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_type/{type_uri}")
     public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
@@ -78,7 +79,7 @@ public class WebservicePlugin extends PluginActivator {
         return dms.getTopics(typeUri, maxResultSize);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
     public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
@@ -116,14 +117,14 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Associations ===
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}")
     public Association getAssociation(@PathParam("id") long assocId) {
         return dms.getAssociation(assocId);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
@@ -134,7 +135,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // ---
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
@@ -142,7 +143,7 @@ public class WebservicePlugin extends PluginActivator {
         return dms.getAssociations(topic1Id, topic2Id);
     }
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
@@ -205,8 +206,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/topictype")
     @Transactional
-    public TopicType createTopicType(TopicTypeModel topicTypeModel) {
-        return dms.createTopicType(topicTypeModel);
+    public TopicType createTopicType(TopicTypeModel model) {
+        return dms.createTopicType(model);
     }
 
     @PUT
@@ -250,8 +251,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/assoctype")
     @Transactional
-    public AssociationType createAssociationType(AssociationTypeModel assocTypeModel) {
-        return dms.createAssociationType(assocTypeModel);
+    public AssociationType createAssociationType(AssociationTypeModel model) {
+        return dms.createAssociationType(model);
     }
 
     @PUT
@@ -272,6 +273,17 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
+    // === Role Types ===
+
+    @POST
+    @Path("/roletype")
+    @Transactional
+    public Topic createRoleType(TopicModel model) {
+        return dms.createRoleType(model);
+    }
+
+
+
     // === Plugins ===
 
     @GET
@@ -288,7 +300,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_topics")
     public ResultList<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                    long topicId,
@@ -302,6 +314,19 @@ public class WebservicePlugin extends PluginActivator {
             othersTopicTypeUri, maxResultSize);
     }
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/topic/{id}/related_assocs")
+    public ResultList<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")      long topicId,
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+        Topic topic = dms.getTopic(topicId);
+        return getRelatedAssociations(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
+    }
+
 
 
     // ****************************
@@ -310,7 +335,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // Note: the "fetch_composite" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_topics")
     public ResultList<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")              long assocId,
@@ -322,6 +347,19 @@ public class WebservicePlugin extends PluginActivator {
         Association assoc = dms.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);
+    }
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/association/{id}/related_assocs")
+    public ResultList<RelatedAssociation> getAssociationRelatedAssociations(@PathParam("id") long assocId,
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
+        Association assoc = dms.getAssociation(assocId);
+        return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri);
     }
 
 
@@ -339,6 +377,20 @@ public class WebservicePlugin extends PluginActivator {
             logger.info(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
                 maxResultSize);
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed " + paramInfo, e);
+        }
+    }
+
+    private ResultList<RelatedAssociation> getRelatedAssociations(DeepaMehtaObject object, String objectInfo,
+                                                                  String assocTypeUri, String myRoleTypeUri,
+                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
+        String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
+        String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
+        try {
+            logger.info(operation + " " + paramInfo);
+            return object.getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

@@ -24,7 +24,7 @@
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",
-                            composite: {
+                            childs: {
                                 dm4.webclient.simple_renderer_uri: "dm4.webclient.title_renderer"
                             }
                         }
@@ -37,7 +37,7 @@
                     view_config_topics: [
                         {
                             type_uri: "dm4.webclient.view_config",
-                            composite: {
+                            childs: {
                                 dm4.webclient.input_field_rows: 15,
                                 dm4.webclient.simple_renderer_uri: "dm4.webclient.body_text_renderer"
                             }
@@ -48,7 +48,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/de.deepamehta.notes/images/yellow-ball.png",
                         dm4.webclient.show_in_create_menu: true,
                         dm4.webclient.searchable_as_unit: true

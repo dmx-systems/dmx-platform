@@ -846,7 +846,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             uri(topicNode),
             typeUri(topicNode),
             simpleValue(topicNode),
-            null    // composite=null
+            null    // childTopics=null
         );
     }
 
@@ -868,7 +868,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             typeUri(assocNode),
             roleModels.get(0), roleModels.get(1),
             simpleValue(assocNode),
-            null    // composite=null
+            null    // childTopics=null
         );
     }
 

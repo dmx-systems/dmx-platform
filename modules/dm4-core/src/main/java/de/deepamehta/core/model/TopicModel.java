@@ -16,8 +16,8 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(typeUri, value);
     }
 
-    public TopicModel(String typeUri, CompositeValueModel composite) {
-        super(typeUri, composite);
+    public TopicModel(String typeUri, ChildTopicsModel childTopics) {
+        super(typeUri, childTopics);
     }
 
     public TopicModel(String uri, String typeUri) {
@@ -28,8 +28,8 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(uri, typeUri, value);
     }
 
-    public TopicModel(String uri, String typeUri, CompositeValueModel composite) {
-        super(uri, typeUri, composite);
+    public TopicModel(String uri, String typeUri, ChildTopicsModel childTopics) {
+        super(uri, typeUri, childTopics);
     }
 
     public TopicModel(long id) {
@@ -40,18 +40,18 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(id, typeUri);
     }
 
-    public TopicModel(long id, CompositeValueModel composite) {
-        super(id, composite);
+    public TopicModel(long id, ChildTopicsModel childTopics) {
+        super(id, childTopics);
     }
 
     /**
      * @param   uri         If <code>null</code> an empty string is set. This is OK.
      * @param   typeUri     Mandatory. Note: only the internal meta type topic (ID 0) has no type URI (null).
      * @param   value       If <code>null</code> an empty string value is set. This is OK.
-     * @param   composite   If <code>null</code> an empty composite is set. This is OK.
+     * @param   childTopics If <code>null</code> an empty composite is set. This is OK.
      */
-    public TopicModel(long id, String uri, String typeUri, SimpleValue value, CompositeValueModel composite) {
-        super(id, uri, typeUri, value, composite);
+    public TopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics) {
+        super(id, uri, typeUri, value, childTopics);
     }
 
     public TopicModel(TopicModel model) {

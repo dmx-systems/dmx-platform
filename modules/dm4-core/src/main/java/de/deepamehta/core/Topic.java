@@ -29,30 +29,4 @@ public interface Topic extends DeepaMehtaObject {
     // === Updating ===
 
     void update(TopicModel model);
-
-
-
-    // === Traversal ===
-
-    // --- Association Retrieval ---
-
-    // ### TODO: move to DeepaMehtaObject
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersAssocTypeUri  may be null
-     */
-    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                             String othersAssocTypeUri);
-
-    // ### TODO: move to DeepaMehtaObject
-    /**
-     * @param   assocTypeUri        may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersAssocTypeUri  may be null
-     */
-    List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                    String othersAssocTypeUri);
 }

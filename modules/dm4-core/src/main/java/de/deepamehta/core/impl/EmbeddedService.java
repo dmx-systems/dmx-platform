@@ -44,8 +44,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DEFAULT_TOPIC_TYPE_URI = "domain.project.topic_type_";
-    private static final String DEFAULT_ASSOCIATION_TYPE_URI = "domain.project.assoc_type_";
+    private static final String URI_PREFIX_TOPIC_TYPE       = "domain.project.topic_type_";
+    private static final String URI_PREFIX_ASSOCIATION_TYPE = "domain.project.assoc_type_";
+    private static final String URI_PREFIX_ROLE_TYPE        = "domain.project.role_type_";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -151,14 +152,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic createTopic(TopicModel model) {
-        try {
-            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            Topic topic = topicFactory(model);
-            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
-            return topic;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating topic failed (" + model + ")", e);
-        }
+        return createTopic(model, null);    // uriPrefix=null
     }
 
     @Override
@@ -228,7 +222,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public List<RelatedAssociation> getAssociations(String assocTypeUri) {
+    public ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
         try {
             return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
                 "dm4.core.type", "dm4.core.instance", assocTypeUri);
@@ -464,6 +458,26 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
+    // === Role Types ===
+
+    @Override
+    public Topic createRoleType(TopicModel model) {
+        // check type URI argument
+        String typeUri = model.getTypeUri();
+        if (typeUri == null) {
+            model.setTypeUri("dm4.core.role_type");
+        } else {
+            if (!typeUri.equals("dm4.core.role_type")) {
+                throw new IllegalArgumentException("A role type is supposed to be of type \"dm4.core.role_type\" " +
+                    "(found: \"" + typeUri + "\")");
+            }
+        }
+        //
+        return createTopic(model, URI_PREFIX_ROLE_TYPE);
+    }
+
+
+
     // === Plugins ===
 
     @Override
@@ -594,9 +608,11 @@ public class EmbeddedService implements DeepaMehtaService {
         return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2));
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Instantiation ===
 
     /**
      * Attaches this core service to a topic model fetched from storage layer.
@@ -666,8 +682,8 @@ public class EmbeddedService implements DeepaMehtaService {
         return new AttachedRelatedAssociation(model, this);
     }
 
-    List<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
-        List<RelatedAssociation> relAssocs = new ArrayList();
+    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
+        ResultList<RelatedAssociation> relAssocs = new ResultList();
         for (RelatedAssociationModel model : models) {
             try {
                 relAssocs.add(instantiateRelatedAssociation(model, true));  // checkAccess=true
@@ -678,7 +694,22 @@ public class EmbeddedService implements DeepaMehtaService {
         return relAssocs;
     }
 
-    // ===
+
+
+    // === Factory ===
+
+    private Topic createTopic(TopicModel model, String uriPrefix) {
+        try {
+            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+            Topic topic = topicFactory(model, uriPrefix);
+            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+            return topic;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating topic failed (" + model + ")", e);
+        }
+    }
+
+    // ---
 
     private void checkAccess(TopicModel model, boolean checkAccess) {
         if (checkAccess) {
@@ -697,14 +728,24 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * Factory method: creates a new topic in the DB according to the given topic model and returns a topic instance.
      */
-    private Topic topicFactory(TopicModel model) {
+    private Topic topicFactory(TopicModel model, String uriPrefix) {
         // 1) store in DB
         storageDecorator.storeTopic(model);
         valueStorage.storeValue(model);
         createTopicInstantiation(model.getId(), model.getTypeUri());
         //
-        // 2) create application object
-        return new AttachedTopic(model, this);
+        // 2) instantiate
+        Topic topic = new AttachedTopic(model, this);
+        //
+        // 3) set default URI
+        // If no URI is given the topic gets a default URI based on its ID, if requested.
+        // Note: this must be done *after* the topic is stored. The ID is not known before.
+        // Note: in case no URI was given: once stored a topic's URI is empty (not null).
+        if (uriPrefix != null && topic.getUri().equals("")) {
+            topic.setUri(uriPrefix + topic.getId());
+        }
+        //
+        return topic;
     }
 
     /**
@@ -717,7 +758,7 @@ public class EmbeddedService implements DeepaMehtaService {
         valueStorage.storeValue(model);
         createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
-        // 2) create application object
+        // 2) instantiate
         return new AttachedAssociation(model, this);
     }
 
@@ -729,10 +770,10 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private TopicType topicTypeFactory(TopicTypeModel model) {
         // 1) store in DB
-        createTypeTopic(model, DEFAULT_TOPIC_TYPE_URI);         // store generic topic
-        typeStorage.storeType(model);                           // store type-specific parts
+        topicFactory(model, URI_PREFIX_TOPIC_TYPE);         // store generic topic
+        typeStorage.storeType(model);                       // store type-specific parts
         //
-        // 2) create application object
+        // 2) instantiate
         TopicType topicType = new AttachedTopicType(model, this);
         typeCache.putTopicType(topicType);
         //
@@ -745,25 +786,14 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private AssociationType associationTypeFactory(AssociationTypeModel model) {
         // 1) store in DB
-        createTypeTopic(model, DEFAULT_ASSOCIATION_TYPE_URI);   // store generic topic
-        typeStorage.storeType(model);                           // store type-specific parts
+        topicFactory(model, URI_PREFIX_ASSOCIATION_TYPE);   // store generic topic
+        typeStorage.storeType(model);                       // store type-specific parts
         //
-        // 2) create application object
+        // 2) instantiate
         AssociationType assocType = new AttachedAssociationType(model, this);
         typeCache.putAssociationType(assocType);
         //
         return assocType;
-    }
-
-    // ---
-
-    private void createTypeTopic(TopicModel model, String defaultUriPrefix) {
-        Topic typeTopic = topicFactory(model);
-        // If no URI is set the type gets a default URI based on its ID.
-        // Note: this must be done *after* the topic is created. The ID is not known before.
-        if (typeTopic.getUri().equals("")) {
-            typeTopic.setUri(defaultUriPrefix + typeTopic.getId());
-        }
     }
 
 

@@ -1,6 +1,7 @@
 dm4c.add_plugin("de.deepamehta.typeeditor", function() {
 
     // Note: no "uri" is set here. A new topic type gets its default URI at server-side.
+    // Note: also the "type_uri" is provided at server-side (see TopicTypeModel constructor).
     var DEFAULT_TOPIC_TYPE = {
         value: "Topic Type Name",
         data_type_uri: "dm4.core.text",
@@ -8,7 +9,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         view_config_topics: [
             {
                 type_uri: "dm4.webclient.view_config",
-                composite: {
+                childs: {
                     "dm4.webclient.show_in_create_menu": true
                 }
             }
@@ -16,6 +17,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     }
 
     // Note: no "uri" is set here. A new association type gets its default URI at server-side.
+    // Note: also the "type_uri" is provided at server-side (see AssociationTypeModel constructor).
     var DEFAULT_ASSOC_TYPE = {
         value: "Association Type Name",
         data_type_uri: "dm4.core.text",
@@ -23,11 +25,17 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         view_config_topics: [
             {
                 type_uri: "dm4.webclient.view_config",
-                composite: {
+                childs: {
                     "dm4.webclient.show_in_create_menu": true    // ### TODO
                 }
             }
         ]
+    }
+
+    // Note: no "uri" is set here. A new role type gets its default URI at server-side.
+    // Note: also the "type_uri" is provided at server-side (see EmbeddedService#createRoleType()).
+    var DEFAULT_ROLE_TYPE = {
+        value: "Role Type Name"
     }
 
     // === Webclient Listeners ===
@@ -60,8 +68,9 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         // WRITEability of the selected workspace.)
         var tt = dm4c.has_read_permission("dm4.core.topic_type")
         var at = dm4c.has_read_permission("dm4.core.assoc_type")
+        var rt = dm4c.has_read_permission("dm4.core.role_type")
         //
-        if (tt || at) {
+        if (tt || at || rt) {
             type_menu.add_separator()
         }
         //
@@ -73,6 +82,11 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         if (at) {
             type_menu.add_item({label: "New Association Type", handler: function() {
                 dm4c.do_create_association_type(DEFAULT_ASSOC_TYPE)
+            }})
+        }
+        if (rt) {
+            type_menu.add_item({label: "New Role Type", handler: function() {
+                dm4c.do_create_role_type(DEFAULT_ROLE_TYPE)
             }})
         }
     })

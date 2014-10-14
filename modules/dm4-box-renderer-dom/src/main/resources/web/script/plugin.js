@@ -153,8 +153,8 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             topic_view.dom.find(".topic-label").text(topic_view.label)
             // content
             if (topic_view.type_uri == "dm4.notes.note") {
-                // Note: newly created topics have an empty composite
-                var text = topic_view.composite["dm4.notes.text"]
+                // Note: newly created topics have no child topics
+                var text = topic_view.childs["dm4.notes.text"]
                 text && topic_view.dom.find(".topic-content").html(text.value)
             }
         }
@@ -176,7 +176,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             }
 
             function load_note() {
-                if (expanded && !topic_view.composite["dm4.notes.text"]) {
+                if (expanded && !topic_view.childs["dm4.notes.text"]) {
                     var note = dm4c.fetch_topic(topic_view.id)
                     canvas_view.update_topic(note)
                 }

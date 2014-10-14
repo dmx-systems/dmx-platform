@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-parent</artifactId>
-    <version>5</version>
+    <version>6</version>
     <packaging>pom</packaging>
 
     <properties>

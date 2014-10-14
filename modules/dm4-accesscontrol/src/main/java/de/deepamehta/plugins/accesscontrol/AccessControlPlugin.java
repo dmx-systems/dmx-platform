@@ -19,7 +19,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -460,10 +460,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
-            Topic usernameTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.username");
-            Topic passwordTopic = topic.getCompositeValue().getTopic("dm4.accesscontrol.password");
+            Topic usernameTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.username");
+            Topic passwordTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.password");
             String newUsername = usernameTopic.getSimpleValue().toString();
-            TopicModel oldUsernameTopic = oldModel.getCompositeValueModel().getTopic("dm4.accesscontrol.username",
+            TopicModel oldUsernameTopic = oldModel.getChildTopicsModel().getTopic("dm4.accesscontrol.username",
                 null);
             String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
             if (!newUsername.equals(oldUsername)) {
@@ -538,7 +538,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new CompositeValueModel()
+        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
             .put("dm4.accesscontrol.username", cred.username)
             .put("dm4.accesscontrol.password", cred.password)));
     }
@@ -780,7 +780,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The encryted password of the specified User Account.
      */
     private String password(Topic userAccount) {
-        return userAccount.getCompositeValue().getString("dm4.accesscontrol.password");
+        return userAccount.getChildTopics().getString("dm4.accesscontrol.password");
     }
 
     // ---
@@ -1022,27 +1022,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
         // ### TODO: rethink this and possibly simplify the code. Meanwhile CREATE is dropped and we enrich with
         // only *one* permission (WRITE).
-        CompositeValueModel typePermissions = permissions(type);
+        ChildTopicsModel typePermissions = permissions(type);
         typePermissions.put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri));
     }
 
-    private CompositeValueModel permissions(DeepaMehtaObject object) {
+    private ChildTopicsModel permissions(DeepaMehtaObject object) {
         // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
         // Permissions are for transfer only, recalculated for each request, not stored in DB.
         // Note 2: The permissions topic exists only in the object's model (see note below).
         // There is no corresponding topic in the attached composite value. So we must query the model here.
-        // (object.getCompositeValue().getTopic(...) would not work)
-        TopicModel permissionsTopic = object.getCompositeValue().getModel()
+        // (object.getChildTopics().getTopic(...) would not work)
+        TopicModel permissionsTopic = object.getChildTopics().getModel()
             .getTopic("dm4.accesscontrol.permissions", null);
-        CompositeValueModel permissions;
+        ChildTopicsModel permissions;
         if (permissionsTopic != null) {
-            permissions = permissionsTopic.getCompositeValueModel();
+            permissions = permissionsTopic.getChildTopicsModel();
         } else {
-            permissions = new CompositeValueModel();
+            permissions = new ChildTopicsModel();
             // Note: we put the permissions topic directly in the model here (instead of the attached composite value).
             // The "permissions" topic is for transfer only. It must not be stored in the DB (as it would when putting
             // it in the attached composite value).
-            object.getCompositeValue().getModel().put("dm4.accesscontrol.permissions", permissions);
+            object.getChildTopics().getModel().put("dm4.accesscontrol.permissions", permissions);
         }
         return permissions;
     }

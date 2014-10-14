@@ -1,11 +1,11 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.CompositeValue;
+import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
@@ -23,11 +23,11 @@ import java.util.logging.Logger;
 /**
  * A composite value model that is attached to the DB.
  */
-class AttachedCompositeValue implements CompositeValue {
+class AttachedChildTopics implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private CompositeValueModel model;                          // underlying model
+    private ChildTopicsModel model;                             // underlying model
 
     private AttachedDeepaMehtaObject parent;                    // attached object cache
 
@@ -43,7 +43,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedCompositeValue(CompositeValueModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
+    AttachedChildTopics(ChildTopicsModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
@@ -54,9 +54,9 @@ class AttachedCompositeValue implements CompositeValue {
 
 
 
-    // *************************************
-    // *** CompositeValue Implementation ***
-    // *************************************
+    // **********************************
+    // *** ChildTopics Implementation ***
+    // **********************************
 
 
 
@@ -99,7 +99,7 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     @Override
-    public CompositeValueModel getModel() {
+    public ChildTopicsModel getModel() {
         return model;
     }
 
@@ -140,8 +140,8 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     @Override
-    public CompositeValue getCompositeValue(String childTypeUri) {
-        return getTopic(childTypeUri).getCompositeValue();
+    public ChildTopics getChildTopics(String childTypeUri) {
+        return getTopic(childTypeUri).getChildTopics();
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
@@ -151,36 +151,36 @@ class AttachedCompositeValue implements CompositeValue {
     // === Manipulators ===
 
     @Override
-    public CompositeValue set(String childTypeUri, TopicModel value) {
+    public ChildTopics set(String childTypeUri, TopicModel value) {
         return _update(childTypeUri, value);
     }
 
     @Override
-    public CompositeValue set(String childTypeUri, Object value) {
+    public ChildTopics set(String childTypeUri, Object value) {
         return _update(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
     }
 
     @Override
-    public CompositeValue set(String childTypeUri, CompositeValueModel value) {
+    public ChildTopics set(String childTypeUri, ChildTopicsModel value) {
         return _update(childTypeUri, new TopicModel(childTypeUri, value));
     }
 
     // ---
 
     @Override
-    public CompositeValue setRef(String childTypeUri, long refTopicId) {
+    public ChildTopics setRef(String childTypeUri, long refTopicId) {
         return _update(childTypeUri, new TopicReferenceModel(refTopicId));
     }
 
     @Override
-    public CompositeValue setRef(String childTypeUri, String refTopicUri) {
+    public ChildTopics setRef(String childTypeUri, String refTopicUri) {
         return _update(childTypeUri, new TopicReferenceModel(refTopicUri));
     }
 
     // ---
 
     @Override
-    public CompositeValue remove(String childTypeUri, long topicId) {
+    public ChildTopics remove(String childTypeUri, long topicId) {
         return _update(childTypeUri, new TopicDeletionModel(topicId));
     }
 
@@ -188,7 +188,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(CompositeValueModel newComp) {
+    void update(ChildTopicsModel newComp) {
         try {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
                 String childTypeUri   = assocDef.getChildTypeUri();
@@ -217,7 +217,7 @@ class AttachedCompositeValue implements CompositeValue {
             dms.valueStorage.refreshLabel(parent.getModel());
             //
         } catch (Exception e) {
-            throw new RuntimeException("Updating composite value of " + parent.className() + " " + parent.getId() +
+            throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
                 " failed (newComp=" + newComp + ")", e);
         }
     }
@@ -248,7 +248,7 @@ class AttachedCompositeValue implements CompositeValue {
     // ---
 
     void loadChildTopics() {
-        dms.valueStorage.fetchCompositeValue(parent.getModel());
+        dms.valueStorage.fetchChildTopics(parent.getModel());
         initAttachedObjectCache();
     }
 
@@ -323,7 +323,7 @@ class AttachedCompositeValue implements CompositeValue {
 
     // ---
 
-    private CompositeValue _update(String childTypeUri, TopicModel newChildTopic) {
+    private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
         // regard parent object as updated
         parent.addUpdateDirective();
         //
@@ -363,7 +363,7 @@ class AttachedCompositeValue implements CompositeValue {
                 // update DB
                 childTopic.delete();
                 // update memory
-                removeFromCompositeValue(childTopic, assocDef);
+                removeFromChildTopics(childTopic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -393,7 +393,7 @@ class AttachedCompositeValue implements CompositeValue {
             Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
                 (TopicReferenceModel) newChildTopic, assocDef);
             // update memory
-            putInCompositeValue(topic, assocDef);
+            putInChildTopics(topic, assocDef);
         } else if (newChildTopic.getId() != -1) {
             // == update child ==
             updateChildTopicOne(newChildTopic, assocDef);
@@ -421,7 +421,7 @@ class AttachedCompositeValue implements CompositeValue {
                 // update DB
                 childTopic.getRelatingAssociation().delete();
                 // update memory
-                removeFromCompositeValue(childTopic, assocDef);
+                removeFromChildTopics(childTopic, assocDef);
             } else if (newChildTopic instanceof TopicReferenceModel) {
                 if (isReferingToAny((TopicReferenceModel) newChildTopic, assocDef)) {
                     // Note: "create assignment" is an idempotent operation. A create request for an assignment which
@@ -433,7 +433,7 @@ class AttachedCompositeValue implements CompositeValue {
                 Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
                     (TopicReferenceModel) newChildTopic, assocDef);
                 // update memory
-                addToCompositeValue(topic, assocDef);
+                addToChildTopics(topic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -477,7 +477,7 @@ class AttachedCompositeValue implements CompositeValue {
         Topic childTopic = dms.createTopic(newChildTopic);
         dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
         // update memory
-        putInCompositeValue(childTopic, assocDef);
+        putInChildTopics(childTopic, assocDef);
     }
 
     private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef) {
@@ -485,7 +485,7 @@ class AttachedCompositeValue implements CompositeValue {
         Topic childTopic = dms.createTopic(newChildTopic);
         dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
         // update memory
-        addToCompositeValue(childTopic, assocDef);
+        addToChildTopics(childTopic, assocDef);
     }
 
 
@@ -524,7 +524,7 @@ class AttachedCompositeValue implements CompositeValue {
                 topics.add(createAttachedObject(childTopic));
             }
         } else {
-            throw new RuntimeException("Unexpected value in a CompositeValueModel: " + value);
+            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
         }
     }
 
@@ -552,7 +552,7 @@ class AttachedCompositeValue implements CompositeValue {
     /**
      * For single-valued childs
      */
-    private void putInCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+    private void putInChildTopics(Topic childTopic, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         put(childTypeUri, childTopic);                              // attached object cache
         getModel().put(childTypeUri, childTopic.getModel());        // underlying model
@@ -561,7 +561,7 @@ class AttachedCompositeValue implements CompositeValue {
     /**
      * For multiple-valued childs
      */
-    private void addToCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+    private void addToChildTopics(Topic childTopic, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         add(childTypeUri, childTopic);                              // attached object cache
         getModel().add(childTypeUri, childTopic.getModel());        // underlying model
@@ -570,7 +570,7 @@ class AttachedCompositeValue implements CompositeValue {
     /**
      * For multiple-valued childs
      */
-    private void removeFromCompositeValue(Topic childTopic, AssociationDefinition assocDef) {
+    private void removeFromChildTopics(Topic childTopic, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         remove(childTypeUri, childTopic);                           // attached object cache
         getModel().remove(childTypeUri, childTopic.getModel());     // underlying model

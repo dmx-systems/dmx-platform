@@ -39,7 +39,7 @@ public class StorageDecorator {
 
     /**
      * @return  The fetched topic.
-     *          Note: its composite value is not initialized.
+     *          Note: its child topics are not fetched.
      */
     TopicModel fetchTopic(long topicId) {
         return storage.fetchTopic(topicId);
@@ -57,7 +57,7 @@ public class StorageDecorator {
      * (for dynamically created data fields, typically in migration classes).
      *
      * @return  The fetched topic.
-     *          Note: its composite value is not initialized.
+     *          Note: its child topics are not fetched.
      */
     TopicModel fetchTopic(String key, SimpleValue value) {
         return storage.fetchTopic(key, value.value());
@@ -71,7 +71,7 @@ public class StorageDecorator {
 
     /**
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     List<TopicModel> queryTopics(String searchTerm, String fieldUri) {
         return storage.queryTopics(fieldUri, searchTerm);
@@ -278,7 +278,7 @@ public class StorageDecorator {
 
     /**
      * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     List<AssociationModel> fetchTopicAssociations(long topicId) {
         return storage.fetchTopicAssociations(topicId);
@@ -298,8 +298,8 @@ public class StorageDecorator {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      *
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     * @return  The fetched topic.
+     *          Note: its child topics are not fetched.
      */
     RelatedTopicModel fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
@@ -324,11 +324,11 @@ public class StorageDecorator {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
+                                                          String myRoleTypeUri, String othersRoleTypeUri,
+                                                          String othersTopicTypeUri, int maxResultSize) {
         List<RelatedTopicModel> relTopics = storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
@@ -344,11 +344,11 @@ public class StorageDecorator {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
-                                                                String myRoleTypeUri, String othersRoleTypeUri,
-                                                                String othersTopicTypeUri, int maxResultSize) {
+                                                          String myRoleTypeUri, String othersRoleTypeUri,
+                                                          String othersTopicTypeUri, int maxResultSize) {
         ResultList<RelatedTopicModel> result = new ResultList();
         for (String assocTypeUri : assocTypeUris) {
             ResultList<RelatedTopicModel> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
@@ -364,19 +364,19 @@ public class StorageDecorator {
      * Convenience method (checks singularity).
      *
      * @return  The fetched association.
-     *          Note: its composite value is not initialized.
+     *          Note: its child topics are not fetched.
      */
     RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                                String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+                                                         String othersRoleTypeUri, String othersAssocTypeUri) {
+        ResultList<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.size()) {
+        switch (assocs.getSize()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
         }
@@ -389,12 +389,14 @@ public class StorageDecorator {
      * @param   othersAssocTypeUri  may be null
      *
      * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
-    List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return storage.fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
+    ResultList<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                                      String othersAssocTypeUri) {
+        List<RelatedAssociationModel> relAssocs = storage.fetchTopicRelatedAssociations(topicId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return new ResultList(relAssocs.size(), relAssocs);
     }
 
     // ---
@@ -402,8 +404,8 @@ public class StorageDecorator {
     /**
      * Convenience method (checks singularity).
      *
-     * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     * @return  The fetched topic.
+     *          Note: its child topics are not fetched.
      */
     RelatedTopicModel fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
@@ -423,11 +425,11 @@ public class StorageDecorator {
 
     /**
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                                                      String myRoleTypeUri, String othersRoleTypeUri,
-                                                                      String othersTopicTypeUri, int maxResultSize) {
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
         List<RelatedTopicModel> relTopics = storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         // ### TODO: respect maxResultSize
@@ -443,11 +445,11 @@ public class StorageDecorator {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
-                                                                      String myRoleTypeUri, String othersRoleTypeUri,
-                                                                      String othersTopicTypeUri, int maxResultSize) {
+                                                                String myRoleTypeUri, String othersRoleTypeUri,
+                                                                String othersTopicTypeUri, int maxResultSize) {
         ResultList<RelatedTopicModel> result = new ResultList();
         for (String assocTypeUri : assocTypeUris) {
             ResultList<RelatedTopicModel> res = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
@@ -463,19 +465,19 @@ public class StorageDecorator {
      * Convenience method (checks singularity).
      *
      * @return  The fetched association.
-     *          Note: its composite value is not initialized.
+     *          Note: its child topics are not fetched.
      */
     RelatedAssociationModel fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.size()) {
+        ResultList<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.getSize()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (assocId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri +
                 "\"),\nresult=" + assocs);
@@ -489,12 +491,14 @@ public class StorageDecorator {
      * @param   othersAssocTypeUri  may be null
      *
      * @return  The fetched associations.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
-    List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersAssocTypeUri);
+    ResultList<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                                                         String myRoleTypeUri, String othersRoleTypeUri,
+                                                                         String othersAssocTypeUri) {
+        List<RelatedAssociationModel> relAssocs = storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return new ResultList(relAssocs.size(), relAssocs);
     }
 
     // ---
@@ -509,7 +513,7 @@ public class StorageDecorator {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topic.
-     *          Note: its composite value is not initialized.
+     *          Note: its child topics are not fetched.
      */
     RelatedTopicModel fetchRelatedTopic(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
@@ -535,7 +539,7 @@ public class StorageDecorator {
      * @param   othersTopicTypeUri  may be null
      *
      * @return  The fetched topics.
-     *          Note: their composite values are not initialized.
+     *          Note: their child topics are not fetched.
      */
     ResultList<RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                                   String othersRoleTypeUri, String othersTopicTypeUri) {

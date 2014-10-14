@@ -11,7 +11,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -84,13 +84,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}")
     @Override
     public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId,
-                                         @QueryParam("fetch_composite") boolean fetchComposite) {
+                                         @QueryParam("include_childs") boolean includeChilds) {
         try {
-            logger.info("Loading topicmap " + topicmapId + " (fetchComposite=" + fetchComposite + ")");
+            logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dms.getTopic(topicmapId).loadChildTopics();
-            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, fetchComposite);
+            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, includeChilds);
             Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
             //
             return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
@@ -112,8 +112,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
-        CompositeValueModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new CompositeValueModel()
+        ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
+        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new ChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
@@ -127,7 +127,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                   CompositeValueModel viewProps) {
+                                   ChildTopicsModel viewProps) {
         try {
             dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
                 new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
@@ -170,7 +170,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                                                    CompositeValueModel viewProps) {
+                                                                    ChildTopicsModel viewProps) {
         try {
             storeStandardViewProperties(topicmapId, topicId, viewProps);
             storeCustomViewProperties(topicmapId, topicId, viewProps);
@@ -226,9 +226,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
         try {
-            CompositeValueModel topicmapState = new CompositeValueModel()
-                .put("dm4.topicmaps.state", new CompositeValueModel()
-                    .put("dm4.topicmaps.translation", new CompositeValueModel()
+            ChildTopicsModel topicmapState = new ChildTopicsModel()
+                .put("dm4.topicmaps.state", new ChildTopicsModel()
+                    .put("dm4.topicmaps.translation", new ChildTopicsModel()
                         .put("dm4.topicmaps.translation_x", transX)
                         .put("dm4.topicmaps.translation_y", transY)));
             dms.updateTopic(new TopicModel(topicmapId, topicmapState));
@@ -303,16 +303,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch ---
 
-    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean fetchComposite) {
+    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewmodel> topics = new HashMap();
         ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics("dm4.topicmaps.topic_mapcontext",
             "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0);   // othersTopicTypeUri=null, maxResultSize=0
-        if (fetchComposite) {
+        if (includeChilds) {
             relTopics.loadChildTopics();
         }
         for (RelatedTopic topic : relTopics) {
             Association assoc = topic.getRelatingAssociation().loadChildTopics();
-            CompositeValueModel viewProps = assoc.getCompositeValue().getModel();
+            ChildTopicsModel viewProps = assoc.getChildTopics().getModel();
             invokeViewmodelCustomizers("enrichViewProperties", topic, viewProps);
             topics.put(topic.getId(), new TopicViewmodel(topic.getModel(), viewProps));
         }
@@ -321,7 +321,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewmodel> assocs = new HashMap();
-        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
+        ResultList<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(
             "dm4.topicmaps.association_mapcontext", "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), new AssociationViewmodel(assoc.getModel()));
@@ -342,25 +342,25 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Store ---
 
-    private void storeStandardViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
-        fetchTopicRefAssociation(topicmapId, topicId).setCompositeValue(viewProps);
+    private void storeStandardViewProperties(long topicmapId, long topicId, ChildTopicsModel viewProps) {
+        fetchTopicRefAssociation(topicmapId, topicId).setChildTopics(viewProps);
     }
 
     // ### Note: the topicmapId parameter is not used. Per-topicmap custom view properties not yet supported.
-    private void storeCustomViewProperties(long topicmapId, long topicId, CompositeValueModel viewProps) {
+    private void storeCustomViewProperties(long topicmapId, long topicId, ChildTopicsModel viewProps) {
         invokeViewmodelCustomizers("storeViewProperties", dms.getTopic(topicId), viewProps);
     }
 
     // --- Viewmodel Customizers ---
 
-    private void invokeViewmodelCustomizers(String method, Topic topic, CompositeValueModel viewProps) {
+    private void invokeViewmodelCustomizers(String method, Topic topic, ChildTopicsModel viewProps) {
         for (ViewmodelCustomizer customizer : viewmodelCustomizers) {
             invokeViewmodelCustomizer(customizer, method, topic, viewProps);
         }
     }
 
     private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, String method,
-                                                    Topic topic, CompositeValueModel viewProps) {
+                                                    Topic topic, ChildTopicsModel viewProps) {
         try {
             // we don't want use reflection here for performance reasons
             if (method.equals("enrichViewProperties")) {
@@ -396,7 +396,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --------------------------------------------------------------------------------------------- Private Inner Class
 
-    private class StandardViewProperties extends CompositeValueModel {
+    private class StandardViewProperties extends ChildTopicsModel {
 
         private StandardViewProperties(int x, int y, boolean visibility) {
             put(x, y);

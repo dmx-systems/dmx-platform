@@ -226,7 +226,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     }
 
     function fetch_workspaces() {
-        workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // fetch_composite=false
+        workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // include_childs=false
                                                                                             // sort=true
     }
 

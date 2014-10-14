@@ -9,7 +9,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -168,7 +168,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/filerepo/" + topic.getCompositeValue().getString("dm4.files.path");
+            String iconUrl = "/filerepo/" + topic.getChildTopics().getString("dm4.files.path");
             logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
             newModel.setSimpleValue(iconUrl);
         }
@@ -226,7 +226,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Creates a "Search" topic.
      */
     private Topic createSearchTopic(String searchTerm, Collection<? extends Topic> resultItems) {
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new CompositeValueModel()
+        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
             .put("dm4.webclient.search_term", searchTerm)
         ));
         //
@@ -326,7 +326,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Webclient Start ===
 
     private String getWebclientUrl() {
-        boolean isHttpsEnabled = Boolean.valueOf(System.getProperty("org.apache.felix.https.enable"));
+        boolean isHttpsEnabled = Boolean.getBoolean("org.osgi.service.http.secure.enabled");
         String protocol, port;
         if (isHttpsEnabled) {
             // Note: if both protocols are enabled HTTPS takes precedence

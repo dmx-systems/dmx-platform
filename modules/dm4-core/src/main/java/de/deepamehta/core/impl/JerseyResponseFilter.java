@@ -40,31 +40,36 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             dms.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
-            boolean fetchComposite = getFetchComposite(request);
+            boolean includeChilds = getIncludeChilds(request);
             if (entity != null) {
+                // 1) Loading child topics
+                if (entity instanceof DeepaMehtaObject) {
+                    loadChildTopics((DeepaMehtaObject) entity, includeChilds);
+                } else if (isIterable(response, DeepaMehtaObject.class)) {
+                    loadChildTopics((Iterable<DeepaMehtaObject>) entity, includeChilds);
+                }
+                // 2) Firing PRE_SEND events
                 if (entity instanceof TopicType) {          // Note: must take precedence over topic
                     firePreSend((TopicType) entity);
                 } else if (entity instanceof AssociationType) {
                     firePreSend((AssociationType) entity);  // Note: must take precedence over topic
                 } else if (entity instanceof Topic) {
-                    loadChildTopics((Topic) entity, fetchComposite);
                     firePreSend((Topic) entity);
                 } else if (entity instanceof Association) {
-                    loadChildTopics((Association) entity, fetchComposite);
                     firePreSend((Association) entity);
                 } else if (entity instanceof Directives) {
                     // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
                     // E.g. the Access Control plugin must enrich updated objects with permission information.
                     // ### TODO: check if this is still required. Meanwhile permissions are not an enrichment anymore.
+                    // ### Update: Yes, it is still required, e.g. by the Time plugin when enriching with timestamps.
                     firePreSend((Directives) entity);
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity);
                 } else if (isIterable(response, AssociationType.class)) {
                     firePreSendAssociationTypes((Iterable<AssociationType>) entity);
                 } else if (isIterable(response, Topic.class)) {
-                    loadChildTopics((Iterable<Topic>) entity, fetchComposite);
                     firePreSendTopics((Iterable<Topic>) entity);
-                // ### FIXME: Iterable<Association> responses not yet handled
+                // ### FIXME: for Iterable<Association> no PRE_SEND_ASSOCIATION events are fired
                 }
             }
             //
@@ -81,16 +86,16 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Loading child topics ===
 
-    private void loadChildTopics(DeepaMehtaObject object, boolean fetchComposite) {
-        if (fetchComposite) {
+    private void loadChildTopics(DeepaMehtaObject object, boolean includeChilds) {
+        if (includeChilds) {
             object.loadChildTopics();
         }
     }
 
-    private void loadChildTopics(Iterable<Topic> topics, boolean fetchComposite) {
-        if (fetchComposite) {
-            for (Topic topic : topics) {
-                topic.loadChildTopics();
+    private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds) {
+        if (includeChilds) {
+            for (DeepaMehtaObject object : objects) {
+                object.loadChildTopics();
             }
         }
     }
@@ -165,7 +170,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         return false;
     }
 
-    private boolean getFetchComposite(ContainerRequest request) {
-        return Boolean.parseBoolean(request.getQueryParameters().getFirst("fetch_composite"));
+    private boolean getIncludeChilds(ContainerRequest request) {
+        return Boolean.parseBoolean(request.getQueryParameters().getFirst("include_childs"));
     }
 }

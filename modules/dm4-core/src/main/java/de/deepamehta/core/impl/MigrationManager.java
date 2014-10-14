@@ -40,7 +40,7 @@ class MigrationManager {
      * Determines the migrations to be run for the specified plugin and run them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
-        int migrationNr = plugin.getPluginTopic().getCompositeValue().getTopic("dm4.core.plugin_migration_nr")
+        int migrationNr = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
             .getSimpleValue().intValue();
         int requiredMigrationNr = Integer.parseInt(plugin.getConfigProperty("requiredPluginMigrationNr", "0"));
         int migrationsToRun = requiredMigrationNr - migrationNr;

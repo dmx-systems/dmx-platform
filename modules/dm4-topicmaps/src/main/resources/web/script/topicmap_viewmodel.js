@@ -65,7 +65,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
      *
      * @return  The topic viewmodel that represents what is about to be added to the view (a TopicViewmodel object).
      *          This is either a new viewmodel (in case the domain topic was not yet contained in the topicmap) or
@@ -174,7 +174,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
      */
     this.update_topic = function(topic) {
         var t = topics[topic.id]
@@ -422,7 +422,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
             // ### TODO
             if (js.is_array(val)) {
                 throw "multiple-valued view properties are not supported"
-            } else if (js.size(val.composite)) {
+            } else if (js.size(val.childs)) {
                 throw "composite view properties are not supported"
             }
             //
@@ -458,7 +458,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
     // ---
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
      */
     function add_topic(topic, view_props) {
         var _topic = new TopicViewmodel(topic, view_props)
@@ -506,7 +506,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
     // ------------------------------------------------------------------------------------------------- Private Classes
 
     /**
-     * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
+     * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
      */
     function TopicViewmodel(topic, view_props) {
 
@@ -545,7 +545,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
         }
 
         /**
-         * @param   topic   a domain topic (has "id", "type_uri", "value", "composite" properties).
+         * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
          */
         this.update = function(topic) {
             init(topic)
@@ -560,9 +560,9 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
         // ---
 
         function init(topic) {
-            _self.type_uri  = topic.type_uri
-            _self.label     = topic.value
-            _self.composite = topic.composite
+            _self.type_uri = topic.type_uri
+            _self.label    = topic.value
+            _self.childs   = topic.childs
         }
 
         function reset_selection_conditionally() {

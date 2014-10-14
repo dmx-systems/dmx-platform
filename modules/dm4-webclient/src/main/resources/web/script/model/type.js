@@ -1,11 +1,11 @@
 function Type(type) {
 
     if (type) {
-        this.id        = type.id
-        this.uri       = type.uri
-        this.value     = type.value
-        this.type_uri  = type.type_uri
-        this.composite = type.composite
+        this.id       = type.id
+        this.uri      = type.uri
+        this.value    = type.value
+        this.type_uri = type.type_uri
+        this.childs   = type.childs
         //
         this.data_type_uri      = type.data_type_uri
         this.index_mode_uris    = type.index_mode_uris

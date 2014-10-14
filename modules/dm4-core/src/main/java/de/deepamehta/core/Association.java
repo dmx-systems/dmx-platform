@@ -72,12 +72,4 @@ public interface Association extends DeepaMehtaObject {
     // === Updating ===
 
     void update(AssociationModel model);
-
-
-
-    // === Traversal ===
-
-    // ### TODO: move to DeepaMehtaObject
-    // ### TODO: add "othersAssocTypeUri" argument
-    RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri);
 }

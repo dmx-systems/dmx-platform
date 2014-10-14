@@ -1,11 +1,11 @@
 function Association(assoc) {
-    this.id        = assoc.id
-    this.uri       = assoc.uri
-    this.type_uri  = assoc.type_uri
-    this.value     = assoc.value
-    this.composite = build_composite(assoc.composite)   // build_composite is defined in topic.js
-    this.role_1    = assoc.role_1
-    this.role_2    = assoc.role_2
+    this.id       = assoc.id
+    this.uri      = assoc.uri
+    this.type_uri = assoc.type_uri
+    this.value    = assoc.value
+    this.childs   = build_child_topics(assoc.childs)   // build_child_topics is defined in topic.js
+    this.role_1   = assoc.role_1
+    this.role_2   = assoc.role_2
 }
 
 // === "Page Displayable" implementation ===
@@ -21,11 +21,11 @@ Association.prototype.get_commands = function(context) {
 // === Public API ===
 
 Association.prototype.get_topic_1 = function() {
-    return dm4c.fetch_topic(this.role_1.topic_id, false)    // fetch_composite=false
+    return dm4c.fetch_topic(this.role_1.topic_id)
 }
 
 Association.prototype.get_topic_2 = function() {
-    return dm4c.fetch_topic(this.role_2.topic_id, false)    // fetch_composite=false
+    return dm4c.fetch_topic(this.role_2.topic_id)
 }
 
 // ---

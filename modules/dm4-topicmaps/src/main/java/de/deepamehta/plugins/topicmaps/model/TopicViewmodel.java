@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -18,18 +18,18 @@ public class TopicViewmodel extends TopicModel {
 
     // --- Instance Variables ---
 
-    private CompositeValueModel viewProps;
+    private ChildTopicsModel viewProps;
 
     // --- Constructors ---
 
-    public TopicViewmodel(TopicModel topic, CompositeValueModel viewProps) {
+    public TopicViewmodel(TopicModel topic, ChildTopicsModel viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }
 
     // --- Public Methods ---
 
-    public CompositeValueModel getViewProperties() {
+    public ChildTopicsModel getViewProperties() {
         return viewProps;
     }
 

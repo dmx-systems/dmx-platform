@@ -47,6 +47,11 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
 
     // ---
 
+    public void add(T item) {
+        totalCount++;
+        items.add(item);
+    }
+
     public void addAll(ResultList<T> result) {
         totalCount += result.getTotalCount();
         items.addAll(result.getItems());
