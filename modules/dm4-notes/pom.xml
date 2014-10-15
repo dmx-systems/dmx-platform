@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Notes</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-notes</artifactId>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.4</version>
     <packaging>bundle</packaging>
 
     <parent>
