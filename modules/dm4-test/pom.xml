@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Test</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-test</artifactId>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.4</version>
     <packaging>jar</packaging>
 
     <parent>
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.4-SNAPSHOT</version>
+            <version>4.4</version>
         </dependency>
     </dependencies>
 </project>

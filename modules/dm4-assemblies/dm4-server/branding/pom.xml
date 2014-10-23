@@ -5,14 +5,14 @@
 
     <groupId>de.deepamehta.assemblies.server</groupId>
     <artifactId>deepamehta-branding</artifactId>
-    <version>4.4-SNAPSHOT</version>
+    <version>4.4</version>
     <packaging>bundle</packaging>
     <name>DeepaMehta 4 Assemblies :: Server :: Branding</name>
 
     <parent>
         <groupId>de.deepamehta.assemblies</groupId>
         <artifactId>deepamehta-server</artifactId>
-        <version>4.4-SNAPSHOT</version>
+        <version>4.4</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
