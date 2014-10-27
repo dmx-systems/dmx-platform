@@ -3,6 +3,10 @@
 <features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
     <feature name="dm4-standard" description="DeepaMehta Standard Distribution" version="${project.version}">
+
+        <feature>http</feature>
+        <feature>eventadmin</feature>
+
         <!-- DeepaMehta 3rd-party libraries -->
         <bundle>mvn:com.sun.jersey/jersey-core/1.14</bundle>
         <bundle>mvn:com.sun.jersey/jersey-server/1.14</bundle>
@@ -10,7 +14,7 @@
         <bundle>mvn:org.codehaus.jettison/jettison/1.3.2</bundle>
         <bundle>mvn:commons-fileupload/commons-fileupload/1.2.2</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/1.3.2_5</bundle>
-        <bundle>mvn:org.apache.felix/org.apache.felix.http.jetty/2.2.2</bundle>
+
         <!-- DeepaMehta Standard Distribution -->
         <bundle>mvn:de.deepamehta/deepamehta-core/4.4.1-SNAPSHOT</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webservice/4.4.1-SNAPSHOT</bundle>

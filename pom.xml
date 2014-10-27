@@ -10,7 +10,59 @@
     <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <description>DeepaMehta is a platform for knowledge workers</description>
+    <url>http://www.deepamehta.de/</url>
+    <scm>
+        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License, version 3</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jri</id>
+            <name>Jörg Richter</name>
+            <email>jri@deepamehta.de</email>
+        </developer>
+        <developer>
+            <id>mre</id>
+            <name>Malte Reißig</name>
+            <email>mre@deepamehta.de</email>
+        </developer>
+        <developer>
+            <id>eschnepel</id>
+            <name>Enrico Schnepel</name>
+            <email>enrico.schnepel@gmx.de</email>
+        </developer>
+        <developer>
+            <id>jucovschi</id>
+            <name>Constantin Jucovschi</name>
+            <email>jucovschi@gmail.com</email>
+        </developer>        
+    </developers>
+
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <properties>
+
+        <!-- Maven Deploy-->
+        <gpg.keyname>...</gpg.keyname>
 
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -235,9 +287,67 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.1</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
-    <scm>
-        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
-    </scm>
+
+
 </project>
