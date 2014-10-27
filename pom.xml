@@ -30,6 +30,11 @@
             <email>jri@deepamehta.de</email>
         </developer>
         <developer>
+            <id>dgf</id>
+            <name>Danny Gräf</name>
+            <email>mail@dagnu.de</email>
+        </developer>
+        <developer>
             <id>mre</id>
             <name>Malte Reißig</name>
             <email>mre@deepamehta.de</email>
