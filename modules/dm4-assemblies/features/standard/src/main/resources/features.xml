@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<features name="deepamehta-4.4" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+<features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="dm4-standard" description="DeepaMehta Standard Distribution" version="4.4">
+    <feature name="dm4-standard" description="DeepaMehta Standard Distribution" version="${project.version}">
 
-	<feature>http</feature>
-	<feature>eventadmin</feature>
+        <feature>http</feature>
+        <feature>eventadmin</feature>
 
         <!-- DeepaMehta 3rd-party libraries -->
         <bundle>mvn:com.sun.jersey/jersey-core/1.14</bundle>
