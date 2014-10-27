@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Plugin Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-plugin-parent</artifactId>
-    <version>4.4</version>
+    <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- pre-configured plugin environment -->
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.4</version>
+            <version>4.4.1-SNAPSHOT</version>
         </dependency>
 
         <!-- Testing -->
@@ -122,9 +122,9 @@
                     <runner>1.7.5</runner>
                     <widenScope>true</widenScope>
                     <deployURLs>
-                        mvn:de.deepamehta/3rd-party-bundles/4.4/pom,
-                        mvn:de.deepamehta/felix-bundles/4.4/pom,
-                        mvn:de.deepamehta/deepamehta-bundles/4.4/pom
+                        mvn:de.deepamehta/3rd-party-bundles/4.4.1-SNAPSHOT/pom,
+                        mvn:de.deepamehta/felix-bundles/4.4.1-SNAPSHOT/pom,
+                        mvn:de.deepamehta/deepamehta-bundles/4.4.1-SNAPSHOT/pom
                     </deployURLs>
                 </configuration>
             </plugin>
@@ -137,7 +137,7 @@
                     <show>private</show>
                     <linksource>true</linksource>
                     <links>
-                        <link>http://api.deepamehta.de/deepamehta/4.4</link>
+                        <link>http://api.deepamehta.de/deepamehta/4.4.1-SNAPSHOT</link>
                     </links>
                     <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
                     <docletArtifact>
