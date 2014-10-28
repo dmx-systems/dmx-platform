@@ -256,50 +256,13 @@
         </profile>
 
         <profile>
-            <id>neo4j</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.2</version>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <includePluginDependencies>true</includePluginDependencies>
-                            <mainClass>org.neo4j.shell.StartClient</mainClass>
-                            <arguments>
-                                <argument>-path</argument>
-                                <argument>${dm4.database.path}</argument>
-                                <argument>-readonly</argument>
-                                <argument>-v</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-            <dependencies>
-                <dependency>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j-shell</artifactId>
-                    <version>1.8.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.neo4j</groupId>
-                    <artifactId>neo4j-kernel</artifactId>
-                    <version>1.8.1</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>release</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.1</version>
+                        <version>1.6.3</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -307,7 +270,6 @@
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                         </configuration>
                     </plugin>
-
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -351,8 +313,43 @@
                 </plugins>
             </build>
         </profile>
+
+        <profile>
+            <id>neo4j</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2</version>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>org.neo4j.shell.StartClient</mainClass>
+                            <arguments>
+                                <argument>-path</argument>
+                                <argument>${dm4.database.path}</argument>
+                                <argument>-readonly</argument>
+                                <argument>-v</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-shell</artifactId>
+                    <version>1.8.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-kernel</artifactId>
+                    <version>1.8.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
     </profiles>
-
-
-
 </project>
