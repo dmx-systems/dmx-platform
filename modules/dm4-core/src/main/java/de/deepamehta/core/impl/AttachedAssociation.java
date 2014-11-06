@@ -66,9 +66,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
      */
     @Override
     public void update(AssociationModel model) {
-        // ### TODO: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
+        // Note: the child topics are not needed for the actual update operation but for refreshing the label.
+        // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
+        loadChildTopics();
+        //
+        // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
         // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
-        // Per request exactly one association is updated. Its childs are topics (never associations).
+        // Per request exactly one association is updated. Its childs are always topics (never associations).
         logger.info("Updating association " + getId() + " (new " + model + ")");
         //
         dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
