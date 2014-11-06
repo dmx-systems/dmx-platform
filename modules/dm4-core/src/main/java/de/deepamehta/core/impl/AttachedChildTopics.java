@@ -11,6 +11,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
+import de.deepamehta.core.service.Directives;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -325,7 +326,7 @@ class AttachedChildTopics implements ChildTopics {
 
     private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
         // regard parent object as updated
-        parent.addUpdateDirective();
+        Directives.get().add(parent.getUpdateDirective(), parent);
         //
         updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri));  // newChildTopics=null
         dms.valueStorage.refreshLabel(parent.getModel());

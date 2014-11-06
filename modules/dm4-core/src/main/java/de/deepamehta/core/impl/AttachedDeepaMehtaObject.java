@@ -11,6 +11,8 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -181,6 +183,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
         updateValue(newModel);
+        //
+        Directives.get().add(getUpdateDirective(), this);
     }
 
     // ---
@@ -306,8 +310,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     abstract String className();
 
-    // ### TODO: Directive getUpdateDirective()
-    abstract void addUpdateDirective();
+    abstract Directive getUpdateDirective();
 
     abstract void storeUri();
 

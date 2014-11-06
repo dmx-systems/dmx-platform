@@ -82,8 +82,6 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
-        addUpdateDirective();
-        //
         dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel);
     }
 
@@ -319,8 +317,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     }
 
     @Override
-    void addUpdateDirective() {
-        Directives.get().add(Directive.UPDATE_ASSOCIATION, this);
+    Directive getUpdateDirective() {
+        return Directive.UPDATE_ASSOCIATION;
     }
 
     @Override

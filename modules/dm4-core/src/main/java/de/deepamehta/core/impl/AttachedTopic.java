@@ -206,8 +206,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
         TopicModel oldModel = getModel().clone();
         super.update(model);
         //
-        addUpdateDirective();
-        //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
     }
 
@@ -221,8 +219,8 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     }
 
     @Override
-    void addUpdateDirective() {
-        Directives.get().add(Directive.UPDATE_TOPIC, this);
+    Directive getUpdateDirective() {
+        return Directive.UPDATE_TOPIC;
     }
 
     @Override
