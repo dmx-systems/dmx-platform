@@ -10,6 +10,13 @@
     <version>4.4.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-global</artifactId>
+        <version>4.4.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
     <!-- pre-configured plugin environment -->
     <properties>
 

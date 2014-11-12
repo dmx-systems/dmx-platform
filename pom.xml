@@ -65,10 +65,6 @@
     </repositories>
 
     <properties>
-
-        <!-- Maven Deploy-->
-        <gpg.keyname>...</gpg.keyname>
-
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.enabled>true</org.osgi.service.http.enabled>
@@ -100,6 +96,7 @@
         </java.util.logging.config.file>
         <felix.log.level>1</felix.log.level><!-- To see any Felix logging set the level to at least 4. -->
 
+        <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -257,12 +254,43 @@
 
         <profile>
             <id>release</id>
+            <modules>
+                <module>modules/dm4-core</module>
+                <module>modules/dm4-webservice</module>
+                <module>modules/dm4-webclient</module>
+                <module>modules/dm4-webbrowser</module>
+                <module>modules/dm4-notes</module>
+                <module>modules/dm4-contacts</module>
+                <module>modules/dm4-workspaces</module>
+                <module>modules/dm4-typeeditor</module>
+                <module>modules/dm4-iconpicker</module>
+                <module>modules/dm4-typesearch</module>
+                <module>modules/dm4-topicmaps</module>
+                <module>modules/dm4-files</module>
+                <module>modules/dm4-filemanager</module>
+                <module>modules/dm4-help</module>
+                <module>modules/dm4-accesscontrol</module>
+                <module>modules/dm4-facets</module>
+                <module>modules/dm4-geomaps</module>
+                <module>modules/dm4-time</module>
+                <module>modules/dm4-caching</module>
+                <module>modules/dm4-storage-neo4j</module>
+                <module>modules/dm4-box-renderer-dom</module>
+                <!-- Testing -->
+                <module>modules/dm4-test</module>
+                <!-- POM projects -->
+                <module>modules/dm4-parent</module>
+                <module>modules/dm4-plugin-parent</module>
+                <module>modules/dm4-provision</module>
+                <module>modules/dm4-assemblies</module>
+                <module>modules/dm4-distribution</module>
+            </modules>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.3</version>
+                        <version>1.6.5</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
@@ -312,6 +340,12 @@
                     </plugin>
                 </plugins>
             </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
         </profile>
 
         <profile>
