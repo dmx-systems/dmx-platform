@@ -14,7 +14,7 @@ public class Neo4jStorageActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH = System.getProperty("dm4.database.path");
+    private static final String DATABASE_PATH = System.getProperty("dm4.database.path", "deepamehta-db");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

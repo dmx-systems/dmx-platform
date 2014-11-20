@@ -319,7 +319,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                                String othersRoleTypeUri, String othersTopicTypeUri);
+                                                 String othersRoleTypeUri, String othersTopicTypeUri);
 
     abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                 String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);

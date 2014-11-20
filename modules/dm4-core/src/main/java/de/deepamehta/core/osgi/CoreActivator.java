@@ -19,10 +19,6 @@ import java.util.logging.Logger;
 
 public class CoreActivator implements BundleActivator {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String DATABASE_PATH    = System.getProperty("dm4.database.path");
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private BundleContext bundleContext;
