@@ -32,7 +32,7 @@ public class DeepaMehtaUtils {
 
     private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");
     static {
-        logger.info("Host setting:\n    dm4.host.url=\""+ DM4_HOST_URL + "\"");
+        logger.info("Host setting:\ndm4.host.url=\"" + DM4_HOST_URL + "\"");
     }
 
 

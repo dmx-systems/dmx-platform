@@ -87,9 +87,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Security settings
-    private static final boolean READ_REQUIRES_LOGIN  = Boolean.getBoolean("dm4.security.read_requires_login");
-    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.getBoolean("dm4.security.write_requires_login");
-    private static final String SUBNET_FILTER         = System.getProperty("dm4.security.subnet_filter");
+    private static final boolean READ_REQUIRES_LOGIN  = Boolean.parseBoolean(
+        System.getProperty("dm4.security.read_requires_login", "false"));
+    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.parseBoolean(
+        System.getProperty("dm4.security.write_requires_login", "true"));
+    private static final String SUBNET_FILTER = System.getProperty("dm4.security.subnet_filter", "127.0.0.1/32");
+    // Note: the default values are required in case no config file is in effect. This applies when DM is started
+    // via feature:install from Karaf. The default values must match the values defined in global POM.
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
@@ -362,9 +366,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void init() {
         logger.info("Security settings:" +
-            "\n    dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
-            "\n    dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
-            "\n    dm4.security.subnet_filter=\""+ SUBNET_FILTER + "\"");
+            "\ndm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
+            "\ndm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
+            "\ndm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"");
     }
 
 
