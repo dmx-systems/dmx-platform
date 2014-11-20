@@ -30,7 +30,7 @@ public class DeepaMehtaUtils {
 
     private static Logger logger = Logger.getLogger("de.deepamehta.core.util.DeepaMehtaUtils");
 
-    private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");
+    private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");  // ### TODO: default value (#734)
     static {
         logger.info("Host setting:\ndm4.host.url=\"" + DM4_HOST_URL + "\"");
     }

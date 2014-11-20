@@ -44,7 +44,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path");
+    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
+    // Note: the default value is required in case no config file is in effect. This applies when DM is started
+    // via feature:install from Karaf. The default value must match the value defined in global POM.
+
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
