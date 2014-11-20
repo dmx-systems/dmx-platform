@@ -35,7 +35,7 @@ public class ChildTopicsModel implements Iterable<String> {
      * Key: String, value: TopicModel or List<TopicModel>
      */
     private Map<String, Object> childTopics = new HashMap();
-    // Note: it must be List<TopicModel>, not Set<TopicModel> (like before).
+    // Note: it must be List<TopicModel>, not Set<TopicModel>.
     // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
     // ID equality (see DeepaMehtaObjectModel.equals()).
