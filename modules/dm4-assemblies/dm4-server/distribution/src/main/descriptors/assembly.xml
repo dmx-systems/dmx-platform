@@ -7,7 +7,6 @@
         <format>tar.gz</format>
     </formats>
 
-
     <files>
         <!-- copy README to / -->
         <file>

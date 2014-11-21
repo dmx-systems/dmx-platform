@@ -18,11 +18,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <!-- These properties are overridden. For the distribution we must use relative paths. -->
+    <!-- Override properties. The distribution must use relative paths. -->
     <properties>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
         <dm4.database.path>deepamehta-db</dm4.database.path>
-        <felix.log.level>1</felix.log.level>
     </properties>
 
     <dependencies>
@@ -67,7 +66,6 @@
     </dependencies>
 
     <build>
-        <finalName>deepamehta-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -84,6 +82,9 @@
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
+                            <finalName>deepamehta-${project.version}</finalName>
+                            <!-- Exclude assembly ID ("-distribution") from assembly final name -->
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
                 </executions>
