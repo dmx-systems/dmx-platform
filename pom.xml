@@ -7,13 +7,14 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.4.1-SNAPSHOT</version>
+    <version>4.4.1</version>
     <packaging>pom</packaging>
 
-    <description>DeepaMehta is a platform for knowledge workers</description>
+    <description>DeepaMehta is a software platform for knowledge workers</description>
     <url>http://www.deepamehta.de/</url>
     <scm>
         <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
+        <url>https://github.com/jri/deepamehta</url>
     </scm>
 
     <licenses>
