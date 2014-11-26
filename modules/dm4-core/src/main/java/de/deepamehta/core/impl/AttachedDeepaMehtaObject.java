@@ -11,6 +11,8 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -181,18 +183,20 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
         updateValue(newModel);
+        //
+        Directives.get().add(getUpdateDirective(), this);
     }
 
     // ---
 
     @Override
     public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(newChildTopic, null, assocDef);
+        getChildTopics().updateChildTopics(newChildTopic, null, assocDef);      // newChildTopics=null
     }
 
     @Override
     public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(null, newChildTopics, assocDef);
+        getChildTopics().updateChildTopics(null, newChildTopics, assocDef);     // newChildTopic=null
     }
 
 
@@ -324,8 +328,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     abstract String className();
 
-    // ### TODO: Directive getUpdateDirective()
-    abstract void addUpdateDirective();
+    abstract Directive getUpdateDirective();
 
     abstract void storeUri();
 
@@ -334,7 +337,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                                String othersRoleTypeUri, String othersTopicTypeUri);
+                                                 String othersRoleTypeUri, String othersTopicTypeUri);
 
     abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                 String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);

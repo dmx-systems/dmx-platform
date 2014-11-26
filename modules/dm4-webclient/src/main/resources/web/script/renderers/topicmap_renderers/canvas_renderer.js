@@ -226,7 +226,7 @@ function CanvasRenderer() {
 
     this.select_topic = function(topic_id) {
         // fetch from DB
-        var topic = dm4c.fetch_topic(topic_id, true)    // include_childs=true
+        var topic = dm4c.fetch_topic(topic_id, true)        // include_childs=true
         // update viewmodel
         topicmap.set_topic_selection(topic_id)
         // update view
@@ -237,7 +237,7 @@ function CanvasRenderer() {
 
     this.select_association = function(assoc_id) {
         // fetch from DB
-        var assoc = dm4c.fetch_association(assoc_id)
+        var assoc = dm4c.fetch_association(assoc_id, true)  // include_childs=true
         // update viewmodel
         topicmap.set_association_selection(assoc_id)
         // update view

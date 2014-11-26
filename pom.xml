@@ -7,11 +7,65 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.4</version>
+    <version>4.4.1</version>
     <packaging>pom</packaging>
 
-    <properties>
+    <description>DeepaMehta is a software platform for knowledge workers</description>
+    <url>http://www.deepamehta.de/</url>
+    <scm>
+        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
+        <url>https://github.com/jri/deepamehta</url>
+    </scm>
 
+    <licenses>
+        <license>
+            <name>GNU General Public License, version 3</name>
+            <url>http://www.gnu.org/licenses/gpl.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>jri</id>
+            <name>Jörg Richter</name>
+            <email>jri@deepamehta.de</email>
+        </developer>
+        <developer>
+            <id>dgf</id>
+            <name>Danny Gräf</name>
+            <email>mail@dagnu.de</email>
+        </developer>
+        <developer>
+            <id>mre</id>
+            <name>Malte Reißig</name>
+            <email>mre@deepamehta.de</email>
+        </developer>
+        <developer>
+            <id>eschnepel</id>
+            <name>Enrico Schnepel</name>
+            <email>enrico.schnepel@gmx.de</email>
+        </developer>
+        <developer>
+            <id>jucovschi</id>
+            <name>Constantin Jucovschi</name>
+            <email>jucovschi@gmail.com</email>
+        </developer>        
+    </developers>
+
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <properties>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
         <org.osgi.service.http.enabled>true</org.osgi.service.http.enabled>
@@ -43,6 +97,7 @@
         </java.util.logging.config.file>
         <felix.log.level>1</felix.log.level><!-- To see any Felix logging set the level to at least 4. -->
 
+        <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -153,9 +208,9 @@
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
-                <!-- Note: modules/dm4-assemblies and modules/dm4-distribution are not included here. -->
-                <!-- We don't want to build the assemblies and distribution with every reactor build. -->
-                <!-- To build the assemblies and distribution use "mvn clean install -P dist".        -->
+                <!-- Note: modules/dm4-distribution and modules/dm4-assemblies are not included here. -->
+                <!-- We don't want to build the distribution and assemblies with every reactor build. -->
+                <!-- To build the distribution and assemblies use "mvn clean install -P dist".        -->
                 <module>modules/dm4-parent</module>
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
@@ -199,6 +254,102 @@
         </profile>
 
         <profile>
+            <id>release</id>
+            <modules>
+                <module>modules/dm4-core</module>
+                <module>modules/dm4-webservice</module>
+                <module>modules/dm4-webclient</module>
+                <module>modules/dm4-webbrowser</module>
+                <module>modules/dm4-notes</module>
+                <module>modules/dm4-contacts</module>
+                <module>modules/dm4-workspaces</module>
+                <module>modules/dm4-typeeditor</module>
+                <module>modules/dm4-iconpicker</module>
+                <module>modules/dm4-typesearch</module>
+                <module>modules/dm4-topicmaps</module>
+                <module>modules/dm4-files</module>
+                <module>modules/dm4-filemanager</module>
+                <module>modules/dm4-help</module>
+                <module>modules/dm4-accesscontrol</module>
+                <module>modules/dm4-facets</module>
+                <module>modules/dm4-geomaps</module>
+                <module>modules/dm4-time</module>
+                <module>modules/dm4-caching</module>
+                <module>modules/dm4-storage-neo4j</module>
+                <module>modules/dm4-box-renderer-dom</module>
+                <!-- Testing -->
+                <module>modules/dm4-test</module>
+                <!-- POM projects -->
+                <module>modules/dm4-parent</module>
+                <module>modules/dm4-plugin-parent</module>
+                <module>modules/dm4-provision</module>
+                <module>modules/dm4-distribution</module>
+                <module>modules/dm4-assemblies</module>
+            </modules>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.5</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+
+        <profile>
             <id>neo4j</id>
             <build>
                 <plugins>
@@ -236,8 +387,4 @@
             </dependencies>
         </profile>
     </profiles>
-
-    <scm>
-        <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
-    </scm>
 </project>

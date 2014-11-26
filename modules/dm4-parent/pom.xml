@@ -10,6 +10,14 @@
     <version>6</version>
     <packaging>pom</packaging>
 
+    <parent>
+        <groupId>de.deepamehta</groupId>
+        <artifactId>deepamehta-global</artifactId>
+        <version>4.4.1</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- TODO: remove this as derived from parent? -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

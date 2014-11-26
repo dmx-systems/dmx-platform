@@ -158,9 +158,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateTopic(TopicModel model) {
         try {
-            // Note: the child topics are not needed for the actual update operation but for refreshing the label.
-            // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
-            getTopic(model.getId()).loadChildTopics().update(model);
+            getTopic(model.getId()).update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic failed (" + model + ")", e);
         }
@@ -278,9 +276,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void updateAssociation(AssociationModel model) {
         try {
-            // Note: the child topics are not needed for the actual update operation but for refreshing the label.
-            // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
-            getAssociation(model.getId()).loadChildTopics().update(model);
+            getAssociation(model.getId()).update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating association failed (" + model + ")", e);
         }

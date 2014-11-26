@@ -7,41 +7,40 @@
     <name>DeepaMehta 4 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>4.4</version>
+    <version>4.4.1</version>
     <packaging>pom</packaging>
 
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
-        <version>4.4</version>
+        <version>4.4.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <!-- These properties are overridden. For the distribution we must use relative paths. -->
+    <!-- Override properties. The distribution must use relative paths. -->
     <properties>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
         <dm4.database.path>deepamehta-db</dm4.database.path>
-        <felix.log.level>1</felix.log.level>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-bundles</artifactId>
-            <version>4.4</version>
+            <version>4.4.1</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>3rd-party-bundles</artifactId>
-            <version>4.4</version>
+            <version>4.4.1</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>felix-bundles</artifactId>
-            <version>4.4</version>
+            <version>4.4.1</version>
             <type>pom</type>
         </dependency>
         <dependency>
@@ -67,7 +66,6 @@
     </dependencies>
 
     <build>
-        <finalName>deepamehta-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -84,6 +82,9 @@
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
+                            <finalName>deepamehta-${project.version}</finalName>
+                            <!-- Exclude assembly ID ("-distribution") from assembly final name -->
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>
                 </executions>

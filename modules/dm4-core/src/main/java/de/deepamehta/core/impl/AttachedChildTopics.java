@@ -11,6 +11,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
+import de.deepamehta.core.service.Directives;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -222,6 +223,9 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
+    // Note: the given association definition must not necessarily originate from the parent object's type definition.
+    // It may originate from a facet definition as well.
+    // Called from AttachedDeepaMehtaObject.updateChildTopic() and AttachedDeepaMehtaObject.updateChildTopics().
     void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
@@ -264,7 +268,7 @@ class AttachedChildTopics implements ChildTopics {
      *
      * @param   assocDef    the child topics according to this association definition are loaded.
      *                      <p>
-     *                      Note: the association definition must not necessarily originate from this object's
+     *                      Note: the association definition must not necessarily originate from the parent object's
      *                      type definition. It may originate from a facet definition as well.
      */
     private void loadChildTopics(AssociationDefinition assocDef) {
@@ -324,11 +328,7 @@ class AttachedChildTopics implements ChildTopics {
     // ---
 
     private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
-        // regard parent object as updated
-        parent.addUpdateDirective();
-        //
-        updateChildTopics(newChildTopic, null, getAssocDef(childTypeUri));  // newChildTopics=null
-        dms.valueStorage.refreshLabel(parent.getModel());
+        parent.update(new TopicModel(parent.getTypeUri(), new ChildTopicsModel().put(childTypeUri, newChildTopic)));
         return this;
     }
 
