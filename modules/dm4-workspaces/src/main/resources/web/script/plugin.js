@@ -157,7 +157,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         // update model
         set_selected_workspace(workspace_id)
         // update view
-        var workspace = dm4c.fetch_topic(workspace_id)
+        var workspace = dm4c.fetch_topic(workspace_id, true)    // include_childs=true
         dm4c.show_topic(workspace, "show", undefined, true)     // coordinates=undefined, do_center=true
         //
         dm4c.fire_event("post_select_workspace", workspace_id)
