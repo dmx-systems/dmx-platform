@@ -1458,7 +1458,6 @@ dm4c = new function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    // ### TODO: rename to get_topic()
     /**
      * @param   include_childs  Optional (boolean): if true the fetched topic will include its child topics.
      *                          Default is false.
@@ -1467,7 +1466,6 @@ dm4c = new function() {
         return build_topic(dm4c.restc.get_topic_by_id(topic_id, include_childs))
     }
 
-    // ### TODO: rename to get_association()
     /**
      * @param   include_childs  Optional (boolean): if true the fetched association will include its child topics.
      *                          Default is false.
