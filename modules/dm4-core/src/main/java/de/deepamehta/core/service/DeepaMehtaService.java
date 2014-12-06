@@ -199,11 +199,16 @@ public interface DeepaMehtaService {
     // === Properties ===
 
     /**
+     * Returns a topic's or association's property value associated with the given property URI.
+     * If there's no property value associated with the property URI an exception is thrown.
+     *
      * @param   id  a topic ID, or an association ID
      */
     Object getProperty(long id, String propUri);
 
     /**
+     * Checks whether for a given topic or association a property value is associated with a given property URI.
+     *
      * @param   id  a topic ID, or an association ID
      */
     boolean hasProperty(long id, String propUri);

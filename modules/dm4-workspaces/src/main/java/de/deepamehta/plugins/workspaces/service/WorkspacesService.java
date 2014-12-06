@@ -1,20 +1,27 @@
 package de.deepamehta.plugins.workspaces.service;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.ResultList;
 
 
 
 public interface WorkspacesService extends PluginService {
 
     /**
+     * Returns all topics of a given type that are assigned to a given workspace.
+     */
+    ResultList<RelatedTopic> getAssignedTopics(long workspaceId, String typeUri);
+
+    /**
      * Returns the workspace a topic or association is assigned to.
      *
      * @param   id      a topic ID, or an association ID
      *
-     * @return  The assigned workspace (a "Workspace" topic, including its child topics),
+     * @return  The assigned workspace (a topic of type "Workspace"),
      *          or <code>null</code> if no workspace is assigned.
      */
     Topic getAssignedWorkspace(long id);

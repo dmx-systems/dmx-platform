@@ -7,6 +7,7 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
@@ -16,16 +17,27 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 
 
+@Path("/workspace")
+@Consumes("application/json")
+@Produces("application/json")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssociationTypeListener,
                                                                                     PostCreateTopicListener,
@@ -57,13 +69,23 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/topics/{type_uri}")
+    @Override
+    public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
+                                                      @PathParam("type_uri") String topicTypeUri) {
+        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri, 0);   // maxResultSize=0
+        applyWorkspaceFilter(topics.iterator(), workspaceId);
+        return topics;
+    }
+
     @Override
     public Topic getAssignedWorkspace(long id) {
-        if (!dms.hasProperty(id, PROP_WORKSPACE_ID)) {
+        long workspaceId = workspaceId(id);
+        if (workspaceId == -1) {
             return null;
         }
-        //
-        long workspaceId = (Long) dms.getProperty(id, PROP_WORKSPACE_ID);
         return dms.getTopic(workspaceId);
     }
 
@@ -232,6 +254,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private long workspaceId(long id) {
+        if (!dms.hasProperty(id, PROP_WORKSPACE_ID)) {
+            return -1;
+        }
+        //
+        return (Long) dms.getProperty(id, PROP_WORKSPACE_ID);
+    }
+
     private long workspaceId() {
         Cookies cookies = Cookies.get();
         if (!cookies.has("dm4_workspace_id")) {
@@ -263,6 +293,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // 1) create assignment association
         // Note 1: we are refering to an existing workspace. So we must add a topic reference.
         // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
+        // ### TODO: redefine workspace_facet as a single-facet and use putRef() then
         FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
         facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value);
         //
@@ -296,6 +327,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private Topic fetchDefaultWorkspace() {
         return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI));
+    }
+
+    private void applyWorkspaceFilter(Iterator<? extends Topic> topics, long workspaceId) {
+        while (topics.hasNext()) {
+            Topic topic = topics.next();
+            if (!isAssignedToWorkspace(topic, workspaceId)) {
+                topics.remove();
+            }
+        }
     }
 
     /**
