@@ -25,7 +25,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
 
     dm4c.add_listener("search", function(searchmode) {
         if (searchmode == "by-type") {
-            return dm4c.restc.get_topics_and_create_bucket(get_type_uri(), dm4c.MAX_RESULT_SIZE)
+            return dm4c.restc.get_topics_and_create_bucket(get_type_uri())
         }
     })
 
