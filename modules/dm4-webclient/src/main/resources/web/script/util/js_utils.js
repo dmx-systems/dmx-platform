@@ -12,6 +12,20 @@ var js = {
 
 
     /**
+     * Returns the first array element that matches a filter function.
+     * If there is no such element undefined is returned.
+     */
+    find: function(array, fn) {
+        var i = 0, e
+        while (e = array[i]) {
+            if (fn(e)) {
+                return e
+            }
+            i++
+        }
+    },
+
+    /**
      * Keeps array elements that match a filter function.
      * The array is manipulated in-place.
      */
