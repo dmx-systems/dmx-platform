@@ -11,6 +11,16 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
 
 
+    // === REST Client Extension ===
+
+    dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
+        var params = this.createRequestParameter({include_childs: include_childs})
+        return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri +
+            params.to_query_string()).items
+    }
+
+
+
     // === Webclient Listeners ===
 
     dm4c.add_listener("init", function() {
@@ -122,7 +132,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     this.get_workspace_id = function() {
         if (!selected_workspace_id) {
-            throw "WorkspacesException: the selected workspace is unknown"
+            throw "WorkspacesError: the selected workspace is unknown"
         }
         return selected_workspace_id
     }

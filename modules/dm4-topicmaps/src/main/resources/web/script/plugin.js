@@ -8,7 +8,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var topicmap                    // Selected topicmap (TopicmapViewmodel object)     \ updated together by
     var topicmap_renderer           // The topicmap renderer of the selected topicmap   / set_selected_topicmap()
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
-    var topicmap_topics             // All topicmaps in the DB (object, key: topicmap ID, value: topicmap topic)
+    var topicmap_topics = {}        // Loaded topicmap topics, grouped by workspace, an object:
+                                    //   {
+                                    //     workspaceId: {
+                                    //       "selected_topicmap_id": topicmapId
+                                    //       "topicmap_topics": [topicmapTopic]
+                                    //     }
+                                    //   }
     var topicmap_cache = {}         // Loaded topicmaps (key: topicmap ID, value: TopicmapViewmodel object)
 
     // View
@@ -58,11 +64,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === Webclient Listeners ===
 
+    /**
+     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init_2.
+     * Registering the topicmap renderers at init(1) ensures they are available for being customized.
+     */
     dm4c.add_listener("init", function() {
 
         register_topicmap_renderers()
-        create_topicmap_menu()
-        init_model()    // Note: the topicmap menu must already be created
 
         function register_topicmap_renderers() {
             // default renderer
@@ -77,6 +85,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 topicmap_renderers[renderer.get_info().uri] = renderer
             }
         }
+    })
+
+    /**
+     * Note: the Workspaces plugin initializes at init(1).
+     * Initializing the topicmaps model at init_2 ensures a selected workspace is already known.
+     */
+    dm4c.add_listener("init_2", function() {
+
+        create_topicmap_menu()
+        init_model()    // Note: the topicmap menu must already be created
 
         function create_topicmap_menu() {
             // build topicmap widget
@@ -403,11 +421,34 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // 2) update "topicmap_renderer"
         // Note: the renderer must be set *before* the topicmap is loaded.
         // The renderer is responsible for loading.
-        var renderer_uri = topicmap_topics[topicmap_id].get("dm4.topicmaps.topicmap_renderer_uri")
+        var renderer_uri = get_topicmap_topic(topicmap_id).get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
         //
         // 3) update "topicmap"
         topicmap = get_topicmap(topicmap_id)
+    }
+
+    /**
+     * Looks up a topicmap topic from the model and returns it.
+     *
+     * Prerequisite: the specified topicmap must be assigned to the currently selected workspace.
+     */
+    function get_topicmap_topic(topicmap_id) {
+        var workspace_id = get_workspace_id()
+        var topicmap_topics = get_topicmap_entry(workspace_id).topicmap_topics
+        var topicmap_topic = find_topic(topicmap_topics, topicmap_id)
+        if (!topicmap_topic) {
+            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model (workspace_id=" + workspace_id + ")"
+        }
+        return topicmap_topic
+
+        function find_topic(topics, id) {
+            for (var i = 0, topic; topic = topics[i]; i++) {
+                if (topic.id == id) {
+                    return topic
+                }
+            }
+        }
     }
 
     /**
@@ -431,7 +472,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function load_topicmap(topicmap_id) {
         var config = {
-            is_writable: dm4c.has_write_permission_for_topic(topicmap_topics[topicmap_id])
+            is_writable: dm4c.has_write_permission_for_topic(get_topicmap_topic(topicmap_id))
         }
         var topicmap = topicmap_renderer.load_topicmap(topicmap_id, config)
         put_in_cache(topicmap)
@@ -442,9 +483,27 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // ---
 
     function fetch_topicmap_topics() {
-        var topics = dm4c.restc.get_topics("dm4.topicmaps.topicmap", true).items    // include_childs=true
-        topicmap_topics = dm4c.hash_by_id(dm4c.build_topics(topics))
-        // ### FIXME: object properties are not sorted
+        var workspace_id = get_workspace_id()
+        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
+        get_topicmap_entry(workspace_id, true).topicmap_topics = dm4c.build_topics(topics)        // create=true
+        // ### TODO: sort topicmaps by name
+    }
+
+    function get_topicmap_entry(workspace_id, create) {
+        var entry = topicmap_topics[workspace_id]
+        if (!entry) {
+            if (create) {
+                entry = {}
+                topicmap_topics[workspace_id] = entry
+            } else {
+                throw "TopicmapsError: no topicmaps entry for workspace " + workspace_id + " found in model"
+            }
+        }
+        return entry
+    }
+
+    function get_workspace_id() {
+        return dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
     }
 
 
@@ -523,9 +582,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var topicmap_id = get_topicmap_id_from_menu()   // save selection
         topicmap_menu.empty()
         // add topicmaps to menu
-        for (var id in topicmap_topics) {
-            var topicmap = topicmap_topics[id]
-            topicmap_menu.add_item({label: topicmap.value, value: topicmap.id, icon: icon_src})
+        var topicmap_topics = get_topicmap_entry(get_workspace_id()).topicmap_topics
+        for (var i = 0, topicmap_topic; topicmap_topic = topicmap_topics[i]; i++) {
+            topicmap_menu.add_item({label: topicmap_topic.value, value: topicmap_topic.id, icon: icon_src})
         }
         // add "New..." to menu
         if (dm4c.has_read_permission("dm4.topicmaps.topicmap")) {   // ### FIXME: should check CREATE permission
