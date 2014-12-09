@@ -33,8 +33,10 @@ function RESTClient(config) {
      *
      * @return  the topic, or <code>null</code>.
      */
-    this.get_topic_by_value = function(key, value) {
-        return request("GET", "/core/topic/by_value/" + key + "/" + encodeURIComponent(value))
+    this.get_topic_by_value = function(key, value, include_childs) {
+        var params = new RequestParameter({include_childs: include_childs})
+        return request("GET", "/core/topic/by_value/" + key + "/" + encodeURIComponent(value) +
+            params.to_query_string())
     }
 
     this.get_topic = function(type_uri, key, value) {
