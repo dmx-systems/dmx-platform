@@ -10,10 +10,11 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
     var topicmap_topics = {}        // Loaded topicmap topics, grouped by workspace, an object:
                                     //   {
-                                    //     workspaceId: {
-                                    //       "selected_topicmap_id": topicmapId
-                                    //       "topicmap_topics": [topicmapTopic]
-                                    //     }
+                                    //     workspaceId: [topicmapTopic]
+                                    //   }
+    var selected_topicmap_ids = {}  // ID of the selected topicmap, per-workspace, an object:
+                                    //   {
+                                    //     workspaceId: selectedTopicmapId
                                     //   }
     var topicmap_cache = {}         // Loaded topicmaps (key: topicmap ID, value: TopicmapViewmodel object)
 
@@ -227,6 +228,21 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
 
+    // === Workspace Listeners ===
+
+    dm4c.add_listener("post_select_workspace", function(workspace_id) {
+        fetch_topicmap_topics_and_refresh_menu()    // update model + view
+        //
+        var topicmap_id = selected_topicmap_ids[workspace_id]
+        if (!topicmap_id) {
+            topicmap_id = get_topicmap_id_from_menu()
+        }
+        //
+        self.select_topicmap(topicmap_id)           // update model + view
+    })
+
+
+
     // === Access Control Listeners ===
 
     dm4c.add_listener("logged_in", function(username) {
@@ -409,12 +425,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     /**
-     * Updates the model to reflect the given topicmap is now selected ("topicmap", "topicmap_renderer").
+     * Updates the model to reflect the given topicmap is now selected. That includes setting a cookie
+     * and updating 3 model objects ("topicmap", "topicmap_renderer", "selected_topicmap_ids").
      *
      * Prerequisite: the topicmap topic for the specified topicmap is already loaded/up-to-date.
      */
     function set_selected_topicmap(topicmap_id) {
-        // 1) update cookie
+        // 1) set cookie
         // Note: the cookie must be set *before* the topicmap is loaded.
         // Server-side topic loading might depend on the topicmap type.
         js.set_cookie("dm4_topicmap_id", topicmap_id)
@@ -425,8 +442,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var renderer_uri = get_topicmap_topic(topicmap_id).get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
         //
-        // 3) update "topicmap"
+        // 3) update "topicmap" and "selected_topicmap_ids"
         topicmap = get_topicmap(topicmap_id)
+        selected_topicmap_ids[get_workspace_id()] = topicmap_id
     }
 
     /**
@@ -444,7 +462,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     function get_topicmap_topics(workspace_id) {
-        return get_topicmap_entry(workspace_id).topicmap_topics
+        return topicmap_topics[workspace_id]
     }
 
     /**
@@ -481,21 +499,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     function fetch_topicmap_topics() {
         var workspace_id = get_workspace_id()
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
-        get_topicmap_entry(workspace_id, true).topicmap_topics = dm4c.build_topics(topics)        // create=true
+        topicmap_topics[workspace_id] = dm4c.build_topics(topics)
         // ### TODO: sort topicmaps by name
-    }
-
-    function get_topicmap_entry(workspace_id, create) {
-        var entry = topicmap_topics[workspace_id]
-        if (!entry) {
-            if (create) {
-                entry = {}
-                topicmap_topics[workspace_id] = entry
-            } else {
-                throw "TopicmapsError: no topicmaps entry for workspace " + workspace_id + " found in model"
-            }
-        }
-        return entry
     }
 
     function get_workspace_id() {
