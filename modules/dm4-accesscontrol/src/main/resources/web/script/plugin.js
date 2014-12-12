@@ -185,6 +185,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 dm4c.restore_selection()
                 // signal login status change
                 dm4c.fire_event("logged_out")
+                dm4c.fire_event("logged_out_2")
             })
         }
 

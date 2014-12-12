@@ -119,8 +119,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         fetch_workspaces_and_refresh_menu()
     })
 
-    dm4c.add_listener("logged_out", function() {
+    // Note: the Topicmaps plugin clears its topicmap cache at logout(1). Switching the workspace at logout_2
+    // ensures the Topicmaps plugin loads an up-to-date topicmap (in its "post_select_workspace" listener).
+    dm4c.add_listener("logged_out_2", function() {
         fetch_workspaces_and_refresh_menu()
+        //
+        select_workspace(get_workspace_id_from_menu())
     })
 
 
@@ -225,7 +229,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     }
 
     /**
-     * Updates the model to reflect the given workspace is now selected ("selected_workspace_id").
+     * Updates the model to reflect the given workspace is now selected. That includes setting a cookie
+     * and updating 1 model object ("selected_workspace_id").
      */
     function set_selected_workspace(workspace_id) {
         js.set_cookie("dm4_workspace_id", workspace_id)

@@ -232,6 +232,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     dm4c.add_listener("post_select_workspace", function(workspace_id) {
         fetch_topicmap_topics_and_refresh_menu()    // update model + view
+        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
         //
         var topicmap_id = selected_topicmap_ids[workspace_id]
         if (!topicmap_id) {
@@ -254,11 +255,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     })
 
     dm4c.add_listener("logged_out", function() {
-        fetch_topicmap_topics_and_refresh_menu()
-        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
-        //
         clear_topicmap_cache()
-        reload_topicmap()
+        // Note: the topicmap is switched/reloaded by the "post_select_workspace" listener (above)
     })
 
 
