@@ -168,7 +168,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 clear_permissions_cache()
                 // update view
                 login_widget.show_user(username)
-                dm4c.restore_selection()
                 // signal login status change
                 dm4c.fire_event("logged_in", username)
             })
@@ -182,7 +181,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 clear_permissions_cache()
                 // update view
                 login_widget.show_login()
-                dm4c.restore_selection()
                 // signal login status change
                 dm4c.fire_event("logged_out")
                 dm4c.fire_event("logged_out_2")

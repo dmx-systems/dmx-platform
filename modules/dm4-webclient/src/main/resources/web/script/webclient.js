@@ -449,14 +449,6 @@ dm4c = new function() {
         dm4c.page_panel.render_form(topic_or_association)
     }
 
-    this.restore_selection = function() {
-        if (dm4c.selected_object instanceof Topic) {
-            dm4c.do_select_topic(dm4c.selected_object.id)
-        } else if (dm4c.selected_object instanceof Association) {
-            dm4c.do_select_association(dm4c.selected_object.id)
-        }
-    }
-
     // ---
 
     /**
