@@ -136,7 +136,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     this.get_workspace_id = function() {
         if (!selected_workspace_id) {
-            throw "WorkspacesError: the selected workspace is unknown"
+            throw "WorkspacesError: no workspace is selected yet"
         }
         return selected_workspace_id
     }
@@ -242,6 +242,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
                                                                                             // sort=true
     }
 
+    function is_logged_in() {
+        return dm4c.get_plugin("de.deepamehta.accesscontrol").get_username()
+    }
+
 
 
     // ************
@@ -264,7 +268,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm4c.has_read_permission("dm4.workspaces.workspace")) {   // ### TODO: who is allowed to create a workspace?
+        if (is_logged_in()) {
             workspace_menu.add_separator()
             workspace_menu.add_item({label: "New Workspace...", value: "_new", is_trigger: true})
         }
