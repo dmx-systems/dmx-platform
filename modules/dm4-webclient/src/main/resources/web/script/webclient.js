@@ -1169,6 +1169,8 @@ dm4c = new function() {
         return !js.contains(result, false)
     }
 
+    // ---
+
     // ### TODO: add the same for association types
     this.has_read_permission = function(type_uri) {
         var result = dm4c.fire_event("has_read_permission", dm4c.get_topic_type(type_uri))

@@ -592,9 +592,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             topicmap_menu.add_item({label: topicmap_topic.value, value: topicmap_topic.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm4c.has_read_permission("dm4.topicmaps.topicmap")) {   // ### FIXME: should check CREATE permission
-            // ... (instead of READ permission), but this would involve quering the current workspace, which might
-            // not known yet, because the Topicmaps plugin might be loaded *before* the Workspaces plugin.
+        if (dm4c.has_create_permission("dm4.topicmaps.topicmap")) {
             topicmap_menu.add_separator()
             topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }

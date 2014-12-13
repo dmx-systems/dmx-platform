@@ -294,6 +294,10 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
      *     {
      *         "dm4.accesscontrol.operation.write": true
      *     }
+     *
+     * Note: at client-side there is no explicit READ permission.
+     * The Webclient never gets hold of an object the user is not allowed to read.
+     * The server would not send it in the first place.
      */
     var permissions_cache = {}
 
