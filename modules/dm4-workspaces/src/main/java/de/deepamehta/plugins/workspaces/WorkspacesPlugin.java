@@ -47,7 +47,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private static final String DEFAULT_WORKSPACE_NAME = "DeepaMehta";
     private static final String DEFAULT_WORKSPACE_URI = "de.workspaces.deepamehta";     // ### TODO: "dm4.workspaces..."
-    private static final String DEFAULT_WORKSPACE_TYPE_URI = "dm4.workspaces.type.public";
+    private static final String DEFAULT_WORKSPACE_TYPE_URI = "dm4.workspaces.public";
 
     // Property URIs
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
@@ -124,11 +124,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     @Override
-    public Topic createWorkspace(String name, String uri, String workspaceTypeUri) {
+    public Topic createWorkspace(String name, String uri, String sharingModeUri) {
         logger.info("Creating workspace \"" + name + "\"");
         return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
             .put("dm4.workspaces.name", name)
-            .putRef("dm4.workspaces.type", workspaceTypeUri)
+            .putRef("dm4.workspaces.sharing_mode", sharingModeUri)
         ));
     }
 

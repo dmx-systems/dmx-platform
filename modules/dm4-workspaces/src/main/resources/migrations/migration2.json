@@ -1,12 +1,12 @@
-### TODO: rethink weather "Workspace Type" is a concept that should be defined in the Access Control module instead
+### TODO: rethink weather "Sharing Mode" is a concept that should be defined in the Access Control module instead
 {
     "topic_types": [
 
-        ### Workspace Type ###
+        ### Sharing Mode ###
 
         {
-            "value":            "Workspace Type",
-            "uri":              "dm4.workspaces.type",
+            "value":            "Sharing Mode",
+            "uri":              "dm4.workspaces.sharing_mode",
             "data_type_uri":    "dm4.core.text"
         }
     ],
@@ -14,28 +14,28 @@
     "topics": [
         {
             "value":    "Private",
-            "uri":      "dm4.workspaces.type.private",
-            "type_uri": "dm4.workspaces.type"
+            "uri":      "dm4.workspaces.private",
+            "type_uri": "dm4.workspaces.sharing_mode"
         },
         {
             "value":    "Confidential",
-            "uri":      "dm4.workspaces.type.confidential",
-            "type_uri": "dm4.workspaces.type"
+            "uri":      "dm4.workspaces.confidential",
+            "type_uri": "dm4.workspaces.sharing_mode"
         },
         {
             "value":    "Collaborative",
-            "uri":      "dm4.workspaces.type.collaborative",
-            "type_uri": "dm4.workspaces.type"
+            "uri":      "dm4.workspaces.collaborative",
+            "type_uri": "dm4.workspaces.sharing_mode"
         },
         {
             "value":    "Public",
-            "uri":      "dm4.workspaces.type.public",
-            "type_uri": "dm4.workspaces.type"
+            "uri":      "dm4.workspaces.public",
+            "type_uri": "dm4.workspaces.sharing_mode"
         },
         {
             "value":    "Common",
-            "uri":      "dm4.workspaces.type.common",
-            "type_uri": "dm4.workspaces.type"
+            "uri":      "dm4.workspaces.common",
+            "type_uri": "dm4.workspaces.sharing_mode"
         }
     ]
 }

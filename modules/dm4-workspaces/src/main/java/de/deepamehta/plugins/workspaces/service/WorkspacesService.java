@@ -59,5 +59,5 @@ public interface WorkspacesService extends PluginService {
     /**
      * @param   uri     may be null
      */
-    Topic createWorkspace(String name, String uri, String workspaceTypeUri);
+    Topic createWorkspace(String name, String uri, String sharingModeUri);
 }

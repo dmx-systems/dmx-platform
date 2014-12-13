@@ -50,29 +50,29 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
         function do_open_workspace_dialog() {
             var name_input = dm4c.render.input(undefined, 30)
-            var type_selector = type_selector()
+            var sharing_mode_selector = sharing_mode_selector()
             dm4c.ui.dialog({
                 title: "New Workspace",
                 content: dm4c.render.label("Name").add(name_input)
-                    .add(dm4c.render.label("Type")).add(type_selector),
+                    .add(dm4c.render.label("Sharing Mode")).add(sharing_mode_selector),
                 button_label: "Create",
                 button_handler: do_create_workspace
             })
 
-            function type_selector() {
+            function sharing_mode_selector() {
                 var selector = $()
-                add_option("Private",       "dm4.workspaces.type.private", true)
-                add_option("Confidential",  "dm4.workspaces.type.confidential")
-                add_option("Collaborative", "dm4.workspaces.type.collaborative")
-                add_option("Public",        "dm4.workspaces.type.public")
-                add_option("Common",        "dm4.workspaces.type.common")
+                add_option("Private",       "dm4.workspaces.private", true)
+                add_option("Confidential",  "dm4.workspaces.confidential")
+                add_option("Collaborative", "dm4.workspaces.collaborative")
+                add_option("Public",        "dm4.workspaces.public")
+                add_option("Common",        "dm4.workspaces.common")
                 return selector
 
                 function add_option(label, value, checked) {
                     selector = selector
                         .add($("<label>")
                             .append($("<input>").attr({
-                                type: "radio", name: "workspace-type", value: value, checked: checked
+                                type: "radio", name: "sharing-mode", value: value, checked: checked
                             }))
                             .append(label)
                         )
@@ -82,8 +82,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
             function do_create_workspace() {
                 var name = name_input.val()
-                var type_uri = type_selector.find(":checked").val()
-                create_workspace(name, type_uri)
+                var sharing_mode_uri = sharing_mode_selector.find(":checked").val()
+                create_workspace(name, sharing_mode_uri)
             }
         }
     })
@@ -175,14 +175,14 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     }
 
     /**
-     * Creates a workspace with the given name and type, puts it in the workspace menu, and selects it.
+     * Creates a workspace with the given name and sharing mode, puts it in the workspace menu, and selects it.
      *
-     * @param   type_uri    The URI of the workspace type ("dm4.workspaces.type.private",
-     *                      "dm4.workspaces.type.confidential", ...)
+     * @param   sharing_mode_uri    The URI of the sharing mode ("dm4.workspaces.private",
+     *                              "dm4.workspaces.confidential", ...)
      */
-    function create_workspace(name, type_uri) {
+    function create_workspace(name, sharing_mode_uri) {
         // update DB
-        var workspace = create_workspace_topic(name, type_uri)
+        var workspace = create_workspace_topic(name, sharing_mode_uri)
         // update model + view
         add_workspace(workspace.id)
     }
@@ -192,10 +192,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      *
      * @return  The created Workspace topic.
      */
-    function create_workspace_topic(name, type_uri) {
+    function create_workspace_topic(name, sharing_mode_uri) {
         return dm4c.create_topic("dm4.workspaces.workspace", {
             "dm4.workspaces.name": name,
-            "dm4.workspaces.type": "ref_uri:" + type_uri
+            "dm4.workspaces.sharing_mode": "ref_uri:" + sharing_mode_uri
         })
     }
 

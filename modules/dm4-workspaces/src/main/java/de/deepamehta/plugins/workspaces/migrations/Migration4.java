@@ -13,7 +13,7 @@ public class Migration4 extends Migration {
     public void run() {
         // set type "Public" for workspace "DeepaMehta"
         dms.getTopic("uri", new SimpleValue("de.workspaces.deepamehta")).update(
-            new TopicModel(null, new ChildTopicsModel().putRef("dm4.workspaces.type", "dm4.workspaces.type.public"))
+            new TopicModel(null, new ChildTopicsModel().putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public"))
         );
     }
 }

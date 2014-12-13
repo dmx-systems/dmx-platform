@@ -536,7 +536,7 @@ public class ChildTopicsModel implements Iterable<String> {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for a mandatory topic property
             // ### TODO: "type_uri" should not be regarded mandatory. It would simplify update requests.
-            // ### Can we use another heuristic for detection: "value" exists OR "composite" exists?
+            // ### Can we use another heuristic for detection: "value" exists OR "childs" exists?
             if (val.has("type_uri")) {
                 // canonic format
                 return new TopicModel(val);

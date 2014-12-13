@@ -5,7 +5,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
-import de.deepamehta.core.service.accesscontrol.WorkspaceType;
+import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.logging.Logger;
 
@@ -106,8 +106,8 @@ class AccessControlImpl implements AccessControl {
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
      */
     private boolean hasReadPermission(String username, long workspaceId) {
-        WorkspaceType workspaceType = workspaceType(workspaceId);
-        switch (workspaceType) {
+        SharingMode sharingMode = sharingMode(workspaceId);
+        switch (sharingMode) {
         case PRIVATE:
             return isOwner(username, workspaceId);
         case CONFIDENTIAL:
@@ -119,7 +119,7 @@ class AccessControlImpl implements AccessControl {
         case COMMON:
             return true;
         default:
-            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
+            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
         }
     }
 
@@ -127,8 +127,8 @@ class AccessControlImpl implements AccessControl {
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
      */
     private boolean hasWritePermission(String username, long workspaceId) {
-        WorkspaceType workspaceType = workspaceType(workspaceId);
-        switch (workspaceType) {
+        SharingMode sharingMode = sharingMode(workspaceId);
+        switch (sharingMode) {
         case PRIVATE:
             return isOwner(username, workspaceId);
         case CONFIDENTIAL:
@@ -140,7 +140,7 @@ class AccessControlImpl implements AccessControl {
         case COMMON:
             return true;
         default:
-            throw new RuntimeException(workspaceType + " is an unsupported workspace type");
+            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
         }
     }
 
@@ -190,14 +190,14 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
-    private WorkspaceType workspaceType(long workspaceId) {
+    private SharingMode sharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel workspaceType = dms.storageDecorator.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.type");
-        if (workspaceType == null) {
-            throw new RuntimeException("No workspace type is assigned to workspace " + workspaceId);
+        TopicModel sharingMode = dms.storageDecorator.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation",
+            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.sharing_mode");
+        if (sharingMode == null) {
+            throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
-        return WorkspaceType.fromUri(workspaceType.getUri());
+        return SharingMode.fromUri(sharingMode.getUri());
     }
 
     // ---
