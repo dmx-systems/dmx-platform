@@ -190,7 +190,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     /**
      * Creates a new workspace (a topic of type "Workspace") in the DB.
      *
-     * @return  The created Topicmap topic.
+     * @return  The created Workspace topic.
      */
     function create_workspace_topic(name, type_uri) {
         return dm4c.create_topic("dm4.workspaces.workspace", {

@@ -180,25 +180,15 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
-            //
+            // 1) update model
             invalidate_topicmap_cache(topic.id)
-            var topicmap_topics = get_topicmap_topics(get_workspace_id())
-            delete_topic(topicmap_topics, topic.id)
             //
-            // update the topicmap menu
-            var topicmap_id = get_topicmap_id_from_menu()
-            if (topicmap_id == topic.id) {
-                // the deleted topic was the CURRENT topicmap:
-                // update the topicmap menu and select the first item
-                if (!topicmap_topics.length) {
-                    create_topicmap_topic("untitled")
-                }
-                fetch_topicmap_topics_and_refresh_menu()
+            // 2) update model + view
+            fetch_topicmap_topics_and_refresh_menu()
+            // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
+            // Note: if the last topicmap was deleted another one is already created.
+            if (topic.id == topicmap.get_id()) {
                 select_topicmap(get_topicmap_id_from_menu())
-            } else {
-                // the deleted topic was ANOTHER topicmap:
-                // update the topicmap menu and restore the selection
-                fetch_topicmap_topics_and_refresh_menu()
             }
         }
     })
@@ -390,9 +380,14 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     function fetch_topicmap_topics_and_refresh_menu() {
-        // update model
-        fetch_topicmap_topics()
-        // update view
+        // 1) update model
+        var count = fetch_topicmap_topics()
+        // create default topicmap
+        if (!count) {
+            create_topicmap_topic("untitled")
+            fetch_topicmap_topics()
+        }
+        // 2) update view
         refresh_topicmap_menu()
     }
 
@@ -499,6 +494,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
         topicmap_topics[workspace_id] = dm4c.build_topics(topics)
         // ### TODO: sort topicmaps by name
+        return topics.length
     }
 
     function get_workspace_id() {
@@ -531,12 +527,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     function find_topic(topics, id) {
         return js.find(topics, function(topic) {
-            return topic.id == id
-        })
-    }
-
-    function delete_topic(topics, id) {
-        js.delete(topics, function(topic) {
             return topic.id == id
         })
     }
