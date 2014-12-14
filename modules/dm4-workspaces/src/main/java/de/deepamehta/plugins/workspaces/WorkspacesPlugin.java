@@ -80,8 +80,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return topics;
     }
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/object/{id}")
     @Override
-    public Topic getAssignedWorkspace(long id) {
+    public Topic getAssignedWorkspace(@PathParam("id") long id) {
         long workspaceId = workspaceId(id);
         if (workspaceId == -1) {
             return null;
