@@ -237,9 +237,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Object Info ===
 
+    @GET
+    @Path("/object/{id}/creator")
     @Override
-    public String getCreator(DeepaMehtaObject object) {
-        return object.hasProperty(PROP_CREATOR) ? (String) object.getProperty(PROP_CREATOR) : null;
+    public String getCreator(@PathParam("id") long objectId) {
+        return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
     }
 
     @Override
@@ -254,10 +256,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    @GET
+    @Path("/object/{id}/owner")
     @Override
-    public String getOwner(DeepaMehtaObject object) {
+    public String getOwner(@PathParam("id") long objectId) {
         // ### TODO: delegate to Core's AccessControl.owner()?
-        return object.hasProperty(PROP_OWNER) ? (String) object.getProperty(PROP_OWNER) : null;
+        return dms.hasProperty(objectId, PROP_OWNER) ? (String) dms.getProperty(objectId, PROP_OWNER) : null;
     }
 
     @Override
@@ -272,9 +276,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    @GET
+    @Path("/object/{id}/modifier")
     @Override
-    public String getModifier(DeepaMehtaObject object) {
-        return object.hasProperty(PROP_MODIFIER) ? (String) object.getProperty(PROP_MODIFIER) : null;
+    public String getModifier(@PathParam("id") long objectId) {
+        return dms.hasProperty(objectId, PROP_MODIFIER) ? (String) dms.getProperty(objectId, PROP_MODIFIER) : null;
     }
 
 
@@ -642,7 +648,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             // Note: we only check for creator assignment.
             // If an object has a creator assignment it is expected to have an ACL entry as well.
-            if (getCreator(topic) != null) {
+            if (getCreator(topic.getId()) != null) {
                 logger.info("### " + operation + " ABORTED -- already setup");
                 return;
             }

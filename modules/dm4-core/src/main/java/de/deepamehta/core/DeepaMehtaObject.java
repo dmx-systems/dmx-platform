@@ -148,8 +148,15 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // === Properties ===
 
+    /**
+     * Returns this object's property value associated with the given property URI.
+     * If there's no property value associated with the property URI an exception is thrown.
+     */
     Object getProperty(String propUri);
 
+    /**
+     * Checks whether for this object a property value is associated with a given property URI.
+     */
     boolean hasProperty(String propUri);
 
     void setProperty(String propUri, Object propValue, boolean addToIndex);

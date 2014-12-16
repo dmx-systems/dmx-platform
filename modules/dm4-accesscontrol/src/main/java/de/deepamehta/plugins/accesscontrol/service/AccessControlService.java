@@ -76,7 +76,7 @@ public interface AccessControlService extends PluginService {
      *
      * @return  The username of the creator, or <code>null</code> if no creator is set.
      */
-    String getCreator(DeepaMehtaObject object);
+    String getCreator(long objectId);
 
     /**
      * Sets the creator of a topic or an association.
@@ -90,7 +90,7 @@ public interface AccessControlService extends PluginService {
      *
      * @return  The username of the owner, or <code>null</code> if no owner is set.
      */
-    String getOwner(DeepaMehtaObject object);
+    String getOwner(long objectId);
 
     /**
      * Sets the owner of a topic or an association.
@@ -104,7 +104,7 @@ public interface AccessControlService extends PluginService {
      *
      * @return  The username of the modifier, or <code>null</code> if no modifier is set.
      */
-    String getModifier(DeepaMehtaObject object);
+    String getModifier(long objectId);
 
 
 
