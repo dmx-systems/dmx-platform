@@ -35,6 +35,7 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreGetAssociationListener;
 import de.deepamehta.core.service.event.PreGetTopicListener;
@@ -84,6 +85,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                        PostCreateTopicListener,
                                                                                        PostCreateAssociationListener,
                                                                                        PostUpdateTopicListener,
+                                                                                       PostUpdateAssociationListener,
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
                                                                                        ServiceRequestFilterListener,
@@ -120,9 +122,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     );
 
     // Property URIs
-    private static String PROP_CREATOR = "dm4.accesscontrol.creator";
-    private static String PROP_OWNER   = "dm4.accesscontrol.owner";
-    private static String PROP_ACL     = "dm4.accesscontrol.acl";
+    private static String PROP_CREATOR  = "dm4.accesscontrol.creator";
+    private static String PROP_OWNER    = "dm4.accesscontrol.owner";
+    private static String PROP_MODIFIER = "dm4.accesscontrol.modifier";
+    private static String PROP_ACL      = "dm4.accesscontrol.acl";
 
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
@@ -232,7 +235,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Creator ===
+    // === Object Info ===
 
     @Override
     public String getCreator(DeepaMehtaObject object) {
@@ -249,9 +252,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-
-
-    // === Owner ===
+    // ---
 
     @Override
     public String getOwner(DeepaMehtaObject object) {
@@ -267,6 +268,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("Setting the owner of " + info(object) + " failed (username=" + username + ")",
                 e);
         }
+    }
+
+    // ---
+
+    @Override
+    public String getModifier(DeepaMehtaObject object) {
+        return object.hasProperty(PROP_MODIFIER) ? (String) object.getProperty(PROP_MODIFIER) : null;
     }
 
 
@@ -487,6 +495,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 setOwner(passwordTopic, newUsername);
             }
         }
+        //
+        storeModifier(topic);
+    }
+
+    @Override
+    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
+        storeModifier(assoc);
     }
 
     // ---
@@ -1055,6 +1070,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Permissions createPermissions(boolean write) {
         return new Permissions().add(Operation.WRITE, write);
+    }
+
+    // ---
+
+    private void storeModifier(DeepaMehtaObject object) {
+        String username = getUsername();
+        // Note: when a plugin topic is updated there is no user logged in yet.
+        if (username != null) {
+            object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
+        }
     }
 
 
