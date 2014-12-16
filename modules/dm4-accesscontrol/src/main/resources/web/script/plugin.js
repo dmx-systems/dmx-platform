@@ -25,17 +25,17 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.restc.get_association_permissions = function(assoc_id) {
         return this.request("GET", "/accesscontrol/association/" + assoc_id)
     }
-    // ### FIXME: adapt to server-side
-    dm4c.restc.get_owned_topic = function(user_id, type_uri) {
-        return this.request("GET", "/accesscontrol/owner/" + user_id + "/" + type_uri)
+    dm4c.restc.get_creator = function(object_id) {
+        return this.request("GET", "/accesscontrol/object/" + object_id + "/creator",
+            undefined, undefined, undefined, "text")
     }
-    // ### FIXME: adapt to server-side
-    dm4c.restc.set_owner = function(topic_id, user_id) {
-        this.request("POST", "/accesscontrol/topic/" + topic_id + "/owner/" + user_id)
+    dm4c.restc.get_owner = function(object_id) {
+        return this.request("GET", "/accesscontrol/object/" + object_id + "/owner",
+            undefined, undefined, undefined, "text")
     }
-    // ### FIXME: adapt to server-side
-    dm4c.restc.create_acl_entry = function(topic_id, user_role_uri, permissions) {
-        this.request("POST", "/accesscontrol/topic/" + topic_id + "/userrole/" + user_role_uri, permissions)
+    dm4c.restc.get_modifier = function(object_id) {
+        return this.request("GET", "/accesscontrol/object/" + object_id + "/modifier",
+            undefined, undefined, undefined, "text")
     }
     dm4c.restc.join_workspace = function(username, workspace_id) {
         this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)

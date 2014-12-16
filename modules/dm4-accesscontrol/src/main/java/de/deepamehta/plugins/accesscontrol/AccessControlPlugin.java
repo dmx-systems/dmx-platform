@@ -239,6 +239,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @GET
     @Path("/object/{id}/creator")
+    @Produces("text/plain")
     @Override
     public String getCreator(@PathParam("id") long objectId) {
         return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
@@ -258,6 +259,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @GET
     @Path("/object/{id}/owner")
+    @Produces("text/plain")
     @Override
     public String getOwner(@PathParam("id") long objectId) {
         // ### TODO: delegate to Core's AccessControl.owner()?
@@ -278,6 +280,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @GET
     @Path("/object/{id}/modifier")
+    @Produces("text/plain")
     @Override
     public String getModifier(@PathParam("id") long objectId) {
         return dms.hasProperty(objectId, PROP_MODIFIER) ? (String) dms.getProperty(objectId, PROP_MODIFIER) : null;
