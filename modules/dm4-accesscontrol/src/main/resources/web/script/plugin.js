@@ -194,6 +194,37 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
     })
 
+    dm4c.add_listener("topic_commands", function(topic) {
+        return [
+            {
+                is_separator: true,
+                context: "context-menu"
+            },
+            {
+                label:   "Get Info",
+                handler: do_open_info_dialog,
+                context: "context-menu"
+            }
+        ]
+
+        function do_open_info_dialog() {
+            var created  = dm4c.restc.get_creation_time(topic.id)
+            var modified = dm4c.restc.get_modification_time(topic.id)
+            var creator  = dm4c.restc.get_creator(topic.id)
+            var owner    = dm4c.restc.get_owner(topic.id)
+            var modifier = dm4c.restc.get_modifier(topic.id)
+            //
+            var content = /* ### TODO dm4c.render.label("Owner").add($("<div>").text(owner)) */
+                dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
+                .add(dm4c.render.label("Modified")).add($("<div>").text(new Date(modified) + " by " + modifier))
+            //
+            dm4c.ui.dialog({
+                title: "Topic Info",
+                content: content
+            })
+        }
+    })
+
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
         // Note: the toolbar's Create menu is only refreshed when the login status changes, not when a workspace is
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
