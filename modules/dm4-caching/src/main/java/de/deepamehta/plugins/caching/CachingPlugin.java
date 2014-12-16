@@ -62,7 +62,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
                 throw new RuntimeException("Time service is not available");
             }
             //
-            long time = timeService.getModificationTime(object);
+            long time = timeService.getModificationTime(object.getId());
             Response.ResponseBuilder response = request.evaluatePreconditions(new Date(time));
             if (response != null) {
                 logger.info("### Precondition of " + request.getMethod() + " request failed (object " +

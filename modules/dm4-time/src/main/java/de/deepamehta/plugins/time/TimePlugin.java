@@ -54,8 +54,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String PROP_URI_CREATED  = "dm4.time.created";
-    private static String PROP_URI_MODIFIED = "dm4.time.modified";
+    private static String PROP_CREATED  = "dm4.time.created";
+    private static String PROP_MODIFIED = "dm4.time.modified";
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
@@ -80,14 +80,18 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // Note: the timestamp getters must return 0 as default. Before we used -1 but Jersey's evaluatePreconditions()
     // does not work as expected when called with a negative value which is not dividable by 1000.
 
+    @GET
+    @Path("/object/{id}/created")
     @Override
-    public long getCreationTime(DeepaMehtaObject object) {
-        return object.hasProperty(PROP_URI_CREATED) ? (Long) object.getProperty(PROP_URI_CREATED) : 0;
+    public long getCreationTime(@PathParam("id") long objectId) {
+        return dms.hasProperty(objectId, PROP_CREATED) ? (Long) dms.getProperty(objectId, PROP_CREATED) : 0;
     }
 
+    @GET
+    @Path("/object/{id}/modified")
     @Override
-    public long getModificationTime(DeepaMehtaObject object) {
-        return object.hasProperty(PROP_URI_MODIFIED) ? (Long) object.getProperty(PROP_URI_MODIFIED) : 0;
+    public long getModificationTime(@PathParam("id") long objectId) {
+        return dms.hasProperty(objectId, PROP_MODIFIED) ? (Long) dms.getProperty(objectId, PROP_MODIFIED) : 0;
     }
 
 
@@ -99,7 +103,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
                                                      @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_URI_CREATED, from, to);
+        return dms.getTopicsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -107,7 +111,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
                                                          @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_URI_MODIFIED, from, to);
+        return dms.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
     @GET
@@ -115,7 +119,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
                                                                  @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_URI_CREATED, from, to);
+        return dms.getAssociationsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -123,7 +127,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
                                                                      @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_URI_MODIFIED, from, to);
+        return dms.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
 
@@ -227,11 +231,11 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     private void storeCreationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, PROP_URI_CREATED, time);
+        storeTime(object, PROP_CREATED, time);
     }
 
     private void storeModificationTime(DeepaMehtaObject object, long time) {
-        storeTime(object, PROP_URI_MODIFIED, time);
+        storeTime(object, PROP_MODIFIED, time);
     }
 
     // ---
@@ -249,11 +253,12 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     private long enrichWithTimestamp(DeepaMehtaObject object) {
-        long created = getCreationTime(object);
-        long modified = getModificationTime(object);
+        long objectId = object.getId();
+        long created = getCreationTime(objectId);
+        long modified = getModificationTime(objectId);
         ChildTopicsModel childTopics = object.getChildTopics().getModel();
-        childTopics.put(PROP_URI_CREATED, created);
-        childTopics.put(PROP_URI_MODIFIED, modified);
+        childTopics.put(PROP_CREATED, created);
+        childTopics.put(PROP_MODIFIED, modified);
         return modified;
     }
 

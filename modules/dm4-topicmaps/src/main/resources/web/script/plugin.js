@@ -449,7 +449,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var workspace_id = get_workspace_id()
         var topicmap_topic = find_topic(get_topicmap_topics(workspace_id), topicmap_id)
         if (!topicmap_topic) {
-            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model (workspace_id=" + workspace_id + ")"
+            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " + workspace_id
         }
         return topicmap_topic
     }

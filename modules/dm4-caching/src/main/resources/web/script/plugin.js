@@ -1,7 +1,7 @@
 dm4c.add_plugin("de.deepamehta.caching", function() {
 
     var CACHABLE_PATH = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
-    var PROP_URI_MODIFIED = "dm4.time.modified"
+    var PROP_MODIFIED = "dm4.time.modified"
 
     // === Webclient Listeners ===
 
@@ -43,15 +43,15 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
 
         function request_object_timestamp() {
             var childs = request.data.childs
-            return childs && childs[PROP_URI_MODIFIED] && childs[PROP_URI_MODIFIED].value
-            // ### TODO: request.data.get(PROP_URI_MODIFIED) would be more comfortable
+            return childs && childs[PROP_MODIFIED] && childs[PROP_MODIFIED].value
+            // ### TODO: request.data.get(PROP_MODIFIED) would be more comfortable
             // ### but is not supported for non-model values. See Topic.prototype.get()
         }
 
         function page_panel_object_timestamp() {
             var displayed_object = dm4c.page_panel.get_displayed_object()
             if (displayed_object && displayed_object.id == object_id) {
-                return displayed_object.childs[PROP_URI_MODIFIED].value
+                return displayed_object.childs[PROP_MODIFIED].value
             }
         }
     })
