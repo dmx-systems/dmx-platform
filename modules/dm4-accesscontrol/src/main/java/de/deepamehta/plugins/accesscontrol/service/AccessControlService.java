@@ -110,17 +110,17 @@ public interface AccessControlService extends PluginService {
 
     // === Access Control List ===
 
-    /**
+    /** ###
      * Returns the Access Control List of a topic or an association.
      *
      * @return  The Access Control List. If no one was set an empty Access Control List is returned.
-     */
-    AccessControlList getACL(DeepaMehtaObject object);
+     *
+    AccessControlList getACL(DeepaMehtaObject object); */
 
-    /**
+    /** ###
      * Sets the Access Control List for a topic or an association.
-     */
-    void setACL(DeepaMehtaObject object, AccessControlList acl);
+     *
+    void setACL(DeepaMehtaObject object, AccessControlList acl); */
 
 
 

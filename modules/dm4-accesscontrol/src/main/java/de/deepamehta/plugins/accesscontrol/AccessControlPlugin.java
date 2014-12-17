@@ -113,19 +113,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // Associations
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
 
-    // Default ACLs
-    private static final AccessControlList DEFAULT_INSTANCE_ACL = new AccessControlList(
-        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER, UserRole.MEMBER)
-    );
-    private static final AccessControlList DEFAULT_USER_ACCOUNT_ACL = new AccessControlList(
-        new ACLEntry(Operation.WRITE,  UserRole.CREATOR, UserRole.OWNER)
-    );
-
     // Property URIs
     private static String PROP_CREATOR  = "dm4.accesscontrol.creator";
     private static String PROP_OWNER    = "dm4.accesscontrol.owner";
     private static String PROP_MODIFIER = "dm4.accesscontrol.modifier";
-    private static String PROP_ACL      = "dm4.accesscontrol.acl";
+    // ### private static String PROP_ACL      = "dm4.accesscontrol.acl";
 
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
@@ -290,6 +282,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Access Control List ===
 
+    /* ###
     @Override
     public AccessControlList getACL(DeepaMehtaObject object) {
         try {
@@ -301,8 +294,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Fetching the ACL of " + info(object) + " failed", e);
         }
-    }
+    } */
 
+    /* ###
     @Override
     public void setACL(DeepaMehtaObject object, AccessControlList acl) {
         try {
@@ -310,7 +304,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Setting the ACL of " + info(object) + " failed", e);
         }
-    }
+    } */
 
 
 
@@ -385,7 +379,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // At post-install time our listeners are not yet registered. So we must setup manually here.
         // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
         // instead of (the higher-level) setupUserAccountAccessControl().
-        setupAccessControl(adminAccount, DEFAULT_USER_ACCOUNT_ACL, DEFAULT_USERNAME);
+        setupAccessControl(adminAccount, DEFAULT_USERNAME);
         // ### TODO: setup access control for the admin account's Username and Password topics.
         // However, they are not strictly required for the moment.
     }
@@ -657,7 +651,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
             //
             logger.info("### " + operation);
-            setupAccessControl(topic, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+            setupAccessControl(topic, DEFAULT_USERNAME);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -843,7 +837,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * If no user is logged in, nothing is performed.
      */
     private void setupDefaultAccessControl(DeepaMehtaObject object) {
-        setupAccessControl(object, DEFAULT_INSTANCE_ACL);
+        setupAccessControl(object);
     }
 
     private void setupDefaultAccessControl(Type type) {
@@ -855,7 +849,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 setupViewConfigAccessControl(type.getViewConfig());
             }
             //
-            setupAccessControl(type, DEFAULT_INSTANCE_ACL, username);
+            setupAccessControl(type, username);
         } catch (Exception e) {
             throw new RuntimeException("Setting up access control for " + info(type) + " failed (" + type + ")", e);
         }
@@ -864,18 +858,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private void setupUserAccountAccessControl(Topic topic) {
-        setupAccessControl(topic, DEFAULT_USER_ACCOUNT_ACL);
+        setupAccessControl(topic);
     }
 
     private void setupViewConfigAccessControl(ViewConfiguration viewConfig) {
         for (Topic configTopic : viewConfig.getConfigTopics()) {
-            setupAccessControl(configTopic, DEFAULT_INSTANCE_ACL, DEFAULT_USERNAME);
+            setupAccessControl(configTopic, DEFAULT_USERNAME);
         }
     }
 
     // ---
 
-    private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl) {
+    private void setupAccessControl(DeepaMehtaObject object) {
         try {
             String username = getUsername();
             // Note: when no user is logged in we do NOT fallback to the default user for the access control setup.
@@ -889,7 +883,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 return;
             }
             //
-            setupAccessControl(object, acl, username);
+            setupAccessControl(object, username);
         } catch (Exception e) {
             throw new RuntimeException("Setting up access control for " + info(object) + " failed (" + object + ")", e);
         }
@@ -898,10 +892,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * @param   username    must not be null.
      */
-    private void setupAccessControl(DeepaMehtaObject object, AccessControlList acl, String username) {
+    private void setupAccessControl(DeepaMehtaObject object, String username) {
         setCreator(object, username);
-        setOwner(object, username);
-        setACL(object, acl);
+        if (object.getTypeUri().equals("dm4.workspaces.workspace")) {
+            setOwner(object, username);
+        }
     }
 
 
