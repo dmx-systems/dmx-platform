@@ -463,11 +463,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         // when a workspace is created its creator joins automatically
         joinIfWorkspace(topic);
+        //
+        storeModifier(topic);
     }
 
     @Override
     public void postCreateAssociation(Association assoc) {
         setupDefaultAccessControl(assoc);
+        //
+        storeModifier(assoc);
     }
 
     // ---
