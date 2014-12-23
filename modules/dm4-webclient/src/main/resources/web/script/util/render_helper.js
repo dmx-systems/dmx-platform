@@ -181,6 +181,7 @@ function RenderHelper() {
     /**
      * @param   page_model      Optional: the initial value (a TopicRenderer.PageModel object or a non-object value).
      *                          If not specified the text field will be empty.
+     * @param   size            Optional.
      *
      * @return  The <input> element (jQuery object).
      */

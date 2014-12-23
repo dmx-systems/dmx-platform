@@ -110,10 +110,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
-            var dialog_content = $("<div>").addClass("field-label").text("Username")
-                .add(username_input)
-                .add($("<div>").addClass("field-label").text("Password"))
-                .add(password_input)
+            var dialog_content = dm4c.render.label("Username").add(username_input)
+                .add(dm4c.render.label("Password")).add(password_input)
                 .add(message_div)
             // Note: as of jQuery 1.9 you can't add objects to a disconnected (not in a document)
             // jQuery object with the after() method. Use add() instead.
@@ -235,9 +233,25 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
         //
         type_menu.add_separator()
-        type_menu.add_item({label: "New User Account", handler: function() {
-            dm4c.do_create_topic("dm4.accesscontrol.user_account");
-        }})
+        type_menu.add_item({label: "New User Account", handler: do_open_new_user_account_dialog})
+
+        function do_open_new_user_account_dialog() {
+            var username_input = dm4c.render.input()
+            var password_input = dm4c.render.input()
+            dm4c.ui.dialog({
+                title: "New User Account",
+                content: dm4c.render.label("Username").add(username_input)
+                    .add(dm4c.render.label("Password")).add(password_input),
+                button_label: "Create",
+                button_handler: do_create_user_account
+            })
+
+            function do_create_user_account() {
+                var username = username_input.val()
+                var password = password_input.val()
+                self.create_user_account(username, password);
+            }
+        }
     })
 
     dm4c.add_listener("pre_update_topic", function(topic_model) {

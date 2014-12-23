@@ -124,12 +124,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         function do_open_topicmap_dialog() {
             var title_input = dm4c.render.input(undefined, 30)
             var type_menu = create_maptype_menu()
-            var dialog_content = $("<div>").addClass("field-label").text("Title")
-                .add(title_input)
+            var dialog_content = dm4c.render.label("Title").add(title_input)
             if (type_menu.get_item_count() > 1) {
-                dialog_content = dialog_content
-                    .add($("<div>").addClass("field-label").text("Type"))
-                    .add(type_menu.dom)
+                dialog_content = dialog_content.add(dm4c.render.label("Type")).add(type_menu.dom)
             }
             dm4c.ui.dialog({
                 title: "New Topicmap",
