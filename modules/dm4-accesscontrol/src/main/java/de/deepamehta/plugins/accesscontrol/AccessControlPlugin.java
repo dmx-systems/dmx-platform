@@ -157,7 +157,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Session ===
+    // === User Session ===
+
+    @GET
+    @Path("/user")
+    @Produces("text/plain")
+    @Override
+    public String getUsername() {
+        try {
+            HttpSession session = request.getSession(false);    // create=false
+            if (session == null) {
+                return null;
+            }
+            return username(session);
+        } catch (IllegalStateException e) {
+            // Note: if not invoked through network no request (and thus no session) is available.
+            // This happens e.g. while starting up.
+            return null;    // user is unknown
+        }
+    }
+
+    // ---
 
     @POST
     @Path("/login")
@@ -182,24 +202,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === User ===
+    // === User Accounts ===
 
-    @GET
-    @Path("/user")
-    @Produces("text/plain")
+    @POST
+    @Path("/user_account")
+    @Transactional
     @Override
-    public String getUsername() {
-        try {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session == null) {
-                return null;
-            }
-            return username(session);
-        } catch (IllegalStateException e) {
-            // Note: if not invoked through network no request (and thus no session) is available.
-            // This happens e.g. while starting up.
-            return null;    // user is unknown
-        }
+    public Topic createUserAccount(Credentials cred) {
+        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+            .put("dm4.accesscontrol.username", cred.username)
+            .put("dm4.accesscontrol.password", cred.password)));
     }
 
     @Override
@@ -308,7 +320,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Workspaces ===
+    // === Memberships ===
 
     @POST
     @Path("/user/{username}/workspace/{workspace_id}")
@@ -563,12 +575,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
-            .put("dm4.accesscontrol.username", cred.username)
-            .put("dm4.accesscontrol.password", cred.password)));
-    }
-
     private boolean isUserAccount(Topic topic) {
         String typeUri = topic.getTypeUri();
         return typeUri.equals("dm4.accesscontrol.user_account")
@@ -773,7 +779,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * Prerequisite: username is not <code>null</code>.
      *
-     * @param   password    The encrypted password.
+     * @param   password    The encoded password.
      */
     private boolean matches(Topic username, String password) {
         return password(fetchUserAccount(username)).equals(password);

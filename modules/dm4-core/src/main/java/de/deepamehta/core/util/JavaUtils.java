@@ -234,7 +234,7 @@ public class JavaUtils {
 
 
 
-    // === Encryption ===
+    // === Encoding ===
 
     /* static {
         for (Provider p : Security.getProviders()) {

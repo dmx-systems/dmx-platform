@@ -1,6 +1,7 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
+import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
@@ -15,7 +16,16 @@ public interface AccessControlService extends PluginService {
 
 
 
-    // === Session ===
+    // === User Session ===
+
+    /**
+     * Returns the username of the logged in user.
+     *
+     * @return  The username, or <code>null</code> if no user is logged in.
+     */
+    String getUsername();
+
+    // ---
 
     /**
      * Checks weather the credentials in the authorization string match an existing User Account,
@@ -42,14 +52,9 @@ public interface AccessControlService extends PluginService {
 
 
 
-    // === User ===
+    // === User Accounts ===
 
-    /**
-     * Returns the username of the logged in user.
-     *
-     * @return  The username, or <code>null</code> if no user is logged in.
-     */
-    String getUsername();
+    Topic createUserAccount(Credentials cred);
 
     /**
      * Returns the "Username" topic for the specified username.
@@ -124,7 +129,7 @@ public interface AccessControlService extends PluginService {
 
 
 
-    // === Workspaces ===
+    // === Memberships ===
 
     void createMembership(String username, long workspaceId);
 

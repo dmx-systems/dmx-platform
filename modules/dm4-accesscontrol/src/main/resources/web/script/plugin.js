@@ -1,6 +1,6 @@
 dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
-    var ENCRYPTED_PASSWORD_PREFIX = "-SHA256-"
+    var ENCODED_PASSWORD_PREFIX = "-SHA256-"
     var self = this
 
     dm4c.load_script("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
@@ -9,15 +9,18 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // === REST Client Extension ===
 
+    dm4c.restc.get_username = function() {
+        return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
+        // Note: response 204 No Content yields to null result
+    }
     dm4c.restc.login = function(authorization) {
         this.request("POST", "/accesscontrol/login", undefined, undefined, {"Authorization": authorization})
     }
     dm4c.restc.logout = function() {
         this.request("POST", "/accesscontrol/logout")
     }
-    dm4c.restc.get_username = function() {
-        return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
-        // Note: response 204 No Content yields to null result
+    dm4c.restc.create_user_account = function(username, password) { // password is expected to be SHA256 encoded
+        return this.request("POST", "/accesscontrol/user_account", {username: username, password: password})
     }
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
@@ -37,7 +40,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/object/" + object_id + "/modifier",
             undefined, undefined, undefined, "text")
     }
-    dm4c.restc.join_workspace = function(username, workspace_id) {
+    dm4c.restc.create_membership = function(username, workspace_id) {
         this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)
     }
 
@@ -249,7 +252,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             function do_create_user_account() {
                 var username = username_input.val()
                 var password = password_input.val()
-                self.create_user_account(username, password);
+                var user_account = self.create_user_account(username, password);
+                dm4c.show_topic(user_account, "show", undefined, true)      // coordinates=undefined, do_center=true
             }
         }
     })
@@ -261,8 +265,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         //
         var password_topic = topic_model.childs["dm4.accesscontrol.password"]
         var password = password_topic.value
-        if (!js.begins_with(password, ENCRYPTED_PASSWORD_PREFIX)) {
-            password_topic.value = encrypt_password(password)
+        if (!js.begins_with(password, ENCODED_PASSWORD_PREFIX)) {
+            password_topic.value = encode_password(password)
         }
     })
 
@@ -300,11 +304,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return dm4c.restc.get_username()
     }
 
+    /**
+     * @param   password    unencoded
+     */
     this.create_user_account = function(username, password) {
-        return dm4c.create_topic("dm4.accesscontrol.user_account", {
-            "dm4.accesscontrol.username": username,
-            "dm4.accesscontrol.password": encrypt_password(password)
-        })
+        return new Topic(dm4c.restc.create_user_account(username, encode_password(password)))
     }
 
     this.is_workspace_writable = function() {
@@ -327,8 +331,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // ---
 
-    function encrypt_password(password) {
-        return ENCRYPTED_PASSWORD_PREFIX + SHA256(password)
+    function encode_password(password) {
+        return ENCODED_PASSWORD_PREFIX + SHA256(password)
     }
 
     // === Permissions Cache ===
