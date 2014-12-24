@@ -29,6 +29,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -52,10 +54,16 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Property URIs
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
+    // Query parameter
+    private static final String PARAM_NO_WORKSPACE_ASSIGNMENT = "no_workspace_assignment";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
     private FacetsService facetsService;
+
+    @Context
+    private UriInfo uriInfo;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -85,7 +93,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/object/{id}")
     @Override
     public Topic getAssignedWorkspace(@PathParam("id") long id) {
-        long workspaceId = workspaceId(id);
+        long workspaceId = getAssignedWorkspaceId(id);
         if (workspaceId == -1) {
             return null;
         }
@@ -215,6 +223,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             if (workspaceId == -1) {
                 return;
             }
+            // Note: never reached when outside request scope
+            if (abortAssignment(topic)) {
+                return;
+            }
             //
             assignToWorkspace(topic, workspaceId);
         } catch (Exception e) {
@@ -245,6 +257,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             if (workspaceId == -1) {
                 return;
             }
+            // Note: never reached when outside request scope
+            if (abortAssignment(assoc)) {
+                return;
+            }
             //
             assignToWorkspace(assoc, workspaceId);
         } catch (Exception e) {
@@ -256,14 +272,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private long workspaceId(long id) {
-        if (!dms.hasProperty(id, PROP_WORKSPACE_ID)) {
-            return -1;
-        }
-        //
-        return (Long) dms.getProperty(id, PROP_WORKSPACE_ID);
-    }
 
     private long workspaceId() {
         Cookies cookies = Cookies.get();
@@ -291,6 +299,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     // ---
+
+    private long getAssignedWorkspaceId(long id) {
+        if (!dms.hasProperty(id, PROP_WORKSPACE_ID)) {
+            return -1;
+        }
+        //
+        return (Long) dms.getProperty(id, PROP_WORKSPACE_ID);
+    }
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         // 1) create assignment association
@@ -349,6 +365,45 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (!typeUri.equals("dm4.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
                 "\")");
+        }
+    }
+
+    // ### TODO: abort topic and association assignments separately?
+    private boolean abortAssignment(DeepaMehtaObject object) {
+        // Note: never called outside a request scope. So the UriInfo methods doesn't throw IllegalStateException.
+        String value = uriInfo.getQueryParameters().getFirst(PARAM_NO_WORKSPACE_ASSIGNMENT);
+        if (value == null) {
+            // no such parameter in request
+            return false;
+        }
+        if (!value.equals("false") && !value.equals("true")) {
+            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" +
+                PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter (expected are \"false\" or \"true\")");
+        }
+        boolean abort = value.equals("true");
+        if (abort) {
+            logger.info("### Workspace assignment for " + info(object) + " ABORTED -- \"" +
+                PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter detected");
+        }
+        return abort;
+    }
+
+    // ---
+
+    // ### FIXME: copied from Access Control
+    // ### TODO: add shortInfo() to DeepaMehtaObject interface
+    private String info(DeepaMehtaObject object) {
+        if (object instanceof TopicType) {
+            return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof AssociationType) {
+            return "association type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
+        } else if (object instanceof Topic) {
+            return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", uri=\"" + object.getUri() +
+                "\")";
+        } else if (object instanceof Association) {
+            return "association " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\")";
+        } else {
+            throw new RuntimeException("Unexpected object: " + object);
         }
     }
 }
