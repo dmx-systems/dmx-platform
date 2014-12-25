@@ -24,6 +24,10 @@ public enum SharingMode {
         return sharingMode;
     }
 
+    public String getUri() {
+        return uri;
+    }
+
     // ---
 
     private final String uri;

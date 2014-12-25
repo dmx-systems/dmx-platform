@@ -9,7 +9,7 @@ import com.sun.jersey.core.util.Base64;
 
 
 /**
- * A pair of a username and a SHA256 encoded password.
+ * A pair of username and SHA256 encoded password.
  */
 public class Credentials {
 
@@ -35,7 +35,7 @@ public class Credentials {
     /**
      * Note: invoked from JAX-RS message body reader (see Webservice's ObjectProvider.java).
      *
-     * @param   cread   A JSON object with 2 properties: "username" and "password".
+     * @param   cred    A JSON object with 2 properties: "username" and "password".
      *                  The password is expected to be SHA256 encoded.
      */
     public Credentials(JSONObject cred) {

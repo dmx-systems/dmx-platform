@@ -2,8 +2,6 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
-import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
-import de.deepamehta.plugins.accesscontrol.model.ACLEntry;
 import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.UserRole;
@@ -12,6 +10,7 @@ import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -30,6 +29,7 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.service.accesscontrol.Operation;
+import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
@@ -44,16 +44,12 @@ import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
-
-import org.codehaus.jettison.json.JSONObject;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.GET;
@@ -71,7 +67,6 @@ import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -109,6 +104,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // Default user account
     private static final String DEFAULT_USERNAME = "admin";
     private static final String DEFAULT_PASSWORD = "";
+    private static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
+
+    // System workspace
+    private static final String SYSTEM_WORKSPACE_NAME = "DeepaMehta";
+    private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+    private static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
     // Associations
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
@@ -209,9 +210,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Transactional
     @Override
     public Topic createUserAccount(Credentials cred) {
-        return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+        logger.info("Creating user account \"" + cred.username + "\"");
+        // create user account
+        Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
             .put("dm4.accesscontrol.username", cred.username)
             .put("dm4.accesscontrol.password", cred.password)));
+        ChildTopics childTopics = userAccount.getChildTopics();
+        // create private workspace
+        Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
+        // assign user account and password to private workspace
+        long privateWorkspaceId = privateWorkspace.getId();
+        wsService.assignToWorkspace(userAccount, privateWorkspaceId);
+        wsService.assignToWorkspace(childTopics.getTopic("dm4.accesscontrol.password"), privateWorkspaceId);
+        // assign user name to "System" workspace
+        Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
+        wsService.assignToWorkspace(childTopics.getTopic("dm4.accesscontrol.username"), systemWorkspace.getId());
+        //
+        return userAccount;
     }
 
     @Override
@@ -385,7 +400,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postInstall() {
-        logger.info("Creating \"admin\" user account");
+        // create workspace "System"
+        wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI, SYSTEM_WORKSPACE_SHARING_MODE);
+        //
+        // create user account "admin"
         Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
         // Note 1: the admin account needs to be setup for access control itself.
         // At post-install time our listeners are not yet registered. So we must setup manually here.
@@ -423,7 +441,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void allPluginsActive() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic defaultWorkspace = wsService.getDefaultWorkspace();
+            Topic defaultWorkspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
             //
             // 1) create membership for default user and default workspace
             createDefaultMembership(defaultWorkspace);

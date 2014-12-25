@@ -18,6 +18,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
@@ -47,10 +48,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DEFAULT_WORKSPACE_NAME = "DeepaMehta";
-    private static final String DEFAULT_WORKSPACE_URI = "de.workspaces.deepamehta";     // ### TODO: "dm4.workspaces..."
-    private static final String DEFAULT_WORKSPACE_TYPE_URI = "dm4.workspaces.public";
-
     // Property URIs
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
@@ -77,6 +74,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
+    @Override
+    public Topic getWorkspace(String uri) {
+        Topic workspace = dms.getTopic("uri", new SimpleValue(uri));
+        if (workspace == null) {
+            throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
+        }
+        return workspace;
+    }
+
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/{id}/topics/{type_uri}")
@@ -92,8 +98,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/object/{id}")
     @Override
-    public Topic getAssignedWorkspace(@PathParam("id") long id) {
-        long workspaceId = getAssignedWorkspaceId(id);
+    public Topic getAssignedWorkspace(@PathParam("id") long objectId) {
+        long workspaceId = getAssignedWorkspaceId(objectId);
         if (workspaceId == -1) {
             return null;
         }
@@ -104,13 +110,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public boolean isAssignedToWorkspace(Topic topic, long workspaceId) {
         // ### TODO: check property instead facet
         return facetsService.hasFacet(topic.getId(), "dm4.workspaces.workspace_facet", workspaceId);
-    }
-
-    // ---
-
-    @Override
-    public Topic getDefaultWorkspace() {
-        return fetchDefaultWorkspace();
     }
 
     // ---
@@ -135,11 +134,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     @Override
-    public Topic createWorkspace(String name, String uri, String sharingModeUri) {
+    public Topic createWorkspace(String name, String uri, SharingMode sharingMode) {
         logger.info("Creating workspace \"" + name + "\"");
         return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
             .put("dm4.workspaces.name", name)
-            .putRef("dm4.workspaces.sharing_mode", sharingModeUri)
+            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
         ));
     }
 
@@ -156,7 +155,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postInstall() {
-        createWorkspace(DEFAULT_WORKSPACE_NAME, DEFAULT_WORKSPACE_URI, DEFAULT_WORKSPACE_TYPE_URI);
+        createWorkspace(DEEPAMEHTA_WORKSPACE_NAME, DEEPAMEHTA_WORKSPACE_URI, DEEPAMEHTA_WORKSPACE_SHARING_MODE);
     }
 
 
@@ -288,7 +287,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         } else {
             // assign types of the DeepaMehta standard distribution to the default workspace
             if (isDeepaMehtaStandardType(type)) {
-                Topic defaultWorkspace = fetchDefaultWorkspace();
+                Topic defaultWorkspace = getDeepaMehtaWorkspace();
                 // Note: the default workspace is NOT required to exist ### TODO: think about it
                 if (defaultWorkspace != null) {
                     return defaultWorkspace.getId();
@@ -344,8 +343,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    private Topic fetchDefaultWorkspace() {
-        return dms.getTopic("uri", new SimpleValue(DEFAULT_WORKSPACE_URI));
+    private Topic getDeepaMehtaWorkspace() {
+        return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
     }
 
     private void applyWorkspaceFilter(Iterator<? extends Topic> topics, long workspaceId) {

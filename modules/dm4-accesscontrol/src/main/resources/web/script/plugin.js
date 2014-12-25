@@ -20,7 +20,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         this.request("POST", "/accesscontrol/logout")
     }
     dm4c.restc.create_user_account = function(username, password) { // password is expected to be SHA256 encoded
-        return this.request("POST", "/accesscontrol/user_account", {username: username, password: password})
+        return this.request("POST", "/accesscontrol/user_account?no_workspace_assignment=true",
+            {username: username, password: password})
     }
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
