@@ -2,7 +2,6 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
-import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
@@ -28,6 +27,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
+import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
@@ -107,7 +107,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
 
     // System workspace
-    private static final String SYSTEM_WORKSPACE_NAME = "DeepaMehta";
+    private static final String SYSTEM_WORKSPACE_NAME = "System";
     private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
     private static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
@@ -210,14 +210,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Transactional
     @Override
     public Topic createUserAccount(Credentials cred) {
-        logger.info("Creating user account \"" + cred.username + "\"");
+        String username = cred.username;
+        logger.info("Creating user account \"" + username + "\"");
         // create user account
         Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
-            .put("dm4.accesscontrol.username", cred.username)
+            .put("dm4.accesscontrol.username", username)
             .put("dm4.accesscontrol.password", cred.password)));
         ChildTopics childTopics = userAccount.getChildTopics();
         // create private workspace
         Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
+        setupAccessControl(privateWorkspace, username);
         // assign user account and password to private workspace
         long privateWorkspaceId = privateWorkspace.getId();
         wsService.assignToWorkspace(userAccount, privateWorkspaceId);
@@ -230,7 +232,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public Topic getUsername(String username) {
+    public Topic getUsernameTopic(String username) {
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
     }
 
@@ -344,7 +346,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
             dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
-                new TopicRoleModel(getUsernameOrThrow(username).getId(), "dm4.core.default"),
+                new TopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
                 new TopicRoleModel(workspaceId, "dm4.core.default")
             ));
         } catch (Exception e) {
@@ -401,10 +403,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postInstall() {
         // create workspace "System"
-        wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI, SYSTEM_WORKSPACE_SHARING_MODE);
-        //
+        Topic systemWorkspace = wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI,
+            SYSTEM_WORKSPACE_SHARING_MODE);
+        setupAccessControl(systemWorkspace, DEFAULT_USERNAME);
         // create user account "admin"
         Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        //
+        // ### TODO: is this still required?
         // Note 1: the admin account needs to be setup for access control itself.
         // At post-install time our listeners are not yet registered. So we must setup manually here.
         // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
@@ -488,7 +493,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (isUserAccount(topic)) {
             setupUserAccountAccessControl(topic);
         } else {
-            setupDefaultAccessControl(topic);
+            setupAccessControl(topic);
         }
         //
         // when a workspace is created its creator joins automatically
@@ -499,7 +504,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateAssociation(Association assoc) {
-        setupDefaultAccessControl(assoc);
+        setupAccessControl(assoc);
         //
         storeModifier(assoc);
     }
@@ -608,11 +613,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
      */
     /* ### private Topic fetchDefaultUser() {
-        return getUsernameOrThrow(DEFAULT_USERNAME);
+        return getUsernameTopicOrThrow(DEFAULT_USERNAME);
     } */
 
-    private Topic getUsernameOrThrow(String username) {
-        Topic usernameTopic = getUsername(username);
+    private Topic getUsernameTopicOrThrow(String username) {
+        Topic usernameTopic = getUsernameTopic(username);
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
@@ -765,11 +770,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private boolean checkCredentials(Credentials cred) {
-        Topic username = getUsername(cred.username);
-        if (username == null) {
-            return false;
-        }
-        return matches(username, cred.password);
+        return dms.getAccessControl().checkCredentials(cred);
     }
 
     // ---
@@ -794,43 +795,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    /**
-     * Prerequisite: username is not <code>null</code>.
-     *
-     * @param   password    The encoded password.
-     */
-    private boolean matches(Topic username, String password) {
-        return password(fetchUserAccount(username)).equals(password);
-    }
-
-    /**
-     * Prerequisite: username is not <code>null</code>.
-     */
-    private Topic fetchUserAccount(Topic username) {
-        Topic userAccount = username.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-            "dm4.accesscontrol.user_account");
-        if (userAccount == null) {
-            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
-                username.getSimpleValue() + "\" (username=" + username + ")");
-        }
-        return userAccount;
-    }
-
-    // ---
-
     private String username(HttpSession session) {
         String username = (String) session.getAttribute("username");
         if (username == null) {
             throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
         }
         return username;
-    }
-
-    /**
-     * @return  The encryted password of the specified User Account.
-     */
-    private String password(Topic userAccount) {
-        return userAccount.getChildTopics().getString("dm4.accesscontrol.password");
     }
 
     // ---
@@ -856,17 +826,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Create ACL Entries ===
-
-    /**
-     * Sets the logged in user as the creator and the owner of the specified object
-     * and creates a default access control entry for it.
-     *
-     * If no user is logged in, nothing is performed.
-     */
-    private void setupDefaultAccessControl(DeepaMehtaObject object) {
-        setupAccessControl(object);
-    }
+    // === Setup Access Control ===
 
     private void setupDefaultAccessControl(Type type) {
         try {
@@ -897,6 +857,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    /**
+     * Sets the logged in user as the creator and the owner of the specified object.
+     *
+     * If no user is logged in, nothing is performed.
+     */
     private void setupAccessControl(DeepaMehtaObject object) {
         try {
             String username = getUsername();
@@ -1026,7 +991,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   object      the object in question.
      */
     /* ### private boolean userIsMember(String username, DeepaMehtaObject object) {
-        Topic usernameTopic = getUsernameOrThrow(username);
+        Topic usernameTopic = getUsernameTopicOrThrow(username);
         Topic workspace = wsService.getAssignedWorkspace(object);
         logger.fine(info(object) + " is assigned to workspace \"" + workspace.getSimpleValue() + "\"");
         if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {    // ### TODO: use Membership

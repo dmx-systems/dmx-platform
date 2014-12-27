@@ -1,12 +1,12 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
-import de.deepamehta.plugins.accesscontrol.model.Credentials;
 import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.Credentials;
 
 import java.util.Collection;
 
@@ -62,7 +62,7 @@ public interface AccessControlService extends PluginService {
      * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
      *          or <code>null</code> if no such username exists.
      */
-    Topic getUsername(String username);
+    Topic getUsernameTopic(String username);
 
 
 

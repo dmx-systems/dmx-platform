@@ -1,9 +1,12 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
+import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
@@ -39,6 +42,21 @@ class AccessControlImpl implements AccessControl {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    @Override
+    public boolean checkCredentials(Credentials cred) {
+        Topic username = null;
+        try {
+            username = getUsernameTopic(cred.username);
+            if (username == null) {
+                return false;
+            }
+            return matches(username, cred.password);
+        } catch (Exception e) {
+            throw new RuntimeException("Checking credentials for user \"" + cred.username + "\" failed (username " +
+                username + ")", e);
+        }
+    }
 
     /**
      * Checks if a user is permitted to perform an operation on an object (topic or association).
@@ -88,6 +106,47 @@ class AccessControlImpl implements AccessControl {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     *
+     * @param   password    The encoded password.
+     */
+    private boolean matches(Topic username, String password) {
+        return password(fetchUserAccount(username)).equals(password);
+    }
+
+    /**
+     * Prerequisite: username is not <code>null</code>.
+     */
+    private TopicModel fetchUserAccount(Topic username) {
+        // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
+        // So direct storage access is required here.
+        RelatedTopicModel userAccount = dms.storageDecorator.fetchTopicRelatedTopic(username.getId(),
+            "dm4.core.composition", "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
+        if (userAccount == null) {
+            throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
+                username.getSimpleValue() + "\" (username=" + username + ")");
+        }
+        return userAccount;
+    }
+
+    /**
+     * @return  The encoded password of the specified User Account.
+     */
+    private String password(TopicModel userAccount) {
+        // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
+        // So we use direct storage access here.
+        RelatedTopicModel password = dms.storageDecorator.fetchTopicRelatedTopic(userAccount.getId(),
+            "dm4.core.composition", "dm4.core.parent", "dm4.core.child", "dm4.accesscontrol.password");
+        if (password == null) {
+            throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
+                userAccount.getSimpleValue() + "\" (userAccount=" + userAccount + ")");
+        }
+        return password.getSimpleValue().toString();
+    }
+
+    // ---
 
     private boolean _hasPermission(String username, Operation operation, long workspaceId) {
         switch (operation) {
@@ -210,17 +269,25 @@ class AccessControlImpl implements AccessControl {
         return (String) dms.storageDecorator.fetchProperty(workspaceId, PROP_OWNER);
     }
 
+    private String typeUri(long objectId) {
+        // Note: direct storage access is required here
+        return (String) dms.storageDecorator.fetchProperty(objectId, "type_uri");
+    }
+
+    // ---
+
+    // ### TODO: copy in AccessControlService
+    private Topic getUsernameTopic(String username) {
+        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
+    }
+
     private TopicModel usernameTopic(String username) {
+        // ### TODO: direct storage access is not required anymore
         TopicModel usernameTopic = dms.storageDecorator.fetchTopic(TYPE_USERNAME, new SimpleValue(username));
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
-    }
-
-    private String typeUri(long objectId) {
-        // Note: direct storage access is required here
-        return (String) dms.storageDecorator.fetchProperty(objectId, "type_uri");
     }
 
 
