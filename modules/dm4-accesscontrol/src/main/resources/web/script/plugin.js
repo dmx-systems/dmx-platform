@@ -253,8 +253,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             function do_create_user_account() {
                 var username = username_input.val()
                 var password = password_input.val()
-                var user_account = self.create_user_account(username, password);
-                dm4c.show_topic(user_account, "show", undefined, true)      // coordinates=undefined, do_center=true
+                var username_topic = self.create_user_account(username, password);
+                dm4c.show_topic(username_topic, "show", undefined, true)    // coordinates=undefined, do_center=true
             }
         }
     })

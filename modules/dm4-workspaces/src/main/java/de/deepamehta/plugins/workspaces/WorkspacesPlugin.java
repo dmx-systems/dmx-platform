@@ -207,6 +207,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void postCreateTopic(Topic topic) {
         long workspaceId = -1;
         try {
+            if (abortAssignment(topic)) {
+                return;
+            }
             // Note: we must avoid vicious circles
             if (isOwnTopic(topic)) {
                 return;
@@ -220,10 +223,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
             // the other hand we don't have such a mechanism (and don't want one either).
             if (workspaceId == -1) {
-                return;
-            }
-            // Note: never reached when outside request scope
-            if (abortAssignment(topic)) {
                 return;
             }
             //
@@ -241,6 +240,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void postCreateAssociation(Association assoc) {
         long workspaceId = -1;
         try {
+            if (abortAssignment(assoc)) {
+                return;
+            }
             // Note: we must avoid vicious circles
             if (isOwnAssociation(assoc)) {
                 return;
@@ -254,10 +256,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
             // the other hand we don't have such a mechanism (and don't want one either).
             if (workspaceId == -1) {
-                return;
-            }
-            // Note: never reached when outside request scope
-            if (abortAssignment(assoc)) {
                 return;
             }
             //
@@ -369,22 +367,26 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ### TODO: abort topic and association assignments separately?
     private boolean abortAssignment(DeepaMehtaObject object) {
-        // Note: never called outside a request scope. So the UriInfo methods doesn't throw IllegalStateException.
-        String value = uriInfo.getQueryParameters().getFirst(PARAM_NO_WORKSPACE_ASSIGNMENT);
-        if (value == null) {
-            // no such parameter in request
+        try {
+            String value = uriInfo.getQueryParameters().getFirst(PARAM_NO_WORKSPACE_ASSIGNMENT);
+            if (value == null) {
+                // no such parameter in request
+                return false;
+            }
+            if (!value.equals("false") && !value.equals("true")) {
+                throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" +
+                    PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter (expected are \"false\" or \"true\")");
+            }
+            boolean abort = value.equals("true");
+            if (abort) {
+                logger.info("### Workspace assignment for " + info(object) + " ABORTED -- \"" +
+                    PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter detected");
+            }
+            return abort;
+        } catch (IllegalStateException e) {
+            // Note: this happens if a UriInfo method is called outside request scope
             return false;
         }
-        if (!value.equals("false") && !value.equals("true")) {
-            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" +
-                PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter (expected are \"false\" or \"true\")");
-        }
-        boolean abort = value.equals("true");
-        if (abort) {
-            logger.info("### Workspace assignment for " + info(object) + " ABORTED -- \"" +
-                PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter detected");
-        }
-        return abort;
     }
 
     // ---

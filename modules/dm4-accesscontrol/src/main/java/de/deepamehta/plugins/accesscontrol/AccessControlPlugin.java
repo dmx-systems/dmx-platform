@@ -212,23 +212,31 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public Topic createUserAccount(Credentials cred) {
         String username = cred.username;
         logger.info("Creating user account \"" + username + "\"");
-        // create user account
+        //
+        // 1) create user account
         Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
             .put("dm4.accesscontrol.username", username)
             .put("dm4.accesscontrol.password", cred.password)));
         ChildTopics childTopics = userAccount.getChildTopics();
-        // create private workspace
+        Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
+        Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
+        //
+        // 2) create private workspace
         Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
         setupAccessControl(privateWorkspace, username);
-        // assign user account and password to private workspace
-        long privateWorkspaceId = privateWorkspace.getId();
-        wsService.assignToWorkspace(userAccount, privateWorkspaceId);
-        wsService.assignToWorkspace(childTopics.getTopic("dm4.accesscontrol.password"), privateWorkspaceId);
-        // assign user name to "System" workspace
-        Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
-        wsService.assignToWorkspace(childTopics.getTopic("dm4.accesscontrol.username"), systemWorkspace.getId());
         //
-        return userAccount;
+        // 3) assign user account and password to private workspace
+        // Note: the current user has no READ access to the private workspace just created.
+        // So we must use the privileged assignToWorkspace calls here (instead using the Workspaces service).
+        long privateWorkspaceId = privateWorkspace.getId();
+        dms.getAccessControl().assignToWorkspace(userAccount, privateWorkspaceId);
+        dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
+        //
+        // 4) assign user name to "System" workspace
+        Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
+        wsService.assignToWorkspace(usernameTopic, systemWorkspace.getId());
+        //
+        return usernameTopic;
     }
 
     @Override
@@ -407,16 +415,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             SYSTEM_WORKSPACE_SHARING_MODE);
         setupAccessControl(systemWorkspace, DEFAULT_USERNAME);
         // create user account "admin"
-        Topic adminAccount = createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
         //
-        // ### TODO: is this still required?
-        // Note 1: the admin account needs to be setup for access control itself.
-        // At post-install time our listeners are not yet registered. So we must setup manually here.
+        // ### TODO: set a creator and modifier for the User Account, Username and Password topics.
+        // Note 1: at post-install time our listeners are not yet registered.
+        // So we set the creator manually here. ### TODO: set the modifier as well. ### FIXDOC
         // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
         // instead of (the higher-level) setupUserAccountAccessControl().
-        setupAccessControl(adminAccount, DEFAULT_USERNAME);
-        // ### TODO: setup access control for the admin account's Username and Password topics.
-        // However, they are not strictly required for the moment.
+        // ### setupAccessControl(adminAccount, DEFAULT_USERNAME);
+        // ### TODO: set a creator and modifier for the admin account's Username and Password topics as well.
+        // However, they are not strictly required at the moment.
     }
 
     @Override

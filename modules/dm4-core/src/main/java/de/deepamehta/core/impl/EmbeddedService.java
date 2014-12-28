@@ -748,7 +748,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Factory method: creates a new association in the DB according to the given association model and returns an
      * association instance.
      */
-    private Association associationFactory(AssociationModel model) {
+    Association associationFactory(AssociationModel model) {
         // 1) store in DB
         storageDecorator.storeAssociation(model);
         valueStorage.storeValue(model);

@@ -54,6 +54,9 @@ public interface AccessControlService extends PluginService {
 
     // === User Accounts ===
 
+    /**
+     * @return  The "Username" topic of the created user account.
+     */
     Topic createUserAccount(Credentials cred);
 
     /**

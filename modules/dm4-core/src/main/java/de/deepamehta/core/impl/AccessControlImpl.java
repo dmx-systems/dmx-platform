@@ -1,10 +1,12 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
@@ -27,7 +29,9 @@ class AccessControlImpl implements AccessControl {
     // Property URIs
     // ### TODO: move to dm4.core namespace?
     // ### TODO: copy in AccessControlPlugin.java
-    private static String PROP_OWNER = "dm4.accesscontrol.owner";
+    private static final String PROP_OWNER = "dm4.accesscontrol.owner";
+    // ### TODO: copy in WorkspacesPlugin.java
+    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -103,6 +107,17 @@ class AccessControlImpl implements AccessControl {
     @Override
     public boolean isMember(String username, long workspaceId) {
         return _isMember(username, workspaceId);
+    }
+
+    @Override
+    public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
+        // 1) create assignment association
+        dms.associationFactory(new AssociationModel("dm4.core.aggregation",
+            new TopicRoleModel(object.getId(), "dm4.core.parent"),
+            new TopicRoleModel(workspaceId, "dm4.core.child")
+        ));
+        // 2) store assignment property
+        object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
