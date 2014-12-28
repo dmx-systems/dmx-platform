@@ -3,6 +3,7 @@ package de.deepamehta.plugins.workspaces;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.facets.service.FacetsService;
+import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
@@ -18,6 +19,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -26,6 +28,7 @@ import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -59,6 +62,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Inject
     private FacetsService facetsService;
 
+    @Inject
+    private TopicmapsService topicmapsService;
+
     @Context
     private UriInfo uriInfo;
 
@@ -73,6 +79,21 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ****************************************
 
 
+
+    @POST
+    @Path("/{name}/{uri:[^/]*?}/{sharing_mode_uri}")    // Note: default is [^/]+?     // +? is a "reluctant" quantifier
+    @Transactional
+    @Override
+    public Topic createWorkspace(@PathParam("name") String name, @PathParam("uri") String uri,
+                                 @PathParam("sharing_mode_uri") SharingMode sharingMode) {
+        logger.info("Creating workspace \"" + name + "\" (uri=\"" + uri + "\", sharingMode=" + sharingMode + ")");
+        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
+            .put("dm4.workspaces.name", name)
+            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
+        ));
+    }
+
+    // ---
 
     @Override
     public Topic getWorkspace(String uri) {
@@ -129,17 +150,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
             _assignToWorkspace(configTopic, workspaceId);
         }
-    }
-
-    // ---
-
-    @Override
-    public Topic createWorkspace(String name, String uri, SharingMode sharingMode) {
-        logger.info("Creating workspace \"" + name + "\"");
-        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
-            .put("dm4.workspaces.name", name)
-            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
-        ));
     }
 
 

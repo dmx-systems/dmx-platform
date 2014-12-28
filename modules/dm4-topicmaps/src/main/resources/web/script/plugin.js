@@ -25,6 +25,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === REST Client Extension ===
 
+    dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
+        return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)
+    }
+
     /**
      * @param   include_childs (boolean)    Optional: if true the topics contained in the returned topicmap will
      *                                      include their child topics. Default is false.
@@ -32,9 +36,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.restc.get_topicmap = function(topicmap_id, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})
         return this.request("GET", "/topicmap/" + topicmap_id + params.to_query_string())
-    }
-    dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
-        return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)
     }
     dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, view_props) {
         this.request("POST", "/topicmap/" + topicmap_id + "/topic/" + topic_id, view_props)

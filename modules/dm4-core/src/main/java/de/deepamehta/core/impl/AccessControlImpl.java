@@ -263,7 +263,7 @@ class AccessControlImpl implements AccessControl {
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
-        return SharingMode.fromUri(sharingMode.getUri());
+        return SharingMode.fromString(sharingMode.getUri());
     }
 
     // ---

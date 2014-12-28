@@ -14,9 +14,30 @@ public enum SharingMode {
     PUBLIC("dm4.workspaces.public"),
     COMMON("dm4.workspaces.common");
 
-    // ---
+    // ------------------------------------------------------------------------------------------------- Class Variables
 
-    public static SharingMode fromUri(String uri) {
+    private static Map<String, SharingMode> sharingModes;
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private final String uri;
+
+    // ---------------------------------------------------------------------------------------------------- Constructors
+
+    private SharingMode(String uri) {
+        this.uri = uri;
+        put(uri, this);
+        // sharingModes.put(uri, this);   // ### "illegal reference to static field from initializer"
+    }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public String getUri() {
+        return uri;
+    }
+
+    // Called also by JAX-RS container to get a SharingMode instance from a @PathParam or @QueryParam
+    public static SharingMode fromString(String uri) {
         SharingMode sharingMode = sharingModes.get(uri);
         if (sharingMode == null) {
             throw new RuntimeException("\"" + uri + "\" is an unexpected sharing mode URI");
@@ -24,21 +45,7 @@ public enum SharingMode {
         return sharingMode;
     }
 
-    public String getUri() {
-        return uri;
-    }
-
-    // ---
-
-    private final String uri;
-
-    private static Map<String, SharingMode> sharingModes;
-
-    private SharingMode(String uri) {
-        this.uri = uri;
-        put(uri, this);
-        // sharingModes.put(uri, this);   // ### "illegal reference to static field from initializer"
-    }
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void put(String uri, SharingMode sharingMode) {
         if (sharingModes == null) {

@@ -13,15 +13,18 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TopicmapsService extends PluginService {
 
+    Topic createTopicmap(String name,             String topicmapRendererUri);
+
+    Topic createTopicmap(String name, String uri, String topicmapRendererUri);
+
+    // ---
+
     /**
      * @param   includeChilds   if true the topics contained in the topicmap will include their child topics.
      */
     TopicmapViewmodel getTopicmap(long topicmapId, boolean includeChilds);
 
-    // ---
-
-    Topic createTopicmap(String name,             String topicmapRendererUri);
-    Topic createTopicmap(String name, String uri, String topicmapRendererUri);
+    boolean isTopicInTopicmap(long topicmapId, long topicId);
 
     // ---
 
@@ -33,10 +36,6 @@ public interface TopicmapsService extends PluginService {
     void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility);
 
     void addAssociationToTopicmap(long topicmapId, long assocId);
-
-    // ---
-
-    boolean isTopicInTopicmap(long topicmapId, long topicId);
 
     // ---
 
@@ -63,8 +62,12 @@ public interface TopicmapsService extends PluginService {
     // ---
 
     void registerTopicmapRenderer(TopicmapRenderer renderer);
+
     // ### TODO: unregister needed? Might a renderer hold a stale dms instance?
 
+    // ---
+
     void registerViewmodelCustomizer(ViewmodelCustomizer customizer);
+
     void unregisterViewmodelCustomizer(ViewmodelCustomizer customizer);
 }

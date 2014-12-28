@@ -80,6 +80,27 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
+    @POST
+    @Path("/{name}/{topicmap_renderer_uri}")
+    @Transactional
+    @Override
+    public Topic createTopicmap(@PathParam("name") String name,
+                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
+        return createTopicmap(name, null, topicmapRendererUri);
+    }
+
+    @Override
+    public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
+        ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
+        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new ChildTopicsModel()
+            .put("dm4.topicmaps.name", name)
+            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
+            .put("dm4.topicmaps.state", topicmapState)
+        ));
+    }
+
+    // ---
+
     @GET
     @Path("/{id}")
     @Override
@@ -99,25 +120,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    // ---
-
-    @POST
-    @Path("/{name}/{topicmap_renderer_uri}")
-    @Transactional
     @Override
-    public Topic createTopicmap(@PathParam("name") String name,
-                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
-        return createTopicmap(name, null, topicmapRendererUri);
-    }
-
-    @Override
-    public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
-        ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new ChildTopicsModel()
-            .put("dm4.topicmaps.name", name)
-            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.state", topicmapState)
-        ));
+    public boolean isTopicInTopicmap(long topicmapId, long topicId) {
+        return fetchTopicRefAssociation(topicmapId, topicId) != null;
     }
 
     // ---
@@ -154,13 +159,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
         ));
-    }
-
-    // ---
-
-    @Override
-    public boolean isTopicInTopicmap(long topicmapId, long topicId) {
-        return fetchTopicRefAssociation(topicmapId, topicId) != null;
     }
 
     // ---

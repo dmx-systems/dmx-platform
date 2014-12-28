@@ -12,9 +12,20 @@ import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 public interface WorkspacesService extends PluginService {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
     static final String DEEPAMEHTA_WORKSPACE_NAME = "DeepaMehta";
     static final String DEEPAMEHTA_WORKSPACE_URI = "de.workspaces.deepamehta";  // ### FIXME: "de." -> "dm4."
     static final SharingMode DEEPAMEHTA_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    /**
+     * @param   uri     may be null
+     */
+    Topic createWorkspace(String name, String uri, SharingMode sharingMode);
+
+    // ---
 
     /**
      * Returns a workspace by URI.
@@ -55,11 +66,4 @@ public interface WorkspacesService extends PluginService {
      * Assigns the specified type and all its view configuration topics to a workspace.
      */
     void assignTypeToWorkspace(Type type, long workspaceId);
-
-    // ---
-
-    /**
-     * @param   uri     may be null
-     */
-    Topic createWorkspace(String name, String uri, SharingMode sharingMode);
 }

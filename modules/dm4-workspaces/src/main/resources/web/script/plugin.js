@@ -13,6 +13,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === REST Client Extension ===
 
+    dm4c.restc.create_workspace = function(name, uri, sharing_mode_uri) {
+        return this.request("POST", "/workspace/" + encodeURIComponent(name) + "/" + (uri || "") + "/" + sharing_mode_uri)
+    }
     dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})
         return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri +
@@ -197,10 +200,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * @return  The created Workspace topic.
      */
     function create_workspace_topic(name, sharing_mode_uri) {
-        return dm4c.create_topic("dm4.workspaces.workspace", {
-            "dm4.workspaces.name": name,
-            "dm4.workspaces.sharing_mode": "ref_uri:" + sharing_mode_uri
-        })
+        return dm4c.restc.create_workspace(name, undefined, sharing_mode_uri)
     }
 
     /**
