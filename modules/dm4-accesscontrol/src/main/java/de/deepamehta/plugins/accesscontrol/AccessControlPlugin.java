@@ -2,8 +2,6 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
-import de.deepamehta.plugins.accesscontrol.model.Permissions;
-import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
@@ -29,6 +27,7 @@ import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
+import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -118,7 +117,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static String PROP_CREATOR  = "dm4.accesscontrol.creator";
     private static String PROP_OWNER    = "dm4.accesscontrol.owner";
     private static String PROP_MODIFIER = "dm4.accesscontrol.modifier";
-    // ### private static String PROP_ACL      = "dm4.accesscontrol.acl";
 
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
@@ -227,12 +225,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
-        // So we must use the privileged assignToWorkspace calls here (instead using the Workspaces service).
+        // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
         long privateWorkspaceId = privateWorkspace.getId();
         dms.getAccessControl().assignToWorkspace(userAccount, privateWorkspaceId);
         dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
         //
-        // 4) assign user name to "System" workspace
+        // 4) assign username to "System" workspace
         Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
         wsService.assignToWorkspace(usernameTopic, systemWorkspace.getId());
         //
@@ -314,34 +312,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public String getModifier(@PathParam("id") long objectId) {
         return dms.hasProperty(objectId, PROP_MODIFIER) ? (String) dms.getProperty(objectId, PROP_MODIFIER) : null;
     }
-
-
-
-    // === Access Control List ===
-
-    /* ###
-    @Override
-    public AccessControlList getACL(DeepaMehtaObject object) {
-        try {
-            if (object.hasProperty(PROP_ACL)) {
-                return new AccessControlList(new JSONObject((String) object.getProperty(PROP_ACL)));
-            } else {
-                return new AccessControlList();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the ACL of " + info(object) + " failed", e);
-        }
-    } */
-
-    /* ###
-    @Override
-    public void setACL(DeepaMehtaObject object, AccessControlList acl) {
-        try {
-            object.setProperty(PROP_ACL, acl.toJSON().toString(), false);    // addToIndex=false
-        } catch (Exception e) {
-            throw new RuntimeException("Setting the ACL of " + info(object) + " failed", e);
-        }
-    } */
 
 
 
@@ -498,11 +468,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic) {
-        if (isUserAccount(topic)) {
-            setupUserAccountAccessControl(topic);
-        } else {
-            setupAccessControl(topic);
-        }
+        setupAccessControl(topic);
         //
         // when a workspace is created its creator joins automatically
         joinIfWorkspace(topic);
@@ -605,24 +571,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private boolean isUserAccount(Topic topic) {
-        String typeUri = topic.getTypeUri();
-        return typeUri.equals("dm4.accesscontrol.user_account")
-            || typeUri.equals("dm4.accesscontrol.username")
-            || typeUri.equals("dm4.accesscontrol.password");
-    }
-
-    /**
-     * Fetches the default user ("admin").
-     *
-     * @throws  RuntimeException    If the default user doesn't exist.
-     *
-     * @return  The default user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>).
-     */
-    /* ### private Topic fetchDefaultUser() {
-        return getUsernameTopicOrThrow(DEFAULT_USERNAME);
-    } */
 
     private Topic getUsernameTopicOrThrow(String username) {
         Topic usernameTopic = getUsernameTopic(username);
@@ -853,10 +801,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void setupUserAccountAccessControl(Topic topic) {
-        setupAccessControl(topic);
-    }
-
     private void setupViewConfigAccessControl(ViewConfiguration viewConfig) {
         for (Topic configTopic : viewConfig.getConfigTopics()) {
             setupAccessControl(configTopic, DEFAULT_USERNAME);
@@ -867,7 +811,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     /**
      * Sets the logged in user as the creator and the owner of the specified object.
-     *
+     * <p>
      * If no user is logged in, nothing is performed.
      */
     private void setupAccessControl(DeepaMehtaObject object) {
@@ -900,9 +844,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
+    // ---
+
+    private void storeModifier(DeepaMehtaObject object) {
+        String username = getUsername();
+        // Note: when a plugin topic is updated there is no user logged in yet.
+        if (username != null) {
+            object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
+        }
+    }
 
 
-    // === Determine Permissions ===
+
+    // === Calculate Permissions ===
 
     /**
      * @param   objectId    a topic ID, or an association ID
@@ -914,21 +868,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    // ---
-
-    /**
-     * Checks if a user is permitted to perform an operation on an object (topic or association).
-     * If so, <code>true</code> is returned.
-     *
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     * @param   objectId    a topic ID, or an association ID.
-     */
-    private boolean hasPermission(String username, Operation operation, long objectId) {
-        return dms.getAccessControl().hasPermission(username, operation, objectId);
-    }
-
-    // ########## Legacy code follows ...
-
     /**
      * @param   objectId    a topic ID, or an association ID.
      */
@@ -936,139 +875,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return createPermissions(hasPermission(getUsername(), Operation.WRITE, objectId));
     }
 
-    // ---
-
     /**
-     * Checks if a user is allowed to perform an operation on an object (topic or association).
-     * If so, <code>true</code> is returned.
+     * Checks if a user is permitted to perform an operation on an object (topic or association).
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     * @param   objectId    a topic ID, or an association ID.
+     *
+     * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
-    /* ### private boolean hasPermission(String username, Operation operation, DeepaMehtaObject object) {
-        try {
-            logger.fine("Determining permission for " + userInfo(username) + " to " + operation + " " + info(object));
-            UserRole[] userRoles = getACL(object).getUserRoles(operation);
-            for (UserRole userRole : userRoles) {
-                logger.fine("There is an ACL entry for user role " + userRole);
-                if (userOccupiesRole(username, userRole, object)) {
-                    logger.fine("=> ALLOWED");
-                    return true;
-                }
-            }
-            logger.fine("=> DENIED");
-            return false;
-        } catch (Exception e) {
-            throw new RuntimeException("Determining permission for " + info(object) + " failed (" +
-                userInfo(username) + ", operation=" + operation + ")", e);
-        }
-    } */
-
-    /**
-     * Checks if a user occupies a role with regard to the specified object.
-     * If so, <code>true</code> is returned.
-     *
-     * @param   username    the logged in user (a Topic of type "Username" / <code>dm4.accesscontrol.username</code>),
-     *                      or <code>null</code> if no user is logged in.
-     */
-    /* ### private boolean userOccupiesRole(String username, UserRole userRole, DeepaMehtaObject object) {
-        switch (userRole) {
-        case EVERYONE:
-            return true;
-        case USER:
-            return username != null;
-        case MEMBER:
-            return username != null && userIsMember(username, object);
-        case OWNER:
-            return username != null && userIsOwner(username, object);
-        case CREATOR:
-            return username != null && userIsCreator(username, object);
-        default:
-            throw new RuntimeException(userRole + " is an unsupported user role");
-        }
-    } */
-
-    // ---
-
-    /**
-     * Checks if a user is a member of any workspace the object is assigned to.
-     * If so, <code>true</code> is returned.
-     *
-     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
-     *
-     * @param   username    the logged in user.
-     * @param   object      the object in question.
-     */
-    /* ### private boolean userIsMember(String username, DeepaMehtaObject object) {
-        Topic usernameTopic = getUsernameTopicOrThrow(username);
-        Topic workspace = wsService.getAssignedWorkspace(object);
-        logger.fine(info(object) + " is assigned to workspace \"" + workspace.getSimpleValue() + "\"");
-        if (wsService.isAssignedToWorkspace(usernameTopic, workspace.getId())) {    // ### TODO: use Membership
-            logger.fine(userInfo(username) + " IS member of workspace " + workspace);
-            return true;
-        } else {
-            logger.fine(userInfo(username) + " is NOT member of workspace " + workspace);
-            return false;
-        }
-    } */
-
-    /**
-     * Checks if a user is the owner of the object.
-     * If so, <code>true</code> is returned.
-     *
-     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
-     *
-     * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>). ### FIXDOC
-     */
-    /* ### private boolean userIsOwner(String username, DeepaMehtaObject object) {
-        String owner = getOwner(object);
-        logger.fine("The owner is " + userInfo(owner));
-        return owner != null && owner.equals(username);
-    } */
-
-    /**
-     * Checks if a user is the creator of the object.
-     * If so, <code>true</code> is returned.
-     *
-     * Prerequisite: a user is logged in (<code>username</code> is not <code>null</code>).
-     *
-     * @param   username    a Topic of type "Username" (<code>dm4.accesscontrol.username</code>). ### FIXDOC
-     */
-    /* ### private boolean userIsCreator(String username, DeepaMehtaObject object) {
-        String creator = getCreator(object);
-        logger.fine("The creator is " + userInfo(creator));
-        return creator != null && creator.equals(username);
-    } */
-
-    // ---
-
-    private void enrichWithPermissions(Type type, Permissions permissions) {
-        // Note: we must extend/override possibly existing permissions.
-        // Consider a type update: directive UPDATE_TOPIC_TYPE is followed by UPDATE_TOPIC, both on the same object.
-        // ### TODO: rethink this and possibly simplify the code. Meanwhile CREATE is dropped and we enrich with
-        // only *one* permission (WRITE).
-        ChildTopicsModel typePermissions = permissions(type);
-        typePermissions.put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri));
-    }
-
-    private ChildTopicsModel permissions(DeepaMehtaObject object) {
-        // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are for transfer only, recalculated for each request, not stored in DB.
-        // Note 2: The permissions topic exists only in the object's model (see note below).
-        // There is no corresponding topic in the attached composite value. So we must query the model here.
-        // (object.getChildTopics().getTopic(...) would not work)
-        TopicModel permissionsTopic = object.getChildTopics().getModel()
-            .getTopic("dm4.accesscontrol.permissions", null);
-        ChildTopicsModel permissions;
-        if (permissionsTopic != null) {
-            permissions = permissionsTopic.getChildTopicsModel();
-        } else {
-            permissions = new ChildTopicsModel();
-            // Note: we put the permissions topic directly in the model here (instead of the attached composite value).
-            // The "permissions" topic is for transfer only. It must not be stored in the DB (as it would when putting
-            // it in the attached composite value).
-            object.getChildTopics().getModel().put("dm4.accesscontrol.permissions", permissions);
-        }
-        return permissions;
+    private boolean hasPermission(String username, Operation operation, long objectId) {
+        return dms.getAccessControl().hasPermission(username, operation, objectId);
     }
 
     // ---
@@ -1077,14 +893,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return new Permissions().add(Operation.WRITE, write);
     }
 
-    // ---
-
-    private void storeModifier(DeepaMehtaObject object) {
-        String username = getUsername();
-        // Note: when a plugin topic is updated there is no user logged in yet.
-        if (username != null) {
-            object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
-        }
+    // ### TODO: rethink type enrichment. Is it still required? At server-side we have no CREATE permission anymore.
+    private void enrichWithPermissions(Type type, Permissions permissions) {
+        type.getChildTopics().getModel().put("dm4.accesscontrol.permissions", new ChildTopicsModel()
+            .put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri)));
+        // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
+        // Permissions are for transfer only, recalculated for each request, not stored in DB.
+        // Note 2: we put the permissions topic directly in the model here (instead of the attached child topics).
+        // The "permissions" topic is for transfer only. It must not be stored in the DB (as it would when putting
+        // it in the attached child topics).
     }
 
 

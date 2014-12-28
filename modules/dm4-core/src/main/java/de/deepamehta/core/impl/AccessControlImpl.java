@@ -62,14 +62,6 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
-    /**
-     * Checks if a user is permitted to perform an operation on an object (topic or association).
-     *
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     * @param   objectId    a topic ID, or an association ID.
-     *
-     * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
-     */
     @Override
     public boolean hasPermission(String username, Operation operation, long objectId) {
         String typeUri = null;

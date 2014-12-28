@@ -1,12 +1,11 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
-import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
-import de.deepamehta.plugins.accesscontrol.model.Permissions;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.Credentials;
+import de.deepamehta.core.service.accesscontrol.Permissions;
 
 import java.util.Collection;
 
@@ -71,8 +70,14 @@ public interface AccessControlService extends PluginService {
 
     // === Permissions ===
 
+    /**
+     * @return  A Permissions object with one entry: <code>dm4.accesscontrol.operation.write</code>.
+     */
     Permissions getTopicPermissions(long topicId);
 
+    /**
+     * @return  A Permissions object with one entry: <code>dm4.accesscontrol.operation.write</code>.
+     */
     Permissions getAssociationPermissions(long assocId);
 
 
@@ -113,22 +118,6 @@ public interface AccessControlService extends PluginService {
      * @return  The username of the modifier, or <code>null</code> if no modifier is set.
      */
     String getModifier(long objectId);
-
-
-
-    // === Access Control List ===
-
-    /** ###
-     * Returns the Access Control List of a topic or an association.
-     *
-     * @return  The Access Control List. If no one was set an empty Access Control List is returned.
-     *
-    AccessControlList getACL(DeepaMehtaObject object); */
-
-    /** ###
-     * Sets the Access Control List for a topic or an association.
-     *
-    void setACL(DeepaMehtaObject object, AccessControlList acl); */
 
 
 
