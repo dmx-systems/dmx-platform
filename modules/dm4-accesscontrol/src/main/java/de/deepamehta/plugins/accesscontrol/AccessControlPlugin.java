@@ -459,17 +459,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postCreateTopic(Topic topic) {
         setupAccessControl(topic);
-        //
-        // when a workspace is created its creator joins automatically
-        joinIfWorkspace(topic);
-        //
         storeModifier(topic);
     }
 
     @Override
     public void postCreateAssociation(Association assoc) {
         setupAccessControl(assoc);
-        //
         storeModifier(assoc);
     }
 
@@ -568,17 +563,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
-    }
-
-    private void joinIfWorkspace(Topic topic) {
-        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-            String username = getUsername();
-            // Note: when the default workspace is created there is no user logged in yet.
-            // The default user is assigned to the default workspace later on (see allPluginsActive()).
-            if (username != null) {
-                createMembership(username, topic.getId());
-            }
-        }
     }
 
 
