@@ -185,34 +185,22 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Override
     public void introduceTopicType(TopicType topicType) {
-        long workspaceId = -1;
-        try {
-            workspaceId = workspaceIdForType(topicType);
-            if (workspaceId == -1) {
-                return;
-            }
-            //
-            assignTypeToWorkspace(topicType, workspaceId);
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning topic type \"" + topicType.getUri() + "\" to workspace " +
-                workspaceId + " failed", e);
+        long workspaceId = workspaceIdForType(topicType);
+        if (workspaceId == -1) {
+            return;
         }
+        //
+        assignTypeToWorkspace(topicType, workspaceId);
     }
 
     @Override
     public void introduceAssociationType(AssociationType assocType) {
-        long workspaceId = -1;
-        try {
-            workspaceId = workspaceIdForType(assocType);
-            if (workspaceId == -1) {
-                return;
-            }
-            //
-            assignTypeToWorkspace(assocType, workspaceId);
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning association type \"" + assocType.getUri() + "\" to workspace " +
-                workspaceId + " failed", e);
+        long workspaceId = workspaceIdForType(assocType);
+        if (workspaceId == -1) {
+            return;
         }
+        //
+        assignTypeToWorkspace(assocType, workspaceId);
     }
 
     // ---
@@ -222,31 +210,28 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateTopic(Topic topic) {
-        long workspaceId = -1;
-        try {
-            if (abortAssignment(topic)) {
-                return;
-            }
-            // Note: for topics we must not avoid vicious circles. 2 cases:
-            // - within request scope abortAssignment() takes effect (provided "no_workspace_assignment" is present).
-            // - outside request scope there is no cookie and the 2nd abortion criteria takes effect (see below).
-            //
-            workspaceId = workspaceId();
-            // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-            // the default workspace. This would not help in gaining data consistency because the topics created so far
-            // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
-            // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
-            // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
-            // the other hand we don't have such a mechanism (and don't want one either).
-            if (workspaceId == -1) {
-                return;
-            }
-            //
-            assignToWorkspace(topic, workspaceId);
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning topic " + topic.getId() + " to workspace " + workspaceId +
-                " failed", e);
+        if (abortAssignment(topic)) {
+            return;
         }
+        // Note: we must avoid a vicious circle that would occur when editing a workspace. A Description topic
+        // would be created (as no description is set when the workspace is created) and be assigned to the
+        // workspace itself. This would create an endless recursion while bubbling the modification timestamp.
+        if (isWorkspaceDescription(topic)) {
+            return;
+        }
+        //
+        long workspaceId = workspaceId();
+        // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
+        // the default workspace. This would not help in gaining data consistency because the topics created so far
+        // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
+        // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
+        // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
+        // the other hand we don't have such a mechanism (and don't want one either).
+        if (workspaceId == -1) {
+            return;
+        }
+        //
+        assignToWorkspace(topic, workspaceId);
     }
 
     /**
@@ -254,32 +239,26 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateAssociation(Association assoc) {
-        long workspaceId = -1;
-        try {
-            if (abortAssignment(assoc)) {
-                return;
-            }
-            // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
-            if (isWorkspaceAssignment(assoc)) {
-                return;
-            }
-            //
-            workspaceId = workspaceId();
-            // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-            // the default workspace. This would not help in gaining data consistency because the associations created
-            // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
-            // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
-            // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
-            // the other hand we don't have such a mechanism (and don't want one either).
-            if (workspaceId == -1) {
-                return;
-            }
-            //
-            assignToWorkspace(assoc, workspaceId);
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning association " + assoc.getId() + " to workspace " + workspaceId +
-                " failed", e);
+        if (abortAssignment(assoc)) {
+            return;
         }
+        // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
+        if (isWorkspaceAssignment(assoc)) {
+            return;
+        }
+        //
+        long workspaceId = workspaceId();
+        // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
+        // the default workspace. This would not help in gaining data consistency because the associations created
+        // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
+        // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
+        // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
+        // the other hand we don't have such a mechanism (and don't want one either).
+        if (workspaceId == -1) {
+            return;
+        }
+        //
+        assignToWorkspace(assoc, workspaceId);
     }
 
 
@@ -322,21 +301,29 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        // 1) create assignment association
-        // Note 1: we are refering to an existing workspace. So we must add a topic reference.
-        // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
-        // ### TODO: redefine workspace_facet as a single-facet and use putRef() then
-        FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value);
-        //
-        // 2) store assignment property
-        object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+        try {
+            // 1) create assignment association
+            // Note 1: we are refering to an existing workspace. So we must add a topic reference.
+            // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
+            // ### TODO: redefine workspace_facet as a single-facet and use putRef() then
+            FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
+            facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value);
+            //
+            // 2) store assignment property
+            object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
+        }
     }
 
     // --- Helper ---
 
     private boolean isDeepaMehtaStandardType(Type type) {
         return type.getUri().startsWith("dm4.");
+    }
+
+    private boolean isWorkspaceDescription(Topic topic) {
+        return topic.getTypeUri().equals("dm4.workspaces.description");
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
