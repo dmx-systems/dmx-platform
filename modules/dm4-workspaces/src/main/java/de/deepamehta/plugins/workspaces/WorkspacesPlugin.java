@@ -87,10 +87,17 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public Topic createWorkspace(@PathParam("name") String name, @PathParam("uri") String uri,
                                  @PathParam("sharing_mode_uri") SharingMode sharingMode) {
         logger.info("Creating workspace \"" + name + "\" (uri=\"" + uri + "\", sharingMode=" + sharingMode + ")");
-        return dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
+        // create workspace
+        Topic workspace = dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
             .put("dm4.workspaces.name", name)
             .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
         ));
+        // create default topicmap and assign to workspace
+        Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
+            TopicmapsService.DEFAULT_TOPICMAP_RENDERER);
+        assignToWorkspace(topicmap, workspace.getId());
+        //
+        return workspace;
     }
 
     // ---
@@ -220,10 +227,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             if (abortAssignment(topic)) {
                 return;
             }
-            // Note: we must avoid vicious circles
-            if (isOwnTopic(topic)) {
-                return;
-            }
+            // Note: for topics we must not avoid vicious circles. 2 cases:
+            // - within request scope abortAssignment() takes effect (provided "no_workspace_assignment" is present).
+            // - outside request scope there is no cookie and the 2nd abortion criteria takes effect (see below).
             //
             workspaceId = workspaceId();
             // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
@@ -253,8 +259,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             if (abortAssignment(assoc)) {
                 return;
             }
-            // Note: we must avoid vicious circles
-            if (isOwnAssociation(assoc)) {
+            // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
+            if (isWorkspaceAssignment(assoc)) {
                 return;
             }
             //
@@ -333,13 +339,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dm4.");
     }
 
-    // ---
-
-    private boolean isOwnTopic(Topic topic) {
-        return topic.getTypeUri().startsWith("dm4.workspaces.");
-    }
-
-    private boolean isOwnAssociation(Association assoc) {
+    private boolean isWorkspaceAssignment(Association assoc) {
         if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
             Topic topic = assoc.getTopic("dm4.core.child");
             if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {

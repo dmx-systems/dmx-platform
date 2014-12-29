@@ -417,8 +417,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * Setup access control for the default user and the default topicmap.
      *   1) create membership for default user and default workspace
      *   2) setup access control for default workspace
-     *   3) assign default topicmap to default workspace
-     *   4) setup access control for default topicmap
      */
     @Override
     public void allPluginsActive() {
@@ -430,14 +428,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             createDefaultMembership(defaultWorkspace);
             // 2) setup access control for default workspace
             setupDefaultAccessControl(defaultWorkspace, "default workspace (\"DeepaMehta\")");
-            //
-            Topic defaultTopicmap = fetchDefaultTopicmap();
-            if (defaultTopicmap != null) {
-                // 3) assign default topicmap to default workspace
-                assignDefaultTopicmapToDefaultWorkspace(defaultTopicmap, defaultWorkspace);
-                // 4) setup access control for default topicmap
-                setupDefaultAccessControl(defaultTopicmap, "default topicmap (\"untitled\")");
-            }
             //
             tx.success();
         } catch (Exception e) {
@@ -611,24 +601,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private void assignDefaultTopicmapToDefaultWorkspace(Topic defaultTopicmap, Topic defaultWorkspace) {
-        String operation = "Assigning the default topicmap (\"untitled\") to the default workspace (\"DeepaMehta\")";
-        try {
-            // abort if already assigned
-            Topic workspace = wsService.getAssignedWorkspace(defaultTopicmap.getId());
-            if (workspace != null) {
-                logger.info("### Assigning the default topicmap (\"untitled\") to a workspace ABORTED -- " +
-                    "already assigned to workspace \"" + workspace.getSimpleValue() + "\"");
-                return;
-            }
-            //
-            logger.info("### " + operation);
-            wsService.assignToWorkspace(defaultTopicmap, defaultWorkspace.getId());
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
-
     private void setupDefaultAccessControl(Topic topic, String topicInfo) {
         String operation = "Setup access control for the " + topicInfo;
         try {
@@ -644,16 +616,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
-    }
-
-    private Topic fetchDefaultTopicmap() {
-        // Note: the Access Control plugin does not DEPEND on the Topicmaps plugin but is designed to work TOGETHER
-        // with the Topicmaps plugin.
-        // Currently the Access Control plugin needs to know some Topicmaps internals e.g. the URI of the default
-        // topicmap. ### TODO: make "optional plugin dependencies" an explicit concept. Plugins must be able to ask
-        // the core weather a certain plugin is installed (regardles weather it is activated already) and would wait
-        // for its service only if installed.
-        return dms.getTopic("uri", new SimpleValue("dm4.topicmaps.default_topicmap"));
     }
 
 

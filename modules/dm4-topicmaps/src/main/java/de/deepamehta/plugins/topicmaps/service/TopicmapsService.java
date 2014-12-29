@@ -13,9 +13,14 @@ import de.deepamehta.core.service.PluginService;
 
 public interface TopicmapsService extends PluginService {
 
-    Topic createTopicmap(String name,             String topicmapRendererUri);
+    // ------------------------------------------------------------------------------------------------------- Constants
 
-    Topic createTopicmap(String name, String uri, String topicmapRendererUri);
+    static final String DEFAULT_TOPICMAP_NAME     = "untitled";
+    static final String DEFAULT_TOPICMAP_RENDERER = "dm4.webclient.default_topicmap_renderer";
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    Topic createTopicmap(String name, String topicmapRendererUri);
 
     // ---
 

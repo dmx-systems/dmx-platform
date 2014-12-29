@@ -44,10 +44,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DEFAULT_TOPICMAP_NAME     = "untitled";
-    private static final String DEFAULT_TOPICMAP_URI      = "dm4.topicmaps.default_topicmap";
-    private static final String DEFAULT_TOPICMAP_RENDERER = "dm4.webclient.default_topicmap_renderer";
-
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
     private static final String TOPIC_MAPCONTEXT       = "dm4.topicmaps.topic_mapcontext";
     private static final String ASSOCIATION_MAPCONTEXT = "dm4.topicmaps.association_mapcontext";
@@ -86,13 +82,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topic createTopicmap(@PathParam("name") String name,
                                 @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
-        return createTopicmap(name, null, topicmapRendererUri);
-    }
-
-    @Override
-    public Topic createTopicmap(String name, String uri, String topicmapRendererUri) {
         ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
-        return dms.createTopic(new TopicModel(uri, "dm4.topicmaps.topicmap", new ChildTopicsModel()
+        return dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new ChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.state", topicmapState)
@@ -278,21 +269,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public InputStream getTopicmapAndTopicInWebclient() {
         // Note: the path parameters are evaluated at client-side
         return invokeWebclient();
-    }
-
-
-
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
-
-
-
-    @Override
-    public void postInstall() {
-        createTopicmap(DEFAULT_TOPICMAP_NAME, DEFAULT_TOPICMAP_URI, DEFAULT_TOPICMAP_RENDERER);
-        // Note: On post-install we have no workspace cookie.
-        // The workspace assignment is made by the Access Control plugin on all-plugins-active.
     }
 
 
