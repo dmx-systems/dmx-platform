@@ -38,8 +38,6 @@ import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreGetAssociationListener;
 import de.deepamehta.core.service.event.PreGetTopicListener;
-import de.deepamehta.core.service.event.PreSendAssociationTypeListener;
-import de.deepamehta.core.service.event.PreSendTopicTypeListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
@@ -83,9 +81,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                        IntroduceTopicTypeListener,
                                                                                        IntroduceAssociationTypeListener,
                                                                                        ServiceRequestFilterListener,
-                                                                                       ResourceRequestFilterListener,
-                                                                                       PreSendTopicTypeListener,
-                                                                                       PreSendAssociationTypeListener {
+                                                                                       ResourceRequestFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -519,28 +515,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         requestFilter(servletRequest);
     }
 
-    // ---
-
-    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
-    // with the types (don't use the preSend{}Type hooks). Instead let the client request the permissions separately.
-
-    @Override
-    public void preSendTopicType(TopicType topicType) {
-        // Note: the permissions for "Meta Meta Type" must be set manually.
-        // This type doesn't exist in DB. Fetching its ACL entries would fail.
-        if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-            enrichWithPermissions(topicType, createPermissions(false));     // write=false
-            return;
-        }
-        //
-        enrichWithPermissions(topicType, getPermissions(topicType.getId()));
-    }
-
-    @Override
-    public void preSendAssociationType(AssociationType assocType) {
-        enrichWithPermissions(assocType, getPermissions(assocType.getId()));
-    }
-
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -804,21 +778,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.getAccessControl().hasPermission(username, operation, objectId);
     }
 
-    // ---
-
     private Permissions createPermissions(boolean write) {
         return new Permissions().add(Operation.WRITE, write);
-    }
-
-    // ### TODO: rethink type enrichment. Is it still required? At server-side we have no CREATE permission anymore.
-    private void enrichWithPermissions(Type type, Permissions permissions) {
-        type.getChildTopics().getModel().put("dm4.accesscontrol.permissions", new ChildTopicsModel()
-            .put(Operation.WRITE.uri, permissions.get(Operation.WRITE.uri)));
-        // Note 1: "dm4.accesscontrol.permissions" is a contrived URI. There is no such type definition.
-        // Permissions are for transfer only, recalculated for each request, not stored in DB.
-        // Note 2: we put the permissions topic directly in the model here (instead of the attached child topics).
-        // The "permissions" topic is for transfer only. It must not be stored in the DB (as it would when putting
-        // it in the attached child topics).
     }
 
 
