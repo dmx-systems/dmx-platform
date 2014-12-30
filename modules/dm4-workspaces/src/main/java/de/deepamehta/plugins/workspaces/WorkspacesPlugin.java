@@ -168,11 +168,16 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     /**
-     * Creates the "Default" workspace.
+     * Creates the "DeepaMehta" workspace.
      */
     @Override
     public void postInstall() {
         createWorkspace(DEEPAMEHTA_WORKSPACE_NAME, DEEPAMEHTA_WORKSPACE_URI, DEEPAMEHTA_WORKSPACE_SHARING_MODE);
+        // Note 1: the workspace has no owner yet as the Access Control plugin is not yet activated (as it depends
+        // on the Workspaces plugin). We set the owner in the Access Control plugin's allPluginsActive() listener.
+        // Note 2: we can't postpone the creation of the "DeepaMehta" workspace to the Access Control plugin's
+        // postInstall() hook as it must be already available at Workspaces plugin activation time (as needed
+        // for the type introduction).
     }
 
 

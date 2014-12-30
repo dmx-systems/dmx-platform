@@ -380,21 +380,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postInstall() {
-        // create workspace "System"
+        // 1) create "System" workspace
         Topic systemWorkspace = wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI,
             SYSTEM_WORKSPACE_SHARING_MODE);
+        // Note: at post-install time our listeners are not yet registered.
+        // So we set the creator/owner/modifier manually here.
         setupAccessControl(systemWorkspace, DEFAULT_USERNAME);
-        // create user account "admin"
-        createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
         //
-        // ### TODO: set a creator and modifier for the User Account, Username and Password topics.
-        // Note 1: at post-install time our listeners are not yet registered.
-        // So we set the creator manually here. ### TODO: set the modifier as well. ### FIXDOC
-        // Note 2: at post-install time there is no user session. So we call setupAccessControl() directly
-        // instead of (the higher-level) setupUserAccountAccessControl().
-        // ### setupAccessControl(adminAccount, DEFAULT_USERNAME);
-        // ### TODO: set a creator and modifier for the admin account's Username and Password topics as well.
-        // However, they are not strictly required at the moment.
+        // 2) create "admin" user account
+        createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
     }
 
     @Override
@@ -414,20 +408,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     /**
-     * Setup access control for the default user and the default topicmap.
-     *   1) create membership for default user and default workspace
-     *   2) setup access control for default workspace
+     * Setup access control for the "DeepaMehta" workspace.
      */
     @Override
     public void allPluginsActive() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic defaultWorkspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
-            //
-            // 1) create membership for default user and default workspace
-            createDefaultMembership(defaultWorkspace);
-            // 2) setup access control for default workspace
-            setupDefaultAccessControl(defaultWorkspace, "default workspace (\"DeepaMehta\")");
+            Topic workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+            setupDefaultAccessControl(workspace, "\"DeepaMehta\" workspace");
             //
             tx.success();
         } catch (Exception e) {
@@ -569,27 +557,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === All Plugins Activated ===
 
-    private void createDefaultMembership(Topic defaultWorkspace) {
-        String operation = "Creating membership for default user (\"admin\") and default workspace (\"DeepaMehta\")";
-        try {
-            // abort if membership already exists
-            if (isMember(DEFAULT_USERNAME, defaultWorkspace.getId())) {
-                logger.info("### " + operation + " ABORTED -- membership already exists");
-                return;
-            }
-            //
-            logger.info("### " + operation);
-            createMembership(DEFAULT_USERNAME, defaultWorkspace.getId());
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
-
     private void setupDefaultAccessControl(Topic topic, String topicInfo) {
         String operation = "Setup access control for the " + topicInfo;
         try {
-            // Note: we only check for creator assignment.
-            // If an object has a creator assignment it is expected to have an ACL entry as well.
+            // Abort if creator/owner/modifier is already set
             if (getCreator(topic.getId()) != null) {
                 logger.info("### " + operation + " ABORTED -- already setup");
                 return;
