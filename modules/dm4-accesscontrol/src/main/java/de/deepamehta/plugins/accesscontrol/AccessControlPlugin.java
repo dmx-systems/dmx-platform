@@ -30,8 +30,6 @@ import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.AllPluginsActiveListener;
-import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
-import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
@@ -72,16 +70,14 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
-                                                                                       PreGetTopicListener,
-                                                                                       PreGetAssociationListener,
-                                                                                       PostCreateTopicListener,
-                                                                                       PostCreateAssociationListener,
-                                                                                       PostUpdateTopicListener,
-                                                                                       PostUpdateAssociationListener,
-                                                                                       IntroduceTopicTypeListener,
-                                                                                       IntroduceAssociationTypeListener,
-                                                                                       ServiceRequestFilterListener,
-                                                                                       ResourceRequestFilterListener {
+                                                                                         PreGetTopicListener,
+                                                                                         PreGetAssociationListener,
+                                                                                         PostCreateTopicListener,
+                                                                                         PostCreateAssociationListener,
+                                                                                         PostUpdateTopicListener,
+                                                                                         PostUpdateAssociationListener,
+                                                                                         ServiceRequestFilterListener,
+                                                                                         ResourceRequestFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -96,9 +92,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
-    // Default user account
-    private static final String DEFAULT_USERNAME = "admin";
-    private static final String DEFAULT_PASSWORD = "";
+    // Admin user account
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String ADMIN_DEFAULT_PASSWORD = "";
+
+    // Private workspaces
     private static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
 
     // System workspace
@@ -217,7 +215,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         // 2) create private workspace
         Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
-        setupAccessControl(privateWorkspace, username);
+        setOwner(privateWorkspace, username);
+        // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's private
+        // workspace has been created by the new user itself. Instead we set the *current* user as the creator/modifier
+        // (via postCreateTopic() listener). In case of the "admin" user account the creator/modifier remain undefined
+        // as it is actually created by the system itself.
         //
         // 3) assign user account and password to private workspace
         // Note: the current user has no READ access to the private workspace just created.
@@ -379,12 +381,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // 1) create "System" workspace
         Topic systemWorkspace = wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI,
             SYSTEM_WORKSPACE_SHARING_MODE);
-        // Note: at post-install time our listeners are not yet registered.
-        // So we set the creator/owner/modifier manually here.
-        setupAccessControl(systemWorkspace, DEFAULT_USERNAME);
+        // Note: at post-install time no user is logged in (our listeners are not even registered).
+        // So we set the owner manually here.
+        setOwner(systemWorkspace, ADMIN_USERNAME);
+        // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
+        // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
+        // the System workspace is actually created by the system itself.
         //
         // 2) create "admin" user account
-        createUserAccount(new Credentials(DEFAULT_USERNAME, DEFAULT_PASSWORD));
+        createUserAccount(new Credentials(ADMIN_USERNAME, ADMIN_DEFAULT_PASSWORD));
     }
 
     @Override
@@ -404,14 +409,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     /**
-     * Setup access control for the "DeepaMehta" workspace.
+     * Sets the owner of the "DeepaMehta" workspace.
      */
     @Override
     public void allPluginsActive() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
-            setupDefaultAccessControl(workspace, "\"DeepaMehta\" workspace");
+            setupDeepaMehtaWorkspace();
             //
             tx.success();
         } catch (Exception e) {
@@ -442,14 +446,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic) {
-        setupAccessControl(topic);
-        storeModifier(topic);
+        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            setOwner(topic);
+        }
+        //
+        setCreatorAndModifier(topic);
     }
 
     @Override
     public void postCreateAssociation(Association assoc) {
-        setupAccessControl(assoc);
-        storeModifier(assoc);
+        setCreatorAndModifier(assoc);
     }
 
     // ---
@@ -481,24 +487,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
         }
         //
-        storeModifier(topic);
+        setModifier(topic);
     }
 
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
-        storeModifier(assoc);
-    }
-
-    // ---
-
-    @Override
-    public void introduceTopicType(TopicType topicType) {
-        setupDefaultAccessControl(topicType);
-    }
-
-    @Override
-    public void introduceAssociationType(AssociationType assocType) {
-        setupDefaultAccessControl(assocType);
+        setModifier(assoc);
     }
 
     // ---
@@ -525,26 +519,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
-    }
-
-
-
-    // === All Plugins Activated ===
-
-    private void setupDefaultAccessControl(Topic topic, String topicInfo) {
-        String operation = "Setup access control for the " + topicInfo;
-        try {
-            // Abort if creator/owner/modifier is already set
-            if (getCreator(topic.getId()) != null) {
-                logger.info("### " + operation + " ABORTED -- already setup");
-                return;
-            }
-            //
-            logger.info("### " + operation);
-            setupAccessControl(topic, DEFAULT_USERNAME);
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
     }
 
 
@@ -675,37 +649,38 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Setup Access Control ===
 
-    private void setupDefaultAccessControl(Type type) {
+    /**
+     * Sets user "admin" as the owner of the "DeepaMehta" workspace if not yet set.
+     */
+    private void setupDeepaMehtaWorkspace() {
+        String operation = "Setting the owner of the \"DeepaMehta\" workspace";
         try {
-            String username = getUsername();
-            //
-            if (username == null) {
-                username = DEFAULT_USERNAME;
-                setupViewConfigAccessControl(type.getViewConfig());
+            Topic workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+            // Abort if owner is already set
+            if (getOwner(workspace.getId()) != null) {
+                logger.info("### " + operation + " ABORTED -- already set");
+                return;
             }
             //
-            setupAccessControl(type, username);
+            logger.info("### " + operation);
+            // Note: at all-plugins-active time no user is logged in. So we set the owner manually here.
+            setOwner(workspace, ADMIN_USERNAME);
+            // Note: we don't set a particular creator/modifier here as we don't want suggest that the DeepaMehta
+            // workspace has been created by the "admin" user. Instead the creator/modifier of the DeepaMehhta
+            // workspace remain undefined as the DeepaMehta workspace is actually created by the system itself.
         } catch (Exception e) {
-            throw new RuntimeException("Setting up access control for " + info(type) + " failed (" + type + ")", e);
-        }
-    }
-
-    // ---
-
-    private void setupViewConfigAccessControl(ViewConfiguration viewConfig) {
-        for (Topic configTopic : viewConfig.getConfigTopics()) {
-            setupAccessControl(configTopic, DEFAULT_USERNAME);
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
     // ---
 
     /**
-     * Sets the logged in user as the creator and the owner of the specified object.
+     * Sets the logged in user as the creator/modifier of the given object.
      * <p>
      * If no user is logged in, nothing is performed.
      */
-    private void setupAccessControl(DeepaMehtaObject object) {
+    private void setCreatorAndModifier(DeepaMehtaObject object) {
         try {
             String username = getUsername();
             // Note: when no user is logged in we do NOT fallback to the default user for the access control setup.
@@ -715,34 +690,51 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
             // the other hand we don't have such a mechanism (and don't want one either).
             if (username == null) {
-                logger.fine("Setting up access control for " + info(object) + " ABORTED -- no user is logged in");
+                logger.fine("Setting the creator/modifier of " + info(object) + " ABORTED -- no user is logged in");
                 return;
             }
             //
-            setupAccessControl(object, username);
+            setCreatorAndModifier(object, username);
         } catch (Exception e) {
-            throw new RuntimeException("Setting up access control for " + info(object) + " failed (" + object + ")", e);
+            throw new RuntimeException("Setting the creator/modifier of " + info(object) + " failed", e);
         }
     }
 
     /**
      * @param   username    must not be null.
      */
-    private void setupAccessControl(DeepaMehtaObject object, String username) {
+    private void setCreatorAndModifier(DeepaMehtaObject object, String username) {
         setCreator(object, username);
-        if (object.getTypeUri().equals("dm4.workspaces.workspace")) {
-            setOwner(object, username);
-        }
+        setModifier(object, username);
     }
 
     // ---
 
-    private void storeModifier(DeepaMehtaObject object) {
+    private void setModifier(DeepaMehtaObject object) {
         String username = getUsername();
         // Note: when a plugin topic is updated there is no user logged in yet.
-        if (username != null) {
-            object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
+        if (username == null) {
+            return;
         }
+        //
+        setModifier(object, username);
+    }
+
+    private void setModifier(DeepaMehtaObject object, String username) {
+        object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
+    }
+
+    // ---
+
+    private void setOwner(DeepaMehtaObject object) {
+        String username = getUsername();
+        // Note: username is null if the Access Control plugin is activated already
+        // when a 3rd-party plugin creates a workspace at install-time.
+        if (username == null) {
+            return;
+        }
+        //
+        setOwner(object, username);
     }
 
 
@@ -763,7 +755,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   objectId    a topic ID, or an association ID.
      */
     private Permissions getPermissions(long objectId) {
-        return createPermissions(hasPermission(getUsername(), Operation.WRITE, objectId));
+        return new Permissions().add(Operation.WRITE, hasPermission(getUsername(), Operation.WRITE, objectId));
     }
 
     /**
@@ -776,10 +768,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
         return dms.getAccessControl().hasPermission(username, operation, objectId);
-    }
-
-    private Permissions createPermissions(boolean write) {
-        return new Permissions().add(Operation.WRITE, write);
     }
 
 
