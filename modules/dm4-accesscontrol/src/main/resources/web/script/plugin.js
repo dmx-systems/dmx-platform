@@ -9,19 +9,26 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // === REST Client Extension ===
 
-    dm4c.restc.get_username = function() {
-        return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
-        // Note: response 204 No Content yields to null result
-    }
     dm4c.restc.login = function(authorization) {
         this.request("POST", "/accesscontrol/login", undefined, undefined, {"Authorization": authorization})
     }
     dm4c.restc.logout = function() {
         this.request("POST", "/accesscontrol/logout")
     }
+    dm4c.restc.get_username = function() {
+        return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
+        // Note: response 204 No Content yields to null result
+    }
     dm4c.restc.create_user_account = function(username, password) { // password is expected to be SHA256 encoded
         return this.request("POST", "/accesscontrol/user_account?no_workspace_assignment=true",
             {username: username, password: password})
+    }
+    dm4c.restc.get_workspace_owner = function(workspace_id) {
+        return this.request("GET", "/accesscontrol/workspace/" + workspace_id + "/owner",
+            undefined, undefined, undefined, "text")
+    }
+    dm4c.restc.create_membership = function(username, workspace_id) {
+        this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)
     }
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
@@ -33,16 +40,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/object/" + object_id + "/creator",
             undefined, undefined, undefined, "text")
     }
-    dm4c.restc.get_owner = function(object_id) {
-        return this.request("GET", "/accesscontrol/object/" + object_id + "/owner",
-            undefined, undefined, undefined, "text")
-    }
     dm4c.restc.get_modifier = function(object_id) {
         return this.request("GET", "/accesscontrol/object/" + object_id + "/modifier",
             undefined, undefined, undefined, "text")
-    }
-    dm4c.restc.create_membership = function(username, workspace_id) {
-        this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)
     }
 
 
@@ -213,8 +213,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             var created  = dm4c.restc.get_creation_time(topic.id)
             var modified = dm4c.restc.get_modification_time(topic.id)
             var creator  = dm4c.restc.get_creator(topic.id)
-            var owner    = dm4c.restc.get_owner(topic.id)
             var modifier = dm4c.restc.get_modifier(topic.id)
+            // ### TODO var owner    = dm4c.restc.get_workspace_owner(topic.id)
             //
             var content = /* ### TODO dm4c.render.label("Owner").add($("<div>").text(owner)) */
                 dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))

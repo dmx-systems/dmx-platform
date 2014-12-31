@@ -152,26 +152,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === User Session ===
 
-    @GET
-    @Path("/user")
-    @Produces("text/plain")
-    @Override
-    public String getUsername() {
-        try {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session == null) {
-                return null;
-            }
-            return username(session);
-        } catch (IllegalStateException e) {
-            // Note: if not invoked through network no request (and thus no session) is available.
-            // This happens e.g. while starting up.
-            return null;    // user is unknown
-        }
-    }
-
-    // ---
-
     @POST
     @Path("/login")
     @Override
@@ -190,6 +170,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // The login dialog can't be used to login again.
         if (READ_REQUIRES_LOGIN) {
             throw401Unauthorized();
+        }
+    }
+
+    // ---
+
+    @GET
+    @Path("/user")
+    @Produces("text/plain")
+    @Override
+    public String getUsername() {
+        try {
+            HttpSession session = request.getSession(false);    // create=false
+            if (session == null) {
+                return null;
+            }
+            return username(session);
+        } catch (IllegalStateException e) {
+            // Note: if not invoked through network no request (and thus no session) is available.
+            // This happens e.g. while starting up.
+            return null;    // user is unknown
         }
     }
 
@@ -215,7 +215,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         // 2) create private workspace
         Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
-        setOwner(privateWorkspace, username);
+        setWorkspaceOwner(privateWorkspace, username);
         // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's private
         // workspace has been created by the new user itself. Instead we set the *current* user as the creator/modifier
         // (via postCreateTopic() listener). In case of the "admin" user account the creator/modifier remain undefined
@@ -238,6 +238,52 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public Topic getUsernameTopic(String username) {
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
+    }
+
+
+
+    // === Workspaces / Memberships ===
+
+    @GET
+    @Path("/workspace/{workspace_id}/owner")
+    @Produces("text/plain")
+    @Override
+    public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
+        // ### TODO: delegate to Core's AccessControl.owner()?
+        return dms.hasProperty(workspaceId, PROP_OWNER) ? (String) dms.getProperty(workspaceId, PROP_OWNER) : null;
+    }
+
+    @Override
+    public void setWorkspaceOwner(Topic workspace, String username) {
+        try {
+            workspace.setProperty(PROP_OWNER, username, true);  // addToIndex=true
+        } catch (Exception e) {
+            throw new RuntimeException("Setting the workspace owner of " + info(workspace) + " failed (username=" +
+                username + ")", e);
+        }
+    }
+
+    // ---
+
+    @POST
+    @Path("/user/{username}/workspace/{workspace_id}")
+    @Transactional
+    @Override
+    public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
+        try {
+            dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
+                new TopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
+                new TopicRoleModel(workspaceId, "dm4.core.default")
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
+    }
+
+    @Override
+    public boolean isMember(String username, long workspaceId) {
+        return dms.getAccessControl().isMember(username, workspaceId);
     }
 
 
@@ -270,70 +316,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
     }
 
-    @Override
-    public void setCreator(DeepaMehtaObject object, String username) {
-        try {
-            object.setProperty(PROP_CREATOR, username, true);    // addToIndex=true
-        } catch (Exception e) {
-            throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
-                e);
-        }
-    }
-
-    // ---
-
-    @GET
-    @Path("/object/{id}/owner")
-    @Produces("text/plain")
-    @Override
-    public String getOwner(@PathParam("id") long objectId) {
-        // ### TODO: delegate to Core's AccessControl.owner()?
-        return dms.hasProperty(objectId, PROP_OWNER) ? (String) dms.getProperty(objectId, PROP_OWNER) : null;
-    }
-
-    @Override
-    public void setOwner(DeepaMehtaObject object, String username) {
-        try {
-            object.setProperty(PROP_OWNER, username, true);      // addToIndex=true
-        } catch (Exception e) {
-            throw new RuntimeException("Setting the owner of " + info(object) + " failed (username=" + username + ")",
-                e);
-        }
-    }
-
-    // ---
-
     @GET
     @Path("/object/{id}/modifier")
     @Produces("text/plain")
     @Override
     public String getModifier(@PathParam("id") long objectId) {
         return dms.hasProperty(objectId, PROP_MODIFIER) ? (String) dms.getProperty(objectId, PROP_MODIFIER) : null;
-    }
-
-
-
-    // === Memberships ===
-
-    @POST
-    @Path("/user/{username}/workspace/{workspace_id}")
-    @Transactional
-    @Override
-    public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
-        try {
-            dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
-                new TopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
-                new TopicRoleModel(workspaceId, "dm4.core.default")
-            ));
-        } catch (Exception e) {
-            throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
-                workspaceId + " failed", e);
-        }
-    }
-
-    @Override
-    public boolean isMember(String username, long workspaceId) {
-        return dms.getAccessControl().isMember(username, workspaceId);
     }
 
 
@@ -383,7 +371,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             SYSTEM_WORKSPACE_SHARING_MODE);
         // Note: at post-install time no user is logged in (our listeners are not even registered).
         // So we set the owner manually here.
-        setOwner(systemWorkspace, ADMIN_USERNAME);
+        setWorkspaceOwner(systemWorkspace, ADMIN_USERNAME);
         // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
         // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
         // the System workspace is actually created by the system itself.
@@ -447,7 +435,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postCreateTopic(Topic topic) {
         if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-            setOwner(topic);
+            setWorkspaceOwner(topic);
         }
         //
         setCreatorAndModifier(topic);
@@ -460,6 +448,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    // ### TODO: revise/drop this method. Meanwhile a user account is created via dialog.
     @Override
     public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
@@ -481,9 +470,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                     "    - User Account topic (ID " + topic.getId() + ")\n" + 
                     "    - Username topic (ID " + usernameTopic.getId() + ")\n" + 
                     "    - Password topic (ID " + passwordTopic.getId() + ")");
-                setOwner(topic, newUsername);
-                setOwner(usernameTopic, newUsername);
-                setOwner(passwordTopic, newUsername);
+                // ### setOwner(topic, newUsername);
+                // ### setOwner(usernameTopic, newUsername);
+                // ### setOwner(passwordTopic, newUsername);
             }
         }
         //
@@ -657,14 +646,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         try {
             Topic workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
             // Abort if owner is already set
-            if (getOwner(workspace.getId()) != null) {
+            if (getWorkspaceOwner(workspace.getId()) != null) {
                 logger.info("### " + operation + " ABORTED -- already set");
                 return;
             }
             //
             logger.info("### " + operation);
             // Note: at all-plugins-active time no user is logged in. So we set the owner manually here.
-            setOwner(workspace, ADMIN_USERNAME);
+            setWorkspaceOwner(workspace, ADMIN_USERNAME);
             // Note: we don't set a particular creator/modifier here as we don't want suggest that the DeepaMehta
             // workspace has been created by the "admin" user. Instead the creator/modifier of the DeepaMehhta
             // workspace remain undefined as the DeepaMehta workspace is actually created by the system itself.
@@ -710,6 +699,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
+    /**
+     * Sets the creator of a topic or an association.
+     */
+    private void setCreator(DeepaMehtaObject object, String username) {
+        try {
+            object.setProperty(PROP_CREATOR, username, true);   // addToIndex=true
+        } catch (Exception e) {
+            throw new RuntimeException("Setting the creator of " + info(object) + " failed (username=" + username + ")",
+                e);
+        }
+    }
+
+    // ---
+
     private void setModifier(DeepaMehtaObject object) {
         String username = getUsername();
         // Note: when a plugin topic is updated there is no user logged in yet.
@@ -726,7 +729,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void setOwner(DeepaMehtaObject object) {
+    private void setWorkspaceOwner(Topic workspace) {
         String username = getUsername();
         // Note: username is null if the Access Control plugin is activated already
         // when a 3rd-party plugin creates a workspace at install-time.
@@ -734,7 +737,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             return;
         }
         //
-        setOwner(object, username);
+        setWorkspaceOwner(workspace, username);
     }
 
 

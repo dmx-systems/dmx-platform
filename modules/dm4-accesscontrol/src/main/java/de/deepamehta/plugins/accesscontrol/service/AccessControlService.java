@@ -18,15 +18,6 @@ public interface AccessControlService extends PluginService {
     // === User Session ===
 
     /**
-     * Returns the username of the logged in user.
-     *
-     * @return  The username, or <code>null</code> if no user is logged in.
-     */
-    String getUsername();
-
-    // ---
-
-    /**
      * Checks weather the credentials in the authorization string match an existing User Account,
      * and if so, creates an HTTP session. ### FIXDOC
      *
@@ -49,6 +40,15 @@ public interface AccessControlService extends PluginService {
      */
     void logout();
 
+    // ---
+
+    /**
+     * Returns the username of the logged in user.
+     *
+     * @return  The username, or <code>null</code> if no user is logged in.
+     */
+    String getUsername();
+
 
 
     // === User Accounts ===
@@ -65,6 +65,41 @@ public interface AccessControlService extends PluginService {
      *          or <code>null</code> if no such username exists.
      */
     Topic getUsernameTopic(String username);
+
+
+
+    // === Workspaces / Memberships ===
+
+    /**
+     * Returns the owner of a workspace.
+     *
+     * @return  The username of the owner, or <code>null</code> if no owner is set.
+     *          ### TODO: should throw an exception instead of returning null
+     */
+    String getWorkspaceOwner(long workspaceId);
+
+    /**
+     * Sets the owner of a workspace.
+     * ### TODO: should take an ID instead a topic.
+     * ### Core service must be extended with a property setter.
+     */
+    void setWorkspaceOwner(Topic workspace, String username);
+
+    // ---
+
+    void createMembership(String username, long workspaceId);
+
+    /**
+     * Checks if a user is a member of the given workspace.
+     *
+     * @param   username        the user.
+     *                          If <code>null</code> is passed, <code>false</code> is returned.
+     *                          If an unknown username is passed an exception is thrown.
+     * @param   workspaceId     the workspace.
+     *
+     * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
+     */
+    boolean isMember(String username, long workspaceId);
 
 
 
@@ -92,50 +127,11 @@ public interface AccessControlService extends PluginService {
     String getCreator(long objectId);
 
     /**
-     * Sets the creator of a topic or an association.
-     */
-    void setCreator(DeepaMehtaObject object, String username);
-
-    // ---
-
-    /**
-     * Returns the owner of a topic or an association.
-     *
-     * @return  The username of the owner, or <code>null</code> if no owner is set.
-     */
-    String getOwner(long objectId);
-
-    /**
-     * Sets the owner of a topic or an association.
-     */
-    void setOwner(DeepaMehtaObject object, String username);
-
-    // ---
-
-    /**
      * Returns the modifier of a topic or an association.
      *
      * @return  The username of the modifier, or <code>null</code> if no modifier is set.
      */
     String getModifier(long objectId);
-
-
-
-    // === Memberships ===
-
-    void createMembership(String username, long workspaceId);
-
-    /**
-     * Checks if a user is a member of the given workspace.
-     *
-     * @param   username        the user.
-     *                          If <code>null</code> is passed, <code>false</code> is returned.
-     *                          If an unknown username is passed an exception is thrown.
-     * @param   workspaceId     the workspace.
-     *
-     * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
-     */
-    boolean isMember(String username, long workspaceId);
 
 
 
