@@ -196,6 +196,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
     })
 
+    // ---
+
     dm4c.add_listener("topic_commands", function(topic) {
         return [
             {
@@ -204,27 +206,28 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             },
             {
                 label:   "Get Info",
-                handler: do_open_info_dialog,
+                handler: function() {
+                    open_info_dialog(topic.id, "Topic Info")
+                },
                 context: "context-menu"
             }
         ]
+    })
 
-        function do_open_info_dialog() {
-            var created  = dm4c.restc.get_creation_time(topic.id)
-            var modified = dm4c.restc.get_modification_time(topic.id)
-            var creator  = dm4c.restc.get_creator(topic.id)
-            var modifier = dm4c.restc.get_modifier(topic.id)
-            // ### TODO var owner    = dm4c.restc.get_workspace_owner(topic.id)
-            //
-            var content = /* ### TODO dm4c.render.label("Owner").add($("<div>").text(owner)) */
-                dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
-                .add(dm4c.render.label("Modified")).add($("<div>").text(new Date(modified) + " by " + modifier))
-            //
-            dm4c.ui.dialog({
-                title: "Topic Info",
-                content: content
-            })
-        }
+    dm4c.add_listener("association_commands", function(assoc) {
+        return [
+            {
+                is_separator: true,
+                context: "context-menu"
+            },
+            {
+                label:   "Get Info",
+                handler: function() {
+                    open_info_dialog(assoc.id, "Association Info")
+                },
+                context: "context-menu"
+            }
+        ]
     })
 
     dm4c.add_listener("post_refresh_create_menu", function(type_menu) {
@@ -335,6 +338,26 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     function encode_password(password) {
         return ENCODED_PASSWORD_PREFIX + SHA256(password)
     }
+
+    // === Info Dialog ===
+
+    function open_info_dialog(object_id, title) {
+        var created  = dm4c.restc.get_creation_time(object_id)
+        var modified = dm4c.restc.get_modification_time(object_id)
+        var creator  = dm4c.restc.get_creator(object_id)
+        var modifier = dm4c.restc.get_modifier(object_id)
+        // ### TODO var owner    = dm4c.restc.get_workspace_owner(object_id)
+        //
+        var content = /* ### TODO dm4c.render.label("Owner").add($("<div>").text(owner)) */
+            dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
+            .add(dm4c.render.label("Modified")).add($("<div>").text(new Date(modified) + " by " + modifier))
+        //
+        dm4c.ui.dialog({
+            title: title,
+            content: content
+        })
+    }
+
 
     // === Permissions Cache ===
 
