@@ -207,7 +207,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             {
                 label:   "Get Info",
                 handler: function() {
-                    open_info_dialog(topic.id, "Topic Info")
+                    open_info_dialog("Topic Info", topic.id, topic.type_uri == "dm4.workspaces.workspace")
                 },
                 context: "context-menu"
             }
@@ -223,7 +223,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             {
                 label:   "Get Info",
                 handler: function() {
-                    open_info_dialog(assoc.id, "Association Info")
+                    open_info_dialog("Association Info", assoc.id)
                 },
                 context: "context-menu"
             }
@@ -341,16 +341,23 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // === Info Dialog ===
 
-    function open_info_dialog(object_id, title) {
+    function open_info_dialog(title, object_id, is_workspace) {
         var created  = dm4c.restc.get_creation_time(object_id)
         var modified = dm4c.restc.get_modification_time(object_id)
         var creator  = dm4c.restc.get_creator(object_id)
         var modifier = dm4c.restc.get_modifier(object_id)
-        // ### TODO var owner    = dm4c.restc.get_workspace_owner(object_id)
         //
-        var content = /* ### TODO dm4c.render.label("Owner").add($("<div>").text(owner)) */
-            dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
+        if (is_workspace) {
+            title = "Workspace Info"
+            var workspace_id = object_id
+        } else {
+            var workspace_id = dm4c.restc.get_assigned_workspace(object_id).id
+        }
+        var owner = dm4c.restc.get_workspace_owner(workspace_id)
+        //
+        var content = dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
             .add(dm4c.render.label("Modified")).add($("<div>").text(new Date(modified) + " by " + modifier))
+            .add(dm4c.render.label("Owner")).add($("<div>").text(owner))
         //
         dm4c.ui.dialog({
             title: title,
