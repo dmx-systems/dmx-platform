@@ -351,20 +351,20 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             title = "Workspace Info"
             var workspace_id = object_id
         } else {
-            var workspace_id = dm4c.restc.get_assigned_workspace(object_id).id
+            var workspace = dm4c.restc.get_assigned_workspace(object_id)
+            var workspace_id = workspace && workspace.id
         }
-        var owner = dm4c.restc.get_workspace_owner(workspace_id)
+        var owner = workspace_id && dm4c.restc.get_workspace_owner(workspace_id)
         //
         var content = dm4c.render.label("Created").add($("<div>").text(new Date(created) + " by " + creator))
             .add(dm4c.render.label("Modified")).add($("<div>").text(new Date(modified) + " by " + modifier))
-            .add(dm4c.render.label("Owner")).add($("<div>").text(owner))
+            .add(dm4c.render.label("Owner")).add($("<div>").text("" + owner))
         //
         dm4c.ui.dialog({
             title: title,
             content: content
         })
     }
-
 
     // === Permissions Cache ===
 
