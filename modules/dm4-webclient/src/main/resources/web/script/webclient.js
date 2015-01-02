@@ -1159,25 +1159,32 @@ dm4c = new function() {
 
     // === Permissions ===
 
-    this.has_write_permission_for_topic = function(topic) {
-        var result = dm4c.fire_event("has_write_permission_for_topic", topic)
+    this.has_write_permission_for_topic = function(topic_id) {
+        var result = dm4c.fire_event("has_write_permission_for_topic", topic_id)
         return !js.contains(result, false)
     }
 
-    this.has_write_permission_for_association = function(assoc) {
-        var result = dm4c.fire_event("has_write_permission_for_association", assoc)
+    this.has_write_permission_for_association = function(assoc_id) {
+        var result = dm4c.fire_event("has_write_permission_for_association", assoc_id)
         return !js.contains(result, false)
     }
 
     // ---
 
-    // ### TODO: add the same for association types
+    this.has_retype_permission_for_association = function(assoc_type, topic_1, topic_2) {
+        var result = dm4c.fire_event("has_retype_permission_for_association", assoc_type, topic_1, topic_2)
+        return !js.contains(result, false)
+    }
+
+    // ---
+
+    // ### TODO: add the same for association types? Still required at all?
     this.has_read_permission = function(type_uri) {
         var result = dm4c.fire_event("has_read_permission", dm4c.get_topic_type(type_uri))
         return !js.contains(result, false)
     }
 
-    // ### TODO: add the same for association types
+    // ### TODO: add the same for association types? Still required at all?
     this.has_create_permission = function(type_uri) {
         var result = dm4c.fire_event("has_create_permission", dm4c.get_topic_type(type_uri))
         return !js.contains(result, false)
@@ -1329,7 +1336,7 @@ dm4c = new function() {
     }
 
     this.adjust_create_menu_visibility = function() {
-        // Note: factually this makes the Access Control plugin a webclient dependency. ### TODO: should we avoid that?
+        // Note: this makes the Access Control plugin a webclient dependency. ### TODO: should we avoid that?
         if (dm4c.get_plugin("de.deepamehta.accesscontrol").is_workspace_writable()) {
             dm4c.toolbar.create_widget.show()
         } else {

@@ -276,23 +276,34 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     // ---
 
-    dm4c.add_listener("has_write_permission_for_topic", function(topic) {
-        return get_topic_permissions(topic.id)["dm4.accesscontrol.operation.write"]
+    dm4c.add_listener("has_write_permission_for_topic", function(topic_id) {
+        return get_topic_permissions(topic_id)["dm4.accesscontrol.operation.write"]
     })
 
-    dm4c.add_listener("has_write_permission_for_association", function(assoc) {
-        return get_association_permissions(assoc.id)["dm4.accesscontrol.operation.write"]
+    dm4c.add_listener("has_write_permission_for_association", function(assoc_id) {
+        return get_association_permissions(assoc_id)["dm4.accesscontrol.operation.write"]
     })
 
-    // ### TODO: make the types cachable (like topics/associations). That is, don't deliver the permissions along
-    // with the types (in the child topics). Instead let the client request the permissions separately.
+    dm4c.add_listener("has_retype_permission_for_association", function(assoc_type, topic_1, topic_2) {
+        // ### TODO: enforce the retype permission at *server-side*
+        if (assoc_type.uri == "dm4.accesscontrol.membership") {
+            if (matches(topic_1, topic_2, "dm4.workspaces.workspace", "dm4.accesscontrol.username")) {
+                var workspace = get_topic_by_type(topic_1, topic_2, "dm4.workspaces.workspace")
+                return dm4c.has_write_permission_for_topic(workspace.id)
+            }
+            return false
+        }
+        return true
+    })
 
-    // ### TODO: add the same for association types
+    // ---
+
+    // ### TODO: add the same for association types? Still required at all?
     dm4c.add_listener("has_read_permission", function(topic_type) {
         return is_topic_type_readable(topic_type.uri)
     })
 
-    // ### TODO: add the same for association types
+    // ### TODO: add the same for association types? Still required at all?
     dm4c.add_listener("has_create_permission", function(topic_type) {
         return is_topic_type_readable(topic_type.uri) && is_workspace_writable()
     })
@@ -404,5 +415,16 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function clear_permissions_cache() {
         permissions_cache = {}
+    }
+
+    // === Utilities ===
+
+    function matches(topic_1, topic_2, type_uri_1, type_uri_2) {
+        return topic_1.type_uri == type_uri_1 && topic_2.type_uri == type_uri_2 ||
+               topic_1.type_uri == type_uri_2 && topic_2.type_uri == type_uri_1
+    }
+
+    function get_topic_by_type(topic_1, topic_2, topic_type_uri) {
+        return topic_1.type_uri == topic_type_uri ? topic_1 : topic_2
     }
 })

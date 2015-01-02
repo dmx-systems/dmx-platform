@@ -4,7 +4,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // Model
     var selected_workspace_id   // ID of the selected workspace
-    var workspaces              // All workspaces in the DB (topic-like objects)
+    var workspaces              // All workspaces in the DB (array of topic-like objects)
 
     // View
     var workspace_menu          // A GUIToolkit Menu object

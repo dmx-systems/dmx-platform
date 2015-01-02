@@ -477,7 +477,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function load_topicmap(topicmap_id) {
         var config = {
-            is_writable: dm4c.has_write_permission_for_topic(get_topicmap_topic(topicmap_id))
+            is_writable: dm4c.has_write_permission_for_topic(topicmap_id)
         }
         var topicmap = topicmap_renderer.load_topicmap(topicmap_id, config)
         put_in_cache(topicmap)

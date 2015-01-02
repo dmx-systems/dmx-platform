@@ -31,7 +31,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             context: "context-menu"
         })
         // ### FIXME: check locked state as well (at least for retype)
-        if (dm4c.has_write_permission_for_topic(topic)) {
+        if (dm4c.has_write_permission_for_topic(topic.id)) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Retype",
@@ -150,7 +150,7 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             })
         }
         //
-        if (dm4c.has_write_permission_for_association(assoc)) {
+        if (dm4c.has_write_permission_for_association(assoc.id)) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Delete",
@@ -235,10 +235,10 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
     // ----------------------------------------------------------------------------------------------- Private Functions
 
     function is_topic_changable(topic) {
-        return dm4c.has_write_permission_for_topic(topic) && !topic.get_type().is_locked()
+        return dm4c.has_write_permission_for_topic(topic.id) && !topic.get_type().is_locked()
     }
 
     function is_association_changable(assoc) {
-        return dm4c.has_write_permission_for_association(assoc) && !assoc.get_type().is_locked()
+        return dm4c.has_write_permission_for_association(assoc.id) && !assoc.get_type().is_locked()
     }
 })
