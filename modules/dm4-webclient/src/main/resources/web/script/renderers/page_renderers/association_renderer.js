@@ -31,7 +31,7 @@
             var role_type_menu_1 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_1.role_type_uri)
             var role_type_menu_2 = dm4c.render.topic_menu("dm4.core.role_type", assoc.role_2.role_type_uri)
             // association type
-            var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri,
+            var assoc_type_menu = dm4c.render.topic_menu("dm4.core.assoc_type", assoc.type_uri, undefined,
                 from_processing_function(true))     // returns a GUIToolkit Menu object, stay_in_edit_mode=true
             dm4c.render.field_label("Association Type")
             dm4c.render.page(assoc_type_menu.dom)

@@ -296,30 +296,40 @@ function RenderHelper() {
      * Renders a menu which is populated by all topics of the specified type.
      * The menu item values can be either the respective topic IDs or the topic URIs.
      *
-     * @param   selected_id_or_uri  The ID or the URI of the initially selected item.
-     *                              If an ID (number) is specified the menu item values are the respective topic IDs.
-     *                              If an URI (string) is specified the menu item values are the respective topic URIs.
-     * @param   handler             Optional: The callback function. Called every time the user selects a menu item.
-     *                              One argument is passed: the selected menu item (an object with "value" and "label"
-     *                              properties).
+     * @param   selected_id_or_uri
+     *              The ID or the URI of the initially selected item.
+     *              If an ID (number) is specified the menu item values are the respective topic IDs.
+     *              If an URI (string) is specified the menu item values are the respective topic URIs.
+     * @param   filter_func
+     *              Optional: the function to filter the topics appearing in the menu. The topic is passed.
+     *              If the function returns a true-ish value the topic appears as enabled in the menu.
+     *              Otherwise the topic appears as disabled in the menu.
+     *              If no filter function is specified all topics appear as enabled.
+     * @param   handler 
+     *              Optional: the function that is called every time the user selects a menu item.
+     *              One argument is passed: the selected menu item (an object with "value" and "label" properties).
      *
      * @return  a GUIToolkit Menu object
      */
-    this.topic_menu = function(topic_type_uri, selected_id_or_uri, handler) {
+    this.topic_menu = function(topic_type_uri, selected_id_or_uri, filter_func, handler) {
         // determine item value type
         if (typeof selected_id_or_uri == "number") {
             var value_attr = "id"
         } else if (typeof selected_id_or_uri == "string") {
             var value_attr = "uri"
         } else {
-            throw "RendererHelperError: topic_menu(): illegal \"selected_id_or_uri\" argument"
+            throw "RendererHelperError: illegal \"selected_id_or_uri\" argument in topic_menu() call"
         }
         // fetch all instances
         var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // include_childs=false, sort=true
         // build menu
         var menu = dm4c.ui.menu(handler)
         for (var i = 0, topic; topic = topics[i]; i++) {
-            menu.add_item({label: topic.value, value: topic[value_attr]})
+            menu.add_item({
+                label: topic.value,
+                value: topic[value_attr],
+                disabled: filter_func && !filter_func(topic)
+            })
         }
         menu.select(selected_id_or_uri)
         //

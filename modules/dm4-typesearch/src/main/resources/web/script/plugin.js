@@ -67,7 +67,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     function refresh_type_menu() {
         // Note: refreshing the type menu is only required if the "By Type" searchmode is selected
         if (is_searchmode_selected()) {
-            dm4c.refresh_type_menu(type_menu)   // no filter_func specified
+            dm4c.refresh_type_menu(type_menu)   // no type list specified
         }
     }
 

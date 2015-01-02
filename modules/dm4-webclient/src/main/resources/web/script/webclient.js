@@ -1338,7 +1338,11 @@ dm4c = new function() {
     }
 
     /**
-     * Creates a list of all the topic types the current user is enabled to create instances of.
+     * Creates a list of all the topic types the current user is allowed to create instances of.
+     *
+     * @param   permission_function
+     *              A function that indicates whether the current user is allowed to create an instance of a
+     *              given type. The type URI is passed.
      *
      * @return  the list of topic types.
      */
