@@ -191,20 +191,22 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
     dm4c.add_listener("canvas_commands", function(cx, cy) {
         var commands = []
-        var topic_types = dm4c.topic_type_list(dm4c.has_create_permission)
-        if (topic_types.length) {
-            commands.push({
-                label: "Create",
-                disabled: true,
-                context: "context-menu"
-            })
-            for (var i = 0, topic_type; topic_type = topic_types[i]; i++) {
+        if (dm4c.is_workspace_writable()) {
+            var topic_types = dm4c.topic_type_list()
+            if (topic_types.length) {
                 commands.push({
-                    label: topic_type.value,
-                    icon:  topic_type.get_icon_src(),
-                    handler: create_handler(topic_type.uri),
+                    label: "Create",
+                    disabled: true,
                     context: "context-menu"
                 })
+                for (var i = 0, topic_type; topic_type = topic_types[i]; i++) {
+                    commands.push({
+                        label: topic_type.value,
+                        icon:  topic_type.get_icon_src(),
+                        handler: create_handler(topic_type.uri),
+                        context: "context-menu"
+                    })
+                }
             }
         }
         return commands

@@ -235,7 +235,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
         // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
         // WRITEability of the selected workspace.)
-        if (!dm4c.has_read_permission("dm4.accesscontrol.user_account")) {
+        if (!dm4c.has_read_permission_for_topic_type("dm4.accesscontrol.user_account")) {
             return
         }
         //
@@ -285,27 +285,15 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     })
 
     dm4c.add_listener("has_retype_permission_for_association", function(assoc_type, topic_1, topic_2) {
-        // ### TODO: enforce the retype permission at *server-side*
+        // ### TODO: enforce the retype policy at *server-side*
         if (assoc_type.uri == "dm4.accesscontrol.membership") {
             if (matches(topic_1, topic_2, "dm4.workspaces.workspace", "dm4.accesscontrol.username")) {
-                var workspace = get_topic_by_type(topic_1, topic_2, "dm4.workspaces.workspace")
+                var workspace = choose_topic_by_type(topic_1, topic_2, "dm4.workspaces.workspace")
                 return dm4c.has_write_permission_for_topic(workspace.id)
             }
             return false
         }
         return true
-    })
-
-    // ---
-
-    // ### TODO: add the same for association types? Still required at all?
-    dm4c.add_listener("has_read_permission", function(topic_type) {
-        return is_topic_type_readable(topic_type.uri)
-    })
-
-    // ### TODO: add the same for association types? Still required at all?
-    dm4c.add_listener("has_create_permission", function(topic_type) {
-        return is_topic_type_readable(topic_type.uri) && is_workspace_writable()
     })
 
 
@@ -326,25 +314,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return new Topic(dm4c.restc.create_user_account(username, encode_password(password)))
     }
 
-    this.is_workspace_writable = function() {
-        return is_workspace_writable()
-    }
-
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
-
-    function is_topic_type_readable(topic_type_uri) {
-        // Note: at startup the webclient loads all readable types into the type cache
-        return dm4c.has_topic_type(topic_type_uri)
-    }
-
-    function is_workspace_writable() {
-        var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
-        return get_topic_permissions(workspace_id)["dm4.accesscontrol.operation.write"]
-    }
-
-    // ---
 
     function encode_password(password) {
         return ENCODED_PASSWORD_PREFIX + SHA256(password)
@@ -424,7 +396,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                topic_1.type_uri == type_uri_2 && topic_2.type_uri == type_uri_1
     }
 
-    function get_topic_by_type(topic_1, topic_2, topic_type_uri) {
+    function choose_topic_by_type(topic_1, topic_2, topic_type_uri) {
         return topic_1.type_uri == topic_type_uri ? topic_1 : topic_2
     }
 })

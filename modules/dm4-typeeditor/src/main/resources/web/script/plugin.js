@@ -66,9 +66,9 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
         // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
         // WRITEability of the selected workspace.)
-        var tt = dm4c.has_read_permission("dm4.core.topic_type")
-        var at = dm4c.has_read_permission("dm4.core.assoc_type")
-        var rt = dm4c.has_read_permission("dm4.core.role_type")
+        var tt = dm4c.has_read_permission_for_topic_type("dm4.core.topic_type")
+        var at = dm4c.has_read_permission_for_topic_type("dm4.core.assoc_type")
+        var rt = dm4c.has_read_permission_for_topic_type("dm4.core.role_type")
         //
         if (tt || at || rt) {
             type_menu.add_separator()

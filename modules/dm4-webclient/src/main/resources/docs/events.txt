@@ -70,8 +70,6 @@ Webclient
 "has_write_permission_for_topic"
 "has_write_permission_for_association"
 "has_retype_permission_for_association"
-"has_read_permission"       // for types only
-"has_create_permission"     // for types only
 
 // REST Client
 "pre_send_request"

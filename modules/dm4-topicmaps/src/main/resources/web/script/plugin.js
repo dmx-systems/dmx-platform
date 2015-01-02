@@ -590,7 +590,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             topicmap_menu.add_item({label: topicmap_topic.value, value: topicmap_topic.id, icon: icon_src})
         }
         // add "New..." to menu
-        if (dm4c.has_create_permission("dm4.topicmaps.topicmap")) {
+        if (dm4c.has_create_permission_for_topic_type("dm4.topicmaps.topicmap")) {
             topicmap_menu.add_separator()
             topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }

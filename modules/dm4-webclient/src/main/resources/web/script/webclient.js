@@ -946,11 +946,11 @@ dm4c = new function() {
 
     // ---
 
-    this.has_topic_type = function(topic_type_uri) {
+    function has_topic_type(topic_type_uri) {
         return type_cache.has_topic_type(topic_type_uri)
     }
 
-    this.has_assoc_type = function(assoc_type_uri) {
+    function has_assoc_type(assoc_type_uri) {
         return type_cache.has_assoc_type(assoc_type_uri)
     }
 
@@ -1000,6 +1000,18 @@ dm4c = new function() {
     }
 
     // ---
+
+    /**
+     * Creates a list of all the topic types about to appear in a Create menu (that is toolbar menu or context menu).
+     * These are the types where "Show in Create Menu" is set (in the type's view configuration).
+     *
+     * @return  the list of topic types.
+     */
+    this.topic_type_list = function() {
+        return type_cache.get_topic_types(function(topic_type) {
+            return topic_type.get_menu_config("create-type-menu")
+        })
+    }
 
     /**
      * Clears the type cache and loads all types. Once complete calls the callback function.
@@ -1178,16 +1190,37 @@ dm4c = new function() {
 
     // ---
 
-    // ### TODO: add the same for association types? Still required at all?
-    this.has_read_permission = function(type_uri) {
-        var result = dm4c.fire_event("has_read_permission", dm4c.get_topic_type(type_uri))
-        return !js.contains(result, false)
+    // Note: calculating the READ and CREATE permissions for topic types is sole Webclient logic.
+    // The READ permission for types is implicit: the Webclient loads all readable types into its type cache.
+    // If a type is not readable, the server would not send it in the first place. The type cache is invalidated
+    // once the login state changes. Thus the type cache always represents the set of readable types.
+    // The CREATE permission for types is synthesized: the type must the readable *and* the selected workspace 
+    // must be writable.
+
+    // ### TODO: add the same for association types?
+    this.has_read_permission_for_topic_type = function(topic_type_uri) {
+        return is_topic_type_readable(topic_type_uri)
     }
 
-    // ### TODO: add the same for association types? Still required at all?
-    this.has_create_permission = function(type_uri) {
-        var result = dm4c.fire_event("has_create_permission", dm4c.get_topic_type(type_uri))
-        return !js.contains(result, false)
+    // ### TODO: add the same for association types?
+    this.has_create_permission_for_topic_type = function(topic_type_uri) {
+        return is_topic_type_readable(topic_type_uri) && dm4c.is_workspace_writable()
+    }
+
+    // ---
+
+    function is_topic_type_readable(topic_type_uri) {
+        // Note: at startup the webclient loads all readable types into the type cache
+        return has_topic_type(topic_type_uri)
+    }
+
+    /**
+     * Returns true if the current user has write access to the selected workspace.
+     */
+    this.is_workspace_writable = function() {
+        // Note: the Workspaces plugin is a Webclient dependency
+        var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
+        return dm4c.has_write_permission_for_topic(workspace_id)
     }
 
     // === GUI ===
@@ -1208,7 +1241,7 @@ dm4c = new function() {
         //
         // 2) Setting up the create widget
         // Note: the create menu must be popularized *after* the plugins are loaded.
-        // Two events are involved: "post_refresh_create_menu" and "has_create_permission".
+        // One event is involved: "post_refresh_create_menu".
         // Note: adjust_create_widget() must be called *after* firing the "init" events.
         // Adjusting the create widget relies on a initialized Workspaces plugin, in particular a current workspace.
         adjust_create_widget()
@@ -1331,32 +1364,16 @@ dm4c = new function() {
      */
     this.refresh_create_menu = function() {
         var type_menu = dm4c.toolbar.create_menu
-        dm4c.refresh_type_menu(type_menu, this.topic_type_list(dm4c.has_read_permission))
+        dm4c.refresh_type_menu(type_menu, this.topic_type_list())
         dm4c.fire_event("post_refresh_create_menu", type_menu)
     }
 
     this.adjust_create_menu_visibility = function() {
-        // Note: this makes the Access Control plugin a webclient dependency. ### TODO: should we avoid that?
-        if (dm4c.get_plugin("de.deepamehta.accesscontrol").is_workspace_writable()) {
+        if (dm4c.is_workspace_writable()) {
             dm4c.toolbar.create_widget.show()
         } else {
             dm4c.toolbar.create_widget.hide()
         }
-    }
-
-    /**
-     * Creates a list of all the topic types the current user is allowed to create instances of.
-     *
-     * @param   permission_function
-     *              A function that indicates whether the current user is allowed to create an instance of a
-     *              given type. The type URI is passed.
-     *
-     * @return  the list of topic types.
-     */
-    this.topic_type_list = function(permission_function) {
-        return type_cache.get_topic_types(function(topic_type) {
-            return permission_function(topic_type.uri) && topic_type.get_menu_config("create-type-menu")
-        })
     }
 
     // ---
