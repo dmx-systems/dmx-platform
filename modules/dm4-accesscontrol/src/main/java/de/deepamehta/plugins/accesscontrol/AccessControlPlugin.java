@@ -249,7 +249,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
-        // ### TODO: delegate to Core's AccessControl.owner()?
+        // ### TODO: delegate to Core's AccessControl.getOwner()?
         return dms.hasProperty(workspaceId, PROP_OWNER) ? (String) dms.getProperty(workspaceId, PROP_OWNER) : null;
     }
 

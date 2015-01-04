@@ -33,6 +33,10 @@ class AccessControlImpl implements AccessControl {
     // ### TODO: copy in WorkspacesPlugin.java
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
+    // ### TODO: copy in AccessControlPlugin.java
+    private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+    private long systemWorkspaceId = -1;    // initialized lazily
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
@@ -49,16 +53,16 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public boolean checkCredentials(Credentials cred) {
-        Topic username = null;
+        TopicModel usernameTopic = null;
         try {
-            username = getUsernameTopic(cred.username);
-            if (username == null) {
+            usernameTopic = getUsernameTopic(cred.username);
+            if (usernameTopic == null) {
                 return false;
             }
-            return matches(username, cred.password);
+            return matches(usernameTopic, cred.password);
         } catch (Exception e) {
-            throw new RuntimeException("Checking credentials for user \"" + cred.username + "\" failed (username " +
-                username + ")", e);
+            throw new RuntimeException("Checking credentials for user \"" + cred.username +
+                "\" failed (usernameTopic=" + usernameTopic + ")", e);
         }
     }
 
@@ -66,12 +70,12 @@ class AccessControlImpl implements AccessControl {
     public boolean hasPermission(String username, Operation operation, long objectId) {
         String typeUri = null;
         try {
-            typeUri = typeUri(objectId);
+            typeUri = getTypeUri(objectId);
             long workspaceId;
             if (typeUri.equals("dm4.workspaces.workspace")) {
                 workspaceId = objectId;
             } else {
-                workspaceId = assignedWorkspaceId(objectId);
+                workspaceId = getAssignedWorkspaceId(objectId);
                 //
                 if (workspaceId == -1) {
                     switch (operation) {
@@ -98,7 +102,18 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public boolean isMember(String username, long workspaceId) {
-        return _isMember(username, workspaceId);
+        try {
+            if (username == null) {
+                return false;
+            }
+            // Note: direct storage access is required here
+            AssociationModel membership = dms.storageDecorator.fetchAssociation(TYPE_MEMBERSHIP,
+                getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
+            return membership != null;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
     }
 
     @Override
@@ -115,25 +130,25 @@ class AccessControlImpl implements AccessControl {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
-     * Prerequisite: username is not <code>null</code>.
+     * Prerequisite: usernameTopic is not <code>null</code>.
      *
      * @param   password    The encoded password.
      */
-    private boolean matches(Topic username, String password) {
-        return password(fetchUserAccount(username)).equals(password);
+    private boolean matches(TopicModel usernameTopic, String password) {
+        return getPassword(getUserAccount(usernameTopic)).equals(password);
     }
 
     /**
-     * Prerequisite: username is not <code>null</code>.
+     * Prerequisite: usernameTopic is not <code>null</code>.
      */
-    private TopicModel fetchUserAccount(Topic username) {
+    private TopicModel getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModel userAccount = dms.storageDecorator.fetchTopicRelatedTopic(username.getId(),
+        RelatedTopicModel userAccount = dms.storageDecorator.fetchTopicRelatedTopic(usernameTopic.getId(),
             "dm4.core.composition", "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
-                username.getSimpleValue() + "\" (username=" + username + ")");
+                usernameTopic.getSimpleValue() + "\" (usernameTopic=" + usernameTopic + ")");
         }
         return userAccount;
     }
@@ -141,7 +156,7 @@ class AccessControlImpl implements AccessControl {
     /**
      * @return  The encoded password of the specified User Account.
      */
-    private String password(TopicModel userAccount) {
+    private String getPassword(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
         RelatedTopicModel password = dms.storageDecorator.fetchTopicRelatedTopic(userAccount.getId(),
@@ -169,10 +184,11 @@ class AccessControlImpl implements AccessControl {
     // ---
 
     /**
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
+     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
      */
     private boolean hasReadPermission(String username, long workspaceId) {
-        SharingMode sharingMode = sharingMode(workspaceId);
+        SharingMode sharingMode = getSharingMode(workspaceId);
         switch (sharingMode) {
         case PRIVATE:
             return isOwner(username, workspaceId);
@@ -181,7 +197,9 @@ class AccessControlImpl implements AccessControl {
         case COLLABORATIVE:
             return isOwner(username, workspaceId) || isMember(username, workspaceId);
         case PUBLIC:
-            return true;
+            // Note: the System workspace is special: although it is a public workspace
+            // its content is readable only for logged in users.
+            return workspaceId != getSystemWorkspaceId() || username != null;
         case COMMON:
             return true;
         default:
@@ -190,10 +208,11 @@ class AccessControlImpl implements AccessControl {
     }
 
     /**
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
+     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
      */
     private boolean hasWritePermission(String username, long workspaceId) {
-        SharingMode sharingMode = sharingMode(workspaceId);
+        SharingMode sharingMode = getSharingMode(workspaceId);
         switch (sharingMode) {
         case PRIVATE:
             return isOwner(username, workspaceId);
@@ -212,7 +231,7 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    private long assignedWorkspaceId(long objectId) {
+    private long getAssignedWorkspaceId(long objectId) {
         // Note: direct storage access is required here
         TopicModel workspace = dms.storageDecorator.fetchRelatedTopic(objectId, "dm4.core.aggregation",
             "dm4.core.parent", "dm4.core.child", "dm4.workspaces.workspace");
@@ -224,39 +243,21 @@ class AccessControlImpl implements AccessControl {
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
      *
-     * @return  <code>true</code> of the user is the owner, <code>false</code> otherwise.
+     * @return  <code>true</code> if the user is the owner, <code>false</code> otherwise.
      */
     private boolean isOwner(String username, long workspaceId) {
         try {
             if (username == null) {
                 return false;
             }
-            return owner(workspaceId).equals(username);
+            return getOwner(workspaceId).equals(username);
         } catch (Exception e) {
             throw new RuntimeException("Checking ownership of workspace " + workspaceId + " and user \"" +
                 username + "\" failed", e);
         }
     }
 
-    /**
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     */
-    private boolean _isMember(String username, long workspaceId) {
-        try {
-            if (username == null) {
-                return false;
-            }
-            // Note: direct storage access is required here
-            AssociationModel membership = dms.storageDecorator.fetchAssociation(TYPE_MEMBERSHIP,
-                usernameTopic(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
-            return membership != null;
-        } catch (Exception e) {
-            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
-                workspaceId + " failed", e);
-        }
-    }
-
-    private SharingMode sharingMode(long workspaceId) {
+    private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
         TopicModel sharingMode = dms.storageDecorator.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation",
             "dm4.core.parent", "dm4.core.child", "dm4.workspaces.sharing_mode");
@@ -268,7 +269,7 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    private String owner(long workspaceId) {
+    private String getOwner(long workspaceId) {
         // Note: direct storage access is required here
         if (!dms.storageDecorator.hasProperty(workspaceId, PROP_OWNER)) {
             throw new RuntimeException("No owner is assigned to workspace " + workspaceId);
@@ -276,25 +277,44 @@ class AccessControlImpl implements AccessControl {
         return (String) dms.storageDecorator.fetchProperty(workspaceId, PROP_OWNER);
     }
 
-    private String typeUri(long objectId) {
+    private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
         return (String) dms.storageDecorator.fetchProperty(objectId, "type_uri");
     }
 
     // ---
 
-    // ### TODO: copy in AccessControlService
-    private Topic getUsernameTopic(String username) {
-        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
+    private TopicModel getUsernameTopic(String username) {
+        // Note: username topics are not readable by <anonymous>.
+        // So direct storage access is required here.
+        return dms.storageDecorator.fetchTopic(TYPE_USERNAME, new SimpleValue(username));
     }
 
-    private TopicModel usernameTopic(String username) {
-        // ### TODO: direct storage access is not required anymore
-        TopicModel usernameTopic = dms.storageDecorator.fetchTopic(TYPE_USERNAME, new SimpleValue(username));
+    private TopicModel getUsernameTopicOrThrow(String username) {
+        TopicModel usernameTopic = getUsernameTopic(username);
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
+    }
+
+    // ---
+
+    long getSystemWorkspaceId() {
+        if (systemWorkspaceId != -1) {
+            return systemWorkspaceId;
+        }
+        // Note: fetching the System workspace topic though the Core service would involve a permission check
+        // and run in a vicious circle. So direct storage access is required here.
+        TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
+        // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
+        if (workspace == null) {
+            throw new RuntimeException("The System workspace does not exist");
+        }
+        //
+        systemWorkspaceId = workspace.getId();
+        //
+        return systemWorkspaceId;
     }
 
 
