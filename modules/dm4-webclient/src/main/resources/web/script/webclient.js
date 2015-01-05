@@ -950,8 +950,8 @@ dm4c = new function() {
         return type_cache.has_topic_type(topic_type_uri)
     }
 
-    function has_assoc_type(assoc_type_uri) {
-        return type_cache.has_assoc_type(assoc_type_uri)
+    function has_association_type(assoc_type_uri) {
+        return type_cache.has_association_type(assoc_type_uri)
     }
 
     // ---
@@ -1202,9 +1202,14 @@ dm4c = new function() {
         return is_topic_type_readable(topic_type_uri)
     }
 
-    // ### TODO: add the same for association types?
+    // ---
+
     this.has_create_permission_for_topic_type = function(topic_type_uri) {
         return is_topic_type_readable(topic_type_uri) && dm4c.is_workspace_writable()
+    }
+
+    this.has_create_permission_for_association_type = function(assoc_type_uri) {
+        return is_association_type_readable(assoc_type_uri) && dm4c.is_workspace_writable()
     }
 
     // ---
@@ -1213,6 +1218,13 @@ dm4c = new function() {
         // Note: at startup the webclient loads all readable types into the type cache
         return has_topic_type(topic_type_uri)
     }
+
+    function is_association_type_readable(assoc_type_uri) {
+        // Note: at startup the webclient loads all readable types into the type cache
+        return has_association_type(assoc_type_uri)
+    }
+
+    // ---
 
     /**
      * Returns true if the current user has write access to the selected workspace.

@@ -23,13 +23,15 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 ui_icon: "pencil"
             })
         }
-        // ### FIXME: check permission
-        commands.push({is_separator: true, context: "context-menu"})
-        commands.push({
-            label: "Associate",
-            handler: do_associate,
-            context: "context-menu"
-        })
+        //
+        if (dm4c.has_create_permission_for_association_type("dm4.core.association")) {
+            commands.push({is_separator: true, context: "context-menu"})
+            commands.push({
+                label: "Associate",
+                handler: do_associate,
+                context: "context-menu"
+            })
+        }
         // ### FIXME: check locked state as well (at least for retype)
         if (dm4c.has_write_permission_for_topic(topic.id)) {
             commands.push({is_separator: true, context: "context-menu"})

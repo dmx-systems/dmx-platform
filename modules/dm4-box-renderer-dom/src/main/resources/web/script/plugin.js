@@ -190,6 +190,9 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             topic_dom.find(".type-icon").remove()
             topic_dom.append(type_icon)
             //
+            var assoc_allowed = dm4c.has_create_permission_for_association_type("dm4.core.association")
+            type_icon.css("cursor", assoc_allowed && "crosshair")
+            //
             set_src()
             set_size()
             add_event_handler()
@@ -205,9 +208,11 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
             function add_event_handler() {
                 type_icon.mousedown(function(event) {
                     if (event.button == 0 && !event.ctrlKey) {  // ctrlKey: see comment in canvas_view.js do_mousedown()
-                        var pos = canvas_view.pos(event)
-                        dm4c.do_select_topic(topic_view.id)
-                        dm4c.topicmap_renderer.begin_association(topic_view.id, pos.x, pos.y)
+                        if (assoc_allowed) {
+                            var pos = canvas_view.pos(event)
+                            dm4c.do_select_topic(topic_view.id)
+                            dm4c.topicmap_renderer.begin_association(topic_view.id, pos.x, pos.y)
+                        }
                         return false    // avoids the browser from dragging an icon copy
                     }
                 })

@@ -29,7 +29,7 @@ function TypeCache() {
         return topic_types[topic_type_uri] != undefined
     }
 
-    this.has_assoc_type = function(assoc_type_uri) {
+    this.has_association_type = function(assoc_type_uri) {
         return assoc_types[assoc_type_uri] != undefined
     }
 
