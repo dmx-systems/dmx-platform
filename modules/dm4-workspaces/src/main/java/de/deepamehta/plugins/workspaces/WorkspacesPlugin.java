@@ -308,11 +308,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         try {
             // 1) create assignment association
-            // Note 1: we are refering to an existing workspace. So we must add a topic reference.
-            // Note 2: workspace_facet is a multi-facet. So we must call addRef() (as opposed to putRef()).
-            // ### TODO: redefine workspace_facet as a single-facet and use putRef() then
-            FacetValue value = new FacetValue("dm4.workspaces.workspace").addRef(workspaceId);
-            facetsService.updateFacet(object, "dm4.workspaces.workspace_facet", value);
+            facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
+                new FacetValue("dm4.workspaces.workspace").putRef(workspaceId));
+            // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
             //
             // 2) store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false

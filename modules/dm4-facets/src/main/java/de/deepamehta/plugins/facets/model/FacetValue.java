@@ -38,6 +38,8 @@ public class FacetValue extends ChildTopicsModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // === Single-valued Facets ===
+
     /**
      * Accesses a single-valued facet.
      */
@@ -80,7 +82,23 @@ public class FacetValue extends ChildTopicsModel {
     // ---
 
     /**
-     * Adds all the values to a multiple-valued facet.
+     * Puts a by-ID topic reference for a single-valued facet.
+     */
+    public FacetValue putRef(long refTopicId) {
+        return (FacetValue) putRef(childTypeUri, refTopicId);
+    }
+
+    /**
+     * Puts a by-URI topic reference for a single-valued facet.
+     */
+    public FacetValue putRef(String refTopicUri) {
+        return (FacetValue) putRef(childTypeUri, refTopicUri);
+    }
+
+    // === Multiple-valued Facets ===
+
+    /**
+     * Sets the values of a multiple-valued facet.
      */
     public FacetValue put(List<TopicModel> values) {
         return (FacetValue) put(childTypeUri, values);
