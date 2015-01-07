@@ -5,6 +5,9 @@ import de.deepamehta.core.service.Migration;
 
 
 
+/**
+ * Part of DM 4.5
+ */
 public class Migration3 extends Migration {
 
     @Override

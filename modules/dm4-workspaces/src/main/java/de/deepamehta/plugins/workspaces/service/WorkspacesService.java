@@ -15,7 +15,7 @@ public interface WorkspacesService extends PluginService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     static final String DEEPAMEHTA_WORKSPACE_NAME = "DeepaMehta";
-    static final String DEEPAMEHTA_WORKSPACE_URI = "de.workspaces.deepamehta";  // ### FIXME: "de." -> "dm4."
+    static final String DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
     static final SharingMode DEEPAMEHTA_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
     // -------------------------------------------------------------------------------------------------- Public Methods

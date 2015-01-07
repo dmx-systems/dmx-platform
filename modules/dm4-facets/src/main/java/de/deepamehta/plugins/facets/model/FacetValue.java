@@ -82,14 +82,14 @@ public class FacetValue extends ChildTopicsModel {
     // ---
 
     /**
-     * Puts a by-ID topic reference for a single-valued facet.
+     * Puts a by-ID topic reference in a single-valued facet.
      */
     public FacetValue putRef(long refTopicId) {
         return (FacetValue) putRef(childTypeUri, refTopicId);
     }
 
     /**
-     * Puts a by-URI topic reference for a single-valued facet.
+     * Puts a by-URI topic reference in a single-valued facet.
      */
     public FacetValue putRef(String refTopicUri) {
         return (FacetValue) putRef(childTypeUri, refTopicUri);

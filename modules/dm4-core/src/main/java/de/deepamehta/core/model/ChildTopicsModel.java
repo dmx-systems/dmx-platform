@@ -355,7 +355,7 @@ public class ChildTopicsModel implements Iterable<String> {
     // ---
 
     /**
-     * Puts a by-ID topic reference for a single-valued child.
+     * Puts a by-ID topic reference in a single-valued child.
      * An existing reference is overwritten.
      * <p>
      * Used to maintain the assigment of an *aggregated* child.
@@ -367,7 +367,7 @@ public class ChildTopicsModel implements Iterable<String> {
     }
 
     /**
-     * Puts a by-URI topic reference for a single-valued child.
+     * Puts a by-URI topic reference in a single-valued child.
      * An existing reference is overwritten.
      * <p>
      * Used to maintain the assigment of an *aggregated* child.
