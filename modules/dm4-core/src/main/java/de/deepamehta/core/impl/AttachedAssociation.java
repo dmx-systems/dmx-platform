@@ -162,24 +162,24 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public Topic getTopic(String roleTypeUri) {
-        List<Topic> topics = getTopics(roleTypeUri);
-        switch (topics.size()) {
-        case 0:
-            return null;
-        case 1:
-            return topics.get(0);
-        default:
-            throw new RuntimeException("Ambiguity in association: " + topics.size() + " topics have role type \"" +
-                roleTypeUri + "\" (" + this + ")");
+        Topic topic1 = filterTopic(getRole1(), roleTypeUri);
+        Topic topic2 = filterTopic(getRole2(), roleTypeUri);
+        if (topic1 != null && topic2 != null) {
+            throw new RuntimeException("Ambiguity in association: both topics have role type \"" + roleTypeUri +
+                "\" (" + this + ")");
         }
+        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
     }
 
     @Override
-    public List<Topic> getTopics(String roleTypeUri) {
-        List<Topic> topics = new ArrayList();
-        filterTopic(getRole1(), roleTypeUri, topics);
-        filterTopic(getRole2(), roleTypeUri, topics);
-        return topics;
+    public Topic getTopicByType(String topicTypeUri) {
+        Topic topic1 = filterTopic(getPlayer1(), topicTypeUri);
+        Topic topic2 = filterTopic(getPlayer2(), topicTypeUri);
+        if (topic1 != null && topic2 != null) {
+            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri +
+                "\" (" + this + ")");
+        }
+        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
     }
 
     // ---
@@ -196,8 +196,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     public boolean isPlayer(TopicRoleModel roleModel) {
-        List<Topic> topics = getTopics(roleModel.getRoleTypeUri());
-        return topics.size() > 0 && topics.get(0).getId() == roleModel.getPlayerId();
+        return filterRole(getRole1(), roleModel) != null || filterRole(getRole2(), roleModel) != null;
     }
 
     // ---
@@ -375,10 +374,22 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         }
     }
 
-    private void filterTopic(Role role, String roleTypeUri, List<Topic> topics) {
-        if (role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri)) {
-            topics.add(((TopicRole) role).getTopic());
-        }
+    // ---
+
+    private Topic filterTopic(Role role, String roleTypeUri) {
+        return role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri) ? ((TopicRole) role).getTopic()
+            : null;
+    }
+
+    private Topic filterTopic(DeepaMehtaObject object, String topicTypeUri) {
+        return object instanceof Topic && object.getTypeUri().equals(topicTypeUri) ? (Topic) object : null;
+    }
+
+    // ---
+
+    private TopicRole filterRole(Role role, TopicRoleModel roleModel) {
+        return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
+            role.getPlayerId() == roleModel.getPlayerId() ? (TopicRole) role : null;
     }
 
     // ---

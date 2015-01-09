@@ -40,10 +40,12 @@ public interface Association extends DeepaMehtaObject {
     Topic getTopic(String roleTypeUri);
 
     /**
-     * @teturn  this association's topics which play the given role.
-     *          The resulting set can have 0, 1, or 2 elements.
+     * @teturn  this association's topic which has the given type.
+     *          If there is no such topic, null is returned.
+     *          <p>
+     *          If there are 2 such topics an exception is thrown.
      */
-    List<Topic> getTopics(String roleTypeUri);
+    Topic getTopicByType(String topicTypeUri);
 
     // ---
 

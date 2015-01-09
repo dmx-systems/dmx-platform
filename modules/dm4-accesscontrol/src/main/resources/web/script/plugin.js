@@ -236,8 +236,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
         // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
         // WRITEability of the selected workspace.) ### FIXDOC
-        init_system_workspace_id()
-        if (!system_workspace_id || !dm4c.has_write_permission_for_topic(system_workspace_id)) {
+        if (!init_system_workspace_id() || !dm4c.has_write_permission_for_topic(system_workspace_id)) {
             return
         }
         //
@@ -329,6 +328,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                     .get_workspace("dm4.workspaces.system").id
             }
         }
+        return system_workspace_id
     }
 
     function encode_password(password) {

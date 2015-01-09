@@ -481,6 +481,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
+        if (isMembership(assoc.getModel())) {
+            if (isMembership(oldModel)) {
+                // ### TODO?
+            } else {
+                wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
+            }
+        } else if (isMembership(oldModel)) {
+            // ### TODO?
+        }
+        //
         setModifier(assoc);
     }
 
@@ -508,6 +518,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
+    }
+
+    private boolean isMembership(AssociationModel assoc) {
+        return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
     }
 
 
