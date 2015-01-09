@@ -1,6 +1,7 @@
 dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     var ENCODED_PASSWORD_PREFIX = "-SHA256-"
+    var system_workspace_id                     // constant
     var self = this
 
     dm4c.load_script("/de.deepamehta.accesscontrol/script/vendor/sha256.js")
@@ -54,6 +55,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         var login_widget
 
         create_login_widget()
+
+        system_workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace("dm4.workspaces.system").id
 
         function create_login_widget() {
             login_widget = new LoginWidget()
@@ -235,7 +238,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
         // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
         // WRITEability of the selected workspace.)
-        if (!dm4c.has_read_permission_for_topic_type("dm4.accesscontrol.user_account")) {
+        if (!dm4c.has_write_permission_for_topic(system_workspace_id)) {
             return
         }
         //

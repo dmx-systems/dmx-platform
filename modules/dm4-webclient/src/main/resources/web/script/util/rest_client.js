@@ -39,8 +39,10 @@ function RESTClient(config) {
             params.to_query_string())
     }
 
-    this.get_topic = function(type_uri, key, value) {
-        return request("GET", "/core/topic/" + type_uri + "/" + key + "/" + encodeURIComponent(value))
+    this.get_topics_by_value = function(key, value, include_childs) {
+        var params = new RequestParameter({include_childs: include_childs})
+        return request("GET", "/core/topic/multi/by_value/" + key + "/" + encodeURIComponent(value) +
+            params.to_query_string())
     }
 
     /**
@@ -308,7 +310,7 @@ function RESTClient(config) {
      * Sends an AJAX request.
      *
      * @param   method              The HTTP method: "GET", "POST", "PUT", "DELETE".
-     * @patam   uri                 The request URI.
+     * @patam   uri                 The request URI, including query parameters.
      * @param   data                Optional: the data to be sent to the server (an object). By default the data object
      *                              is serialized to JSON format. Note: key/value pairs with undefined values are not
      *                              serialized.

@@ -4,7 +4,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // Model
     var selected_workspace_id   // ID of the selected workspace
-    var workspaces              // All workspaces in the DB (array of topic-like objects)
+    var workspaces              // All workspaces readable by the current user (array of topic-like objects)
 
     // View
     var workspace_menu          // A GUIToolkit Menu object
@@ -16,6 +16,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     dm4c.restc.create_workspace = function(name, uri, sharing_mode_uri) {
         return this.request("POST", "/workspace/" + encodeURIComponent(name) + "/" + (uri || "") + "/" +
             sharing_mode_uri + "?no_workspace_assignment=true")
+    }
+    dm4c.restc.get_workspace = function(uri, include_childs) {
+        var params = this.createRequestParameter({include_childs: include_childs})
+        return this.request("GET", "/workspace/" + uri + params.to_query_string())
     }
     dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})
@@ -156,6 +160,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     this.select_workspace = function(workspace_id) {
         select_menu_item(workspace_id)
         select_workspace(workspace_id)
+    }
+
+    this.get_workspace = function(uri, include_childs) {
+        return dm4c.restc.get_workspace(uri, include_childs)
     }
 
 

@@ -102,8 +102,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{uri}")
     @Override
-    public Topic getWorkspace(String uri) {
+    public Topic getWorkspace(@PathParam("uri") String uri) {
         Topic workspace = dms.getTopic("uri", new SimpleValue(uri));
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
