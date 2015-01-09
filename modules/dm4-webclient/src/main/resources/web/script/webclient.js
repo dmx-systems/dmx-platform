@@ -1015,7 +1015,7 @@ dm4c = new function() {
 
     /**
      * Clears the type cache and loads all types. Once complete calls the callback function.
-     *
+     * <p>
      * Note: this is a utility function callable by plugins (see Access Control plugin).
      * It is not used for the the initial type loading (see document-ready function below).
      */

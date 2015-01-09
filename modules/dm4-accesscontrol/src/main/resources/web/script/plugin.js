@@ -56,8 +56,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         create_login_widget()
 
-        system_workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace("dm4.workspaces.system").id
-
         function create_login_widget() {
             login_widget = new LoginWidget()
             dm4c.toolbar.dom.append(login_widget.dom)
@@ -237,8 +235,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         // Note: the toolbar's Create menu is only refreshed when the login status changes, not when a workspace is
         // selected. (At workspace selection time the Create menu is not refreshed but shown/hidden in its entirety.)
         // So, we check the READ permission here, not the CREATE permission. (The CREATE permission involves the
-        // WRITEability of the selected workspace.)
-        if (!dm4c.has_write_permission_for_topic(system_workspace_id)) {
+        // WRITEability of the selected workspace.) ### FIXDOC
+        init_system_workspace_id()
+        if (!system_workspace_id || !dm4c.has_write_permission_for_topic(system_workspace_id)) {
             return
         }
         //
@@ -320,6 +319,17 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function init_system_workspace_id() {
+        if (!system_workspace_id) {
+            // Note: if not logged in the System workspace is not readable.
+            // The get_workspace() call would fail with error 500.
+            if (self.get_username()) {
+                system_workspace_id = dm4c.get_plugin("de.deepamehta.workspaces")
+                    .get_workspace("dm4.workspaces.system").id
+            }
+        }
+    }
 
     function encode_password(password) {
         return ENCODED_PASSWORD_PREFIX + SHA256(password)
