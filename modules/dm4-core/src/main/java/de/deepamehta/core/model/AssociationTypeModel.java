@@ -37,6 +37,13 @@ public class AssociationTypeModel extends TypeModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
+    public AssociationTypeModel addAssocDef(AssociationDefinitionModel assocDef) {
+        return (AssociationTypeModel) super.addAssocDef(assocDef);
+    }
+
+    // ---
+
+    @Override
     public String toString() {
         return "association type (" + super.toString() + ")";
     }

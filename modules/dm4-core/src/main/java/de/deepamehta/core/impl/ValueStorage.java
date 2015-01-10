@@ -166,21 +166,21 @@ class ValueStorage {
      * Creates an association between the given parent object ("Parent" role) and the referenced topic ("Child" role).
      * The association type is taken from the given association definition.
      *
-     * @return  the resolved child topic, including its composite values.
+     * @return  the resolved child topic.
      */
-    Topic associateReferencedChildTopic(DeepaMehtaObjectModel parent, TopicReferenceModel childTopicRef,
-                                                                      AssociationDefinition assocDef) {
+    private Topic associateReferencedChildTopic(DeepaMehtaObjectModel parent, TopicReferenceModel childTopicRef,
+                                                                              AssociationDefinition assocDef) {
         if (childTopicRef.isReferenceById()) {
             long childTopicId = childTopicRef.getId();
             associateChildTopic(parent, childTopicId, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
-            // It might be required at client-side.
+            // It might be required at client-side. ### TODO
             return dms.getTopic(childTopicId);                          // ### FIXME: had fetchComposite=true
         } else if (childTopicRef.isReferenceByUri()) {
             String childTopicUri = childTopicRef.getUri();
             associateChildTopic(parent, childTopicUri, assocDef);
             // Note: the resolved topic must be fetched including its composite value.
-            // It might be required at client-side.
+            // It might be required at client-side. ### TODO
             return dms.getTopic("uri", new SimpleValue(childTopicUri)); // ### FIXME: had fetchComposite=true
         } else {
             throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");

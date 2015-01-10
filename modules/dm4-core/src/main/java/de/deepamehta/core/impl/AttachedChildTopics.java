@@ -1,8 +1,8 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -11,7 +11,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
-import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -390,8 +390,7 @@ class AttachedChildTopics implements ChildTopics {
                 // == create assignment ==
             }
             // update DB
-            Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
-                (TopicReferenceModel) newChildTopic, assocDef);
+            Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
             // update memory
             putInChildTopics(topic, assocDef);
         } else if (newChildTopic.getId() != -1) {
@@ -430,8 +429,7 @@ class AttachedChildTopics implements ChildTopics {
                 }
                 // == create assignment ==
                 // update DB
-                Topic topic = dms.valueStorage.associateReferencedChildTopic(parent.getModel(),
-                    (TopicReferenceModel) newChildTopic, assocDef);
+                Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
                 // update memory
                 addToChildTopics(topic, assocDef);
             } else if (childTopicId != -1) {
@@ -444,7 +442,54 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
+    // --- ### TODO: avoid structural similar code, see ValueStorage
+
+    /**
+     * Creates an association between our parent object ("Parent" role) and the referenced topic ("Child" role).
+     * The association type is taken from the given association definition.
+     *
+     * @return  the resolved child topic.
+     */
+    RelatedTopic associateReferencedChildTopic(TopicReferenceModel childTopicRef, AssociationDefinition assocDef) {
+        if (childTopicRef.isReferenceById()) {
+            long childTopicId = childTopicRef.getId();
+            // Note: the resolved topic must be fetched including its composite value.
+            // It might be required at client-side. ### FIXME: had fetchComposite=true
+            Topic childTopic = dms.getTopic(childTopicId);
+            Association assoc = associateChildTopic(childTopicId, assocDef);
+            return createRelatedTopic(childTopic, assoc);
+        } else if (childTopicRef.isReferenceByUri()) {
+            String childTopicUri = childTopicRef.getUri();
+            // Note: the resolved topic must be fetched including its composite value.
+            // It might be required at client-side. ### FIXME: had fetchComposite=true
+            Topic childTopic = dms.getTopic("uri", new SimpleValue(childTopicUri));
+            Association assoc = associateChildTopic(childTopicUri, assocDef);
+            return createRelatedTopic(childTopic, assoc);
+        } else {
+            throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");
+        }
+    }
+
+    private Association associateChildTopic(long childTopicId, AssociationDefinition assocDef) {
+        return associateChildTopic(new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef);
+    }
+
+    private Association associateChildTopic(String childTopicUri, AssociationDefinition assocDef) {
+        return associateChildTopic(new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef);
+    }
+
     // ---
+
+    private Association associateChildTopic(TopicRoleModel child, AssociationDefinition assocDef) {
+        return dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
+            parent.getModel().createRoleModel("dm4.core.parent"), child);
+    }
+
+    private RelatedTopic createRelatedTopic(Topic topic, Association assoc) {
+        return new AttachedRelatedTopic(new RelatedTopicModel(topic.getModel(), assoc.getModel()), dms);
+    }
+
+    // --- ### end TODO
 
     private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);

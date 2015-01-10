@@ -102,7 +102,7 @@ public abstract class TypeModel extends TopicModel {
         return assocDef;
     }
 
-    public void addAssocDef(AssociationDefinitionModel assocDef) {
+    public TypeModel addAssocDef(AssociationDefinitionModel assocDef) {
         // error check ### FIXME: drop this check or provide proper feedback to the type editor user
         if (!getDataTypeUri().equals("dm4.core.composite")) {
             throw new RuntimeException("Association definitions can only be added to composite topic types. " +
@@ -117,6 +117,8 @@ public abstract class TypeModel extends TopicModel {
         }
         //
         updateAssocDef(assocDef);
+        //
+        return this;
     }
 
     public void updateAssocDef(AssociationDefinitionModel assocDef) {

@@ -41,6 +41,13 @@ public class TopicTypeModel extends TypeModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
+    public TopicTypeModel addAssocDef(AssociationDefinitionModel assocDef) {
+        return (TopicTypeModel) super.addAssocDef(assocDef);
+    }
+
+    // ---
+
+    @Override
     public String toString() {
         return "topic type (" + super.toString() + ")";
     }

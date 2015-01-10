@@ -8,12 +8,15 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -433,6 +436,137 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         topics = getTopicInstancesByTraversal(type);
         assertEquals(4, topics.getSize());
         // ### Note: the Lucene index update was already visible within the transaction!
+    }
+
+    // ---
+
+    @Test
+    public void updateAggregationOne() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic comp1, item1, item2;
+        try {
+            // 1) define composite type
+            // child types
+            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            dms.createTopicType(new TopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
+            // parent type
+            dms.createTopicType(new TopicTypeModel("dm4.test.composite", "Composite", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.composite", "dm4.test.name", "dm4.core.one", "dm4.core.one"
+                ))
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.composite", "dm4.test.item", "dm4.core.many", "dm4.core.one"
+                ))
+            );
+            // 2) create example child instances
+            item1 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 1")));
+            item2 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 2")));
+            // 3) create composite instance
+            comp1 = dms.createTopic(new TopicModel("dm4.test.composite", new ChildTopicsModel()
+                .put("dm4.test.name", "Composite 1")
+                // ### .putRef("dm4.test.item", item1.getId())
+            ));
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        // check memory
+        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+        assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
+        comp1.loadChildTopics();
+        assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
+        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        //
+        // update and check again
+        tx = dms.beginTx();
+        try {
+            comp1.update(new TopicModel(comp1.getId(), new ChildTopicsModel()
+                .putRef("dm4.test.item", item2.getId())
+            ));
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        //
+        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+        assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
+        assertEquals("Item 2",      comp1.getChildTopics().getString("dm4.test.item"));
+        assertEquals(item2.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
+        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        //
+        // update and check again
+        tx = dms.beginTx();
+        try {
+            comp1.update(new TopicModel(comp1.getId(), new ChildTopicsModel()
+                .putRef("dm4.test.item", item1.getId())
+            ));
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        //
+        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+        assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
+        assertEquals("Item 1",      comp1.getChildTopics().getString("dm4.test.item"));
+        assertEquals(item1.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
+        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+    }
+
+    @Test
+    public void updateAggregationOneFacet() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic name, item1, item2;
+        try {
+            // 1) define facet
+            dms.createTopicType(new TopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
+            dms.createTopicType(new TopicTypeModel("dm4.test.item_facet", "Item Facet", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.item_facet", "dm4.test.item", "dm4.core.many", "dm4.core.one"
+                ))
+            );
+            // 2) create example facet values
+            item1 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 1")));
+            item2 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 2")));
+            // 3) define simple type + instance
+            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            name = dms.createTopic(new TopicModel("dm4.test.name", new SimpleValue("Name 1")));
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        //
+        AssociationDefinition assocDef = dms.getTopicType("dm4.test.item_facet").getAssocDef("dm4.test.item");
+        //
+        // update facet
+        tx = dms.beginTx();
+        try {
+            name.updateChildTopic(new TopicReferenceModel(item1.getId()), assocDef);
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        //
+        assertTrue(                 name.getChildTopics().has("dm4.test.item"));
+        Topic facetValue = (Topic)  name.getChildTopics().get("dm4.test.item");
+        assertEquals("Item 1",      facetValue.getSimpleValue().toString());
+        assertEquals(item1.getId(), facetValue.getId());
+        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        //
+        // update facet again
+        tx = dms.beginTx();
+        try {
+            name.updateChildTopic(new TopicReferenceModel(item2.getId()), assocDef);
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        //
+        assertTrue(                 name.getChildTopics().has("dm4.test.item"));
+        facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
+        assertEquals("Item 2",      facetValue.getSimpleValue().toString());
+        assertEquals(item2.getId(), facetValue.getId());
+        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
     }
 
     // ---
