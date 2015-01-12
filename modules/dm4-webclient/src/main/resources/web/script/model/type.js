@@ -54,6 +54,10 @@ Type.prototype.is_composite = function() {
     return this.data_type_uri == "dm4.core.composite"
 }
 
+Type.prototype.is_number = function() {
+    return this.data_type_uri == "dm4.core.number"
+}
+
 // --- View Configuration ---
 
 Type.prototype.is_hidden = function() {

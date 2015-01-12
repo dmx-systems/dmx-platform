@@ -15,9 +15,9 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                         '<div class="field-label">Version</div>' +
                         '<div>${project.version}</div>' +
                         '<div class="field-label">Release Date</div>' +
-                        '<div>Nov 22, 2014</div>' +
+                        '<div>Jan 13, 2015</div>' +
                         '<div class="field-label">Copyright</div>' +
-                        '<div>2000-2014 Jörg Richter et al.</div>' +
+                        '<div>2000-2015 Jörg Richter et al.</div>' +
                         '<div class="field-label">License</div>' +
                         '<div>GNU General Public License, v3</div>' +
                         '<div class="field-label">Website</div>' +
