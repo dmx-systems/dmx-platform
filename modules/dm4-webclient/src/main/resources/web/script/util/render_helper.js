@@ -215,31 +215,41 @@ function RenderHelper() {
     // ---
 
     /**
-     * Renders an input field or a combobox for the given page model.
-     * What is rendered depends on the page model's underlying association definition.
+     * Renders an input field, a text area, or a combobox for the given page model.
      * Rendering takes place inside the given parent element.
      *
      * @param   parent_element  Rendering takes place inside this element.
      *
-     * @return  an input field (a jQuery object) or a combobox (a GUIToolkit Combobox object).
+     * @return  an input field (a jQuery object), a text area (a jQuery object),
+     *          or a combobox (a GUIToolkit Combobox object).
      */
     this.form_element = function(page_model, parent_element) {
-        switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
-        case undefined:
-            // Note: for non-composite topics the field's assoc_def is undefined.
-            // We treat this like a composition here.
-        case "dm4.core.composition_def":
-            return render_input()
-        case "dm4.core.aggregation_def":
-            return render_combobox()
-        default:
-            throw "RenderHelperError: \"" + page_model.assoc_def.type_uri + "\" is an unexpected assoc type URI"
+        if (page_model.input_field_rows == 1) {
+            switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
+            case undefined:
+                // Note: for non-composite topics the field's assoc_def is undefined.
+                // We treat this like a composition here.
+            case "dm4.core.composition_def":
+                return render_input()
+            case "dm4.core.aggregation_def":
+                return render_combobox()
+            default:
+                throw "RenderHelperError: \"" + page_model.assoc_def.type_uri + "\" is an unexpected assoc type URI"
+            }
+        } else {
+            return render_textarea()
         }
 
         function render_input() {
             var input = dm4c.render.input(page_model)
             render(input)
             return input
+        }
+
+        function render_textarea() {
+            var textarea = $("<textarea>").attr("rows", page_model.input_field_rows).text(page_model.value)
+            render(textarea)
+            return textarea
         }
 
         function render_combobox() {
@@ -271,11 +281,15 @@ function RenderHelper() {
      *
      * @param   form_element    an input field (a jQuery object), a text area (a jQuery object),
      *                          or a combobox (a GUIToolkit Combobox object).
+     * @param   page_model      the page model underlying the form element.
      */
-    this.form_element_function = function(form_element) {
+    this.form_element_function = function(form_element, page_model) {
         return function() {
+            var is_number_field = page_model.object_type.is_number()
             if (form_element instanceof jQuery) {
-                return $.trim(form_element.val())
+                // form_element is a an input field or a text area
+                var val = form_element.val()
+                return is_number_field ? check_number(val) : $.trim(val)
             } else {
                 // form_element is a Combobox
                 var selection = form_element.get_selection() // either a menu item (object) or the text entered (string)
@@ -284,9 +298,19 @@ function RenderHelper() {
                     return dm4c.REF_PREFIX + selection.value
                 } else {
                     // user entered new value
-                    return selection
+                    return is_number_field ? check_number(selection) : selection // value is already trimmed by Combobox
                 }
             }
+        }
+
+        function check_number(val) {
+            var value = Number(val)
+            if (isNaN(value)) {
+                alert("\"" + val + "\" is not a number.\n(field \"" + page_model.label + "\")\n\n" +
+                    "The old value is restored.")
+                return null     // prevent this field from being updated
+            }
+            return value
         }
     }
 
