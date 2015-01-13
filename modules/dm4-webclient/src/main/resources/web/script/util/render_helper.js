@@ -318,7 +318,7 @@ function RenderHelper() {
                     return dm4c.REF_PREFIX + selection.value
                 } else {
                     // user entered new value
-                    return is_number_field ? check_number(selection) : val  // value is already trimmed by Combobox
+                    return is_number_field ? check_number(selection) : selection // value is already trimmed by Combobox
                 }
             }
         }
