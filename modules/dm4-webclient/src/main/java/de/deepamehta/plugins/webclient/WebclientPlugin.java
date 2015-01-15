@@ -103,11 +103,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @GET
     @Path("/search/by_type/{type_uri}")
     @Transactional
-    public Topic getTopics(@PathParam("type_uri") String typeUri, @QueryParam("max_result_size") int maxResultSize) {
+    public Topic getTopics(@PathParam("type_uri") String typeUri) {
         try {
-            logger.info("typeUri=\"" + typeUri + "\", maxResultSize=" + maxResultSize);
+            logger.info("typeUri=\"" + typeUri + "\"");
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<RelatedTopic> topics = dms.getTopics(typeUri, maxResultSize).getItems();
+            List<RelatedTopic> topics = dms.getTopics(typeUri, 0).getItems();   // maxResultSize=0
             //
             Topic searchTopic = createSearchTopic(searchTerm, topics);
             return searchTopic;
@@ -229,16 +229,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
             .put("dm4.webclient.search_term", searchTerm)
         ));
-        //
         // associate result items
-        logger.fine("Associating " + resultItems.size() + " result items to search (ID " + searchTopic.getId() + ")");
         for (Topic resultItem : resultItems) {
-            logger.fine("Associating " + resultItem);
             dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
                 new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
                 new TopicRoleModel(resultItem.getId(), "dm4.core.default")
             ));
         }
+        //
         return searchTopic;
     }
 

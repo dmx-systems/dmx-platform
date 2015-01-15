@@ -236,6 +236,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
+    public Topic getPrivateWorkspace() {
+        String username = getUsername();
+        if (username == null) {
+            throw new IllegalStateException("No user is logged in");
+        }
+        //
+        Topic passwordTopic = getPasswordTopic(getUserAccount(getUsernameTopic(username)));
+        return wsService.getAssignedWorkspace(passwordTopic.getId());
+    }
+
+    @Override
     public Topic getUsernameTopic(String username) {
         return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
     }
@@ -434,8 +445,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic) {
-        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+        String typeUri = topic.getTypeUri();
+        if (typeUri.equals("dm4.workspaces.workspace")) {
             setWorkspaceOwner(topic);
+        } else if (typeUri.equals("dm4.webclient.search")) {
+            assignSearchTopicToWorkspace(topic);
         }
         //
         setCreatorAndModifier(topic);
@@ -512,6 +526,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private Topic getUserAccount(Topic usernameTopic) {
+        return usernameTopic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
+            "dm4.accesscontrol.user_account");
+    }
+
+    private Topic getPasswordTopic(Topic userAccount) {
+        return userAccount.getChildTopics().getTopic("dm4.accesscontrol.password");
+    }
+
     private Topic getUsernameTopicOrThrow(String username) {
         Topic usernameTopic = getUsernameTopic(username);
         if (usernameTopic == null) {
@@ -522,6 +545,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean isMembership(AssociationModel assoc) {
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
+    }
+
+    private void assignSearchTopicToWorkspace(Topic searchTopic) {
+        if (getUsername() != null) {
+            // assign to user's private workspace
+            wsService.assignToWorkspace(searchTopic, getPrivateWorkspace().getId());
+        } else {
+            // ### TODO
+        }
     }
 
 

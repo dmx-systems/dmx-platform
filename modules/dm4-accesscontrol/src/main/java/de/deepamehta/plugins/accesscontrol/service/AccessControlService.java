@@ -59,6 +59,15 @@ public interface AccessControlService extends PluginService {
     Topic createUserAccount(Credentials cred);
 
     /**
+     * Returns the private workspace of the logged in user.
+     * If no user is logged in an exception is thrown.
+     * <p>
+     * Note: a user can have more than one private workspace. The workspace returned
+     * by this method is the one that holds the user's password topic.
+     */
+    Topic getPrivateWorkspace();
+
+    /**
      * Returns the "Username" topic for the specified username.
      *
      * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
