@@ -449,7 +449,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (typeUri.equals("dm4.workspaces.workspace")) {
             setWorkspaceOwner(topic);
         } else if (typeUri.equals("dm4.webclient.search")) {
-            assignSearchTopicToWorkspace(topic);
+            assignSearchTopic(topic);
         }
         //
         setCreatorAndModifier(topic);
@@ -547,13 +547,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
     }
 
-    private void assignSearchTopicToWorkspace(Topic searchTopic) {
+    private void assignSearchTopic(Topic searchTopic) {
+        Topic workspace;
         if (getUsername() != null) {
-            // assign to user's private workspace
-            wsService.assignToWorkspace(searchTopic, getPrivateWorkspace().getId());
+            workspace = getPrivateWorkspace();
         } else {
-            // ### TODO
+            workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
         }
+        wsService.assignToWorkspace(searchTopic, workspace.getId());
     }
 
 
