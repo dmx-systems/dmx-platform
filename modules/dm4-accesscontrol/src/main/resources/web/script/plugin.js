@@ -164,30 +164,17 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         // ---
 
         function update_gui_login(username) {
-            // Note: the types must be reloaded *before* the logged_in event is fired.
-            // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
-            dm4c.reload_types(function() {
-                // update model
-                clear_permissions_cache()
-                // update view
-                login_widget.show_user(username)
-                // signal login status change
-                dm4c.fire_event("logged_in", username)
-            })
+            // update model
+            increase_authority(username)
+            // update view
+            login_widget.show_user(username)
         }
 
         function update_gui_logout() {
-            // Note: the types must be reloaded *before* the logged_out event is fired.
-            // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
-            dm4c.reload_types(function() {
-                // update model
-                clear_permissions_cache()
-                // update view
-                login_widget.show_login()
-                // signal login status change
-                dm4c.fire_event("logged_out")
-                dm4c.fire_event("logged_out_2")
-            })
+            // update model
+            decrease_authority()
+            // update view
+            login_widget.show_login()
         }
 
         // ---
@@ -264,14 +251,21 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     })
 
     dm4c.add_listener("pre_update_topic", function(topic_model) {
-        if (topic_model.type_uri != "dm4.accesscontrol.user_account") {
-            return
+        if (topic_model.type_uri == "dm4.accesscontrol.user_account") {
+            var password_topic = topic_model.childs["dm4.accesscontrol.password"]
+            var password = password_topic.value
+            if (!js.begins_with(password, ENCODED_PASSWORD_PREFIX)) {
+                password_topic.value = encode_password(password)
+            }
         }
-        //
-        var password_topic = topic_model.childs["dm4.accesscontrol.password"]
-        var password = password_topic.value
-        if (!js.begins_with(password, ENCODED_PASSWORD_PREFIX)) {
-            password_topic.value = encode_password(password)
+    })
+
+    dm4c.add_listener("post_delete_association", function(assoc) {
+        if (assoc.type_uri == "dm4.accesscontrol.membership") {
+            var username_topic = assoc.get_topic_by_type("dm4.accesscontrol.username")
+            if (username_topic.value == self.get_username()) {
+                decrease_authority()
+            }
         }
     })
 
@@ -285,11 +279,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return get_association_permissions(assoc_id)["dm4.accesscontrol.operation.write"]
     })
 
-    dm4c.add_listener("has_retype_permission_for_association", function(assoc_type, topic_1, topic_2) {
+    dm4c.add_listener("has_retype_permission_for_association", function(assoc, assoc_type) {
         // ### TODO: enforce the retype policy at *server-side*
         if (assoc_type.uri == "dm4.accesscontrol.membership") {
-            if (matches(topic_1, topic_2, "dm4.workspaces.workspace", "dm4.accesscontrol.username")) {
-                var workspace = choose_topic_by_type(topic_1, topic_2, "dm4.workspaces.workspace")
+            if (assoc.matches("dm4.workspaces.workspace", "dm4.accesscontrol.username")) {
+                var workspace = assoc.get_topic_by_type("dm4.workspaces.workspace")
                 return dm4c.has_write_permission_for_topic(workspace.id)
             }
             return false
@@ -333,6 +327,31 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function encode_password(password) {
         return ENCODED_PASSWORD_PREFIX + SHA256(password)
+    }
+
+    // ---
+
+    function increase_authority(username) {
+        // Note: the types must be reloaded *before* the authority_increased event is fired.
+        // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
+        dm4c.reload_types(function() {
+            // update model
+            clear_permissions_cache()
+            // signal authority change
+            dm4c.fire_event("authority_increased", username)
+        })
+    }
+
+    function decrease_authority() {
+        // Note: the types must be reloaded *before* the authority_decreased events are fired.
+        // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
+        dm4c.reload_types(function() {
+            // update model
+            clear_permissions_cache()
+            // signal authority change
+            dm4c.fire_event("authority_decreased")
+            dm4c.fire_event("authority_decreased_2")
+        })
     }
 
     // === Info Dialog ===
@@ -400,16 +419,5 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function clear_permissions_cache() {
         permissions_cache = {}
-    }
-
-    // === Utilities ===
-
-    function matches(topic_1, topic_2, type_uri_1, type_uri_2) {
-        return topic_1.type_uri == type_uri_1 && topic_2.type_uri == type_uri_2 ||
-               topic_1.type_uri == type_uri_2 && topic_2.type_uri == type_uri_1
-    }
-
-    function choose_topic_by_type(topic_1, topic_2, topic_type_uri) {
-        return topic_1.type_uri == topic_type_uri ? topic_1 : topic_2
     }
 })

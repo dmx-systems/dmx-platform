@@ -48,7 +48,7 @@
             return from_processing_function()
 
             function filter_function(assoc_type) {
-                return dm4c.has_retype_permission_for_association(assoc_type, topic_1, topic_2)
+                return dm4c.has_retype_permission_for_association(assoc, assoc_type)
             }
 
             function from_processing_function(stay_in_edit_mode) {

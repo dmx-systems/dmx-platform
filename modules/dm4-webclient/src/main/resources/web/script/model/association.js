@@ -6,6 +6,8 @@ function Association(assoc) {
     this.childs   = build_child_topics(assoc.childs)   // build_child_topics is defined in topic.js
     this.role_1   = assoc.role_1
     this.role_2   = assoc.role_2
+    this.topic_1  = null
+    this.topic_2  = null
 }
 
 // === "Page Displayable" implementation ===
@@ -21,11 +23,17 @@ Association.prototype.get_commands = function(context) {
 // === Public API ===
 
 Association.prototype.get_topic_1 = function() {
-    return dm4c.fetch_topic(this.role_1.topic_id)
+    if (!this.topic_1) {
+        this.topic_1 = dm4c.fetch_topic(this.role_1.topic_id)
+    }
+    return this.topic_1
 }
 
 Association.prototype.get_topic_2 = function() {
-    return dm4c.fetch_topic(this.role_2.topic_id)
+    if (!this.topic_2) {
+        this.topic_2 = dm4c.fetch_topic(this.role_2.topic_id)
+    }
+    return this.topic_2
 }
 
 // ---
@@ -60,4 +68,11 @@ Association.prototype.get_role = function(role_type_uri) {
             " when looking for the \"" + role_type_uri + "\" role"
     }
     return match_1 ? this.role_1 : match_2 ? this.role_2 : undefined
+}
+
+Association.prototype.matches = function(type_uri_1, type_uri_2) {
+    var topic_1 = this.get_topic_1()
+    var topic_2 = this.get_topic_2()
+    return topic_1.type_uri == type_uri_1 && topic_2.type_uri == type_uri_2 ||
+           topic_1.type_uri == type_uri_2 && topic_2.type_uri == type_uri_1
 }

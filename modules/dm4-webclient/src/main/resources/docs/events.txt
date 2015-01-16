@@ -78,9 +78,9 @@ Webclient
 Access Control plugin
 ---------------------
 
-"logged_in"
-"logged_out"
-"logged_out_2"
+"authority_increased"
+"authority_decreased"
+"authority_decreased_2"
 
 
 Topicmaps plugin

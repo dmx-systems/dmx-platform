@@ -127,13 +127,14 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Access Control Listeners ===
 
-    dm4c.add_listener("logged_in", function(username) {
+    dm4c.add_listener("authority_increased", function(username) {
         fetch_workspaces_and_refresh_menu()
     })
 
-    // Note: the Topicmaps plugin clears its topicmap cache at logout(1). Switching the workspace at logout_2
-    // ensures the Topicmaps plugin loads an up-to-date topicmap (in its "post_select_workspace" listener).
-    dm4c.add_listener("logged_out_2", function() {
+    // Note: the Topicmaps plugin clears its topicmap cache at authority_decreased(1). Switching the workspace at
+    // authority_decreased_2 ensures the Topicmaps plugin loads an up-to-date topicmap (in its "post_select_workspace"
+    // listener).
+    dm4c.add_listener("authority_decreased_2", function() {
         fetch_workspaces_and_refresh_menu()
         //
         select_workspace(get_workspace_id_from_menu())

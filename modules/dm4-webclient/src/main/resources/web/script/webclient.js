@@ -1182,8 +1182,8 @@ dm4c = new function() {
 
     // ---
 
-    this.has_retype_permission_for_association = function(assoc_type, topic_1, topic_2) {
-        var result = dm4c.fire_event("has_retype_permission_for_association", assoc_type, topic_1, topic_2)
+    this.has_retype_permission_for_association = function(assoc, assoc_type) {
+        var result = dm4c.fire_event("has_retype_permission_for_association", assoc, assoc_type)
         return !js.contains(result, false)
     }
 
