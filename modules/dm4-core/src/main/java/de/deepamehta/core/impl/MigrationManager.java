@@ -2,10 +2,12 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
+import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.io.InputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -132,6 +134,7 @@ class MigrationManager {
                 } else {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
                     logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
+                    injectServices(migration, mi.migrationInfo, plugin);
                     migration.setCoreService(dms);
                     migration.run();
                 }
@@ -142,6 +145,19 @@ class MigrationManager {
             logger.info("Updating migration number (" + migrationNr + ")");
         } catch (Exception e) {
             throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
+        }
+    }
+
+    private void injectServices(Migration migration, String migrationInfo, PluginImpl plugin) {
+        try {
+            for (Field field : PluginImpl.getInjectableFields(migration.getClass())) {
+                Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
+                PluginService service = plugin.getPluginService(serviceInterface);
+                logger.info("Injecting service " + serviceInterface.getName() + " into " + migrationInfo);
+                field.set(migration, service);  // throws IllegalAccessException
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Injecting services into " + migrationInfo + " failed", e);
         }
     }
 

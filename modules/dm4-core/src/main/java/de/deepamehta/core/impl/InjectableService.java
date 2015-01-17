@@ -15,7 +15,7 @@ class InjectableService {
     private Class<? extends PluginService> serviceInterface;
     private Field injectableField;
 
-    private boolean isServiceAvailable;
+    private PluginService service;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -24,8 +24,6 @@ class InjectableService {
         this.pluginContext = pluginContext;
         this.serviceInterface = serviceInterface;
         this.injectableField = injectableField;
-        //
-        injectableField.setAccessible(true);    // allow injection into private fields
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -41,20 +39,20 @@ class InjectableService {
         return serviceInterface;
     }
 
+    PluginService getService() {
+        if (!isServiceAvailable()) {
+            throw new RuntimeException("Service " + this + " is not available (consumed by " + pluginContext + ")");
+        }
+        return service;
+    }
+
     boolean isServiceAvailable() {
-        return isServiceAvailable;
+        return service != null;
     }
 
-    // ---
-
-    void injectService(Object service) {
+    void injectService(PluginService service) {
+        this.service = service;
         injectValue(service);
-        isServiceAvailable = true;
-    }
-
-    void injectNull() {
-        injectValue(null);
-        isServiceAvailable = false;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

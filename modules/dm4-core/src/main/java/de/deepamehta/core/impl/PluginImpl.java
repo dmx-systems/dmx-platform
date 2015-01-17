@@ -303,19 +303,9 @@ public class PluginImpl implements Plugin, EventHandler {
     private List<InjectableService> createInjectableServices() {
         List <InjectableService> injectableServices = new ArrayList();
         //
-        // Note: we use getDeclaredFields() (instead of getFields()) to *not* search the super classes
-        for (Field field : pluginContext.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Inject.class)) {
-                Class<?> fieldType = field.getType();
-                //
-                if (!PluginService.class.isAssignableFrom(fieldType)) {
-                    throw new RuntimeException("Injected field \"" + field.getName() + "\" is not a plugin service. " +
-                        "Use @Inject only for plugin services");
-                }
-                //
-                Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) fieldType;
-                injectableServices.add(new InjectableService(pluginContext, serviceInterface, field));
-            }
+        for (Field field : getInjectableFields(pluginContext.getClass())) {
+            Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
+            injectableServices.add(new InjectableService(pluginContext, serviceInterface, field));
         }
         return injectableServices;
     }
@@ -327,6 +317,39 @@ public class PluginImpl implements Plugin, EventHandler {
             }
         }
         return true;
+    }
+
+    // ---
+
+    // called also from MigrationManager
+    static List<Field> getInjectableFields(Class<?> clazz) {
+        List <Field> injectableFields = new ArrayList();
+        //
+        // Note: we use getDeclaredFields() (instead of getFields()) to *not* search the super classes
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Inject.class)) {
+                Class<?> fieldType = field.getType();
+                //
+                if (!PluginService.class.isAssignableFrom(fieldType)) {
+                    throw new RuntimeException("@Inject annotated field \"" + field.getName() +
+                        "\" has an unsupported type (" + fieldType.getName() + "). Use @Inject " +
+                        "only for injecting plugin services.");
+                }
+                //
+                field.setAccessible(true);  // allow injection into private fields
+                injectableFields.add(field);
+            }
+        }
+        return injectableFields;
+    }
+
+    // called from MigrationManager
+    PluginService getPluginService(Class<? extends PluginService> serviceInterface) {
+        InjectableService injectableService = consumedPluginServices.get(serviceInterface);
+        if (injectableService == null) {
+            throw new RuntimeException("Service " + serviceInterface.getName() + " is not consumed by " + this);
+        }
+        return injectableService.getService();
     }
 
     // ---
@@ -398,7 +421,7 @@ public class PluginImpl implements Plugin, EventHandler {
             checkRequirementsForActivation();
         } else if (service instanceof PluginService) {
             logger.info("Adding service " + serviceInterface.getName() + " to " + this);
-            consumedPluginServices.get(serviceInterface).injectService(service);
+            consumedPluginServices.get(serviceInterface).injectService((PluginService) service);
             pluginContext.serviceArrived((PluginService) service);
             checkRequirementsForActivation();
         }
@@ -421,7 +444,7 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof PluginService) {
             logger.info("Removing service " + serviceInterface.getName() + " from " + this);
             pluginContext.serviceGone((PluginService) service);
-            consumedPluginServices.get(serviceInterface).injectNull();
+            consumedPluginServices.get(serviceInterface).injectService(null);
         }
     }
 
