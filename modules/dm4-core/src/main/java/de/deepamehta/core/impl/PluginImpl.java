@@ -80,6 +80,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     // Provided OSGi service
+    private String providedServiceInterface;
     private ServiceRegistration registration;
 
     // Provided resources
@@ -104,6 +105,8 @@ public class PluginImpl implements Plugin, EventHandler {
         this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
         this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = pluginDependencies();
+        //
+        this.providedServiceInterface = providedServiceInterface();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -195,6 +198,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     Topic getPluginTopic() {
         return pluginTopic;
+    }
+
+    String getProvidedServiceInterface() {
+        return providedServiceInterface;
     }
 
     // ---
@@ -301,7 +308,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private List<InjectableService> createInjectableServices() {
-        List <InjectableService> injectableServices = new ArrayList();
+        List<InjectableService> injectableServices = new ArrayList();
         //
         for (Field field : getInjectableFields(pluginContext.getClass())) {
             Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
@@ -323,7 +330,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // called also from MigrationManager
     static List<Field> getInjectableFields(Class<?> clazz) {
-        List <Field> injectableFields = new ArrayList();
+        List<Field> injectableFields = new ArrayList();
         //
         // Note: we use getDeclaredFields() (instead of getFields()) to *not* search the super classes
         for (Field field : clazz.getDeclaredFields()) {
@@ -332,7 +339,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 //
                 if (!PluginService.class.isAssignableFrom(fieldType)) {
                     throw new RuntimeException("@Inject annotated field \"" + field.getName() +
-                        "\" has an unsupported type (" + fieldType.getName() + "). Use @Inject " +
+                        "\" has unsupported type (" + fieldType.getName() + "). Use @Inject " +
                         "only for injecting plugin services.");
                 }
                 //
@@ -483,7 +490,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Activates this plugin and then posts the PLUGIN_ACTIVATED OSGi event.
      *
      * Activation comprises:
-     *   - install the plugin in the database (includes migrations, post-install event, type introduction)
+     *   - install the plugin in the database (includes migrations, post-install hook, type introduction)
      *   - initialize the plugin
      *   - register the plugin's event listeners
      *   - register the plugin's OSGi service
@@ -692,15 +699,13 @@ public class PluginImpl implements Plugin, EventHandler {
      */
     private void registerPluginService() {
         try {
-            String serviceInterface = providedServiceInterface();
-            //
-            if (serviceInterface == null) {
+            if (providedServiceInterface == null) {
                 logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");
                 return;
             }
             //
-            logger.info("Registering service \"" + serviceInterface + "\" at OSGi framework");
-            registration = bundleContext.registerService(serviceInterface, pluginContext, null);
+            logger.info("Registering service \"" + providedServiceInterface + "\" at OSGi framework");
+            registration = bundleContext.registerService(providedServiceInterface, pluginContext, null);
         } catch (Exception e) {
             throw new RuntimeException("Registering service of " + this + " at OSGi framework failed", e);
         }

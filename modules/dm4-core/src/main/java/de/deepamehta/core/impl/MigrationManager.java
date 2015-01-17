@@ -152,7 +152,15 @@ class MigrationManager {
         try {
             for (Field field : PluginImpl.getInjectableFields(migration.getClass())) {
                 Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
-                PluginService service = plugin.getPluginService(serviceInterface);
+                PluginService service;
+                // 
+                if (serviceInterface.getName().equals(plugin.getProvidedServiceInterface())) {
+                    // the migration consumes the plugin's own service
+                    service = (PluginService) plugin.getContext();
+                } else {
+                    service = plugin.getPluginService(serviceInterface);
+                }
+                //
                 logger.info("Injecting service " + serviceInterface.getName() + " into " + migrationInfo);
                 field.set(migration, service);  // throws IllegalAccessException
             }
