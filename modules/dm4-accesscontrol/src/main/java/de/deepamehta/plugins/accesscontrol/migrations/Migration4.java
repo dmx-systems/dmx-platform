@@ -9,6 +9,11 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Removes "owner" and "acl" properties.
+ * <p>
+ * Part of DM 4.5
+ */
 public class Migration4 extends Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

@@ -6,13 +6,14 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
+ * Corrects URI of DeepaMehta workspace: "de." -> "dm4."
+ * <p>
  * Part of DM 4.5
  */
 public class Migration4 extends Migration {
 
     @Override
     public void run() {
-        // correct URI of DeepaMehta workspace: "de." -> "dm4."
         dms.getTopic("uri", new SimpleValue("de.workspaces.deepamehta")).setUri("dm4.workspaces.deepamehta");
     }
 }
