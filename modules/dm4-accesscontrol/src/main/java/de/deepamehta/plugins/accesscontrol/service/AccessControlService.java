@@ -1,17 +1,30 @@
 package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Permissions;
+import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.Collection;
 
 
 
 public interface AccessControlService extends PluginService {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // Admin user account
+    static final String ADMIN_USERNAME = "admin";
+    static final String ADMIN_DEFAULT_PASSWORD = "";
+
+    // System workspace
+    static final String SYSTEM_WORKSPACE_NAME = "System";
+    static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+    static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
 
 
 

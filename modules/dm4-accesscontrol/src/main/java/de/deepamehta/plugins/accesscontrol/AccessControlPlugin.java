@@ -92,17 +92,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
-    // Admin user account
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_DEFAULT_PASSWORD = "";
-
     // Private workspaces
     private static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
-
-    // System workspace
-    private static final String SYSTEM_WORKSPACE_NAME = "System";
-    private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
-    private static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
     // Associations
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
@@ -243,7 +234,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         Topic passwordTopic = getPasswordTopic(getUserAccount(getUsernameTopic(username)));
-        return wsService.getAssignedWorkspace(passwordTopic.getId());
+        Topic workspace = wsService.getAssignedWorkspace(passwordTopic.getId());
+        if (workspace == null) {
+            throw new RuntimeException("User \"" + username + "\" has no private workspace");
+        }
+        return workspace;
     }
 
     @Override
@@ -548,13 +543,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void assignSearchTopic(Topic searchTopic) {
-        Topic workspace;
-        if (getUsername() != null) {
-            workspace = getPrivateWorkspace();
-        } else {
-            workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+        try {
+            Topic workspace;
+            if (getUsername() != null) {
+                workspace = getPrivateWorkspace();
+            } else {
+                workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+            }
+            wsService.assignToWorkspace(searchTopic, workspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning search topic to workspace failed", e);
         }
-        wsService.assignToWorkspace(searchTopic, workspace.getId());
     }
 
 

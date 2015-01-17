@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 /**
  * Removes "owner" and "acl" properties.
+ * Runs only when UPDATE.
  * <p>
  * Part of DM 4.5
  */
