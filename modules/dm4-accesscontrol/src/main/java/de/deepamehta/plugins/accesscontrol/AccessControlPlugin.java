@@ -29,7 +29,6 @@ import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
-import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
@@ -69,8 +68,7 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, AllPluginsActiveListener,
-                                                                                         PreGetTopicListener,
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreGetTopicListener,
                                                                                          PreGetAssociationListener,
                                                                                          PostCreateTopicListener,
                                                                                          PostCreateAssociationListener,
@@ -368,22 +366,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
-    public void postInstall() {
-        // 1) create "System" workspace
-        Topic systemWorkspace = wsService.createWorkspace(SYSTEM_WORKSPACE_NAME, SYSTEM_WORKSPACE_URI,
-            SYSTEM_WORKSPACE_SHARING_MODE);
-        // Note: at post-install time no user is logged in (our listeners are not even registered).
-        // So we set the owner manually here.
-        setWorkspaceOwner(systemWorkspace, ADMIN_USERNAME);
-        // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
-        // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
-        // the System workspace is actually created by the system itself.
-        //
-        // 2) create "admin" user account
-        createUserAccount(new Credentials(ADMIN_USERNAME, ADMIN_DEFAULT_PASSWORD));
-    }
-
-    @Override
     public void init() {
         logger.info("Security settings:" +
             "\ndm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
@@ -398,26 +380,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ********************************
 
 
-
-    /**
-     * Sets the owner of the "DeepaMehta" workspace.
-     */
-    @Override
-    public void allPluginsActive() {
-        DeepaMehtaTransaction tx = dms.beginTx();
-        try {
-            setupDeepaMehtaWorkspace();
-            //
-            tx.success();
-        } catch (Exception e) {
-            logger.warning("ROLLBACK! (" + this + ")");
-            throw new RuntimeException("Setting up " + this + " failed", e);
-        } finally {
-            tx.finish();
-        }
-    }
-
-    // ---
 
     @Override
     public void preGetTopic(long topicId) {
@@ -680,32 +642,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // === Setup Access Control ===
-
-    /**
-     * Sets user "admin" as the owner of the "DeepaMehta" workspace if not yet set.
-     */
-    private void setupDeepaMehtaWorkspace() {
-        String operation = "Setting the owner of the \"DeepaMehta\" workspace";
-        try {
-            Topic workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
-            // Abort if owner is already set
-            if (getWorkspaceOwner(workspace.getId()) != null) {
-                logger.info("### " + operation + " ABORTED -- already set");
-                return;
-            }
-            //
-            logger.info("### " + operation);
-            // Note: at all-plugins-active time no user is logged in. So we set the owner manually here.
-            setWorkspaceOwner(workspace, ADMIN_USERNAME);
-            // Note: we don't set a particular creator/modifier here as we don't want suggest that the DeepaMehta
-            // workspace has been created by the "admin" user. Instead the creator/modifier of the DeepaMehhta
-            // workspace remain undefined as the DeepaMehta workspace is actually created by the system itself.
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
-
-    // ---
 
     /**
      * Sets the logged in user as the creator/modifier of the given object.

@@ -7,17 +7,15 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
 
-import java.util.logging.Logger;
-
 
 
 /**
  * Creates the "System" workspace.
- * Runs only in UPDATE mode.
+ * Runs ALWAYS.
  * <p>
  * Part of DM 4.5
  */
-public class Migration5 extends Migration {
+public class Migration3 extends Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -27,13 +25,10 @@ public class Migration5 extends Migration {
     @Inject
     private WorkspacesService wsService;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public void run() {
-        // compare to AccessControlPlugin.postInstall()
         Topic systemWorkspace = wsService.createWorkspace(
             AccessControlService.SYSTEM_WORKSPACE_NAME,
             AccessControlService.SYSTEM_WORKSPACE_URI,
@@ -42,5 +37,8 @@ public class Migration5 extends Migration {
         // Note: at migration running time our plugin listeners are not yet registered
         // (furthermore there is no user logged in). So we set the owner manually here.
         acService.setWorkspaceOwner(systemWorkspace, AccessControlService.ADMIN_USERNAME);
+        // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
+        // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
+        // the System workspace is actually created by the system itself.
     }
 }
