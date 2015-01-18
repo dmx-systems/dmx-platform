@@ -7,6 +7,7 @@ import de.deepamehta.core.service.Migration;
 
 /**
  * Corrects URI of DeepaMehta workspace: "de." -> "dm4."
+ * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.5
  */

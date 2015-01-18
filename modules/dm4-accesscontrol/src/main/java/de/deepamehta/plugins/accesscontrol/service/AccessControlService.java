@@ -24,6 +24,9 @@ public interface AccessControlService extends PluginService {
     static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
     static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
+    // Private workspaces
+    static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 

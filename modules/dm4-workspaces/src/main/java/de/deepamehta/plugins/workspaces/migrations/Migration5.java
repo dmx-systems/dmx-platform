@@ -8,7 +8,8 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
- * Sets sharing mode "Public" for workspace "DeepaMehta".
+ * Sets sharing mode of "DeepaMehta" workspace to "Public".
+ * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.5
  */

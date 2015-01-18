@@ -5,7 +5,8 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
- * Sets cardinality of the workspace facet to "one".
+ * Changes cardinality of the workspace facet to "one".
+ * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.5
  */

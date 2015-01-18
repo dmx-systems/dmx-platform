@@ -6,7 +6,8 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
- * Adds "Sharing Mode" to topic type "Workspace".
+ * Adds child type "Sharing Mode" to the "Workspace" topic type.
+ * Runs ALWAYS.
  * <p>
  * Part of DM 4.5
  */

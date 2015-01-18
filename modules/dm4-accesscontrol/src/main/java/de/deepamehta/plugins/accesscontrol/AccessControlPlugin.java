@@ -92,9 +92,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
-    // Private workspaces
-    private static final String DEFAULT_PRIVATE_WORKSPACE_NAME = "Private Workspace";
-
     // Associations
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
 
