@@ -15,8 +15,6 @@ public interface PluginContext {
 
     void shutdown();
 
-    void postInstall();
-
     void serviceArrived(PluginService service);
 
     void serviceGone(PluginService service);

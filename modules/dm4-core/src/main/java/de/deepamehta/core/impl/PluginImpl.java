@@ -503,8 +503,8 @@ public class PluginImpl implements Plugin, EventHandler {
             initializePlugin();
             registerListeners();
             registerPluginService();
-            // Note: the event listeners must be registered *after* the plugin is installed in the database and its
-            // postInstall() hook is triggered (see PluginImpl.installPluginInDB()).
+            // Note: the event listeners must be registered *after* the plugin is installed in the database (see
+            // installPluginInDB() below).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
             //
             logger.info("----- Activation of " + this + " complete -----");
@@ -528,8 +528,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Installs the plugin in the database. This comprises:
      *   1) create "Plugin" topic
      *   2) run migrations
-     *   3) post installation (triggers the plugin's postInstall() hook)
-     *   4) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
+     *   3) type introduction (fires the {@link CoreEvent.INTRODUCE_TOPIC_TYPE} and
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     private void installPluginInDB() {
@@ -541,9 +540,7 @@ public class PluginImpl implements Plugin, EventHandler {
             dms.migrationManager.runPluginMigrations(this, isCleanInstall);
             //
             if (isCleanInstall) {
-                // 3) post installation
-                pluginContext.postInstall();
-                // 4) type introduction
+                // 3) type introduction
                 introduceTopicTypesToPlugin();
                 introduceAssociationTypesToPlugin();
             }

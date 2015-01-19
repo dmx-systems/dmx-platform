@@ -96,10 +96,6 @@ public class PluginActivator implements BundleActivator, PluginContext {
     }
 
     @Override
-    public void postInstall() {
-    }
-
-    @Override
     public void serviceArrived(PluginService service) {
     }
 
