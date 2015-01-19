@@ -33,6 +33,10 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    public T get(int index) {
+        return items.get(index);
+    }
+
     public int getSize() {
         return items.size();
     }

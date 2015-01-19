@@ -263,7 +263,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.getSize());
             //
             // retype assoc
-            Association assoc = childTypes.getItems().get(0).getRelatingAssociation();
+            Association assoc = childTypes.get(0).getRelatingAssociation();
             assertEquals("dm4.core.composition_def", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.association");
             assertEquals("dm4.core.association", assoc.getTypeUri());
@@ -300,7 +300,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, childTypes.getSize());
             //
             // retype assoc roles
-            Association assoc = childTypes.getItems().get(0).getRelatingAssociation();
+            Association assoc = childTypes.get(0).getRelatingAssociation();
             assoc.getRole1().setRoleTypeUri("dm4.core.default");
             assoc.getRole2().setRoleTypeUri("dm4.core.default");
             //
@@ -338,7 +338,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, topics.getSize());  // we have 3 topics
             //
             // retype the first topic
-            Topic topic = topics.getItems().get(0);
+            Topic topic = topics.get(0);
             assertEquals("dm4.core.plugin", topic.getTypeUri());
             topic.setTypeUri("dm4.core.data_type");
             assertEquals("dm4.core.data_type", topic.getTypeUri());
@@ -375,7 +375,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(3, assocs.getSize());  // we have 3 associations
             //
             // retype the first association
-            Association assoc = assocs.getItems().get(0);
+            Association assoc = assocs.get(0);
             assertEquals("dm4.core.association", assoc.getTypeUri());
             assoc.setTypeUri("dm4.core.composition");
             assertEquals("dm4.core.composition", assoc.getTypeUri());
@@ -408,7 +408,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(5, topics.getSize());
             //
             // retype topic
-            Topic topic = topics.getItems().get(0);
+            Topic topic = topics.get(0);
             assertEquals("dm4.core.data_type", topic.getTypeUri());
             topic.setTypeUri("dm4.core.index_mode");
             assertEquals("dm4.core.index_mode", topic.getTypeUri());
