@@ -81,11 +81,11 @@ class AccessControlImpl implements AccessControl {
                     switch (operation) {
                     case READ:
                         logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") has no workspace assignment -- READ permission is granted");
+                            "\") is not assigned to any workspace -- READ permission is granted");
                         return true;
                     case WRITE:
                         logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") has no workspace assignment -- WRITE permission is refused");
+                            "\") is not assigned to any workspace -- WRITE permission is refused");
                         return false;
                     default:
                         throw new RuntimeException(operation + " is an unsupported operation");
@@ -231,11 +231,9 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
+    // ### TODO: copy in WorkspacesPlugin.java
     private long getAssignedWorkspaceId(long objectId) {
-        // Note: direct storage access is required here
-        TopicModel workspace = dms.storageDecorator.fetchRelatedTopic(objectId, "dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.workspace");
-        return workspace != null ? workspace.getId() : -1;
+        return dms.hasProperty(objectId, PROP_WORKSPACE_ID) ? (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID) : -1;
     }
 
     /**

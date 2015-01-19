@@ -36,7 +36,7 @@ public interface WorkspacesService extends PluginService {
     Topic getWorkspace(String uri);
 
     /**
-     * Returns all topics of a given type that are assigned to a given workspace.
+     * Returns all topics of the given type that are assigned to the given workspace.
      */
     ResultList<RelatedTopic> getAssignedTopics(long workspaceId, String typeUri);
 
@@ -51,19 +51,19 @@ public interface WorkspacesService extends PluginService {
     Topic getAssignedWorkspace(long objectId);
 
     /**
-     * Checks weather the specified topic is assigned to the specified workspace
+     * Checks weather the given topic or association is assigned to the given workspace.
      */
-    boolean isAssignedToWorkspace(Topic topic, long workspaceId);
+    boolean isAssignedToWorkspace(long objectId, long workspaceId);
 
     // ---
 
     /**
-     * Assigns the specified object to a workspace.
+     * Assigns the given object to the given workspace.
      */
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
 
     /**
-     * Assigns the specified type and all its view configuration topics to a workspace.
+     * Assigns the given type and all its view configuration topics to the given workspace.
      */
     void assignTypeToWorkspace(Type type, long workspaceId);
 }

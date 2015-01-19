@@ -138,9 +138,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     @Override
-    public boolean isAssignedToWorkspace(Topic topic, long workspaceId) {
-        // ### TODO: check property instead facet
-        return facetsService.hasFacet(topic.getId(), "dm4.workspaces.workspace_facet", workspaceId);
+    public boolean isAssignedToWorkspace(long objectId, long workspaceId) {
+        return getAssignedWorkspaceId(objectId) == workspaceId;
     }
 
     // ---
@@ -279,12 +278,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    private long getAssignedWorkspaceId(long id) {
-        if (!dms.hasProperty(id, PROP_WORKSPACE_ID)) {
-            return -1;
-        }
-        //
-        return (Long) dms.getProperty(id, PROP_WORKSPACE_ID);
+    // ### TODO: copy in AccessControlImpl.java
+    private long getAssignedWorkspaceId(long objectId) {
+        return dms.hasProperty(objectId, PROP_WORKSPACE_ID) ? (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID) : -1;
     }
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
@@ -330,7 +326,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void applyWorkspaceFilter(Iterator<? extends Topic> topics, long workspaceId) {
         while (topics.hasNext()) {
             Topic topic = topics.next();
-            if (!isAssignedToWorkspace(topic, workspaceId)) {
+            if (!isAssignedToWorkspace(topic.getId(), workspaceId)) {
                 topics.remove();
             }
         }

@@ -243,7 +243,11 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         var groups = location.pathname.match(/\/topicmap\/(\d+)/)
         if (groups) {
             var topicmap_id = groups[1]
-            var workspace_id = dm4c.restc.get_assigned_workspace(topicmap_id).id
+            var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
+            if (!workspace) {
+                throw "WorkspacesError: topicmap " + topicmap_id + " is not assigned to any workspace"
+            }
+            var workspace_id = workspace.id
             select_menu_item(workspace_id)
         } else {
             var workspace_id = get_workspace_id_from_menu()
