@@ -1,7 +1,5 @@
 package de.deepamehta.plugins.workspaces.migrations;
 
-import de.deepamehta.plugins.workspaces.service.WorkspacesService;
-
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
@@ -9,7 +7,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ResultList;
 
@@ -30,9 +27,6 @@ public class Migration5 extends Migration {
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Inject
-    private WorkspacesService wsService;
 
     private long objects = 0, initialized = 0, ambiguous = 0;;
 
