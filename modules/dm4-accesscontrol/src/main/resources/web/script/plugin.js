@@ -260,13 +260,15 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
     })
 
-    dm4c.add_listener("post_delete_association", function(assoc) {
-        if (assoc.type_uri == "dm4.accesscontrol.membership") {
-            var username_topic = assoc.get_topic_by_type("dm4.accesscontrol.username")
-            if (username_topic.value == self.get_username()) {
-                decrease_authority()
-            }
+    dm4c.add_listener("post_update_association", function(assoc, old_assoc) {
+        // Note: old_assoc is undefined if the updated association is NOT the selected one
+        if (assoc.type_uri != "dm4.accesscontrol.membership" && old_assoc) {
+            check_membership(old_assoc)
         }
+    })
+
+    dm4c.add_listener("post_delete_association", function(assoc) {
+        check_membership(assoc)
     })
 
     // ---
@@ -327,6 +329,19 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
     function encode_password(password) {
         return ENCODED_PASSWORD_PREFIX + SHA256(password)
+    }
+
+    /**
+     * Checks if the given association is a membership and if at the username end is the current user.
+     * If so the Webclient is updated to reflect a decrease in authority.
+     */
+    function check_membership(assoc) {
+        if (assoc.type_uri == "dm4.accesscontrol.membership") {
+            var username_topic = assoc.get_topic_by_type("dm4.accesscontrol.username")
+            if (username_topic.value == self.get_username()) {
+                decrease_authority()
+            }
+        }
     }
 
     // ---

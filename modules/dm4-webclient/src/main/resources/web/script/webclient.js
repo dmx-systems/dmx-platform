@@ -253,7 +253,7 @@ dm4c = new function() {
 
     /**
      * Updates a topic in the DB and on the GUI.
-     * Fires the "pre_update_topic" and "post_update_topic" (indirectly) event.
+     * Fires the "pre_update_topic" and "post_update_topic" (indirectly) events.
      *
      * @param   topic_model     Optional: a topic model containing the data to be udpated.
      *                          If not specified no DB update is performed but the page panel is still refreshed.
@@ -270,16 +270,19 @@ dm4c = new function() {
 
     /**
      * Updates an association in the DB and on the GUI.
-     * Fires the "post_update_association" event (indirectly).
+     * Fires the "pre_update_association" and "post_update_association" (indirectly) events.
      *
      * @param   assoc_model     an association model containing the data to be udpated.
      *
      * ### TODO: remove stay_in_edit_mode parameter
      */
     this.do_update_association = function(assoc_model, stay_in_edit_mode) {
+        dm4c.fire_event("pre_update_association", assoc_model)
         // update DB, client model, and GUI
         return dm4c.restc.update_association(assoc_model, stay_in_edit_mode)
     }
+
+    // ---
 
     /**
      * Updates a topic type in the DB and on the GUI.
@@ -501,12 +504,12 @@ dm4c = new function() {
      */
     function update_topic(topic) {
         // update client model
-        set_topic_selection_conditionally(topic)
+        var old_topic = set_topic_selection_conditionally(topic)
         // update GUI
         dm4c.topicmap_renderer.update_topic(topic)
         dm4c.page_panel.render_page_if_selected(topic)
         //
-        dm4c.fire_event("post_update_topic", topic)
+        dm4c.fire_event("post_update_topic", topic, old_topic)
     }
 
     /**
@@ -521,14 +524,16 @@ dm4c = new function() {
      */
     function update_association(assoc, stay_in_edit_mode) {
         // update client model
-        set_association_selection_conditionally(assoc)
+        var old_assoc = set_association_selection_conditionally(assoc)
         // update GUI
         dm4c.topicmap_renderer.update_association(assoc)
         stay_in_edit_mode ? dm4c.page_panel.render_form_if_selected(assoc) :
                             dm4c.page_panel.render_page_if_selected(assoc)
         //
-        dm4c.fire_event("post_update_association", assoc)
+        dm4c.fire_event("post_update_association", assoc, old_assoc)
     }
+
+    // ---
 
     /**
      * Processes an UPDATE_TOPIC_TYPE directive.
@@ -650,13 +655,17 @@ dm4c = new function() {
 
     function set_topic_selection_conditionally(topic) {
         if (topic.id == dm4c.selected_object.id) {
+            var old_topic = dm4c.selected_object
             set_topic_selection(topic, true)            // no_history_update=true
+            return old_topic
         }
     }
 
     function set_association_selection_conditionally(assoc) {
         if (assoc.id == dm4c.selected_object.id) {
+            var old_assoc = dm4c.selected_object
             set_association_selection(assoc, true)      // no_history_update=true
+            return old_assoc
         }
     }
 

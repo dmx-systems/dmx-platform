@@ -20,6 +20,7 @@ Webclient
 
 // Storage (DB updates)
 "pre_update_topic"
+"pre_update_association"
 "post_create_topic"
 "post_update_topic"
 "post_update_association"
