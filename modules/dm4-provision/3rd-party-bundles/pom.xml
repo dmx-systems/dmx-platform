@@ -6,14 +6,14 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>4.4.2</version>
+    <version>4.4.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>3rd-party (= non-DeepaMehta) libraries to be provisioned in the OSGi runtime.</description>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.4.2</version>
+        <version>4.4.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -24,7 +24,7 @@
         <!--dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency-->
         <!-- Jersey -->
         <dependency>

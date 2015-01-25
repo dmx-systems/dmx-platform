@@ -6,14 +6,14 @@
     <name>DeepaMehta 4 Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-bundles</artifactId>
-    <version>4.4.2</version>
+    <version>4.4.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>DeepaMehta bundles that make up the DeepaMehta 4 Standard Distribution.</description>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.4.2</version>
+        <version>4.4.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -21,107 +21,107 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webclient</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webbrowser</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-notes</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-contacts</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-workspaces</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typeeditor</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-iconpicker</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-typesearch</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-files</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-filemanager</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-help</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-accesscontrol</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-facets</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-geomaps</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-time</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-caching</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-box-renderer-dom</artifactId>
-            <version>4.4.2</version>
+            <version>4.4.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
