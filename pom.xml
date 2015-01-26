@@ -208,9 +208,9 @@
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
-                <!-- Note: modules/dm4-distribution and modules/dm4-assemblies are not included here. -->
-                <!-- We don't want to build the distribution and assemblies with every reactor build. -->
-                <!-- To build the distribution and assemblies use "mvn clean install -P dist".        -->
+                <!-- Note: modules/dm4-distribution is not included here.              -->
+                <!-- We don't want to build the distribution with every reactor build. -->
+                <!-- To build the distribution use "mvn clean install -P dist".        -->
                 <module>modules/dm4-parent</module>
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
@@ -249,7 +249,6 @@
             <id>dist</id>
             <modules>
                 <module>modules/dm4-distribution</module>
-                <module>modules/dm4-assemblies</module>
             </modules>
         </profile>
 
@@ -284,7 +283,6 @@
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
                 <module>modules/dm4-distribution</module>
-                <module>modules/dm4-assemblies</module>
             </modules>
             <build>
                 <plugins>
