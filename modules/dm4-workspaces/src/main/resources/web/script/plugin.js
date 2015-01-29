@@ -100,6 +100,35 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         }
     })
 
+    dm4c.add_listener("topic_commands", function(topic) {
+        return [
+            {
+                is_separator: true,
+                context: "context-menu"
+            },
+            {
+                label:   "Assign to",
+                sub_commands: sub_commands(),
+                context: "context-menu"
+            }
+        ]
+
+        function sub_commands() {
+            var commands = []
+            var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
+            for (var i = 0, workspace; workspace = workspaces[i]; i++) {
+                commands.push({
+                    label: workspace.value,
+                    icon: icon_src,
+                    handler: function() {
+                        console.log("Assigning topic", topic.id, "to workspace", workspace.id)
+                    }
+                })
+            }
+            return commands
+        }
+    })
+
     /**
      * @param   topic   a Topic object
      */

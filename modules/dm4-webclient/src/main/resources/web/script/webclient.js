@@ -1332,17 +1332,31 @@ dm4c = new function() {
             for (var i = 0, cmd; cmd = commands[i]; i++) {
                 if (cmd.is_separator) {
                     context_menu.add_separator()
+                } else if (cmd.sub_commands) {
+                    context_menu.add_submenu(cmd.label, submenu_items(cmd.sub_commands))
                 } else {
-                    context_menu.add_item({
-                        label:    cmd.label,
-                        icon:     cmd.icon,
-                        handler:  cmd.handler,
-                        disabled: cmd.disabled
-                    })
+                    context_menu.add_item(menu_item(cmd))
                 }
             }
             //
             context_menu.open(pos.x, pos.y)
+        }
+
+        function submenu_items(sub_commands) {
+            var items = []
+            for (var i = 0, cmd; cmd = sub_commands[i]; i++) {
+                items.push(menu_item(cmd))
+            }
+            return items
+        }
+
+        function menu_item(command) {
+            return {
+                label:    command.label,
+                icon:     command.icon,
+                handler:  command.handler,
+                disabled: command.disabled
+            }
         }
     }
 

@@ -240,30 +240,22 @@ function GUIToolkit(config) {
         this.add_item = function(item) {
             // 1) update GUI
             menu.append(
-                menu_item().append(item_anchor())
+                menu_item_dom(item)
             ).menu("refresh")
             // 2) update model
             items.push(item)
+        }
 
-            function menu_item() {
-                var menu_item = $("<li>")
-                    .toggleClass("ui-state-disabled", item.disabled == true)
-                    .mouseup(item_handler(item))
-                    .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
-                    .click(consume_event)       // prevent default, that is don't invoke href "#"
-                return menu_item
+        this.add_submenu = function(label, items) {
+            var submenu = $("<ul>")
+            for (var i = 0, item; item = items[i]; i++) {
+                submenu.append(
+                    menu_item_dom(item)
+                )
             }
-
-            function item_anchor() {
-                var anchor = $("<a>").attr("href", "#")
-                if (item.icon) {
-                    anchor.append(
-                        $("<img>").attr("src", item.icon).addClass("icon")
-                    )
-                }
-                anchor.append(item.label)
-                return anchor
-            }
+            menu.append(
+                $("<li>").append(label).append(submenu)
+            ).menu("refresh")
         }
 
         this.add_separator = function() {
@@ -351,6 +343,27 @@ function GUIToolkit(config) {
         }
 
         // ---
+
+        function menu_item_dom(item) {
+            var menu_item = $("<li>")
+                .toggleClass("ui-state-disabled", item.disabled == true)
+                .mouseup(item_handler(item))
+                .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
+                .click(consume_event)       // prevent default, that is don't invoke href "#"
+                .append(item_anchor_dom(item))
+            return menu_item
+        }
+
+        function item_anchor_dom(item) {
+            var anchor = $("<a>").attr("href", "#")
+            if (item.icon) {
+                anchor.append(
+                    $("<img>").attr("src", item.icon).addClass("icon")
+                )
+            }
+            anchor.append(item.label)
+            return anchor
+        }
 
         function item_handler(item) {
             return function(event) {
@@ -619,6 +632,10 @@ function GUIToolkit(config) {
 
             this.add_item = function(item) {
                 base_menu.add_item(item)
+            }
+
+            this.add_submenu = function(label, items) {
+                base_menu.add_submenu(label, items)
             }
 
             this.add_separator = function() {
