@@ -17,6 +17,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
@@ -149,18 +150,20 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @PUT
     @Path("/{workspace_id}/topic/{topic_id}")
     @Transactional
-    public void assignTopicToWorkspace(@PathParam("topic_id") long topicId,
-                                       @PathParam("workspace_id") long workspaceId) {
+    public Directives assignTopicToWorkspace(@PathParam("topic_id") long topicId,
+                                             @PathParam("workspace_id") long workspaceId) {
         assignToWorkspace(dms.getTopic(topicId), workspaceId);
+        return Directives.get();
     }
 
     // Note: not part of workspaces service
     @PUT
     @Path("/{workspace_id}/association/{assoc_id}")
     @Transactional
-    public void assignAssociationToWorkspace(@PathParam("assoc_id") long assocId,
-                                             @PathParam("workspace_id") long workspaceId) {
+    public Directives assignAssociationToWorkspace(@PathParam("assoc_id") long assocId,
+                                                   @PathParam("workspace_id") long workspaceId) {
         assignToWorkspace(dms.getAssociation(assocId), workspaceId);
+        return Directives.get();
     }
 
     // ---
