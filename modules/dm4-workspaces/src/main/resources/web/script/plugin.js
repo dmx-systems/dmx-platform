@@ -106,6 +106,42 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         }
     })
 
+    dm4c.add_listener("topic_commands", function(topic) {
+        return [
+            {is_separator: true, context: "context-menu"},
+            {label: "Assign to Workspace", handler: do_open_workspace_dialog, context: "context-menu"}
+        ]
+
+        function do_open_workspace_dialog() {
+            var workspace_menu = workspace_menu()
+            dm4c.ui.dialog({
+                title: "Assign Topic to Workspace",
+                content: workspace_menu.dom,
+                width: "300px",
+                button_label: "Assign",
+                button_handler: do_assign_to_workspace
+            })
+
+            function workspace_menu() {
+                var workspace_menu = dm4c.ui.menu()
+                var workspace = dm4c.restc.get_assigned_workspace(topic.id)
+                var workspace_id = workspace && workspace.id
+                var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
+                // add workspaces to menu
+                for (var i = 0, workspace; workspace = workspaces[i]; i++) {
+                    workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
+                }
+                workspace_menu.select(workspace_id)
+                return workspace_menu
+            }
+
+            function do_assign_to_workspace() {
+                var workspace_id = workspace_menu.get_selection().value
+                dm4c.restc.assign_topic_to_workspace(topic.id, workspace_id)
+            }
+        }
+    })
+
     /**
      * @param   topic   a Topic object
      */
