@@ -29,6 +29,7 @@ import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -140,6 +141,26 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public boolean isAssignedToWorkspace(long objectId, long workspaceId) {
         return getAssignedWorkspaceId(objectId) == workspaceId;
+    }
+
+    // ---
+
+    // Note: not part of workspaces service
+    @PUT
+    @Path("/{workspace_id}/topic/{topic_id}")
+    @Transactional
+    public void assignTopicToWorkspace(@PathParam("topic_id") long topicId,
+                                       @PathParam("workspace_id") long workspaceId) {
+        assignToWorkspace(dms.getTopic(topicId), workspaceId);
+    }
+
+    // Note: not part of workspaces service
+    @PUT
+    @Path("/{workspace_id}/association/{assoc_id}")
+    @Transactional
+    public void assignAssociationToWorkspace(@PathParam("assoc_id") long assocId,
+                                             @PathParam("workspace_id") long workspaceId) {
+        assignToWorkspace(dms.getAssociation(assocId), workspaceId);
     }
 
     // ---
