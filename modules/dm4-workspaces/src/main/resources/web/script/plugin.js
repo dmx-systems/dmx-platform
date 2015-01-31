@@ -138,6 +138,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             function do_assign_to_workspace() {
                 var workspace_id = workspace_menu.get_selection().value
                 dm4c.restc.assign_topic_to_workspace(topic.id, workspace_id)
+                dm4c.page_panel.refresh()
             }
         }
     })
