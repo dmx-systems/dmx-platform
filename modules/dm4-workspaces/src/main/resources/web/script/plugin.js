@@ -48,7 +48,6 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         // init view
         create_workspace_menu()
         refresh_workspace_menu()
-        select_menu_item(get_selected_workspace_id())
 
         function create_workspace_menu() {
             // build workspace widget
