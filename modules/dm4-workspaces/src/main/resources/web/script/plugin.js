@@ -128,11 +128,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
                 var workspace_menu = dm4c.ui.menu()
                 var workspace = dm4c.restc.get_assigned_workspace(topic.id)
                 var workspace_id = workspace && workspace.id
-                var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
-                // add workspaces to menu
-                for (var i = 0, workspace; workspace = workspaces[i]; i++) {
-                    workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
-                }
+                add_workspaces_to_menu(workspace_menu, function(workspace) {
+                    return dm4c.has_write_permission_for_topic(workspace.id)
+                })
                 workspace_menu.select(workspace_id)
                 return workspace_menu
             }
@@ -333,13 +331,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * Refreshes the workspace menu based on the model ("workspaces").
      */
     function refresh_workspace_menu() {
-        var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
         var workspace_id = get_workspace_id_from_menu()     // save selection
         workspace_menu.empty()
         // add workspaces to menu
-        for (var i = 0, workspace; workspace = workspaces[i]; i++) {
-            workspace_menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
-        }
+        add_workspaces_to_menu(workspace_menu)
         // add "New..." to menu
         if (is_logged_in()) {
             workspace_menu.add_separator()
@@ -363,5 +358,16 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     function get_workspace_id_from_menu() {
         var item = workspace_menu.get_selection()
         return item && item.value
+    }
+
+    // --- Utilities ---
+
+    function add_workspaces_to_menu(menu, filter_func) {
+        var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
+        for (var i = 0, workspace; workspace = workspaces[i]; i++) {
+            if (!filter_func || filter_func(workspace)) {
+                menu.add_item({label: workspace.value, value: workspace.id, icon: icon_src})
+            }
+        }
     }
 })
