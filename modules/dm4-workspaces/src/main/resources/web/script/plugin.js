@@ -107,10 +107,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
-        return [
-            {is_separator: true, context: "context-menu"},
-            {label: "Assign to Workspace", handler: do_open_workspace_dialog, context: "context-menu"}
-        ]
+        if (topic.type_uri != "dm4.workspaces.workspace" && dm4c.has_write_permission_for_topic(topic.id)) {
+            return [
+                {is_separator: true, context: "context-menu"},
+                {label: "Assign to Workspace", handler: do_open_workspace_dialog, context: "context-menu"}
+            ]
+        }
 
         function do_open_workspace_dialog() {
             var workspace_menu = workspace_menu()
