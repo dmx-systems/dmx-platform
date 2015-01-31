@@ -3,8 +3,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     var self = this
 
     // Model
-    var selected_workspace_id   // ID of the selected workspace
     var workspaces              // All workspaces readable by the current user (array of topic-like objects)
+    var selected_workspace_id   // ID of the selected workspace
 
     // View
     var workspace_menu          // A GUIToolkit Menu object
@@ -43,8 +43,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     dm4c.add_listener("init", function() {
 
+        init_model()
+
+        // init view
         create_workspace_menu()
-        init_model()    // Note: the workspace menu must already be created
+        refresh_workspace_menu()
+        select_menu_item(get_selected_workspace_id())
 
         function create_workspace_menu() {
             // build workspace widget
@@ -157,11 +161,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
-            // update the workspace menu
             fetch_workspaces_and_refresh_menu()
-            // if the deleted workspace was the selected workspace select another one
-            if (topic.id == selected_workspace_id) {
-                select_workspace(get_workspace_id_from_menu())
+            // if the deleted workspace was the selected one select another workspace
+            if (topic.id == get_selected_workspace_id()) {
+                select_workspace(get_first_workspace_id())
             }
         }
     })
@@ -180,7 +183,18 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     dm4c.add_listener("authority_decreased_2", function() {
         fetch_workspaces_and_refresh_menu()
         //
-        select_workspace(get_workspace_id_from_menu())
+        var selected_workspace_id = get_selected_workspace_id()
+        if (is_workspace_readable(selected_workspace_id)) {
+            // stay in selected workspace
+            var workspace_id = selected_workspace_id
+        } else {
+            // switch to another workspace
+            var workspace_id = get_first_workspace_id()
+        }
+        // Note: we must select a workspace in any case in order to fire the "post_select_workspace" event.
+        // Even when we stay in the selected workspace the Topicmaps plugin must adjust the current topicmap
+        // according to decreased authority.
+        select_workspace(workspace_id)
     })
 
 
@@ -190,11 +204,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     /**
      * @return  The ID of the selected workspace
      */
-    this.get_workspace_id = function() {
-        if (!selected_workspace_id) {
-            throw "WorkspacesError: no workspace is selected yet"
-        }
-        return selected_workspace_id
+    this.get_selected_workspace_id = function() {
+        return get_selected_workspace_id()
     }
 
     /**
@@ -213,6 +224,12 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+
+
+    function is_logged_in() {
+        return dm4c.get_plugin("de.deepamehta.accesscontrol").get_username()
+    }
 
 
 
@@ -281,7 +298,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
 
     function init_model() {
-        fetch_workspaces_and_refresh_menu()
+        fetch_workspaces()
         //
         var groups = location.pathname.match(/\/topicmap\/(\d+)/)
         if (groups) {
@@ -291,13 +308,14 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
                 throw "WorkspacesError: topicmap " + topicmap_id + " is not assigned to any workspace"
             }
             var workspace_id = workspace.id
-            select_menu_item(workspace_id)
         } else {
-            var workspace_id = get_workspace_id_from_menu()
+            var workspace_id = get_first_workspace_id()
         }
-        // update model
+        //
         set_selected_workspace(workspace_id)
     }
+
+    // ---
 
     /**
      * Updates the model to reflect the given workspace is now selected. That includes setting a cookie
@@ -308,13 +326,32 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         selected_workspace_id = workspace_id
     }
 
+    function get_selected_workspace_id() {
+        if (!selected_workspace_id) {
+            throw "WorkspacesError: no workspace is selected yet"
+        }
+        return selected_workspace_id
+    }
+
+    // ---
+
     function fetch_workspaces() {
         workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // include_childs=false
                                                                                             // sort=true
     }
 
-    function is_logged_in() {
-        return dm4c.get_plugin("de.deepamehta.accesscontrol").get_username()
+    function is_workspace_readable(workspace_id) {
+        return js.includes(workspaces, function(workspace) {
+            return workspace.id == workspace_id
+        })
+    }
+
+    function get_first_workspace_id() {
+        var workspace = workspaces[0]
+        if (!workspace) {
+            throw "WorkspacesError: no workspace available"
+        }
+        return workspace.id
     }
 
 
@@ -331,17 +368,15 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * Refreshes the workspace menu based on the model ("workspaces").
      */
     function refresh_workspace_menu() {
-        var workspace_id = get_workspace_id_from_menu()     // save selection
         workspace_menu.empty()
-        // add workspaces to menu
         add_workspaces_to_menu(workspace_menu)
-        // add "New..." to menu
+        //
         if (is_logged_in()) {
             workspace_menu.add_separator()
             workspace_menu.add_item({label: "New Workspace...", value: "_new", is_trigger: true})
         }
         // restore selection
-        select_menu_item(workspace_id)
+        select_menu_item(get_selected_workspace_id())
     }
 
     /**
@@ -349,15 +384,6 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     function select_menu_item(workspace_id) {
         workspace_menu.select(workspace_id)
-    }
-
-    /**
-     * Reads out the workspace menu and returns the workspace ID.
-     * If the workspace menu has no items yet, undefined is returned.
-     */
-    function get_workspace_id_from_menu() {
-        var item = workspace_menu.get_selection()
-        return item && item.value
     }
 
     // --- Utilities ---

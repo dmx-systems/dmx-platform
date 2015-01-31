@@ -1239,7 +1239,7 @@ dm4c = new function() {
      */
     this.is_workspace_writable = function() {
         // Note: the Workspaces plugin is a Webclient dependency
-        var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
+        var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
         return dm4c.has_write_permission_for_topic(workspace_id)
     }
 

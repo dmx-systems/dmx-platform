@@ -435,7 +435,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         //
         // 3) update "topicmap" and "selected_topicmap_ids"
         topicmap = get_topicmap(topicmap_id)
-        selected_topicmap_ids[get_workspace_id()] = topicmap_id
+        selected_topicmap_ids[get_selected_workspace_id()] = topicmap_id
     }
 
     /**
@@ -444,7 +444,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Prerequisite: the specified topicmap must be assigned to the currently selected workspace.
      */
     function get_topicmap_topic(topicmap_id) {
-        var workspace_id = get_workspace_id()
+        var workspace_id = get_selected_workspace_id()
         var topicmap_topic = find_topic(get_topicmap_topics(workspace_id), topicmap_id)
         if (!topicmap_topic) {
             throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " + workspace_id
@@ -488,15 +488,15 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // ---
 
     function fetch_topicmap_topics() {
-        var workspace_id = get_workspace_id()
+        var workspace_id = get_selected_workspace_id()
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
         topicmap_topics[workspace_id] = dm4c.build_topics(topics)
         // ### TODO: sort topicmaps by name
         return topics.length
     }
 
-    function get_workspace_id() {
-        return dm4c.get_plugin("de.deepamehta.workspaces").get_workspace_id()
+    function get_selected_workspace_id() {
+        return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
     }
 
 
@@ -585,7 +585,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var topicmap_id = get_topicmap_id_from_menu()   // save selection
         topicmap_menu.empty()
         // add topicmaps to menu
-        var topicmap_topics = get_topicmap_topics(get_workspace_id())
+        var topicmap_topics = get_topicmap_topics(get_selected_workspace_id())
         for (var i = 0, topicmap_topic; topicmap_topic = topicmap_topics[i]; i++) {
             topicmap_menu.add_item({label: topicmap_topic.value, value: topicmap_topic.id, icon: icon_src})
         }
