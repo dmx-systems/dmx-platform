@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -470,6 +471,22 @@ public class EmbeddedService implements DeepaMehtaService {
         }
         //
         return createTopic(model, URI_PREFIX_ROLE_TYPE);
+    }
+
+
+
+    // === Generic Object ===
+
+    @Override
+    public DeepaMehtaObject getObject(long id) {
+        DeepaMehtaObjectModel model = storageDecorator.fetchObject(id);
+        if (model instanceof TopicModel) {
+            return instantiateTopic((TopicModel) model, true);              // checkAccess=true
+        } else if (model instanceof AssociationModel) {
+            return instantiateAssociation((AssociationModel) model, true);  // checkAccess=true
+        } else {
+            throw new RuntimeException("Unexpected model: " + model);
+        }
     }
 
 

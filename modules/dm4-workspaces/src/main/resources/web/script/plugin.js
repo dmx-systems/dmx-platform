@@ -30,11 +30,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         var params = this.createRequestParameter({include_childs: include_childs})
         return this.request("GET", "/workspace/object/" + object_id + params.to_query_string())
     }
-    dm4c.restc.assign_topic_to_workspace = function(topic_id, workspace_id) {
-        this.request("PUT", "/workspace/" + workspace_id + "/topic/" + topic_id)
-    }
-    dm4c.restc.assign_association_to_workspace = function(assoc_id, workspace_id) {
-        this.request("PUT", "/workspace/" + workspace_id + "/association/" + assoc_id)
+    dm4c.restc.assign_to_workspace = function(object_id, workspace_id) {
+        this.request("PUT", "/workspace/" + workspace_id + "/object/" + object_id)
     }
 
 
@@ -140,7 +137,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
             function do_assign_to_workspace() {
                 var workspace_id = workspace_menu.get_selection().value
-                dm4c.restc.assign_topic_to_workspace(topic.id, workspace_id)
+                dm4c.restc.assign_to_workspace(topic.id, workspace_id)
                 dm4c.page_panel.refresh()
             }
         }

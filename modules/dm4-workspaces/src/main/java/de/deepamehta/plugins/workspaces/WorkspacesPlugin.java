@@ -148,25 +148,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // Note: not part of workspaces service
     @PUT
-    @Path("/{workspace_id}/topic/{topic_id}")
+    @Path("/{workspace_id}/object/{object_id}")
     @Transactional
-    public Directives assignTopicToWorkspace(@PathParam("topic_id") long topicId,
-                                             @PathParam("workspace_id") long workspaceId) {
-        assignToWorkspace(dms.getTopic(topicId), workspaceId);
+    public Directives assignToWorkspace(@PathParam("object_id") long objectId,
+                                        @PathParam("workspace_id") long workspaceId) {
+        assignToWorkspace(dms.getObject(objectId), workspaceId);
         return Directives.get();
     }
-
-    // Note: not part of workspaces service
-    @PUT
-    @Path("/{workspace_id}/association/{assoc_id}")
-    @Transactional
-    public Directives assignAssociationToWorkspace(@PathParam("assoc_id") long assocId,
-                                                   @PathParam("workspace_id") long workspaceId) {
-        assignToWorkspace(dms.getAssociation(assocId), workspaceId);
-        return Directives.get();
-    }
-
-    // ---
 
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {

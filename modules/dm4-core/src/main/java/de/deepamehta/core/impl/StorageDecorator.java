@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -270,6 +271,14 @@ public class StorageDecorator {
 
     void deleteAssociation(long assocId) {
         storage.deleteAssociation(assocId);
+    }
+
+
+
+    // === Generic Object ===
+
+    DeepaMehtaObjectModel fetchObject(long id) {
+        return storage.fetchObject(id);
     }
 
 

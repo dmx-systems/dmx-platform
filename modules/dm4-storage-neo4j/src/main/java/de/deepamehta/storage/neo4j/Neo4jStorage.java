@@ -347,6 +347,24 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
 
 
+    // === Generic Object ===
+
+    @Override
+    public DeepaMehtaObjectModel fetchObject(long id) {
+        Node node = fetchNode(id);
+        NodeType nodeType = NodeType.of(node);
+        switch (nodeType) {
+        case TOPIC:
+            return buildTopic(node);
+        case ASSOC:
+            return buildAssociation(node);
+        default:
+            throw new RuntimeException("Unexpected node type: " + nodeType);
+        }
+    }
+
+
+
     // === Traversal ===
 
     @Override
