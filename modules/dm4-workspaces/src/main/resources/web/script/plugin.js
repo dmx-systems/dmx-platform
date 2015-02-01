@@ -45,101 +45,27 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         // init view
         create_workspace_menu()
         refresh_workspace_menu()
-
-        function create_workspace_menu() {
-            // build workspace widget
-            var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
-            workspace_menu = dm4c.ui.menu(do_select_workspace)
-            var workspace_widget = $("<div>").attr("id", "workspace-widget")
-                .append(workspace_label)
-                .append(workspace_menu.dom)
-            // put in toolbar
-            dm4c.toolbar.dom.prepend(workspace_widget)
-
-            function do_select_workspace(menu_item) {
-                var workspace_id = menu_item.value
-                if (workspace_id == "_new") {
-                    do_open_workspace_dialog()
-                } else {
-                    select_workspace(workspace_id)
-                }
-            }
-        }
-
-        function do_open_workspace_dialog() {
-            var name_input = dm4c.render.input(undefined, 30)
-            var sharing_mode_selector = sharing_mode_selector()
-            dm4c.ui.dialog({
-                title: "New Workspace",
-                content: dm4c.render.label("Name").add(name_input)
-                    .add(dm4c.render.label("Sharing Mode")).add(sharing_mode_selector),
-                button_label: "Create",
-                button_handler: do_create_workspace
-            })
-
-            function sharing_mode_selector() {
-                var selector = $()
-                add_option("Private",       "dm4.workspaces.private", true)
-                add_option("Confidential",  "dm4.workspaces.confidential")
-                add_option("Collaborative", "dm4.workspaces.collaborative")
-                add_option("Public",        "dm4.workspaces.public")
-                add_option("Common",        "dm4.workspaces.common")
-                return selector
-
-                function add_option(label, value, checked) {
-                    selector = selector
-                        .add($("<label>")
-                            .append($("<input>").attr({
-                                type: "radio", name: "sharing-mode", value: value, checked: checked
-                            }))
-                            .append(label)
-                        )
-                        .add($("<br>"))
-                }
-            }
-
-            function do_create_workspace() {
-                var name = name_input.val()
-                var sharing_mode_uri = sharing_mode_selector.find(":checked").val()
-                create_workspace(name, sharing_mode_uri)
-            }
-        }
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
-        if (topic.type_uri != "dm4.workspaces.workspace" && dm4c.has_write_permission_for_topic(topic.id)) {
+        if (dm4c.has_write_permission_for_topic(topic.id) && topic.type_uri != "dm4.workspaces.workspace") {
             return [
-                {is_separator: true, context: "context-menu"},
-                {label: "Assign to Workspace", handler: do_open_workspace_dialog, context: "context-menu"}
+                {context: "context-menu", is_separator: true},
+                {context: "context-menu", label: "Assign to Workspace", handler: function() {
+                    open_assign_workspace_dialog(topic.id, "Topic")
+                }}
             ]
         }
+    })
 
-        function do_open_workspace_dialog() {
-            var workspace_menu = workspace_menu()
-            dm4c.ui.dialog({
-                title: "Assign Topic to Workspace",
-                content: workspace_menu.dom,
-                width: "300px",
-                button_label: "Assign",
-                button_handler: do_assign_to_workspace
-            })
-
-            function workspace_menu() {
-                var workspace_menu = dm4c.ui.menu()
-                var workspace = dm4c.restc.get_assigned_workspace(topic.id)
-                var workspace_id = workspace && workspace.id
-                add_workspaces_to_menu(workspace_menu, function(workspace) {
-                    return dm4c.has_write_permission_for_topic(workspace.id)
-                })
-                workspace_menu.select(workspace_id)
-                return workspace_menu
-            }
-
-            function do_assign_to_workspace() {
-                var workspace_id = workspace_menu.get_selection().value
-                dm4c.restc.assign_to_workspace(topic.id, workspace_id)
-                dm4c.page_panel.refresh()
-            }
+    dm4c.add_listener("association_commands", function(assoc) {
+        if (dm4c.has_write_permission_for_association(assoc.id)) {
+            return [
+                {context: "context-menu", is_separator: true},
+                {context: "context-menu", label: "Assign to Workspace", handler: function() {
+                    open_assign_workspace_dialog(assoc.id, "Association")
+                }}
+            ]
         }
     })
 
@@ -360,6 +286,26 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Workspace Menu ===
 
+    function create_workspace_menu() {
+        // build workspace widget
+        var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
+        workspace_menu = dm4c.ui.menu(do_select_workspace)
+        var workspace_widget = $("<div>").attr("id", "workspace-widget")
+            .append(workspace_label)
+            .append(workspace_menu.dom)
+        // put in toolbar
+        dm4c.toolbar.dom.prepend(workspace_widget)
+
+        function do_select_workspace(menu_item) {
+            var workspace_id = menu_item.value
+            if (workspace_id == "_new") {
+                open_new_workspace_dialog()
+            } else {
+                select_workspace(workspace_id)
+            }
+        }
+    }
+
     /**
      * Refreshes the workspace menu based on the model ("workspaces").
      */
@@ -382,7 +328,80 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         workspace_menu.select(workspace_id)
     }
 
-    // --- Utilities ---
+
+
+    // === Workspace Dialogs ===
+
+    function open_new_workspace_dialog() {
+        var name_input = dm4c.render.input(undefined, 30)
+        var sharing_mode_selector = sharing_mode_selector()
+        dm4c.ui.dialog({
+            title: "New Workspace",
+            content: dm4c.render.label("Name").add(name_input)
+                .add(dm4c.render.label("Sharing Mode")).add(sharing_mode_selector),
+            button_label: "Create",
+            button_handler: do_create_workspace
+        })
+
+        function sharing_mode_selector() {
+            var selector = $()
+            add_option("Private",       "dm4.workspaces.private", true)
+            add_option("Confidential",  "dm4.workspaces.confidential")
+            add_option("Collaborative", "dm4.workspaces.collaborative")
+            add_option("Public",        "dm4.workspaces.public")
+            add_option("Common",        "dm4.workspaces.common")
+            return selector
+
+            function add_option(label, value, checked) {
+                selector = selector
+                    .add($("<label>")
+                        .append($("<input>").attr({
+                            type: "radio", name: "sharing-mode", value: value, checked: checked
+                        }))
+                        .append(label)
+                    )
+                    .add($("<br>"))
+            }
+        }
+
+        function do_create_workspace() {
+            var name = name_input.val()
+            var sharing_mode_uri = sharing_mode_selector.find(":checked").val()
+            create_workspace(name, sharing_mode_uri)
+        }
+    }
+
+    function open_assign_workspace_dialog(object_id, object_info) {
+        var workspace_menu = workspace_menu()
+        dm4c.ui.dialog({
+            title: "Assign " + object_info + " to Workspace",
+            content: workspace_menu.dom,
+            width: "300px",
+            button_label: "Assign",
+            button_handler: do_assign_to_workspace
+        })
+
+        function workspace_menu() {
+            var workspace_menu = dm4c.ui.menu()
+            var workspace = dm4c.restc.get_assigned_workspace(object_id)
+            var workspace_id = workspace && workspace.id
+            add_workspaces_to_menu(workspace_menu, function(workspace) {
+                return dm4c.has_write_permission_for_topic(workspace.id)
+            })
+            workspace_menu.select(workspace_id)
+            return workspace_menu
+        }
+
+        function do_assign_to_workspace() {
+            var workspace_id = workspace_menu.get_selection().value
+            dm4c.restc.assign_to_workspace(object_id, workspace_id)
+            dm4c.page_panel.refresh()
+        }
+    }
+
+
+
+    // === Utilities ===
 
     function add_workspaces_to_menu(menu, filter_func) {
         var icon_src = dm4c.get_type_icon_src("dm4.workspaces.workspace")
