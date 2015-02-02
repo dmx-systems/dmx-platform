@@ -64,7 +64,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
     @Override
     Topic instantiateObject(TopicModel model) {
-        return dms.instantiateTopic(model, true);           // checkAccess=true
+        return dms.instantiateTopic(model);
     }
 }
 
@@ -83,7 +83,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModel> 
 
     @Override
     Association instantiateObject(AssociationModel model) {
-        return dms.instantiateAssociation(model, true);     // checkAccess=true
+        return dms.instantiateAssociation(model);
     }
 }
 

@@ -28,6 +28,10 @@
             <artifactId>deepamehta-time</artifactId>
             <version>4.5-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

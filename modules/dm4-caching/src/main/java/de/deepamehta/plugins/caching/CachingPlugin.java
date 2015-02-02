@@ -7,12 +7,17 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceResponseFilterListener;
+import de.deepamehta.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
+import javax.servlet.http.HttpServletRequest;
+
+import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -23,6 +28,7 @@ import java.util.regex.Pattern;
 
 
 
+@Path("/cache")
 public class CachingPlugin extends PluginActivator implements ServiceRequestFilterListener,
                                                               ServiceResponseFilterListener {
 
@@ -36,6 +42,9 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
     @Inject
     private TimeService timeService;
+
+    @Context
+    HttpServletRequest req;
 
     private Pattern cachablePath = Pattern.compile(CACHABLE_PATH);
 
@@ -63,8 +72,9 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
             Response.ResponseBuilder builder = request.evaluatePreconditions(new Date(time));
             if (builder != null) {
                 Response response = builder.build();
-                logger.info("### Precondition of request \"" + request.getMethod() + " /" + request.getPath() +
-                    "\" failed -- Sending " + response.getStatus() + " response");
+                Response.Status status = Response.Status.fromStatusCode(response.getStatus());
+                logger.info("### Preconditions of request \"" + JavaUtils.requestInfo(req) +
+                    "\" are not met -- Generating " + JavaUtils.responseInfo(status));
                 throw new WebApplicationException(response);
             }
         }

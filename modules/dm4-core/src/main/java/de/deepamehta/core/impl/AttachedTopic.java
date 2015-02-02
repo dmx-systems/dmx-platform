@@ -131,7 +131,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc, true) : null;   // checkAccess=true
+        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
     }
 
     @Override
@@ -149,7 +149,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                                                    long othersTopicId) {
         AssociationModel assoc = dms.storageDecorator.fetchAssociation(assocTypeUri, getId(), othersTopicId,
             myRoleTypeUri, othersRoleTypeUri);
-        return assoc != null ? dms.instantiateAssociation(assoc, true) : null;  // checkAccess=true
+        return assoc != null ? dms.instantiateAssociation(assoc) : null;
     }
 
     @Override

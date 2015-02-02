@@ -1,5 +1,8 @@
 package de.deepamehta.core.util;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -230,6 +233,17 @@ public class JavaUtils {
     public static BigInteger networkMask(int maskNumber, int size) {
         String networkMask = times("1", maskNumber) + times("0", size - maskNumber);
         return new BigInteger(networkMask, 2);      // radix=2 (binary)
+    }
+
+    // ---
+
+    public static String requestInfo(HttpServletRequest request) {
+        String queryString = request.getQueryString();
+        return request.getMethod() + " " + request.getRequestURI() + (queryString != null ? "?" + queryString : "");
+    }
+
+    public static String responseInfo(Response.Status status) {
+        return status.getStatusCode() + " response (" + status.getReasonPhrase() + ")";
     }
 
 
