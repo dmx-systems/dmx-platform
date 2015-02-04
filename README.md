@@ -20,14 +20,14 @@ Live demo:
 Download:  
 <http://download.deepamehta.de/>
 
+Mailing lists:  
+<http://lists.deepamehta.de/>
+
 Issue tracker, documentation, release notes:  
 <https://trac.deepamehta.de/>
 
 API documentation:  
 <http://api.deepamehta.de/>
-
-Mailing lists:  
-<http://lists.deepamehta.de/>
 
 Continuous integration:  
 <https://ci.deepamehta.de/jenkins/>
