@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Help</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-help</artifactId>
-    <version>4.5</version>
+    <version>4.6-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
