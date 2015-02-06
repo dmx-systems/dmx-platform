@@ -350,13 +350,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Viewmodel Customizers ---
 
-    private void invokeViewmodelCustomizers(Topic topic, ViewProperties viewProps) {
+    private void invokeViewmodelCustomizers(RelatedTopic topic, ViewProperties viewProps) {
         for (ViewmodelCustomizer customizer : viewmodelCustomizers) {
             invokeViewmodelCustomizer(customizer, topic, viewProps);
         }
     }
 
-    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, Topic topic, ViewProperties viewProps) {
+    private void invokeViewmodelCustomizer(ViewmodelCustomizer customizer, RelatedTopic topic,
+                                                                           ViewProperties viewProps) {
         try {
             customizer.enrichViewProperties(topic, viewProps);
         } catch (Exception e) {

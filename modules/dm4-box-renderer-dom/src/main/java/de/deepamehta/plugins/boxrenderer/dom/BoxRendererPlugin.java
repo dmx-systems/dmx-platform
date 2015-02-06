@@ -1,10 +1,11 @@
 package de.deepamehta.plugins.boxrenderer.dom;
 
 import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
+import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.PluginService;
@@ -51,52 +52,30 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** ViewmodelCustomizer Implementation ***
 
     @Override
-    public void enrichViewProperties(Topic topic, ChildTopicsModel viewProps) {
+    public void enrichViewProperties(RelatedTopic topic, ViewProperties viewProps) {
         boolean expanded = _enrichViewProperties(topic, viewProps);
         if (expanded) {
             topic.loadChildTopics("dm4.notes.text");
         }
     }
 
-    @Override
-    public void storeViewProperties(Topic topic, ChildTopicsModel viewProps) {
-        storeColor(topic, viewProps);
-        storeExpanded(topic, viewProps);
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private boolean _enrichViewProperties(Topic topic, ChildTopicsModel viewProps) {
+    private boolean _enrichViewProperties(RelatedTopic topic, ViewProperties viewProps) {
+        Association mapcontextAssoc = topic.getRelatingAssociation();
         // 1) color
-        if (topic.hasProperty(PROP_COLOR)) {
-            String color = (String) topic.getProperty(PROP_COLOR);
+        if (mapcontextAssoc.hasProperty(PROP_COLOR)) {
+            String color = (String) mapcontextAssoc.getProperty(PROP_COLOR);
             viewProps.put(PROP_COLOR, color);
         }
         // 2) expanded
         boolean expanded = false;
         if (topic.getTypeUri().equals("dm4.notes.note")) {
-            if (topic.hasProperty(PROP_EXPANDED)) {
-                expanded = (Boolean) topic.getProperty(PROP_EXPANDED);
+            if (mapcontextAssoc.hasProperty(PROP_EXPANDED)) {
+                expanded = (Boolean) mapcontextAssoc.getProperty(PROP_EXPANDED);
                 viewProps.put(PROP_EXPANDED, expanded);
             }
         }
         return expanded;
-    }
-
-    // ---
-
-    private void storeColor(Topic topic, ChildTopicsModel viewProps) {
-        if (viewProps.has(PROP_COLOR)) {
-            String color = viewProps.getString(PROP_COLOR);
-            topic.setProperty(PROP_COLOR, color, false);        // addToIndex = false
-        }
-    }
-
-    private void storeExpanded(Topic topic, ChildTopicsModel viewProps) {
-        if (viewProps.has(PROP_EXPANDED)) {
-            boolean expanded = viewProps.getBoolean(PROP_EXPANDED);
-            topic.setProperty(PROP_EXPANDED, expanded, false);  // addToIndex = false
-            // ### TODO: store the expanded flag *per-topicmap*
-        }
     }
 }
