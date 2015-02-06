@@ -387,8 +387,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
 
         function init_topics() {
             for (var i = 0, topic; topic = topicmap.topics[i]; i++) {
-                var view_props = compact_composite_format(topic.view_props)
-                add_topic(topic, view_props)
+                add_topic(topic, topic.view_props)
             }
         }
 
@@ -413,22 +412,6 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
                 self.background_image = dm4c.create_image(image_url)
             }
         }
-    }
-
-    function compact_composite_format(comp_value) {
-        var simple_comp = {}
-        for (var type_uri in comp_value) {
-            var val = comp_value[type_uri]
-            // ### TODO
-            if (js.is_array(val)) {
-                throw "multiple-valued view properties are not supported"
-            } else if (js.size(val.childs)) {
-                throw "composite view properties are not supported"
-            }
-            //
-            simple_comp[type_uri] = val.value
-        }
-        return simple_comp
     }
 
     // ---

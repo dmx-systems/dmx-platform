@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.topicmaps.model;
 
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -18,18 +18,18 @@ public class TopicViewmodel extends TopicModel {
 
     // --- Instance Variables ---
 
-    private ChildTopicsModel viewProps;
+    private ViewProperties viewProps;
 
     // --- Constructors ---
 
-    public TopicViewmodel(TopicModel topic, ChildTopicsModel viewProps) {
+    public TopicViewmodel(TopicModel topic, ViewProperties viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }
 
     // --- Public Methods ---
 
-    public ChildTopicsModel getViewProperties() {
+    public ViewProperties getViewProperties() {
         return viewProps;
     }
 
@@ -39,20 +39,14 @@ public class TopicViewmodel extends TopicModel {
      * Convencience method to access the "dm4.topicmaps.x" standard view property.
      */
     public int getX() {
-        // Note: coordinates can be both: double (through JavaScript) and integer (programmatically placed).
-        // ### TODO: store coordinates always as integers
-        Object x = viewProps.getObject("dm4.topicmaps.x");
-        return x instanceof Double ? ((Double) x).intValue() : (Integer) x;
+        return viewProps.getInt("dm4.topicmaps.x");
     }
 
     /**
      * Convencience method to access the "dm4.topicmaps.y" standard view property.
      */
     public int getY() {
-        // Note: coordinates can be both: double (through JavaScript) and integer (programmatically placed).
-        // ### TODO: store coordinates always as integers
-        Object y = viewProps.getObject("dm4.topicmaps.y");
-        return y instanceof Double ? ((Double) y).intValue() : (Integer) y;
+        return viewProps.getInt("dm4.topicmaps.y");
     }
 
     /**
@@ -68,7 +62,7 @@ public class TopicViewmodel extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("view_props", viewProps.toJSON());
+            o.put("view_props", viewProps);
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
