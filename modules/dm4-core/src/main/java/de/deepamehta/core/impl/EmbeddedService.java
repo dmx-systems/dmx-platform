@@ -366,7 +366,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void deleteTopicType(String topicTypeUri) {
         try {
-            getTopicType(topicTypeUri).delete();
+            getTopicType(topicTypeUri).delete();    // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         }

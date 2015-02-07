@@ -161,6 +161,10 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     void setProperty(String propUri, Object propValue, boolean addToIndex);
 
+    /**
+     * Removes this object's property associated with the given property URI.
+     * If there's no property value associated with the property URI nothing is performed.
+     */
     void removeProperty(String propUri);
 
 
