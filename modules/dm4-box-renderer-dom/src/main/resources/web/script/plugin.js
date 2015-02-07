@@ -177,7 +177,7 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
 
             function load_note() {
                 if (expanded && !topic_view.childs["dm4.notes.text"]) {
-                    var note = dm4c.fetch_topic(topic_view.id)
+                    var note = dm4c.fetch_topic(topic_view.id, true)    // include_childs=true
                     canvas_view.update_topic(note)
                 }
             }
