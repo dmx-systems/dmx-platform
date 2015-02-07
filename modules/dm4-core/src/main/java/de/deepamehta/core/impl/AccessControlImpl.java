@@ -80,11 +80,11 @@ class AccessControlImpl implements AccessControl {
                 if (workspaceId == -1) {
                     switch (operation) {
                     case READ:
-                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
+                        logger.warning("Object " + objectId + " (typeUri=\"" + typeUri +
                             "\") is not assigned to any workspace -- READ permission is granted");
                         return true;
                     case WRITE:
-                        logger.warning("object " + objectId + " (typeUri=\"" + typeUri +
+                        logger.warning("Object " + objectId + " (typeUri=\"" + typeUri +
                             "\") is not assigned to any workspace -- WRITE permission is refused");
                         return false;
                     default:

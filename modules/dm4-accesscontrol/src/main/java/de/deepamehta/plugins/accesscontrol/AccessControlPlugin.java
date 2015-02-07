@@ -173,8 +173,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             }
             return username(session);
         } catch (IllegalStateException e) {
-            // Note: if not invoked through network no request (and thus no session) is available.
-            // This happens e.g. while starting up.
+            // Note: this happens if a request method is called outside request scope.
+            // This is the case while system startup.
             return null;    // user is unknown
         }
     }
@@ -727,6 +727,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @param   objectId    a topic ID, or an association ID
      */
     private void checkReadPermission(long objectId) {
+        if (!inRequestScope()) {
+            logger.info("### Object " + objectId + " is accessed by \"System\" -- READ permission is granted");
+            return;
+        }
+        //
         String username = getUsername();
         if (!hasPermission(username, Operation.READ, objectId)) {
             throw new AccessControlException(userInfo(username) + " has no READ permission for object " + objectId);
@@ -750,6 +755,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
         return dms.getAccessControl().hasPermission(username, operation, objectId);
+    }
+
+    private boolean inRequestScope() {
+        try {
+            request.getMethod();
+            return true;
+        } catch (IllegalStateException e) {
+            // Note: this happens if a request method is called outside request scope.
+            // This is the case while system startup.
+            return false;
+        }
     }
 
 
