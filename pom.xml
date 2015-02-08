@@ -249,6 +249,7 @@
             <id>dist</id>
             <modules>
                 <module>modules/dm4-distribution</module>
+                <module>modules/dm4-features</module>
             </modules>
         </profile>
 
