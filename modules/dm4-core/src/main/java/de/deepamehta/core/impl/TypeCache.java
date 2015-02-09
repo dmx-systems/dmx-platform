@@ -29,7 +29,7 @@ class TypeCache {
 
     private EmbeddedService dms;
 
-    private EndlessRecursionProtection endlessRecursionProtection = new EndlessRecursionProtection();
+    private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -76,6 +76,7 @@ class TypeCache {
         if (topicTypes.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
         }
+        dms.typeStorage.removeFromTypeCache(topicTypeUri);
     }
 
     void removeAssociationType(String assocTypeUri) {
@@ -83,82 +84,50 @@ class TypeCache {
         if (assocTypes.remove(assocTypeUri) == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in type cache");
         }
+        dms.typeStorage.removeFromTypeCache(assocTypeUri);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private TopicType loadTopicType(String topicTypeUri) {
-        TopicType topicType = null;
         try {
             logger.info("Loading topic type \"" + topicTypeUri + "\"");
-            endlessRecursionProtection.check(topicTypeUri);
+            endlessRecursionDetection.check(topicTypeUri);
             //
             TopicTypeModel model = dms.typeStorage.getTopicType(topicTypeUri);
-            topicType = new AttachedTopicType(model, dms);
-            return topicType;
+            return new AttachedTopicType(model, dms);
         } finally {
-            // Note: if loading fails (e.g. type URI is invalid) the protection counter must be decremented.
-            // Otherwise a 2nd load try would raise a bogus "Endless recursion" exception.
-            if (topicType == null) {
-                endlessRecursionProtection.uncheck(topicTypeUri);
-            }
+            endlessRecursionDetection.reset(topicTypeUri);
         }
     }
 
     private AssociationType loadAssociationType(String assocTypeUri) {
-        AssociationType assocType = null;
         try {
             logger.info("Loading association type \"" + assocTypeUri + "\"");
-            endlessRecursionProtection.check(assocTypeUri);
+            endlessRecursionDetection.check(assocTypeUri);
             //
             AssociationTypeModel model = dms.typeStorage.getAssociationType(assocTypeUri);
-            assocType = new AttachedAssociationType(model, dms);
-            return assocType;
+            return new AttachedAssociationType(model, dms);
         } finally {
-            // Note: if loading fails (e.g. type URI is invalid) the protection counter must be decremented.
-            // Otherwise a 2nd load try would raise a bogus "Endless recursion" exception.
-            if (assocType == null) {
-                endlessRecursionProtection.uncheck(assocTypeUri);
-            }
+            endlessRecursionDetection.reset(assocTypeUri);
         }
     }
 
     // ---
 
-    private class EndlessRecursionProtection {
+    private class EndlessRecursionDetection {
 
-        private Map<String, Integer> callCount = new HashMap();
+        private Map<String, Boolean> loadInProgress = new HashMap();
 
         private void check(String typeUri) {
-            int count = incCount(typeUri);
-            if (count >= 2) {
-                throw new RuntimeException("Endless recursion while loading type \"" + typeUri +
-                    "\" (count=" + count + ")");
+            if (loadInProgress.get(typeUri) != null) {
+                throw new RuntimeException("Endless recursion detected while loading type \"" + typeUri + "\"");
             }
+            loadInProgress.put(typeUri, true);
         }
 
-        private void uncheck(String typeUri) {
-            decCount(typeUri);
-        }
-
-        // ---
-
-        private int incCount(String typeUri) {
-            Integer count = callCount.get(typeUri);
-            if (count == null) {
-                count = 0;
-            }
-            count++;
-            callCount.put(typeUri, count);
-            return count;
-        }
-
-        private int decCount(String typeUri) {
-            Integer count = callCount.get(typeUri);
-            // Note: null check is not required here. Decrement always follows increment.
-            count--;
-            callCount.put(typeUri, count);
-            return count;
+        private void reset(String typeUri) {
+            loadInProgress.remove(typeUri);
         }
     }
 }

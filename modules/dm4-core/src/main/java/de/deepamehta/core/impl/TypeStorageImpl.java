@@ -61,16 +61,6 @@ class TypeStorageImpl implements TypeStorage {
 
     // === Type Model Cache ===
 
-    private TypeModel getType(String typeUri) {
-        return typeCache.get(typeUri);
-    }
-
-    private void putInTypeCache(TypeModel type) {
-        typeCache.put(type.getUri(), type);
-    }
-
-    // ---
-
     TopicTypeModel getTopicType(String topicTypeUri) {
         TopicTypeModel topicType = (TopicTypeModel) getType(topicTypeUri);
         return topicType != null ? topicType : fetchTopicType(topicTypeUri);
@@ -79,6 +69,20 @@ class TypeStorageImpl implements TypeStorage {
     AssociationTypeModel getAssociationType(String assocTypeUri) {
         AssociationTypeModel assocType = (AssociationTypeModel) getType(assocTypeUri);
         return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
+    }
+
+    // ---
+
+    private TypeModel getType(String typeUri) {
+        return typeCache.get(typeUri);
+    }
+
+    private void putInTypeCache(TypeModel type) {
+        typeCache.put(type.getUri(), type);
+    }
+
+    void removeFromTypeCache(String typeUri) {
+        typeCache.remove(typeUri);
     }
 
 
