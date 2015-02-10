@@ -195,6 +195,53 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void setLabelChildWhileChildsAreNotLoaded() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin", new ChildTopicsModel()
+                .put("dm4.core.plugin_name", "My Plugin")
+                .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
+                .put("dm4.core.plugin_migration_nr", 1)
+            ));
+            assertEquals("My Plugin", topic.getSimpleValue().toString());
+            //
+            topic = dms.getTopic(topic.getId());                            // Note: the childs are not loaded
+            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
+            topic.getChildTopics().set("dm4.core.plugin_name", "HuHu");     // setting child used for labeling
+            assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is still intact
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    @Ignore // ### FIXME
+    public void setNonlabelChildWhileChildsAreNotLoaded() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin", new ChildTopicsModel()
+                .put("dm4.core.plugin_name", "My Plugin")
+                .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
+                .put("dm4.core.plugin_migration_nr", 1)
+            ));
+            assertEquals("My Plugin", topic.getSimpleValue().toString());
+            //
+            topic = dms.getTopic(topic.getId());                            // Note: the childs are not loaded
+            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
+            topic.getChildTopics().set("dm4.core.plugin_migration_nr", 3);  // setting child NOT used for labeling
+            assertEquals("My Plugin", topic.getSimpleValue().toString());   // ### FIXME: the label is broken
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void assocDefSequence() {
         Type type = dms.getTopicType("dm4.core.plugin");
         //
