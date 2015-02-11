@@ -211,7 +211,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             topic = dms.getTopic(topic.getId());                            // Note: the childs are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
             topic.getChildTopics().set("dm4.core.plugin_name", "HuHu");     // setting child used for labeling
-            assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is still intact
+            assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
             //
             tx.success();
         } finally {
@@ -233,7 +233,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             topic = dms.getTopic(topic.getId());                            // Note: the childs are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
             topic.getChildTopics().set("dm4.core.plugin_migration_nr", 3);  // setting child NOT used for labeling
-            assertEquals("My Plugin", topic.getSimpleValue().toString());   // ### FIXME: the label is broken (empty)
+            assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
             //
             tx.success();
         } finally {
