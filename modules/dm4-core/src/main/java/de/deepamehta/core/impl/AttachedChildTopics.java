@@ -328,6 +328,10 @@ class AttachedChildTopics implements ChildTopics {
     // ---
 
     private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
+        // Note: calling parent.update(..) would not work. The JVM would call the update() method of the base class
+        // (AttachedDeepaMehtaObject), not the subclass's update() method. This is related to Java's (missing) multiple
+        // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
+        // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
         parent.updateChildTopics(new ChildTopicsModel().put(childTypeUri, newChildTopic));
         return this;
     }

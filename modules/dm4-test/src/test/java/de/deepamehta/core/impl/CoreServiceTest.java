@@ -32,10 +32,13 @@ import org.junit.Test;
 
 import static java.util.Arrays.asList;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 
 public class CoreServiceTest extends CoreServiceTestEnvironment {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Test
     public void typeDefinition() {
@@ -217,7 +220,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    @Ignore // ### FIXME
     public void setNonlabelChildWhileChildsAreNotLoaded() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
@@ -231,7 +233,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             topic = dms.getTopic(topic.getId());                            // Note: the childs are not loaded
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is intact
             topic.getChildTopics().set("dm4.core.plugin_migration_nr", 3);  // setting child NOT used for labeling
-            assertEquals("My Plugin", topic.getSimpleValue().toString());   // ### FIXME: the label is broken
+            assertEquals("My Plugin", topic.getSimpleValue().toString());   // ### FIXME: the label is broken (empty)
             //
             tx.success();
         } finally {
