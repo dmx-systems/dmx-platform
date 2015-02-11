@@ -8,6 +8,10 @@ public class TopicModel extends DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public TopicModel(ChildTopicsModel childTopics) {
+        super(childTopics);
+    }
+
     public TopicModel(String typeUri) {
         super(typeUri);
     }

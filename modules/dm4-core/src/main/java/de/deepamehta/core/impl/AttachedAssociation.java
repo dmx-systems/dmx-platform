@@ -10,6 +10,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -18,7 +19,6 @@ import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import java.util.logging.Logger;
@@ -303,6 +303,11 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     final String className() {
         return "association";
+    }
+
+    @Override
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        update(new AssociationModel(childTopics));
     }
 
     @Override

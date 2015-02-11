@@ -328,7 +328,7 @@ class AttachedChildTopics implements ChildTopics {
     // ---
 
     private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
-        parent.update(new TopicModel(parent.getTypeUri(), new ChildTopicsModel().put(childTypeUri, newChildTopic)));
+        parent.updateChildTopics(new ChildTopicsModel().put(childTypeUri, newChildTopic));
         return this;
     }
 

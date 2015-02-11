@@ -144,6 +144,9 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return childTopics;
     }
 
+    // ### FIXME: no UPDATE directives are added. No UPDATE events are fired.
+    // Should we call the abstract updateChildTopics() instead?
+    // Should we drop setChildTopics() completely as its semantics is too unclear?
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
@@ -182,7 +185,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     public void update(DeepaMehtaObjectModel newModel) {
         updateUri(newModel.getUri());
         updateTypeUri(newModel.getTypeUri());
-        updateValue(newModel);
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            getChildTopics().update(newModel.getChildTopicsModel());
+        } else {
+            updateSimpleValue(newModel.getSimpleValue());
+        }
         //
         Directives.get().add(getUpdateDirective(), this);
     }
@@ -328,6 +335,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     abstract String className();
 
+    abstract void updateChildTopics(ChildTopicsModel childTopics);
+
     abstract Directive getUpdateDirective();
 
     abstract void storeUri();
@@ -380,14 +389,6 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
             logger.info("### Changing type URI of " + className() + " " + getId() +
                 " from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
             setTypeUri(newTypeUri);
-        }
-    }
-
-    private void updateValue(DeepaMehtaObjectModel newModel) {
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getChildTopics().update(newModel.getChildTopicsModel());
-        } else {
-            updateSimpleValue(newModel.getSimpleValue());
         }
     }
 

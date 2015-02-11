@@ -25,6 +25,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public DeepaMehtaObjectModel(ChildTopicsModel childTopics) {
+        this(null, childTopics);
+    }
+
     public DeepaMehtaObjectModel(String typeUri) {
         this(-1, typeUri);
     }

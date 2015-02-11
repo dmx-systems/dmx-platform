@@ -6,9 +6,9 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -206,6 +206,11 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     @Override
     String className() {
         return "topic";
+    }
+
+    @Override
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        update(new TopicModel(childTopics));
     }
 
     @Override
