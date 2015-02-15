@@ -1,38 +1,38 @@
 {
     # Note: Boolean topic types must be created *after* migration 1 has run.
     # Otherwise the data type "Boolean" does not exist.
-    topic_types: [
+    "topic_types": [
         {
-            value:         "Include in Label",
-            uri:           "dm4.core.include_in_label",
-            data_type_uri: "dm4.core.boolean"
+            "value":         "Include in Label",
+            "uri":           "dm4.core.include_in_label",
+            "data_type_uri": "dm4.core.boolean"
         }
     ],
 
     # Note: Both association types relies on association type "Composition Definition".
     # It must be defined first. See also EmbeddedService.createAssociationType().
-    assoc_types: [
+    "assoc_types": [
         {
-            value:         "Composition Definition",
-            uri:           "dm4.core.composition_def",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value":         "Composition Definition",
+            "uri":           "dm4.core.composition_def",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.core.include_in_label",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.core.include_in_label",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ]
         },
         {
-            value:         "Aggregation Definition",
-            uri:           "dm4.core.aggregation_def",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value":         "Aggregation Definition",
+            "uri":           "dm4.core.aggregation_def",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.core.include_in_label",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.core.include_in_label",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ]
         }
