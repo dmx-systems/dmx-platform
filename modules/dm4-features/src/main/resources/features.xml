@@ -2,7 +2,7 @@
 
 <features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="dm4-core" description="DeepaMehta Core Features" version="${project.version}">
+    <feature name="dm4-platform" description="DeepaMehta 4 Platform" version="${project.version}">
 
         <feature>http</feature>
         <feature>eventadmin</feature>
@@ -19,7 +19,6 @@
         <bundle>mvn:de.deepamehta/deepamehta-core/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webservice/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webclient/${project.version}</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-webbrowser/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-workspaces/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-typeeditor/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-iconpicker/${project.version}</bundle>
@@ -36,13 +35,14 @@
         <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/${project.version}</bundle>
     </feature>
 
-    <feature name="dm4-standard" description="DeepaMehta Standard Features" version="${project.version}">
+    <feature name="dm4-standard-distribution" description="DeepaMehta 4 Standard Distribution" version="${project.version}">
 
-        <feature>dm4-core</feature>
+        <feature>dm4-platform</feature>
 
         <bundle>mvn:de.deepamehta/deepamehta-notes/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-contacts/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-geomaps/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webbrowser/${project.version}</bundle>
     </feature>
 
 </features>
