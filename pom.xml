@@ -283,6 +283,7 @@
                 <module>modules/dm4-parent</module>
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
+                <module>modules/dm4-features</module>
                 <module>modules/dm4-distribution</module>
             </modules>
             <build>
