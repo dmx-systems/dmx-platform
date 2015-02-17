@@ -221,6 +221,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return usernameTopic;
     }
 
+    @GET
+    @Path("/user/workspace")
     @Override
     public Topic getPrivateWorkspace() {
         String username = getUsername();
