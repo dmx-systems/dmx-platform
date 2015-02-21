@@ -27,14 +27,14 @@ public class Migration6 extends Migration {
 
     @Override
     public void run() {
-        logger.info("########## Running Access Control migration 4: removing owner and acl properties");
+        logger.info("########## Removing owner and acl properties");
         for (Topic topic : dms.getAllTopics()) {
             migrateObject(topic, "topic");
         }
         for (Association assoc : dms.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
-        logger.info("########## Access Control migration 4 complete.\n    Objects processed: " + objects +
+        logger.info("########## Removing owner and acl properties complete.\n    Objects processed: " + objects +
             "\n    Owner properties removed: " + ownerRemoved + "\n    ACL properties removed: " + aclRemoved);
     }
 

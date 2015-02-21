@@ -107,6 +107,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     /**
      * Used for types: topic types and association types.
+     * ### TODO: drop this constructor. The base class should not know about the subclasses (here: types).
      */
     public DeepaMehtaObjectModel(JSONObject typeModel, String typeUri) {
         try {

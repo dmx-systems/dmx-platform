@@ -3,6 +3,7 @@ package de.deepamehta.core.model;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
@@ -529,23 +530,22 @@ public class ChildTopicsModel implements Iterable<String> {
      *
      * Both topic serialization formats are supported:
      * 1) canonic format -- contains entire topic models.
-     * 2) compact format -- contains the topic value only (simple or composite).
+     * 2) simplified format -- contains the topic value only (simple or composite).
      */
-    private TopicModel createTopicModel(String childTypeUri, Object value) {
+    private TopicModel createTopicModel(String childTypeUri, Object value) throws JSONException {
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
-            // we detect the canonic format by checking for a mandatory topic property
-            // ### TODO: "type_uri" should not be regarded mandatory. It would simplify update requests.
-            // ### Can we use another heuristic for detection: "value" exists OR "childs" exists?
-            if (val.has("type_uri")) {
+            // we detect the canonic format by checking for a mandatory topic properties
+            if (val.has("value") || val.has("childs")) {
                 // canonic format
+                initTypeUri(val, childTypeUri);
                 return new TopicModel(val);
             } else {
-                // compact format (composite topic)
+                // simplified format (composite topic)
                 return new TopicModel(childTypeUri, new ChildTopicsModel(val));
             }
         } else {
-            // compact format (simple topic or topic reference)
+            // simplified format (simple topic or topic reference)
             if (value instanceof String) {
                 String val = (String) value;
                 if (val.startsWith(REF_ID_PREFIX)) {
@@ -556,8 +556,21 @@ public class ChildTopicsModel implements Iterable<String> {
                     return new TopicDeletionModel(delTopicId(val));     // topic deletion reference
                 }
             }
-            // compact format (simple topic)
+            // simplified format (simple topic)
             return new TopicModel(childTypeUri, new SimpleValue(value));
+        }
+    }
+
+    private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {
+        if (!value.has("type_uri")) {
+            value.put("type_uri", childTypeUri);
+        } else {
+            // sanity check
+            String typeUri = value.getString("type_uri");
+            if (!typeUri.equals(childTypeUri)) {
+                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has type_uri=\"" +
+                    typeUri + "\"");
+            }
         }
     }
 
