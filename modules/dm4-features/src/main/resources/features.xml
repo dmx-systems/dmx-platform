@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
+
+    <feature name="dm4-platform" description="DeepaMehta 4 Platform" version="${project.version}">
+
+        <feature>http</feature>
+        <feature>eventadmin</feature>
+
+        <!-- 3rd-party libraries -->
+        <bundle>mvn:com.sun.jersey/jersey-core/1.14</bundle>
+        <bundle>mvn:com.sun.jersey/jersey-server/1.14</bundle>
+        <bundle>mvn:com.sun.jersey/jersey-servlet/1.14</bundle>
+        <bundle>mvn:org.codehaus.jettison/jettison/1.3.2</bundle>
+        <bundle>mvn:commons-fileupload/commons-fileupload/1.2.2</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/1.3.2_5</bundle>
+
+        <!-- DeepaMehta platform -->
+        <bundle>mvn:de.deepamehta/deepamehta-core/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webservice/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webclient/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-workspaces/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-typeeditor/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-iconpicker/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-typesearch/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-topicmaps/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-files/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-filemanager/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-help/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-accesscontrol/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-facets/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-time/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-caching/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/${project.version}</bundle>
+    </feature>
+
+    <feature name="dm4-standard-distribution" description="DeepaMehta 4 Standard Distribution" version="${project.version}">
+
+        <feature>dm4-platform</feature>
+
+        <bundle>mvn:de.deepamehta/deepamehta-notes/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-contacts/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-webbrowser/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-geomaps/${project.version}</bundle>
+    </feature>
+
+</features>

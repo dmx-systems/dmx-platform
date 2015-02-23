@@ -249,6 +249,7 @@
             <id>dist</id>
             <modules>
                 <module>modules/dm4-distribution</module>
+                <module>modules/dm4-features</module>
             </modules>
         </profile>
 
@@ -283,6 +284,7 @@
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
                 <module>modules/dm4-distribution</module>
+                <module>modules/dm4-features</module>
             </modules>
             <build>
                 <plugins>
