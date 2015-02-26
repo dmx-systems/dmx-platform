@@ -482,6 +482,11 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
+    private RelatedAssociationModel fetchPredecessor(long assocDefId) {
+        return dms.storageDecorator.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence",
+            "dm4.core.successor", "dm4.core.predecessor", null);    // othersAssocTypeUri=null
+    }
+
     // --- Store ---
 
     private void storeSequence(String typeUri, Collection<AssociationDefinitionModel> assocDefs) {
@@ -501,9 +506,29 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
+    void insertAtSequenceStart(long typeId, long assocDefId, long oldAssocDefId) {
+        dms.getAssociationBetweenTopicAndAssociation("dm4.core.aggregation", typeId, oldAssocDefId, "dm4.core.type",
+            "dm4.core.sequence_start").delete();
+        storeSequenceStart(typeId, assocDefId);
+        storeSequenceSegment(assocDefId, oldAssocDefId);
+    }
+
+    void insertIntoSequence(long assocDefId, long beforeAssocDefId) {
+        RelatedAssociationModel assoc = fetchPredecessor(beforeAssocDefId);
+        dms.deleteAssociation(assoc.getRelatingAssociation().getId());
+        storeSequenceSegment(assoc.getId(), assocDefId);
+        storeSequenceSegment(assocDefId, beforeAssocDefId);
+    }
+
     private void storeSequenceStart(String typeUri, long assocDefId) {
         dms.createAssociation("dm4.core.aggregation",
             new TopicRoleModel(typeUri, "dm4.core.type"),
+            new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
+    }
+
+    private void storeSequenceStart(long typeId, long assocDefId) {
+        dms.createAssociation("dm4.core.aggregation",
+            new TopicRoleModel(typeId, "dm4.core.type"),
             new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
     }
 

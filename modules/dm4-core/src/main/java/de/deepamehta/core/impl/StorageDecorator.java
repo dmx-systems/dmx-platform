@@ -184,7 +184,7 @@ public class StorageDecorator {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
     List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                                        String roleTypeUri1, String roleTypeUri2) {
+                                                                  String roleTypeUri1, String roleTypeUri2) {
         return storage.fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
     }
 

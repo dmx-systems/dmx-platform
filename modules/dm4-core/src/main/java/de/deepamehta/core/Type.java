@@ -37,6 +37,8 @@ public interface Type extends Topic {
 
     void addAssocDef(AssociationDefinitionModel assocDef);
 
+    void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri);
+
     /**
      * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
      * If you want to update memory and DB use {@link AssociationDefinition#update}.

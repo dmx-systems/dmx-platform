@@ -11,14 +11,13 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -27,8 +26,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, AssociationDefinition> assocDefs;   // Attached object cache
-    private ViewConfiguration viewConfig;                   // Attached object cache
+    private SequencedHashMap<String, AssociationDefinition> assocDefs;  // Attached object cache
+    private ViewConfiguration viewConfig;                               // Attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -153,22 +152,41 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void addAssocDef(AssociationDefinitionModel model) {
+    public void addAssocDef(AssociationDefinitionModel assocDef) {
         // Note: the predecessor must be determined *before* the memory is updated
         AssociationDefinitionModel predecessor = lastAssocDef();
         // update memory
-        getModel().addAssocDef(model);      // update model
-        _addAssocDef(model);                // update attached object cache
+        getModel().addAssocDef(assocDef);       // update model
+        _addAssocDef(assocDef);                 // update attached object cache
         // update DB
-        dms.typeStorage.storeAssociationDefinition(model);
-        dms.typeStorage.appendToSequence(getUri(), model, predecessor);
+        dms.typeStorage.storeAssociationDefinition(assocDef);
+        dms.typeStorage.appendToSequence(getUri(), assocDef, predecessor);
     }
 
     @Override
-    public void updateAssocDef(AssociationDefinitionModel model) {
+    public void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
+        // Note: the first assoc def must be determined *before* the memory is updated
+        AssociationDefinitionModel firstAssocDef = firstAssocDef();
         // update memory
-        getModel().updateAssocDef(model);   // update model
-        _addAssocDef(model);                // update attached object cache
+        getModel().addAssocDefBefore(assocDef, beforeChildTypeUri); // update model
+        _addAssocDefBefore(assocDef, beforeChildTypeUri);           // update attached object cache
+        // update DB
+        dms.typeStorage.storeAssociationDefinition(assocDef);
+        long assocDefId = assocDef.getId();
+        boolean isFirst = firstAssocDef.getChildTypeUri().equals(beforeChildTypeUri);
+        if (isFirst) {
+            dms.typeStorage.insertAtSequenceStart(getId(), assocDefId, firstAssocDef.getId());
+        } else {
+            long beforeAssocDefId = getAssocDef(beforeChildTypeUri).getId();
+            dms.typeStorage.insertIntoSequence(assocDefId, beforeAssocDefId);
+        }
+    }
+
+    @Override
+    public void updateAssocDef(AssociationDefinitionModel assocDef) {
+        // update memory
+        getModel().updateAssocDef(assocDef);    // update model
+        _addAssocDef(assocDef);                 // update attached object cache
         // update DB
         // ### Note: the DB is not updated here! In case of interactive assoc type change the association is
         // already updated in DB. => See interface comment.
@@ -363,23 +381,26 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return lastAssocDef;
     }
 
+    private AssociationDefinitionModel firstAssocDef() {
+        return getModel().getAssocDefs().iterator().next();
+    }
+
     // --- Attached Object Cache ---
 
     // ### FIXME: make it private
     protected void initAssocDefs() {
-        this.assocDefs = new LinkedHashMap();
+        this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel model : getModel().getAssocDefs()) {
             _addAssocDef(model);
         }
     }
 
-    /**
-     * @param   model   the new association definition.
-     *                  Note: all fields must be initialized.
-     */
     private void _addAssocDef(AssociationDefinitionModel model) {
-        AttachedAssociationDefinition assocDef = new AttachedAssociationDefinition(model, dms);
-        assocDefs.put(assocDef.getChildTypeUri(), assocDef);
+        _addAssocDefBefore(model, null);    // beforeChildTypeUri=null
+    }
+
+    private void _addAssocDefBefore(AssociationDefinitionModel model, String beforeChildTypeUri) {
+        assocDefs.putBefore(model.getChildTypeUri(), new AttachedAssociationDefinition(model, dms), beforeChildTypeUri);
     }
 
     private void _removeAssocDef(String childTypeUri) {

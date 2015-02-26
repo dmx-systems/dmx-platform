@@ -1,15 +1,14 @@
 package de.deepamehta.core.model;
 
 import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -20,9 +19,9 @@ public abstract class TypeModel extends TopicModel {
 
     private String dataTypeUri;
     private List<IndexMode> indexModes;
-    private Map<String, AssociationDefinitionModel> assocDefs;  // is never null, may be empty
-    private List<String> labelConfig;                           // is never null, may be empty
-    private ViewConfigurationModel viewConfig;                  // is never null
+    private SequencedHashMap<String, AssociationDefinitionModel> assocDefs; // is never null, may be empty
+    private List<String> labelConfig;                                       // is never null, may be empty
+    private ViewConfigurationModel viewConfig;                              // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -32,7 +31,7 @@ public abstract class TypeModel extends TopicModel {
         super(uri, topicTypeUri, value);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = new ArrayList();
-        this.assocDefs = new LinkedHashMap();
+        this.assocDefs = new SequencedHashMap();
         this.labelConfig = new ArrayList();
         this.viewConfig = new ViewConfigurationModel();
     }
@@ -43,7 +42,7 @@ public abstract class TypeModel extends TopicModel {
         super(topic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
-        this.assocDefs = new LinkedHashMap();
+        this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : assocDefs) {
             addAssocDef(assocDef);
         }
@@ -56,7 +55,7 @@ public abstract class TypeModel extends TopicModel {
         try {
             this.dataTypeUri = typeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(typeModel);
-            this.assocDefs = new LinkedHashMap();
+            this.assocDefs = new SequencedHashMap();
             this.labelConfig = parseLabelConfig(typeModel);
             this.viewConfig = new ViewConfigurationModel(typeModel);
             parseAssocDefs(typeModel);
@@ -103,11 +102,10 @@ public abstract class TypeModel extends TopicModel {
     }
 
     public TypeModel addAssocDef(AssociationDefinitionModel assocDef) {
-        // error check ### FIXME: drop this check or provide proper feedback to the type editor user
-        if (!getDataTypeUri().equals("dm4.core.composite")) {
-            throw new RuntimeException("Association definitions can only be added to composite topic types. " +
-                "Topic type \"" + getUri() + "\" is of data type \"" + getDataTypeUri() + "\". (" + assocDef + ")");
-        }
+        return addAssocDefBefore(assocDef, null);   // beforeChildTypeUri=null
+    }
+
+    public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
         // error check
         String childTypeUri = assocDef.getChildTypeUri();
         AssociationDefinitionModel existing = assocDefs.get(childTypeUri);
@@ -116,8 +114,7 @@ public abstract class TypeModel extends TopicModel {
                 "\" has more than one association definitions with uri \"" + childTypeUri + "\"");
         }
         //
-        updateAssocDef(assocDef);
-        //
+        assocDefs.putBefore(assocDef.getChildTypeUri(), assocDef, beforeChildTypeUri);
         return this;
     }
 

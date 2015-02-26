@@ -31,6 +31,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static java.util.Arrays.asList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -272,6 +274,57 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
             null);                              // othersAssocTypeUri=null
         assertNull(assocDef);
+    }
+
+    // ---
+
+    @Test
+    public void insertAssocDefAtPos0() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Type type = dms.getTopicType("dm4.core.plugin");
+            //
+            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            // insert assoc def at pos 0
+            type.addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def",
+                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_name");
+            //
+            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            assertSame(4, assocDefs.size());
+            //
+            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            assertEquals("dm4.test.name", i.next().getChildTypeUri());          // new assoc def is at pos 0
+            assertEquals("dm4.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void insertAssocDefAtPos1() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Type type = dms.getTopicType("dm4.core.plugin");
+            //
+            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            // insert assoc def at pos 1
+            type.addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def",
+                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_symbolic_name");
+            //
+            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            assertSame(4, assocDefs.size());
+            //
+            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            assertEquals("dm4.core.plugin_name", i.next().getChildTypeUri());           // pos 0 is unchanged
+            assertEquals("dm4.test.name", i.next().getChildTypeUri());                  // new assoc def is at pos 1
+            assertEquals("dm4.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 
     // ---
