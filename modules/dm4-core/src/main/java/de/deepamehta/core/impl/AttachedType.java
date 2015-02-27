@@ -153,30 +153,28 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void addAssocDef(AssociationDefinitionModel assocDef) {
-        // Note: the predecessor must be determined *before* the memory is updated
-        AssociationDefinitionModel predecessor = lastAssocDef();
-        // update memory
-        getModel().addAssocDef(assocDef);       // update model
-        _addAssocDef(assocDef);                 // update attached object cache
-        // update DB
-        dms.typeStorage.storeAssociationDefinition(assocDef);
-        dms.typeStorage.appendToSequence(getUri(), assocDef, predecessor);
+        addAssocDefBefore(assocDef, null);  // beforeChildTypeUri=null
     }
 
     @Override
     public void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
-        // Note: the first assoc def must be determined *before* the memory is updated
-        AssociationDefinitionModel firstAssocDef = firstAssocDef();
-        // update memory
+        // Note: the last last assoc def must be determined *before* the memory is updated
+        AssociationDefinitionModel lastAssocDef = lastAssocDef();
+        // 1) update memory
         getModel().addAssocDefBefore(assocDef, beforeChildTypeUri); // update model
         _addAssocDefBefore(assocDef, beforeChildTypeUri);           // update attached object cache
-        // update DB
+        // 2) update DB
         dms.typeStorage.storeAssociationDefinition(assocDef);
+        // update sequence
         long assocDefId = assocDef.getId();
-        boolean isFirst = firstAssocDef.getChildTypeUri().equals(beforeChildTypeUri);
-        if (isFirst) {
-            dms.typeStorage.insertAtSequenceStart(getId(), assocDefId, firstAssocDef.getId());
+        if (beforeChildTypeUri == null) {
+            // append at end
+            dms.typeStorage.appendToSequence(getId(), assocDefId, lastAssocDef);
+        } else if (firstAssocDef().getId() == assocDefId) {
+            // insert at start
+            dms.typeStorage.insertAtSequenceStart(getId(), assocDefId);
         } else {
+            // insert in the middle
             long beforeAssocDefId = getAssocDef(beforeChildTypeUri).getId();
             dms.typeStorage.insertIntoSequence(assocDefId, beforeAssocDefId);
         }
@@ -399,6 +397,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
         _addAssocDefBefore(model, null);    // beforeChildTypeUri=null
     }
 
+    /**
+     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is added.
+     *                              If <code>null</code> the assoc def is added at the end.
+     */
     private void _addAssocDefBefore(AssociationDefinitionModel model, String beforeChildTypeUri) {
         assocDefs.putBefore(model.getChildTypeUri(), new AttachedAssociationDefinition(model, dms), beforeChildTypeUri);
     }
