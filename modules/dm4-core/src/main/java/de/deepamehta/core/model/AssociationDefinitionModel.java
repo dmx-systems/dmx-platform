@@ -21,10 +21,10 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String instanceLevelAssocTypeUri;       // derived, not serialized
+    private String customAssocTypeUri;
 
-    private String parentTypeUri;                   // derived, not serialized
-    private String childTypeUri;                    // derived, not serialized
+    private String parentTypeUri;   // derived, not serialized
+    private String childTypeUri;    // derived, not serialized
 
     private String parentCardinalityUri;
     private String childCardinalityUri;
@@ -37,15 +37,19 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     public AssociationDefinitionModel(String typeUri, String parentTypeUri, String childTypeUri,
                                                       String parentCardinalityUri, String childCardinalityUri) {
-        this(-1, null, typeUri, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri, null);
+        this(-1, null, typeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri, null);
     }
 
-    public AssociationDefinitionModel(long id, String uri, String typeUri, String parentTypeUri, String childTypeUri,
+    /**
+     * @param   customAssocTypeUri      if null no custom association type will be set.
+     */
+    public AssociationDefinitionModel(long id, String uri, String typeUri, String customAssocTypeUri,
+                                                           String parentTypeUri, String childTypeUri,
                                                            String parentCardinalityUri, String childCardinalityUri,
                                                            ViewConfigurationModel viewConfigModel) {
         super(id, uri, typeUri, parentRoleModel(parentTypeUri), childRoleModel(childTypeUri));
         //
-        this.instanceLevelAssocTypeUri = instanceLevelAssocTypeUri(typeUri);
+        this.customAssocTypeUri = customAssocTypeUri;
         //
         this.parentTypeUri = parentTypeUri;
         this.childTypeUri = childTypeUri;
@@ -58,8 +62,11 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    /**
+     * The type to be used to create an association instance based on this association definition.
+     */
     public String getInstanceLevelAssocTypeUri() {
-        return instanceLevelAssocTypeUri;
+        return customAssocTypeUri !=null ? customAssocTypeUri : defaultInstanceLevelAssocTypeUri();
     }
 
     public String getParentTypeUri() {
@@ -84,10 +91,8 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---
 
-    @Override
-    public void setTypeUri(String typeUri) {
-        super.setTypeUri(typeUri);
-        this.instanceLevelAssocTypeUri = instanceLevelAssocTypeUri(typeUri);
+    public void setCustomAssocTypeUri(String customAssocTypeUri) {
+        this.customAssocTypeUri = customAssocTypeUri;
     }
 
     public void setParentCardinalityUri(String parentCardinalityUri) {
@@ -109,6 +114,7 @@ public class AssociationDefinitionModel extends AssociationModel {
             JSONObject o = super.toJSON();
             o.put("parent_cardinality_uri", parentCardinalityUri);
             o.put("child_cardinality_uri", childCardinalityUri);
+            o.put("custom_assoc_type_uri", customAssocTypeUri != null ? customAssocTypeUri : JSONObject.NULL);
             viewConfigModel.toJSON(o);
             return o;
         } catch (Exception e) {
@@ -123,6 +129,7 @@ public class AssociationDefinitionModel extends AssociationModel {
         return "\n    association definition (" + super.toString() +
             ",\n        parent cardinality=\"" + parentCardinalityUri +
             "\",\n        child cardinality=\"" + childCardinalityUri +
+            "\",\n        custom association type=\"" + customAssocTypeUri +
             "\",\n        " + viewConfigModel + ")\n";
     }
 
@@ -130,10 +137,11 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     static AssociationDefinitionModel fromJSON(JSONObject assocDef, String parentTypeUri) {
         try {
-            long id             = assocDef.optLong("id", -1);
-            String uri          = null;
-            String typeUri      = assocDef.getString("assoc_type_uri");
-            String childTypeUri = assocDef.getString("child_type_uri");
+            long id                   = assocDef.optLong("id", -1);
+            String uri                = null;
+            String typeUri            = assocDef.getString("assoc_type_uri");
+            String customAssocTypeUri = assocDef.optString("custom_assoc_type_uri", null);
+            String childTypeUri       = assocDef.getString("child_type_uri");
             //
             if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
                 throw new RuntimeException("\"parent_cardinality_uri\" is missing");
@@ -143,7 +151,7 @@ public class AssociationDefinitionModel extends AssociationModel {
             //
             ViewConfigurationModel viewConfigModel = new ViewConfigurationModel(assocDef);
             //
-            return new AssociationDefinitionModel(id, uri, typeUri, parentTypeUri, childTypeUri,
+            return new AssociationDefinitionModel(id, uri, typeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
                 parentCardinalityUri, childCardinalityUri, viewConfigModel);
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
@@ -165,12 +173,12 @@ public class AssociationDefinitionModel extends AssociationModel {
     }
 
     private static TopicRoleModel childRoleModel(String childTypeUri) {
-        return new TopicRoleModel(childTypeUri,  "dm4.core.child_type");
+        return new TopicRoleModel(childTypeUri, "dm4.core.child_type");
     }
 
     // ---
 
-    private String instanceLevelAssocTypeUri(String typeUri) {
+    private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dm4.core.aggregation_def")) {
             return "dm4.core.aggregation";
         } else if (typeUri.equals("dm4.core.composition_def")) {

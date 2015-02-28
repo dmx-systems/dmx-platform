@@ -299,7 +299,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             long assocId = assoc.getId();
             return new AssociationDefinitionModel(
-                assocId, assoc.getUri(), assoc.getTypeUri(),
+                assocId, assoc.getUri(), assoc.getTypeUri(), customAssocTypeUri(assoc),
                 parentTypeUri, childTypeUri,
                 fetchParentCardinality(assocId).getUri(), fetchChildCardinality(assocId).getUri(),
                 fetchAssocDefViewConfig(assoc)
@@ -307,6 +307,14 @@ class TypeStorageImpl implements TypeStorage {
         } catch (Exception e) {
             throw new RuntimeException("Fetching association definition failed (parentTypeUri=\"" + parentTypeUri +
                 "\", childTypeUri=" + childTypeUri + ", " + assoc + ")", e);
+        }
+    }
+
+    private String customAssocTypeUri(Association assocDef) {
+        if (assocDef.getChildTopics().has("dm4.core.assoc_type")) {
+            return assocDef.getChildTopics().getTopic("dm4.core.assoc_type").getUri();
+        } else {
+            return null;
         }
     }
 
