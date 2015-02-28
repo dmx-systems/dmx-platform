@@ -38,8 +38,8 @@ public interface Type extends Topic {
     void addAssocDef(AssociationDefinitionModel assocDef);
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is added.
-     *                              If <code>null</code> the assoc def is added at the end.
+     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     *                              If <code>null</code> the assoc def is appended at the end.
      */
     void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri);
 

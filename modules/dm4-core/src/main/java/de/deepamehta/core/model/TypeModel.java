@@ -106,8 +106,8 @@ public abstract class TypeModel extends TopicModel {
     }
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is added.
-     *                              If <code>null</code> the assoc def is added at the end.
+     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     *                              If <code>null</code> the assoc def is appended at the end.
      */
     public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
         // error check

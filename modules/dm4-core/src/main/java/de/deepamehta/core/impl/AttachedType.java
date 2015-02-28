@@ -158,7 +158,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
-        // Note: the last last assoc def must be determined *before* the memory is updated
+        // Note: the last assoc def must be determined *before* the memory is updated
         AssociationDefinitionModel lastAssocDef = lastAssocDef();
         // 1) update memory
         getModel().addAssocDefBefore(assocDef, beforeChildTypeUri); // update model
@@ -398,8 +398,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is added.
-     *                              If <code>null</code> the assoc def is added at the end.
+     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     *                              If <code>null</code> the assoc def is appended at the end.
      */
     private void _addAssocDefBefore(AssociationDefinitionModel model, String beforeChildTypeUri) {
         assocDefs.putBefore(model.getChildTypeUri(), new AttachedAssociationDefinition(model, dms), beforeChildTypeUri);
