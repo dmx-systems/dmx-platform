@@ -146,7 +146,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    // Note: not part of workspaces service
+    // Note: part of REST API, not part of OSGi service
     @PUT
     @Path("/{workspace_id}/object/{object_id}")
     @Transactional
@@ -159,15 +159,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         checkArgument(workspaceId);
-        //
         _assignToWorkspace(object, workspaceId);
     }
 
     @Override
     public void assignTypeToWorkspace(Type type, long workspaceId) {
-        checkArgument(workspaceId);
-        //
-        _assignToWorkspace(type, workspaceId);
+        assignToWorkspace(type, workspaceId);
+        // view config topics
         for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
             _assignToWorkspace(configTopic, workspaceId);
         }
@@ -181,6 +179,17 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
+    /**
+     * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
+     * This is important in conjunction with access control.
+     * Note: type introduction is aborted if at least one of these conditions apply:
+     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this 
+     *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
+     *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
+     *       for doing the workspace assignment (in case the type is created programmatically while a migration).
+     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DeepaMehta standard
+     *       type if its URI begins with "dm4."
+     */
     @Override
     public void introduceTopicType(TopicType topicType) {
         long workspaceId = workspaceIdForType(topicType);
@@ -191,6 +200,17 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         assignTypeToWorkspace(topicType, workspaceId);
     }
 
+    /**
+     * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
+     * This is important in conjunction with access control.
+     * Note: type introduction is aborted if at least one of these conditions apply:
+     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this 
+     *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
+     *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
+     *       for doing the workspace assignment (in case the type is created programmatically while a migration).
+     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DeepaMehta standard
+     *       type if its URI begins with "dm4."
+     */
     @Override
     public void introduceAssociationType(AssociationType assocType) {
         long workspaceId = workspaceIdForType(assocType);
@@ -220,8 +240,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         //
         long workspaceId = workspaceId();
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-        // the default workspace. This would not help in gaining data consistency because the topics created so far
-        // (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
+        // the DeepaMehta workspace. This would not help in gaining data consistency because the topics created
+        // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
         // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
         // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
         // the other hand we don't have such a mechanism (and don't want one either).
@@ -247,7 +267,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         //
         long workspaceId = workspaceId();
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-        // the default workspace. This would not help in gaining data consistency because the associations created
+        // the DeepaMehta workspace. This would not help in gaining data consistency because the associations created
         // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
         // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
         // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
@@ -271,21 +291,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return cookies.getLong("dm4_workspace_id");
     }
 
+    /**
+     * Returns the ID of the DeepaMehta workspace or -1 to signal abortion of type introduction.
+     */
     private long workspaceIdForType(Type type) {
-        long workspaceId = workspaceId();
-        if (workspaceId != -1) {
-            return workspaceId;
-        } else {
-            // assign types of the DeepaMehta standard distribution to the default workspace
-            if (isDeepaMehtaStandardType(type)) {
-                Topic defaultWorkspace = getDeepaMehtaWorkspace();
-                // Note: the default workspace is NOT required to exist ### TODO: think about it
-                if (defaultWorkspace != null) {
-                    return defaultWorkspace.getId();
-                }
-            }
-        }
-        return -1;
+        return workspaceId() == -1 && isDeepaMehtaStandardType(type) ? getDeepaMehtaWorkspace().getId() : -1;
     }
 
     // ---
@@ -331,6 +341,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
+    /**
+     * Returns the DeepaMehta workspace or throws an exception if it doesn't exist.
+     */
     private Topic getDeepaMehtaWorkspace() {
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
     }

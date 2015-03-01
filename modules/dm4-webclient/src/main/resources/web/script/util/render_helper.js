@@ -308,7 +308,7 @@ function RenderHelper() {
                             // a topic was assigned before -- delete the assignment
                             return dm4c.DEL_PREFIX + topic_id
                         } else {
-                            // no topic was assigned before -- abort (that is don't create empty topic)
+                            // no topic was assigned before -- abort (don't create empty topic)
                             return null     // prevent this field from being updated
                         }
                     }
