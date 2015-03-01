@@ -407,6 +407,14 @@ public class ChildTopicsModel implements Iterable<String> {
     }
 
     /**
+     * Removes a single-valued child.
+     */
+    public ChildTopicsModel remove(String childTypeUri) {
+        childTopics.remove(childTypeUri);
+        return this;
+    }
+
+    /**
      * Removes a value from a multiple-valued child.
      */
     public ChildTopicsModel remove(String childTypeUri, TopicModel value) {

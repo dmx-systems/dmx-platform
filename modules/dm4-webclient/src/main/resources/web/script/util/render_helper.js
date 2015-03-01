@@ -277,7 +277,7 @@ function RenderHelper() {
     }
 
     /**
-     * Returns a function that reads out the value of the given form element.
+     * Returns a function that reads out the value of an input field, text area, or combobox.
      *
      * @param   form_element    an input field (a jQuery object), a text area (a jQuery object),
      *                          or a combobox (a GUIToolkit Combobox object).
@@ -287,18 +287,31 @@ function RenderHelper() {
         return function() {
             var is_number_field = page_model.object_type.is_number()
             if (form_element instanceof jQuery) {
-                // form_element is a an input field or a text area
+                // -- input field or text area --
                 var val = form_element.val()
                 return is_number_field ? check_number(val) : $.trim(val)
             } else {
-                // form_element is a Combobox
+                // -- combobox --
                 var selection = form_element.get_selection() // either a menu item (object) or the text entered (string)
                 if (typeof(selection) == "object") {
                     // user selected existing topic
                     return dm4c.REF_PREFIX + selection.value
                 } else {
-                    // user entered new value
-                    return is_number_field ? check_number(selection) : selection // value is already trimmed by Combobox
+                    // user entered new value (the value is already trimmed by Combobox)
+                    if (selection) {
+                        // user entered non-empty value
+                        return is_number_field ? check_number(selection) : selection
+                    } else {
+                        // user entered empty value
+                        var topic_id = page_model.object.id
+                        if (topic_id != -1) {
+                            // a topic was assigned before -- delete the assignment
+                            return dm4c.DEL_PREFIX + topic_id
+                        } else {
+                            // no topic was assigned before -- abort (that is don't create empty topic)
+                            return null     // prevent this field from being updated
+                        }
+                    }
                 }
             }
         }

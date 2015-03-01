@@ -382,7 +382,19 @@ class AttachedChildTopics implements ChildTopics {
 
     private void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
-        if (newChildTopic instanceof TopicReferenceModel) {
+        // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
+        if (newChildTopic instanceof TopicDeletionModel) {
+            if (childTopic == null) {
+                // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
+                // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                return;
+            }
+            // == delete assignment ==
+            // update DB
+            childTopic.getRelatingAssociation().delete();
+            // update memory
+            removeChildTopic(assocDef);
+        } else if (newChildTopic instanceof TopicReferenceModel) {
             if (childTopic != null) {
                 if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
                     return;
@@ -607,6 +619,12 @@ class AttachedChildTopics implements ChildTopics {
         getModel().put(childTypeUri, childTopic.getModel());        // underlying model
     }
 
+    private void removeChildTopic(AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        remove(childTypeUri);                                       // attached object cache
+        getModel().remove(childTypeUri);                            // underlying model
+    }
+
     /**
      * For multiple-valued childs
      */
@@ -632,6 +650,13 @@ class AttachedChildTopics implements ChildTopics {
      */
     private void put(String childTypeUri, Topic topic) {
         childTopics.put(childTypeUri, topic);
+    }
+
+    /**
+     * Removes a single-valued child.
+     */
+    private void remove(String childTypeUri) {
+        childTopics.remove(childTypeUri);
     }
 
     /**
@@ -661,6 +686,9 @@ class AttachedChildTopics implements ChildTopics {
 
     // === Helper ===
 
+    /**
+     * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
+     */
     private AttachedRelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
         List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
         for (Topic childTopic : childTopics) {
