@@ -6,6 +6,7 @@ import de.deepamehta.plugins.facets.service.FacetsService;
 import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
@@ -168,6 +169,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // view config topics
         for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
             _assignToWorkspace(configTopic, workspaceId);
+        }
+        // association definitions
+        for (AssociationDefinition assocDef : type.getAssocDefs()) {
+            _assignToWorkspace(assocDef, workspaceId);
+            // view config topics (of association definition)
+            for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {
+                _assignToWorkspace(configTopic, workspaceId);
+            }
         }
     }
 
