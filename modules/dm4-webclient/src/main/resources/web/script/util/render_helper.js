@@ -285,33 +285,43 @@ function RenderHelper() {
      */
     this.form_element_function = function(form_element, page_model) {
         return function() {
-            var is_number_field = page_model.object_type.is_number()
             if (form_element instanceof jQuery) {
-                // -- input field or text area --
-                var val = form_element.val()
-                return is_number_field ? check_number(val) : $.trim(val)
+                // input field or text area
+                var val = $.trim(form_element.val())
             } else {
-                // -- combobox --
-                var selection = form_element.get_selection() // either a menu item (object) or the text entered (string)
-                if (typeof(selection) == "object") {
+                // combobox
+                var val = form_element.get_selection()  // either a menu item (object) or the text entered,
+                if (typeof(val) == "object") {                                          // trimmed (string)
                     // user selected existing topic
-                    return dm4c.REF_PREFIX + selection.value
-                } else {
-                    // user entered new value (the value is already trimmed by Combobox)
-                    if (selection) {
-                        // user entered non-empty value
-                        return is_number_field ? check_number(selection) : selection
+                    return dm4c.REF_PREFIX + val.value
+                }
+            }
+            return check_input(val)
+        }
+
+        /**
+         * Checks for empty input and possibly generates a deletion reference.
+         * Checks input in Number fields for validity.
+         */
+        function check_input(val) {
+            if (val) {
+                // user entered non-empty value
+                return page_model.object_type.is_number() ? check_number(val) : val
+            } else {
+                // user entered empty value
+                var topic_id = page_model.object.id
+                if (topic_id != -1) {
+                    if (page_model.parent) {
+                        // a child was assigned before -- delete it (composition) resp. the assignment (aggregagtion)
+                        return dm4c.DEL_PREFIX + topic_id
                     } else {
-                        // user entered empty value
-                        var topic_id = page_model.object.id
-                        if (topic_id != -1) {
-                            // a topic was assigned before -- delete the assignment
-                            return dm4c.DEL_PREFIX + topic_id
-                        } else {
-                            // no topic was assigned before -- abort (don't create empty topic)
-                            return null     // prevent this field from being updated
-                        }
+                        // a top-level field (of a simple topic) was emptied -- accept that change
+                        // Note: we allow empty Number fields instead of filling 0 automatically (no check_number())
+                        return val
                     }
+                } else {
+                    // no child was assigned before -- abort (don't create empty topic)
+                    return null // prevent this field from being updated
                 }
             }
         }

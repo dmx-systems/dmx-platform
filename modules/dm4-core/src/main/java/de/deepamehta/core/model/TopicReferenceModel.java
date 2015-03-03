@@ -53,4 +53,11 @@ public class TopicReferenceModel extends TopicModel {
         }
         return false;
     }
+
+    // ---
+
+    @Override
+    public String toString() {
+        return "reference " + super.toString();
+    }
 }

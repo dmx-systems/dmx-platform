@@ -342,7 +342,18 @@ class AttachedChildTopics implements ChildTopics {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
-        if (childTopic != null) {
+        if (newChildTopic instanceof TopicDeletionModel) {
+            if (childTopic == null) {
+                // Note: "delete child" is an idempotent operation. A delete request for an child which has been
+                // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
+                return;
+            }
+            // == delete child ==
+            // update DB
+            childTopic.delete();
+            // update memory
+            removeChildTopic(assocDef);
+        } else if (childTopic != null) {
             // == update child ==
             // update DB
             childTopic._update(newChildTopic);
@@ -619,6 +630,9 @@ class AttachedChildTopics implements ChildTopics {
         getModel().put(childTypeUri, childTopic.getModel());        // underlying model
     }
 
+    /**
+     * For single-valued childs
+     */
     private void removeChildTopic(AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         remove(childTypeUri);                                       // attached object cache

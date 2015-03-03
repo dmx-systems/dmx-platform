@@ -17,21 +17,20 @@ dm4c.render.page_model = (function() {
      *                                2) The particular simple renderers are free to operate on it.
      *                                   Simple renderers which do so:
      *                                     - TextRenderer (Webclient module)
-     * @param   field_uri           The field URI. Unique within the page/form. The field URI is a path composed of
-     *                              association definition URIs that leads to this field, e.g.
-     *                              "/dm4.contacts.address/dm4.contacts.street".
-     *                              For a non-composite object the field URI is an empty string.
-     *                              This URI is passed to the simple renderer constructors (as a property of the "field"
-     *                              argument). The particular simple renderers are free to operate on it.
-     *                              Simple renderers which do so:
+     * @param   field_uri           The field URI to be stored in the "uri" property. Unique within the page/form.
+     *                              The field URI is a path composed of child type URIs that leads to this field, e.g.
+     *                              "/dm4.contacts.address_entry/dm4.contacts.address/dm4.contacts.city".
+     *                              For a top-level page model an empty string is passed here.
+     *                              The particular simple renderers are free to operate on it. Simple renderers which do
+     *                              so:
      *                                - HTMLRenderer (Webclient module)
      *                                - IconRenderer (Icon Picker module)
-     * @param   parent_page_model   The parent page model to be stored in the "parent" property. Renderers are free to
-     *                              operate on it. Simple renderers which do so:
+     * @param   parent_page_model   The parent page model to be stored in the "parent" property.
+     *                              For a top-level page model <code>undefined</code> is passed here.
+     *                              Renderers are free to operate on it. Simple renderers which do so:
      *                                - SearchResultRenderer  (Webclient module)
      *                                - FileContentRenderer   (Files module)
      *                                - FolderContentRenderer (Files module)
-     *                              For a top-level page model <code>undefined</code> is passed here.
      */
     function PageModel(page_model_type, object, assoc_def, field_uri, parent_page_model) {
 
@@ -356,9 +355,7 @@ dm4c.render.page_model = (function() {
          */
         build_object_model: function(page_model) {
             var object_model = {
-                id: page_model.object.id,
-                type_uri: page_model.object.type_uri    // ### TODO: setting type_uri should not be required
-                                                        // ### see ChildTopicsModel.createTopicModel()
+                id: page_model.object.id
             }
             if (page_model.type == PageModel.SIMPLE) {
                 var value = page_model.read_form_value()
@@ -367,17 +364,13 @@ dm4c.render.page_model = (function() {
                 if (value == null) {
                     return null
                 }
-                // ### TODO: explain. Compare to TextRenderer.render_form()
-                switch (page_model.assoc_def && page_model.assoc_def.type_uri) {
-                case undefined:
-                case "dm4.core.composition_def":
+                // ### TODO: explain composition/aggregation format
+                if (page_model.assoc_def && page_model.assoc_def.type_uri == "dm4.core.aggregation_def" ||
+                                                                                        is_del_ref(value)) {
+                    return value
+                } else {
                     object_model.value = value
                     return object_model
-                case "dm4.core.aggregation_def":
-                    return value
-                default:
-                    throw "PageModelError: \"" + page_model.assoc_def.type_uri +
-                        "\" is an unexpected association definition type URI"
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
                 object_model.childs = {}
@@ -398,6 +391,11 @@ dm4c.render.page_model = (function() {
                 return object_model
             } else {
                 throw "PageModelError: invalid page model"
+            }
+
+            function is_del_ref(value) {
+                // Note: value can be a boolean or number as well. js.begins_with() would fail.
+                return typeof(value) == "string" && js.begins_with(value, dm4c.DEL_PREFIX)
             }
         }
     }
