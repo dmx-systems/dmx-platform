@@ -732,7 +732,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     /**
-     * Factory method: creates a new topic in the DB according to the given topic model and returns a topic instance.
+     * Factory method: creates a new topic in the DB according to the given model
+     * and returns a topic instance.
      */
     private Topic topicFactory(TopicModel model, String uriPrefix) {
         // 1) store in DB
@@ -755,8 +756,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     /**
-     * Factory method: creates a new association in the DB according to the given association model and returns an
-     * association instance.
+     * Factory method: creates a new association in the DB according to the given model
+     * and returns an association instance.
      */
     Association associationFactory(AssociationModel model) {
         // 1) store in DB
@@ -771,17 +772,12 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     /**
-     * Factory method: creates a new topic type in the DB according to the given topic type model
+     * Factory method: creates a new topic type in the DB according to the given model
      * and returns a topic type instance.
-     *
-     * ### TODO: think about: type topics are created via *direct storage call*. Why? As a consequence they get
-     * e.g. no creation timestamp and creator info. View Config topics in contrast are created via *core service*.
-     * As a consequence they are assigned to a workspace 2 times (one time through post-create action and one time
-     * through type introduction)! This is not a problem, but odd.
      */
     private TopicType topicTypeFactory(TopicTypeModel model) {
         // 1) store in DB
-        topicFactory(model, URI_PREFIX_TOPIC_TYPE);         // store generic topic
+        createTopic(model, URI_PREFIX_TOPIC_TYPE);          // store generic topic
         typeStorage.storeType(model);                       // store type-specific parts
         //
         // 2) instantiate
@@ -792,17 +788,12 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     /**
-     * Factory method: creates a new association type in the DB according to the given association type model
-     * and returns a topic type instance.
-     *
-     * ### TODO: think about: type topics are created via *direct storage call*. Why? As a consequence they get
-     * e.g. no creation timestamp and creator info. View Config topics in contrast are created via *core service*.
-     * As a consequence they are assigned to a workspace 2 times (one time through post-create action and one time
-     * through type introduction)! This is not a problem, but odd.
+     * Factory method: creates a new association type in the DB according to the given model
+     * and returns an association type instance.
      */
     private AssociationType associationTypeFactory(AssociationTypeModel model) {
         // 1) store in DB
-        topicFactory(model, URI_PREFIX_ASSOCIATION_TYPE);   // store generic topic
+        createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // store generic topic
         typeStorage.storeType(model);                       // store type-specific parts
         //
         // 2) instantiate

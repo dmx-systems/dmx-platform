@@ -9,4 +9,11 @@ public class TopicDeletionModel extends TopicModel {
     public TopicDeletionModel(long topicId) {
         super(topicId);
     }
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    @Override
+    public String toString() {
+        return "delete " + super.toString();
+    }
 }

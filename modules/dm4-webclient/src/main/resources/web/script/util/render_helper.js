@@ -277,7 +277,7 @@ function RenderHelper() {
     }
 
     /**
-     * Returns a function that reads out the value of the given form element.
+     * Returns a function that reads out the value of an input field, text area, or combobox.
      *
      * @param   form_element    an input field (a jQuery object), a text area (a jQuery object),
      *                          or a combobox (a GUIToolkit Combobox object).
@@ -285,20 +285,43 @@ function RenderHelper() {
      */
     this.form_element_function = function(form_element, page_model) {
         return function() {
-            var is_number_field = page_model.object_type.is_number()
             if (form_element instanceof jQuery) {
-                // form_element is a an input field or a text area
-                var val = form_element.val()
-                return is_number_field ? check_number(val) : $.trim(val)
+                // input field or text area
+                var val = $.trim(form_element.val())
             } else {
-                // form_element is a Combobox
-                var selection = form_element.get_selection() // either a menu item (object) or the text entered (string)
-                if (typeof(selection) == "object") {
+                // combobox
+                var val = form_element.get_selection()  // either a menu item (object) or the text entered,
+                if (typeof(val) == "object") {                                          // trimmed (string)
                     // user selected existing topic
-                    return dm4c.REF_PREFIX + selection.value
+                    return dm4c.REF_PREFIX + val.value
+                }
+            }
+            return check_input(val)
+        }
+
+        /**
+         * Checks for empty input and possibly generates a deletion reference.
+         * Checks input in Number fields for validity.
+         */
+        function check_input(val) {
+            if (val) {
+                // user entered non-empty value
+                return page_model.object_type.is_number() ? check_number(val) : val
+            } else {
+                // user entered empty value
+                var topic_id = page_model.object.id
+                if (topic_id != -1) {
+                    if (page_model.parent) {
+                        // a child was assigned before -- delete it (composition) resp. the assignment (aggregagtion)
+                        return dm4c.DEL_PREFIX + topic_id
+                    } else {
+                        // a top-level field (of a simple topic) was emptied -- accept that change
+                        // Note: we allow empty Number fields instead of filling 0 automatically (no check_number())
+                        return val
+                    }
                 } else {
-                    // user entered new value
-                    return is_number_field ? check_number(selection) : selection // value is already trimmed by Combobox
+                    // no child was assigned before -- abort (don't create empty topic)
+                    return null // prevent this field from being updated
                 }
             }
         }
