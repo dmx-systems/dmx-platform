@@ -356,6 +356,9 @@ function GUIToolkit(config) {
 
         function item_handler(item) {
             return function(event) {
+                //
+                self.close()
+                //
                 if (!item.disabled) {
                     // invoke internal callback
                     _config.on_select && _config.on_select(item)
@@ -365,8 +368,6 @@ function GUIToolkit(config) {
                         var p = pos(event)                  // pass coordinates of selecting mouse click to handler
                         h(item, p.x, p.y)
                     }
-                } else {
-                    self.close()
                 }
             }
 
