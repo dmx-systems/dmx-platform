@@ -356,15 +356,17 @@ function GUIToolkit(config) {
 
         function item_handler(item) {
             return function(event) {
-                // invoke internal callback
-                _config.on_select && _config.on_select(item)
-                //
-                self.close()                            // required for keyboard item selection
-                // invoke application handler
-                var h = item.handler || _config.handler // individual item handler overrides global menu handler
-                if (h) {
-                    var p = pos(event)                  // pass coordinates of selecting mouse click to handler
-                    h(item, p.x, p.y)
+                if (!item.disabled) {
+                    // invoke internal callback
+                    _config.on_select && _config.on_select(item)
+                    // invoke application handler
+                    var h = item.handler || _config.handler // individual item handler overrides global menu handler
+                    if (h) {
+                        var p = pos(event)                  // pass coordinates of selecting mouse click to handler
+                        h(item, p.x, p.y)
+                    }
+                } else {
+                    self.close()
                 }
             }
 
