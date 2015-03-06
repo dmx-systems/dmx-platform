@@ -211,18 +211,21 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // === Deletion ===
 
     /**
-     * Deletes all sub-topics of this DeepaMehta object (associated via "dm4.core.composition", recursively) and
-     * deletes all the remaining direct associations of this DeepaMehta object.
+     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
+     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
      * <p>
      * Note: deletion of the object itself is up to the subclasses.
      */
     @Override
     public void delete() {
-        // 1) recursively delete sub-topics
-        ResultList<RelatedTopic> childTopics = getRelatedTopics("dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", null, 0);
-        for (Topic childTopic : childTopics) {
-            childTopic.delete();
+        // 1) delete child topics (recursively)
+        for (AssociationDefinition assocDef : getType().getAssocDefs()) {
+            if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
+                for (Topic childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
+                        "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri(), 0)) {
+                    childTopic.delete();
+                }
+            }
         }
         // 2) delete direct associations
         for (Association assoc : getAssociations()) {       // getAssociations() is abstract
