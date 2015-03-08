@@ -44,7 +44,8 @@ dm4c.render.page_model = (function() {
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.parent = parent_page_model
-        this.label = this.object_type.value
+        this.label = assoc_def && assoc_def.custom_assoc_type_uri &&
+            dm4c.association_type_name(assoc_def.custom_assoc_type_uri) || this.object_type.value
         this.input_field_rows = dm4c.get_view_config(self.object_type, "input_field_rows", assoc_def)
         var renderer_uri
         var renderer = lookup_renderer()
