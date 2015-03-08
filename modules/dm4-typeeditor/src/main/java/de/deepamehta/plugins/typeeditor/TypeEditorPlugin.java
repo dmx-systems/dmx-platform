@@ -65,10 +65,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         // Note: the assoc def's ID is already known. Setting it explicitely
         // prevents the core from creating the underlying association.
         AssociationDefinitionModel assocDef = new AssociationDefinitionModel(
-            assoc.getId(), assoc.getUri(), assoc.getTypeUri(), null,
-            parentType.getUri(), childTypeUri, "dm4.core.one", "dm4.core.one",
-            null    // customAssocTypeUri=null, viewConfigModel=null
-        );
+            assoc.getId(), assoc.getUri(), assoc.getTypeUri(), dms.getTypeStorage().fetchCustomAssocTypeUri(assoc),
+            parentType.getUri(), childTypeUri, "dm4.core.one", "dm4.core.one", null);   // viewConfigModel=null
         logger.info("### Adding association definition \"" + childTypeUri + "\" to type \"" + parentType.getUri() +
             "\" (" + assocDef + ")");
         //
@@ -113,7 +111,6 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         if (assoc.hasSameRoleTypeUris()) {
             return false;
         }
-        //
         if (assoc.getRoleModel("dm4.core.parent_type") == null ||
             assoc.getRoleModel("dm4.core.child_type") == null)  {
             return false;

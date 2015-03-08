@@ -20,6 +20,10 @@ public interface TypeStorage {
 
     // --
 
+    String fetchCustomAssocTypeUri(Association assoc);
+
+    // ---
+
     // Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
     // association is *not* removed from DB.
     // This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
