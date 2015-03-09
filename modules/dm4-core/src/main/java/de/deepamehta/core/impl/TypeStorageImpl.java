@@ -41,6 +41,12 @@ import java.util.logging.Logger;
  */
 class TypeStorageImpl implements TypeStorage {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // role types
+    private static final String PARENT_CARDINALITY = "dm4.core.parent_cardinality";
+    private static final String CHILD_CARDINALITY  = "dm4.core.child_cardinality";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, TypeModel> typeCache = new HashMap();
@@ -245,12 +251,24 @@ class TypeStorageImpl implements TypeStorage {
 
     @Override
     public AssociationDefinitionModel createAssociationDefinition(Association assoc) {
-        // Note: the assoc def's ID is already known. Setting it explicitely
-        // prevents the core from creating the underlying association.
+        // Note: the assoc def's ID is already known. Setting it explicitely prevents
+        // creating the underlying association (see storeAssociationDefinition()).
         return new AssociationDefinitionModel(assoc.getId(), assoc.getUri(),
             assoc.getTypeUri(), fetchCustomAssocTypeUri(assoc),
             fetchParentType(assoc).getUri(), fetchChildType(assoc).getUri(),
-            "dm4.core.one", "dm4.core.one", null);   // viewConfigModel=null
+            defaultCardinalityUri(assoc, PARENT_CARDINALITY),
+            defaultCardinalityUri(assoc, CHILD_CARDINALITY), null);   // viewConfigModel=null
+    }
+
+    // Note: if the underlying association was an association definition before it have cardinality
+    // assignments already. These assignments are restored. Otherwise "One" is used as default.
+    private String defaultCardinalityUri(Association assoc, String cardinalityRoleTypeUri) {
+        RelatedTopicModel cardinality = fetchCardinality(assoc.getId(), cardinalityRoleTypeUri);
+        if (cardinality != null) {
+            return cardinality.getUri();
+        } else {
+            return "dm4.core.one";
+        }
     }
 
     @Override
@@ -311,7 +329,8 @@ class TypeStorageImpl implements TypeStorage {
             return new AssociationDefinitionModel(
                 assocId, assoc.getUri(), assoc.getTypeUri(), fetchCustomAssocTypeUri(assoc),
                 parentTypeUri, childTypeUri,
-                fetchParentCardinalityOrThrow(assocId).getUri(), fetchChildCardinalityOrThrow(assocId).getUri(),
+                fetchCardinalityOrThrow(assocId, PARENT_CARDINALITY).getUri(),
+                fetchCardinalityOrThrow(assocId, CHILD_CARDINALITY).getUri(),
                 fetchAssocDefViewConfig(assoc)
             );
         } catch (Exception e) {
@@ -356,19 +375,24 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeAssociationDefinition(AssociationDefinitionModel assocDef) {
         try {
-            // Note: creating the underlying association is conditional. It exists already for
-            // an interactively created association definition. Its ID is already set.
+            // 1) create association
+            // Note: if the association definition has been created interactively the underlying association
+            // exists already. Its ID is already set.
             if (assocDef.getId() == -1) {
                 dms.createAssociation(assocDef);
             }
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
-            // cardinality
-            removeParentCardinalityAssignmentIfExists(assocDefId);
-            associateParentCardinality(assocDefId, assocDef.getParentCardinalityUri());
-            removeChildCardinalityAssignmentIfExists(assocDefId);
-            associateChildCardinality(assocDefId, assocDef.getChildCardinalityUri());
             //
+            // 2) cardinality
+            // Note: if the underlying association was an association definition before it has cardinality
+            // assignments already. These must be removed before assigning new cardinality.
+            removeCardinalityAssignmentIfExists(assocDefId, PARENT_CARDINALITY);
+            removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
+            associateCardinality(assocDefId, PARENT_CARDINALITY, assocDef.getParentCardinalityUri());
+            associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
+            //
+            // 3) view config
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + assocDef.getChildTypeUri() +
@@ -412,89 +436,57 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    private RelatedTopicModel fetchParentCardinality(long assocDefId) {
+    private RelatedTopicModel fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
         return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
-            "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
+            "dm4.core.aggregation", "dm4.core.assoc_def", cardinalityRoleTypeUri, "dm4.core.cardinality");
     }
 
-    private RelatedTopicModel fetchParentCardinalityOrThrow(long assocDefId) {
-        RelatedTopicModel parentCard = fetchParentCardinality(assocDefId);
+    private RelatedTopicModel fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
+        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         // error check
-        if (parentCard == null) {
-            throw new RuntimeException("Invalid association definition: parent cardinality is missing (assocDefId=" +
-                assocDefId + ")");
+        if (cardinality == null) {
+            throw new RuntimeException("Invalid association definition: cardinality is missing (assocDefId=" +
+                assocDefId + ", cardinalityRoleTypeUri=\"" + cardinalityRoleTypeUri + "\")");
         }
         //
-        return parentCard;
-    }
-
-    // ---
-
-    private RelatedTopicModel fetchChildCardinality(long assocDefId) {
-        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
-            "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
-    }
-
-    private RelatedTopicModel fetchChildCardinalityOrThrow(long assocDefId) {
-        RelatedTopicModel childCard = fetchChildCardinality(assocDefId);
-        // error check
-        if (childCard == null) {
-            throw new RuntimeException("Invalid association definition: child cardinality is missing (assocDefId=" +
-                assocDefId + ")");
-        }
-        //
-        return childCard;
+        return cardinality;
     }
 
     // --- Store ---
 
     void storeParentCardinalityUri(long assocDefId, String parentCardinalityUri) {
-        // remove current assignment
-        long assocId = fetchParentCardinalityOrThrow(assocDefId).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId);
-        // create new assignment
-        associateParentCardinality(assocDefId, parentCardinalityUri);
+        storeCardinalityUri(assocDefId, PARENT_CARDINALITY, parentCardinalityUri);
     }
 
     void storeChildCardinalityUri(long assocDefId, String childCardinalityUri) {
+        storeCardinalityUri(assocDefId, CHILD_CARDINALITY, childCardinalityUri);
+    }
+
+    // ---
+
+    private void storeCardinalityUri(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
         // remove current assignment
-        long assocId = fetchChildCardinalityOrThrow(assocDefId).getRelatingAssociation().getId();
-        dms.deleteAssociation(assocId);
+        RelatedTopicModel cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
+        removeCardinalityAssignment(cardinality);
         // create new assignment
-        associateChildCardinality(assocDefId, childCardinalityUri);
+        associateCardinality(assocDefId, cardinalityRoleTypeUri, cardinalityUri);
     }
 
-    // ---
-
-    private void removeParentCardinalityAssignmentIfExists(long assocDefId) {
-        // remove current assignment
-        RelatedTopicModel parentCard = fetchParentCardinality(assocDefId);
-        if (parentCard != null) {
-            long assocId = parentCard.getRelatingAssociation().getId();
-            dms.deleteAssociation(assocId);
+    private void removeCardinalityAssignmentIfExists(long assocDefId, String cardinalityRoleTypeUri) {
+        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+        if (cardinality != null) {
+            removeCardinalityAssignment(cardinality);
         }
     }
 
-    private void removeChildCardinalityAssignmentIfExists(long assocDefId) {
-        // remove current assignment
-        RelatedTopicModel childCard = fetchChildCardinality(assocDefId);
-        if (childCard != null) {
-            long assocId = childCard.getRelatingAssociation().getId();
-            dms.deleteAssociation(assocId);
-        }
+    private void removeCardinalityAssignment(RelatedTopicModel cardinalityAssignment) {
+        long assocId = cardinalityAssignment.getRelatingAssociation().getId();
+        dms.deleteAssociation(assocId);
     }
 
-    // ---
-
-    private void associateParentCardinality(long assocDefId, String parentCardinalityUri) {
+    private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(parentCardinalityUri, "dm4.core.parent_cardinality"),
-            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
-    }
-
-    private void associateChildCardinality(long assocDefId, String childCardinalityUri) {
-        dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(childCardinalityUri, "dm4.core.child_cardinality"),
+            new TopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
             new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
