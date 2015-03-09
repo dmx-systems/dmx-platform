@@ -244,6 +244,16 @@ class TypeStorageImpl implements TypeStorage {
     // === Association Definitions ===
 
     @Override
+    public AssociationDefinitionModel createAssociationDefinition(Association assoc) {
+        // Note: the assoc def's ID is already known. Setting it explicitely
+        // prevents the core from creating the underlying association.
+        return new AssociationDefinitionModel(assoc.getId(), assoc.getUri(),
+            assoc.getTypeUri(), fetchCustomAssocTypeUri(assoc),
+            fetchParentType(assoc).getUri(), fetchChildType(assoc).getUri(),
+            "dm4.core.one", "dm4.core.one", null);   // viewConfigModel=null
+    }
+
+    @Override
     public void removeAssociationDefinitionFromMemoryAndRebuildSequence(Type type, String childTypeUri) {
         ((AttachedType) type).removeAssocDefFromMemoryAndRebuildSequence(childTypeUri);
     }
@@ -301,7 +311,7 @@ class TypeStorageImpl implements TypeStorage {
             return new AssociationDefinitionModel(
                 assocId, assoc.getUri(), assoc.getTypeUri(), fetchCustomAssocTypeUri(assoc),
                 parentTypeUri, childTypeUri,
-                fetchParentCardinality(assocId).getUri(), fetchChildCardinality(assocId).getUri(),
+                fetchParentCardinalityOrThrow(assocId).getUri(), fetchChildCardinalityOrThrow(assocId).getUri(),
                 fetchAssocDefViewConfig(assoc)
             );
         } catch (Exception e) {
@@ -310,8 +320,7 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    @Override
-    public String fetchCustomAssocTypeUri(Association assoc) {
+    private String fetchCustomAssocTypeUri(Association assoc) {
         if (assoc.getChildTopics().has("dm4.core.assoc_type")) {
             return assoc.getChildTopics().getTopic("dm4.core.assoc_type").getUri();
         } else {
@@ -355,7 +364,9 @@ class TypeStorageImpl implements TypeStorage {
             // Note: the assoc def ID is known only after creating the association
             long assocDefId = assocDef.getId();
             // cardinality
+            removeParentCardinalityAssignmentIfExists(assocDefId);
             associateParentCardinality(assocDefId, assocDef.getParentCardinalityUri());
+            removeChildCardinalityAssignmentIfExists(assocDefId);
             associateChildCardinality(assocDefId, assocDef.getChildCardinalityUri());
             //
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
@@ -401,10 +412,13 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    // ### TODO: pass Association instead ID?
     private RelatedTopicModel fetchParentCardinality(long assocDefId) {
-        RelatedTopicModel parentCard = dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
+        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
             "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.parent_cardinality", "dm4.core.cardinality");
+    }
+
+    private RelatedTopicModel fetchParentCardinalityOrThrow(long assocDefId) {
+        RelatedTopicModel parentCard = fetchParentCardinality(assocDefId);
         // error check
         if (parentCard == null) {
             throw new RuntimeException("Invalid association definition: parent cardinality is missing (assocDefId=" +
@@ -414,10 +428,15 @@ class TypeStorageImpl implements TypeStorage {
         return parentCard;
     }
 
-    // ### TODO: pass Association instead ID?
+    // ---
+
     private RelatedTopicModel fetchChildCardinality(long assocDefId) {
-        RelatedTopicModel childCard = dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
+        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
             "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.child_cardinality", "dm4.core.cardinality");
+    }
+
+    private RelatedTopicModel fetchChildCardinalityOrThrow(long assocDefId) {
+        RelatedTopicModel childCard = fetchChildCardinality(assocDefId);
         // error check
         if (childCard == null) {
             throw new RuntimeException("Invalid association definition: child cardinality is missing (assocDefId=" +
@@ -431,7 +450,7 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeParentCardinalityUri(long assocDefId, String parentCardinalityUri) {
         // remove current assignment
-        long assocId = fetchParentCardinality(assocDefId).getRelatingAssociation().getId();
+        long assocId = fetchParentCardinalityOrThrow(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId);
         // create new assignment
         associateParentCardinality(assocDefId, parentCardinalityUri);
@@ -439,10 +458,30 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeChildCardinalityUri(long assocDefId, String childCardinalityUri) {
         // remove current assignment
-        long assocId = fetchChildCardinality(assocDefId).getRelatingAssociation().getId();
+        long assocId = fetchChildCardinalityOrThrow(assocDefId).getRelatingAssociation().getId();
         dms.deleteAssociation(assocId);
         // create new assignment
         associateChildCardinality(assocDefId, childCardinalityUri);
+    }
+
+    // ---
+
+    private void removeParentCardinalityAssignmentIfExists(long assocDefId) {
+        // remove current assignment
+        RelatedTopicModel parentCard = fetchParentCardinality(assocDefId);
+        if (parentCard != null) {
+            long assocId = parentCard.getRelatingAssociation().getId();
+            dms.deleteAssociation(assocId);
+        }
+    }
+
+    private void removeChildCardinalityAssignmentIfExists(long assocDefId) {
+        // remove current assignment
+        RelatedTopicModel childCard = fetchChildCardinality(assocDefId);
+        if (childCard != null) {
+            long assocId = childCard.getRelatingAssociation().getId();
+            dms.deleteAssociation(assocId);
+        }
     }
 
     // ---

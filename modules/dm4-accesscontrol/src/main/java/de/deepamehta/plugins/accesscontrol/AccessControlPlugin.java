@@ -730,7 +730,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      */
     private void checkReadPermission(long objectId) {
         if (!inRequestScope()) {
-            logger.info("### Object " + objectId + " is accessed by \"System\" -- READ permission is granted");
+            logger.fine("### Object " + objectId + " is accessed by \"System\" -- READ permission is granted");
             return;
         }
         //

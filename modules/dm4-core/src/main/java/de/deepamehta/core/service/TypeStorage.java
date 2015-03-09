@@ -7,8 +7,9 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 
 
 
-// ### TODO: should move to "storage" package?
 public interface TypeStorage {
+
+    AssociationDefinitionModel createAssociationDefinition(Association assoc);
 
     AssociationDefinitionModel fetchAssociationDefinition(Association assoc);
 
@@ -17,10 +18,6 @@ public interface TypeStorage {
     Topic fetchParentType(Association assoc);
 
     Topic fetchChildType(Association assoc);
-
-    // --
-
-    String fetchCustomAssocTypeUri(Association assoc);
 
     // ---
 
