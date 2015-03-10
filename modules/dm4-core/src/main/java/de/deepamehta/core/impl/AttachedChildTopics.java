@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A composite value model that is attached to the DB.
+ * A child topics model that is attached to the DB.
  */
 class AttachedChildTopics implements ChildTopics {
 
@@ -252,8 +252,9 @@ class AttachedChildTopics implements ChildTopics {
     // ---
 
     void loadChildTopics() {
-        dms.valueStorage.fetchChildTopics(parent.getModel());
-        initAttachedObjectCache();
+        for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
+            loadChildTopics(assocDef);
+        }
     }
 
     void loadChildTopics(String childTypeUri) {
@@ -276,7 +277,7 @@ class AttachedChildTopics implements ChildTopics {
         if (!has(childTypeUri)) {
             logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
                 parent.getId());
-            dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef);
+            dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
             initAttachedObjectCache(childTypeUri);
         }
     }
@@ -547,7 +548,7 @@ class AttachedChildTopics implements ChildTopics {
     private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
         Topic childTopic = dms.createTopic(newChildTopic);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef.getModel());
         // update memory
         putInChildTopics(childTopic, assocDef);
     }
@@ -555,7 +556,7 @@ class AttachedChildTopics implements ChildTopics {
     private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
         Topic childTopic = dms.createTopic(newChildTopic);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef);
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef.getModel());
         // update memory
         addToChildTopics(childTopic, assocDef);
     }
@@ -565,8 +566,8 @@ class AttachedChildTopics implements ChildTopics {
     // === Attached Object Cache Initialization ===
 
     /**
-     * Initializes this attached object cache. For all childs contained in the underlying model attached topics are
-     * created and put in the attached object cache (recursively).
+     * Initializes this attached object cache. Creates a hierarchy of attached topics (recursively) that is isomorph
+     * to the underlying model.
      */
     private void initAttachedObjectCache() {
         for (String childTypeUri : model) {
@@ -575,7 +576,8 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     /**
-     * Initializes this attached object cache selectively (and recursively).
+     * Initializes this attached object cache selectively. Creates a hierarchy of attached topics (recursively) that is
+     * isomorph to the underlying model, starting at the given child sub-tree.
      */
     private void initAttachedObjectCache(String childTypeUri) {
         Object value = model.get(childTypeUri);
@@ -584,7 +586,7 @@ class AttachedChildTopics implements ChildTopics {
             return;
         }
         // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
-        // implies creating further attached composite values, which in turn calls this method again but for the next
+        // implies creating further AttachedChildTopics objects, which in turn calls this method again but for the next
         // child-level. Finally attached topics are created for all child-levels.
         if (value instanceof TopicModel) {
             TopicModel childTopic = (TopicModel) value;
@@ -605,12 +607,12 @@ class AttachedChildTopics implements ChildTopics {
      */
     private Topic createAttachedObject(TopicModel model) {
         if (model instanceof RelatedTopicModel) {
-            // Note: composite value models obtained through *fetching* contain *related topic models*.
+            // Note: child topics models obtained through *fetching* contain *related topic models*.
             // We exploit the related topics when updating assignments (in conjunction with aggregations).
             // See updateAggregationOne() and updateAggregationMany().
             return new AttachedRelatedTopic((RelatedTopicModel) model, dms);
         } else {
-            // Note: composite value models for *new topics* to be created contain sole *topic models*.
+            // Note: child topics models for *new topics* to be created contain sole *topic models*.
             return new AttachedTopic(model, dms);
         }
     }

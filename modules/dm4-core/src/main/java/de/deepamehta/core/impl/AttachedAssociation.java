@@ -285,16 +285,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         dms.storageDecorator.removeAssociationProperty(getId(), propUri);
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    /**
-     * Convenience method.
-     */
-    AssociationType getAssociationType() {
-        return (AssociationType) getType();
-    }
 
 
 
@@ -341,6 +332,13 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
                                                           int maxResultSize) {
         return dms.storageDecorator.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+    }
+
+    // ---
+
+    @Override
+    AssociationType getType() {
+        return dms.getAssociationType(getTypeUri());
     }
 
 

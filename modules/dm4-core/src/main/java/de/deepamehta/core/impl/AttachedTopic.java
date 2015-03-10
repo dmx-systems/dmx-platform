@@ -176,13 +176,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Convenience method.
-     */
-    TopicType getTopicType() {
-        return (TopicType) getType();
-    }
-
-    /**
      * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
      * <p>
      * Called multiple times while updating the child topics (see AttachedChildTopics).
@@ -244,6 +237,13 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
                                                            int maxResultSize) {
         return dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri, maxResultSize);
+    }
+
+    // ---
+
+    @Override
+    TopicType getType() {
+        return dms.getTopicType(getTypeUri());
     }
 
 
