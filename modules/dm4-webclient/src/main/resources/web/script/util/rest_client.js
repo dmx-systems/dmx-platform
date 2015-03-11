@@ -19,8 +19,8 @@ function RESTClient(config) {
 
     // === Topics ===
 
-    this.get_topic_by_id = function(topic_id, include_childs) {
-        var params = new RequestParameter({include_childs: include_childs})
+    this.get_topic_by_id = function(topic_id, include_childs, include_assoc_childs) {
+        var params = new RequestParameter({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
         return request("GET", "/core/topic/" + topic_id + params.to_query_string())
     }
 

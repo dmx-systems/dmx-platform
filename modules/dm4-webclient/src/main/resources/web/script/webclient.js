@@ -936,6 +936,12 @@ dm4c = new function() {
         })
     }
 
+    this.empty_association = function(assoc_type_uri) {
+        return new Association({
+            id: -1, uri: "", type_uri: assoc_type_uri, value: "", childs: {}
+        })
+    }
+
     // === Types ===
 
     /**
@@ -1530,8 +1536,8 @@ dm4c = new function() {
      * @param   include_childs  Optional (boolean): if true the fetched topic will include its child topics.
      *                          Default is false.
      */
-    this.fetch_topic = function(topic_id, include_childs) {
-        return build_topic(dm4c.restc.get_topic_by_id(topic_id, include_childs))
+    this.fetch_topic = function(topic_id, include_childs, include_assoc_childs) {
+        return build_topic(dm4c.restc.get_topic_by_id(topic_id, include_childs, include_assoc_childs))
     }
 
     /**

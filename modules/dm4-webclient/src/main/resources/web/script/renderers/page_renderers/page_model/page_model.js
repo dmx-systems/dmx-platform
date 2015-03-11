@@ -215,8 +215,7 @@ dm4c.render.page_model = (function() {
             var cardinality_uri = assoc_def.child_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
                 var child_topic = object.childs[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
-                var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
-                    page_model)
+                var child_model = create_page_model(child_topic, this)
                 page_model.childs[assoc_def.child_type_uri] = child_model
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
@@ -231,13 +230,29 @@ dm4c.render.page_model = (function() {
                 var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri, page_model)
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                     // Note: the page models of a MULTI get the COMPOSITE as the parent page model, not the MULTI
-                    var child_field = this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
-                        page_model)
+                    var child_field = create_page_model(child_topic, this)
                     child_model.values.push(child_field)
                 }
                 page_model.childs[assoc_def.child_type_uri] = child_model
             } else {
                 throw "PageModelError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
+            }
+
+            function create_page_model(child_topic, self) {
+                var child_model = self.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
+                    page_model)
+                if (!assoc_def.custom_assoc_type_uri ||
+                    !dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
+                    return child_model
+                } else {
+                    var page_model = new PageModel(PageModel.COMPOSITE, child_topic, undefined, undefined, undefined)
+                    var relating_assoc = child_topic.assoc && new Association(child_topic.assoc) ||
+                        dm4c.empty_association(assoc_def.custom_assoc_type_uri)
+                    page_model.childs["dm4.core.relating_assoc"] = self.create_page_model(relating_assoc,
+                        assoc_def, child_field_uri, render_mode, page_model)
+                    page_model.childs["dm4.core.related_topic"] = child_model
+                    return page_model
+                }
             }
         },
 
@@ -374,22 +389,29 @@ dm4c.render.page_model = (function() {
                     return object_model
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
-                object_model.childs = {}
-                for (var child_type_uri in page_model.childs) {
-                    var child_model = page_model.childs[child_type_uri]
-                    if (child_model.type == PageModel.MULTI) {
-                        // cardinality "many"
-                        var values = child_model.read_form_values()
-                        object_model.childs[child_type_uri] = values
-                    } else {
-                        // cardinality "one"
-                        var value = this.build_object_model(child_model)
-                        if (value != null) {
-                            object_model.childs[child_type_uri] = value
+                if (page_model.childs["dm4.core.relating_assoc"]) {
+                    var topic_model = this.build_object_model(page_model.childs["dm4.core.related_topic"])
+                    var assoc_model = this.build_object_model(page_model.childs["dm4.core.relating_assoc"])
+                    topic_model.assoc = assoc_model
+                    return topic_model
+                } else {
+                    object_model.childs = {}
+                    for (var child_type_uri in page_model.childs) {
+                        var child_model = page_model.childs[child_type_uri]
+                        if (child_model.type == PageModel.MULTI) {
+                            // cardinality "many"
+                            var values = child_model.read_form_values()
+                            object_model.childs[child_type_uri] = values
+                        } else {
+                            // cardinality "one"
+                            var value = this.build_object_model(child_model)
+                            if (value != null) {
+                                object_model.childs[child_type_uri] = value
+                            }
                         }
                     }
+                    return object_model
                 }
-                return object_model
             } else {
                 throw "PageModelError: invalid page model"
             }
