@@ -3,6 +3,8 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.ChildTopics;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Directives;
@@ -41,13 +43,16 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             //
             Object entity = response.getEntity();
             boolean includeChilds = getIncludeChilds(request);
+            boolean includeAssocChilds = getIncludeAssocChilds(request);
             if (entity != null) {
+                //
                 // 1) Loading child topics
                 if (entity instanceof DeepaMehtaObject) {
-                    loadChildTopics((DeepaMehtaObject) entity, includeChilds);
+                    loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
-                    loadChildTopics((Iterable<DeepaMehtaObject>) entity, includeChilds);
+                    loadChildTopics((Iterable<DeepaMehtaObject>) entity, includeChilds, includeAssocChilds);
                 }
+                //
                 // 2) Firing PRE_SEND events
                 if (entity instanceof TopicType) {          // Note: must take precedence over topic
                     firePreSend((TopicType) entity);
@@ -86,16 +91,47 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Loading child topics ===
 
-    private void loadChildTopics(DeepaMehtaObject object, boolean includeChilds) {
+    private void loadChildTopics(DeepaMehtaObject object, boolean includeChilds,
+                                                          boolean includeAssocChilds) {
         if (includeChilds) {
             object.loadChildTopics();
+            if (includeAssocChilds) {
+                loadRelatingAssociationChildTopics(object);
+            }
         }
     }
 
-    private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds) {
+    private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds,
+                                                                     boolean includeAssocChilds) {
         if (includeChilds) {
             for (DeepaMehtaObject object : objects) {
                 object.loadChildTopics();
+            }
+            if (includeAssocChilds) {
+                for (DeepaMehtaObject object : objects) {
+                    loadRelatingAssociationChildTopics(object);
+                }
+            }
+        }
+    }
+
+    // ---
+
+    private void loadRelatingAssociationChildTopics(DeepaMehtaObject object) {
+        ChildTopics childTopics = object.getChildTopics();
+        for (String childTypeUri : childTopics) {
+            Object value = childTopics.get(childTypeUri);
+            if (value instanceof RelatedTopic) {
+                RelatedTopic childTopic = (RelatedTopic) value;
+                childTopic.getRelatingAssociation().loadChildTopics();
+                loadRelatingAssociationChildTopics(childTopic);         // recursion
+            } else if (value instanceof List) {
+                for (RelatedTopic childTopic : (List<RelatedTopic>) value) {
+                    childTopic.getRelatingAssociation().loadChildTopics();
+                    loadRelatingAssociationChildTopics(childTopic);     // recursion
+                }
+            } else {
+                throw new RuntimeException("Unexpected \"" + childTypeUri + "\" value in ChildTopics: " + value);
             }
         }
     }
@@ -170,7 +206,19 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         return false;
     }
 
+    // ---
+
     private boolean getIncludeChilds(ContainerRequest request) {
-        return Boolean.parseBoolean(request.getQueryParameters().getFirst("include_childs"));
+        return getBooleanQueryParameter(request, "include_childs");
     }
+
+    private boolean getIncludeAssocChilds(ContainerRequest request) {
+        return getBooleanQueryParameter(request, "include_assoc_childs");
+    }
+
+    // ---
+
+    private boolean getBooleanQueryParameter(ContainerRequest request, String param) {
+        return Boolean.parseBoolean(request.getQueryParameters().getFirst(param));
+    }    
 }

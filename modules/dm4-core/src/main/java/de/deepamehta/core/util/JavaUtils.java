@@ -243,7 +243,7 @@ public class JavaUtils {
     }
 
     public static String responseInfo(Response.Status status) {
-        return status.getStatusCode() + " response (" + status.getReasonPhrase() + ")";
+        return status.getStatusCode() + " (" + status.getReasonPhrase() + ")";
     }
 
 

@@ -15,6 +15,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -85,11 +86,6 @@ class AttachedChildTopics implements ChildTopics {
     @Override
     public boolean has(String childTypeUri) {
         return childTopics.containsKey(childTypeUri);
-    }
-
-    @Override
-    public Iterable<String> childTypeUris() {
-        return childTopics.keySet();
     }
 
     @Override
@@ -183,6 +179,15 @@ class AttachedChildTopics implements ChildTopics {
     @Override
     public ChildTopics remove(String childTypeUri, long topicId) {
         return _update(childTypeUri, new TopicDeletionModel(topicId));
+    }
+
+
+
+    // === Iterable Implementation ===
+
+    @Override
+    public Iterator<String> iterator() {
+        return childTopics.keySet().iterator();
     }
 
 

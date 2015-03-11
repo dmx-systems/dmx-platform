@@ -65,7 +65,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
     }
 
     private String errorMessage(Status status) {
-        return "Request \"" + JavaUtils.requestInfo(request) + "\" failed. Generating " +
+        return "Request \"" + JavaUtils.requestInfo(request) + "\" failed. Responding with " +
             JavaUtils.responseInfo(status) + ". The original exception/error is:";
     }
 }

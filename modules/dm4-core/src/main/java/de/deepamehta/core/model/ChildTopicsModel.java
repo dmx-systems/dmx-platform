@@ -147,15 +147,14 @@ public class ChildTopicsModel implements Iterable<String> {
     }
 
     /**
-     * Checks if a child is directly contained in this composite value.
-     * ### TODO: could be renamed to "contains()"
+     * Checks if a child is contained in this ChildTopicsModel.
      */
     public boolean has(String childTypeUri) {
         return childTopics.containsKey(childTypeUri);
     }
 
     /**
-     * Returns the number of childs directly contained in this composite value.
+     * Returns the number of childs contained in this ChildTopicsModel.
      * Multiple-valued childs count as one.
      */
     public int size() {
@@ -467,7 +466,7 @@ public class ChildTopicsModel implements Iterable<String> {
     // === Iterable Implementation ===
 
     /**
-     * Returns an interator which iterates this composite value's child type URIs.
+     * Returns an interator which iterates this ChildTopicsModel's child type URIs.
      */
     @Override
     public Iterator<String> iterator() {

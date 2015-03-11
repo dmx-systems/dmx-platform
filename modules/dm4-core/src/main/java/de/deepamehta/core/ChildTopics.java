@@ -1,14 +1,13 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
 import java.util.List;
 
 
 
-public interface ChildTopics {
+public interface ChildTopics extends Iterable<String> {
 
 
 
@@ -31,8 +30,6 @@ public interface ChildTopics {
     Object get(String childTypeUri);
 
     boolean has(String childTypeUri);
-
-    Iterable<String> childTypeUris();
 
     int size();
 

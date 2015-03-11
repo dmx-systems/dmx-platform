@@ -74,7 +74,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
                 Response response = builder.build();
                 Response.Status status = Response.Status.fromStatusCode(response.getStatus());
                 logger.info("### Preconditions of request \"" + JavaUtils.requestInfo(req) +
-                    "\" are not met -- Generating " + JavaUtils.responseInfo(status));
+                    "\" are not met -- Responding with " + JavaUtils.responseInfo(status));
                 throw new WebApplicationException(response);
             }
         }
