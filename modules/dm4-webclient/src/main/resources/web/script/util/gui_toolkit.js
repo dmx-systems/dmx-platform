@@ -494,7 +494,7 @@ function GUIToolkit(config) {
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item_value      Value of the menu item to select.
-             *                          If there is not such menu item nothing is performed.
+             *                          If there is not such menu item nothing is performed. ### TODO: throw exception?
              */
             this.select = function(item_value) {
                 select_item(base_menu.find_item(item_value))
@@ -515,6 +515,14 @@ function GUIToolkit(config) {
 
             this.get_item_count = function() {
                 return base_menu.get_item_count()
+            }
+
+            /**
+             * Finds a menu item by value.
+             * If there is no such menu item undefined is returned.
+             */
+            this.find_item = function(value) {
+                return base_menu.find_item(value)
             }
 
             /**
@@ -663,8 +671,25 @@ function GUIToolkit(config) {
                 menu.add_item(item)
             }
 
-            this.select_by_label = function(item_label) {
-                set_input_text(item_label)
+            /**
+             * @param   item_value
+             *              The value of the menu item to select.
+             *              If no menu item with this value exists an exception is thrown.
+             *              Unless the value is null or undefined; in that case the input field is cleared.
+             */
+            this.select = function(item_value) {
+                // Note: menu.select() is not called here as the combobox menu is stateless (it has no selection)
+                if (item_value != null) {
+                    var item = menu.find_item(item_value)
+                    if (!item) {
+                        throw "ComboboxError: item with value \"" + item_value +
+                            "\" not found in menu (select() method)"
+                    }
+                    var text = item.label
+                } else {
+                    var text = ""
+                }
+                set_input_text(text)
             }
 
             /**

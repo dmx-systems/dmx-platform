@@ -49,26 +49,26 @@ function TypeRenderer() {
                 .text(dm4c.topic_type_name(assoc_def.child_type_uri))
             var parent_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.parent_cardinality_uri)
             var child_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
-            var assoc_type_label = $("<span>").addClass("label").addClass("field-label").text("Association Type")
-            var assoc_type_menu = create_assoc_type_menu(assoc_def.type_uri)
+            var assoc_type_menu = create_assoc_type_menu()
+            var custom_assoc_type_menu = create_custom_assoc_type_menu()
             var label_config_checkbox = dm4c.render.checkbox(label_state)
-            var label_config_label = $("<span>").addClass("label").addClass("field-label").text("Include in Label")
             //
             var optional_card_div = $("<div>").append(parent_type_label).append(parent_card_menu.dom)
             optional_card_div.toggle(is_aggregation_selected())
             //
             this.dom = $("<li>").addClass("assoc-def-editor").addClass("ui-state-default")
                 .append($("<div>").append(child_type_label).append(child_card_menu.dom)
-                                  .append(label_config_checkbox).append(label_config_label))
+                                  .append(label_config_checkbox).append(small_label("Include in Label")))
                 .append(optional_card_div)
-                .append($("<div>").append(assoc_type_label).append(assoc_type_menu.dom))
-                .data("model_func", get_model)
+                .append($("<div>").append(small_label("Association Type")).append(assoc_type_menu.dom))
+                .append($("<div>").append(small_label("Custom Association Type")).append(custom_assoc_type_menu.dom))
+                .data("model_func", build_assoc_def_model)
 
-            function create_assoc_type_menu(selected_uri) {
+            function create_assoc_type_menu() {
                 var menu = dm4c.ui.menu(do_refresh_opional_card_div)
                 menu.add_item({label: "Composition Definition", value: "dm4.core.composition_def"})
                 menu.add_item({label: "Aggregation Definition", value: "dm4.core.aggregation_def"})
-                menu.select(selected_uri)
+                menu.select(assoc_def.type_uri)
                 return menu
 
                 function do_refresh_opional_card_div() {
@@ -84,14 +84,33 @@ function TypeRenderer() {
                 return assoc_type_menu.get_selection().value == "dm4.core.aggregation_def"
             }
 
-            function get_model() {
+            function create_custom_assoc_type_menu() {
+                return dm4c.render.topic_combobox("dm4.core.assoc_type", "uri", assoc_def.custom_assoc_type_uri)
+            }
+
+            function small_label(text) {
+                return $("<span>").addClass("label").addClass("field-label").text(text)
+            }
+
+            function build_assoc_def_model() {
+                var val = custom_assoc_type_menu.get_selection()
+                if (typeof(val) == "object") {
+                    var custom_assoc_type_uri = val.value
+                } else {
+                    if (val) {
+                        alert("Custom Association Type \"" + val + "\" ignored")
+                    }
+                    var custom_assoc_type_uri = null
+                }
+                console.log(assoc_def.child_type_uri, custom_assoc_type_uri)
                 return {
                     assoc_def: {
                         id:                     assoc_def.id,
                         child_type_uri:         assoc_def.child_type_uri,
                         child_cardinality_uri:  child_card_menu.get_selection().value,
                         parent_cardinality_uri: parent_card_menu.get_selection().value,
-                        assoc_type_uri:         assoc_type_menu.get_selection().value
+                        assoc_type_uri:         assoc_type_menu.get_selection().value,
+                        custom_assoc_type_uri:  custom_assoc_type_uri
                     },
                     label_state: label_config_checkbox.get(0).checked
                 }

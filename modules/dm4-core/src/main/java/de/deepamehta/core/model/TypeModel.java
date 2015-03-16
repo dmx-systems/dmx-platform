@@ -3,8 +3,9 @@ package de.deepamehta.core.model;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.SequencedHashMap;
 
-import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -207,20 +208,29 @@ public abstract class TypeModel extends TopicModel {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private List<String> parseLabelConfig(JSONObject typeModel) throws Exception {
+    private List<String> parseLabelConfig(JSONObject typeModel) throws JSONException {
         if (typeModel.has("label_config")) {
             return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
         }
         return new ArrayList();
     }
 
-    private void parseAssocDefs(JSONObject typeModel) throws Exception {
+    private void parseAssocDefs(JSONObject typeModel) throws JSONException {
         JSONArray assocDefs = typeModel.optJSONArray("assoc_defs");
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
                 JSONObject assocDef = assocDefs.getJSONObject(i);
-                addAssocDef(AssociationDefinitionModel.fromJSON(assocDef, this.uri));
+                assocDef.put("parent_type_uri", this.uri);
+                addAssocDef(parseAssocDef(assocDef));
             }
+        }
+    }
+
+    private AssociationDefinitionModel parseAssocDef(JSONObject assocDef) {
+        try {
+            return new AssociationDefinitionModel(assocDef);
+        } catch (JSONException e) {
+            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
     }
 }

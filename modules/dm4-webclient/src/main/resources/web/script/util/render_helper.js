@@ -254,21 +254,18 @@ function RenderHelper() {
 
         function render_combobox() {
             var topics = self.get_option_topics(page_model)
-            var combobox = create_combobox()
+            // build combobox
+            var combobox = dm4c.ui.combobox()
+            for (var i in topics) {
+                combobox.add_item({label: topics[i].value, value: topics[i].id})
+            }
+            if (page_model.object.id != -1) {
+                // Note: the page model's object might be an empty topic (id=-1). Selection would fail.
+                combobox.select(page_model.object.id)
+            }
+            //
             render(combobox.dom)
             return combobox
-
-            function create_combobox() {
-                var combobox = dm4c.ui.combobox()
-                // add items
-                for (var i in topics) {
-                    combobox.add_item({label: topics[i].value, value: topics[i].id})
-                }
-                // select item
-                combobox.select_by_label(page_model.value)
-                //
-                return combobox
-            }
         }
 
         function render(form_element) {
@@ -341,10 +338,10 @@ function RenderHelper() {
 
     /**
      * Renders a menu which is populated by all topics of the specified type.
-     * The menu item values can be either the respective topic IDs or the topic URIs.
+     * Either the topic IDs or the topic URIs can be used as the menu item values.
      *
      * @param   selected_id_or_uri
-     *              The ID or the URI of the initially selected item.
+     *              The ID or the URI of the initially selected topic.
      *              If an ID (number) is specified the menu item values are the respective topic IDs.
      *              If an URI (string) is specified the menu item values are the respective topic URIs.
      * @param   filter_func
@@ -359,11 +356,11 @@ function RenderHelper() {
      * @return  a GUIToolkit Menu object
      */
     this.topic_menu = function(topic_type_uri, selected_id_or_uri, filter_func, handler) {
-        // determine item value type
+        // determine item value property
         if (typeof selected_id_or_uri == "number") {
-            var value_attr = "id"
+            var item_value_prop = "id"
         } else if (typeof selected_id_or_uri == "string") {
-            var value_attr = "uri"
+            var item_value_prop = "uri"
         } else {
             throw "RendererHelperError: illegal \"selected_id_or_uri\" argument in topic_menu() call"
         }
@@ -374,7 +371,7 @@ function RenderHelper() {
         for (var i = 0, topic; topic = topics[i]; i++) {
             menu.add_item({
                 label: topic.value,
-                value: topic[value_attr],
+                value: topic[item_value_prop],
                 disabled: filter_func && !filter_func(topic)
             })
         }
@@ -382,6 +379,38 @@ function RenderHelper() {
         //
         return menu
     }
+
+    /**
+     * Renders a combobox whose menu is populated by all topics of the specified type.
+     * Either the topic IDs or the topic URIs can be used as the menu item values.
+     *
+     * @param   item_value_prop
+     *              "id" or "uri", determines weather the topic IDs or the topic URIs are used as the menu item values.
+     * @param   selected_id_or_uri
+     *              The ID or the URI of the initially selected topic.
+     *              If item_value_prop is "id" a topic ID must be specified.
+     *              If item_value_prop is "uri" a topic URI must be specified.
+     *              If no topic with that ID/URI exists in the menu an exception is thrown.
+     *              Unless the specified value is null or undefined; in that case no topic is initially selected
+     *              (that is the input field remains empty).
+     */
+    this.topic_combobox = function(topic_type_uri, item_value_prop, selected_id_or_uri) {
+        // fetch all instances
+        var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // include_childs=false, sort=true
+        // build combobox
+        var combobox = dm4c.ui.combobox()
+        for (var i = 0, topic; topic = topics[i]; i++) {
+            combobox.add_item({
+                label: topic.value,
+                value: topic[item_value_prop]
+            })
+        }
+        combobox.select(selected_id_or_uri)
+        //
+        return combobox
+    }
+
+    // ---
 
     this.get_option_topics = function(page_model) {
         var result = dm4c.fire_event("option_topics", page_model)

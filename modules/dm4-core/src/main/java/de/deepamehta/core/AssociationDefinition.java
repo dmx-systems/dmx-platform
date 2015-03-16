@@ -12,6 +12,17 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
  */
 public interface AssociationDefinition extends Association {
 
+    /**
+     * @return  The custom association type, or <code>null</code> if not set.
+     */
+    String getCustomAssocTypeUri();
+
+    /**
+     * @return  The type to be used to create an association instance based on this association definition.
+     *          This is the custom association type if set, otherwise this is <code>dm4.core.composition</code>
+     *          or <code>dm4.core.aggregation</code> depending on this association definition's type.
+     *          Is never <code>null</code>.
+     */
     String getInstanceLevelAssocTypeUri();
 
     String getParentTypeUri();
@@ -27,6 +38,10 @@ public interface AssociationDefinition extends Association {
     // ---
 
     AssociationDefinitionModel getModel();
+
+    // ---
+
+    void setCustomAssocTypeUri(String customAssocTypeUri);
 
     // ---
 

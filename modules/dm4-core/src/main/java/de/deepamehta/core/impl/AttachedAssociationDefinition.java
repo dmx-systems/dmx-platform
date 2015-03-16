@@ -39,6 +39,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
 
     @Override
+    public String getCustomAssocTypeUri() {
+        return getModel().getCustomAssocTypeUri();
+    }
+
+    @Override
     public String getInstanceLevelAssocTypeUri() {
         return getModel().getInstanceLevelAssocTypeUri();
     }
@@ -78,6 +83,13 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     // ---
 
     @Override
+    public void setCustomAssocTypeUri(String customAssocTypeUri) {
+        getChildTopics().setRef("dm4.core.assoc_type", customAssocTypeUri);
+    }
+
+    // ---
+
+    @Override
     public void setParentCardinalityUri(String parentCardinalityUri) {
         // update memory
         getModel().setParentCardinalityUri(parentCardinalityUri);
@@ -101,6 +113,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     public void update(AssociationDefinitionModel newModel) {
         // assoc type
         updateAssocTypeUri(newModel);
+        // custom assoc type
+        updateCustomAssocTypeUri(newModel.getCustomAssocTypeUri());
         // cardinality
         updateParentCardinality(newModel.getParentCardinalityUri());
         updateChildCardinality(newModel.getChildCardinalityUri());
@@ -122,6 +136,21 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         String typeUri = getTypeUri();
         if (!typeUri.equals(newTypeUri)) {
             super.update(newModel);
+        }
+    }
+
+    private void updateCustomAssocTypeUri(String newCustomAssocTypeUri) {
+        /* abort if no update is requested ### TODO
+        if (newCustomAssocTypeUri == null) {
+            return;
+        } */
+        //
+        String customAssocTypeUri = getCustomAssocTypeUri();
+        if (customAssocTypeUri != null ? !customAssocTypeUri.equals(newCustomAssocTypeUri) :
+                                          newCustomAssocTypeUri != null) {
+            logger.info("### Changing custom association type URI from \"" + customAssocTypeUri + "\" -> \"" +
+                newCustomAssocTypeUri + "\"");
+            setCustomAssocTypeUri(newCustomAssocTypeUri);
         }
     }
 

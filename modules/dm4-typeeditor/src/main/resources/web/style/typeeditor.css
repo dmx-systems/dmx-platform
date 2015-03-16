@@ -26,3 +26,7 @@
     margin-left: 3em;
     margin-right: 0.7em;
 }
+
+.assoc-def-editor input.combobox {
+    width: 50% !important;
+}
