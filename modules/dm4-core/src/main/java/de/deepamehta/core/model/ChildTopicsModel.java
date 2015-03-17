@@ -302,6 +302,8 @@ public class ChildTopicsModel implements Iterable<String> {
 
     // === Manipulators ===
 
+    // --- Single-valued Childs ---
+
     /**
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
@@ -381,6 +383,16 @@ public class ChildTopicsModel implements Iterable<String> {
     // ---
 
     /**
+     * Removes a single-valued child.
+     */
+    public ChildTopicsModel remove(String childTypeUri) {
+        childTopics.remove(childTypeUri);
+        return this;
+    }
+
+    // --- Multiple-valued Childs ---
+
+    /**
      * Adds a value to a multiple-valued child.
      */
     public ChildTopicsModel add(String childTypeUri, TopicModel value) {
@@ -402,14 +414,6 @@ public class ChildTopicsModel implements Iterable<String> {
      */
     public ChildTopicsModel put(String childTypeUri, List<TopicModel> values) {
         childTopics.put(childTypeUri, values);
-        return this;
-    }
-
-    /**
-     * Removes a single-valued child.
-     */
-    public ChildTopicsModel remove(String childTypeUri) {
-        childTopics.remove(childTypeUri);
         return this;
     }
 
@@ -453,8 +457,7 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      *
-     * Used to maintain the assigments of *aggregated* childs.
-     * Not applicable for *compositioned* childs.
+     * Applicable for both, *compositioned* childs and *aggregated* childs.
      */
     public ChildTopicsModel addDeletionRef(String childTypeUri, long refTopicId) {
         add(childTypeUri, new TopicDeletionModel(refTopicId));

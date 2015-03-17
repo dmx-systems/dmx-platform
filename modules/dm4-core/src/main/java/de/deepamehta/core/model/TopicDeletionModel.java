@@ -10,6 +10,10 @@ public class TopicDeletionModel extends TopicModel {
         super(topicId);
     }
 
+    public TopicDeletionModel(String uri) {
+        super(uri, (String) null);   // typeUri=null
+    }
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override

@@ -14,7 +14,7 @@ public class TopicReferenceModel extends TopicModel {
     }
 
     public TopicReferenceModel(String uri) {
-        super(uri, (String) null);   // typeUri=null ### FIXME: OK?
+        super(uri, (String) null);   // typeUri=null
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -24,7 +24,7 @@ public class TopicReferenceModel extends TopicModel {
     }
 
     public boolean isReferenceByUri() {
-        return !getUri().equals("");
+        return getUri() != null && !getUri().equals("");
     }
 
     // ---

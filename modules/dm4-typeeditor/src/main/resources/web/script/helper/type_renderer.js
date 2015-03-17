@@ -102,7 +102,6 @@ function TypeRenderer() {
                     }
                     var custom_assoc_type_uri = null
                 }
-                console.log(assoc_def.child_type_uri, custom_assoc_type_uri)
                 return {
                     assoc_def: {
                         id:                     assoc_def.id,

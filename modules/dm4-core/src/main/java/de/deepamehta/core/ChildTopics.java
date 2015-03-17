@@ -121,4 +121,6 @@ public interface ChildTopics extends Iterable<String> {
     // ---
 
     ChildTopics remove(String childTypeUri, long topicId);
+
+    ChildTopics remove(String childTypeUri, String topicUri);
 }

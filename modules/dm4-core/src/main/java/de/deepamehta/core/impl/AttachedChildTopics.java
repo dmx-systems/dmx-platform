@@ -181,6 +181,11 @@ class AttachedChildTopics implements ChildTopics {
         return _update(childTypeUri, new TopicDeletionModel(topicId));
     }
 
+    @Override
+    public ChildTopics remove(String childTypeUri, String topicUri) {
+        return _update(childTypeUri, new TopicDeletionModel(topicUri));
+    }
+
 
 
     // === Iterable Implementation ===

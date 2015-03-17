@@ -84,7 +84,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     @Override
     public void setCustomAssocTypeUri(String customAssocTypeUri) {
-        getChildTopics().setRef("dm4.core.assoc_type", customAssocTypeUri);
+        if (customAssocTypeUri != null) {
+            getChildTopics().setRef("dm4.core.assoc_type", customAssocTypeUri);
+        } else {
+            getChildTopics().remove("dm4.core.assoc_type", customAssocTypeUri);
+        }
     }
 
     // ---
