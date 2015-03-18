@@ -85,40 +85,20 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
         this.childTopics = childTopics != null ? childTopics : new ChildTopicsModel();
     }
 
-    public DeepaMehtaObjectModel(DeepaMehtaObjectModel model) {
-        this(model.id, model.uri, model.typeUri, model.value, model.childTopics);
+    public DeepaMehtaObjectModel(DeepaMehtaObjectModel object) {
+        this(object.id, object.uri, object.typeUri, object.value, object.childTopics);
     }
 
-    /**
-     * Used for regular objects: topics and associations.
-     */
-    public DeepaMehtaObjectModel(JSONObject model) {
+    public DeepaMehtaObjectModel(JSONObject object) {
         try {
-            this.id          = model.optLong("id", -1);
-            this.uri         = model.optString("uri", null);
-            this.typeUri     = model.optString("type_uri", null);
-            this.value       = model.has("value") ? new SimpleValue(model.get("value")) : null;
-            this.childTopics = model.has("childs") ? new ChildTopicsModel(model.getJSONObject("childs"))
-                                                   : new ChildTopicsModel();
+            this.id          = object.optLong("id", -1);
+            this.uri         = object.optString("uri", null);
+            this.typeUri     = object.optString("type_uri", null);
+            this.value       = object.has("value") ? new SimpleValue(object.get("value")) : null;
+            this.childTopics = object.has("childs") ? new ChildTopicsModel(object.getJSONObject("childs"))
+                                                    : new ChildTopicsModel();
         } catch (Exception e) {
-            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + model + ")", e);
-        }
-    }
-
-    /**
-     * Used for types: topic types and association types.
-     * ### TODO: drop this constructor. The base class should not know about the subclasses (here: types).
-     */
-    public DeepaMehtaObjectModel(JSONObject typeModel, String typeUri) {
-        try {
-            this.id = typeModel.optLong("id", -1);
-            this.uri = typeModel.optString("uri");
-            this.typeUri = typeUri;
-            this.value = new SimpleValue(typeModel.get("value"));
-            this.childTopics = new ChildTopicsModel();
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + typeModel +
-                ", typeUri=\"" + typeUri + "\")", e);
+            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + object + ")", e);
         }
     }
 
@@ -194,12 +174,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // ---
 
-    public void set(DeepaMehtaObjectModel model) {
-        setId(model.getId());
-        setUri(model.getUri());
-        setTypeUri(model.getTypeUri());
-        setSimpleValue(model.getSimpleValue());
-        setChildTopicsModel(model.getChildTopicsModel());
+    public void set(DeepaMehtaObjectModel object) {
+        setId(object.getId());
+        setUri(object.getUri());
+        setTypeUri(object.getTypeUri());
+        setSimpleValue(object.getSimpleValue());
+        setChildTopicsModel(object.getChildTopicsModel());
     }
 
     // ---
@@ -236,9 +216,9 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
     @Override
     public DeepaMehtaObjectModel clone() {
         try {
-            DeepaMehtaObjectModel model = (DeepaMehtaObjectModel) super.clone();
-            model.childTopics = childTopics.clone();
-            return model;
+            DeepaMehtaObjectModel object = (DeepaMehtaObjectModel) super.clone();
+            object.childTopics = childTopics.clone();
+            return object;
         } catch (Exception e) {
             throw new RuntimeException("Cloning a DeepaMehtaObjectModel failed", e);
         }

@@ -184,14 +184,6 @@ class ValueStorage {
         }
     }
 
-    void associateChildTopic(DeepaMehtaObjectModel parent, long childTopicId, AssociationDefinitionModel assocDef) {
-        associateChildTopic(parent, new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef);
-    }
-
-    void associateChildTopic(DeepaMehtaObjectModel parent, String childTopicUri, AssociationDefinitionModel assocDef) {
-        associateChildTopic(parent, new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef);
-    }
-
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -459,6 +451,18 @@ class ValueStorage {
             "dm4.core.parent", "dm4.core.child",
             assocDef.getChildTypeUri()
         );
+    }
+
+    // ---
+
+    private void associateChildTopic(DeepaMehtaObjectModel parent, long childTopicId,
+                                                                   AssociationDefinitionModel assocDef) {
+        associateChildTopic(parent, new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef);
+    }
+
+    private void associateChildTopic(DeepaMehtaObjectModel parent, String childTopicUri,
+                                                                   AssociationDefinitionModel assocDef) {
+        associateChildTopic(parent, new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef);
     }
 
     // ---

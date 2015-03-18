@@ -1,5 +1,6 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
@@ -34,8 +35,8 @@ public class TopicTypeModel extends TypeModel {
         super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    public TopicTypeModel(JSONObject topicType) {
-        super(topicType, "dm4.core.topic_type");
+    public TopicTypeModel(JSONObject topicType) throws JSONException {
+        super(topicType.put("type_uri", "dm4.core.topic_type"));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

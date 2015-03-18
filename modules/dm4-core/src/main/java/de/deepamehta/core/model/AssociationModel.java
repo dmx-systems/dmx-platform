@@ -45,23 +45,23 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this.roleModel2 = roleModel2;
     }
 
-    public AssociationModel(AssociationModel model) {
-        super(model);
-        this.roleModel1 = model.getRoleModel1();
-        this.roleModel2 = model.getRoleModel2();
+    public AssociationModel(AssociationModel assoc) {
+        super(assoc);
+        this.roleModel1 = assoc.getRoleModel1();
+        this.roleModel2 = assoc.getRoleModel2();
     }
 
-    public AssociationModel(JSONObject assocModel) {
-        super(assocModel);
+    public AssociationModel(JSONObject assoc) {
+        super(assoc);
         try {
-            if (assocModel.has("role_1")) {
-                this.roleModel1 = parseRole(assocModel.getJSONObject("role_1"));
+            if (assoc.has("role_1")) {
+                this.roleModel1 = parseRole(assoc.getJSONObject("role_1"));
             }
-            if (assocModel.has("role_2")) {
-                this.roleModel2 = parseRole(assocModel.getJSONObject("role_2"));
+            if (assoc.has("role_2")) {
+                this.roleModel2 = parseRole(assoc.getJSONObject("role_2"));
             }
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assocModel + ")", e);
+            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
         }
     }
 
@@ -73,6 +73,16 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     public RoleModel getRoleModel2() {
         return roleModel2;
+    }
+
+    // ---
+
+    public void setRoleModel1(RoleModel roleModel1) {
+        this.roleModel1 = roleModel1;
+    }
+
+    public void setRoleModel2(RoleModel roleModel2) {
+        this.roleModel2 = roleModel2;
     }
 
     // --- Convenience Methods ---
@@ -149,7 +159,7 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return "association (" + super.toString() + "," + roleModel1 + "," + roleModel2 + ")";
+        return "association (" + super.toString() + ", " + roleModel1 + ", " + roleModel2 + ")";
     }
 
 

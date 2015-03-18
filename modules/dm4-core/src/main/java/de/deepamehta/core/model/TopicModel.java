@@ -58,16 +58,12 @@ public class TopicModel extends DeepaMehtaObjectModel {
         super(id, uri, typeUri, value, childTopics);
     }
 
-    public TopicModel(TopicModel model) {
-        super(model);
+    public TopicModel(TopicModel topic) {
+        super(topic);
     }
 
-    public TopicModel(JSONObject model) {
-        super(model);
-    }
-
-    public TopicModel(JSONObject typeModel, String typeUri) {
-        super(typeModel, typeUri);
+    public TopicModel(JSONObject topic) {
+        super(topic);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

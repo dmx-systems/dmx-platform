@@ -1,5 +1,6 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
@@ -30,8 +31,8 @@ public class AssociationTypeModel extends TypeModel {
         super(topic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
-    public AssociationTypeModel(JSONObject assocType) {
-        super(assocType, "dm4.core.assoc_type");
+    public AssociationTypeModel(JSONObject assocType) throws JSONException {
+        super(assocType.put("type_uri", "dm4.core.assoc_type"));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

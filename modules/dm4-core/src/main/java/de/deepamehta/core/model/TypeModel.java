@@ -51,8 +51,8 @@ public abstract class TypeModel extends TopicModel {
         this.viewConfig = viewConfig;
     }
 
-    public TypeModel(JSONObject typeModel, String typeUri) {
-        super(typeModel, typeUri);
+    public TypeModel(JSONObject typeModel) {
+        super(typeModel);
         try {
             this.dataTypeUri = typeModel.getString("data_type_uri");
             this.indexModes = IndexMode.parse(typeModel);

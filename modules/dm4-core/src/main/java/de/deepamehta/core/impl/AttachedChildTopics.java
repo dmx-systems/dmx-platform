@@ -5,8 +5,10 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
@@ -366,9 +368,7 @@ class AttachedChildTopics implements ChildTopics {
             removeChildTopic(assocDef);
         } else if (childTopic != null) {
             // == update child ==
-            // update DB
-            childTopic._update(newChildTopic);
-            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+            updateChildTopic(childTopic, newChildTopic);
         } else {
             // == create child ==
             createChildTopicOne(newChildTopic, assocDef);
@@ -533,7 +533,7 @@ class AttachedChildTopics implements ChildTopics {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
             // update DB
-            childTopic._update(newChildTopic);
+            updateChildTopic(childTopic, newChildTopic);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -545,7 +545,7 @@ class AttachedChildTopics implements ChildTopics {
         AttachedTopic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
         if (childTopic != null) {
             // update DB
-            childTopic._update(newChildTopic);
+            updateChildTopic(childTopic, newChildTopic);
             // Note: memory is already up-to-date. The child topic is updated in-place of parent.
         } else {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -555,20 +555,53 @@ class AttachedChildTopics implements ChildTopics {
 
     // ---
 
+    private void updateChildTopic(AttachedTopic childTopic, TopicModel newChildTopic) {
+        childTopic._update(newChildTopic);
+        //
+        if (newChildTopic instanceof RelatedTopicModel) {
+            ((RelatedTopic) childTopic).getRelatingAssociation().update(
+                ((RelatedTopicModel) newChildTopic).getRelatingAssociation()
+            );
+        }
+    }
+
+    // ---
+
     private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
-        Topic childTopic = dms.createTopic(newChildTopic);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef.getModel());
+        Topic childTopic = createChildTopic(newChildTopic, assocDef);
         // update memory
         putInChildTopics(childTopic, assocDef);
     }
 
     private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
-        Topic childTopic = dms.createTopic(newChildTopic);
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic.getId(), assocDef.getModel());
+        Topic childTopic = createChildTopic(newChildTopic, assocDef);
         // update memory
         addToChildTopics(childTopic, assocDef);
+    }
+
+    // ---
+
+    private Topic createChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
+        // create topic
+        Topic childTopic = dms.createTopic(newChildTopic);
+        // create association
+        String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
+        RoleModel parentRoleModel = parent.getModel().createRoleModel("dm4.core.parent");
+        RoleModel childRoleModel = newChildTopic.createRoleModel("dm4.core.child");
+        AssociationModel assoc;
+        if (newChildTopic instanceof RelatedTopicModel) {
+            assoc = ((RelatedTopicModel) newChildTopic).getRelatingAssociation();
+            assoc.setTypeUri(assocTypeUri);
+            assoc.setRoleModel1(parentRoleModel);
+            assoc.setRoleModel2(childRoleModel);
+        } else {
+            assoc = new AssociationModel(assocTypeUri, parentRoleModel, childRoleModel);
+        }
+        dms.createAssociation(assoc);
+        //
+        return childTopic;
     }
 
 

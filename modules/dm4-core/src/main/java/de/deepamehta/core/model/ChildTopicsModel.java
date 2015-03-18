@@ -549,7 +549,11 @@ public class ChildTopicsModel implements Iterable<String> {
             if (val.has("value") || val.has("childs")) {
                 // canonic format
                 initTypeUri(val, childTypeUri);
-                return new TopicModel(val);
+                if (val.has("assoc")) {
+                    return new RelatedTopicModel(val);
+                } else {
+                    return new TopicModel(val);
+                }
             } else {
                 // simplified format (composite topic)
                 return new TopicModel(childTypeUri, new ChildTopicsModel(val));

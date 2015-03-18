@@ -1,5 +1,6 @@
 package de.deepamehta.core.model;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 
@@ -15,6 +16,11 @@ public class RelatedTopicModel extends TopicModel {
     public RelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
         super(topic);
         this.relatingAssoc = relatingAssoc;
+    }
+
+    RelatedTopicModel(JSONObject relatedTopic) throws JSONException {
+        super(relatedTopic);
+        this.relatingAssoc = new AssociationModel(relatedTopic.getJSONObject("assoc"));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
