@@ -340,11 +340,9 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     private String fetchCustomAssocTypeUri(Association assoc) {
-        if (assoc.getChildTopics().has("dm4.core.assoc_type")) {
-            return assoc.getChildTopics().getTopic("dm4.core.assoc_type").getUri();
-        } else {
-            return null;
-        }
+        TopicModel assocType = dms.storageDecorator.fetchAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
+            "dm4.core.parent", "dm4.core.child", "dm4.core.assoc_type");
+        return assocType != null ? assocType.getUri() : null;
     }
 
     // ---
