@@ -82,7 +82,7 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
-    public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
+    public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field") String fieldUri) {
         return dms.searchTopics(searchTerm, fieldUri);
     }
 

@@ -215,8 +215,8 @@ dm4c.render.page_model = (function() {
             var cardinality_uri = assoc_def.child_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
                 var child_topic = object.childs[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
-                var child_model = create_page_model(this)
-                page_model.childs[assoc_def.child_type_uri] = child_model
+                page_model.childs[assoc_def.child_type_uri] = this.create_child_page_model(child_topic, assoc_def,
+                    child_field_uri, render_mode, page_model)
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
                 var child_topics = object.childs[assoc_def.child_type_uri] || []
@@ -227,36 +227,35 @@ dm4c.render.page_model = (function() {
                 if (child_topics.length == 0) {
                     child_topics.push(dm4c.empty_topic(child_topic_type.uri))
                 }
-                var child_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri, page_model)
+                var multi_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri, page_model)
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                     // Note: the page models of a MULTI get the COMPOSITE as the parent page model, not the MULTI
-                    var child_field = create_page_model(this)
-                    child_model.values.push(child_field)
+                    multi_model.values.push(this.create_child_page_model(child_topic, assoc_def,
+                        child_field_uri, render_mode, page_model))
                 }
-                page_model.childs[assoc_def.child_type_uri] = child_model
+                page_model.childs[assoc_def.child_type_uri] = multi_model
             } else {
                 throw "PageModelError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
             }
+        },
 
-            function create_page_model(self) {
-                var child_model = self.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
-                    page_model)
-                if (!assoc_def.custom_assoc_type_uri ||
-                    !dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
-                    return child_model
-                } else {
-                    return related_topic_page_model(child_model, self)
-                }
+        create_child_page_model: function(child_topic, assoc_def, child_field_uri, render_mode, page_model) {
+            var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode, page_model)
+            if (!assoc_def.custom_assoc_type_uri ||
+                !dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
+                return child_model
+            } else {
+                return related_topic_page_model(child_model, this)
             }
 
             function related_topic_page_model(topic_page_model, self) {
-                var related_topic_page_model = new PageModel(PageModel.COMPOSITE, child_topic, undefined, undefined,
+                var related_topic_page_model = new PageModel(PageModel.COMPOSITE, child_topic, assoc_def, undefined,
                     undefined)
                 var relating_assoc = child_topic.assoc && new Association(child_topic.assoc) ||
                     dm4c.empty_association(assoc_def.custom_assoc_type_uri)
-                related_topic_page_model.childs["dm4.core.relating_assoc"] = self.create_page_model(relating_assoc,
+                related_topic_page_model.childs["dm4.webclient.relating_assoc"] = self.create_page_model(relating_assoc,
                     assoc_def, child_field_uri, render_mode, page_model)
-                related_topic_page_model.childs["dm4.core.related_topic"] = topic_page_model
+                related_topic_page_model.childs["dm4.webclient.related_topic"] = topic_page_model
                 return related_topic_page_model
             }
         },
@@ -394,9 +393,9 @@ dm4c.render.page_model = (function() {
                     return object_model
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
-                if (page_model.childs["dm4.core.relating_assoc"]) {
-                    var topic_model = this.build_object_model(page_model.childs["dm4.core.related_topic"])
-                    var assoc_model = this.build_object_model(page_model.childs["dm4.core.relating_assoc"])
+                if (page_model.childs["dm4.webclient.relating_assoc"]) {
+                    var topic_model = this.build_object_model(page_model.childs["dm4.webclient.related_topic"])
+                    var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
                     topic_model.assoc = assoc_model
                     return topic_model
                 } else {
