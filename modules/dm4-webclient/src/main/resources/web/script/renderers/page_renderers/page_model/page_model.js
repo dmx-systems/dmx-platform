@@ -171,20 +171,39 @@ dm4c.render.page_model = (function() {
          *          Undefined is returned if the object is a simple one and is hidden/locked.
          */
         create_page_model: function(object, assoc_def, field_uri, render_mode, parent_page_model) {
-            var object_type = object.get_type()
-            if (object_type.is_simple()) {
-                //
-                if (dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
-                    return
-                }
-                //
-                return new PageModel(PageModel.SIMPLE, object, assoc_def, field_uri, parent_page_model)
+            var page_model = create_page_model(object, this)
+            if (assoc_def && assoc_def.custom_assoc_type_uri &&
+                    dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
+                return create_related_page_model(page_model, this)
             } else {
-                var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, parent_page_model)
-                for (var i = 0, assoc_def; assoc_def = object_type.assoc_defs[i]; i++) {
-                    this.extend_composite_page_model(object, assoc_def, field_uri, render_mode, page_model)
+                return page_model
+            }
+
+            function create_related_page_model(topic_page_model, self) {
+                var related_page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, undefined, undefined)
+                var relating_assoc = object.assoc && new Association(object.assoc) ||
+                    dm4c.empty_association(assoc_def.custom_assoc_type_uri)
+                related_page_model.childs["dm4.webclient.relating_assoc"] = create_page_model(relating_assoc, self)
+                related_page_model.childs["dm4.webclient.related_topic"] = topic_page_model
+                return related_page_model
+            }
+
+            function create_page_model(object, self) {
+                var object_type = object.get_type()
+                if (object_type.is_simple()) {
+                    //
+                    if (dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
+                        return
+                    }
+                    //
+                    return new PageModel(PageModel.SIMPLE, object, assoc_def, field_uri, parent_page_model)
+                } else {
+                    var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, parent_page_model)
+                    for (var i = 0, _assoc_def; _assoc_def = object_type.assoc_defs[i]; i++) {
+                        self.extend_composite_page_model(object, _assoc_def, field_uri, render_mode, page_model)
+                    }
+                    return page_model;
                 }
-                return page_model;
             }
         },
 
@@ -215,7 +234,7 @@ dm4c.render.page_model = (function() {
             var cardinality_uri = assoc_def.child_cardinality_uri
             if (cardinality_uri == "dm4.core.one") {
                 var child_topic = object.childs[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
-                page_model.childs[assoc_def.child_type_uri] = this.create_child_page_model(child_topic, assoc_def,
+                page_model.childs[assoc_def.child_type_uri] = this.create_page_model(child_topic, assoc_def,
                     child_field_uri, render_mode, page_model)
             } else if (cardinality_uri == "dm4.core.many") {
                 // ### TODO: server: don't send empty arrays
@@ -230,33 +249,12 @@ dm4c.render.page_model = (function() {
                 var multi_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri, page_model)
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
                     // Note: the page models of a MULTI get the COMPOSITE as the parent page model, not the MULTI
-                    multi_model.values.push(this.create_child_page_model(child_topic, assoc_def,
+                    multi_model.values.push(this.create_page_model(child_topic, assoc_def,
                         child_field_uri, render_mode, page_model))
                 }
                 page_model.childs[assoc_def.child_type_uri] = multi_model
             } else {
                 throw "PageModelError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
-            }
-        },
-
-        create_child_page_model: function(child_topic, assoc_def, child_field_uri, render_mode, page_model) {
-            var child_model = this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode, page_model)
-            if (!assoc_def.custom_assoc_type_uri ||
-                !dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
-                return child_model
-            } else {
-                return related_topic_page_model(child_model, this)
-            }
-
-            function related_topic_page_model(topic_page_model, self) {
-                var related_topic_page_model = new PageModel(PageModel.COMPOSITE, child_topic, assoc_def, undefined,
-                    undefined)
-                var relating_assoc = child_topic.assoc && new Association(child_topic.assoc) ||
-                    dm4c.empty_association(assoc_def.custom_assoc_type_uri)
-                related_topic_page_model.childs["dm4.webclient.relating_assoc"] = self.create_page_model(relating_assoc,
-                    assoc_def, child_field_uri, render_mode, page_model)
-                related_topic_page_model.childs["dm4.webclient.related_topic"] = topic_page_model
-                return related_topic_page_model
             }
         },
 
