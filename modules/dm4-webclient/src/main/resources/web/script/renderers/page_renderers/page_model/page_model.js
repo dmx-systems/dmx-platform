@@ -129,6 +129,15 @@ dm4c.render.page_model = (function() {
     PageModel.COMPOSITE = 2
     PageModel.MULTI = 3
 
+    /**
+     * A "Related Topic Page Model" is a page model of type COMPOSITE which has exactly 2 childs:
+     *     - "dm4.webclient.topic"
+     *     - "dm4.webclient.relating_assoc"
+     */
+    function is_related_topic_page_model(page_model) {
+        return page_model.childs["dm4.webclient.relating_assoc"]
+    }
+
     // ------------------------------------------------------------------------------------------------------ Public API
 
     return {
@@ -171,24 +180,26 @@ dm4c.render.page_model = (function() {
          *          Undefined is returned if the object is a simple one and is hidden/locked.
          */
         create_page_model: function(object, assoc_def, field_uri, render_mode, parent_page_model) {
-            var page_model = create_page_model(object, this)
             if (assoc_def && assoc_def.custom_assoc_type_uri &&
                     dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()) {
-                return create_related_page_model(page_model, this)
+                return create_related_topic_page_model(this)
             } else {
+                return create_page_model(object, parent_page_model, this)
+            }
+
+            function create_related_topic_page_model(self) {
+                var page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, field_uri, parent_page_model)
+                var relating_assoc = object.assoc && new Association(object.assoc) ||
+                    dm4c.empty_association(assoc_def.custom_assoc_type_uri)
+                // Note: the Related Topic Page Model is set as the parent page model for its 2 childs.
+                // This is different than with a MULTI page model (see next method). The 2 childs must be able to
+                // recognize their status of being a Related Topic Page Model child (is_removable() below).
+                page_model.childs["dm4.webclient.relating_assoc"] = create_page_model(relating_assoc, page_model, self)
+                page_model.childs["dm4.webclient.topic"]          = create_page_model(object, page_model, self)
                 return page_model
             }
 
-            function create_related_page_model(topic_page_model, self) {
-                var related_page_model = new PageModel(PageModel.COMPOSITE, object, assoc_def, undefined, undefined)
-                var relating_assoc = object.assoc && new Association(object.assoc) ||
-                    dm4c.empty_association(assoc_def.custom_assoc_type_uri)
-                related_page_model.childs["dm4.webclient.relating_assoc"] = create_page_model(relating_assoc, self)
-                related_page_model.childs["dm4.webclient.related_topic"] = topic_page_model
-                return related_page_model
-            }
-
-            function create_page_model(object, self) {
+            function create_page_model(object, parent_page_model, self) {
                 var object_type = object.get_type()
                 if (object_type.is_simple()) {
                     //
@@ -248,7 +259,9 @@ dm4c.render.page_model = (function() {
                 }
                 var multi_model = new PageModel(PageModel.MULTI, child_topics[0], assoc_def, field_uri, page_model)
                 for (var j = 0, child_topic; child_topic = child_topics[j]; j++) {
-                    // Note: the page models of a MULTI get the COMPOSITE as the parent page model, not the MULTI
+                    // Note: the page models of a MULTI get the COMPOSITE as the parent page model, not the MULTI.
+                    // ### TODO: rethink about it. This is different than with a Related Topic page model (see
+                    // previous method).
                     multi_model.values.push(this.create_page_model(child_topic, assoc_def,
                         child_field_uri, render_mode, page_model))
                 }
@@ -276,11 +289,11 @@ dm4c.render.page_model = (function() {
             //
             if (page_model.type == PageModel.SIMPLE) {
                 var box = render_box(PageModel.SIMPLE, page_model.object.id, ref_element, incremental,
-                                                                                          remove_button_page_model())
+                                                                                          is_removable())
                 page_model[render_mode.render_func_name_simple](box)
             } else if (page_model.type == PageModel.COMPOSITE) {
                 var box = render_box(PageModel.COMPOSITE, page_model.object.id, ref_element, incremental,
-                                                                                             remove_button_page_model())
+                                                                                             is_removable())
                 for (var child_type_uri in page_model.childs) {
                     var child_model = page_model.childs[child_type_uri]
                     if (child_model.type == PageModel.MULTI) {
@@ -300,11 +313,11 @@ dm4c.render.page_model = (function() {
              * @param   box_type    PageModel.SIMPLE, PageModel.COMPOSITE, or PageModel.MULTI
              * @param   topic_id    The ID of the topic represented by the box. Undefined in case of PageModel.MULTI
              */
-            function render_box(box_type, topic_id, ref_element, incremental, remove_button_page_model) {
+            function render_box(box_type, topic_id, ref_element, incremental, is_removable) {
                 var box = $("<div>").addClass("box")
-                // Note: a simple box doesn't get a "level" class to let it inherit the background color
+                // Note: a SIMPLE box or a MULTI box doesn't get a "level" class to let it inherit the background color
                 box.toggleClass("level" + level, box_type == PageModel.COMPOSITE)
-                // Note: only a simple and a composite box represents a revealable child topic. A multi box does not.
+                // Note: only a SIMPLE and a COMPOSITE box represents a revealable child topic. A MULTI box does not.
                 // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
                 // topic's Search Result field.
                 if (render_mode == dm4c.render.page_model.mode.INFO && level == 1 && topic_id != -1 &&
@@ -320,8 +333,8 @@ dm4c.render.page_model = (function() {
                     ref_element.append(box)
                 }
                 //
-                if (remove_button_page_model) {
-                    render_remove_button(box, remove_button_page_model)
+                if (is_removable) {
+                    render_remove_button(box)
                 }
                 //
                 return box
@@ -333,19 +346,22 @@ dm4c.render.page_model = (function() {
             // aspect is handled here at framework level. In contrast, the "Add" button is always bound to a MULTI.
             // So, the add button aspect is handled by the respective multi renderers.
 
-            function remove_button_page_model() {
+            /**
+             * Determines weather to render a remove button for the current page model.
+             */
+            function is_removable() {
                 return render_mode == dm4c.render.page_model.mode.FORM &&
-                    page_model.assoc_def &&  // Note: the top-level page model has no assoc_def
+                    page_model.assoc_def &&     // Note: the top-level page model has no assoc_def
                     page_model.assoc_def.child_cardinality_uri == "dm4.core.many" &&
-                    page_model
+                    !is_related_topic_page_model(page_model.parent)
+                    // Note: for childs of a Related Topic Page Model the remove button is already rendered there
             }
 
             /**
              * @param   parent_element  The element the remove button is appended to.
              *                          This element is removed from the page when the remove button is pressed.
-             * @param   page_model      The page model of the topic to be removed when the remove button is pressed.
              */
-            function render_remove_button(parent_element, page_model) {
+            function render_remove_button(parent_element) {
                 var remove_button = dm4c.ui.button({on_click: do_remove, icon: "circle-minus"})
                 var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
                 parent_element.append(remove_button_div)
@@ -391,8 +407,8 @@ dm4c.render.page_model = (function() {
                     return object_model
                 }
             } else if (page_model.type == PageModel.COMPOSITE) {
-                if (page_model.childs["dm4.webclient.relating_assoc"]) {
-                    var topic_model = this.build_object_model(page_model.childs["dm4.webclient.related_topic"])
+                if (is_related_topic_page_model(page_model)) {
+                    var topic_model = this.build_object_model(page_model.childs["dm4.webclient.topic"])
                     var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
                     topic_model.assoc = assoc_model
                     return topic_model
