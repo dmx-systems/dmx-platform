@@ -164,10 +164,12 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // --- Child Topics ---
 
+    // ### TODO: rename to getChildTopics()
     public ChildTopicsModel getChildTopicsModel() {
         return childTopics;
     }
 
+    // ### TODO: rename to setChildTopics()
     public void setChildTopicsModel(ChildTopicsModel childTopics) {
         this.childTopics = childTopics;
     }

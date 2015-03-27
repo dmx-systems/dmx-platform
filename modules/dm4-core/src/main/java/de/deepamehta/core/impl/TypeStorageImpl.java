@@ -297,9 +297,9 @@ class TypeStorageImpl implements TypeStorage {
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
         // Composition Definition itself (child types "Include in Label", "Ordered"). ### FIXDOC: this is obsolete
-        // Note: "othersTopicTypeUri" is set to null. We want consider "dm4.core.topic_type" and "dm4.core.meta_type"
-        // as well (the latter required e.g. by dm4-mail) ### TODO: add a getRelatedTopics() method that takes a list
-        // of topic types.
+        // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dm4.core.topic_type"
+        // and "dm4.core.meta_type" (the latter is required e.g. by dm4-mail). ### TODO: add a getRelatedTopics()
+        // method that takes a list of topic types.
         ResultList<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, 0);
             // othersTopicTypeUri=null, maxResultSize=0
@@ -340,8 +340,8 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     private String fetchCustomAssocTypeUri(Association assoc) {
-        TopicModel assocType = dms.storageDecorator.fetchAssociationRelatedTopic(assoc.getId(), "dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.core.assoc_type");
+        TopicModel assocType = dms.storageDecorator.fetchAssociationRelatedTopic(assoc.getId(),
+            "dm4.core.custom_assoc_type", "dm4.core.parent", "dm4.core.child", "dm4.core.assoc_type");
         return assocType != null ? assocType.getUri() : null;
     }
 
@@ -375,11 +375,18 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // 1) create association
             // Note: if the association definition has been created interactively the underlying association
-            // exists already. Its ID is already set.
+            // exists already. Its ID is already known. A possible Custom Association Type assignment is
+            // already stored as well.
             if (assocDef.getId() == -1) {
+                // 1a) custom association type
+                String customAssocTypeUri = assocDef.getCustomAssocTypeUri();
+                if (customAssocTypeUri != null) {
+                    assocDef.getChildTopicsModel().putRef("dm4.core.assoc_type", customAssocTypeUri);
+                }
+                //
                 dms.createAssociation(assocDef);
             }
-            // Note: the assoc def ID is known only after creating the association
+            // Note: the assoc def ID is definitely known only after creating the association
             long assocDefId = assocDef.getId();
             //
             // 2) cardinality

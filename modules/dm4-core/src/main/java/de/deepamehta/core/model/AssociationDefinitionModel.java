@@ -36,19 +36,26 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public AssociationDefinitionModel(String typeUri, String parentTypeUri, String childTypeUri,
-                                                      String parentCardinalityUri, String childCardinalityUri) {
-        this(-1, null, typeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri, null);
+    public AssociationDefinitionModel(String assocTypeUri, String parentTypeUri, String childTypeUri,
+                                                           String parentCardinalityUri, String childCardinalityUri) {
+        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
+    }
+
+    public AssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
+                                                           String parentTypeUri, String childTypeUri,
+                                                           String parentCardinalityUri, String childCardinalityUri) {
+        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
+            childCardinalityUri, null);
     }
 
     /**
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
-    public AssociationDefinitionModel(long id, String uri, String typeUri, String customAssocTypeUri,
+    public AssociationDefinitionModel(long id, String uri, String assocTypeUri, String customAssocTypeUri,
                                                            String parentTypeUri, String childTypeUri,
                                                            String parentCardinalityUri, String childCardinalityUri,
                                                            ViewConfigurationModel viewConfigModel) {
-        super(id, uri, typeUri, parentRoleModel(parentTypeUri), childRoleModel(childTypeUri));
+        super(id, uri, assocTypeUri, parentRoleModel(parentTypeUri), childRoleModel(childTypeUri));
         //
         this.customAssocTypeUri = customAssocTypeUri;
         //
