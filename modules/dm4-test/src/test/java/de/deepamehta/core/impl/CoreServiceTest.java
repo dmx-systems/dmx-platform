@@ -343,7 +343,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         ResultList<RelatedAssociation> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
-        assertEquals(48, assocs.getSize());
+        assertEquals(49, assocs.getSize());
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
         assertEquals(5, assocs.getSize());
