@@ -1,6 +1,48 @@
 [
     {
         "topic_types": [
+            {
+                "value": "Phone Label",
+                "uri": "dm4.contacts.phone_label",
+                "data_type_uri": "dm4.core.text"
+            },
+            {
+                "value": "Address Label",
+                "uri": "dm4.contacts.address_label",
+                "data_type_uri": "dm4.core.text"
+            }
+        ],
+        "assoc_types": [
+            {
+                "value": "Phone Entry",
+                "uri": "dm4.contacts.phone_entry",
+                "data_type_uri": "dm4.core.composite",
+                "assoc_defs": [
+                    {
+                        "child_type_uri":         "dm4.contacts.phone_label",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "parent_cardinality_uri": "dm4.core.many",
+                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                    }
+                ]
+            },
+            {
+                "value": "Address Entry",
+                "uri": "dm4.contacts.address_entry",
+                "data_type_uri": "dm4.core.composite",
+                "assoc_defs": [
+                    {
+                        "child_type_uri":         "dm4.contacts.address_label",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "parent_cardinality_uri": "dm4.core.many",
+                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "topic_types": [
 
             ### Person Name ###
 
@@ -51,33 +93,10 @@
             ### Phone ###
 
             {
-                "value": "Phone Label",
-                "uri": "dm4.contacts.phone_label",
-                "data_type_uri": "dm4.core.text"
-            },
-            {
                 "value": "Phone",
                 "uri": "dm4.contacts.phone_number",
                 "data_type_uri": "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
-            },
-            {
-                "value": "Phone Entry",
-                "uri": "dm4.contacts.phone_entry",
-                "data_type_uri": "dm4.core.composite",
-                "assoc_defs": [
-                    {
-                        "child_type_uri":         "dm4.contacts.phone_label",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
-                    },
-                    {
-                        "child_type_uri":        "dm4.contacts.phone_number",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
-                    }
-                ]
             },
 
             ### Email Address ###
@@ -154,30 +173,6 @@
                 ]
             },
 
-            {
-                "value": "Address Label",
-                "uri": "dm4.contacts.address_label",
-                "data_type_uri": "dm4.core.text"
-            },
-            {
-                "value": "Address Entry",
-                "uri": "dm4.contacts.address_entry",
-                "data_type_uri": "dm4.core.composite",
-                "assoc_defs": [
-                    {
-                        "child_type_uri":         "dm4.contacts.address_label",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
-                    },
-                    {
-                        "child_type_uri":        "dm4.contacts.address",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
-                    }
-                ]
-            },
-
             ### Notes ###
 
             {
@@ -200,9 +195,10 @@
                         "assoc_type_uri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.phone_entry",
+                        "child_type_uri":        "dm4.contacts.phone_number",
                         "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "assoc_type_uri":        "dm4.core.composition_def",
+                        "custom_assoc_type_uri": "dm4.contacts.phone_entry"
                     },
                     {
                         "child_type_uri":        "dm4.contacts.email_address",
@@ -215,9 +211,10 @@
                         "assoc_type_uri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.address_entry",
+                        "child_type_uri":        "dm4.contacts.address",
                         "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "assoc_type_uri":        "dm4.core.composition_def",
+                        "custom_assoc_type_uri": "dm4.contacts.address_entry"
                     },
                     {
                         "child_type_uri":        "dm4.contacts.notes",
@@ -250,9 +247,10 @@
                         "assoc_type_uri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.phone_entry",
+                        "child_type_uri":        "dm4.contacts.phone_number",
                         "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "assoc_type_uri":        "dm4.core.composition_def",
+                        "custom_assoc_type_uri": "dm4.contacts.phone_entry"
                     },
                     {
                         "child_type_uri":        "dm4.contacts.email_address",
@@ -265,9 +263,10 @@
                         "assoc_type_uri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.address_entry",
+                        "child_type_uri":        "dm4.contacts.address",
                         "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "assoc_type_uri":        "dm4.core.composition_def",
+                        "custom_assoc_type_uri": "dm4.contacts.address_entry"
                     },
                     {
                         "child_type_uri":        "dm4.contacts.notes",
