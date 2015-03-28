@@ -115,24 +115,13 @@ class MigrationManager {
     private void runMigration(int migrationNr, PluginImpl plugin, boolean isCleanInstall) {
         MigrationInfo mi = null;
         try {
+            // collect info
             mi = new MigrationInfo(migrationNr, plugin);
             if (!mi.success) {
                 throw mi.exception;
             }
-            // error checks
-            if (!mi.isDeclarative && !mi.isImperative) {
-                String message = "Neither a migration file (" + mi.migrationFile + ") nor a migration class ";
-                if (mi.migrationClassName != null) {
-                    throw new RuntimeException(message + "(" + mi.migrationClassName + ") is found");
-                } else {
-                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
-                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
-                }
-            }
-            if (mi.isDeclarative && mi.isImperative) {
-                throw new RuntimeException("Ambiguity: a migration file (" + mi.migrationFile + ") AND a migration " +
-                    "class (" + mi.migrationClassName + ") are found. Consider using two different migration numbers.");
-            }
+            mi.checkValidity();
+            //
             // run migration
             String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
             if (mi.runMode.equals(MigrationRunMode.CLEAN_INSTALL.name()) == isCleanInstall ||
@@ -156,6 +145,8 @@ class MigrationManager {
             throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
         }
     }
+
+    // ---
 
     private void injectServices(Migration migration, String migrationInfo, PluginImpl plugin) {
         try {
@@ -272,7 +263,7 @@ class MigrationManager {
         String migrationClassName;  // for imperative migration
         Class migrationClass;       // for imperative migration
         //
-        boolean success;            // error occurred?
+        boolean success;            // error occurred while construction?
         Exception exception;        // the error
 
         MigrationInfo(int migrationNr, PluginImpl plugin) {
@@ -306,6 +297,22 @@ class MigrationManager {
                 success = true;
             } catch (Exception e) {
                 exception = e;
+            }
+        }
+
+        private void checkValidity() {
+            if (!isDeclarative && !isImperative) {
+                String message = "Neither a migration file (" + migrationFile + ") nor a migration class ";
+                if (migrationClassName != null) {
+                    throw new RuntimeException(message + "(" + migrationClassName + ") is found");
+                } else {
+                    throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
+                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
+                }
+            }
+            if (isDeclarative && isImperative) {
+                throw new RuntimeException("Ambiguity: a migration file (" + migrationFile + ") AND a migration " +
+                    "class (" + migrationClassName + ") are found. Consider using two different migration numbers.");
             }
         }
 
