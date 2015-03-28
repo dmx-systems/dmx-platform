@@ -1,9 +1,6 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.Type;
-import de.deepamehta.core.util.DeepaMehtaUtils;
-
-import java.io.InputStream;
 
 
 
@@ -38,12 +35,5 @@ public abstract class Migration {
     // Convenience method ### FIXME: belongs to Webclient module
     protected final void addTypeSetting(Type type, String setting, Object value) {
         type.getViewConfig().addSetting("dm4.webclient.view_config", "dm4.webclient." + setting, value);
-    }
-
-    // ---
-
-    protected final void readMigrationFile(String migrationFile) {
-        InputStream migrationIn = getClass().getResourceAsStream(migrationFile);
-        DeepaMehtaUtils.readMigrationFile(migrationIn, migrationFile, dms);
     }
 }

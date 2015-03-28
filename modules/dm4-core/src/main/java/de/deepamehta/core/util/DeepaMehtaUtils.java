@@ -1,22 +1,13 @@
 package de.deepamehta.core.util;
 
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.DeepaMehtaService;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONTokener;
 
-import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -155,79 +146,5 @@ public class DeepaMehtaUtils {
             array.put(item.toJSON());
         }
         return array;
-    }
-
-    // ---
-
-    /**
-     * Creates types and topics from a JSON formatted input stream.
-     *
-     * @param   migrationFileName   The origin migration file. Used for logging only.
-     */
-    public static void readMigrationFile(InputStream is, String migrationFileName, DeepaMehtaService dms) {
-        try {
-            logger.info("Reading migration file \"" + migrationFileName + "\"");
-            String fileContent = JavaUtils.readText(is);
-            //
-            Object value = new JSONTokener(fileContent).nextValue();
-            if (value instanceof JSONObject) {
-                readEntities((JSONObject) value, dms);
-            } else if (value instanceof JSONArray) {
-                readEntities((JSONArray) value, dms);
-            } else {
-                throw new RuntimeException("Invalid JSON");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
-        }
-    }
-
-    private static void readEntities(JSONArray entities, DeepaMehtaService dms) throws JSONException {
-        for (int i = 0; i < entities.length(); i++) {
-            readEntities(entities.getJSONObject(i), dms);
-        }
-    }
-
-    private static void readEntities(JSONObject entities, DeepaMehtaService dms) throws JSONException {
-        JSONArray topicTypes = entities.optJSONArray("topic_types");
-        if (topicTypes != null) {
-            createTopicTypes(topicTypes, dms);
-        }
-        JSONArray assocTypes = entities.optJSONArray("assoc_types");
-        if (assocTypes != null) {
-            createAssociationTypes(assocTypes, dms);
-        }
-        JSONArray topics = entities.optJSONArray("topics");
-        if (topics != null) {
-            createTopics(topics, dms);
-        }
-        JSONArray assocs = entities.optJSONArray("associations");
-        if (assocs != null) {
-            createAssociations(assocs, dms);
-        }
-    }
-
-    private static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws JSONException {
-        for (int i = 0; i < topicTypes.length(); i++) {
-            dms.createTopicType(new TopicTypeModel(topicTypes.getJSONObject(i)));
-        }
-    }
-
-    private static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws JSONException {
-        for (int i = 0; i < assocTypes.length(); i++) {
-            dms.createAssociationType(new AssociationTypeModel(assocTypes.getJSONObject(i)));
-        }
-    }
-
-    private static void createTopics(JSONArray topics, DeepaMehtaService dms) throws JSONException {
-        for (int i = 0; i < topics.length(); i++) {
-            dms.createTopic(new TopicModel(topics.getJSONObject(i)));
-        }
-    }
-
-    private static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws JSONException {
-        for (int i = 0; i < assocs.length(); i++) {
-            dms.createAssociation(new AssociationModel(assocs.getJSONObject(i)));
-        }
     }
 }

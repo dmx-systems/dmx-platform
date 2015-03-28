@@ -1,9 +1,18 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.JavaUtils;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -130,7 +139,7 @@ class MigrationManager {
                 mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
                 logger.info("Running " + mi.migrationInfo + runInfo);
                 if (mi.isDeclarative) {
-                    DeepaMehtaUtils.readMigrationFile(mi.migrationIn, mi.migrationFile, dms);
+                    readMigrationFile(mi.migrationIn, mi.migrationFile);
                 } else {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
                     logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
@@ -166,6 +175,80 @@ class MigrationManager {
             }
         } catch (Exception e) {
             throw new RuntimeException("Injecting services into " + migrationInfo + " failed", e);
+        }
+    }
+
+    // ---
+
+    /**
+     * Creates types and topics from a JSON formatted input stream.
+     *
+     * @param   migrationFileName   The origin migration file. Used for logging only.
+     */
+    private void readMigrationFile(InputStream in, String migrationFileName) {
+        try {
+            logger.info("Reading migration file \"" + migrationFileName + "\"");
+            String fileContent = JavaUtils.readText(in);
+            //
+            Object value = new JSONTokener(fileContent).nextValue();
+            if (value instanceof JSONObject) {
+                readEntities((JSONObject) value);
+            } else if (value instanceof JSONArray) {
+                readEntities((JSONArray) value);
+            } else {
+                throw new RuntimeException("Invalid file content");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
+        }
+    }
+
+    private void readEntities(JSONArray entities) throws JSONException {
+        for (int i = 0; i < entities.length(); i++) {
+            readEntities(entities.getJSONObject(i));
+        }
+    }
+
+    private void readEntities(JSONObject entities) throws JSONException {
+        JSONArray topicTypes = entities.optJSONArray("topic_types");
+        if (topicTypes != null) {
+            createTopicTypes(topicTypes);
+        }
+        JSONArray assocTypes = entities.optJSONArray("assoc_types");
+        if (assocTypes != null) {
+            createAssociationTypes(assocTypes);
+        }
+        JSONArray topics = entities.optJSONArray("topics");
+        if (topics != null) {
+            createTopics(topics);
+        }
+        JSONArray assocs = entities.optJSONArray("associations");
+        if (assocs != null) {
+            createAssociations(assocs);
+        }
+    }
+
+    private void createTopicTypes(JSONArray topicTypes) throws JSONException {
+        for (int i = 0; i < topicTypes.length(); i++) {
+            dms.createTopicType(new TopicTypeModel(topicTypes.getJSONObject(i)));
+        }
+    }
+
+    private void createAssociationTypes(JSONArray assocTypes) throws JSONException {
+        for (int i = 0; i < assocTypes.length(); i++) {
+            dms.createAssociationType(new AssociationTypeModel(assocTypes.getJSONObject(i)));
+        }
+    }
+
+    private void createTopics(JSONArray topics) throws JSONException {
+        for (int i = 0; i < topics.length(); i++) {
+            dms.createTopic(new TopicModel(topics.getJSONObject(i)));
+        }
+    }
+
+    private void createAssociations(JSONArray assocs) throws JSONException {
+        for (int i = 0; i < assocs.length(); i++) {
+            dms.createAssociation(new AssociationModel(assocs.getJSONObject(i)));
         }
     }
 
