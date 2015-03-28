@@ -11,7 +11,9 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.DeepaMehtaService;
 
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONTokener;
 
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -167,53 +169,65 @@ public class DeepaMehtaUtils {
             logger.info("Reading migration file \"" + migrationFileName + "\"");
             String fileContent = JavaUtils.readText(is);
             //
-            JSONObject o = new JSONObject(fileContent);
-            JSONArray topicTypes = o.optJSONArray("topic_types");
-            if (topicTypes != null) {
-                createTopicTypes(topicTypes, dms);
-            }
-            JSONArray assocTypes = o.optJSONArray("assoc_types");
-            if (assocTypes != null) {
-                createAssociationTypes(assocTypes, dms);
-            }
-            JSONArray topics = o.optJSONArray("topics");
-            if (topics != null) {
-                createTopics(topics, dms);
-            }
-            JSONArray assocs = o.optJSONArray("associations");
-            if (assocs != null) {
-                createAssociations(assocs, dms);
+            Object value = new JSONTokener(fileContent).nextValue();
+            if (value instanceof JSONObject) {
+                readEntities((JSONObject) value, dms);
+            } else if (value instanceof JSONArray) {
+                readEntities((JSONArray) value, dms);
+            } else {
+                throw new RuntimeException("Invalid JSON");
             }
         } catch (Exception e) {
             throw new RuntimeException("Reading migration file \"" + migrationFileName + "\" failed", e);
         }
     }
 
-    public static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws Exception {
+    private static void readEntities(JSONArray entities, DeepaMehtaService dms) throws JSONException {
+        for (int i = 0; i < entities.length(); i++) {
+            readEntities(entities.getJSONObject(i), dms);
+        }
+    }
+
+    private static void readEntities(JSONObject entities, DeepaMehtaService dms) throws JSONException {
+        JSONArray topicTypes = entities.optJSONArray("topic_types");
+        if (topicTypes != null) {
+            createTopicTypes(topicTypes, dms);
+        }
+        JSONArray assocTypes = entities.optJSONArray("assoc_types");
+        if (assocTypes != null) {
+            createAssociationTypes(assocTypes, dms);
+        }
+        JSONArray topics = entities.optJSONArray("topics");
+        if (topics != null) {
+            createTopics(topics, dms);
+        }
+        JSONArray assocs = entities.optJSONArray("associations");
+        if (assocs != null) {
+            createAssociations(assocs, dms);
+        }
+    }
+
+    private static void createTopicTypes(JSONArray topicTypes, DeepaMehtaService dms) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
-            TopicTypeModel topicTypeModel = new TopicTypeModel(topicTypes.getJSONObject(i));
-            dms.createTopicType(topicTypeModel);
+            dms.createTopicType(new TopicTypeModel(topicTypes.getJSONObject(i)));
         }
     }
 
-    public static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws Exception {
+    private static void createAssociationTypes(JSONArray assocTypes, DeepaMehtaService dms) throws JSONException {
         for (int i = 0; i < assocTypes.length(); i++) {
-            AssociationTypeModel assocTypeModel = new AssociationTypeModel(assocTypes.getJSONObject(i));
-            dms.createAssociationType(assocTypeModel);
+            dms.createAssociationType(new AssociationTypeModel(assocTypes.getJSONObject(i)));
         }
     }
 
-    public static void createTopics(JSONArray topics, DeepaMehtaService dms) throws Exception {
+    private static void createTopics(JSONArray topics, DeepaMehtaService dms) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
-            TopicModel topicModel = new TopicModel(topics.getJSONObject(i));
-            dms.createTopic(topicModel);
+            dms.createTopic(new TopicModel(topics.getJSONObject(i)));
         }
     }
 
-    public static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws Exception {
+    private static void createAssociations(JSONArray assocs, DeepaMehtaService dms) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            AssociationModel assocModel = new AssociationModel(assocs.getJSONObject(i));
-            dms.createAssociation(assocModel);
+            dms.createAssociation(new AssociationModel(assocs.getJSONObject(i)));
         }
     }
 }
