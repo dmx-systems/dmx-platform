@@ -11,7 +11,7 @@ function PagePanel() {
                                         // (a Topic object, or an Association object, or null).
     var page_renderer                   // The displayed object's page renderer
                                         // (only consulted if displayed_object is not null).
-    var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
+    var scroll_position = {}            // Per-object scrollbar positions (key: object ID, value: scrollTop value).
     var form_processing_function        // The form processing function: called to "submit" the form
                                         // (only consulted if a form is displayed).
     var form_processing_called          // Tracks the form processing function call (boolean).
@@ -25,6 +25,9 @@ function PagePanel() {
     // "keyup" would fire immediately once a "Create" menu item is selected via enter key.
     // This is because the "menuselect" event is fired early at "keydown" time. At time of
     // the subsequent "keyup" event the page panel form is already visible and focused.
+
+    var page_state = PageState.NONE     // Tracks page state. Used to fire the "post_destroy_form" event in case.
+
     show_splash()
 
     this.dom = dom
@@ -33,6 +36,7 @@ function PagePanel() {
 
     this.render_page = function(topic_or_association) {
         // update model
+        save_scroll_position()
         set_displayed_object(topic_or_association)
         // update view
         render_page()
@@ -46,6 +50,7 @@ function PagePanel() {
 
     this.render_form = function(topic_or_association) {
         // update model
+        save_scroll_position()
         set_displayed_object(topic_or_association)
         // update view
         render_form()
@@ -64,6 +69,7 @@ function PagePanel() {
 
     this.clear = function() {
         // update model
+        save_scroll_position()
         set_displayed_object(null)
         // update view
         clear_page(PageState.NONE)
@@ -85,6 +91,8 @@ function PagePanel() {
         if (!displayed_object) {
             return
         }
+        // update model
+        save_scroll_position()
         // update view
         render_page()
     }
@@ -125,6 +133,21 @@ function PagePanel() {
         }
     }
 
+    // ---
+
+    function save_scroll_position() {
+        if (page_state == PageState.PAGE) {
+            scroll_position[displayed_object.id] = $("#page-content").scrollTop()
+        }
+    }
+
+    function restore_scroll_position() {
+        var pos = scroll_position[displayed_object.id]
+        if (pos != undefined) {
+            $("#page-content").scrollTop(pos)
+        }
+    }
+
     // === View ===
 
     function render_page() {
@@ -132,6 +155,7 @@ function PagePanel() {
         prepare_page()
         page_renderer.render_page(displayed_object)
         render_buttons("detail-panel-show")
+        restore_scroll_position()
     }
 
     function render_form() {
@@ -173,7 +197,7 @@ function PagePanel() {
         if (page_state == PageState.FORM) {
             dm4c.fire_event("post_destroy_form")
         }
-        // update model
+        //
         page_state = new_page_state
     }
 
