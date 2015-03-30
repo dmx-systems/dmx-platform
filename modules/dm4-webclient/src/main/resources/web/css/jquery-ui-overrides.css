@@ -10,7 +10,7 @@
     padding-bottom: 1.1em;
 }
 
-/* OpenLayer's event layer has z-index 999. */
+/* Note: OpenLayer's event layer has z-index 999. */
 
 .ui-menu {
     font-size: 0.875em;
@@ -21,8 +21,8 @@
 }
 
 .ui-menu .ui-menu-divider {
-    margin-top: 2px;            /* default is 5 pixel and leads to unequal      */
-    margin-bottom: 2px;         /* top/bottom margin of first/last menu items   */
+    margin-top: 2px;            /* jQuery UI default is 5 pixel and leads to unequal    */
+    margin-bottom: 2px;         /* top/bottom margin of first/last menu items           */
 }
 
 .ui-front {                     /* Used for jQuery UI dialogs.  */
@@ -31,4 +31,11 @@
 
 .ui-resizable-handle {
     z-index: 1000 !important;   /* "important" overrides the resizable-handle's style attribute */
+}
+
+.ui-resizable-e {
+    right: 0;                   /* jQuery UI default is -5px. This moves the resizable-handle 5 pixels to the   */
+                                /* right into the detail panel and left only 2 pixels (of the 7 pixel handle    */
+                                /* width) mouse sensitive as the area overlapping with the detail panel does    */
+                                /* not respond to mouse events (I don't know why).                              */
 }
