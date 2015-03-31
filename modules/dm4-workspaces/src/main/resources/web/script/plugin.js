@@ -8,6 +8,30 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // View
     var workspace_menu          // A GUIToolkit Menu object
+    var sharing_mode_help = {
+        "dm4.workspaces.private":
+            "Only you get access to the workspace content.\n\n" +
+            "Use this for your privacy.",
+        "dm4.workspaces.confidential":
+            "Workspace members get READ access to the workspace content.\n" +
+            "Only you get WRITE access to the workspace content.\n" +
+            "Only you can create memberships.\n\n" +
+            "Use this if you want make content available to a closed user group you control (like a mailing).",
+        "dm4.workspaces.collaborative":
+            "Workspace members get READ/WRITE access to the workspace content.\n" +
+            "Each workspace member can create further memberships.\n\n" +
+            "Use this if you want work together with a user group (like a groupware). Each user get equal rights.",
+        "dm4.workspaces.public":
+            "Every user of this DeepaMehta installation (logged in or not) get READ access to the workspace " +
+                "content.\n" +
+            "Workspace members get READ/WRITE access to the workspace content.\n" +
+            "Each workspace member can create further memberships.\n\n" +
+            "Use this if you want make content available to the public (like a blog).",
+        "dm4.workspaces.common":
+            "Every user of this DeepaMehta installation (logged in or not) get READ/WRITE access to the workspace " +
+                "content.\n\n" +
+            "Use this for content belonging to the commons (like a wiki)."
+    }
 
 
 
@@ -354,7 +378,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
             function add_option(label, value, checked) {
                 selector = selector
-                    .add($("<label>")
+                    .add($("<label>").attr("title", sharing_mode_help[value])
                         .append($("<input>").attr({
                             type: "radio", name: "sharing-mode", value: value, checked: checked
                         }))
