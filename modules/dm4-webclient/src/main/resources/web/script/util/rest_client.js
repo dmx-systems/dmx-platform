@@ -137,7 +137,7 @@ function RESTClient(config) {
      * Returns the associations between two topics. If no such association exists an empty array is returned.
      *
      * @param   assoc_type_uri  Association type filter (optional).
-     *                          Pass <code>null</code>/<code>undefined</code> to switch filter off.
+     *                          If not specified (that is any falsish value) no filter is applied.
      *
      * @return  An array of associations.
      */

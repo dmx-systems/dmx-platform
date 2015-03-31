@@ -149,14 +149,19 @@ dm4c = new function() {
      * Fires the "pre_show_topic" and "post_show_topic" events (indirectly).
      * Fires the "post_show_association" event (for each association).
      *
-     * @param   topic_id    ID of the topic to reveal.
-     * @param   action      Optional: the action to perform on the revealed topic, 3 possible values:
-     *                          "none" - do not select the topic (page panel doesn't change) -- the default.
-     *                          "show" - select the topic and show its info in the page panel.
-     *                          "edit" - select the topic and show its form in the page panel.
-     *                      If not specified (that is any falsish value) "none" is assumed.
+     * @param   topic_id
+     *              ID of the topic to reveal.
+     * @param   action
+     *              Optional: the action to perform on the revealed topic, 3 possible values:
+     *                  "none" - do not select the topic (page panel doesn't change) -- the default.
+     *                  "show" - select the topic and show its info in the page panel.
+     *                  "edit" - select the topic and show its form in the page panel.
+     *              If not specified (that is any falsish value) "none" is assumed.
+     * @param   assoc_type_uri
+     *              Optional: association type filter.
+     *              If not specified (that is any falsish value) no filter is applied.
      */
-    this.do_reveal_related_topic = function(topic_id, action) {
+    this.do_reveal_related_topic = function(topic_id, action, assoc_type_uri) {
         // Note: -1 must not be passed to dm4c.restc.get_associations() as this would be interpreted at
         // server side as "filter not set".
         if (topic_id == -1) {
@@ -164,7 +169,7 @@ dm4c = new function() {
         }
         // fetch from DB
         var topic = dm4c.fetch_topic(topic_id, true)        // include_childs=true
-        var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id)
+        var assocs = dm4c.restc.get_associations(dm4c.selected_object.id, topic_id, assoc_type_uri)
         // update client model and GUI
         dm4c.show_topic(topic, action, undefined, true)     // coordinates=undefined, do_center=true
         for (var i = 0, assoc; assoc = assocs[i]; i++) {

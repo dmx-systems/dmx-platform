@@ -61,7 +61,8 @@ function RenderHelper() {
                     click_handler(topic, spot)
                 } else {
                     var action = spot == "label" && "show"
-                    dm4c.do_reveal_related_topic(topic.id, action)
+                    var assoc_type_uri = topic.assoc && topic.assoc.type_uri
+                    dm4c.do_reveal_related_topic(topic.id, action, assoc_type_uri)
                 }
                 // reflect "visible on canvas" status in page panel
                 if (spot == "icon") {
