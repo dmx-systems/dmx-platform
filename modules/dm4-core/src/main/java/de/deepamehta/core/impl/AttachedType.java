@@ -152,12 +152,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void addAssocDef(AssociationDefinitionModel assocDef) {
-        addAssocDefBefore(assocDef, null);  // beforeChildTypeUri=null
+    public Type addAssocDef(AssociationDefinitionModel assocDef) {
+        return addAssocDefBefore(assocDef, null);   // beforeChildTypeUri=null
     }
 
     @Override
-    public void addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
+    public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
         // Note: the last assoc def must be determined *before* the memory is updated
         AssociationDefinitionModel lastAssocDef = lastAssocDef();
         // 1) update memory
@@ -178,6 +178,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             long beforeAssocDefId = getAssocDef(beforeChildTypeUri).getId();
             dms.typeStorage.insertIntoSequence(assocDefId, beforeAssocDefId);
         }
+        return this;
     }
 
     @Override
@@ -191,13 +192,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public void removeAssocDef(String childTypeUri) {
+    public Type removeAssocDef(String childTypeUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
         // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
         getAssocDef(childTypeUri).delete();
+        return this;
     }
 
     // --- Label Configuration ---
