@@ -674,6 +674,94 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void createManyChildRefViaModel() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic parent1, child1;
+        try {
+            // 1) define composite type
+            // child type
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            // parent type
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
+                ))
+            );
+            // 2) create example child instance
+            child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            // 3) create composite instance
+            // Note: addRef() must be used (instead of putRef()) as child is defined as "many".
+            parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+                .addRef("dm4.test.child", child1.getId())
+            ));
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        assertEquals(1, childs.size());
+        assertEquals(child1.getId(), childs.get(0).getId());
+        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+    }
+
+    @Test
+    public void createManyChildRefViaObject() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic parent1, child1;
+        try {
+            // 1) define composite type
+            // child type
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            // parent type
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
+                ))
+            );
+            // 2) create example child instance
+            child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            // 3) create composite instance
+            parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
+            parent1.getChildTopics().setRef("dm4.test.child", child1.getId());
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        assertEquals(1, childs.size());
+        assertEquals(child1.getId(), childs.get(0).getId());
+        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+    }
+
+    @Test
+    public void createManyChildViaObject() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        Topic parent1;
+        try {
+            // 1) define composite type
+            // child type
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            // parent type
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
+                ))
+            );
+            // 2) create composite instance
+            parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
+            parent1.getChildTopics().set("dm4.test.child", "Child 1");
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        assertEquals(1, childs.size());
+        assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
+    }
+
+    // ---
+
+    @Test
     public void deleteTopic() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
