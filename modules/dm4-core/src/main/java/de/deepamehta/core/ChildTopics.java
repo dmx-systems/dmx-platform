@@ -91,11 +91,15 @@ public interface ChildTopics extends Iterable<String> {
 
     // === Manipulators ===
 
+    // --- Single-valued Childs ---
+
     /**
      * Sets a child.
      * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
     ChildTopics set(String childTypeUri, TopicModel value);
+
+    // ---
 
     /**
      * Convenience method to set the simple value of a child.
@@ -120,7 +124,29 @@ public interface ChildTopics extends Iterable<String> {
 
     // ---
 
-    ChildTopics remove(String childTypeUri, long topicId);
+    ChildTopics setDeletionRef(String childTypeUri, long refTopicId);
 
-    ChildTopics remove(String childTypeUri, String topicUri);
+    ChildTopics setDeletionRef(String childTypeUri, String refTopicUri);
+
+    // --- Multiple-valued Childs ---
+
+    ChildTopics add(String childTypeUri, TopicModel value);
+
+    // ---
+
+    ChildTopics add(String childTypeUri, Object value);
+
+    ChildTopics add(String childTypeUri, ChildTopicsModel value);
+
+    // ---
+
+    ChildTopics addRef(String childTypeUri, long refTopicId);
+
+    ChildTopics addRef(String childTypeUri, String refTopicUri);
+
+    // ---
+
+    ChildTopics addDeletionRef(String childTypeUri, long refTopicId);
+
+    ChildTopics addDeletionRef(String childTypeUri, String refTopicUri);
 }

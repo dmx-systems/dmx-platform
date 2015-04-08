@@ -87,7 +87,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         if (customAssocTypeUri != null) {
             getChildTopics().setRef("dm4.core.assoc_type", customAssocTypeUri);
         } else {
-            getChildTopics().remove("dm4.core.assoc_type", customAssocTypeUri);
+            getChildTopics().setDeletionRef("dm4.core.assoc_type", customAssocTypeUri);
         }
     }
 

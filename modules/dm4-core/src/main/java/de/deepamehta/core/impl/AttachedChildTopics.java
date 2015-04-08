@@ -149,43 +149,90 @@ class AttachedChildTopics implements ChildTopics {
 
     // === Manipulators ===
 
+    // --- Single-valued Childs ---
+
     @Override
     public ChildTopics set(String childTypeUri, TopicModel value) {
-        return _update(childTypeUri, value);
+        return _updateOne(childTypeUri, value);
     }
+
+    // ---
 
     @Override
     public ChildTopics set(String childTypeUri, Object value) {
-        return _update(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+        return _updateOne(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics set(String childTypeUri, ChildTopicsModel value) {
-        return _update(childTypeUri, new TopicModel(childTypeUri, value));
+        return _updateOne(childTypeUri, new TopicModel(childTypeUri, value));
     }
 
     // ---
 
     @Override
     public ChildTopics setRef(String childTypeUri, long refTopicId) {
-        return _update(childTypeUri, new TopicReferenceModel(refTopicId));
+        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicId));
     }
 
     @Override
     public ChildTopics setRef(String childTypeUri, String refTopicUri) {
-        return _update(childTypeUri, new TopicReferenceModel(refTopicUri));
+        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicUri));
     }
 
     // ---
 
     @Override
-    public ChildTopics remove(String childTypeUri, long topicId) {
-        return _update(childTypeUri, new TopicDeletionModel(topicId));
+    public ChildTopics setDeletionRef(String childTypeUri, long refTopicId) {
+        return _updateOne(childTypeUri, new TopicDeletionModel(refTopicId));
     }
 
     @Override
-    public ChildTopics remove(String childTypeUri, String topicUri) {
-        return _update(childTypeUri, new TopicDeletionModel(topicUri));
+    public ChildTopics setDeletionRef(String childTypeUri, String refTopicUri) {
+        return _updateOne(childTypeUri, new TopicDeletionModel(refTopicUri));
+    }
+
+    // --- Multiple-valued Childs ---
+
+    @Override
+    public ChildTopics add(String childTypeUri, TopicModel value) {
+        return _updateMany(childTypeUri, value);
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics add(String childTypeUri, Object value) {
+        return _updateMany(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+    }
+
+    @Override
+    public ChildTopics add(String childTypeUri, ChildTopicsModel value) {
+        return _updateMany(childTypeUri, new TopicModel(childTypeUri, value));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics addRef(String childTypeUri, long refTopicId) {
+        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics addRef(String childTypeUri, String refTopicUri) {
+        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicUri));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics addDeletionRef(String childTypeUri, long refTopicId) {
+        return _updateMany(childTypeUri, new TopicDeletionModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics addDeletionRef(String childTypeUri, String refTopicUri) {
+        return _updateMany(childTypeUri, new TopicDeletionModel(refTopicUri));
     }
 
 
@@ -340,12 +387,17 @@ class AttachedChildTopics implements ChildTopics {
 
     // ---
 
-    private ChildTopics _update(String childTypeUri, TopicModel newChildTopic) {
+    private ChildTopics _updateOne(String childTypeUri, TopicModel newChildTopic) {
         // Note: calling parent.update(..) would not work. The JVM would call the update() method of the base class
         // (AttachedDeepaMehtaObject), not the subclass's update() method. This is related to Java's (missing) multiple
         // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
         // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
         parent.updateChildTopics(new ChildTopicsModel().put(childTypeUri, newChildTopic));
+        return this;
+    }
+
+    private ChildTopics _updateMany(String childTypeUri, TopicModel newChildTopic) {
+        parent.updateChildTopics(new ChildTopicsModel().add(childTypeUri, newChildTopic));
         return this;
     }
 

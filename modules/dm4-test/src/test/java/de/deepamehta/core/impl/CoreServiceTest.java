@@ -722,7 +722,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create composite instance
             parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
-            parent1.getChildTopics().setRef("dm4.test.child", child1.getId());
+            parent1.getChildTopics().addRef("dm4.test.child", child1.getId());
             tx.success();
         } finally {
             tx.finish();
@@ -749,7 +749,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             );
             // 2) create composite instance
             parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
-            parent1.getChildTopics().set("dm4.test.child", "Child 1");
+            parent1.getChildTopics().add("dm4.test.child", "Child 1");
             tx.success();
         } finally {
             tx.finish();
