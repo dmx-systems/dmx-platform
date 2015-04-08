@@ -95,7 +95,6 @@ public interface ChildTopics extends Iterable<String> {
 
     /**
      * Sets a child.
-     * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
     ChildTopics set(String childTypeUri, TopicModel value);
 
@@ -103,7 +102,6 @@ public interface ChildTopics extends Iterable<String> {
 
     /**
      * Convenience method to set the simple value of a child.
-     * Works for both, single-valued child and multiple-valued child (cardinality "many").
      *
      * @param   value   The simple value.
      *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
@@ -112,7 +110,6 @@ public interface ChildTopics extends Iterable<String> {
 
     /**
      * Convenience method to set the composite value of a child.
-     * Works for both, single-valued child and multiple-valued child (cardinality "many").
      */
     ChildTopics set(String childTypeUri, ChildTopicsModel value);
 

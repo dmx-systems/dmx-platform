@@ -418,6 +418,21 @@ class AttachedChildTopics implements ChildTopics {
             childTopic.delete();
             // update memory
             removeChildTopic(assocDef);
+        } else if (newChildTopic instanceof TopicReferenceModel) {
+            if (childTopic != null) {
+                if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
+                    return;
+                }
+                // == update assignment ==
+                // update DB
+                childTopic.delete();
+            } else {
+                // == create assignment ==
+            }
+            // update DB
+            Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
+            // update memory
+            putInChildTopics(topic, assocDef);
         } else if (childTopic != null) {
             // == update child ==
             updateChildTopic(childTopic, newChildTopic);
@@ -442,6 +457,11 @@ class AttachedChildTopics implements ChildTopics {
                 childTopic.delete();
                 // update memory
                 removeFromChildTopics(childTopic, assocDef);
+            } else if (newChildTopic instanceof TopicReferenceModel) {
+                // == create assignment ==
+                if (!createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef)) {
+                    continue;
+                }
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -512,16 +532,10 @@ class AttachedChildTopics implements ChildTopics {
                 // update memory
                 removeFromChildTopics(childTopic, assocDef);
             } else if (newChildTopic instanceof TopicReferenceModel) {
-                if (isReferingToAny((TopicReferenceModel) newChildTopic, assocDef)) {
-                    // Note: "create assignment" is an idempotent operation. A create request for an assignment which
-                    // exists already is not an error. Instead, nothing is performed.
+                // == create assignment ==
+                if (!createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef)) {
                     continue;
                 }
-                // == create assignment ==
-                // update DB
-                Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
-                // update memory
-                addToChildTopics(topic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -532,7 +546,7 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    // --- ### TODO: avoid structural similar code, see ValueStorage
+    // --- References ---
 
     /**
      * Creates an association between our parent object ("Parent" role) and the referenced topic ("Child" role).
@@ -579,7 +593,7 @@ class AttachedChildTopics implements ChildTopics {
         return new AttachedRelatedTopic(new RelatedTopicModel(topic.getModel(), assoc.getModel()), dms);
     }
 
-    // --- ### end TODO
+    // --- Update ---
 
     private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
@@ -617,7 +631,7 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    // ---
+    // --- Create ---
 
     private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
@@ -654,6 +668,22 @@ class AttachedChildTopics implements ChildTopics {
         dms.createAssociation(assoc);
         //
         return childTopic;
+    }
+
+    // --- Assignment ---
+
+    private boolean createAssignmentMany(TopicReferenceModel newChildTopic, AssociationDefinition assocDef) {
+        if (isReferingToAny(newChildTopic, assocDef)) {
+            // Note: "create assignment" is an idempotent operation. A create request for an assignment which
+            // exists already is not an error. Instead, nothing is performed.
+            return false;
+        }
+        // update DB
+        Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
+        // update memory
+        addToChildTopics(topic, assocDef);
+        //
+        return true;
     }
 
 

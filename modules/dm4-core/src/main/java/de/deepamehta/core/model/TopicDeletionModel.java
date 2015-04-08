@@ -10,8 +10,8 @@ public class TopicDeletionModel extends TopicModel {
         super(topicId);
     }
 
-    public TopicDeletionModel(String uri) {
-        super(uri, (String) null);   // typeUri=null
+    public TopicDeletionModel(String topicUri) {
+        super(topicUri, (String) null);     // typeUri=null
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

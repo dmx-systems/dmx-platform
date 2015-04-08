@@ -13,8 +13,8 @@ public class TopicReferenceModel extends TopicModel {
         super(topicId);
     }
 
-    public TopicReferenceModel(String uri) {
-        super(uri, (String) null);   // typeUri=null
+    public TopicReferenceModel(String topicUri) {
+        super(topicUri, (String) null);     // typeUri=null
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

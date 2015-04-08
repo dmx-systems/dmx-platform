@@ -359,9 +359,6 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Puts a by-ID topic reference in a single-valued child.
      * An existing reference is overwritten.
-     * <p>
-     * Used to maintain the assigment of an *aggregated* child.
-     * Not applicable for a *compositioned* child.
      */
     public ChildTopicsModel putRef(String childTypeUri, long refTopicId) {
         put(childTypeUri, new TopicReferenceModel(refTopicId));
@@ -371,9 +368,6 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Puts a by-URI topic reference in a single-valued child.
      * An existing reference is overwritten.
-     * <p>
-     * Used to maintain the assigment of an *aggregated* child.
-     * Not applicable for a *compositioned* child.
      */
     public ChildTopicsModel putRef(String childTypeUri, String refTopicUri) {
         put(childTypeUri, new TopicReferenceModel(refTopicUri));
@@ -432,9 +426,6 @@ public class ChildTopicsModel implements Iterable<String> {
 
     /**
      * Adds a by-ID topic reference to a multiple-valued child.
-     *
-     * Used to maintain the assigments of *aggregated* childs.
-     * Not applicable for *compositioned* childs.
      */
     public ChildTopicsModel addRef(String childTypeUri, long refTopicId) {
         add(childTypeUri, new TopicReferenceModel(refTopicId));
@@ -443,9 +434,6 @@ public class ChildTopicsModel implements Iterable<String> {
 
     /**
      * Adds a by-URI topic reference to a multiple-valued child.
-     *
-     * Used to maintain the assigments of *aggregated* childs.
-     * Not applicable for *compositioned* childs.
      */
     public ChildTopicsModel addRef(String childTypeUri, String refTopicUri) {
         add(childTypeUri, new TopicReferenceModel(refTopicUri));
@@ -456,8 +444,6 @@ public class ChildTopicsModel implements Iterable<String> {
 
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
-     *
-     * Applicable for both, *compositioned* childs and *aggregated* childs.
      */
     public ChildTopicsModel addDeletionRef(String childTypeUri, long refTopicId) {
         add(childTypeUri, new TopicDeletionModel(refTopicId));
