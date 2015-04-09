@@ -16,4 +16,12 @@
         <version>6</version>
         <relativePath>../dm4-parent/pom.xml</relativePath>
     </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-core</artifactId>
+            <version>4.6-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 </project>
