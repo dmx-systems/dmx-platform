@@ -324,7 +324,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             // 2) store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
         } catch (Exception e) {
-            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
+            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed (" +
+                object + ")", e);
         }
     }
 

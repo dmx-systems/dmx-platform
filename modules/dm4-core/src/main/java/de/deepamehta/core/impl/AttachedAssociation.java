@@ -328,8 +328,8 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                          String othersRoleTypeUri, String othersTopicTypeUri,
-                                                          int maxResultSize) {
+                                                           String othersRoleTypeUri, String othersTopicTypeUri,
+                                                           int maxResultSize) {
         return dms.storageDecorator.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
     }

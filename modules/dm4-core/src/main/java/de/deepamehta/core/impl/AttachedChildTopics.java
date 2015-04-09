@@ -8,6 +8,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.RelatedTopicReferenceModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
@@ -176,8 +177,18 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public ChildTopics setRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(childTypeUri, new RelatedTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
     public ChildTopics setRef(String childTypeUri, String refTopicUri) {
         return _updateOne(childTypeUri, new TopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics setRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(childTypeUri, new RelatedTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -219,8 +230,18 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public ChildTopics addRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(childTypeUri, new RelatedTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
     public ChildTopics addRef(String childTypeUri, String refTopicUri) {
         return _updateMany(childTypeUri, new TopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics addRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(childTypeUri, new RelatedTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -423,12 +444,11 @@ class AttachedChildTopics implements ChildTopics {
                 if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
                     return;
                 }
-                // == update assignment ==
+                // == delete child ==
                 // update DB
                 childTopic.delete();
-            } else {
-                // == create assignment ==
             }
+            // == create assignment ==
             // update DB
             Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
             // update memory
@@ -493,12 +513,11 @@ class AttachedChildTopics implements ChildTopics {
                 if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
                     return;
                 }
-                // == update assignment ==
+                // == delete assignment ==
                 // update DB
                 childTopic.getRelatingAssociation().delete();
-            } else {
-                // == create assignment ==
             }
+            // == create assignment ==
             // update DB
             Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
             // update memory
@@ -679,7 +698,7 @@ class AttachedChildTopics implements ChildTopics {
             return false;
         }
         // update DB
-        Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
+        Topic topic = associateReferencedChildTopic(newChildTopic, assocDef);
         // update memory
         addToChildTopics(topic, assocDef);
         //

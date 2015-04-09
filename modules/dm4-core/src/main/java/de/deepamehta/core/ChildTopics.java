@@ -117,7 +117,11 @@ public interface ChildTopics extends Iterable<String> {
 
     ChildTopics setRef(String childTypeUri, long refTopicId);
 
+    ChildTopics setRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
+
     ChildTopics setRef(String childTypeUri, String refTopicUri);
+
+    ChildTopics setRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
 
     // ---
 
@@ -139,7 +143,11 @@ public interface ChildTopics extends Iterable<String> {
 
     ChildTopics addRef(String childTypeUri, long refTopicId);
 
+    ChildTopics addRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
+
     ChildTopics addRef(String childTypeUri, String refTopicUri);
+
+    ChildTopics addRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
 
     // ---
 
