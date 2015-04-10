@@ -197,12 +197,12 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // ---
 
     @Override
-    public void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
+    public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         getChildTopics().updateChildTopics(newChildTopic, null, assocDef);      // newChildTopics=null
     }
 
     @Override
-    public void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+    public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
         getChildTopics().updateChildTopics(null, newChildTopics, assocDef);     // newChildTopic=null
     }
 

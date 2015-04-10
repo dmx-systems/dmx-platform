@@ -2,7 +2,7 @@ package de.deepamehta.core.model;
 
 
 
-public class TopicDeletionModel extends TopicModel {
+public class TopicDeletionModel extends RelatedTopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

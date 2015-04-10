@@ -13,6 +13,31 @@ public class RelatedTopicModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    public RelatedTopicModel(String topicUri, String topicTypeUri) {
+        super(topicUri, topicTypeUri);
+        this.relatingAssoc = new AssociationModel();
+    }
+
+    public RelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
+        super(topicUri, (String) null);     // typeUri=null
+        this.relatingAssoc = relatingAssoc;
+    }
+
+    public RelatedTopicModel(long topicId) {
+        super(topicId);
+        this.relatingAssoc = new AssociationModel();
+    }
+
+    public RelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
+        super(topicId);
+        this.relatingAssoc = relatingAssoc;
+    }
+
+    public RelatedTopicModel(TopicModel topic) {
+        super(topic);
+        this.relatingAssoc = new AssociationModel();
+    }
+
     public RelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
         super(topic);
         this.relatingAssoc = relatingAssoc;
@@ -43,6 +68,15 @@ public class RelatedTopicModel extends TopicModel {
     }
 
     // === Java API ===
+
+    @Override
+    public RelatedTopicModel clone() {
+        try {
+            return (RelatedTopicModel) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a RelatedTopicModel failed", e);
+        }
+    }
 
     @Override
     public String toString() {

@@ -26,6 +26,10 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
+    public AssociationModel() {
+        super(-1);
+    }
+
     public AssociationModel(long id) {
         super(id);
     }

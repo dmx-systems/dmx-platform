@@ -762,6 +762,36 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void createAndUpdateAggregationOne() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // 1) define parent type (with Aggregation-One child definition)
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.one"
+                ))
+            );
+            // 2) create parent instance
+            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+                .put("dm4.test.child", "Child 1")
+            ));
+            //
+            assertEquals("Child 1", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
+            // 3) update child topics
+            parent1.getChildTopics().set("dm4.test.child", "Child 2");
+            //
+            assertEquals("Child 2", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void deleteTopic() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {

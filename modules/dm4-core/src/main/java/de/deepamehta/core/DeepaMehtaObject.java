@@ -2,8 +2,8 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
@@ -65,8 +65,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    void updateChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef);
-    void updateChildTopics(List<TopicModel> newChildTopics, AssociationDefinition assocDef);
+    void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef);
+    void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef);
 
 
 

@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.facets.model;
 
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -43,14 +43,14 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Accesses a single-valued facet.
      */
-    public TopicModel getTopic() {
+    public RelatedTopicModel getTopic() {
         return getTopic(childTypeUri);
     }
 
     /**
      * Accesses a multiple-valued facet.
      */
-    public List<TopicModel> getTopics() {
+    public List<RelatedTopicModel> getTopics() {
         return getTopics(childTypeUri);
     }
 
@@ -59,7 +59,7 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Puts a value in a single-valued facet.
      */
-    public FacetValue put(TopicModel value) {
+    public FacetValue put(RelatedTopicModel value) {
         return (FacetValue) put(childTypeUri, value);
     }
 
@@ -100,7 +100,7 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Sets the values of a multiple-valued facet.
      */
-    public FacetValue put(List<TopicModel> values) {
+    public FacetValue put(List<RelatedTopicModel> values) {
         return (FacetValue) put(childTypeUri, values);
     }
 

@@ -8,7 +8,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
-import de.deepamehta.core.model.RelatedTopicReferenceModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
@@ -38,7 +37,7 @@ class AttachedChildTopics implements ChildTopics {
 
     /**
      * Attached object cache.
-     * Key: child type URI (String), value: AttachedTopic or List<AttachedTopic>
+     * Key: child type URI (String), value: RelatedTopic or List<RelatedTopic>
      */
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
@@ -178,7 +177,7 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics setRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(childTypeUri, new RelatedTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
     }
 
     @Override
@@ -188,7 +187,7 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics setRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(childTypeUri, new RelatedTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -231,7 +230,7 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics addRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(childTypeUri, new RelatedTopicReferenceModel(refTopicId, relatingAssocChildTopics));
+        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
     }
 
     @Override
@@ -241,7 +240,7 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics addRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(childTypeUri, new RelatedTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -274,8 +273,8 @@ class AttachedChildTopics implements ChildTopics {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
                 String childTypeUri   = assocDef.getChildTypeUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
-                TopicModel newChildTopic        = null;     // only used for "one"
-                List<TopicModel> newChildTopics = null;     // only used for "many"
+                RelatedTopicModel newChildTopic        = null;  // only used for "one"
+                List<RelatedTopicModel> newChildTopics = null;  // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
                     newChildTopic = newComp.getTopic(childTypeUri, null);        // defaultValue=null
                     // skip if not contained in update request
@@ -306,7 +305,8 @@ class AttachedChildTopics implements ChildTopics {
     // Note: the given association definition must not necessarily originate from the parent object's type definition.
     // It may originate from a facet definition as well.
     // Called from AttachedDeepaMehtaObject.updateChildTopic() and AttachedDeepaMehtaObject.updateChildTopics().
-    void updateChildTopics(TopicModel newChildTopic, List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+    void updateChildTopics(RelatedTopicModel newChildTopic, List<RelatedTopicModel> newChildTopics,
+                                                            AssociationDefinition assocDef) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
         //
@@ -424,7 +424,7 @@ class AttachedChildTopics implements ChildTopics {
 
     // --- Composition ---
 
-    private void updateCompositionOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
+    private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
@@ -462,7 +462,7 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    private void updateCompositionMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+    private void updateCompositionMany(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
@@ -494,7 +494,7 @@ class AttachedChildTopics implements ChildTopics {
 
     // --- Aggregation ---
 
-    private void updateAggregationOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
+    private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
@@ -535,7 +535,7 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    private void updateAggregationMany(List<TopicModel> newChildTopics, AssociationDefinition assocDef) {
+    private void updateAggregationMany(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
         for (TopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
@@ -732,13 +732,13 @@ class AttachedChildTopics implements ChildTopics {
         // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
         // implies creating further AttachedChildTopics objects, which in turn calls this method again but for the next
         // child-level. Finally attached topics are created for all child-levels.
-        if (value instanceof TopicModel) {
-            TopicModel childTopic = (TopicModel) value;
+        if (value instanceof RelatedTopicModel) {
+            RelatedTopicModel childTopic = (RelatedTopicModel) value;
             childTopics.put(childTypeUri, createAttachedObject(childTopic));
         } else if (value instanceof List) {
-            List<Topic> topics = new ArrayList();
+            List<RelatedTopic> topics = new ArrayList();
             childTopics.put(childTypeUri, topics);
-            for (TopicModel childTopic : (List<TopicModel>) value) {
+            for (RelatedTopicModel childTopic : (List<RelatedTopicModel>) value) {
                 topics.add(createAttachedObject(childTopic));
             }
         } else {
@@ -749,16 +749,8 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * Creates an attached topic to be put in this attached object cache.
      */
-    private Topic createAttachedObject(TopicModel model) {
-        if (model instanceof RelatedTopicModel) {
-            // Note: child topics models obtained through *fetching* contain *related topic models*.
-            // We exploit the related topics when updating assignments (in conjunction with aggregations).
-            // See updateAggregationOne() and updateAggregationMany().
-            return new AttachedRelatedTopic((RelatedTopicModel) model, dms);
-        } else {
-            // Note: child topics models for *new topics* to be created contain sole *topic models*.
-            return new AttachedTopic(model, dms);
-        }
+    private RelatedTopic createAttachedObject(RelatedTopicModel model) {
+        return new AttachedRelatedTopic(model, dms);
     }
 
 

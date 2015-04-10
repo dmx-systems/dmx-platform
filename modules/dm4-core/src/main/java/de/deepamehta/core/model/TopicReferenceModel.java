@@ -5,7 +5,7 @@ import java.util.List;
 
 
 
-public class TopicReferenceModel extends TopicModel {
+public class TopicReferenceModel extends RelatedTopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -15,6 +15,14 @@ public class TopicReferenceModel extends TopicModel {
 
     public TopicReferenceModel(String topicUri) {
         super(topicUri, (String) null);     // typeUri=null
+    }
+
+    public TopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {
+        super(topicId, new AssociationModel(relatingAssocChildTopics));
+    }
+
+    public TopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics) {
+        super(topicUri, new AssociationModel(relatingAssocChildTopics));
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
