@@ -709,16 +709,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         Topic parent1, child1;
         try {
-            // 1) define composite type
-            // child type
+            // 1) define parent type (with Aggregation-Many child definition)
             dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
-            // parent type
             dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
                 .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
                 ))
             );
-            // 2) create example child instance
+            // 2) create child instance
             child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create composite instance
             parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));

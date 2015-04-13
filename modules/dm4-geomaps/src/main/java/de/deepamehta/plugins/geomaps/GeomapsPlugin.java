@@ -327,7 +327,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 // Note: we don't want load child topics from DB. So we use has() before getTopics().
                 // The latter would load the child topics on-demand.
                 if (comp.has(childTypeUri)) {
-                    List<Topic> childTopics = comp.getTopics(childTypeUri);
+                    List<RelatedTopic> childTopics = comp.getTopics(childTypeUri);
                     if (!childTopics.isEmpty()) {
                         childTopic = childTopics.get(0);
                     }

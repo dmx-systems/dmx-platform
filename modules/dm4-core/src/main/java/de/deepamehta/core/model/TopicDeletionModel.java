@@ -11,7 +11,7 @@ public class TopicDeletionModel extends RelatedTopicModel {
     }
 
     public TopicDeletionModel(String topicUri) {
-        super(topicUri, (String) null);     // typeUri=null
+        super(topicUri);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

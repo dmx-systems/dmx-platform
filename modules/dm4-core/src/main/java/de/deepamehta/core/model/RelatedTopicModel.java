@@ -13,16 +13,6 @@ public class RelatedTopicModel extends TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public RelatedTopicModel(String topicUri, String topicTypeUri) {
-        super(topicUri, topicTypeUri);
-        this.relatingAssoc = new AssociationModel();
-    }
-
-    public RelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        super(topicUri, (String) null);     // typeUri=null
-        this.relatingAssoc = relatingAssoc;
-    }
-
     public RelatedTopicModel(long topicId) {
         super(topicId);
         this.relatingAssoc = new AssociationModel();
@@ -31,6 +21,26 @@ public class RelatedTopicModel extends TopicModel {
     public RelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
         super(topicId);
         this.relatingAssoc = relatingAssoc;
+    }
+
+    public RelatedTopicModel(String topicUri) {
+        super(topicUri, (String) null);     // typeUri=null
+        this.relatingAssoc = new AssociationModel();
+    }
+
+    public RelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
+        super(topicUri, (String) null);     // typeUri=null
+        this.relatingAssoc = relatingAssoc;
+    }
+
+    public RelatedTopicModel(String topicTypeUri, SimpleValue value) {
+        super(topicTypeUri, value);
+        this.relatingAssoc = new AssociationModel();
+    }
+
+    public RelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics) {
+        super(topicTypeUri, childTopics);
+        this.relatingAssoc = new AssociationModel();
     }
 
     public RelatedTopicModel(TopicModel topic) {

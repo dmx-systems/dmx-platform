@@ -14,7 +14,7 @@ public class TopicReferenceModel extends RelatedTopicModel {
     }
 
     public TopicReferenceModel(String topicUri) {
-        super(topicUri, (String) null);     // typeUri=null
+        super(topicUri);
     }
 
     public TopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {

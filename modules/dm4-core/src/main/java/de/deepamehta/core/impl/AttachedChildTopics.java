@@ -153,19 +153,19 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics set(String childTypeUri, TopicModel value) {
-        return _updateOne(childTypeUri, value);
+        return _updateOne(childTypeUri, new RelatedTopicModel(value));
     }
 
     // ---
 
     @Override
     public ChildTopics set(String childTypeUri, Object value) {
-        return _updateOne(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+        return _updateOne(childTypeUri, new RelatedTopicModel(childTypeUri, new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics set(String childTypeUri, ChildTopicsModel value) {
-        return _updateOne(childTypeUri, new TopicModel(childTypeUri, value));
+        return _updateOne(childTypeUri, new RelatedTopicModel(childTypeUri, value));
     }
 
     // ---
@@ -206,19 +206,19 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics add(String childTypeUri, TopicModel value) {
-        return _updateMany(childTypeUri, value);
+        return _updateMany(childTypeUri, new RelatedTopicModel(value));
     }
 
     // ---
 
     @Override
     public ChildTopics add(String childTypeUri, Object value) {
-        return _updateMany(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+        return _updateMany(childTypeUri, new RelatedTopicModel(childTypeUri, new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics add(String childTypeUri, ChildTopicsModel value) {
-        return _updateMany(childTypeUri, new TopicModel(childTypeUri, value));
+        return _updateMany(childTypeUri, new RelatedTopicModel(childTypeUri, value));
     }
 
     // ---
@@ -408,16 +408,22 @@ class AttachedChildTopics implements ChildTopics {
 
     // ---
 
-    private ChildTopics _updateOne(String childTypeUri, TopicModel newChildTopic) {
-        // Note: calling parent.update(..) would not work. The JVM would call the update() method of the base class
-        // (AttachedDeepaMehtaObject), not the subclass's update() method. This is related to Java's (missing) multiple
-        // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
-        // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
+    // Note 1: we need to explicitly declare the arg as RelatedTopicModel. When declared as TopicModel instead the
+    // JVM would invoke the ChildTopicsModel's put()/add() which takes a TopicModel object even if at runtime a
+    // RelatedTopicModel or even a TopicReferenceModel is passed. This is because Java method overloading involves
+    // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dm4-test).
+
+    // Note 2: calling parent.update(..) would not work. The JVM would call the update() method of the base class
+    // (AttachedDeepaMehtaObject), not the subclass's update() method. This is related to Java's (missing) multiple
+    // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
+    // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
+
+    private ChildTopics _updateOne(String childTypeUri, RelatedTopicModel newChildTopic) {
         parent.updateChildTopics(new ChildTopicsModel().put(childTypeUri, newChildTopic));
         return this;
     }
 
-    private ChildTopics _updateMany(String childTypeUri, TopicModel newChildTopic) {
+    private ChildTopics _updateMany(String childTypeUri, RelatedTopicModel newChildTopic) {
         parent.updateChildTopics(new ChildTopicsModel().add(childTypeUri, newChildTopic));
         return this;
     }

@@ -60,30 +60,98 @@ public class JavaAPITest {
     }
 
     /*
-        We always create a *subclass* instance.
+        TestClass has a overloaded method, one with a parameter baseclass, one with a parameter subclass.
+        In both test cases we create a parameter object of the *subclass*.
         The difference is whether the holding variable is declared as of the base type, or the sub type.
-        --> Result: always the subclass's method is invoked.
+        --> Result: if the parameter object is declared as base-type the base method is invoked!
+        --> Method overloading involves NO dynamic dispatch! The method to be invoked is determined at **compile time**.
     */
 
+    class TestClass {
+
+        String hi(PBC param) {
+            return "base";
+        }
+
+        String hi(PSC param) {
+            return "sub";
+        }
+    }
+
     @Test
-    public void methodDispatch1() {
+    public void methodOverloading1() {
+        TestClass t = new TestClass();
+        PBC p = new PSC();
+        String res = t.hi(p);
+        assertSame("base", res);
+    }
+
+    @Test
+    public void methodOverloading2() {
+        TestClass t = new TestClass();
+        PSC p = new PSC();
+        String res = t.hi(p);
+        assertSame("sub", res);
+    }
+
+    /*
+        SubClass overrides a method from the BaseClass.
+        In both test cases we create a *subclass* instance.
+        The difference is whether the holding variable is declared as of the base type, or the sub type.
+        --> Result: always the subclass's method is invoked.
+        --> Method overriding involves dynamic dispatch. The method to be invoked is determined at **runtime**.
+    */
+
+    class BaseClass {
+
+        String hi() {
+            return "base";
+        }
+    }
+
+    class SubClass extends BaseClass {
+
+        String hi() {
+            return "sub";
+        }
+    }
+
+    @Test
+    public void methodOverriding1() {
         BaseClass o = new SubClass();
         String res = o.hi();
         assertSame("sub", res);
     }
 
     @Test
-    public void methodDispatch2() {
+    public void methodOverriding2() {
         SubClass o = new SubClass();
         String res = o.hi();
         assertSame("sub", res);
     }
 
     /*
-        We always create a *subclass* instance and a *parameter subclass* instance.
+        The subclass (SC) overrides a method from the baseclass (BC) with an subclassed parameter.
+        In all 4 test cases we create a *subclass* instance and a *parameter subclass* instance.
         The difference is whether the holding variables are declared as of the respective base types, or the sub types.
         --> Result: the subclass's method is only invoked if *both* variables are declared as of the sub types.
     */
+
+    // base class
+    class BC {
+
+        String hi(PBC param) {
+            return "base";
+        }
+    }
+
+    // subclass
+    class SC extends BC {
+
+        String hi(PSC param) {
+            return "sub";
+        }
+    }
 
     @Test
     public void missingMultipleDispatch1() {
@@ -119,38 +187,6 @@ public class JavaAPITest {
 }
 
 // ---
-
-class BaseClass {
-
-    String hi() {
-        return "base";
-    }
-}
-
-class SubClass extends BaseClass {
-
-    String hi() {
-        return "sub";
-    }
-}
-
-// ---
-
-// base class
-class BC {
-
-    String hi(PBC param) {
-        return "base";
-    }
-}
-
-// subclass
-class SC extends BC {
-
-    String hi(PSC param) {
-        return "sub";
-    }
-}
 
 // parameter base class
 class PBC {
