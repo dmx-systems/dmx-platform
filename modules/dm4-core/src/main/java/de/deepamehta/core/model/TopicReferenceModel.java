@@ -53,7 +53,7 @@ public class TopicReferenceModel extends RelatedTopicModel {
     /**
      * Checks weather this reference refers to any of the given topics.
      */
-    public boolean isReferingToAny(List<Topic> topics) {
+    public boolean isReferingToAny(List<? extends Topic> topics) {
         for (Topic topic : topics) {
             if (isReferingTo(topic)) {
                 return true;

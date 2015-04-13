@@ -698,7 +698,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
         assertEquals(child1.getId(), childs.get(0).getId());
         assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
@@ -727,7 +727,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
         assertEquals(child1.getId(), childs.get(0).getId());
         assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
@@ -754,7 +754,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         } finally {
             tx.finish();
         }
-        List<Topic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
+        List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
         assertEquals("Child 1", childs.get(0).getSimpleValue().toString());
     }

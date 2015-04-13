@@ -184,6 +184,8 @@ class ValueStorage {
         }
     }
 
+    // ---
+
     /**
      * Called to store the initial value of a newly created topic/association.
      * Just prepares the arguments and calls storeChildTopics() repetitively.
@@ -224,8 +226,6 @@ class ValueStorage {
         }
     }
 
-    // ---
-
     private void storeChildTopics(RelatedTopicModel childTopic, List<RelatedTopicModel> childTopics,
                                   DeepaMehtaObjectModel parent, AssociationDefinitionModel assocDef) {
         String assocTypeUri = assocDef.getTypeUri();
@@ -249,82 +249,89 @@ class ValueStorage {
 
     // --- Composition ---
 
-    private void storeCompositionOne(RelatedTopicModel model, DeepaMehtaObjectModel parent,
-                                                              AssociationDefinitionModel assocDef) {
-        // == create child ==
-        // update DB
-        Topic childTopic = dms.createTopic(model);
-        associateChildTopic(parent, childTopic.getId(), assocDef);
-        // Note: memory is already up-to-date. The child topic ID is updated in-place.
+    private void storeCompositionOne(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
+                                                                   AssociationDefinitionModel assocDef) {
+        createAndAssociateChildTopic(childTopic, parent, assocDef);
     }
 
-    private void storeCompositionMany(List<RelatedTopicModel> models, DeepaMehtaObjectModel parent,
-                                                                      AssociationDefinitionModel assocDef) {
-        for (TopicModel model : models) {
-            // == create child ==
-            // update DB
-            Topic childTopic = dms.createTopic(model);
-            associateChildTopic(parent, childTopic.getId(), assocDef);
-            // Note: memory is already up-to-date. The child topic ID is updated in-place.
+    private void storeCompositionMany(List<RelatedTopicModel> childTopics, DeepaMehtaObjectModel parent,
+                                                                           AssociationDefinitionModel assocDef) {
+        for (RelatedTopicModel childTopic : childTopics) {
+            createAndAssociateChildTopic(childTopic, parent, assocDef);
         }
     }
 
     // --- Aggregation ---
 
-    private void storeAggregationOne(RelatedTopicModel model, DeepaMehtaObjectModel parent,
-                                                              AssociationDefinitionModel assocDef) {
-        if (model instanceof TopicReferenceModel) {
-            // == create assignment ==
-            // update DB
-            Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef);
-            // update memory
-            putInChildTopics(parent, childTopic, assocDef);
+    private void storeAggregationOne(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
+                                                                   AssociationDefinitionModel assocDef) {
+        if (childTopic instanceof TopicReferenceModel) {
+            resolveAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
         } else {
-            // == create child ==
-            // update DB
-            Topic childTopic = dms.createTopic(model);
-            associateChildTopic(parent, childTopic.getId(), assocDef);
-            // Note: memory is already up-to-date. The child topic ID is updated in-place.
+            createAndAssociateChildTopic(childTopic, parent, assocDef);
         }
     }
 
-    private void storeAggregationMany(List<RelatedTopicModel> models, DeepaMehtaObjectModel parent,
-                                                                      AssociationDefinitionModel assocDef) {
-        for (TopicModel model : models) {
-            if (model instanceof TopicReferenceModel) {
-                // == create assignment ==
-                // update DB
-                Topic childTopic = associateReferencedChildTopic(parent, (TopicReferenceModel) model, assocDef);
-                // update memory
-                replaceReference(model, childTopic);
+    private void storeAggregationMany(List<RelatedTopicModel> childTopics, DeepaMehtaObjectModel parent,
+                                                                           AssociationDefinitionModel assocDef) {
+        for (RelatedTopicModel childTopic : childTopics) {
+            if (childTopic instanceof TopicReferenceModel) {
+                resolveAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
             } else {
-                // == create child ==
-                // update DB
-                Topic childTopic = dms.createTopic(model);
-                associateChildTopic(parent, childTopic.getId(), assocDef);
-                // Note: memory is already up-to-date. The child topic ID is updated in-place.
+                createAndAssociateChildTopic(childTopic, parent, assocDef);
             }
         }
     }
 
     // ---
 
-    /**
-     * For single-valued childs
-     */
-    private void putInChildTopics(DeepaMehtaObjectModel parent, Topic childTopic, AssociationDefinitionModel assocDef) {
-        parent.getChildTopicsModel().put(assocDef.getChildTypeUri(), childTopic.getModel());
+    private void createAndAssociateChildTopic(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
+                                                                            AssociationDefinitionModel assocDef) {
+        dms.createTopic(childTopic);
+        //
+        associateChildTopic(parent, childTopic, assocDef);
     }
 
-    /**
-     * Replaces a topic reference with the resolved topic.
-     *
-     * Used for multiple-valued childs.
-     */
-    private void replaceReference(TopicModel topicRef, Topic topic) {
-        // Note: we must update the topic reference in-place.
-        // Replacing the entire topic in the list of child topics would cause ConcurrentModificationException.
+    private void resolveAndAssociateChildTopic(TopicReferenceModel childTopicRef, DeepaMehtaObjectModel parent,
+                                                                                  AssociationDefinitionModel assocDef) {
+        resolveTopic(childTopicRef);
+        //
+        associateChildTopic(parent, childTopicRef, assocDef);
+    }
+
+    // ---
+
+    private void resolveTopic(TopicReferenceModel topicRef) {
+        Topic topic = fetchReferencedTopic(topicRef);
+        // replace the reference with the resolved topic
         topicRef.set(topic.getModel());
+    }
+
+    private Topic fetchReferencedTopic(TopicReferenceModel topicRef) {
+        // Note: the resolved topic must be fetched including its composite value.
+        // It might be required at client-side. ### TODO
+        if (topicRef.isReferenceById()) {
+            return dms.getTopic(topicRef.getId());                          // ### FIXME: had fetchComposite=true
+        } else if (topicRef.isReferenceByUri()) {
+            return dms.getTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had fetchComposite=true
+        } else {
+            throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
+        }
+    }
+
+    // ---
+
+    /**
+     * Creates an association between the given parent object ("Parent" role) and the child topic ("Child" role).
+     * The association type is taken from the given association definition.
+     */
+    private void associateChildTopic(DeepaMehtaObjectModel parent, RelatedTopicModel childTopic,
+                                                                   AssociationDefinitionModel assocDef) {
+        AssociationModel assoc = childTopic.getRelatingAssociation();
+        assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
+        assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
+        assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
+        dms.createAssociation(assoc);
     }
 
 
@@ -422,41 +429,6 @@ class ValueStorage {
             "dm4.core.parent", "dm4.core.child",
             assocDef.getChildTypeUri()
         );
-    }
-
-    // ---
-
-    /**
-     * Creates an association between the given parent object ("Parent" role) and the referenced topic ("Child" role).
-     * The association type is taken from the given association definition.
-     *
-     * @return  the resolved child topic.
-     */
-    private Topic associateReferencedChildTopic(DeepaMehtaObjectModel parent, TopicReferenceModel childTopicRef,
-                                                                              AssociationDefinitionModel assocDef) {
-        Topic childTopic = fetchReferencedTopic(childTopicRef);
-        associateChildTopic(parent, childTopic.getId(), assocDef);
-        return childTopic;
-    }
-
-    private Topic fetchReferencedTopic(TopicReferenceModel topicRef) {
-        // Note: the resolved topic must be fetched including its composite value.
-        // It might be required at client-side. ### TODO
-        if (topicRef.isReferenceById()) {
-            return dms.getTopic(topicRef.getId());                          // ### FIXME: had fetchComposite=true
-        } else if (topicRef.isReferenceByUri()) {
-            return dms.getTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had fetchComposite=true
-        } else {
-            throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
-        }
-    }
-
-    // ---
-
-    private void associateChildTopic(DeepaMehtaObjectModel parent, long childTopicId,
-                                                                   AssociationDefinitionModel assocDef) {
-        dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(), parent.createRoleModel("dm4.core.parent"),
-            new TopicRoleModel(childTopicId, "dm4.core.child"));
     }
 
     // ---

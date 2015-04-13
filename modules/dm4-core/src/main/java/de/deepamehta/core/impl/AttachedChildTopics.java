@@ -67,13 +67,13 @@ class AttachedChildTopics implements ChildTopics {
     // === Accessors ===
 
     @Override
-    public Topic getTopic(String childTypeUri) {
+    public RelatedTopic getTopic(String childTypeUri) {
         loadChildTopics(childTypeUri);
         return _getTopic(childTypeUri);
     }
 
     @Override
-    public List<Topic> getTopics(String childTypeUri) {
+    public List<RelatedTopic> getTopics(String childTypeUri) {
         loadChildTopics(childTypeUri);
         return _getTopics(childTypeUri);
     }
@@ -364,8 +364,8 @@ class AttachedChildTopics implements ChildTopics {
 
     // --- Access this attached object cache ---
 
-    private Topic _getTopic(String childTypeUri) {
-        Topic topic = (Topic) childTopics.get(childTypeUri);
+    private RelatedTopic _getTopic(String childTypeUri) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
         // error check
         if (topic == null) {
             throw new RuntimeException("Child topic of type \"" + childTypeUri + "\" not found in " + childTopics);
@@ -374,16 +374,16 @@ class AttachedChildTopics implements ChildTopics {
         return topic;
     }
 
-    private AttachedTopic _getTopic(String childTypeUri, AttachedTopic defaultTopic) {
-        AttachedTopic topic = (AttachedTopic) childTopics.get(childTypeUri);
+    private RelatedTopic _getTopic(String childTypeUri, RelatedTopic defaultTopic) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
         return topic != null ? topic : defaultTopic;
     }
 
     // ---
 
-    private List<Topic> _getTopics(String childTypeUri) {
+    private List<RelatedTopic> _getTopics(String childTypeUri) {
         try {
-            List<Topic> topics = (List<Topic>) childTopics.get(childTypeUri);
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
             // error check
             if (topics == null) {
                 throw new RuntimeException("Child topics of type \"" + childTypeUri + "\" not found in " + childTopics);
@@ -396,9 +396,9 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    private List<Topic> _getTopics(String childTypeUri, List<Topic> defaultValue) {
+    private List<RelatedTopic> _getTopics(String childTypeUri, List<RelatedTopic> defaultValue) {
         try {
-            List<Topic> topics = (List<Topic>) childTopics.get(childTypeUri);
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
             getModel().throwInvalidAccess(childTypeUri, e);
@@ -425,7 +425,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Composition ---
 
     private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
@@ -440,19 +440,7 @@ class AttachedChildTopics implements ChildTopics {
             // update memory
             removeChildTopic(assocDef);
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            if (childTopic != null) {
-                if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
-                    return;
-                }
-                // == delete child ==
-                // update DB
-                childTopic.delete();
-            }
-            // == create assignment ==
-            // update DB
-            Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
-            // update memory
-            putInChildTopics(topic, assocDef);
+            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, true);   // deleteChild=true
         } else if (childTopic != null) {
             // == update child ==
             updateChildTopic(childTopic, newChildTopic);
@@ -463,7 +451,7 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     private void updateCompositionMany(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
-        for (TopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 Topic childTopic = findChildTopic(childTopicId, assocDef);
@@ -495,7 +483,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Aggregation ---
 
     private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = (RelatedTopic) _getTopic(assocDef.getChildTypeUri(), null);
+        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
             if (childTopic == null) {
@@ -509,19 +497,7 @@ class AttachedChildTopics implements ChildTopics {
             // update memory
             removeChildTopic(assocDef);
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            if (childTopic != null) {
-                if (((TopicReferenceModel) newChildTopic).isReferingTo(childTopic)) {
-                    return;
-                }
-                // == delete assignment ==
-                // update DB
-                childTopic.getRelatingAssociation().delete();
-            }
-            // == create assignment ==
-            // update DB
-            Topic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
-            // update memory
-            putInChildTopics(topic, assocDef);
+            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, false);  // deleteChild=false
         } else if (newChildTopic.getId() != -1) {
             // == update child ==
             updateChildTopicOne(newChildTopic, assocDef);
@@ -536,7 +512,7 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     private void updateAggregationMany(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
-        for (TopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 RelatedTopic childTopic = findChildTopic(childTopicId, assocDef);
@@ -565,7 +541,113 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    // --- References ---
+    // --- Update ---
+
+    private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
+        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
+            // update DB
+            updateChildTopic(childTopic, newChildTopic);
+            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+        } else {
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
+                parent.className() + " " + parent.getId() + " according to " + assocDef);
+        }
+    }
+
+    private void updateChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
+        RelatedTopic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
+        if (childTopic != null) {
+            // update DB
+            updateChildTopic(childTopic, newChildTopic);
+            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
+        } else {
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
+                parent.className() + " " + parent.getId() + " according to " + assocDef);
+        }
+    }
+
+    // ---
+
+    private void updateChildTopic(RelatedTopic childTopic, TopicModel newChildTopic) {
+        ((AttachedTopic) childTopic)._update(newChildTopic);
+        //
+        if (newChildTopic instanceof RelatedTopicModel) {
+            childTopic.getRelatingAssociation().update(((RelatedTopicModel) newChildTopic).getRelatingAssociation());
+        }
+    }
+
+    // --- Create ---
+
+    private void createChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
+        // update DB
+        RelatedTopic childTopic = createChildTopic(newChildTopic, assocDef);
+        // update memory
+        putInChildTopics(childTopic, assocDef);
+    }
+
+    private void createChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
+        // update DB
+        RelatedTopic childTopic = createChildTopic(newChildTopic, assocDef);
+        // update memory
+        addToChildTopics(childTopic, assocDef);
+    }
+
+    // ---
+
+    private RelatedTopic createChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
+        // create topic
+        Topic childTopic = dms.createTopic(newChildTopic);
+        // create association
+        AssociationModel assoc = newChildTopic.getRelatingAssociation();
+        assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
+        assoc.setRoleModel1(parent.getModel().createRoleModel("dm4.core.parent"));
+        assoc.setRoleModel2(newChildTopic.createRoleModel("dm4.core.child"));
+        dms.createAssociation(assoc);
+        //
+        return instantiateRelatedTopic(newChildTopic);
+    }
+
+    // --- Assignment ---
+
+    private void createAssignmentOne(RelatedTopic childTopic, TopicReferenceModel newChildTopic,
+                                     AssociationDefinition assocDef, boolean deleteChildTopic) {
+        if (childTopic != null) {
+            if (newChildTopic.isReferingTo(childTopic)) {
+                return;
+            }
+            if (deleteChildTopic) {
+                // == delete child ==
+                // update DB
+                childTopic.delete();
+            } else {
+                // == delete assignment ==
+                // update DB
+                childTopic.getRelatingAssociation().delete();
+            }
+        }
+        // == create assignment ==
+        // update DB
+        RelatedTopic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
+        // update memory
+        putInChildTopics(topic, assocDef);
+    }
+
+    private boolean createAssignmentMany(TopicReferenceModel newChildTopic, AssociationDefinition assocDef) {
+        if (isReferingToAny(newChildTopic, assocDef)) {
+            // Note: "create assignment" is an idempotent operation. A create request for an assignment which
+            // exists already is not an error. Instead, nothing is performed.
+            return false;
+        }
+        // update DB
+        RelatedTopic topic = associateReferencedChildTopic(newChildTopic, assocDef);
+        // update memory
+        addToChildTopics(topic, assocDef);
+        //
+        return true;
+    }
+
+    // ---
 
     /**
      * Creates an association between our parent object ("Parent" role) and the referenced topic ("Child" role).
@@ -612,99 +694,6 @@ class AttachedChildTopics implements ChildTopics {
         return new AttachedRelatedTopic(new RelatedTopicModel(topic.getModel(), assoc.getModel()), dms);
     }
 
-    // --- Update ---
-
-    private void updateChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        AttachedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
-        if (childTopic != null && childTopic.getId() == newChildTopic.getId()) {
-            // update DB
-            updateChildTopic(childTopic, newChildTopic);
-            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
-        } else {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                parent.className() + " " + parent.getId() + " according to " + assocDef);
-        }
-    }
-
-    private void updateChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        AttachedTopic childTopic = findChildTopic(newChildTopic.getId(), assocDef);
-        if (childTopic != null) {
-            // update DB
-            updateChildTopic(childTopic, newChildTopic);
-            // Note: memory is already up-to-date. The child topic is updated in-place of parent.
-        } else {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                parent.className() + " " + parent.getId() + " according to " + assocDef);
-        }
-    }
-
-    // ---
-
-    private void updateChildTopic(AttachedTopic childTopic, TopicModel newChildTopic) {
-        childTopic._update(newChildTopic);
-        //
-        if (newChildTopic instanceof RelatedTopicModel) {
-            ((RelatedTopic) childTopic).getRelatingAssociation().update(
-                ((RelatedTopicModel) newChildTopic).getRelatingAssociation()
-            );
-        }
-    }
-
-    // --- Create ---
-
-    private void createChildTopicOne(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        // update DB
-        Topic childTopic = createChildTopic(newChildTopic, assocDef);
-        // update memory
-        putInChildTopics(childTopic, assocDef);
-    }
-
-    private void createChildTopicMany(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        // update DB
-        Topic childTopic = createChildTopic(newChildTopic, assocDef);
-        // update memory
-        addToChildTopics(childTopic, assocDef);
-    }
-
-    // ---
-
-    private Topic createChildTopic(TopicModel newChildTopic, AssociationDefinition assocDef) {
-        // create topic
-        Topic childTopic = dms.createTopic(newChildTopic);
-        // create association
-        String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
-        RoleModel parentRoleModel = parent.getModel().createRoleModel("dm4.core.parent");
-        RoleModel childRoleModel = newChildTopic.createRoleModel("dm4.core.child");
-        AssociationModel assoc;
-        if (newChildTopic instanceof RelatedTopicModel) {
-            assoc = ((RelatedTopicModel) newChildTopic).getRelatingAssociation();
-            assoc.setTypeUri(assocTypeUri);
-            assoc.setRoleModel1(parentRoleModel);
-            assoc.setRoleModel2(childRoleModel);
-        } else {
-            assoc = new AssociationModel(assocTypeUri, parentRoleModel, childRoleModel);
-        }
-        dms.createAssociation(assoc);
-        //
-        return childTopic;
-    }
-
-    // --- Assignment ---
-
-    private boolean createAssignmentMany(TopicReferenceModel newChildTopic, AssociationDefinition assocDef) {
-        if (isReferingToAny(newChildTopic, assocDef)) {
-            // Note: "create assignment" is an idempotent operation. A create request for an assignment which
-            // exists already is not an error. Instead, nothing is performed.
-            return false;
-        }
-        // update DB
-        Topic topic = associateReferencedChildTopic(newChildTopic, assocDef);
-        // update memory
-        addToChildTopics(topic, assocDef);
-        //
-        return true;
-    }
-
 
 
     // === Attached Object Cache Initialization ===
@@ -734,12 +723,12 @@ class AttachedChildTopics implements ChildTopics {
         // child-level. Finally attached topics are created for all child-levels.
         if (value instanceof RelatedTopicModel) {
             RelatedTopicModel childTopic = (RelatedTopicModel) value;
-            childTopics.put(childTypeUri, createAttachedObject(childTopic));
+            childTopics.put(childTypeUri, instantiateRelatedTopic(childTopic));
         } else if (value instanceof List) {
             List<RelatedTopic> topics = new ArrayList();
             childTopics.put(childTypeUri, topics);
             for (RelatedTopicModel childTopic : (List<RelatedTopicModel>) value) {
-                topics.add(createAttachedObject(childTopic));
+                topics.add(instantiateRelatedTopic(childTopic));
             }
         } else {
             throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
@@ -749,7 +738,7 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * Creates an attached topic to be put in this attached object cache.
      */
-    private RelatedTopic createAttachedObject(RelatedTopicModel model) {
+    private RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         return new AttachedRelatedTopic(model, dms);
     }
 
@@ -762,7 +751,7 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * For single-valued childs
      */
-    private void putInChildTopics(Topic childTopic, AssociationDefinition assocDef) {
+    private void putInChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         put(childTypeUri, childTopic);                              // attached object cache
         getModel().put(childTypeUri, childTopic.getModel());        // underlying model
@@ -780,7 +769,7 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * For multiple-valued childs
      */
-    private void addToChildTopics(Topic childTopic, AssociationDefinition assocDef) {
+    private void addToChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
         String childTypeUri = assocDef.getChildTypeUri();
         add(childTypeUri, childTopic);                              // attached object cache
         getModel().add(childTypeUri, childTopic.getModel());        // underlying model
@@ -814,8 +803,8 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * Adds a value to a multiple-valued child.
      */
-    private void add(String childTypeUri, Topic topic) {
-        List<Topic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+    private void add(String childTypeUri, RelatedTopic topic) {
+        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
@@ -828,7 +817,7 @@ class AttachedChildTopics implements ChildTopics {
      * Removes a value from a multiple-valued child.
      */
     private void remove(String childTypeUri, Topic topic) {
-        List<Topic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
         if (topics != null) {
             topics.remove(topic);
         }
@@ -841,11 +830,11 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
      */
-    private AttachedRelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
-        List<Topic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
-        for (Topic childTopic : childTopics) {
+    private RelatedTopic findChildTopic(long childTopicId, AssociationDefinition assocDef) {
+        List<RelatedTopic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
+        for (RelatedTopic childTopic : childTopics) {
             if (childTopic.getId() == childTopicId) {
-                return (AttachedRelatedTopic) childTopic;
+                return childTopic;
             }
         }
         return null;

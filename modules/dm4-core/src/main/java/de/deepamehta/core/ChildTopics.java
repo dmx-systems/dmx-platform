@@ -17,13 +17,13 @@ public interface ChildTopics extends Iterable<String> {
      * Accesses a single-valued child.
      * Throws if there is no such child.
      */
-    Topic getTopic(String childTypeUri);
+    RelatedTopic getTopic(String childTypeUri);
 
     /**
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
-    List<Topic> getTopics(String childTypeUri);
+    List<RelatedTopic> getTopics(String childTypeUri);
 
     // ---
 
