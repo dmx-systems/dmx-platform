@@ -24,12 +24,12 @@ public class RelatedTopicModel extends TopicModel {
     }
 
     public RelatedTopicModel(String topicUri) {
-        super(topicUri, (String) null);     // typeUri=null
+        super(topicUri, (String) null);     // topicTypeUri=null
         this.relatingAssoc = new AssociationModel();
     }
 
     public RelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        super(topicUri, (String) null);     // typeUri=null
+        super(topicUri, (String) null);     // topicTypeUri=null
         this.relatingAssoc = relatingAssoc;
     }
 
@@ -70,7 +70,13 @@ public class RelatedTopicModel extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("assoc", relatingAssoc.toJSON());
+            // Note: the relating association might be uninitialized and thus not serializable.
+            // This is the case at least for enrichments which have no underlying topics (e.g. timestamps).
+            // ### TODO: remodel enrichments? Don't put them in a child topics model but in a proprietary field?
+            if (relatingAssoc.getRoleModel1() != null) {
+                o.put("assoc", relatingAssoc.toJSON());
+            }
+            //
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
