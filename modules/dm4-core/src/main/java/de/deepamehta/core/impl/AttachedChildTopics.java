@@ -473,9 +473,7 @@ class AttachedChildTopics implements ChildTopics {
                 removeFromChildTopics(childTopic, assocDef);
             } else if (newChildTopic instanceof TopicReferenceModel) {
                 // == create assignment ==
-                if (!createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef)) {
-                    continue;
-                }
+                createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -534,9 +532,7 @@ class AttachedChildTopics implements ChildTopics {
                 removeFromChildTopics(childTopic, assocDef);
             } else if (newChildTopic instanceof TopicReferenceModel) {
                 // == create assignment ==
-                if (!createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef)) {
-                    continue;
-                }
+                createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef);
             } else if (childTopicId != -1) {
                 // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
@@ -587,31 +583,23 @@ class AttachedChildTopics implements ChildTopics {
 
     private void createChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
-        RelatedTopic childTopic = createChildTopic(newChildTopic, assocDef);
+        RelatedTopic childTopic = createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         putInChildTopics(childTopic, assocDef);
     }
 
     private void createChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         // update DB
-        RelatedTopic childTopic = createChildTopic(newChildTopic, assocDef);
+        RelatedTopic childTopic = createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         addToChildTopics(childTopic, assocDef);
     }
 
     // ---
 
-    private RelatedTopic createChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        // create topic
-        Topic childTopic = dms.createTopic(newChildTopic);
-        // create association
-        AssociationModel assoc = newChildTopic.getRelatingAssociation();
-        assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
-        assoc.setRoleModel1(parent.getModel().createRoleModel("dm4.core.parent"));
-        assoc.setRoleModel2(newChildTopic.createRoleModel("dm4.core.child"));
-        dms.createAssociation(assoc);
-        //
-        return instantiateRelatedTopic(newChildTopic);
+    private RelatedTopic createAndAssociateChildTopic(RelatedTopicModel childTopic, AssociationDefinition assocDef) {
+        dms.createTopic(childTopic);
+        return associateChildTopic(childTopic, assocDef);
     }
 
     // --- Assignment ---
@@ -634,23 +622,21 @@ class AttachedChildTopics implements ChildTopics {
         }
         // == create assignment ==
         // update DB
-        RelatedTopic topic = associateReferencedChildTopic((TopicReferenceModel) newChildTopic, assocDef);
+        RelatedTopic topic = resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         putInChildTopics(topic, assocDef);
     }
 
-    private boolean createAssignmentMany(TopicReferenceModel newChildTopic, AssociationDefinition assocDef) {
+    private void createAssignmentMany(TopicReferenceModel newChildTopic, AssociationDefinition assocDef) {
         if (isReferingToAny(newChildTopic, assocDef)) {
             // Note: "create assignment" is an idempotent operation. A create request for an assignment which
             // exists already is not an error. Instead, nothing is performed.
-            return false;
+            return;
         }
         // update DB
-        RelatedTopic topic = associateReferencedChildTopic(newChildTopic, assocDef);
+        RelatedTopic topic = resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         addToChildTopics(topic, assocDef);
-        //
-        return true;
     }
 
     // ---
@@ -661,43 +647,14 @@ class AttachedChildTopics implements ChildTopics {
      *
      * @return  the resolved child topic.
      */
-    RelatedTopic associateReferencedChildTopic(TopicReferenceModel childTopicRef, AssociationDefinition assocDef) {
-        if (childTopicRef.isReferenceById()) {
-            long childTopicId = childTopicRef.getId();
-            // Note: the resolved topic must be fetched including its composite value.
-            // It might be required at client-side. ### FIXME: had fetchComposite=true
-            Topic childTopic = dms.getTopic(childTopicId);
-            Association assoc = associateChildTopic(childTopicId, assocDef);
-            return createRelatedTopic(childTopic, assoc);
-        } else if (childTopicRef.isReferenceByUri()) {
-            String childTopicUri = childTopicRef.getUri();
-            // Note: the resolved topic must be fetched including its composite value.
-            // It might be required at client-side. ### FIXME: had fetchComposite=true
-            Topic childTopic = dms.getTopic("uri", new SimpleValue(childTopicUri));
-            Association assoc = associateChildTopic(childTopicUri, assocDef);
-            return createRelatedTopic(childTopic, assoc);
-        } else {
-            throw new RuntimeException("Invalid topic reference (" + childTopicRef + ")");
-        }
+    RelatedTopic resolveRefAndAssociateChildTopic(TopicReferenceModel childTopicRef, AssociationDefinition assocDef) {
+        dms.valueStorage.resolveReference(childTopicRef);
+        return associateChildTopic(childTopicRef, assocDef);
     }
 
-    private Association associateChildTopic(long childTopicId, AssociationDefinition assocDef) {
-        return associateChildTopic(new TopicRoleModel(childTopicId, "dm4.core.child"), assocDef);
-    }
-
-    private Association associateChildTopic(String childTopicUri, AssociationDefinition assocDef) {
-        return associateChildTopic(new TopicRoleModel(childTopicUri, "dm4.core.child"), assocDef);
-    }
-
-    // ---
-
-    private Association associateChildTopic(TopicRoleModel child, AssociationDefinition assocDef) {
-        return dms.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
-            parent.getModel().createRoleModel("dm4.core.parent"), child);
-    }
-
-    private RelatedTopic createRelatedTopic(Topic topic, Association assoc) {
-        return new AttachedRelatedTopic(new RelatedTopicModel(topic.getModel(), assoc.getModel()), dms);
+    private RelatedTopic associateChildTopic(RelatedTopicModel childTopic, AssociationDefinition assocDef) {
+        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic, assocDef.getModel());
+        return instantiateRelatedTopic(childTopic);
     }
 
 

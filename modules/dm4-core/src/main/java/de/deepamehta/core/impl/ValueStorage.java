@@ -266,7 +266,7 @@ class ValueStorage {
     private void storeAggregationOne(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
                                                                    AssociationDefinitionModel assocDef) {
         if (childTopic instanceof TopicReferenceModel) {
-            resolveAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
+            resolveRefAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
         } else {
             createAndAssociateChildTopic(childTopic, parent, assocDef);
         }
@@ -276,7 +276,7 @@ class ValueStorage {
                                                                            AssociationDefinitionModel assocDef) {
         for (RelatedTopicModel childTopic : childTopics) {
             if (childTopic instanceof TopicReferenceModel) {
-                resolveAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
+                resolveRefAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
             } else {
                 createAndAssociateChildTopic(childTopic, parent, assocDef);
             }
@@ -292,16 +292,19 @@ class ValueStorage {
         associateChildTopic(parent, childTopic, assocDef);
     }
 
-    private void resolveAndAssociateChildTopic(TopicReferenceModel childTopicRef, DeepaMehtaObjectModel parent,
+    private void resolveRefAndAssociateChildTopic(TopicReferenceModel childTopicRef, DeepaMehtaObjectModel parent,
                                                                                   AssociationDefinitionModel assocDef) {
-        resolveTopic(childTopicRef);
+        resolveReference(childTopicRef);
         //
         associateChildTopic(parent, childTopicRef, assocDef);
     }
 
     // ---
 
-    private void resolveTopic(TopicReferenceModel topicRef) {
+    /**
+     * Replaces a reference with the real thing.
+     */
+    void resolveReference(TopicReferenceModel topicRef) {
         Topic topic = fetchReferencedTopic(topicRef);
         // replace the reference with the resolved topic
         topicRef.set(topic.getModel());
@@ -325,8 +328,8 @@ class ValueStorage {
      * Creates an association between the given parent object ("Parent" role) and the child topic ("Child" role).
      * The association type is taken from the given association definition.
      */
-    private void associateChildTopic(DeepaMehtaObjectModel parent, RelatedTopicModel childTopic,
-                                                                   AssociationDefinitionModel assocDef) {
+    void associateChildTopic(DeepaMehtaObjectModel parent, RelatedTopicModel childTopic,
+                                                           AssociationDefinitionModel assocDef) {
         AssociationModel assoc = childTopic.getRelatingAssociation();
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
         assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
