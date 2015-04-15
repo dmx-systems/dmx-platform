@@ -394,7 +394,7 @@ dm4c.render.page_model = new function() {
         }
         if (page_model.type == PageModel.SIMPLE) {
             var value = page_model.read_form_value()
-            // Note: undefined form value is an error (means: simple renderer returned no value).
+            // Note: undefined form value is an error (means: simple renderer returned no value). Already thrown.
             // null is a valid form value (means: simple renderer prevents the field from being updated).
             if (value == null) {
                 return null
@@ -410,8 +410,12 @@ dm4c.render.page_model = new function() {
         } else if (page_model.type == PageModel.COMPOSITE) {
             if (is_related_topic_page_model(page_model)) {
                 var topic_model = this.build_object_model(page_model.childs["dm4.webclient.topic"])
-                var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
-                topic_model.assoc = assoc_model
+                // Note: if updating the topic field is prevented the relating assoc form input is ignored as well.
+                if (topic_model != null) {
+                    var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
+                    // ### FIXME: check assoc_model for null?
+                    topic_model.assoc = assoc_model
+                }
                 return topic_model
             } else {
                 object_model.childs = {}
