@@ -57,6 +57,16 @@ public class ViewConfigurationModel {
         return viewConfig.values();
     }
 
+    public void addConfigTopic(TopicModel configTopic) {
+        String configTypeUri = configTopic.getTypeUri();
+        // error check
+        if (getConfigTopic(configTypeUri) != null) {
+            throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
+        }
+        //
+        viewConfig.put(configTypeUri, configTopic);
+    }
+
     public void updateConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();
         TopicModel confTopic = getConfigTopic(configTypeUri);
@@ -66,21 +76,6 @@ public class ViewConfigurationModel {
         }
         //
         confTopic.set(configTopic);
-    }
-
-    public TopicModel addSetting(String configTypeUri, String settingUri, Object value) {
-        // create config topic if not exists
-        boolean created = false;
-        TopicModel configTopic = getConfigTopic(configTypeUri);
-        if (configTopic == null) {
-            configTopic = new TopicModel(configTypeUri);
-            addConfigTopic(configTopic);
-            created = true;
-        }
-        // make setting
-        configTopic.getChildTopicsModel().put(settingUri, value);
-        //
-        return created ? configTopic : null;
     }
 
     // ---
@@ -130,15 +125,5 @@ public class ViewConfigurationModel {
 
     private TopicModel getConfigTopic(String configTypeUri) {
         return viewConfig.get(configTypeUri);
-    }
-
-    private void addConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
-        // error check
-        if (getConfigTopic(configTypeUri) != null) {
-            throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
-        }
-        //
-        viewConfig.put(configTypeUri, configTopic);
     }
 }

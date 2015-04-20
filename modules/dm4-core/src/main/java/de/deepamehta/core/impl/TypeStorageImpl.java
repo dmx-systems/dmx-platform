@@ -645,6 +645,8 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
+    // ### TODO: unify both methods
+
     private ViewConfigurationModel fetchTypeViewConfig(Topic typeTopic) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
@@ -669,34 +671,6 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    // ---
-
-    private RelatedTopicModel fetchTypeViewConfigTopic(long typeId, String configTypeUri) {
-        // Note: the child topics are not fetched as they are not needed
-        return dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
-            "dm4.core.type", "dm4.core.view_config", configTypeUri);
-    }
-
-    private RelatedTopicModel fetchAssocDefViewConfigTopic(long assocDefId, String configTypeUri) {
-        // Note: the child topics are not fetched as they are not needed
-        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation",
-            "dm4.core.assoc_def", "dm4.core.view_config", configTypeUri);
-    }
-
-    // ---
-
-    private TopicModel fetchViewConfigTopic(RoleModel configurable, String configTypeUri) {
-        if (configurable instanceof TopicRoleModel) {
-            long typeId = configurable.getPlayerId();
-            return fetchTypeViewConfigTopic(typeId, configTypeUri);
-        } else if (configurable instanceof AssociationRoleModel) {
-            long assocDefId = configurable.getPlayerId();
-            return fetchAssocDefViewConfigTopic(assocDefId, configTypeUri);
-        } else {
-            throw new RuntimeException("Unexpected configurable: " + configurable);
-        }
-    }
-
     // --- Store ---
 
     private void storeViewConfig(RoleModel configurable, ViewConfigurationModel viewConfig) {
@@ -709,27 +683,11 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
+    Topic storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
         Topic topic = dms.createTopic(configTopic);
-        dms.createAssociation("dm4.core.aggregation", configurable,
-            new TopicRoleModel(topic.getId(), "dm4.core.view_config"));
-    }
-
-    // ---
-
-    /**
-     * Prerequisite: for the configurable a config topic of type configTypeUri exists in the DB.
-     */
-    void storeViewConfigSetting(RoleModel configurable, String configTypeUri, String settingUri, Object value) {
-        try {
-            TopicModel configTopic = fetchViewConfigTopic(configurable, configTypeUri);
-            // ### TODO: do not create an attached topic here. Can we use the value storage?
-            new AttachedTopic(configTopic, dms).getChildTopics().set(settingUri, value);
-        } catch (Exception e) {
-            throw new RuntimeException("Storing view configuration setting failed (configurable=" + configurable +
-                ", configTypeUri=\"" + configTypeUri + "\", settingUri=\"" + settingUri + "\", value=\"" + value +
-                "\")", e);
-        }
+        dms.createAssociation("dm4.core.aggregation", configurable, new TopicRoleModel(topic.getId(),
+            "dm4.core.view_config"));
+        return topic;
     }
 
     // --- Helper ---

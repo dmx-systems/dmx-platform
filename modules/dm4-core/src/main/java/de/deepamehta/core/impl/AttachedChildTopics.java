@@ -702,7 +702,11 @@ class AttachedChildTopics implements ChildTopics {
      * Creates an attached topic to be put in this attached object cache.
      */
     private RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
-        return new AttachedRelatedTopic(model, dms);
+        try {
+            return new AttachedRelatedTopic(model, dms);
+        } catch (Exception e) {
+            throw new RuntimeException("RelatedTopic instantiation failed (" + model + ")", e);
+        }
     }
 
 

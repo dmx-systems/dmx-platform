@@ -18,11 +18,12 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private final RoleModel configurable;
-    private final ViewConfigurationModel model;
-    private final EmbeddedService dms;
-
     private Map<String, Topic> configTopics = new HashMap();    // attached object cache
+
+    private final ViewConfigurationModel model;                 // underlying model
+    private final RoleModel configurable;
+
+    private final EmbeddedService dms;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -44,18 +45,16 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     @Override
     public void addSetting(String configTypeUri, String settingUri, Object value) {
-        // update memory
-        TopicModel createdTopicModel = model.addSetting(configTypeUri, settingUri, value);
-        // update DB
-        if (createdTopicModel != null) {
-            // attached object cache
-            addConfigTopic(createdTopicModel);
-            // Note: a new created view config topic model needs an ID (required for setting up access control).
-            // So, the storage layer must operate on that very topic model (instead of creating another one).
-            dms.typeStorage.storeViewConfigTopic(configurable, createdTopicModel);
-        } else {
-            dms.typeStorage.storeViewConfigSetting(configurable, configTypeUri, settingUri, value);
+        Topic configTopic = getConfigTopic(configTypeUri);
+        if (configTopic == null) {
+            // update DB
+            configTopic = dms.typeStorage.storeViewConfigTopic(configurable, new TopicModel(configTypeUri));
+            // update memory
+            model.addConfigTopic(configTopic.getModel());
+            // update attached object cache
+            addConfigTopic(configTopic);
         }
+        configTopic.getChildTopics().set(settingUri, value);
     }
 
     @Override
@@ -74,11 +73,17 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     private void initConfigTopics() {
         for (TopicModel configTopic : model.getConfigTopics()) {
-            addConfigTopic(configTopic);
+            addConfigTopic(new AttachedTopic(configTopic, dms));
         }
     }
 
-    private void addConfigTopic(TopicModel configTopic) {
-            configTopics.put(configTopic.getTypeUri(), new AttachedTopic(configTopic, dms));
+    // ---
+
+    private Topic getConfigTopic(String configTypeUri) {
+        return configTopics.get(configTypeUri);
+    }
+
+    private void addConfigTopic(Topic configTopic) {
+        configTopics.put(configTopic.getTypeUri(), configTopic);
     }
 }
