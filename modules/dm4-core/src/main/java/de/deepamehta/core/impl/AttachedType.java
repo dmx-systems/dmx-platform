@@ -214,7 +214,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.typeStorage.storeLabelConfig(labelConfig, getModel().getAssocDefs());
+        dms.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());
     }
 
     // --- View Configuration ---

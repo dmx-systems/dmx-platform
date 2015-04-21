@@ -49,7 +49,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TypeModel> typeCache = new HashMap();
+    private Map<String, TypeModel> typeCache = new HashMap();   // type model cache
 
     private EmbeddedService dms;
 
@@ -113,7 +113,7 @@ class TypeStorageImpl implements TypeStorage {
         TopicTypeModel topicType = new TopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
             assocDefs, labelConfig, viewConfig);
         //
-        // 3) put in type cache
+        // 3) put in type model cache
         putInTypeCache(topicType);
         //
         return topicType;
@@ -135,7 +135,7 @@ class TypeStorageImpl implements TypeStorage {
         AssociationTypeModel assocType = new AssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
             assocDefs, labelConfig, viewConfig);
         //
-        // 3) put in type cache
+        // 3) put in type model cache
         putInTypeCache(assocType);
         //
         return assocType;
@@ -172,8 +172,8 @@ class TypeStorageImpl implements TypeStorage {
      * Called to store a newly created topic type or association type.
      */
     void storeType(TypeModel type) {
-        // 1) put in type cache
-        // Note: an association type must be put in type cache *before* storing its association definitions.
+        // 1) put in type model cache
+        // Note: an association type must be put in type model cache *before* storing its association definitions.
         // Consider creation of association type "Composition Definition": it has a composition definition itself.
         putInTypeCache(type);
         //
@@ -631,11 +631,33 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    /**
+     * Stores the label configuration of a <i>newly created</i> type.
+     */
+    private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
-            new AttachedAssociationDefinition(assocDef, dms).getChildTopics()
-                .set("dm4.core.include_in_label", includeInLabel);
+            // Note: we don't do the storage in a type-driven fashion here (as in new AttachedAssociationDefinition(
+            // assocDef, dms).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired and the
+            // Type Editor plugin would react and try to access the assoc def's parent type. This means retrieving
+            // a type that is in-mid its storage process. Strange errors would occur.
+            // As a workaround we create the child topic and the association manually. No POST_UPDATE_ASSOCIATION event
+            // is fired (but a POST_CREATE_ASSOCIATION event the Type Editor plugin is not interested in though).
+            Topic topic = dms.createTopic(new TopicModel("dm4.core.include_in_label", new SimpleValue(includeInLabel)));
+            dms.createAssociation(new AssociationModel("dm4.core.composition",
+                new AssociationRoleModel(assocDef.getId(), "dm4.core.parent"),
+                new TopicRoleModel(topic.getId(), "dm4.core.child")
+            ));
+        }
+    }
+
+    /**
+     * Updates the label configuration of an <i>existing</i> type.
+     */
+    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinition> assocDefs) {
+        for (AssociationDefinition assocDef : assocDefs) {
+            boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
+            assocDef.getChildTopics().set("dm4.core.include_in_label", includeInLabel);
         }
     }
 
