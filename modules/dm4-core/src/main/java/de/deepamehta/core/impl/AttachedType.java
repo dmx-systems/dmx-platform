@@ -77,14 +77,20 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void delete() {
+        String operation = "Deleting " + className() + " \"" + getSimpleValue() + "\" (" + getUri() + ")";
         try {
-            logger.info("Deleting " + className() + " \"" + getUri() + "\"");
+            logger.info(operation);
+            //
+            int size = getAllInstances().size();
+            if (size > 0) {
+                throw new RuntimeException(size + " \"" + getSimpleValue() + "\" instances still exist");
+            }
             //
             super.delete();   // delete type topic
             //
             _removeFromTypeCache();
         } catch (Exception e) {
-            throw new RuntimeException("Deleting " + className() + " \"" + getUri() + "\" failed", e);
+            throw new RuntimeException(operation + " failed", e);
         }
     }
 
