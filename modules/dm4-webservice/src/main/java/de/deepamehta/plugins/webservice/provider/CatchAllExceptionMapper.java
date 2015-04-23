@@ -1,7 +1,12 @@
 package de.deepamehta.plugins.webservice.provider;
 
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.util.JavaUtils;
+
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +17,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+// ### import java.io.PrintWriter;
+// ### import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,14 +49,10 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
             return ((WebApplicationException) e).getResponse();
         }
         //
-        Status status;
-        if (hasNestedAccessControlException(e)) {
-            status = Status.UNAUTHORIZED;
-        } else {
-            status = Status.INTERNAL_SERVER_ERROR;
-        }
+        Status status = hasNestedAccessControlException(e) ? Status.UNAUTHORIZED : Status.INTERNAL_SERVER_ERROR;
+        //
         logger.log(Level.SEVERE, errorMessage(status), e);
-        return Response.status(status).build();
+        return Response.status(status).entity(new ExceptionInfo(e)).build();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -67,5 +70,46 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
     private String errorMessage(Status status) {
         return "Request \"" + JavaUtils.requestInfo(request) + "\" failed. Responding with " +
             JavaUtils.responseInfo(status) + ". The original exception/error is:";
+    }
+
+    /* ### private String toJSON(Throwable e) {
+        try {
+            StringWriter out = new StringWriter();
+            e.printStackTrace(new PrintWriter(out));
+            return new JSONObject().put("exception", out).toString();
+        } catch (JSONException je) {
+            throw new RuntimeException("Generating exception info failed", je);
+        }
+    } */
+
+    // --------------------------------------------------------------------------------------------------- Private Class
+
+    private class ExceptionInfo implements JSONEnabled {
+
+        private JSONObject json;
+
+        private ExceptionInfo(Throwable e) {
+            try {
+                JSONArray causes = new JSONArray();
+                json = createJSONObject(e);
+                json.put("causes", causes);
+                while ((e = e.getCause()) != null) {
+                    causes.put(createJSONObject(e));
+                }
+            } catch (JSONException je) {
+                throw new RuntimeException("Generating exception info failed", je);
+            }
+        }
+
+        private JSONObject createJSONObject(Throwable e) throws JSONException {
+            return new JSONObject()
+                .put("exception", e.getClass().getName())
+                .put("message", e.getMessage());
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            return json;
+        }
     }
 }

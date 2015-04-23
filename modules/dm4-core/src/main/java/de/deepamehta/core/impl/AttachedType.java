@@ -77,7 +77,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     @Override
     public void delete() {
-        String operation = "Deleting " + className() + " \"" + getSimpleValue() + "\" (" + getUri() + ")";
+        String operation = "Deleting " + className() + " \"" + getUri() + "\" (named \"" + getSimpleValue() + "\")";
         try {
             logger.info(operation);
             //
