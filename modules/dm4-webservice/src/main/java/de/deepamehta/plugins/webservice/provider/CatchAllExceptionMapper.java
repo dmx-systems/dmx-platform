@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -52,7 +53,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
         Status status = hasNestedAccessControlException(e) ? Status.UNAUTHORIZED : Status.INTERNAL_SERVER_ERROR;
         //
         logger.log(Level.SEVERE, errorMessage(status), e);
-        return Response.status(status).entity(new ExceptionInfo(e)).build();
+        return Response.status(status).type(MediaType.APPLICATION_JSON).entity(new ExceptionInfo(e)).build();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -84,7 +85,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
 
     // --------------------------------------------------------------------------------------------------- Private Class
 
-    private class ExceptionInfo implements JSONEnabled {
+    private static class ExceptionInfo implements JSONEnabled {
 
         private JSONObject json;
 

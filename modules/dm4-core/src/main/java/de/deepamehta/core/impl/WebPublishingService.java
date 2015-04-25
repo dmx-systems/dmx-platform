@@ -17,6 +17,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import java.io.IOException;
 import java.net.URL;
@@ -176,6 +177,12 @@ public class WebPublishingService {
     String getUriNamespace(Object object) {
         Path path = object.getClass().getAnnotation(Path.class);
         return path != null ? path.value() : null;
+    }
+
+    // ---
+
+    boolean isProviderClass(Class clazz) {
+        return clazz.isAnnotationPresent(Provider.class);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

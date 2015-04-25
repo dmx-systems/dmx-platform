@@ -831,11 +831,15 @@ public class PluginImpl implements Plugin, EventHandler {
     private List<Class<?>> getProviderClasses() throws IOException {
         List<Class<?>> providerClasses = new ArrayList();
         for (String className : scanPackage("/provider")) {
-            Class providerClass = loadClass(className);
-            if (providerClass == null) {
+            Class clazz = loadClass(className);
+            if (clazz == null) {
                 throw new RuntimeException("Loading provider class \"" + className + "\" failed");
+            } else if (!webPublishingService.isProviderClass(clazz)) {
+                // Note: scanPackage() also returns nested classes, so we check explicitly.
+                continue;
             }
-            providerClasses.add(providerClass);
+            //
+            providerClasses.add(clazz);
         }
         return providerClasses;
     }
