@@ -91,21 +91,23 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
 
         private ExceptionInfo(Throwable e) {
             try {
-                JSONArray causes = new JSONArray();
                 json = createJSONObject(e);
-                json.put("causes", causes);
-                while ((e = e.getCause()) != null) {
-                    causes.put(createJSONObject(e));
-                }
             } catch (JSONException je) {
                 throw new RuntimeException("Generating exception info failed", je);
             }
         }
 
         private JSONObject createJSONObject(Throwable e) throws JSONException {
-            return new JSONObject()
+            JSONObject json = new JSONObject()
                 .put("exception", e.getClass().getName())
                 .put("message", e.getMessage());
+            //
+            Throwable cause = e.getCause();
+            if (cause != null) {
+                json.put("cause", createJSONObject(cause));
+            }
+            //
+            return json;
         }
 
         @Override
