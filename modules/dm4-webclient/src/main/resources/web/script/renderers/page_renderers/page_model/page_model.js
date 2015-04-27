@@ -46,11 +46,7 @@ dm4c.render.page_model = new function() {
         this.assoc_def = assoc_def
         this.uri = field_uri
         this.parent = parent_page_model
-        this.label = this.object_type.value
-            // ### TODO: label rule when a custom association type is involved.
-            // This one does not work for all cases (see #341, #779):
-            // assoc_def && assoc_def.custom_assoc_type_uri &&
-            // dm4c.association_type_name(assoc_def.custom_assoc_type_uri) || this.object_type.value
+        this.label = page_model_label()
         this.input_field_rows = dm4c.get_view_config(this.object_type, "input_field_rows", assoc_def)
         var renderer_uri
         var renderer = lookup_renderer()
@@ -112,6 +108,17 @@ dm4c.render.page_model = new function() {
         }
 
         // ===
+
+        function page_model_label() {
+            var custom_assoc_type_uri = assoc_def && assoc_def.custom_assoc_type_uri
+            if (custom_assoc_type_uri) {
+                var custom_assoc_type = dm4c.get_association_type(custom_assoc_type_uri)
+                if (custom_assoc_type.is_simple()) {
+                    return custom_assoc_type.value
+                }
+            }
+            return self.object_type.value
+        }
 
         function lookup_renderer() {
             switch (page_model_type) {
