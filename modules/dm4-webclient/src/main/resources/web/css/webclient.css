@@ -277,6 +277,19 @@ body {
     display: none;
 }
 
+/*** Error Dialog ***/
+
+#error-dialog .exception {
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+#error-dialog .exception .class,
+#error-dialog .exception :first-child {
+    font-size: 0.75em;
+    color: gray;
+}
+
 /*** Menus ***/
 
 .ui-menu .icon {

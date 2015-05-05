@@ -28,6 +28,7 @@ dm4c = new function() {
     // utilities
     this.restc = new RESTClient({
         on_send_request: on_send_request,
+        on_error: on_error,
         process_directives: process_directives
     })
     this.ui = new GUIToolkit({
@@ -900,8 +901,32 @@ dm4c = new function() {
         return pm.deliver_event.apply(undefined, arguments)
     }
 
+    // ---
+
     function on_send_request(request) {
         dm4c.fire_event("pre_send_request", request)
+    }
+
+    function on_error(exception) {
+        var content = $()
+        add_exception(exception, true)
+        //
+        dm4c.ui.dialog({
+            id: "error-dialog",
+            title: "Sorry!",
+            content: content
+        })
+
+        function add_exception(exception, is_top_level) {
+            content = content.add($("<div>").addClass("exception")
+                .append($("<div>").text(is_top_level ? "" : "Reason:"))
+                .append(exception.message)
+                .append($("<div>").addClass("class").text("(" + exception.exception + ")"))
+            )
+            if (exception.cause) {
+                add_exception(exception.cause)
+            }
+        }
     }
 
 

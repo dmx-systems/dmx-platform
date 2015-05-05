@@ -1,15 +1,23 @@
 /**
  * A REST client for the DeepaMehta Core Service.
  *
- * @param   config      Optional: an object with these properties:
- *              on_send_request     Optional: the callback invoked before a request is sent (a function). One argument
- *                                  is passed: the request, an object with these properties:
- *                                      method
- *                                      uri
- *                                      header
- *                                      data
- *              process_directives  Optional: the callback invoked to process the directives received from the server.
- *                                  (a function). One argument is passed: the directives (array of directive).
+ * @param   config
+ *              Optional: an object with these properties:
+ *                  on_send_request
+ *                      Optional: the callback invoked before a request is sent (a function).
+ *                      One argument is passed: the request, an object with these properties:
+ *                          method
+ *                          uri
+ *                          header
+ *                          data
+ *                  on_error
+ *                      Optional: the callback invoked in case of an error response (a function).
+ *                      One argument is passed: the (Java) exception as occurred at server-side (an object with
+ *                      "exception", "message", and "cause" properties. The "cause" value is again an exception object.
+ *                      The final exception has no "cause" property).
+ *                  process_directives
+ *                      Optional: the callback invoked to process the directives received from the server (a function).
+ *                      One argument is passed: the directives (array of directive).
  */
 function RESTClient(config) {
 
@@ -371,7 +379,11 @@ function RESTClient(config) {
             // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the
             // exception is catched by jQuery. That's why we use the Promise style to register our callbacks (done(),
             // fail(), always()). An exception thrown from fail() does reach the calling plugin.
-            throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
+            if (config && config.on_error) {
+                config.on_error(jq_xhr.responseJSON)    // ### TODO: process non-JSON error responses
+            } else {
+                throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
+            }
         })
         .always(function(dummy, text_status) {
             // Note: the signature of the always() callback varies. Depending on the response status it takes
