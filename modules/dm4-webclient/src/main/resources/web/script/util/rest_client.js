@@ -6,10 +6,11 @@
  *                  on_send_request
  *                      Optional: the callback invoked before a request is sent (a function).
  *                      One argument is passed: the request, an object with these properties:
- *                          method
- *                          uri
- *                          header
- *                          data
+ *                          method -- read only (string).
+ *                          uri    -- r/w (string)
+ *                          header -- r/w (object of name/value pairs)
+ *                          data   -- read only. An existing request.data object can be manipulated in place though.
+ *                      The caller can manipulate the request before it is sent.
  *                  on_error
  *                      Optional: the callback invoked in case of an error response (a function).
  *                      One argument is passed: the (Java) exception as occurred at server-side (an object with
@@ -379,15 +380,19 @@ function RESTClient(config) {
             // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the
             // exception is catched by jQuery. That's why we use the Promise style to register our callbacks (done(),
             // fail(), always()). An exception thrown from fail() does reach the calling plugin.
+            var server_exception = jq_xhr.responseJSON  // ### TODO: process non-JSON error responses
+            console.error("Server exception:", server_exception)
             if (config && config.on_error) {
-                config.on_error(jq_xhr.responseJSON)    // ### TODO: process non-JSON error responses
-            } else {
-                throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
+                config.on_error(server_exception)
             }
+            throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
         })
         .always(function(dummy, text_status) {
             // Note: the signature of the always() callback varies. Depending on the response status it takes
             // shape either of the done() or the fail() callback.
+            //
+            // "text_status" comprises 3 success strings: "success", "notmodified", "nocontent",
+            // and 4 error strings:                       "error", "timeout", "abort", "parsererror"
             status = text_status
         })
         //
