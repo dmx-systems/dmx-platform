@@ -28,7 +28,7 @@ dm4c = new function() {
     // utilities
     this.restc = new RESTClient({
         on_send_request: on_send_request,
-        on_error: on_error,
+        on_request_error: on_request_error,
         process_directives: process_directives
     })
     this.ui = new GUIToolkit({
@@ -907,24 +907,39 @@ dm4c = new function() {
         dm4c.fire_event("pre_send_request", request)
     }
 
-    function on_error(exception) {
-        var content = $()
-        add_exception(exception, true)
-        //
+    function on_request_error(error_response) {
+
         dm4c.ui.dialog({
             id: "error-dialog",
             title: "Sorry!",
-            content: content
+            content: render_error()
         })
 
-        function add_exception(exception, is_top_level) {
-            content = content.add($("<div>").addClass("exception")
-                .append($("<div>").text(is_top_level ? "" : "Reason:"))
-                .append(exception.message)
-                .append($("<div>").addClass("class").text("(" + exception.exception + ")"))
-            )
-            if (exception.cause) {
-                add_exception(exception.cause)
+        function render_error() {
+            if (error_response.content_type == "application/json") {
+                var error = JSON.parse(error_response.content)
+                if (error.exception) {
+                    return render_exception(error)
+                } 
+            }
+            // fallback
+            return $("<div>").text(error_response.content)
+        }
+
+        function render_exception(exception) {
+            var content = $()
+            _render_exception(exception, true)
+            return content
+
+            function _render_exception(exception, is_top_level) {
+                content = content.add($("<div>").addClass("exception")
+                    .text(exception.message)
+                    .prepend($("<div>").text(is_top_level ? "" : "Reason:"))
+                    .append($("<div>").addClass("class").text("(" + exception.exception + ")"))
+                )
+                if (exception.cause) {
+                    _render_exception(exception.cause)
+                }
             }
         }
     }
