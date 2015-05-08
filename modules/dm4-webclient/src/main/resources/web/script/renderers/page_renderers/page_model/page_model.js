@@ -406,14 +406,15 @@ dm4c.render.page_model = new function() {
             if (value == null) {
                 return null
             }
-            // ### TODO: explain composition/aggregation format
+            // Note: we never want *update* an aggregated simple child. Instead we either want *create* a new child
+            // or *assign* an existing child. So we remove the ID from the object model. At server-side the update vs.
+            // create decision is based on the existence of an ID.
             if (page_model.assoc_def && page_model.assoc_def.type_uri == "dm4.core.aggregation_def" ||
                                                                                     is_del_ref(value)) {
-                return value
-            } else {
-                object_model.value = value
-                return object_model
+                delete object_model.id
             }
+            object_model.value = value
+            return object_model
         } else if (page_model.type == PageModel.COMPOSITE) {
             if (is_related_topic_page_model(page_model)) {
                 var topic_model = this.build_object_model(page_model.childs["dm4.webclient.topic"])

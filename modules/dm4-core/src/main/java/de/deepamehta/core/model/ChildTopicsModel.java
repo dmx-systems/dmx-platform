@@ -539,12 +539,25 @@ public class ChildTopicsModel implements Iterable<String> {
             JSONObject val = (JSONObject) value;
             // we detect the canonic format by checking for a mandatory topic properties
             if (val.has("value") || val.has("childs")) {
-                // canonic format
-                initTypeUri(val, childTypeUri);
+                // canonic format (topic or topic reference)
+                AssociationModel relatingAssoc = null;
                 if (val.has("assoc")) {
-                    return new RelatedTopicModel(val);
+                    relatingAssoc = new AssociationModel(val.getJSONObject("assoc"));
+                }
+                if (val.has("value")) {
+                    RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
+                    if (topicRef != null) {
+                        return topicRef;
+                    }
+                }
+                //
+                initTypeUri(val, childTypeUri);
+                //
+                TopicModel topic = new TopicModel(val);
+                if (relatingAssoc != null) {
+                    return new RelatedTopicModel(topic, relatingAssoc);
                 } else {
-                    return new RelatedTopicModel(new TopicModel(val));
+                    return new RelatedTopicModel(topic);
                 }
             } else {
                 // simplified format (composite topic)
@@ -552,19 +565,37 @@ public class ChildTopicsModel implements Iterable<String> {
             }
         } else {
             // simplified format (simple topic or topic reference)
-            if (value instanceof String) {
-                String val = (String) value;
-                if (val.startsWith(REF_ID_PREFIX)) {
-                    return new TopicReferenceModel(refTopicId(val));    // topic reference by-ID
-                } else if (val.startsWith(REF_URI_PREFIX)) {
-                    return new TopicReferenceModel(refTopicUri(val));   // topic reference by-URI
-                } else if (val.startsWith(DEL_PREFIX)) {
-                    return new TopicDeletionModel(delTopicId(val));     // topic deletion reference
-                }
+            RelatedTopicModel topicRef = createReferenceModel(value, null);
+            if (topicRef != null) {
+                return topicRef;
             }
             // simplified format (simple topic)
             return new RelatedTopicModel(new TopicModel(childTypeUri, new SimpleValue(value)));
         }
+    }
+
+    private RelatedTopicModel createReferenceModel(Object value, AssociationModel relatingAssoc) {
+        if (value instanceof String) {
+            String val = (String) value;
+            if (val.startsWith(REF_ID_PREFIX)) {
+                long topicId = refTopicId(val);
+                if (relatingAssoc != null) {
+                    return new TopicReferenceModel(topicId, relatingAssoc);
+                } else {
+                    return new TopicReferenceModel(topicId);
+                }
+            } else if (val.startsWith(REF_URI_PREFIX)) {
+                String topicUri = refTopicUri(val);
+                if (relatingAssoc != null) {
+                    return new TopicReferenceModel(topicUri, relatingAssoc);
+                } else {
+                    return new TopicReferenceModel(topicUri);
+                }
+            } else if (val.startsWith(DEL_PREFIX)) {
+                return new TopicDeletionModel(delTopicId(val));
+            }
+        }
+        return null;
     }
 
     private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {

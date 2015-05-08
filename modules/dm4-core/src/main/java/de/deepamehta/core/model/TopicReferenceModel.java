@@ -1,5 +1,6 @@
 package de.deepamehta.core.model;
 
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import java.util.List;
 
@@ -13,8 +14,16 @@ public class TopicReferenceModel extends RelatedTopicModel {
         super(topicId);
     }
 
+    public TopicReferenceModel(long topicId, AssociationModel relatingAssoc) {
+        super(topicId, relatingAssoc);
+    }
+
     public TopicReferenceModel(String topicUri) {
         super(topicUri);
+    }
+
+    public TopicReferenceModel(String topicUri, AssociationModel relatingAssoc) {
+        super(topicUri, relatingAssoc);
     }
 
     public TopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {
@@ -51,15 +60,15 @@ public class TopicReferenceModel extends RelatedTopicModel {
     }
 
     /**
-     * Checks weather this reference refers to any of the given topics.
+     * From the given topics finds the one this reference refers to.
      */
-    public boolean isReferingToAny(List<? extends Topic> topics) {
-        for (Topic topic : topics) {
+    public RelatedTopic findReferencedTopic(List<RelatedTopic> topics) {
+        for (RelatedTopic topic : topics) {
             if (isReferingTo(topic)) {
-                return true;
+                return topic;
             }
         }
-        return false;
+        return null;
     }
 
     // ---

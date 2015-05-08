@@ -305,9 +305,7 @@ class ValueStorage {
      * Replaces a reference with the real thing.
      */
     void resolveReference(TopicReferenceModel topicRef) {
-        Topic topic = fetchReferencedTopic(topicRef);
-        // replace the reference with the resolved topic
-        topicRef.set(topic.getModel());
+        topicRef.set(fetchReferencedTopic(topicRef).getModel());
     }
 
     private Topic fetchReferencedTopic(TopicReferenceModel topicRef) {

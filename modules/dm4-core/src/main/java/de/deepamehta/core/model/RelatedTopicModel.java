@@ -53,11 +53,6 @@ public class RelatedTopicModel extends TopicModel {
         this.relatingAssoc = relatingAssoc;
     }
 
-    RelatedTopicModel(JSONObject relatedTopic) throws JSONException {
-        super(relatedTopic);
-        this.relatingAssoc = new AssociationModel(relatedTopic.getJSONObject("assoc"));
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public AssociationModel getRelatingAssociation() {
