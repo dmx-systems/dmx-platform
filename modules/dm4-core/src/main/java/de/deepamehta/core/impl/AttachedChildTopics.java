@@ -341,6 +341,8 @@ class AttachedChildTopics implements ChildTopics {
         loadChildTopics(getAssocDef(childTypeUri));
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
@@ -359,50 +361,6 @@ class AttachedChildTopics implements ChildTopics {
                 parent.getId());
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
             initAttachedObjectCache(childTypeUri);
-        }
-    }
-
-    // --- Access this attached object cache ---
-
-    private RelatedTopic _getTopic(String childTypeUri) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
-        // error check
-        if (topic == null) {
-            throw new RuntimeException("Child topic of type \"" + childTypeUri + "\" not found in " + childTopics);
-        }
-        //
-        return topic;
-    }
-
-    private RelatedTopic _getTopic(String childTypeUri, RelatedTopic defaultTopic) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
-        return topic != null ? topic : defaultTopic;
-    }
-
-    // ---
-
-    private List<RelatedTopic> _getTopics(String childTypeUri) {
-        try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
-            // error check
-            if (topics == null) {
-                throw new RuntimeException("Child topics of type \"" + childTypeUri + "\" not found in " + childTopics);
-            }
-            //
-            return topics;
-        } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(childTypeUri, e);
-            return null;    // never reached
-        }
-    }
-
-    private List<RelatedTopic> _getTopics(String childTypeUri, List<RelatedTopic> defaultValue) {
-        try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
-            return topics != null ? topics : defaultValue;
-        } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(childTypeUri, e);
-            return null;    // never reached
         }
     }
 
@@ -428,6 +386,10 @@ class AttachedChildTopics implements ChildTopics {
         return this;
     }
 
+
+
+    // === Update Child Topics ===
+
     // --- Composition ---
 
     private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
@@ -435,23 +397,12 @@ class AttachedChildTopics implements ChildTopics {
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
-            if (childTopic == null) {
-                // Note: "delete child" is an idempotent operation. A delete request for an child which has been
-                // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
-                return;
-            }
-            // == delete child ==
-            // update DB
-            childTopic.delete();
-            // update memory
-            removeChildTopic(assocDef);
+            deleteChildTopicOne(childTopic, assocDef, true);                                        // deleteChild=true
         } else if (newChildTopic instanceof TopicReferenceModel) {
             createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, true);   // deleteChild=true
         } else if (childTopic != null) {
-            // == update child ==
             updateRelatedTopic(childTopic, newChildTopic);
         } else {
-            // == create child ==
             createChildTopicOne(newChildTopic, assocDef);
         }
     }
@@ -460,25 +411,12 @@ class AttachedChildTopics implements ChildTopics {
         for (RelatedTopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
-                Topic childTopic = findChildTopicById(childTopicId, assocDef);
-                if (childTopic == null) {
-                    // Note: "delete child" is an idempotent operation. A delete request for an child which has been
-                    // deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
-                    continue;
-                }
-                // == delete child ==
-                // update DB
-                childTopic.delete();
-                // update memory
-                removeFromChildTopics(childTopic, assocDef);
+                deleteChildTopicMany(childTopicId, assocDef, true);                                 // deleteChild=true
             } else if (newChildTopic instanceof TopicReferenceModel) {
-                // == create assignment ==
                 createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef);
             } else if (childTopicId != -1) {
-                // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
             } else {
-                // == create child ==
                 createChildTopicMany(newChildTopic, assocDef);
             }
         }
@@ -490,23 +428,12 @@ class AttachedChildTopics implements ChildTopics {
         RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
-            if (childTopic == null) {
-                // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
-                // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
-                return;
-            }
-            // == delete assignment ==
-            // update DB
-            childTopic.getRelatingAssociation().delete();
-            // update memory
-            removeChildTopic(assocDef);
+            deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
         } else if (newChildTopic instanceof TopicReferenceModel) {
             createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, false);  // deleteChild=false
         } else if (newChildTopic.getId() != -1) {
-            // == update child ==
             updateChildTopicOne(newChildTopic, assocDef);
         } else {
-            // == create child ==
             if (childTopic != null) {
                 childTopic.getRelatingAssociation().delete();
             }
@@ -518,25 +445,12 @@ class AttachedChildTopics implements ChildTopics {
         for (RelatedTopicModel newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
-                RelatedTopic childTopic = findChildTopicById(childTopicId, assocDef);
-                if (childTopic == null) {
-                    // Note: "delete assignment" is an idempotent operation. A delete request for an assignment which
-                    // has been deleted already (resp. is non-existing) is not an error. Instead, nothing is performed.
-                    continue;
-                }
-                // == delete assignment ==
-                // update DB
-                childTopic.getRelatingAssociation().delete();
-                // update memory
-                removeFromChildTopics(childTopic, assocDef);
+                deleteChildTopicMany(childTopicId, assocDef, false);                                // deleteChild=false
             } else if (newChildTopic instanceof TopicReferenceModel) {
-                // == create assignment ==
                 createAssignmentMany((TopicReferenceModel) newChildTopic, assocDef);
             } else if (childTopicId != -1) {
-                // == update child ==
                 updateChildTopicMany(newChildTopic, assocDef);
             } else {
-                // == create child ==
                 createChildTopicMany(newChildTopic, assocDef);
             }
         }
@@ -615,14 +529,11 @@ class AttachedChildTopics implements ChildTopics {
                 return;
             }
             if (deleteChildTopic) {
-                // == delete child ==
                 childTopic.delete();
             } else {
-                // == delete assignment ==
                 childTopic.getRelatingAssociation().delete();
             }
         }
-        // == create assignment ==
         // update DB
         RelatedTopic topic = resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
@@ -638,7 +549,6 @@ class AttachedChildTopics implements ChildTopics {
             // Note: memory is already up-to-date. The association is updated in-place of parent.
             return;
         }
-        // == create assignment ==
         // update DB
         RelatedTopic topic = resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
@@ -663,9 +573,201 @@ class AttachedChildTopics implements ChildTopics {
         return instantiateRelatedTopic(childTopic);
     }
 
+    // --- Delete ---
+
+    private void deleteChildTopicOne(RelatedTopic childTopic, AssociationDefinition assocDef,
+                                                              boolean deleteChildTopic) {
+        if (childTopic == null) {
+            // Note: "delete child"/"delete assignment" is an idempotent operation. A delete request for a
+            // child/assignment which has been deleted already (resp. is non-existing) is not an error.
+            // Instead, nothing is performed.
+            return;
+        }
+        // update DB
+        if (deleteChildTopic) {
+            childTopic.delete();
+        } else {
+            childTopic.getRelatingAssociation().delete();
+        }
+        // update memory
+        removeChildTopic(assocDef);
+    }
+
+    private void deleteChildTopicMany(long childTopicId, AssociationDefinition assocDef, boolean deleteChildTopic) {
+        RelatedTopic childTopic = findChildTopicById(childTopicId, assocDef);
+        if (childTopic == null) {
+            // Note: "delete child"/"delete assignment" is an idempotent operation. A delete request for a
+            // child/assignment which has been deleted already (resp. is non-existing) is not an error.
+            // Instead, nothing is performed.
+            return;
+        }
+        // update DB
+        if (deleteChildTopic) {
+            childTopic.delete();
+        } else {
+            childTopic.getRelatingAssociation().delete();
+        }
+        // update memory
+        removeFromChildTopics(childTopic, assocDef);
+    }
 
 
-    // === Attached Object Cache Initialization ===
+
+    // === Attached Object Cache ===
+
+    // --- Access ---
+
+    private RelatedTopic _getTopic(String childTypeUri) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
+        // error check
+        if (topic == null) {
+            throw new RuntimeException("Child topic of type \"" + childTypeUri + "\" not found in " + childTopics);
+        }
+        //
+        return topic;
+    }
+
+    private RelatedTopic _getTopic(String childTypeUri, RelatedTopic defaultTopic) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
+        return topic != null ? topic : defaultTopic;
+    }
+
+    // ---
+
+    private List<RelatedTopic> _getTopics(String childTypeUri) {
+        try {
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
+            // error check
+            if (topics == null) {
+                throw new RuntimeException("Child topics of type \"" + childTypeUri + "\" not found in " + childTopics);
+            }
+            //
+            return topics;
+        } catch (ClassCastException e) {
+            getModel().throwInvalidAccess(childTypeUri, e);
+            return null;    // never reached
+        }
+    }
+
+    private List<RelatedTopic> _getTopics(String childTypeUri, List<RelatedTopic> defaultValue) {
+        try {
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
+            return topics != null ? topics : defaultValue;
+        } catch (ClassCastException e) {
+            getModel().throwInvalidAccess(childTypeUri, e);
+            return null;    // never reached
+        }
+    }
+
+    // ---
+
+    /**
+     * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
+     */
+    private RelatedTopic findChildTopicById(long childTopicId, AssociationDefinition assocDef) {
+        List<RelatedTopic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
+        for (RelatedTopic childTopic : childTopics) {
+            if (childTopic.getId() == childTopicId) {
+                return childTopic;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * For multiple-valued childs: looks in the attached object cache for the child topic the given reference refers to.
+     *
+     * @param   assocDef    the child topics according to this association definition are considered.
+     */
+    private RelatedTopic findChildTopicByRef(TopicReferenceModel topicRef, AssociationDefinition assocDef) {
+        return topicRef.findReferencedTopic(_getTopics(assocDef.getChildTypeUri(), new ArrayList()));
+    }
+
+    // ---
+
+    private AssociationDefinition getAssocDef(String childTypeUri) {
+        // Note: doesn't work for facets
+        return parent.getType().getAssocDef(childTypeUri);
+    }
+
+    // --- Update attached object cache + underlying model ---
+
+    /**
+     * For single-valued childs
+     */
+    private void putInChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        put(childTypeUri, childTopic);                              // attached object cache
+        getModel().put(childTypeUri, childTopic.getModel());        // underlying model
+    }
+
+    /**
+     * For single-valued childs
+     */
+    private void removeChildTopic(AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        remove(childTypeUri);                                       // attached object cache
+        getModel().remove(childTypeUri);                            // underlying model
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void addToChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        add(childTypeUri, childTopic);                              // attached object cache
+        getModel().add(childTypeUri, childTopic.getModel());        // underlying model
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    private void removeFromChildTopics(Topic childTopic, AssociationDefinition assocDef) {
+        String childTypeUri = assocDef.getChildTypeUri();
+        remove(childTypeUri, childTopic);                           // attached object cache
+        getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
+    }
+
+    // --- Update attached object cache ---
+
+    /**
+     * Puts a single-valued child. An existing value is overwritten.
+     */
+    private void put(String childTypeUri, Topic topic) {
+        childTopics.put(childTypeUri, topic);
+    }
+
+    /**
+     * Removes a single-valued child.
+     */
+    private void remove(String childTypeUri) {
+        childTopics.remove(childTypeUri);
+    }
+
+    /**
+     * Adds a value to a multiple-valued child.
+     */
+    private void add(String childTypeUri, RelatedTopic topic) {
+        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+        // Note: topics just created have no child topics yet
+        if (topics == null) {
+            topics = new ArrayList();
+            childTopics.put(childTypeUri, topics);
+        }
+        topics.add(topic);
+    }
+
+    /**
+     * Removes a value from a multiple-valued child.
+     */
+    private void remove(String childTypeUri, Topic topic) {
+        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+        if (topics != null) {
+            topics.remove(topic);
+        }
+    }
+
+    // --- Initialization ---
 
     /**
      * Initializes this attached object cache. Creates a hierarchy of attached topics (recursively) that is isomorph
@@ -713,117 +815,5 @@ class AttachedChildTopics implements ChildTopics {
         } catch (Exception e) {
             throw new RuntimeException("RelatedTopic instantiation failed (" + model + ")", e);
         }
-    }
-
-
-
-    // === Update ===
-
-    // --- Update this attached object cache + underlying model ---
-
-    /**
-     * For single-valued childs
-     */
-    private void putInChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        put(childTypeUri, childTopic);                              // attached object cache
-        getModel().put(childTypeUri, childTopic.getModel());        // underlying model
-    }
-
-    /**
-     * For single-valued childs
-     */
-    private void removeChildTopic(AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        remove(childTypeUri);                                       // attached object cache
-        getModel().remove(childTypeUri);                            // underlying model
-    }
-
-    /**
-     * For multiple-valued childs
-     */
-    private void addToChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        add(childTypeUri, childTopic);                              // attached object cache
-        getModel().add(childTypeUri, childTopic.getModel());        // underlying model
-    }
-
-    /**
-     * For multiple-valued childs
-     */
-    private void removeFromChildTopics(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        remove(childTypeUri, childTopic);                           // attached object cache
-        getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
-    }
-
-    // --- Update this attached object cache ---
-
-    /**
-     * Puts a single-valued child. An existing value is overwritten.
-     */
-    private void put(String childTypeUri, Topic topic) {
-        childTopics.put(childTypeUri, topic);
-    }
-
-    /**
-     * Removes a single-valued child.
-     */
-    private void remove(String childTypeUri) {
-        childTopics.remove(childTypeUri);
-    }
-
-    /**
-     * Adds a value to a multiple-valued child.
-     */
-    private void add(String childTypeUri, RelatedTopic topic) {
-        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
-        // Note: topics just created have no child topics yet
-        if (topics == null) {
-            topics = new ArrayList();
-            childTopics.put(childTypeUri, topics);
-        }
-        topics.add(topic);
-    }
-
-    /**
-     * Removes a value from a multiple-valued child.
-     */
-    private void remove(String childTypeUri, Topic topic) {
-        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
-        if (topics != null) {
-            topics.remove(topic);
-        }
-    }
-
-
-
-    // === Helper ===
-
-    /**
-     * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
-     */
-    private RelatedTopic findChildTopicById(long childTopicId, AssociationDefinition assocDef) {
-        List<RelatedTopic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
-        for (RelatedTopic childTopic : childTopics) {
-            if (childTopic.getId() == childTopicId) {
-                return childTopic;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * For multiple-valued childs: looks in the attached object cache for the child topic the given reference refers to.
-     *
-     * @param   assocDef    the child topics according to this association definition are considered.
-     */
-    private RelatedTopic findChildTopicByRef(TopicReferenceModel topicRef, AssociationDefinition assocDef) {
-        return topicRef.findReferencedTopic(_getTopics(assocDef.getChildTypeUri(), new ArrayList()));
-    }
-
-    private AssociationDefinition getAssocDef(String childTypeUri) {
-        // Note: doesn't work for facets
-        return parent.getType().getAssocDef(childTypeUri);
     }
 }
