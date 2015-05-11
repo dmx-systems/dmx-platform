@@ -11,7 +11,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // === REST Client Extension ===
 
     dm4c.restc.login = function(authorization) {
-        this.request("POST", "/accesscontrol/login", undefined, undefined, {"Authorization": authorization})
+        this.request("POST", "/accesscontrol/login", undefined, undefined, {"Authorization": authorization}, undefined,
+            function() {return false})      // by returning false the error handler prevents the global error handler
     }
     dm4c.restc.logout = function() {
         this.request("POST", "/accesscontrol/logout")

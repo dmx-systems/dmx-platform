@@ -12,7 +12,7 @@
  *                          data   -- read only. An existing request.data object can be manipulated in place though.
  *                      The caller can manipulate the request before it is sent.
  *                  on_request_error
- *                      Optional: the callback invoked when a request fails (a function).
+ *                      Optional: the "global error handler" to be invoked when a request fails (a function).
  *                      One argument is passed: the error response, an object with 4 properties:
  *                          content_type -- (string)
  *                          content      -- (string)
@@ -194,7 +194,7 @@ function RESTClient(config) {
     // ### TODO: remove stay_in_edit_mode parameter
     this.update_association = function(assoc_model, stay_in_edit_mode) {
         return request("PUT", "/core/association/" + assoc_model.id, assoc_model, undefined, undefined, undefined,
-                                                                                  stay_in_edit_mode)
+                                                                                  undefined, stay_in_edit_mode)
     }
 
     this.delete_association = function(id) {
@@ -283,8 +283,8 @@ function RESTClient(config) {
      * A plugin uses this method to send a request to its REST service.
      * As an example see the DeepaMehta 4 Topicmaps plugin.
      */
-    this.request = function(method, uri, data, callback, headers, response_data_type) {
-        return request(method, uri, data, callback, headers, response_data_type)
+    this.request = function(method, uri, data, callback, headers, response_data_type, on_error) {
+        return request(method, uri, data, callback, headers, response_data_type, on_error)
     }
 
     /**
@@ -337,12 +337,17 @@ function RESTClient(config) {
      *                              of the response data. 2 possible values:
      *                                  "json" - the response data is parsed into a JavaScript object. The default.
      *                                  "text" - the response data is returned as is.
+     * @param   on_error            Optional: the "per-request error handler" to be invoked when the request fails
+     *                              (a function). One argument is passed: the error response (see global error handler
+     *                              in RESTClient constructor).
+     *                              By returning false the per-request error handler can prevent the global error
+     *                              handler from being invoked.
      *
      * @return  For successful synchronous requests: the data returned from the server. Otherwise undefined.
      *
      * ### TODO: remove stay_in_edit_mode parameter
      */
-    function request(method, uri, data, callback, headers, response_data_type, stay_in_edit_mode) {
+    function request(method, uri, data, callback, headers, response_data_type, on_error, stay_in_edit_mode) {
         var request = {
             method: method,
             uri: uri,
@@ -388,7 +393,9 @@ function RESTClient(config) {
                 status_text:  jq_xhr.statusText
             }
             console.error("Error response:", error_response)
-            if (config && config.on_request_error) {
+            // an individual error handler can prevent the global error handler by returning false
+            var prevent_default_error = on_error && on_error(error_response) == false
+            if (!prevent_default_error && config && config.on_request_error) {
                 config.on_request_error(error_response)
             }
             // Note: since at least jQuery 2.0.3 an exception thrown from the "error" callback (as registered in the
