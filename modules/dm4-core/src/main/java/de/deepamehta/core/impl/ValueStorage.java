@@ -200,25 +200,21 @@ class ValueStorage {
             for (AssociationDefinitionModel assocDef : getType(parent).getAssocDefs()) {
                 String childTypeUri   = assocDef.getChildTypeUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
-                RelatedTopicModel childTopic        = null;     // only used for "one"
-                List<RelatedTopicModel> childTopics = null;     // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    childTopic = model.getTopic(childTypeUri, null);        // defaultValue=null
-                    // skip if not contained in create request
-                    if (childTopic == null) {
-                        continue;
+                    RelatedTopicModel childTopic = model.getTopic(childTypeUri, null);          // defaultValue=null
+                    if (childTopic != null) {   // skip if not contained in create request
+                        storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    childTopics = model.getTopics(childTypeUri, null);      // defaultValue=null
-                    // skip if not contained in create request
-                    if (childTopics == null) {
-                        continue;
+                    List<RelatedTopicModel> childTopics = model.getTopics(childTypeUri, null);  // defaultValue=null
+                    if (childTopics != null) {  // skip if not contained in create request
+                        for (RelatedTopicModel childTopic : childTopics) {
+                            storeChildTopic(childTopic, parent, assocDef);
+                        }
                     }
                 } else {
                     throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
-                //
-                storeChildTopics(childTopic, childTopics, parent, assocDef);
             }
         } catch (Exception e) {
             throw new RuntimeException("Storing the child topics of object " + parent.getId() + " failed (" +
@@ -226,77 +222,14 @@ class ValueStorage {
         }
     }
 
-    private void storeChildTopics(RelatedTopicModel childTopic, List<RelatedTopicModel> childTopics,
-                                  DeepaMehtaObjectModel parent, AssociationDefinitionModel assocDef) {
-        String assocTypeUri = assocDef.getTypeUri();
-        boolean one = childTopic != null;
-        if (assocTypeUri.equals("dm4.core.composition_def")) {
-            if (one) {
-                storeCompositionOne(childTopic, parent, assocDef);
-            } else {
-                storeCompositionMany(childTopics, parent, assocDef);
-            }
-        } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
-            if (one) {
-                storeAggregationOne(childTopic, parent, assocDef);
-            } else {
-                storeAggregationMany(childTopics, parent, assocDef);
-            }
-        } else {
-            throw new RuntimeException("Unexpected association type: \"" + assocTypeUri + "\"");
-        }
-    }
-
-    // --- Composition ---
-
-    private void storeCompositionOne(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
-                                                                   AssociationDefinitionModel assocDef) {
-        createAndAssociateChildTopic(childTopic, parent, assocDef);
-    }
-
-    private void storeCompositionMany(List<RelatedTopicModel> childTopics, DeepaMehtaObjectModel parent,
-                                                                           AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel childTopic : childTopics) {
-            createAndAssociateChildTopic(childTopic, parent, assocDef);
-        }
-    }
-
-    // --- Aggregation ---
-
-    private void storeAggregationOne(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
-                                                                   AssociationDefinitionModel assocDef) {
+    private void storeChildTopic(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
+                                                               AssociationDefinitionModel assocDef) {
         if (childTopic instanceof TopicReferenceModel) {
-            resolveRefAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
+            resolveReference((TopicReferenceModel) childTopic);
         } else {
-            createAndAssociateChildTopic(childTopic, parent, assocDef);
+            dms.createTopic(childTopic);
         }
-    }
-
-    private void storeAggregationMany(List<RelatedTopicModel> childTopics, DeepaMehtaObjectModel parent,
-                                                                           AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel childTopic : childTopics) {
-            if (childTopic instanceof TopicReferenceModel) {
-                resolveRefAndAssociateChildTopic((TopicReferenceModel) childTopic, parent, assocDef);
-            } else {
-                createAndAssociateChildTopic(childTopic, parent, assocDef);
-            }
-        }
-    }
-
-    // ---
-
-    private void createAndAssociateChildTopic(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
-                                                                            AssociationDefinitionModel assocDef) {
-        dms.createTopic(childTopic);
-        //
         associateChildTopic(parent, childTopic, assocDef);
-    }
-
-    private void resolveRefAndAssociateChildTopic(TopicReferenceModel childTopicRef, DeepaMehtaObjectModel parent,
-                                                                                  AssociationDefinitionModel assocDef) {
-        resolveReference(childTopicRef);
-        //
-        associateChildTopic(parent, childTopicRef, assocDef);
     }
 
     // ---

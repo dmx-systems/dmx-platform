@@ -790,6 +790,60 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void createCompositionWithChildRef() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // 1) define composite type
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create child instance
+            Topic child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            // 3) create parent instance
+            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+                .putRef("dm4.test.child", child1.getId())
+            ));
+            //
+            assertEquals("Child 1", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void createAggregationWithChildRef() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            // 1) define composite type
+            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    "dm4.test.parent", "dm4.test.child", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create child instance
+            Topic child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            // 3) create parent instance
+            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+                .putRef("dm4.test.child", child1.getId())
+            ));
+            //
+            assertEquals("Child 1", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void deleteTopic() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {

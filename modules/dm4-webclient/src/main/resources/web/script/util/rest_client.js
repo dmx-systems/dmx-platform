@@ -393,7 +393,7 @@ function RESTClient(config) {
                 status_text:  jq_xhr.statusText
             }
             console.error("Error response:", error_response)
-            // an individual error handler can prevent the global error handler by returning false
+            // Note: by returning false the per-request error handler can prevent the global error handler
             var prevent_default_error = on_error && on_error(error_response) == false
             if (!prevent_default_error && config && config.on_request_error) {
                 config.on_request_error(error_response)
