@@ -1,19 +1,16 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
-import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
-import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -294,7 +291,7 @@ class AttachedChildTopics implements ChildTopics {
                 updateChildTopics(newChildTopic, newChildTopics, assocDef);
             }
             //
-            dms.valueStorage.refreshLabel(parent.getModel());
+            refreshParentLabel();
             //
         } catch (Exception e) {
             throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
@@ -362,6 +359,16 @@ class AttachedChildTopics implements ChildTopics {
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
             initAttachedObjectCache(childTypeUri);
         }
+    }
+
+    private void refreshParentLabel() {
+        DeepaMehtaObjectModel parent = this.parent.getModel();
+        //
+        for (String childTypeUri : dms.valueStorage.getLabelChildTypeUris(parent)) {
+            loadChildTopics(childTypeUri);
+        }
+        //
+        dms.valueStorage.refreshLabel(parent);
     }
 
     // ---

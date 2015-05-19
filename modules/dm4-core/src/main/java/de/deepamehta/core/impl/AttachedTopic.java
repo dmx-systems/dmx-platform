@@ -48,10 +48,6 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public void update(TopicModel model) {
-        // Note: the child topics are not needed for the actual update operation but for refreshing the label.
-        // ### TODO: refactor labeling. Child topics involved in labeling should be loaded on demand.
-        loadChildTopics();
-        //
         _update(model);
         //
         dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
