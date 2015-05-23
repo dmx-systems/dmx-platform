@@ -11,15 +11,22 @@ function RenderHelper() {
      * @param   topics          Topics to render (array of Topic objects).
      *                          Note: actually the array can contain any kind of objects as long as each object
      *                          has these properties:
-     *                              "type_uri" -- required to render the icon and tooltip
-     *                              "value"    -- required to render the topic link
-     *                              "id"       -- only required by the default click handler
-     *                              "uri"      -- Optional. If set it is rendered in the tooltip
-     *                              "assoc"    -- Optional. If set the assoc's type name is rendered beneath the topic
+     *                              "type_uri"
+     *                                  Required to render the icon and tooltip
+     *                              "value"
+     *                                  Required to render the topic link
+     *                              "id"
+     *                                  Only required by the default click handler
+     *                              "uri"
+     *                                  Optional. If set it is rendered in the tooltip
+     *                              "assoc"
+     *                                  Optional. If set the assoc's type name and value are rendered beneath the topic
      *
      * @param   click_handler   Optional: the callback invoked when a topic is clicked. 2 arguments are passed:
-     *                              "topic"    -- the clicked topic (object)
-     *                              "spot"     -- indicates where the topic is clicked: "icon" or "label" (string)
+     *                              "topic"
+     *                                  The clicked topic (object)
+     *                              "spot"
+     *                                  Indicates where the topic is clicked: "icon" or "label" (string)
      *                          If not specified the default handler is used. The default handler reveals the clicked
      *                          topic by calling dm4c.do_reveal_related_topic().
      *
@@ -95,8 +102,9 @@ function RenderHelper() {
 
         function assoc_type_label() {
             if (topic.assoc) {
-                return $("<div>").addClass("assoc-type-label")
-                    .text("(" + dm4c.association_type_name(topic.assoc.type_uri) + ")")
+                return $("<div>").addClass("assoc-type-label").text("(" +
+                    dm4c.association_type_name(topic.assoc.type_uri) +
+                    (topic.assoc.value && ": " + topic.assoc.value) + ")")
             }
         }
     }
