@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Global</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-global</artifactId>
-    <version>4.6</version>
+    <version>4.6.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>DeepaMehta is a software platform for knowledge workers</description>

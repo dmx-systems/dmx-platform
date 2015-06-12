@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Files</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-files</artifactId>
-    <version>4.6</version>
+    <version>4.6.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.6</version>
+            <version>4.6.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>
