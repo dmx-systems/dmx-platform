@@ -33,6 +33,7 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreCreateTopicListener;
 import de.deepamehta.core.service.event.PreGetAssociationListener;
 import de.deepamehta.core.service.event.PreGetTopicListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -68,7 +69,8 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreGetTopicListener,
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreCreateTopicListener,
+                                                                                         PreGetTopicListener,
                                                                                          PreGetAssociationListener,
                                                                                          PostCreateTopicListener,
                                                                                          PostCreateAssociationListener,
@@ -188,37 +190,42 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Transactional
     @Override
     public Topic createUserAccount(Credentials cred) {
-        String username = cred.username;
-        logger.info("Creating user account \"" + username + "\"");
-        //
-        // 1) create user account
-        Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
-            .put("dm4.accesscontrol.username", username)
-            .put("dm4.accesscontrol.password", cred.password)));
-        ChildTopics childTopics = userAccount.getChildTopics();
-        Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
-        Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
-        //
-        // 2) create private workspace
-        Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE);
-        setWorkspaceOwner(privateWorkspace, username);
-        // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's private
-        // workspace has been created by the new user itself. Instead we set the *current* user as the creator/modifier
-        // (via postCreateTopic() listener). In case of the "admin" user account the creator/modifier remain undefined
-        // as it is actually created by the system itself.
-        //
-        // 3) assign user account and password to private workspace
-        // Note: the current user has no READ access to the private workspace just created.
-        // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
-        long privateWorkspaceId = privateWorkspace.getId();
-        dms.getAccessControl().assignToWorkspace(userAccount, privateWorkspaceId);
-        dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
-        //
-        // 4) assign username to "System" workspace
-        Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
-        wsService.assignToWorkspace(usernameTopic, systemWorkspace.getId());
-        //
-        return usernameTopic;
+        try {
+            String username = cred.username;
+            logger.info("Creating user account \"" + username + "\"");
+            //
+            // 1) create user account
+            Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+                .put("dm4.accesscontrol.username", username)
+                .put("dm4.accesscontrol.password", cred.password)));
+            ChildTopics childTopics = userAccount.getChildTopics();
+            Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
+            Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
+            //
+            // 2) create private workspace
+            Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null,
+                SharingMode.PRIVATE);
+            setWorkspaceOwner(privateWorkspace, username);
+            // Note: we don't set a particular creator/modifier here as we don't want suggest that the new user's
+            // private workspace has been created by the new user itself. Instead we set the *current* user as the
+            // creator/modifier (via postCreateTopic() listener). In case of the "admin" user account the creator/
+            // modifier remain undefined as it is actually created by the system itself.
+            //
+            // 3) assign user account and password to private workspace
+            // Note: the current user has no READ access to the private workspace just created.
+            // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
+            long privateWorkspaceId = privateWorkspace.getId();
+            dms.getAccessControl().assignToWorkspace(userAccount, privateWorkspaceId);
+            dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
+            //
+            // 4) assign username to "System" workspace
+            Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
+            wsService.assignToWorkspace(usernameTopic, systemWorkspace.getId());
+            //
+            return usernameTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
+        }
     }
 
     @GET
@@ -400,6 +407,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
+    public void preCreateTopic(TopicModel model) {
+        if (model.getTypeUri().equals("dm4.accesscontrol.username")) {
+            String username = model.getSimpleValue().toString();
+            Topic usernameTopic = getUsernameTopic(username);
+            if (usernameTopic != null) {
+                throw new RuntimeException("Username \"" + username + "\" exists already");
+            }
+        }
+    }
+
+    @Override
     public void postCreateTopic(Topic topic) {
         String typeUri = topic.getTypeUri();
         if (typeUri.equals("dm4.workspaces.workspace")) {
@@ -425,8 +443,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             Topic usernameTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.password");
             String newUsername = usernameTopic.getSimpleValue().toString();
-            TopicModel oldUsernameTopic = oldModel.getChildTopicsModel().getTopic("dm4.accesscontrol.username",
-                null);
+            TopicModel oldUsernameTopic = oldModel.getChildTopicsModel().getTopic("dm4.accesscontrol.username", null);
             String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
             if (!newUsername.equals(oldUsername)) {
                 //
