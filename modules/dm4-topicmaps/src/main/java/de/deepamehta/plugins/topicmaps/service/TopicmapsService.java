@@ -31,8 +31,13 @@ public interface TopicmapsService extends PluginService {
 
     boolean isTopicInTopicmap(long topicmapId, long topicId);
 
+    boolean isAssociationInTopicmap(long topicmapId, long assocId);
+
     // ---
 
+    /**
+     * Adds a topic to a topicmap. If the topic is added already an exception is thrown.
+     */
     void addTopicToTopicmap(long topicmapId, long topicId, ViewProperties viewProps);
 
     /**
@@ -40,6 +45,9 @@ public interface TopicmapsService extends PluginService {
      */
     void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility);
 
+    /**
+     * Adds an association to a topicmap. If the association is added already an exception is thrown.
+     */
     void addAssociationToTopicmap(long topicmapId, long assocId);
 
     // ---

@@ -121,6 +121,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         return fetchTopicRefAssociation(topicmapId, topicId) != null;
     }
 
+    @Override
+    public boolean isAssociationInTopicmap(long topicmapId, long assocId) {
+        return fetchAssociationRefAssociation(topicmapId, assocId) != null;
+    }
+
     // ---
 
     @POST
@@ -130,6 +135,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                    ViewProperties viewProps) {
         try {
+            if (isTopicInTopicmap(topicmapId, topicId)) {
+                throw new RuntimeException("The topic is already added to the topicmap");
+            }
+            //
             Association assoc = dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
                 new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
                 new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
@@ -151,10 +160,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
-            new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-            new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
-        ));
+        try {
+            if (isAssociationInTopicmap(topicmapId, assocId)) {
+                throw new RuntimeException("The association is already added to the topicmap");
+            }
+            //
+            dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
+                new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
+                new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed", e);
+        }
     }
 
     // ---
@@ -339,6 +356,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Store ---
 
     private void storeViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
+        // TODO: throw if topic not in topicmap, that is when ref assoc == null
         storeViewProperties(fetchTopicRefAssociation(topicmapId, topicId), viewProps);
     }
 
