@@ -136,7 +136,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    ViewProperties viewProps) {
         try {
             if (isTopicInTopicmap(topicmapId, topicId)) {
-                throw new RuntimeException("The topic is already added to the topicmap");
+                throw new RuntimeException("The topic is already added");
             }
             //
             Association assoc = dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
@@ -162,7 +162,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         try {
             if (isAssociationInTopicmap(topicmapId, assocId)) {
-                throw new RuntimeException("The association is already added to the topicmap");
+                throw new RuntimeException("The association is already added");
             }
             //
             dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
@@ -182,12 +182,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                     ViewProperties viewProps) {
-        try {
-            storeViewProperties(topicmapId, topicId, viewProps);
-        } catch (Exception e) {
-            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
-        }
+        storeViewProperties(topicmapId, topicId, viewProps);
     }
 
 
@@ -197,7 +192,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
-        storeViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+        setViewProperties(topicmapId, topicId, new ViewProperties(x, y));
     }
 
     @PUT
@@ -206,7 +201,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+        setViewProperties(topicmapId, topicId, new ViewProperties(visibility));
     }
 
     @DELETE
@@ -214,7 +209,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
-        fetchAssociationRefAssociation(topicmapId, assocId).delete();
+        try {
+            Association assoc = fetchAssociationRefAssociation(topicmapId, assocId);
+            if (assoc == null) {
+                throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
+            }
+            assoc.delete();
+        } catch (Exception e) {
+            throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
+                e);
+        }
     }
 
     // ---
@@ -356,8 +360,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Store ---
 
     private void storeViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
-        // TODO: throw if topic not in topicmap, that is when ref assoc == null
-        storeViewProperties(fetchTopicRefAssociation(topicmapId, topicId), viewProps);
+        try {
+            Association assoc = fetchTopicRefAssociation(topicmapId, topicId);
+            if (assoc == null) {
+                throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
+            }
+            storeViewProperties(assoc, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        }
     }
 
     private void storeViewProperties(Association mapcontextAssoc, ViewProperties viewProps) {
