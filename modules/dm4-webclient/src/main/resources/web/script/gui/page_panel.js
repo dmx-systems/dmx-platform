@@ -14,8 +14,6 @@ function PagePanel() {
     var scroll_position = {}            // Per-object scrollbar positions (key: object ID, value: scrollTop value).
     var form_processing_function        // The form processing function: called to "submit" the form
                                         // (only consulted if a form is displayed).
-    var form_processing_called          // Tracks the form processing function call (boolean).
-                                        // Used to ensure the form processing function is called only once.
 
     // View
     var dom = $("<div>").attr("id", "page-panel")
@@ -102,11 +100,6 @@ function PagePanel() {
             return
         }
         //
-        if (form_processing_called) {
-            throw "PagePanelError: the form processing function has already been called"
-        }
-        //
-        form_processing_called = true
         form_processing_function()
     }
 
@@ -163,8 +156,6 @@ function PagePanel() {
         prepare_page()
         form_processing_function = page_renderer.render_form(displayed_object)
         render_buttons("detail-panel-edit")
-        //
-        form_processing_called = false
     }
 
     function render_buttons(context) {
