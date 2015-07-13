@@ -36,6 +36,7 @@ import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreCreateTopicListener;
 import de.deepamehta.core.service.event.PreGetAssociationListener;
 import de.deepamehta.core.service.event.PreGetTopicListener;
+import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
@@ -70,6 +71,7 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreCreateTopicListener,
+                                                                                         PreUpdateTopicListener,
                                                                                          PreGetTopicListener,
                                                                                          PreGetAssociationListener,
                                                                                          PostCreateTopicListener,
@@ -436,33 +438,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    // ### TODO: revise/drop this method. Meanwhile a user account is created via dialog.
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
-        if (topic.getTypeUri().equals("dm4.accesscontrol.user_account")) {
-            Topic usernameTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.username");
-            Topic passwordTopic = topic.getChildTopics().getTopic("dm4.accesscontrol.password");
-            String newUsername = usernameTopic.getSimpleValue().toString();
-            TopicModel oldUsernameTopic = oldModel.getChildTopicsModel().getTopic("dm4.accesscontrol.username", null);
-            String oldUsername = oldUsernameTopic != null ? oldUsernameTopic.getSimpleValue().toString() : "";
-            if (!newUsername.equals(oldUsername)) {
-                //
-                if (!oldUsername.equals("")) {
-                    throw new RuntimeException("Changing a Username is not supported (tried \"" + oldUsername +
-                        "\" -> \"" + newUsername + "\")");
-                }
-                //
-                logger.info("### Username has changed from \"" + oldUsername + "\" -> \"" + newUsername +
-                    "\". Setting \"" + newUsername + "\" as the new owner of 3 topics:\n" +
-                    "    - User Account topic (ID " + topic.getId() + ")\n" + 
-                    "    - Username topic (ID " + usernameTopic.getId() + ")\n" + 
-                    "    - Password topic (ID " + passwordTopic.getId() + ")");
-                // ### setOwner(topic, newUsername);
-                // ### setOwner(usernameTopic, newUsername);
-                // ### setOwner(passwordTopic, newUsername);
+    public void preUpdateTopic(Topic topic, TopicModel newModel) {
+        if (topic.getTypeUri().equals("dm4.accesscontrol.username")) {
+            SimpleValue newUsername = newModel.getSimpleValue();
+            String oldUsername = topic.getSimpleValue().toString();
+            if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
+                throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
+                    newUsername + "\")");
             }
         }
-        //
+    }
+
+    @Override
+    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
         setModifier(topic);
     }
 

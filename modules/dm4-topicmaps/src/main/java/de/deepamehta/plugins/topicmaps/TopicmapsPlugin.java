@@ -192,7 +192,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
-        setViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+        storeViewProperties(topicmapId, topicId, new ViewProperties(x, y));
     }
 
     @PUT
@@ -201,7 +201,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        setViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+        storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
     }
 
     @DELETE
