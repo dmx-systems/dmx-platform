@@ -397,7 +397,10 @@ dm4c.render.page_model = new function() {
      */
     this.build_object_model = function(page_model) {
         var object_model = {
-            id: page_model.object.id
+            id:       page_model.object.id,
+            type_uri: page_model.object.type_uri
+            // Note: the type URI is not strictly required for server-side processing, but for the client-side
+            // "pre_update_topic"/"pre_update_association" listeners. They usually do work based on the topic's type.
         }
         if (page_model.type == PageModel.SIMPLE) {
             var value = page_model.read_form_value()

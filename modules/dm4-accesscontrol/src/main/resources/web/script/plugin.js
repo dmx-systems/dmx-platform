@@ -437,3 +437,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         permissions_cache = {}
     }
 })
+
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=access_control_plugin.js
