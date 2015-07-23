@@ -558,6 +558,9 @@ function CanvasView() {
         canvas_element.bind("mousemove",   do_mousemove)
         canvas_element.bind("mouseleave",  do_mouseleave)
         canvas_element.bind("dblclick",    do_doubleclick)
+        canvas_element.bind("touchstart",  do_touchstart)
+        canvas_element.bind("touchend",    do_touchend)
+        canvas_element.bind("touchmove",   do_touchmove)
         canvas_element.bind("contextmenu", do_contextmenu)
         canvas_element.bind("dragover",    do_dragover)
         canvas_element.bind("drop",        do_drop)
@@ -677,6 +680,29 @@ function CanvasView() {
         } else if (detect_association(event)) {
             dm4c.fire_event("association_doubleclicked", dm4c.selected_object)
         }
+    }
+
+
+
+    // === Touch Events ===
+
+    function do_touchstart(event) {
+        var touch = event.originalEvent.targetTouches[0]
+        touch.button = 0    // ### this is hacky
+        console.log("do_touchstart", touch.clientX, touch.clientY)
+        do_mousedown(touch)
+    }
+
+    function do_touchmove(event) {
+        var touch = event.originalEvent.targetTouches[0]
+        console.log("do_touchmove", touch.clientX, touch.clientY)
+        do_mousemove(touch)
+    }
+
+    function do_touchend(event) {
+        var touch = event.originalEvent.changedTouches[0]
+        console.log("do_touchend", touch.clientX, touch.clientY)
+        do_mouseup(touch)
     }
 
     // ---
