@@ -22,8 +22,8 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
         var canvas_renderer = dm4c.get_plugin("de.deepamehta.topicmaps")
             .get_topicmap_renderer("dm4.webclient.default_topicmap_renderer")
         //
-        canvas_renderer.add_view_customizer(BoxView)
-        canvas_renderer.add_viewmodel_customizer(BoxViewmodel)
+        canvas_renderer.register_view_customizer(BoxView)
+        canvas_renderer.register_viewmodel_customizer(BoxViewmodel)
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
@@ -75,6 +75,10 @@ dm4c.add_plugin("de.deepamehta.box-renderer-dom", function() {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
+    /**
+     * The view customizer constructor function.
+     * See register_view_customizer() in canvas_renderer.js
+     */
     function BoxView(_canvas_view) {
 
         // widen scope

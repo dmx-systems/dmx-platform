@@ -24,8 +24,8 @@ function CanvasView() {
     var topicmap            // the viewmodel underlying this view (a TopicmapViewmodel)
 
     // Customization
-    var default_view_customizer
-    var view_customizers = []
+    var default_view_customizer     // internal default view customizer (DefaultViewCustomizer)
+    var view_customizers = []       // registered 3rd-party view customizer instances
     var CANVAS_FLAVOR = false
     var DOM_FLAVOR    = false
 
@@ -259,8 +259,11 @@ function CanvasView() {
 
     // ---
 
-    this.add_view_customizer = function(customizer_constructor) {
-        add_view_customizer(customizer_constructor)
+    /**
+     * @param   view_customizer     The view customizer (a constructor function).
+     */
+    this.register_view_customizer = function(view_customizer) {
+        register_view_customizer(view_customizer)
     }
 
 
@@ -462,7 +465,10 @@ function CanvasView() {
     default_view_customizer = new DefaultViewCustomizer()
     check_customizer(default_view_customizer)
 
-    function add_view_customizer(customizer_constructor) {
+    /**
+     * @param   view_customizer     The view customizer (a constructor function).
+     */
+    function register_view_customizer(view_customizer) {
         var canvas_view_facade = {
             get_topic:           get_topic,
             iterate_topics:      iterate_topics,
@@ -470,7 +476,7 @@ function CanvasView() {
             set_view_properties: set_view_properties,
             pos:                 pos
         }
-        var customizer = new customizer_constructor(canvas_view_facade)
+        var customizer = new view_customizer(canvas_view_facade)
         if (check_customizer(customizer)) {
             view_customizers.push(customizer)
         }
@@ -528,18 +534,24 @@ function CanvasView() {
     }
 
     /**
-     * @param   args    array of arguments
+     * Invokes a hook on all registered 3rd-party view customizers. Then invokes the default view customizer, if not
+     * suppressed.
+     *
+     * A 3rd-party view customizer can suppress the default view customizer by returning a falsish value.
+     *
+     * @param   hook_name   The hook to invoke (String).
+     * @param   args        Arguments to pass (Array).
      */
-    function invoke_customizers(func_name, args) {
+    function invoke_customizers(hook_name, args) {
         var invoke_default = true
         for (var i = 0, customizer; customizer = view_customizers[i]; i++) {
-            var func = customizer[func_name]
+            var func = customizer[hook_name]
             if (!(func && func.apply(undefined, args))) {
                 invoke_default = false
             }
         }
         if (invoke_default) {
-            var func = default_view_customizer[func_name]
+            var func = default_view_customizer[hook_name]
             func && func.apply(undefined, args)     // ### condition required?
         }
     }

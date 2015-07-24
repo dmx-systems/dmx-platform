@@ -12,8 +12,9 @@ function CanvasRenderer() {
         .append($("<div>").attr("id", "topic-layer"))
 
     // Viewmodel
-    var topicmap    // the topicmap currently rendered (a TopicmapViewmodel). Initialized by display_topicmap().
-    var viewmodel_customizers = []
+    var topicmap                    // the topicmap currently rendered (a TopicmapViewmodel).
+                                    // Initialized by display_topicmap().
+    var viewmodel_customizers = []  // registered 3rd-party viewmodel customizer instances
 
     // View (HTML5 Canvas)
     var canvas = new CanvasView()
@@ -295,12 +296,43 @@ function CanvasRenderer() {
 
     // === End of interface implementations ===
 
-    this.add_view_customizer = function(customizer_constructor) {
-        canvas.add_view_customizer(customizer_constructor)
+    /**
+     * Registers a view customizer. Callable by 3rd-party plugins.
+     *
+     * There are 2 flavors of view customizers:
+     *     CANVAS_FLAVOR - draws a topic on canvas
+     *     DOM_FLAVOR    - creates a per-topic DOM
+     *
+     * A view customizer supports these hooks:
+     *     "on_update_topic"
+     *     "on_update_view_properties"
+     *     "on_move_topic"
+     *     "on_mousedown"
+     *     "draw_topic"
+     *     "topic_dom"
+     *          Customizes the per-topic DOM. A TopicView is passed, with the default DOM in its "dom" property.
+     *          The default DOM consists of a div of class "topic". The customizer can append childs to it.
+     *
+     *          The default DOM sets up event listeners for performing topic standard operations: selection, moving,
+     *          receiving association in progress, edit on double-click, invoke context menu on right-click.
+     *     "topic_dom_appendix"
+     *     "topic_dom_draggable_handle"
+     *
+     * All hooks are optional.
+     *
+     * A view customizer can suppress the invocation of the corresponding default hook by returning a falsish value.
+     *
+     * @param   view_customizer     The view customizer (a constructor function).
+     */
+    this.register_view_customizer = function(view_customizer) {
+        canvas.register_view_customizer(view_customizer)
     }
 
-    this.add_viewmodel_customizer = function(customizer_constructor) {
-        viewmodel_customizers.push(new customizer_constructor())
+    /**
+     * @param   viewmodel_customizer    The viewmodel customizer (a constructor function).
+     */
+    this.register_viewmodel_customizer = function(viewmodel_customizer) {
+        viewmodel_customizers.push(new viewmodel_customizer())
     }
 
     // ---
