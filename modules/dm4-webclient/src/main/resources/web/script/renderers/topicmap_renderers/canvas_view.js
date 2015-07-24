@@ -700,7 +700,7 @@ function CanvasView() {
 
     function do_touchstart(event) {
         var touch = event.originalEvent.targetTouches[0]
-        touch.button = 0    // ### this is hacky
+        touch.button = 0    // emulate left mouse button
         console.log("do_touchstart", touch.clientX, touch.clientY)
         do_mousedown(touch)
     }
