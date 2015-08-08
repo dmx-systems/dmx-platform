@@ -909,10 +909,13 @@ dm4c = new function() {
 
     function on_request_error(error_response) {
 
+        var content = render_error()
+            .add($("<div>").text("Server status: " + error_response.status_code + " " + error_response.status_text))
+
         dm4c.ui.dialog({
             id: "error-dialog",
             title: "Sorry!",
-            content: render_error()
+            content: content
         })
 
         function render_error() {

@@ -717,7 +717,9 @@ function CanvasView() {
         do_mouseup(touch)
     }
 
-    // ---
+
+
+    // ===
 
     function end_topic_move() {
         // update viewmodel
@@ -917,27 +919,20 @@ function CanvasView() {
         // set default
         coordinate_system = coordinate_system || Coord.CANVAS
         //
-        switch (coordinate_system) {
-        case Coord.WINDOW:
-            return {
-                x: event.clientX,
-                y: event.clientY
-            }
-        case Coord.CANVAS:
-            return {
-                x: event.clientX,
-                y: event.clientY - $("#topicmap-panel").offset().top
-                // ### x: event.originalEvent.layerX,
-                // ### y: event.originalEvent.layerY
-            }
-        case Coord.TOPICMAP:
-            return {
-                x: event.clientX - topicmap.trans_x,
-                y: event.clientY - topicmap.trans_y - $("#topicmap-panel").offset().top
-                // ### x: event.originalEvent.layerX - topicmap.trans_x,
-                // ### y: event.originalEvent.layerY - topicmap.trans_y
-            }
+        var pos = {
+            // Note: Chrome for Android's touch coordinates are floats. (Firefox's are integers.)
+            // Round to integers in order to match resource method's URL template.
+            x: Math.floor(event.clientX),
+            y: Math.floor(event.clientY)
         }
+        if (coordinate_system == Coord.CANVAS || coordinate_system == Coord.TOPICMAP) {
+            pos.y -= $("#topicmap-panel").offset().top
+        }
+        if (coordinate_system == Coord.TOPICMAP) {
+            pos.x -= topicmap.trans_x
+            pos.y -= topicmap.trans_y
+        }
+        return pos
     }
 
     /**
