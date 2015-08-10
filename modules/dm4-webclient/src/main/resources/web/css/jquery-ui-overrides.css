@@ -33,7 +33,12 @@
     z-index: 1000 !important;   /* "important" overrides the resizable-handle's style attribute */
 }
 
+.ui-resizable-handle:active {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
 .ui-resizable-e {
+    width: 16px;                /* jQuery UI default is 7px.                                                    */
     right: 0;                   /* jQuery UI default is -5px. This moves the resizable-handle 5 pixels to the   */
                                 /* right into the detail panel and left only 2 pixels (of the 7 pixel handle    */
                                 /* width) mouse sensitive as the area overlapping with the detail panel does    */
