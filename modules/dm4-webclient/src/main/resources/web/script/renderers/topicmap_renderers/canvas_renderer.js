@@ -1,5 +1,6 @@
 /**
- * A topicmap renderer that utilizes a HTML5 Canvas.
+ * A TopicmapRenderer implementation that uses a canvas to draw the topics and associations.
+ * Holds a topicmap viewmodel and binds it to the view.
  */
 function CanvasRenderer() {
 
@@ -7,17 +8,15 @@ function CanvasRenderer() {
 
     js.extend(this, TopicmapRenderer)
 
-    this.dom = $("<div>")
-        .append($("<canvas>").attr("id", "canvas"))
-        .append($("<div>").attr("id", "topic-layer"))
-
     // Viewmodel
     var topicmap                    // the topicmap currently rendered (a TopicmapViewmodel).
                                     // Initialized by display_topicmap().
     var viewmodel_customizers = []  // registered 3rd-party viewmodel customizer instances
 
-    // View (HTML5 Canvas)
+    // View
     var canvas = new CanvasView()
+
+    this.dom = canvas.dom
 
     // ------------------------------------------------------------------------------------------------------ Public API
 

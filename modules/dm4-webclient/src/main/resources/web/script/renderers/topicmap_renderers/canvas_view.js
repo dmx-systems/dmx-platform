@@ -1,5 +1,7 @@
 /**
- * A topicmap view based on HTML5 Canvas.
+ * The view as deployed by the CanvasRenderer.
+ * Manages a canvas to draw the topics and associations.
+ * Manages also a topic layer (DOM) that can be levereged by 3rd-party view customizers.
  */
 function CanvasView() {
 
@@ -14,10 +16,10 @@ function CanvasView() {
     var ASSOC_LABEL_COLOR = "gray"
 
     // View
+    var canvas = $("<canvas>").attr("id", "canvas").get(0)
+    var ctx = canvas.getContext("2d")
     var topics              // topics displayed on canvas (Object, key: topic ID, value: TopicView)
     var assocs              // associations displayed on canvas (Object, key: assoc ID, value: AssociationView)
-    var ctx                 // canvas 2D drawing context. Initialized by this.resize()
-    var width, height       // canvas size (in pixel)
     var grid_positioning    // while grid positioning is in progress: a GridPositioning object, null otherwise
 
     // Viewmodel
@@ -49,6 +51,12 @@ function CanvasView() {
     }
 
     var self = this
+
+    this.dom = $("<div>")
+        .append(canvas)
+        .append($("<div>").attr("id", "topic-layer"))
+
+    bind_canvas_event_listeners()
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
@@ -84,7 +92,7 @@ function CanvasView() {
         // update view
         add_topic(topic)
         // render
-        refresh()
+        redraw_canvas()
     }
 
     /**
@@ -94,7 +102,7 @@ function CanvasView() {
         // update view
         add_association(assoc)
         // render
-        refresh()
+        redraw_canvas()
     }
 
     // ---
@@ -107,7 +115,7 @@ function CanvasView() {
         // update view
         topic_view.update(topic)
         // render
-        refresh()                                           // canvas
+        redraw_canvas()                                     // canvas
         DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
     }
 
@@ -118,7 +126,7 @@ function CanvasView() {
         // update view
         get_association(assoc.id).update(assoc)
         // render
-        refresh()
+        redraw_canvas()
     }
 
     // ---
@@ -129,7 +137,7 @@ function CanvasView() {
             // update view
             delete topics[topic_id]
             // render
-            refresh()                                       // canvas
+            redraw_canvas()                                 // canvas
             DOM_FLAVOR && remove_topic_dom(topic_view)      // topic layer DOM
         }
     }
@@ -140,7 +148,7 @@ function CanvasView() {
             // update view
             delete assocs[assoc_id]
             // render
-            refresh()
+            redraw_canvas()
         }
     }
 
@@ -148,32 +156,32 @@ function CanvasView() {
 
     this.update_topic_type = function(topic_type) {
         // render
-        refresh()                                           // canvas
+        redraw_canvas()                                     // canvas
         DOM_FLAVOR && update_topic_type_dom(topic_type)     // topic layer DOM
     }
 
     this.update_association_type = function(assoc_type) {
         // render
-        refresh()                                           // canvas        
+        redraw_canvas()                                     // canvas
     }
 
     // ---
 
     this.set_topic_selection = function(topic_id) {
         // render
-        refresh()                                           // canvas
+        redraw_canvas()                                     // canvas
         DOM_FLAVOR && update_selection_dom(topic_id)        // topic layer DOM
     }
 
     this.set_association_selection = function(assoc_id) {
         // render
-        refresh()                                           // canvas
+        redraw_canvas()                                     // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
     this.reset_selection = function() {
         // render
-        refresh()                                           // canvas
+        redraw_canvas()                                     // canvas
         DOM_FLAVOR && remove_selection_dom()                // topic layer DOM
     }
 
@@ -209,7 +217,7 @@ function CanvasView() {
         tmp_y = y
         //
         set_drawing_cursor()
-        refresh()
+        redraw_canvas()
     }
 
     this.scroll_to_center = function(topic_id) {
@@ -218,33 +226,21 @@ function CanvasView() {
     }
 
     /**
-     * Resizes the HTML5 canvas element.
+     * Resizes the canvas element.
      *
      * @param   size    the new canvas size.
      */
     this.resize = function(size) {
-        width  = size.width
-        height = size.height
+        canvas.width  = size.width
+        canvas.height = size.height
         //
-        // 1) create canvas element
-        // Note: in order to resize the canvas element we must recreate it.
-        // Otherwise the browsers would just distort the canvas rendering.
-        var canvas_element = $("<canvas>").attr({id: "canvas", width: width, height: height})
-        // replace existing canvas element
-        // Note: we can't call dm4c.split_panel.set_topicmap_renderer() here (-> endless recursion)
-        $(".topicmap-renderer #canvas").remove()
-        $(".topicmap-renderer").append(canvas_element)
-        //
-        // 2) initialize the 2D context
-        // Note: the canvas element must be already on the page
-        ctx = canvas_element.get(0).getContext("2d")
-        if (topicmap) { // ### TODO: refactor
+        // Note: a resized canvas looses its translation
+        // Note: at time of the first resize event no topicmap is set
+        if (topicmap) {
             ctx.translate(topicmap.trans_x, topicmap.trans_y)
         }
-        //
-        bind_event_handlers(canvas_element)
-        //
-        refresh()
+        // Note: a resized canvas is cleared
+        redraw_canvas()
     }
 
     // ---
@@ -345,13 +341,13 @@ function CanvasView() {
 
 
 
-    function refresh() {
+    function redraw_canvas() {
         // Note: we can't show until a topicmap is available
         if (!topicmap) {
             return
         }
         //
-        ctx.clearRect(-topicmap.trans_x, -topicmap.trans_y, width, height)
+        ctx.clearRect(-topicmap.trans_x, -topicmap.trans_y, canvas.width, canvas.height)
         //
         dm4c.fire_event("pre_draw_canvas", ctx)
         //
@@ -496,7 +492,7 @@ function CanvasView() {
             var topic_view = get_topic(topic_id)
             topic_view.set_view_properties(view_props)
             // render
-            refresh()
+            redraw_canvas()
             DOM_FLAVOR && position_topic_dom(topic_view)        // topic layer DOM
         }
     }
@@ -564,18 +560,20 @@ function CanvasView() {
 
 
 
-    function bind_event_handlers(canvas_element) {
-        canvas_element.bind("mousedown",   do_mousedown)
-        canvas_element.bind("mouseup",     do_mouseup)
-        canvas_element.bind("mousemove",   do_mousemove)
-        canvas_element.bind("mouseleave",  do_mouseleave)
-        canvas_element.bind("dblclick",    do_doubleclick)
-        canvas_element.bind("touchstart",  do_touchstart)
-        canvas_element.bind("touchend",    do_touchend)
-        canvas_element.bind("touchmove",   do_touchmove)
-        canvas_element.bind("contextmenu", do_contextmenu)
-        canvas_element.bind("dragover",    do_dragover)
-        canvas_element.bind("drop",        do_drop)
+    function bind_canvas_event_listeners() {
+        // in contrast to addEventListener() jQuery's bind() method apparently prevents default behavior
+        var _canvas = $(canvas)
+        _canvas.bind("mousedown",   do_mousedown)
+        _canvas.bind("mouseup",     do_mouseup)
+        _canvas.bind("mousemove",   do_mousemove)
+        _canvas.bind("mouseleave",  do_mouseleave)
+        _canvas.bind("dblclick",    do_doubleclick)
+        _canvas.bind("touchstart",  do_touchstart)
+        _canvas.bind("touchend",    do_touchend)
+        _canvas.bind("touchmove",   do_touchmove)
+        _canvas.bind("contextmenu", do_contextmenu)
+        _canvas.bind("dragover",    do_dragover)
+        _canvas.bind("drop",        do_drop)
     }
 
 
@@ -642,7 +640,7 @@ function CanvasView() {
             }
             tmp_x = p.x
             tmp_y = p.y
-            refresh()
+            redraw_canvas()
         }
     }
 
@@ -762,12 +760,12 @@ function CanvasView() {
 
     function end_association_in_progress(tv) {
         association_in_progress = false
-        // Note: dm4c.do_create_association() implies refresh(). So association_in_progress
+        // Note: dm4c.do_create_association() implies redraw_canvas(). So association_in_progress
         // is reset before. Otherwise the last drawn association state would stay on canvas.
         if (tv && tv.id != action_topic.id) {
             dm4c.do_create_association("dm4.core.association", action_topic.id, tv.id)
         } else {
-            refresh()   // remove incomplete association from canvas
+            redraw_canvas()     // remove incomplete association from canvas
         }
         //
         action_topic = null
@@ -967,8 +965,8 @@ function CanvasView() {
      */
     function random_position() {
         return {
-            x: width  * Math.random() - topicmap.trans_x,
-            y: height * Math.random() - topicmap.trans_y
+            x: canvas.width  * Math.random() - topicmap.trans_x,
+            y: canvas.height * Math.random() - topicmap.trans_y
         }
     }
 
@@ -983,16 +981,16 @@ function CanvasView() {
     }
 
     function scroll_to_center(x, y) {
-        if (x < 0 || x >= width || y < 0 || y >= height) {
-            var dx = (width  / 2 - x) / ANIMATION_STEPS
-            var dy = (height / 2 - y) / ANIMATION_STEPS
+        if (x < 0 || x >= canvas.width || y < 0 || y >= canvas.height) {
+            var dx = (canvas.width  / 2 - x) / ANIMATION_STEPS
+            var dy = (canvas.height / 2 - y) / ANIMATION_STEPS
             var step_count = 0;
             var animation = setInterval(animation_step, ANIMATION_DELAY)
         }
 
         function animation_step() {
             translate_by(dx, dy)
-            refresh()
+            redraw_canvas()
             if (++step_count == ANIMATION_STEPS) {
                 clearInterval(animation)
                 // Note: the Topicmaps module's setTopicmapTranslation()
@@ -1054,7 +1052,7 @@ function CanvasView() {
                     // update view
                     update_topic_view(topic_view)
                     // render
-                    refresh()
+                    redraw_canvas()
                 },
                 stop: function(event, ui) {
                     // update viewmodel
@@ -1394,7 +1392,7 @@ function CanvasView() {
         this.next_position = function() {
             var pos = {x: grid_x, y: grid_y}
             if (item_count == 0) {
-                scroll_to_center(width / 2, pos.y + topicmap.trans_y)
+                scroll_to_center(canvas.width / 2, pos.y + topicmap.trans_y)
             }
             //
             advance_position()
@@ -1416,7 +1414,7 @@ function CanvasView() {
         }
 
         function advance_position() {
-            if (grid_x + GRID_DIST_X + topicmap.trans_x > width) {
+            if (grid_x + GRID_DIST_X + topicmap.trans_x > canvas.width) {
                 grid_x = START_X
                 grid_y += GRID_DIST_Y
             } else {
