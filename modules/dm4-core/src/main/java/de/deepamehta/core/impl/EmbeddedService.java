@@ -187,6 +187,26 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public Association getAssociation(String key, SimpleValue value) {
+        try {
+            AssociationModel assoc = storageDecorator.fetchAssociation(key, value);
+            return assoc != null ? instantiateAssociation(assoc) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+        }
+    }
+
+    @Override
+    public List<Association> getAssociations(String key, SimpleValue value) {
+        try {
+            return instantiateAssociations(storageDecorator.fetchAssociations(key, value));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
+                e);
+        }
+    }
+
+    @Override
     public Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
                                                            String roleTypeUri1, String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +

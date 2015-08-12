@@ -74,6 +74,10 @@ public interface DeepaMehtaStorage {
 
     AssociationModel fetchAssociation(long assocId);
 
+    AssociationModel fetchAssociation(String key, Object value);
+
+    List<AssociationModel> fetchAssociations(String key, Object value);
+
     List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                                 String roleTypeUri2);
 

@@ -48,7 +48,7 @@ public interface DeepaMehtaService {
      * If more than one topic is found a runtime exception is thrown.
      * <p>
      * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
-     * Compare to {@link #getTopics(String,SimpleValue,boolean)}
+     * Compare to {@link #getTopics(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
@@ -95,6 +95,29 @@ public interface DeepaMehtaService {
     Association getAssociation(long assocId);
 
     /**
+     * Looks up a single association by exact value.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association is found a runtime exception is thrown.
+     * <p>
+     * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
+     * Compare to {@link #getAssociations(String,SimpleValue)}
+     * <p>
+     * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
+     */
+    Association getAssociation(String key, SimpleValue value);
+
+    /**
+     * Looks up associations by key and value.
+     * <p>
+     * Wildcards like "*" in String values <i>are</i> interpreted.
+     * <p>
+     * IMPORTANT: Looking up associations this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
+     */
+    List<Association> getAssociations(String key, SimpleValue value);
+
+    /**
      * Returns the association between two topics, qualified by association type and both role types.
      * If no such association exists <code>null</code> is returned.
      * If more than one association exist, a runtime exception is thrown.
@@ -105,7 +128,7 @@ public interface DeepaMehtaService {
                                                     String roleTypeUri1, String roleTypeUri2);
 
     Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                    String topicRoleTypeUri, String assocRoleTypeUri);
+                                                         String topicRoleTypeUri, String assocRoleTypeUri);
 
     // ---
 

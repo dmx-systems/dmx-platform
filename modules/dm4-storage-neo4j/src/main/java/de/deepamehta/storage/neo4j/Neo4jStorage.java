@@ -221,6 +221,17 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     @Override
+    public AssociationModel fetchAssociation(String key, Object value) {
+        Node node = assocContentExact.get(key, value).getSingle();
+        return node != null ? buildAssociation(node) : null;
+    }
+
+    @Override
+    public List<AssociationModel> fetchAssociations(String key, Object value) {
+        return buildAssociations(assocContentExact.query(key, value));
+    }
+
+    @Override
     public List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                          String roleTypeUri1, String roleTypeUri2) {
         return queryAssociationIndex(

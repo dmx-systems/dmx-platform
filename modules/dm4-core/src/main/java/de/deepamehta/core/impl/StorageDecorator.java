@@ -47,15 +47,12 @@ public class StorageDecorator {
     }
 
     /**
-     * Looks up a single topic by exact property value.
+     * Looks up a single topic by exact value.
      * If no such topic exists <code>null</code> is returned.
-     * If more than one topic were found a runtime exception is thrown.
+     * If more than one topic is found a runtime exception is thrown.
      * <p>
-     * IMPORTANT: Looking up a topic this way requires the property to be indexed with indexing mode <code>KEY</code>.
-     * This is achieved by declaring the respective data field with <code>indexing_mode: "KEY"</code>
-     * (for statically declared data field, typically in <code>types.json</code>) or
-     * by calling DataField's {@link DataField#setIndexingMode} method with <code>"KEY"</code> as argument
-     * (for dynamically created data fields, typically in migration classes).
+     * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
      *
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
@@ -149,6 +146,25 @@ public class StorageDecorator {
 
     AssociationModel fetchAssociation(long assocId) {
         return storage.fetchAssociation(assocId);
+    }
+
+    /**
+     * Looks up a single association by exact value.
+     * If no such association exists <code>null</code> is returned.
+     * If more than one association is found a runtime exception is thrown.
+     * <p>
+     * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
+     * <code>dm4.core.key</code>.
+     *
+     * @return  The fetched association.
+     *          Note: its child topics are not fetched.
+     */
+    AssociationModel fetchAssociation(String key, SimpleValue value) {
+        return storage.fetchAssociation(key, value.value());
+    }
+
+    List<AssociationModel> fetchAssociations(String key, SimpleValue value) {
+        return storage.fetchAssociations(key, value.value());
     }
 
     // ---
