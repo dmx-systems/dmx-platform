@@ -99,7 +99,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
             TopicmapsService.DEFAULT_TOPICMAP_RENDERER);
         // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
-        // So we must use privileged assignToWorkspace() call here.
+        // So we must use the privileged assignToWorkspace() call here.
         // This is to support the "DM4 Sign-up" 3rd-party plugin.
         dms.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
         //

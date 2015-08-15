@@ -55,7 +55,7 @@ class AccessControlImpl implements AccessControl {
     public boolean checkCredentials(Credentials cred) {
         TopicModel usernameTopic = null;
         try {
-            usernameTopic = getUsernameTopic(cred.username);
+            usernameTopic = _getUsernameTopic(cred.username);
             if (usernameTopic == null) {
                 return false;
             }
@@ -99,6 +99,16 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("Checking permission for object " + objectId + " (typeUri=\"" + typeUri +
                 "\") failed (" + userInfo(username) + ", operation=" + operation + ")", e);
         }
+    }
+
+    @Override
+    public Topic getUsernameTopic(String username) {
+        TopicModel usernameTopic = _getUsernameTopic(username);
+        if (usernameTopic == null) {
+            return null;
+        }
+        // instantiate topic without performing permission check
+        return new AttachedTopic(usernameTopic, dms);
     }
 
     @Override
@@ -301,14 +311,14 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    private TopicModel getUsernameTopic(String username) {
+    private TopicModel _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
         return dms.storageDecorator.fetchTopic(TYPE_USERNAME, new SimpleValue(username));
     }
 
     private TopicModel getUsernameTopicOrThrow(String username) {
-        TopicModel usernameTopic = getUsernameTopic(username);
+        TopicModel usernameTopic = _getUsernameTopic(username);
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }

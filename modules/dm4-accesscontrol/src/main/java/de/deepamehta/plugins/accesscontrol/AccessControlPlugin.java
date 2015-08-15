@@ -249,9 +249,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return workspace;
     }
 
+    @GET
+    @Path("/username/{username}")
     @Override
-    public Topic getUsernameTopic(String username) {
-        return dms.getTopic("dm4.accesscontrol.username", new SimpleValue(username));
+    public Topic getUsernameTopic(@PathParam("username") String username) {
+        return dms.getAccessControl().getUsernameTopic(username);
     }
 
 

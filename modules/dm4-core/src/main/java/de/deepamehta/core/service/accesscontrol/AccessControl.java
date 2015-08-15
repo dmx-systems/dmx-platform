@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.accesscontrol;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Topic;
 
 
 
@@ -17,6 +18,8 @@ public interface AccessControl {
      * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
     boolean hasPermission(String username, Operation operation, long objectId);
+
+    Topic getUsernameTopic(String username);
 
     /**
      * Checks if a user is a member of a given workspace.
