@@ -26,4 +26,6 @@ public interface AccessControl {
     boolean isMember(String username, long workspaceId);
 
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+
+    long getSystemWorkspaceId();
 }

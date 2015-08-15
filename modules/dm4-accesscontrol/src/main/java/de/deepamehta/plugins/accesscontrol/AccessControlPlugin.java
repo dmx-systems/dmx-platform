@@ -221,8 +221,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
             //
             // 4) assign username to "System" workspace
-            Topic systemWorkspace = wsService.getWorkspace(SYSTEM_WORKSPACE_URI);
-            wsService.assignToWorkspace(usernameTopic, systemWorkspace.getId());
+            // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
+            // This is to support the "DM4 Sign-up" 3rd-party plugin.
+            long systemWorkspaceId = dms.getAccessControl().getSystemWorkspaceId();
+            dms.getAccessControl().assignToWorkspace(usernameTopic, systemWorkspaceId);
             //
             return usernameTopic;
         } catch (Exception e) {

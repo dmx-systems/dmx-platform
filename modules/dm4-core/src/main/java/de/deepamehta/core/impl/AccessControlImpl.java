@@ -128,6 +128,24 @@ class AccessControlImpl implements AccessControl {
         object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
     }
 
+    @Override
+    public long getSystemWorkspaceId() {
+        if (systemWorkspaceId != -1) {
+            return systemWorkspaceId;
+        }
+        // Note: fetching the System workspace topic though the Core service would involve a permission check
+        // and run in a vicious circle. So direct storage access is required here.
+        TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
+        // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
+        if (workspace == null) {
+            throw new RuntimeException("The System workspace does not exist");
+        }
+        //
+        systemWorkspaceId = workspace.getId();
+        //
+        return systemWorkspaceId;
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
@@ -295,25 +313,6 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
-    }
-
-    // ---
-
-    long getSystemWorkspaceId() {
-        if (systemWorkspaceId != -1) {
-            return systemWorkspaceId;
-        }
-        // Note: fetching the System workspace topic though the Core service would involve a permission check
-        // and run in a vicious circle. So direct storage access is required here.
-        TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
-        // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
-        if (workspace == null) {
-            throw new RuntimeException("The System workspace does not exist");
-        }
-        //
-        systemWorkspaceId = workspace.getId();
-        //
-        return systemWorkspaceId;
     }
 
 

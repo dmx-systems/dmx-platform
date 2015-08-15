@@ -90,15 +90,18 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public Topic createWorkspace(@PathParam("name") String name, @PathParam("uri") String uri,
                                  @PathParam("sharing_mode_uri") SharingMode sharingMode) {
         logger.info("Creating workspace \"" + name + "\" (uri=\"" + uri + "\", sharingMode=" + sharingMode + ")");
-        // create workspace
+        // 1) create workspace
         Topic workspace = dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
             .put("dm4.workspaces.name", name)
             .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
         ));
-        // create default topicmap and assign to workspace
+        // 2) create default topicmap and assign to workspace
         Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
             TopicmapsService.DEFAULT_TOPICMAP_RENDERER);
-        assignToWorkspace(topicmap, workspace.getId());
+        // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
+        // So we must use privileged assignToWorkspace() call here.
+        // This is to support the "DM4 Sign-up" 3rd-party plugin.
+        dms.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
         //
         return workspace;
     }
