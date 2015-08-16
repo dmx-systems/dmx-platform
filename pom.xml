@@ -90,6 +90,7 @@
 
         <!-- File Repository -->
         <dm4.filerepo.path></dm4.filerepo.path>
+        <dm4.filerepo.user_quota>150</dm4.filerepo.user_quota>
 
         <!-- Logging -->
         <java.util.logging.config.file>

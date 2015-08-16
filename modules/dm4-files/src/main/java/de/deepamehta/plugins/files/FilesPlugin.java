@@ -1,5 +1,6 @@
 package de.deepamehta.plugins.files;
 
+import de.deepamehta.plugins.files.event.CheckQuotaListener;
 import de.deepamehta.plugins.files.service.FilesService;
 
 import de.deepamehta.core.Topic;
@@ -9,6 +10,8 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -44,11 +47,22 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
+    public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
+    public static final long USER_QUOTA_BYTES = 1024 * 1024 * Integer.getInteger("dm4.filerepo.user_quota", 150);
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in global POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
+
+    // Events
+    public static DeepaMehtaEvent CHECK_QUOTA = new DeepaMehtaEvent(CheckQuotaListener.class) {
+        @Override
+        public void deliver(EventListener listener, Object... params) {
+            ((CheckQuotaListener) listener).checkQuota(
+                (Long) params[0], (Long) params[1]
+            );
+        }
+    };
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

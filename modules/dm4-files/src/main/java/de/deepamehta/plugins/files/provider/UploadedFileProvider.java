@@ -1,11 +1,18 @@
 package de.deepamehta.plugins.files.provider;
 
+import de.deepamehta.core.osgi.CoreActivator;
+import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.plugins.files.FilesPlugin;
+import de.deepamehta.plugins.files.QuotaCheck;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -26,7 +33,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
+public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, QuotaCheck {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -56,6 +63,13 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
         }
     }
 
+    // *** QuotaCheck Implementation ***
+
+    @Override
+    public void check(long fileSize) {
+        getService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.USER_QUOTA_BYTES);
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private UploadedFile parseMultiPart() {
@@ -79,7 +93,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
                     if (file != null) {
                         throw new RuntimeException("Only single file uploads are supported");
                     }
-                    file = new UploadedFile(item);
+                    file = new UploadedFile(item, this);
                     logger.info("### field \"" + fieldName + "\" => " + file);
                 }
             }
@@ -90,5 +104,10 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile> {
         } catch (Exception e) {
             throw new RuntimeException("Parsing multipart/form-data request failed", e);
         }
+    }
+
+    private DeepaMehtaService getService() {
+        BundleContext context = FrameworkUtil.getBundle(CoreActivator.class).getBundleContext();
+        return context.getService(context.getServiceReference(DeepaMehtaService.class));
     }
 }

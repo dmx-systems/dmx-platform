@@ -24,11 +24,13 @@ public class UploadedFile {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private FileItem fileItem;
+    private QuotaCheck quotaCheck;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public UploadedFile(FileItem fileItem) {
+    public UploadedFile(FileItem fileItem, QuotaCheck quotaCheck) {
         this.fileItem = fileItem;
+        this.quotaCheck = quotaCheck;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -103,6 +105,7 @@ public class UploadedFile {
      */
     public void write(File file) {
         try {
+            quotaCheck.check(getSize());
             fileItem.write(file);                   // throws Exception
         } catch (Exception e) {
             throw new RuntimeException("Writing uploaded file to disk failed (" + this + ")", e);

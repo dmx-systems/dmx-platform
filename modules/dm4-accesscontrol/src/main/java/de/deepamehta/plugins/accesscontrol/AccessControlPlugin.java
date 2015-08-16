@@ -3,6 +3,8 @@ package de.deepamehta.plugins.accesscontrol;
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.files.event.CheckQuotaListener;
+import de.deepamehta.plugins.files.service.FilesService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
 import de.deepamehta.core.Association;
@@ -79,7 +81,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                          PostUpdateTopicListener,
                                                                                          PostUpdateAssociationListener,
                                                                                          ServiceRequestFilterListener,
-                                                                                         ResourceRequestFilterListener {
+                                                                                         ResourceRequestFilterListener,
+                                                                                         CheckQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -124,6 +127,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Inject
     private WorkspacesService wsService;
+
+    @Inject
+    private FilesService filesService;
 
     @Context
     private HttpServletRequest request;
@@ -488,6 +494,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         requestFilter(servletRequest);
     }
 
+    // ---
+
+    @Override
+    public void checkQuota(long fileSize, long userQuota) {
+        String username = getUsername();
+        //
+        if (username == null) {
+            throw new RuntimeException("User <anonymous> is not allowed to upload files");
+        }
+        //
+        long occupiedSpace = getOccupiedSpace(username);
+        boolean quotaOK = occupiedSpace + fileSize <= userQuota;
+        //
+        logger.info("### " + userInfo(username) + " occupies " + occupiedSpace + " bytes, file size: " + fileSize +
+            " bytes, user quota: " + userQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
+        //
+        if (!quotaOK) {
+            throw new RuntimeException("File upload quota of " + userInfo(username) + " is exceeded. Quota is " +
+                userQuota + " bytes.");
+        }
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -525,6 +553,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Assigning search topic to workspace failed", e);
         }
+    }
+
+    // --- File upload quota ---
+
+    private long getOccupiedSpace(String username) {
+        long occupiedSpace = 0;
+        for (Topic fileTopic : dms.getTopics("dm4.files.file", 0)) {
+            long fileTopicId = fileTopic.getId();
+            if (getCreator(fileTopicId).equals(username)) {
+                occupiedSpace += filesService.getFile(fileTopicId).length();
+            }
+        }
+        return occupiedSpace;
     }
 
 
