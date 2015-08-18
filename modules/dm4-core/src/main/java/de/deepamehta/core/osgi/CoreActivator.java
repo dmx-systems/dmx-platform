@@ -21,6 +21,7 @@ public class CoreActivator implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private static DeepaMehtaService dms;
     private BundleContext bundleContext;
 
     // consumed services
@@ -75,6 +76,15 @@ public class CoreActivator implements BundleActivator {
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }
+    }
+
+    // ---
+
+    public static DeepaMehtaService getDeepaMehtaService() {
+        if (dms == null) {
+            throw new RuntimeException("DeepaMehtaService not available");
+        }
+        return dms;
     }
 
 
@@ -144,7 +154,7 @@ public class CoreActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
-            EmbeddedService dms = new EmbeddedService(new StorageDecorator(storageService), bundleContext);
+            dms = new EmbeddedService(new StorageDecorator(storageService), bundleContext);
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
             bundleContext.registerService(DeepaMehtaService.class.getName(), dms, null);
             //

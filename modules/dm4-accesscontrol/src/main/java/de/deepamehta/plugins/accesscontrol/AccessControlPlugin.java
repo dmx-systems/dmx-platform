@@ -507,7 +507,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         long occupiedSpace = getOccupiedSpace(username);
         boolean quotaOK = occupiedSpace + fileSize <= userQuota;
         //
-        logger.info("### " + userInfo(username) + " occupies " + occupiedSpace + " bytes, file size: " + fileSize +
+        logger.info("### File size: " + fileSize + " bytes, " + userInfo(username) + " occupies " + occupiedSpace +
             " bytes, user quota: " + userQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {

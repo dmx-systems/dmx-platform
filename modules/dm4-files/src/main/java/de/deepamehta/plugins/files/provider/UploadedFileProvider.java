@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.files.provider;
 
 import de.deepamehta.core.osgi.CoreActivator;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.plugins.files.FilesPlugin;
 import de.deepamehta.plugins.files.QuotaCheck;
 import de.deepamehta.plugins.files.UploadedFile;
@@ -10,9 +9,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -67,7 +63,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Qu
 
     @Override
     public void check(long fileSize) {
-        getService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.USER_QUOTA_BYTES);
+        CoreActivator.getDeepaMehtaService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.USER_QUOTA_BYTES);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -104,10 +100,5 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Qu
         } catch (Exception e) {
             throw new RuntimeException("Parsing multipart/form-data request failed", e);
         }
-    }
-
-    private DeepaMehtaService getService() {
-        BundleContext context = FrameworkUtil.getBundle(CoreActivator.class).getBundleContext();
-        return context.getService(context.getServiceReference(DeepaMehtaService.class));
     }
 }

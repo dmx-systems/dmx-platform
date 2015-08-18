@@ -7,6 +7,7 @@ import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
 
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -24,13 +25,13 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private EmbeddedService dms;
+    private DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EmbeddedService dms) {
+    JerseyResponseFilter(DeepaMehtaService dms) {
         this.dms = dms;
     }
 

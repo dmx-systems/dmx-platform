@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.SecurityHandler;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -49,13 +50,13 @@ public class WebPublishingService {
 
     private HttpService httpService;
 
-    private EmbeddedService dms;
+    private DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public WebPublishingService(EmbeddedService dms, HttpService httpService) {
+    public WebPublishingService(DeepaMehtaService dms, HttpService httpService) {
         try {
             logger.info("Setting up the Web Publishing service");
             this.dms = dms;
