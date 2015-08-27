@@ -2,7 +2,6 @@ package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.impl.PluginImpl;
 
 import org.osgi.framework.Bundle;
@@ -146,7 +145,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     /**
      * @param   securityHandler     Optional. If null no security is provided.
      */
-    protected final void publishDirectory(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
-        plugin.publishDirectory(directoryPath, uriNamespace, securityHandler);
+    protected final void publishDirectory(String directoryPath, String uriNamespace) {
+        plugin.publishDirectory(directoryPath, uriNamespace);
     }
 }

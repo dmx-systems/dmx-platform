@@ -511,7 +511,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             " bytes, user quota: " + userQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {
-            throw new RuntimeException("File upload quota of " + userInfo(username) + " is exceeded. Quota is " +
+            throw new RuntimeException("File upload quota of " + userInfo(username) + " exceeded. Quota is " +
                 userQuota + " bytes.");
         }
     }

@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.SecurityHandler;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -107,10 +106,10 @@ public class WebPublishingService {
     /**
      * Publishes a directory of the server's file system.
      */
-    StaticResources publishStaticResources(String directoryPath, String uriNamespace, SecurityHandler securityHandler) {
+    StaticResources publishStaticResources(String directoryPath, String uriNamespace) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath, securityHandler));
+            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath));
             return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -339,11 +338,9 @@ public class WebPublishingService {
     private class DirectoryHTTPContext implements HttpContext {
 
         private String directoryPath;
-        private SecurityHandler securityHandler;
 
-        private DirectoryHTTPContext(String directoryPath, SecurityHandler securityHandler) {
+        private DirectoryHTTPContext(String directoryPath) {
             this.directoryPath = directoryPath;
-            this.securityHandler = securityHandler;
         }
 
         // ---
@@ -367,15 +364,7 @@ public class WebPublishingService {
         @Override
         public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
                                                                             throws java.io.IOException {
-            boolean doService = resourceRequestFilter(request, response);
-            if (doService) {
-                if (securityHandler != null) {
-                    return securityHandler.handleSecurity(request, response);
-                } else {
-                    return true;
-                }
-            }
-            return false;
+            return resourceRequestFilter(request, response);
         }
     }
 }

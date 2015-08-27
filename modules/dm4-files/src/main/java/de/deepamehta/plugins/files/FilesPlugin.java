@@ -12,8 +12,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
-import de.deepamehta.core.service.SecurityHandler;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -30,7 +30,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.FileOutputStream;
@@ -43,7 +42,7 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, SecurityHandler {
+public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -184,7 +183,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) store file
-            File repoFile = repoFile(directory, file);
+            File repoFile = unusedPath(directory, file);
             file.write(repoFile);
             //
             // 3) create topic
@@ -233,7 +232,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) create directory
-            File repoFile = repoFile(directory, folderName);
+            File repoFile = path(directory, folderName);
             if (repoFile.exists()) {
                 throw new RuntimeException("File or directory \"" + repoFile + "\" already exists");
             }
@@ -373,33 +372,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
 
 
-    // **************************************
-    // *** SecurityHandler Implementation ***
-    // **************************************
-
-
-
-    // ### TODO: to be dropped?
-    @Override
-    public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            String path = request.getRequestURI().substring(FILE_REPOSITORY_URI.length());
-            path = JavaUtils.decodeURIComponent(path);
-            logger.info("### repository path=\"" + path + "\"");
-            File file = enforeSecurity(path);   // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
-            return true;
-        } catch (FileRepositoryException e) {
-            response.setStatus(e.getStatusCode());
-            return false;
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return false;
-        }
-    }
-
-
-
     // ****************************
     // *** Hook Implementations ***
     // ****************************
@@ -408,7 +380,31 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
 
     @Override
     public void init() {
-        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // securityHandler=this
+        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI);
+    }
+
+
+
+    // ********************************
+    // *** Listener Implementations ***
+    // ********************************
+
+
+
+    @Override
+    public void resourceRequestFilter(HttpServletRequest request) {
+        try {
+            String requestURI = request.getRequestURI();
+            if (requestURI.startsWith(FILE_REPOSITORY_URI)) {
+                String path = requestURI.substring(FILE_REPOSITORY_URI.length());
+                path = JavaUtils.decodeURIComponent(path);
+                logger.info("### repository path=\"" + path + "\"");
+                File file = enforeSecurity(path);   // throws FileRepositoryException 403 Forbidden
+                checkFileExistence(file);           // throws FileRepositoryException 404 Not Found
+            }
+        } catch (FileRepositoryException e) {
+            throw new WebApplicationException(e.getStatus());
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -504,29 +500,28 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
     // === File Repository ===
 
     /**
-     * Constructs an absolute path from a repository path.
-     *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
-     */
-    private File repoFile(String path) {
-        return new File(FILE_REPOSITORY_PATH, path);
-    }
-
-    /**
-     * Calculates the storage location for the uploaded file.
+     * Constructs an absolute path from an absolute path and a file name.
      *
      * @param   directory   An absolute path.
+     *
+     * @return  The constructed absolute path.
      */
-    private File repoFile(File directory, UploadedFile file) {
-        return JavaUtils.findUnusedFile(repoFile(directory, file.getName()));
-    }
-
-    /**
-     * @param   directory   An absolute path.
-     */
-    private File repoFile(File directory, String fileName) {
+    private File path(File directory, String fileName) {
         return new File(directory, fileName);
+    }
+
+    /**
+     * Constructs an absolute path for storing an uploaded file.
+     * If a file with that name already exists in the specified directory it remains untouched and the uploaded file
+     * is stored with a unique name (by adding a number).
+     *
+     * @param   directory   The directory to store the uploaded file to.
+     *                      An absolute path.
+     *
+     * @return  The constructed absolute path.
+     */
+    private File unusedPath(File directory, UploadedFile file) {
+        return JavaUtils.findUnusedFile(path(directory, file.getName()));
     }
 
     // ---
@@ -572,7 +567,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
             // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
             // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
             File file = repoFile(path).getCanonicalFile();  // throws IOException
-            checkFilePath(file);                            // throws FileRepositoryException
+            checkFilePath(file);                            // throws FileRepositoryException 403 Forbidden
             //
             return file;
         } catch (FileRepositoryException e) {
@@ -580,6 +575,18 @@ public class FilesPlugin extends PluginActivator implements FilesService, Securi
         } catch (Exception e) {
             throw new RuntimeException("Enforcing security for repository path \"" + path + "\" failed", e);
         }
+    }
+
+    /**
+     * Constructs an absolute path from a repository path.
+     *
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     *
+     * @return  The constructed absolute path.
+     */
+    private File repoFile(String path) {
+        return new File(FILE_REPOSITORY_PATH, path);
     }
 
     // --- File Access ---
