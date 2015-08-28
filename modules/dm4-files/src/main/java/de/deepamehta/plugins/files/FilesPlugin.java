@@ -10,6 +10,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Transactional;
@@ -21,7 +22,6 @@ import org.apache.commons.io.IOUtils;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.POST;
@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.Desktop;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.File;
 import java.net.URL;
 import java.util.logging.Logger;
@@ -47,6 +48,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // ------------------------------------------------------------------------------------------------------- Constants
 
     public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
+    public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
     public static final long USER_QUOTA_BYTES = 1024 * 1024 * Integer.getInteger("dm4.filerepo.user_quota", 150);
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in global POM.
@@ -93,7 +95,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             //
             // 2) check if topic already exists
@@ -125,7 +127,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             //
             // 2) check if topic already exists
@@ -179,7 +181,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = enforeSecurity(path);  // throws FileRepositoryException
+            File directory = absolutePath(path);    // throws FileRepositoryException
             checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) store file
@@ -203,7 +205,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             // 1) pre-checks
-            File file = enforeSecurity(path);       // throws FileRepositoryException
+            File file = absolutePath(path);         // throws FileRepositoryException
             //
             // 2) store file
             FileOutputStream out = new FileOutputStream(file);
@@ -228,7 +230,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = enforeSecurity(path);  // throws FileRepositoryException
+            File directory = absolutePath(path);    // throws FileRepositoryException
             checkFileExistence(directory);          // throws FileRepositoryException
             //
             // 2) create directory
@@ -259,7 +261,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             //
             return new ResourceInfo(file);
@@ -278,7 +280,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            File folder = enforeSecurity(path); // throws FileRepositoryException
+            File folder = absolutePath(path);   // throws FileRepositoryException
             checkFileExistence(folder);         // throws FileRepositoryException
             //
             return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
@@ -322,7 +324,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             return file;
         } catch (Exception e) {
@@ -339,7 +341,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             logger.info(operation);
             //
             String path = repoPath(fileTopicId);
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             return file;
         } catch (Exception e) {
@@ -358,7 +360,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             logger.info(operation);
             //
             String path = repoPath(fileTopicId);
-            File file = enforeSecurity(path);   // throws FileRepositoryException
+            File file = absolutePath(path);     // throws FileRepositoryException
             checkFileExistence(file);           // throws FileRepositoryException
             //
             logger.info("### Opening file \"" + file + "\"");
@@ -399,7 +401,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 String path = requestURI.substring(FILE_REPOSITORY_URI.length());
                 path = JavaUtils.decodeURIComponent(path);
                 logger.info("### repository path=\"" + path + "\"");
-                File file = enforeSecurity(path);   // throws FileRepositoryException 403 Forbidden
+                File file = absolutePath(path);     // throws FileRepositoryException 403 Forbidden
                 checkFileExistence(file);           // throws FileRepositoryException 404 Not Found
             }
         } catch (FileRepositoryException e) {
@@ -455,11 +457,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         //
         ChildTopicsModel childTopics = new ChildTopicsModel();
         childTopics.put("dm4.files.file_name", file.getName());
-        childTopics.put("dm4.files.path",      repoPath(file));
+        childTopics.put("dm4.files.path", repoPath(file));
         if (mediaType != null) {
             childTopics.put("dm4.files.media_type", mediaType);
         }
-        childTopics.put("dm4.files.size",      file.length());
+        childTopics.put("dm4.files.size", file.length());
         //
         return dms.createTopic(new TopicModel("dm4.files.file", childTopics));
     }
@@ -498,6 +500,91 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
     // === File Repository ===
+
+    /**
+     * Constructs an absolute path from a repository path.
+     * Checks the repository path to fight directory traversal attacks.
+     *
+     * @param   repoPath    A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *
+     * @return  The constructed absolute path.
+     */
+    private File absolutePath(String repoPath) throws FileRepositoryException {
+        try {
+            File repo = new File(FILE_REPOSITORY_PATH);
+            //
+            if (!repo.exists()) {
+                throw new RuntimeException("File repository \"" + repo + "\" does not exist");
+            }
+            //
+            if (FILE_REPOSITORY_PER_WORKSPACE) {
+                repo = new File(repo, "/workspace-" + getWorkspaceId());
+                createWorkspaceFileRepository(repo);
+            }
+            //
+            repo = new File(repo, repoPath);
+            //
+            return checkFilePath(repo);     // throws FileRepositoryException 403 Forbidden
+        } catch (FileRepositoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Constructing an absolute path from repository path \"" + repoPath + "\" failed",
+                e);
+        }
+    }
+
+    private long getWorkspaceId() {
+        Cookies cookies = Cookies.get();
+        if (!cookies.has("dm4_workspace_id")) {
+            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
+                "\"dm4_workspace_id\" cookie");
+        }
+        return cookies.getLong("dm4_workspace_id");
+    }
+
+    private void createWorkspaceFileRepository(File repo) {
+        try {
+            if (!repo.exists()) {
+                boolean created = repo.mkdir();
+                if (created) {
+                    logger.info("### Per-workspace file repository created: \"" + repo + "\"");
+                } else {
+                    throw new RuntimeException("Directory \"" + repo + "\" not created successfully");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Creating per-workspace file repository failed", e);
+        }
+    }
+
+    // ---
+
+    private File checkFilePath(File file) throws FileRepositoryException, IOException {
+        // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
+        // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
+        // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
+        file = file.getCanonicalFile();     // throws IOException
+        boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
+        //
+        logger.info("Checking file repository access to \"" + file + "\"\n      dm4.filerepo.path=" +
+            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
+        //
+        if (!pointsToRepository) {
+            throw new FileRepositoryException("\"" + file + "\" is not a file repository path", Status.FORBIDDEN);
+        }
+        //
+        return file;
+    }
+
+    private void checkFileExistence(File file) throws FileRepositoryException {
+        if (!file.exists()) {
+            logger.info("File or directory \"" + file + "\" does not exist => NOT FOUND");
+            throw new FileRepositoryException("\"" + file + "\" does not exist in file repository", Status.NOT_FOUND);
+        }
+    }
+
+    // ---
 
     /**
      * Constructs an absolute path from an absolute path and a file name.
@@ -549,66 +636,5 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     private String repoPath(long fileTopicId) {
         Topic fileTopic = dms.getTopic(fileTopicId);    // ### FIXME: had fetchComposite=true
         return fileTopic.getChildTopics().getString("dm4.files.path");
-    }
-
-
-
-    // === Security ===
-
-    /**
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
-     *
-     * @return  An absolute path.
-     */
-    private File enforeSecurity(String path) throws FileRepositoryException {
-        try {
-            // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
-            // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
-            // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
-            File file = repoFile(path).getCanonicalFile();  // throws IOException
-            checkFilePath(file);                            // throws FileRepositoryException 403 Forbidden
-            //
-            return file;
-        } catch (FileRepositoryException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Enforcing security for repository path \"" + path + "\" failed", e);
-        }
-    }
-
-    /**
-     * Constructs an absolute path from a repository path.
-     *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
-     *
-     * @return  The constructed absolute path.
-     */
-    private File repoFile(String path) {
-        return new File(FILE_REPOSITORY_PATH, path);
-    }
-
-    // --- File Access ---
-
-    /**
-     * Prerequisite: the file's path is canonical.
-     */
-    private void checkFilePath(File file) throws FileRepositoryException {
-        boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
-        //
-        logger.info("Checking file repository access to \"" + file + "\"\n      dm4.filerepo.path=" +
-            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
-        //
-        if (!pointsToRepository) {
-            throw new FileRepositoryException("\"" + file + "\" is not a file repository path", Status.FORBIDDEN);
-        }
-    }
-
-    private void checkFileExistence(File file) throws FileRepositoryException {
-        if (!file.exists()) {
-            logger.info("File or directory \"" + file + "\" does not exist => NOT FOUND");
-            throw new FileRepositoryException("\"" + file + "\" does not exist in file repository", Status.NOT_FOUND);
-        }
     }
 }
