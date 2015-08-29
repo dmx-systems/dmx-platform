@@ -812,12 +812,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean inRequestScope() {
         try {
-            request.getMethod();    // ### FIXME: while system startup request might be null.
-                                    // Jersey might not have injected the proxy object yet.
+            request.getMethod();
             return true;
         } catch (IllegalStateException e) {
             // Note: this happens if a request method is called outside request scope.
             // This is the case while system startup.
+            return false;
+        } catch (NullPointerException e) {
+            // While system startup request might be null.
+            // Jersey might not have injected the proxy object yet.
             return false;
         }
     }
