@@ -14,20 +14,16 @@ import java.util.List;
 
 public class DirectoryListing implements JSONEnabled {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
-    // Note: the default value is required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default value must match the value defined in global POM.
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private String basePath;
     private FileItem dirInfo;
     private List<FileItem> fileItems = new ArrayList<FileItem>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public DirectoryListing(File directory) {
+    public DirectoryListing(File directory, String basePath) {
+        this.basePath = basePath;
         dirInfo = new FileItem(directory.getName(), directory.getPath());
         for (File file : directory.listFiles()) {
             String name = file.getName();
@@ -79,7 +75,7 @@ public class DirectoryListing implements JSONEnabled {
         FileItem(String name, String path) {
             this.kind = ItemKind.DIRECTORY;
             this.name = name;
-            this.path = truncate(path);
+            this.path = repoPath(path);
         }
 
         /**
@@ -88,7 +84,7 @@ public class DirectoryListing implements JSONEnabled {
         FileItem(String name, String path, long size, String type) {
             this.kind = ItemKind.FILE;
             this.name = name;
-            this.path = truncate(path);
+            this.path = repoPath(path);
             this.size = size;
             this.type = type;
         }
@@ -117,13 +113,12 @@ public class DirectoryListing implements JSONEnabled {
 
         // ---
 
-        private String truncate(String path) {
-            // error check
-            if (!path.startsWith(FILE_REPOSITORY_PATH)) {
+        private String repoPath(String path) {
+            if (!path.startsWith(basePath)) {
                 throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
             }
             //
-            return JavaUtils.stripDriveLetter(path.substring(FILE_REPOSITORY_PATH.length()));
+            return JavaUtils.stripDriveLetter(path.substring(basePath.length()));
         }
 
         // ---

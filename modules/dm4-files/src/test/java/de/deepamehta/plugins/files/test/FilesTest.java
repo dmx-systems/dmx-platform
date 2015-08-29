@@ -24,7 +24,7 @@ public class FilesTest {
 
     @Ignore @Test
     public void directoryListing() {
-        DirectoryListing dir = new DirectoryListing(new File("/"));
+        DirectoryListing dir = new DirectoryListing(new File("/"), "");
         List<FileItem> items = dir.getFileItems();
         FileItem item = items.get(0);
         ItemKind kind = item.getItemKind();
@@ -34,7 +34,7 @@ public class FilesTest {
     @Ignore @Test
     public void directoryListingJSON() {
         try {
-            DirectoryListing dir = new DirectoryListing(new File("/"));
+            DirectoryListing dir = new DirectoryListing(new File("/"), "");
             List<FileItem> items = dir.getFileItems();
             FileItem item = items.get(0);
             String kind = item.toJSON().getString("kind");

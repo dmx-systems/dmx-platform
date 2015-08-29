@@ -261,8 +261,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            File file = absolutePath(path);         // throws FileRepositoryException
+            checkFileExistence(file);               // throws FileRepositoryException
             //
             return new ResourceInfo(file);
         } catch (FileRepositoryException e) {
@@ -280,10 +280,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            File folder = absolutePath(path);   // throws FileRepositoryException
-            checkFileExistence(folder);         // throws FileRepositoryException
+            File directory = absolutePath(path);    // throws FileRepositoryException
+            checkFileExistence(directory);          // throws FileRepositoryException
             //
-            return new DirectoryListing(folder);    // ### TODO: if folder is no directory send NOT FOUND
+            return new DirectoryListing(directory, basePath()); // ### TODO: if directory is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -405,7 +405,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 checkFileExistence(file);           // throws FileRepositoryException 404 Not Found
             }
         } catch (FileRepositoryException e) {
-            throw new WebApplicationException(e.getStatus());
+            throw new WebApplicationException(e, e.getStatus());
         }
     }
 
@@ -416,68 +416,82 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // === File System Representation ===
 
     /**
-     * Fetches the File topic representing the file at a given absolute path.
+     * Fetches the File topic representing the file at the given absolute path.
      * If no such File topic exists <code>null</code> is returned.
      *
-     * @param   file   An absolute path.
+     * @param   path   An absolute path.
      */
-    private Topic fetchFileTopic(File file) {
-        return fetchTopic(file, "dm4.files.file");
+    private Topic fetchFileTopic(File path) {
+        return fetchTopic(path, "dm4.files.file");
     }
 
     /**
-     * Fetches the Folder topic representing the folder at a given absolute path.
+     * Fetches the Folder topic representing the folder at the given absolute path.
      * If no such Folder topic exists <code>null</code> is returned.
      *
-     * @param   file   An absolute path.
+     * @param   path   An absolute path.
      */
-    private Topic fetchFolderTopic(File file) {
-        return fetchTopic(file, "dm4.files.folder");
+    private Topic fetchFolderTopic(File path) {
+        return fetchTopic(path, "dm4.files.folder");
     }
 
     // ---
 
     /**
-     * @param   file   An absolute path.
+     * Fetches the File/Folder topic representing the file/directory at the given absolute path.
+     * If no such File/Folder topic exists <code>null</code> is returned.
+     *
+     * @param   path            An absolute path.
+     * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
-    private Topic fetchTopic(File file, String parentTypeUri) {
-        String path = repoPath(file);
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(path));
+    private Topic fetchTopic(File path, String topicTypeUri) {
+        String repoPath = repoPath(path);
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(repoPath));
         if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-                parentTypeUri);     // ### FIXME: had fetchComposite=true
+            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
+                // ### FIXME: had fetchComposite=true
         }
         return null;
     }
 
     // ---
 
-    private Topic createFileTopic(File file) {
-        String mediaType = JavaUtils.getFileType(file.getName());
+    /**
+     * Creates a File topic representing the file at the given absolute path.
+     *
+     * @param   path            An absolute path.
+     */
+    private Topic createFileTopic(File path) {
+        ChildTopicsModel childTopics = new ChildTopicsModel()
+            .put("dm4.files.file_name", path.getName())
+            .put("dm4.files.path", repoPath(path))
+            .put("dm4.files.size", path.length());
         //
-        ChildTopicsModel childTopics = new ChildTopicsModel();
-        childTopics.put("dm4.files.file_name", file.getName());
-        childTopics.put("dm4.files.path", repoPath(file));
+        String mediaType = JavaUtils.getFileType(path.getName());
         if (mediaType != null) {
             childTopics.put("dm4.files.media_type", mediaType);
         }
-        childTopics.put("dm4.files.size", file.length());
         //
         return dms.createTopic(new TopicModel("dm4.files.file", childTopics));
     }
 
-    private Topic createFolderTopic(File file) {
-        String folderName = file.getName();
-        String path = repoPath(file);
+    /**
+     * Creates a Folder topic representing the directory at the given absolute path.
+     *
+     * @param   path            An absolute path.
+     */
+    private Topic createFolderTopic(File path) {
+        String folderName = path.getName();
+        String repoPath = repoPath(path);
         //
         // root folder needs special treatment
-        if (path.equals("/")) {
+        if (repoPath.equals("/")) {
             folderName = "";
         }
         //
-        ChildTopicsModel childTopics = new ChildTopicsModel();
-        childTopics.put("dm4.files.folder_name", folderName);
-        childTopics.put("dm4.files.path",        path);
+        ChildTopicsModel childTopics = new ChildTopicsModel()
+            .put("dm4.files.folder_name", folderName)
+            .put("dm4.files.path",        repoPath);
         //
         return dms.createTopic(new TopicModel("dm4.files.folder", childTopics));
     }
@@ -532,15 +546,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             throw new RuntimeException("Constructing an absolute path from repository path \"" + repoPath + "\" failed",
                 e);
         }
-    }
-
-    private long getWorkspaceId() {
-        Cookies cookies = Cookies.get();
-        if (!cookies.has("dm4_workspace_id")) {
-            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
-                "\"dm4_workspace_id\" cookie");
-        }
-        return cookies.getLong("dm4_workspace_id");
     }
 
     private void createWorkspaceFileRepository(File repo) {
@@ -614,27 +619,47 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // ---
 
     /**
-     * Returns the repository path that corresponds to the given absolute path.
+     * Returns the repository path that corresponds to an absolute path.
      *
-     * @param   file    An absolute path.
+     * @param   path    An absolute path.
      */
-    private String repoPath(File file) {
-        String path = file.getPath().substring(FILE_REPOSITORY_PATH.length());
+    private String repoPath(File path) {
+        String repoPath = path.getPath().substring(basePath().length());
         // root folder needs special treatment
-        if (path.equals("")) {
-            path = "/";
+        if (repoPath.equals("")) {
+            repoPath = "/";
         }
         //
-        return path;
+        return repoPath;
         // ### TODO: there is a principle copy in DirectoryListing
         // ### FIXME: Windows drive letter? See DirectoryListing
     }
 
     /**
-     * Returns the repository path of the given File/Folder topic.
+     * Returns the repository path of a File/Folder topic.
      */
     private String repoPath(long fileTopicId) {
-        Topic fileTopic = dms.getTopic(fileTopicId);    // ### FIXME: had fetchComposite=true
-        return fileTopic.getChildTopics().getString("dm4.files.path");
+        return dms.getTopic(fileTopicId).getChildTopics().getString("dm4.files.path");
+    }
+
+    // ---
+
+    private String basePath() {
+        String basePath = FILE_REPOSITORY_PATH;
+        //
+        if (FILE_REPOSITORY_PER_WORKSPACE) {
+            basePath += "/workspace-" + getWorkspaceId();
+        }
+        //
+        return basePath;
+    }
+
+    private long getWorkspaceId() {
+        Cookies cookies = Cookies.get();
+        if (!cookies.has("dm4_workspace_id")) {
+            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
+                "\"dm4_workspace_id\" cookie");
+        }
+        return cookies.getLong("dm4_workspace_id");
     }
 }
