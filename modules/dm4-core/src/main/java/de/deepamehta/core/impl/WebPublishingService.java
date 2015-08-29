@@ -273,6 +273,12 @@ public class WebPublishingService {
             dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (WebApplicationException e) {
+            // Note: resourceRequestFilter() is called from OSGi HTTP service's static resource HttpContext. JAX-RS is
+            // not involved here. No JAX-RS exception mapper kicks in. Though we use WebApplicationException (which is
+            // JAX-RS API) here in order to transport error response info.
+            // ### TODO: unify exception handling for static and dynamic (JAX-RS servlet) resources. We want unified
+            // error response entites and exception logging. Compare to CatchAllExceptionMapper (dm4-webservice).
+            logger.log(Level.SEVERE, "Resource request filtering failed for " + request.getRequestURI(), e);
             sendError(response, e.getResponse());
             return false;
         } catch (Exception e) {
@@ -290,7 +296,7 @@ public class WebPublishingService {
                 servletResponse.addHeader(header, (String) value);
             }
         }
-        //
+        // transfer status code and entity
         servletResponse.sendError(response.getStatus(), (String) response.getEntity());   // throws IOException
     }
 
