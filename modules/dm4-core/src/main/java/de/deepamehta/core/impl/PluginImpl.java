@@ -10,6 +10,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
@@ -128,19 +129,24 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    public void publishDirectory(String directoryPath, String uriNamespace) {
+    /**
+     * Publishes a directory of the server's file system.
+     *
+     * @param   path    An absolute path to a directory.
+     */
+    public void publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
         try {
-            logger.info("### Publishing directory \"" + directoryPath + "\" at URI namespace \"" + uriNamespace + "\"");
+            logger.info("### Publishing directory \"" + path + "\" at URI namespace \"" + uriNamespace + "\"");
             //
             if (directoryResource != null) {
-                throw new RuntimeException(this + " has already published a directory; " +
-                    "only one per plugin is supported");
+                throw new RuntimeException(this + " has already published a directory; only one per plugin is " +
+                    "supported");
             }
             //
-            directoryResource = webPublishingService.publishStaticResources(directoryPath, uriNamespace);
+            directoryResource = webPublishingService.publishDirectory(path, uriNamespace, resourceMapper);
         } catch (Exception e) {
-            throw new RuntimeException("Publishing directory \"" + directoryPath + "\" at URI namespace \"" +
-                uriNamespace + "\" failed", e);
+            throw new RuntimeException("Publishing directory \"" + path + "\" at URI namespace \"" + uriNamespace +
+                "\" failed", e);
         }
     }
 

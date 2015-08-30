@@ -1,6 +1,7 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.impl.PluginImpl;
 
@@ -143,9 +144,12 @@ public class PluginActivator implements BundleActivator, PluginContext {
     // ---
 
     /**
-     * @param   securityHandler     Optional. If null no security is provided.
+     * Publishes a directory of the server's file system.
+     *
+     * @param   path            An absolute path to a directory.
+     * @param   resourceMapper  Pass null for default mapping.
      */
-    protected final void publishDirectory(String directoryPath, String uriNamespace) {
-        plugin.publishDirectory(directoryPath, uriNamespace);
+    protected final void publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
+        plugin.publishDirectory(path, uriNamespace, resourceMapper);
     }
 }

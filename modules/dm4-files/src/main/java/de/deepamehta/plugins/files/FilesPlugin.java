@@ -12,6 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -36,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -43,7 +45,8 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener {
+public class FilesPlugin extends PluginActivator implements FilesService, DirectoryResourceMapper,
+                                                                          ResourceRequestFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -374,6 +377,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
 
+    // **********************************************
+    // *** DirectoryResourceMapper Implementation ***
+    // **********************************************
+
+
+
+    @Override
+    public URL getResource(String name) throws MalformedURLException {
+        return new URL("file:" + basePath() + "/" + name);
+    }
+
+
+
     // ****************************
     // *** Hook Implementations ***
     // ****************************
@@ -382,7 +398,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @Override
     public void init() {
-        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI);
+        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // resourceMapper=this
     }
 
 
@@ -572,11 +588,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         file = file.getCanonicalFile();     // throws IOException
         boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
         //
-        logger.info("Checking file repository access to \"" + file + "\"\n      dm4.filerepo.path=" +
-            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "ALLOWED" : "FORBIDDEN"));
+        logger.info("Checking path \"" + file + "\"\n  dm4.filerepo.path=" +
+            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
-            throw new FileRepositoryException("\"" + file + "\" is not a file repository path", Status.FORBIDDEN);
+            throw new FileRepositoryException("\"" + file + "\" does not point to file repository", Status.FORBIDDEN);
         }
         //
         return file;
@@ -584,8 +600,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     private void checkFileExistence(File file) throws FileRepositoryException {
         if (!file.exists()) {
-            logger.info("File or directory \"" + file + "\" does not exist => NOT FOUND");
-            throw new FileRepositoryException("\"" + file + "\" does not exist in file repository", Status.NOT_FOUND);
+            throw new FileRepositoryException("File or directory \"" + file + "\" does not exist", Status.NOT_FOUND);
         }
     }
 

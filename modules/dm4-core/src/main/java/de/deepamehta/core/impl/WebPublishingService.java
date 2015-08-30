@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.DirectoryResourceMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -105,11 +106,13 @@ public class WebPublishingService {
 
     /**
      * Publishes a directory of the server's file system.
+     *
+     * @param   path    An absolute path to a directory.
      */
-    StaticResources publishStaticResources(String directoryPath, String uriNamespace) {
+    StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(directoryPath));
+            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(path, resourceMapper));
             return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -343,10 +346,15 @@ public class WebPublishingService {
 
     private class DirectoryHTTPContext implements HttpContext {
 
-        private String directoryPath;
+        private String path;
+        private DirectoryResourceMapper resourceMapper;
 
-        private DirectoryHTTPContext(String directoryPath) {
-            this.directoryPath = directoryPath;
+        /**
+         * @param   path    An absolute path to a directory.
+         */
+        private DirectoryHTTPContext(String path, DirectoryResourceMapper resourceMapper) {
+            this.path = path;
+            this.resourceMapper = resourceMapper;
         }
 
         // ---
@@ -354,7 +362,13 @@ public class WebPublishingService {
         @Override
         public URL getResource(String name) {
             try {
-                URL url = new URL("file:" + directoryPath + "/" + name);    // throws java.net.MalformedURLException
+                URL url;
+                if (resourceMapper != null) {
+                    url = resourceMapper.getResource(name);
+                } else {
+                    // default mapping
+                    url = new URL("file:" + path + "/" + name);     // throws java.net.MalformedURLException
+                }
                 logger.info("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
                 return url;
             } catch (Exception e) {
