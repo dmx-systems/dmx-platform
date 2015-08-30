@@ -85,7 +85,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     // === File System Representation ===
 
     @POST
-    @Path("/file/{path:.+}")       // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/file/{path}")
     @Transactional
     @Override
     public Topic createFileTopic(@PathParam("path") String path) {
@@ -117,7 +117,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     }
 
     @POST
-    @Path("/folder/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/folder/{path}")
     @Transactional
     @Override
     public Topic createFolderTopic(@PathParam("path") String path) {
@@ -151,7 +151,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     // ---
 
     @POST
-    @Path("/parent/{id}/file/{path:.+}")    // Note: we also match slashes as they are already decoded by an apache ...
+    @Path("/parent/{id}/file/{path}")
     @Transactional
     @Override
     public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
@@ -161,7 +161,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     }
 
     @POST
-    @Path("/parent/{id}/folder/{path:.+}")  // Note: we also match slashes as they are already decoded by an apache ...
+    @Path("/parent/{id}/folder/{path}")
     @Transactional
     @Override
     public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
@@ -175,7 +175,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     // === File Repository ===
 
     @POST
-    @Path("/{path:.+}")     // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/{path}")
     @Consumes("multipart/form-data")
     @Transactional
     @Override
@@ -226,7 +226,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     }
 
     @POST
-    @Path("/{path:.+}/folder/{folder_name}") // Note: we also match slashes as they are already decoded by an apache ...
+    @Path("/{path}/folder/{folder_name}")
     @Override
     public void createFolder(@PathParam("folder_name") String folderName, @PathParam("path") String path) {
         String operation = "Creating folder \"" + folderName + "\" at repository path \"" + path + "\"";
@@ -257,7 +257,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     // ---
 
     @GET
-    @Path("/{path:.+}/info")    // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/{path}/info")
     @Override
     public ResourceInfo getResourceInfo(@PathParam("path") String path) {
         String operation = "Getting resource info for repository path \"" + path + "\"";
@@ -276,7 +276,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
     }
 
     @GET
-    @Path("/{path:.+}")         // Note: we also match slashes as they are already decoded by an apache reverse proxy
+    @Path("/{path}")
     @Override
     public DirectoryListing getDirectoryListing(@PathParam("path") String path) {
         String operation = "Getting directory listing for repository path \"" + path + "\"";
@@ -589,7 +589,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
         boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
         //
         logger.info("Checking path \"" + file + "\"\n  dm4.filerepo.path=" +
-            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "OK" : "FORBIDDEN"));
+            "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
             throw new FileRepositoryException("\"" + file + "\" does not point to file repository", Status.FORBIDDEN);

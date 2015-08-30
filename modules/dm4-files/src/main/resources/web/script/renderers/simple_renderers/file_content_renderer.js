@@ -56,7 +56,7 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
 
             function filerepo_URI() {
                 // ### FIXME: principle copy in Files plugin's dm4c.restc.get_file()
-                return "/filerepo/" + encodeURI(path)
+                return "/filerepo/" + encodeURIComponent(path)
             }
 
             function render(content_element) {

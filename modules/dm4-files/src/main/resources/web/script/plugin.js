@@ -5,34 +5,34 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
-        return this.request("POST", "/files/file/" + encodeURI(path))
+        return this.request("POST", "/files/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_folder_topic = function(path) {
-        return this.request("POST", "/files/folder/" + encodeURI(path))
+        return this.request("POST", "/files/folder/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/parent/" + folder_topic_id + "/file/" + encodeURI(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/parent/" + folder_topic_id + "/folder/" + encodeURI(path))
+        return this.request("POST", "/files/parent/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.get_file = function(path) {
         // ### FIXME: principle copy in File Content Renderers's filerepo_URI()
-        return this.request("GET", "/filerepo/" + encodeURI(path), undefined, undefined, undefined, "text")
+        return this.request("GET", "/filerepo/" + encodeURIComponent(path), undefined, undefined, undefined, "text")
         // Note: response_data_type="text" causes the response data to be returned as is
         // (instead of trying to JSON-parse it). It works for non-text files as well.
     }
     dm4c.restc.create_folder = function(folder_name, path) {
-        return this.request("POST", "/files/" + encodeURI(path) + "/folder/" + encodeURI(folder_name))
+        return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
     }
     //
     dm4c.restc.get_resource_info = function(path) {
-        return this.request("GET", "/files/" + encodeURI(path) + "/info")
+        return this.request("GET", "/files/" + encodeURIComponent(path) + "/info")
     }
     dm4c.restc.get_directory_listing = function(path) {
-        return this.request("GET", "/files/" + encodeURI(path))
+        return this.request("GET", "/files/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
@@ -154,7 +154,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         }
 
         function do_open_upload_dialog() {
-            self.open_upload_dialog("/files/" + topic.get("dm4.files.path"), dm4c.page_panel.refresh)
+            var path = topic.get("dm4.files.path")
+            self.open_upload_dialog("/files/" + encodeURIComponent(path), dm4c.page_panel.refresh)
         }
     })
 
@@ -213,6 +214,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
      * Opens a dialog to allow the user to choose a local file and upload it to the server.
      *
      * @param   upload_url  the URL where the selected file is uploaded to (via POST).
+     *                      Proper encoding of the URL and its components is up to the caller.
      * @param   callback    the function invoked once the file has been uploaded and processed at server-side.
      *                      One argument is passed: the object returned by the server-side processing method.
      */
