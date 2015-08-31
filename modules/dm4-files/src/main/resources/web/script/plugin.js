@@ -150,6 +150,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
                 var path = topic.get("dm4.files.path")
                 dm4c.restc.create_folder(folder_name, path)
+                dm4c.page_panel.refresh()
             })
         }
 
