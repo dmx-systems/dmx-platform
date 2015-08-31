@@ -59,7 +59,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
             if (family == Family.CLIENT_ERROR || family == Family.SERVER_ERROR) {
                 Throwable cause = e.getCause();
                 Throwable originalException = cause != null ? cause : e;
-                logError(status, originalException);
+                logException(status, originalException);
                 // Only set entity if not already provided by application
                 if (response.getEntity() == null) {
                     response = errorResponse(Response.fromResponse(response), originalException);
@@ -68,7 +68,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
         } else {
             // build generic response
             Status status = hasNestedAccessControlException(e) ? Status.UNAUTHORIZED : Status.INTERNAL_SERVER_ERROR;
-            logError(status, e);
+            logException(status, e);
             response = errorResponse(Response.status(status), e);
         }
         return response;
@@ -76,7 +76,7 @@ public class CatchAllExceptionMapper implements ExceptionMapper<Throwable> {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void logError(Status status, Throwable e) {
+    private void logException(Status status, Throwable e) {
         logger.log(Level.SEVERE, "Request \"" + JavaUtils.requestInfo(request) + "\" failed. Responding with " +
             JavaUtils.responseInfo(status) + ". The original exception/error is:", e);
     }

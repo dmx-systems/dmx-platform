@@ -12,7 +12,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -37,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 
@@ -45,8 +43,7 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, DirectoryResourceMapper,
-                                                                          ResourceRequestFilterListener {
+public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -99,7 +96,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             //
             // 1) pre-checks
             File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            checkExistence(file);               // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(file);
@@ -131,7 +128,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             //
             // 1) pre-checks
             File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            checkExistence(file);               // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(file);
@@ -185,7 +182,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             logger.info(operation);
             // 1) pre-checks
             File directory = absolutePath(path);    // throws FileRepositoryException
-            checkFileExistence(directory);          // throws FileRepositoryException
+            checkExistence(directory);              // throws FileRepositoryException
             //
             // 2) store file
             File repoFile = unusedPath(directory, file);
@@ -234,7 +231,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             logger.info(operation);
             // 1) pre-checks
             File directory = absolutePath(path);    // throws FileRepositoryException
-            checkFileExistence(directory);          // throws FileRepositoryException
+            checkExistence(directory);              // throws FileRepositoryException
             //
             // 2) create directory
             File repoFile = path(directory, folderName);
@@ -265,7 +262,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             logger.info(operation);
             //
             File file = absolutePath(path);         // throws FileRepositoryException
-            checkFileExistence(file);               // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             //
             return new ResourceInfo(file);
         } catch (FileRepositoryException e) {
@@ -284,9 +281,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             logger.info(operation);
             //
             File directory = absolutePath(path);    // throws FileRepositoryException
-            checkFileExistence(directory);          // throws FileRepositoryException
+            checkExistence(directory);              // throws FileRepositoryException
             //
-            return new DirectoryListing(directory, basePath()); // ### TODO: if directory is no directory send NOT FOUND
+            return new DirectoryListing(directory, FILE_REPOSITORY_PATH);
+            // ### TODO: if directory is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -328,7 +326,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             logger.info(operation);
             //
             File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            checkExistence(file);               // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -345,7 +343,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             //
             String path = repoPath(fileTopicId);
             File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            checkExistence(file);               // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -364,7 +362,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
             //
             String path = repoPath(fileTopicId);
             File file = absolutePath(path);     // throws FileRepositoryException
-            checkFileExistence(file);           // throws FileRepositoryException
+            checkExistence(file);               // throws FileRepositoryException
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
@@ -377,19 +375,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
 
 
 
-    // **********************************************
-    // *** DirectoryResourceMapper Implementation ***
-    // **********************************************
-
-
-
-    @Override
-    public URL getResource(String name) throws MalformedURLException {
-        return new URL("file:" + basePath() + "/" + name);
-    }
-
-
-
     // ****************************
     // *** Hook Implementations ***
     // ****************************
@@ -398,7 +383,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
 
     @Override
     public void init() {
-        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, this);      // resourceMapper=this
+        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, null);      // resourceMapper=null
     }
 
 
@@ -418,7 +403,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
                 path = JavaUtils.decodeURIComponent(path);
                 logger.info("### repository path=\"" + path + "\"");
                 File file = absolutePath(path);     // throws FileRepositoryException 403 Forbidden
-                checkFileExistence(file);           // throws FileRepositoryException 404 Not Found
+                checkExistence(file);               // throws FileRepositoryException 404 Not Found
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(e, e.getStatus());
@@ -548,20 +533,29 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
                 throw new RuntimeException("File repository \"" + repo + "\" does not exist");
             }
             //
-            if (FILE_REPOSITORY_PER_WORKSPACE) {
+            if (repoPath.equals("/") && FILE_REPOSITORY_PER_WORKSPACE) {
                 repo = new File(repo, "/workspace-" + getWorkspaceId());
                 createWorkspaceFileRepository(repo);
             }
             //
             repo = new File(repo, repoPath);
             //
-            return checkFilePath(repo);     // throws FileRepositoryException 403 Forbidden
+            return checkPath(repo);         // throws FileRepositoryException 403 Forbidden
         } catch (FileRepositoryException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Constructing an absolute path from repository path \"" + repoPath + "\" failed",
                 e);
         }
+    }
+
+    private long getWorkspaceId() {
+        Cookies cookies = Cookies.get();
+        if (!cookies.has("dm4_workspace_id")) {
+            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
+                "\"dm4_workspace_id\" cookie");
+        }
+        return cookies.getLong("dm4_workspace_id");
     }
 
     private void createWorkspaceFileRepository(File repo) {
@@ -581,7 +575,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
 
     // ---
 
-    private File checkFilePath(File file) throws FileRepositoryException, IOException {
+    private File checkPath(File file) throws FileRepositoryException, IOException {
         // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
         // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
         // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
@@ -598,7 +592,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
         return file;
     }
 
-    private void checkFileExistence(File file) throws FileRepositoryException {
+    private void checkExistence(File file) throws FileRepositoryException {
         if (!file.exists()) {
             throw new FileRepositoryException("File or directory \"" + file + "\" does not exist", Status.NOT_FOUND);
         }
@@ -639,7 +633,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
      * @param   path    An absolute path.
      */
     private String repoPath(File path) {
-        String repoPath = path.getPath().substring(basePath().length());
+        String repoPath = path.getPath().substring(FILE_REPOSITORY_PATH.length());
         // root folder needs special treatment
         if (repoPath.equals("")) {
             repoPath = "/";
@@ -655,26 +649,5 @@ public class FilesPlugin extends PluginActivator implements FilesService, Direct
      */
     private String repoPath(long fileTopicId) {
         return dms.getTopic(fileTopicId).getChildTopics().getString("dm4.files.path");
-    }
-
-    // ---
-
-    private String basePath() {
-        String basePath = FILE_REPOSITORY_PATH;
-        //
-        if (FILE_REPOSITORY_PER_WORKSPACE) {
-            basePath += "/workspace-" + getWorkspaceId();
-        }
-        //
-        return basePath;
-    }
-
-    private long getWorkspaceId() {
-        Cookies cookies = Cookies.get();
-        if (!cookies.has("dm4_workspace_id")) {
-            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
-                "\"dm4_workspace_id\" cookie");
-        }
-        return cookies.getLong("dm4_workspace_id");
     }
 }

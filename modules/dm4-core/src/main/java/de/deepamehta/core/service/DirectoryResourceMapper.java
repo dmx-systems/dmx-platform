@@ -5,6 +5,7 @@ import java.net.URL;
 
 
 
+// ### TODO: drop this? Not used anymore.
 public interface DirectoryResourceMapper {
 
     /**
