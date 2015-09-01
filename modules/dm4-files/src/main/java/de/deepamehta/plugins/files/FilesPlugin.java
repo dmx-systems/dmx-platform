@@ -103,7 +103,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             Topic fileTopic = fetchFileTopic(file);
             if (fileTopic != null) {
                 logger.info(operation + " ABORTED -- already exists");
-                return fileTopic;
+                return fileTopic.loadChildTopics();
             }
             // 3) create topic
             return createFileTopic(file);
@@ -135,7 +135,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             Topic folderTopic = fetchFolderTopic(file);
             if (folderTopic != null) {
                 logger.info(operation + " ABORTED -- already exists");
-                return folderTopic;
+                return folderTopic.loadChildTopics();
             }
             // 3) create topic
             return createFolderTopic(file);
@@ -616,9 +616,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 // We check authorization for the repository path by checking access to the corresponding File topic.
                 Topic fileTopic = fetchFileTopic(path);
                 if (fileTopic != null) {
-                    // We must perform access control for the fetchFileTopic() call manually here. Although the
-                    // AccessControlPlugin's PreGetTopicListener kicks in, the request is *not* injected into the
-                    // AccessControlPlugin letting fetchFileTopic() effectively run as "System".
+                    // We must perform access control for the fetchFileTopic() call manually here.
+                    //
+                    // Although the AccessControlPlugin's PreGetTopicListener kicks in, the request is *not* injected
+                    // into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
                     //
                     // Note: checkAuthorization() is called (indirectly) from OSGi HTTP service's static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.

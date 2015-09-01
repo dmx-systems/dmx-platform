@@ -23,6 +23,7 @@ public interface FilesService extends PluginService {
     /**
      * Creates and returns a File topic representing the file at a given repository path.
      * If such a File topic exists already that topic is returned.
+     * In any case the returned topic includes its child topics.
      *
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
@@ -32,6 +33,7 @@ public interface FilesService extends PluginService {
     /**
      * Creates and returns a Folder topic representing the folder at a given repository path.
      * If such a Folder topic exists already that topic is returned.
+     * In any case the returned topic includes its child topics.
      *
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
