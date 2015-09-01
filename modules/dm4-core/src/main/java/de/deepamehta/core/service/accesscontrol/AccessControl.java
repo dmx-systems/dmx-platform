@@ -3,6 +3,9 @@ package de.deepamehta.core.service.accesscontrol;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 
 
 public interface AccessControl {
@@ -21,6 +24,8 @@ public interface AccessControl {
 
     Topic getUsernameTopic(String username);
 
+    // ---
+
     /**
      * Checks if a user is a member of a given workspace.
      *
@@ -31,4 +36,10 @@ public interface AccessControl {
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
 
     long getSystemWorkspaceId();
+
+    // ---
+
+    String getUsername(HttpServletRequest request);
+
+    String username(HttpSession session);
 }

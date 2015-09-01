@@ -176,17 +176,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getUsername() {
-        try {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session == null) {
-                return null;
-            }
-            return username(session);
-        } catch (IllegalStateException e) {
-            // Note: this happens if a request method is called outside request scope.
-            // This is the case while system startup.
-            return null;    // user is unknown
-        }
+        return dms.getAccessControl().getUsername(request);
     }
 
 
@@ -577,8 +567,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
             "\n      ##### " + info(request.getSession(false)));    // create=false
         //
-        checkRequestOrigin(request);    // throws WebApplicationException
-        checkAuthorization(request);    // throws WebApplicationException
+        checkRequestOrigin(request);    // throws WebApplicationException 403 Forbidden
+        checkAuthorization(request);    // throws WebApplicationException 401 Unauthorized
     }
 
     // ---
@@ -591,7 +581,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             "\" => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
         //
         if (!allowed) {
-            throw403Forbidden();    // throws WebApplicationException
+            throw403Forbidden();        // throws WebApplicationException
         }
     }
 
@@ -610,7 +600,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         //
         if (!authorized) {
-            throw401Unauthorized(); // throws WebApplicationException
+            throw401Unauthorized();     // throws WebApplicationException
         }
     }
 
@@ -664,11 +654,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private String username(HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
-        }
-        return username;
+        return dms.getAccessControl().username(session);
     }
 
     // ---

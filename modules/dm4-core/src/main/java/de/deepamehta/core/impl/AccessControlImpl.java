@@ -12,6 +12,9 @@ import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import java.util.logging.Logger;
 
 
@@ -111,6 +114,8 @@ class AccessControlImpl implements AccessControl {
         return new AttachedTopic(usernameTopic, dms);
     }
 
+    // ---
+
     @Override
     public boolean isMember(String username, long workspaceId) {
         try {
@@ -154,6 +159,32 @@ class AccessControlImpl implements AccessControl {
         systemWorkspaceId = workspace.getId();
         //
         return systemWorkspaceId;
+    }
+
+    // ---
+
+    @Override
+    public String getUsername(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);    // create=false
+            if (session == null) {
+                return null;
+            }
+            return username(session);
+        } catch (IllegalStateException e) {
+            // Note: this happens if request is a proxy object (injected by Jersey) and a request method is called
+            // outside request scope. This is the case while system startup.
+            return null;    // user is unknown
+        }
+    }
+
+    @Override
+    public String username(HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
+        }
+        return username;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

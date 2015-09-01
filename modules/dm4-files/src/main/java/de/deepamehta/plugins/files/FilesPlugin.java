@@ -14,6 +14,7 @@ import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
@@ -397,13 +398,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void resourceRequestFilter(HttpServletRequest request) {
         try {
-            String requestURI = request.getRequestURI();
-            if (requestURI.startsWith(FILE_REPOSITORY_URI)) {
-                String path = requestURI.substring(FILE_REPOSITORY_URI.length());
-                path = JavaUtils.decodeURIComponent(path);
-                logger.info("### repository path=\"" + path + "\"");
-                File file = absolutePath(path);     // throws FileRepositoryException 403 Forbidden
-                checkExistence(file);               // throws FileRepositoryException 404 Not Found
+            String repoPath = repoPath(request);
+            if (repoPath != null) {
+                logger.info("### Checking access to repository path \"" + repoPath + "\"");
+                File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
+                checkExistence(path);                           // throws FileRepositoryException 404 Not Found
+                checkAuthorization(path, repoPath, request);    // throws FileRepositoryException 401 Unauthorized
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(e, e.getStatus());
@@ -533,7 +533,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 throw new RuntimeException("File repository \"" + repo + "\" does not exist");
             }
             //
-            if (repoPath.equals("/") && FILE_REPOSITORY_PER_WORKSPACE) {
+            if (FILE_REPOSITORY_PER_WORKSPACE && repoPath.equals("/")) {
                 repo = new File(repo, "/workspace-" + getWorkspaceId());
                 createWorkspaceFileRepository(repo);
             }
@@ -575,27 +575,71 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // ---
 
-    private File checkPath(File file) throws FileRepositoryException, IOException {
-        // Note 1: we use getCanonicalPath() to fight directory traversal attacks (../../).
-        // Note 2: A directory path returned by getCanonicalPath() never contains a "/" at the end.
+    /**
+     * Checks if the absolute path represents a directory traversal attack.
+     * If so a FileRepositoryException (403 Forbidden) is thrown.
+     *
+     * @param   path    The absolute path to check.
+     *
+     * @return  The canonical form of the absolute path.
+     */
+    private File checkPath(File path) throws FileRepositoryException, IOException {
+        // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
         // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
-        file = file.getCanonicalFile();     // throws IOException
-        boolean pointsToRepository = file.getPath().startsWith(FILE_REPOSITORY_PATH);
+        path = path.getCanonicalFile();     // throws IOException
+        boolean pointsToRepository = path.getPath().startsWith(FILE_REPOSITORY_PATH);
         //
-        logger.info("Checking path \"" + file + "\"\n  dm4.filerepo.path=" +
+        logger.info("Checking path \"" + path + "\"\n  dm4.filerepo.path=" +
             "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
-            throw new FileRepositoryException("\"" + file + "\" does not point to file repository", Status.FORBIDDEN);
+            throw new FileRepositoryException("\"" + path + "\" does not point to file repository", Status.FORBIDDEN);
         }
         //
-        return file;
+        return path;
     }
 
-    private void checkExistence(File file) throws FileRepositoryException {
-        if (!file.exists()) {
-            throw new FileRepositoryException("File or directory \"" + file + "\" does not exist", Status.NOT_FOUND);
+    private void checkExistence(File path) throws FileRepositoryException {
+        boolean exists = path.exists();
+        //
+        logger.info("Checking existence of \"" + path + "\" => " + (exists ? "EXISTS" : "NOT FOUND"));
+        //
+        if (!exists) {
+            throw new FileRepositoryException("File or directory \"" + path + "\" does not exist", Status.NOT_FOUND);
         }
+    }
+
+    private void checkAuthorization(File path, String repoPath, HttpServletRequest request)
+                                                                                        throws FileRepositoryException {
+        try {
+            if (FILE_REPOSITORY_PER_WORKSPACE) {
+                // We check authorization for the repository path by checking access to the corresponding File topic.
+                Topic fileTopic = fetchFileTopic(path);
+                if (fileTopic != null) {
+                    // We must perform access control for the fetchFileTopic() call manually here. Although the
+                    // AccessControlPlugin's PreGetTopicListener kicks in, the request is *not* injected into the
+                    // AccessControlPlugin letting fetchFileTopic() effectively run as "System".
+                    //
+                    // Note: checkAuthorization() is called (indirectly) from OSGi HTTP service's static resource
+                    // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
+                    String username = dms.getAccessControl().getUsername(request);
+                    if (!dms.getAccessControl().hasPermission(username, Operation.READ, fileTopic.getId())) {
+                        throw new FileRepositoryException(userInfo(username) + " has no READ permission for " +
+                            "repository path \"" + repoPath + "\"", Status.UNAUTHORIZED);
+                    }
+                } else {
+                    throw new RuntimeException("Missing File topic for repository path \"" + repoPath + "\"");
+                }
+            }
+        } catch (FileRepositoryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking authorization for repository path \"" + repoPath + "\" failed", e);
+        }
+    }
+
+    private String userInfo(String username) {
+        return "user " + (username != null ? "\"" + username + "\"" : "<anonymous>");
     }
 
     // ---
@@ -649,5 +693,20 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      */
     private String repoPath(long fileTopicId) {
         return dms.getTopic(fileTopicId).getChildTopics().getString("dm4.files.path");
+    }
+
+    /**
+     * Returns the repository path of a filerepo request.
+     *
+     * @return  The repository path or <code>null</code> if the request is not a filerepo request.
+     */
+    public String repoPath(HttpServletRequest request) {
+        String repoPath = null;
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith(FILE_REPOSITORY_URI)) {
+            repoPath = requestURI.substring(FILE_REPOSITORY_URI.length());
+            repoPath = JavaUtils.decodeURIComponent(repoPath);
+        }
+        return repoPath;
     }
 }

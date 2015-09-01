@@ -281,11 +281,11 @@ public class WebPublishingService {
             // JAX-RS API) here in order to transport error response info.
             // ### TODO: unify exception handling for static and dynamic (JAX-RS servlet) resources. We want unified
             // error response entites and exception logging. Compare to CatchAllExceptionMapper (dm4-webservice).
-            logger.log(Level.SEVERE, "Resource request filtering failed for " + request.getRequestURI(), e);
+            logger.log(Level.SEVERE, "Resource request filtering for \"" + request.getRequestURI() + "\" failed", e);
             sendError(response, e.getResponse());
             return false;
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Resource request filtering failed for " + request.getRequestURI(), e);
+            logger.log(Level.SEVERE, "Resource request filtering for \"" + request.getRequestURI() + "\" failed", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return false;
         }
