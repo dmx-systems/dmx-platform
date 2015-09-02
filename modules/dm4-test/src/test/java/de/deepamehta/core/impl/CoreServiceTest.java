@@ -901,7 +901,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.finish();
         }
     }
-    
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

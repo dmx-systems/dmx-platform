@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.DirectoryResourceMapper;
+import de.deepamehta.core.util.UniversalExceptionMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -16,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
@@ -275,32 +275,14 @@ public class WebPublishingService {
         try {
             dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
             return true;
-        } catch (WebApplicationException e) {
-            // Note: resourceRequestFilter() is called from OSGi HTTP service's static resource HttpContext. JAX-RS is
-            // not involved here. No JAX-RS exception mapper kicks in. Though we use WebApplicationException (which is
-            // JAX-RS API) here in order to transport error response info.
-            // ### TODO: unify exception handling for static and dynamic (JAX-RS servlet) resources. We want unified
-            // error response entites and exception logging. Compare to CatchAllExceptionMapper (dm4-webservice).
-            logger.log(Level.SEVERE, "Resource request filtering for \"" + request.getRequestURI() + "\" failed", e);
-            sendError(response, e.getResponse());
-            return false;
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Resource request filtering for \"" + request.getRequestURI() + "\" failed", e);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (Throwable e) {
+            // Note: resourceRequestFilter() is called from OSGi HTTP service's static resource HttpContext.
+            // JAX-RS is not involved here. No JAX-RS exception mapper kicks in. Though the application's
+            // ResourceRequestFilterListener can throw a WebApplicationException (which is JAX-RS API)
+            // in order to provide error response info.
+            new UniversalExceptionMapper(e, request).initResponse(response);
             return false;
         }
-    }
-
-    private void sendError(HttpServletResponse servletResponse, Response response) throws IOException {
-        // transfer headers
-        MultivaluedMap<String, Object> metadata = response.getMetadata();
-        for (String header : metadata.keySet()) {
-            for (Object value : metadata.get(header)) {
-                servletResponse.addHeader(header, (String) value);
-            }
-        }
-        // transfer status code and entity
-        servletResponse.sendError(response.getStatus(), (String) response.getEntity());   // throws IOException
     }
 
 
