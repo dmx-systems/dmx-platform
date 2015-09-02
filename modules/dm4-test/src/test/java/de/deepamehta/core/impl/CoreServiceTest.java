@@ -862,6 +862,47 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // ---
+
+    @Test
+    public void coreACAssignTopicToWorkspace() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic ws = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            //
+            dms.getAccessControl().assignToWorkspace(t1, ws.getId());
+            //
+            long wsId = (Long) t1.getProperty("dm4.workspaces.workspace_id");
+            assertEquals(ws.getId(), wsId);
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void coreACAssignAssociationToWorkspace() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic ws = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Association assoc = createAssociation(t1, t2);
+            //
+            dms.getAccessControl().assignToWorkspace(assoc, ws.getId());
+            //
+            long wsId = (Long) assoc.getProperty("dm4.workspaces.workspace_id");
+            assertEquals(ws.getId(), wsId);
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+    
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getTopicByUri(String uri) {

@@ -136,7 +136,7 @@ class AccessControlImpl implements AccessControl {
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         // 1) create assignment association
         dms.associationFactory(new AssociationModel("dm4.core.aggregation",
-            new TopicRoleModel(object.getId(), "dm4.core.parent"),
+            object.getModel().createRoleModel("dm4.core.parent"),
             new TopicRoleModel(workspaceId, "dm4.core.child")
         ));
         // 2) store assignment property
