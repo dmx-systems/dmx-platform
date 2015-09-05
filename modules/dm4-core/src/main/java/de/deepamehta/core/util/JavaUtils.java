@@ -1,5 +1,6 @@
 package de.deepamehta.core.util;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
@@ -242,8 +243,18 @@ public class JavaUtils {
         return request.getMethod() + " " + request.getRequestURI() + (queryString != null ? "?" + queryString : "");
     }
 
-    public static String responseInfo(Response.Status status) {
+    public static String responseInfo(Response.StatusType status) {
         return status.getStatusCode() + " (" + status.getReasonPhrase() + ")";
+    }
+
+    // ---
+
+    public static String requestDump(HttpServletRequest request) {
+        StringBuilder dump = new StringBuilder(request + ", session=" + request.getSession(false) + ", cookies=");
+        for (Cookie cookie : request.getCookies()) {
+            dump.append("\n  " + cookie.getName() + "=" + cookie.getValue());
+        }
+        return dump.toString();
     }
 
 

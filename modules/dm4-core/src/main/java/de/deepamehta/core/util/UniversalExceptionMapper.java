@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.Response.StatusType;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,6 +35,15 @@ import java.util.logging.Logger;
  *   - Enriching the response with an error entity.
  */
 public class UniversalExceptionMapper {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // Note: status 405 is not defined by JAX-RS
+    private static StatusType METHOD_NOT_ALLOWED = new StatusType() {
+        @Override public int getStatusCode() {return 405;} 
+        @Override public String getReasonPhrase() {return "Method Not Allowed";}
+        @Override public Family getFamily() {return Family.CLIENT_ERROR;}
+    };
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -55,7 +65,7 @@ public class UniversalExceptionMapper {
         Response response;
         if (e instanceof WebApplicationException) {
             response = ((WebApplicationException) e).getResponse();
-            Status status = Status.fromStatusCode(response.getStatus());
+            StatusType status = fromStatusCode(response.getStatus());
             Family family = status.getFamily();
             // Don't log redirects like 304 Not Modified
             if (family == Family.CLIENT_ERROR || family == Family.SERVER_ERROR) {
@@ -69,7 +79,7 @@ public class UniversalExceptionMapper {
             }
         } else {
             // build generic response
-            Status status = hasNestedAccessControlException(e) ? Status.UNAUTHORIZED : Status.INTERNAL_SERVER_ERROR;
+            StatusType status = hasNestedAccessControlException(e) ? Status.UNAUTHORIZED : Status.INTERNAL_SERVER_ERROR;
             logException(status, e);
             response = errorResponse(Response.status(status), e);
         }
@@ -82,7 +92,7 @@ public class UniversalExceptionMapper {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void logException(Status status, Throwable e) {
+    private void logException(StatusType status, Throwable e) {
         logger.log(Level.SEVERE, "Request \"" + JavaUtils.requestInfo(request) + "\" failed. Responding with " +
             JavaUtils.responseInfo(status) + ". The original exception/error is:", e);
     }
@@ -99,6 +109,19 @@ public class UniversalExceptionMapper {
             e = e.getCause();
         }
         return false;
+    }
+
+    private StatusType fromStatusCode(int statusCode) {
+        StatusType status;
+        if (statusCode == 405) {
+            status = METHOD_NOT_ALLOWED;
+        } else {
+            status = Status.fromStatusCode(statusCode);
+            if (status == null) {
+                throw new RuntimeException(statusCode + " is an unexpected status code");
+            }
+        }
+        return status;
     }
 
     // ---
