@@ -41,6 +41,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
         return new ConfigDefinitions();
     }
 
+    // ---
+
     @Override
     public void registerConfigDefinition(ConfigDefinition configDef) {
         try {
@@ -48,12 +50,28 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
             //
             ConfigDefinition _configDef = configDefs.get(configTypeUri);
             if (_configDef != null) {
-                throw new RuntimeException("Definition for configuration type \"" + configTypeUri + "\" already exits");
+                throw new RuntimeException("A definition for configuration type \"" + configTypeUri +
+                    "\" is already registered");
             }
             //
             configDefs.put(configTypeUri, configDef);
         } catch (Exception e) {
             throw new RuntimeException("Registering a configuration definition failed", e);
+        }
+    }
+
+    @Override
+    public void unregisterConfigDefinition(String configTypeUri) {
+        try {
+            ConfigDefinition _configDef = configDefs.remove(configTypeUri);
+            //
+            if (_configDef == null) {
+                throw new RuntimeException("Definition for configuration type \"" + configTypeUri +
+                    "\" not registered");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unregistering definition for configuration type \"" + configTypeUri +
+                "\" failed", e);
         }
     }
 

@@ -397,6 +397,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, null);      // resourceMapper=null
     }
 
+    @Override
+    public void shutdown() {
+        // ### FIXME: if shutdown() fails the static resources are not unregistered and when the Files
+        // plugin is restarted static resource registration fails as the alias is already in use
+        // ### Note: when the Config plugin is redeployed the Config service is already gone
+        if (configService != null) {
+            configService.unregisterConfigDefinition("dm4.files.disk_quota");
+        }
+    }
+
 
 
     // ********************************

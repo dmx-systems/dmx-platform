@@ -10,5 +10,9 @@ public interface ConfigService extends PluginService {
 
     ConfigDefinitions getConfigDefinitions();
 
+    // ---
+
     void registerConfigDefinition(ConfigDefinition configDef);
+
+    void unregisterConfigDefinition(String configTypeUri);
 }
