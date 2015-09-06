@@ -135,6 +135,7 @@
                     ${project.basedir}/modules/dm4-geomaps/target,
                     ${project.basedir}/modules/dm4-time/target,
                     ${project.basedir}/modules/dm4-caching/target,
+                    ${project.basedir}/modules/dm4-config/target,
                     ${project.basedir}/modules/dm4-storage-neo4j/target,
                     ${project.basedir}/modules/dm4-box-renderer-dom/target,
                     <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
@@ -205,6 +206,7 @@
                 <module>modules/dm4-geomaps</module>
                 <module>modules/dm4-time</module>
                 <module>modules/dm4-caching</module>
+                <module>modules/dm4-config</module>
                 <module>modules/dm4-storage-neo4j</module>
                 <module>modules/dm4-box-renderer-dom</module>
                 <!-- Testing -->
@@ -277,6 +279,7 @@
                 <module>modules/dm4-geomaps</module>
                 <module>modules/dm4-time</module>
                 <module>modules/dm4-caching</module>
+                <module>modules/dm4-config</module>
                 <module>modules/dm4-storage-neo4j</module>
                 <module>modules/dm4-box-renderer-dom</module>
                 <!-- Testing -->
