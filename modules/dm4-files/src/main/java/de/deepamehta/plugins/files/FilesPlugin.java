@@ -2,6 +2,9 @@ package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.event.CheckQuotaListener;
 import de.deepamehta.plugins.files.service.FilesService;
+import de.deepamehta.plugins.config.ModificationRole;
+import de.deepamehta.plugins.config.TypeConfigDefinition;
+import de.deepamehta.plugins.config.service.ConfigService;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
@@ -13,6 +16,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -67,6 +71,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     };
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    @Inject
+    private ConfigService configService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -384,6 +391,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @Override
     public void init() {
+        configService.registerConfigDefinition(new TypeConfigDefinition("dm4.accesscontrol.username",
+            "dm4.files.disk_quota", ModificationRole.ADMIN));
+        //
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, null);      // resourceMapper=null
     }
 

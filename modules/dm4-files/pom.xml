@@ -24,6 +24,11 @@
             <version>4.6.2-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-config</artifactId>
+            <version>4.6.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
         </dependency>

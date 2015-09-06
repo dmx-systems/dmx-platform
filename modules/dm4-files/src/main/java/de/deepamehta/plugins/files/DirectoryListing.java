@@ -59,7 +59,7 @@ public class DirectoryListing implements JSONEnabled {
         }
     }
 
-    // --------------------------------------------------------------------------------------------------- Inner Classes
+    // -------------------------------------------------------------------------------------------------- Nested Classes
 
     public class FileItem implements JSONEnabled {
 

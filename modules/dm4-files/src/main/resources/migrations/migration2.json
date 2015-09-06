@@ -1,0 +1,9 @@
+{
+    "topic_types": [
+        {
+            "value": "Disk Quota",
+            "uri": "dm4.files.disk_quota",
+            "data_type_uri": "dm4.core.number"
+        }
+    ]
+}

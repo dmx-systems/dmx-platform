@@ -65,7 +65,7 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
         return directives.iterator();
     }
 
-    // --------------------------------------------------------------------------------------------------- Inner Classes
+    // -------------------------------------------------------------------------------------------------- Nested Classes
 
     public class Entry implements JSONEnabled {
 

@@ -84,7 +84,7 @@ public class TopicmapViewmodel implements JSONEnabled {
         return "topicmap " + getId();
     }
 
-    // -------------------------------------------------------------------------------------------- Public Inner Classes
+    // -------------------------------------------------------------------------------------------------- Nested Classes
 
     // Note: there is a client-side equivalent in canvas_view.js (deepamehta-webclient plugin)
     public class GridPositioning {
