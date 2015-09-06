@@ -1,0 +1,18 @@
+{
+    "assoc_types": [
+        {
+            "value": "Configuration",
+            "uri": "dm4.config.configuration",
+            "data_type_uri": "dm4.core.text"
+        }
+    ],
+
+    "topics": [
+        ### Role Types ###
+        {
+            "value":    "Configurable",
+            "uri":      "dm4.config.configurable",
+            "type_uri": "dm4.core.role_type"
+        }
+    ]
+}
