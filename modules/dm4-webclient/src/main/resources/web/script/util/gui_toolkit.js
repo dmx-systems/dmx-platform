@@ -236,28 +236,25 @@ function GUIToolkit(config) {
         this.dom = menu
 
         /**
-         * @param   item    object with "label", "value" (optional), "icon" (optional), "disabled" (optional),
-         *                  "is_trigger" (optional), and "handler" (optional) properties.
+         * @param   item    The menu item to add. An object with these properties:
+         *                      "label"
+         *                      "value" (optional)
+         *                      "icon" (optional)
+         *                      "disabled" (optional)
+         *                      "is_trigger" (optional)
+         *                      "handler" (optional)
+         *                      "submenu_items" (optional)
+         *                  See Menu.add_item() below for a detailed property description.
          */
         this.add_item = function(item) {
             // 1) update GUI
-            menu.append(
-                menu_item_dom(item)
-            ).menu("refresh")
+            var item_dom = menu_item_dom(item)
+            if (item.submenu_items) {
+                item_dom.append(submenu_dom(item.submenu_items))
+            }
+            menu.append(item_dom).menu("refresh")
             // 2) update model
             items.push(item)
-        }
-
-        this.add_submenu = function(label, items) {
-            var submenu = $("<ul>")
-            for (var i = 0, item; item = items[i]; i++) {
-                submenu.append(
-                    menu_item_dom(item)
-                )
-            }
-            menu.append(
-                $("<li>").append(label).append(submenu)
-            ).menu("refresh")
         }
 
         this.add_separator = function() {
@@ -365,6 +362,14 @@ function GUIToolkit(config) {
             }
             anchor.append(item.label)
             return anchor
+        }
+
+        function submenu_dom(items) {
+            var submenu = $("<ul>")
+            for (var i = 0, item; item = items[i]; i++) {
+                submenu.append(menu_item_dom(item))
+            }
+            return submenu
         }
 
         function item_handler(item) {
@@ -476,6 +481,7 @@ function GUIToolkit(config) {
              *                          ### TODO: consider renaming to "not_a_state".
              *                      "handler" - Optional: the individual handler. One argument is passed to it:
              *                          the selected menu item (an object with "label", "value", ... properties).
+             *                      "submenu_items" - Optional: an array of items to be displayed as a submenu.
              */
             this.add_item = function(item) {
                 base_menu.add_item(item)
@@ -645,10 +651,6 @@ function GUIToolkit(config) {
 
             this.add_item = function(item) {
                 base_menu.add_item(item)
-            }
-
-            this.add_submenu = function(label, items) {
-                base_menu.add_submenu(label, items)
             }
 
             this.add_separator = function() {

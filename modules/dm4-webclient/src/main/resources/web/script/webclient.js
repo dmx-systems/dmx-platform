@@ -1386,8 +1386,6 @@ dm4c = new function() {
             for (var i = 0, cmd; cmd = commands[i]; i++) {
                 if (cmd.is_separator) {
                     context_menu.add_separator()
-                } else if (cmd.sub_commands) {
-                    context_menu.add_submenu(cmd.label, submenu_items(cmd.sub_commands))
                 } else {
                     context_menu.add_item(menu_item(cmd))
                 }
@@ -1396,21 +1394,25 @@ dm4c = new function() {
             context_menu.open(pos.x, pos.y)
         }
 
+        function menu_item(command) {
+            var menu_item = {
+                label:    command.label,
+                icon:     command.icon,
+                handler:  command.handler,
+                disabled: command.disabled
+            }
+            if (command.sub_commands) {
+                menu_item.submenu_items = submenu_items(command.sub_commands)
+            }
+            return menu_item
+        }
+
         function submenu_items(sub_commands) {
             var items = []
             for (var i = 0, cmd; cmd = sub_commands[i]; i++) {
                 items.push(menu_item(cmd))
             }
             return items
-        }
-
-        function menu_item(command) {
-            return {
-                label:    command.label,
-                icon:     command.icon,
-                handler:  command.handler,
-                disabled: command.disabled
-            }
         }
     }
 
