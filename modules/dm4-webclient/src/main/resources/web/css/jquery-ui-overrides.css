@@ -16,13 +16,64 @@
     font-size: 0.875em;
     position: fixed;
     display: none;
-    overflow: auto;
+    overflow-x: visible;
+    overflow-y: auto;
     z-index: 1001;
 }
+
+/*
+With jQuery UI 1.11.4 we didn't manage to get scrollable menus with submenus layouted properly.
+The submenu appears inside the main menu's container and a vertical scrollbar appears. The submenu is only visible
+after scrolling to the right.
+Fiddling with overflow-x and overflow-y didn't work. The intended x=visible/y=auto combination is not supported by
+browsers. See W3C spec below.
+
+With older jQuery UI 1.10.4 we got it working!
+The solution is to set CSS "position" to "static" (and position the menu by the jQuery UI "position" option then).
+All other position values ("absolute", "fixed", ...) are not working. CSS "overflow" can just be "auto".
+With jQuery UI 1.11.4 the "position=static" solution do not work.
+So, scrollable menus with submenus are possible with jQuery UI 1.10.4 but not with newer jQuery UI 1.11.4.
+All this is true pain!!
+
+W3C spec says:
+
+The computed values of "overflow-x" and "overflow-y" are the same as their specified values, except that some
+combinations with "visible" are not possible: if one is specified as "visible" and the other is "scroll" or "auto",
+then "visible" is set to "auto". The computed value of "overflow" is equal to the computed value of "overflow-x"
+if "overflow-y" is the same; otherwise it is the pair of computed values of "overflow-x" and "overflow-y".
+
+http://www.w3.org/TR/css3-box/#overflow-x
+*/
 
 .ui-menu .ui-menu-divider {
     margin-top: 2px;            /* jQuery UI default is 5 pixel and leads to unequal    */
     margin-bottom: 2px;         /* top/bottom margin of first/last menu items           */
+}
+
+.ui-menu .ui-state-focus,
+.ui-menu .ui-state-active {
+    margin: 0;                  /* jQuery UI default is -1px    */
+}
+
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default {
+    border-width: 0;            /* jQuery UI default is 1px     */
+}
+
+.ui-state-hover,
+.ui-widget-content .ui-state-hover,
+.ui-widget-header .ui-state-hover,
+.ui-state-focus,
+.ui-widget-content .ui-state-focus,
+.ui-widget-header .ui-state-focus {
+    border-width: 0;            /* jQuery UI default is 1px     */
+}
+
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active {
+    border-width: 0;            /* jQuery UI default is 1px     */
 }
 
 .ui-front {                     /* Used for jQuery UI dialogs.  */

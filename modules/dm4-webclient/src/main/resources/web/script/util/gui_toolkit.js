@@ -352,19 +352,13 @@ function GUIToolkit(config) {
                 .mouseup(item_handler(item))
                 .mousedown(consume_event)   // a bubbled up mousedown event would close the menu prematurely
                 .click(consume_event)       // prevent default, that is don't invoke href "#"
-                .append(item_anchor_dom(item))
-            return menu_item
-        }
-
-        function item_anchor_dom(item) {
-            var anchor = $("<a>").attr("href", "#")
+                .append(item.label)
             if (item.icon) {
-                anchor.append(
+                menu_item.prepend(
                     $("<img>").attr("src", item.icon).addClass("icon")
                 )
             }
-            anchor.append(item.label)
-            return anchor
+            return menu_item
         }
 
         function item_handler(item) {
