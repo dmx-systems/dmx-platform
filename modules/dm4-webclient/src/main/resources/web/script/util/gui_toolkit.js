@@ -231,9 +231,15 @@ function GUIToolkit(config) {
         .mousedown(consume_event)   // avoid mousedown on scrollbar parts to close the menu prematurely
         .mouseup(consume_event)     // avoid mouseup   on scrollbar parts to close the menu prematurely
 
+        // We use a container element for absolute menu positioning, which we need.
+        // The menu itself (the <ul>) can't be positioned absolute in combination with overflow "auto" or "scroll".
+        // In this case submenus would not layout properly: they would be contrained to the main menu's box and a
+        // horizontal scrollbar would appear. The submenu would only be visible after scrolling to the right.
+        var menu_container = $("<div>").addClass("menu-container")
+
         // ---
 
-        this.dom = menu
+        this.dom = menu_container.append(menu)
 
         /**
          * @param   item    The menu item to add. An object with these properties:
@@ -277,14 +283,14 @@ function GUIToolkit(config) {
                 config.on_open_menu(this)
             }
             //
-            menu.css({top: y, left: x}).show().focus()  // must be visible for measurement.
-                                                        // focus enables keyboard control.
+            menu_container.css({top: y, left: x}).show()    // must be visible for measurement
+            menu.focus()                                    // focus enables keyboard control
             trim_height()
-            opened_menu = this                          // update global state
+            opened_menu = this                              // update global state
 
             function trim_height() {
                 // measure
-                menu.width("auto").height("auto")       // reset trim for proper measurement
+                menu.width("auto").height("auto")           // reset trim for proper measurement
                 var menu_height = menu.outerHeight()
                 var window_height = window.innerHeight
                 // trim
@@ -308,7 +314,16 @@ function GUIToolkit(config) {
         }
 
         this.is_open = function() {
-            return menu.css("display") != "none"
+            return menu_container.css("display") != "none"
+        }
+
+        this.hide = function() {
+            menu_container.hide()
+        }
+
+        this.destroy = function() {
+            menu.menu("destroy")
+            menu_container.remove()
         }
 
         // ---
@@ -343,6 +358,14 @@ function GUIToolkit(config) {
 
         // ---
 
+        function submenu_dom(items) {
+            var submenu = $("<ul>")
+            for (var i = 0, item; item = items[i]; i++) {
+                submenu.append(menu_item_dom(item))
+            }
+            return submenu
+        }
+
         function menu_item_dom(item) {
             var menu_item = $("<li>")
                 .toggleClass("ui-state-disabled", item.disabled == true)
@@ -354,22 +377,11 @@ function GUIToolkit(config) {
         }
 
         function item_anchor_dom(item) {
-            var anchor = $("<a>").attr("href", "#")
+            var anchor = $("<a>").attr("href", "#").append(item.label)
             if (item.icon) {
-                anchor.append(
-                    $("<img>").attr("src", item.icon).addClass("icon")
-                )
+                anchor.prepend($("<img>").attr("src", item.icon).addClass("icon"))
             }
-            anchor.append(item.label)
             return anchor
-        }
-
-        function submenu_dom(items) {
-            var submenu = $("<ul>")
-            for (var i = 0, item; item = items[i]; i++) {
-                submenu.append(menu_item_dom(item))
-            }
-            return submenu
         }
 
         function item_handler(item) {
@@ -575,7 +587,7 @@ function GUIToolkit(config) {
             }
 
             function on_close() {
-                base_menu.dom.hide()
+                base_menu.hide()
             }
 
             // ---
@@ -667,7 +679,7 @@ function GUIToolkit(config) {
             // ---
 
             function on_close() {
-                base_menu.dom.menu("destroy").remove()
+                base_menu.destroy()
             }
         }
     }

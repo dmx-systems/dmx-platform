@@ -12,12 +12,15 @@
 
 /* Note: OpenLayer's event layer has z-index 999. */
 
-.ui-menu {
-    font-size: 0.875em;
+.menu-container {
     position: fixed;
     display: none;
-    overflow: auto;
     z-index: 1001;
+}
+
+.ui-menu {
+    font-size: 0.875em;
+    overflow: auto;
 }
 
 .ui-menu .ui-menu-divider {
