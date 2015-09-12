@@ -54,7 +54,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
-    public static final long USER_QUOTA_BYTES = 1024 * 1024 * Integer.getInteger("dm4.filerepo.user_quota", 150);
+    public static final int USER_QUOTA_MB = Integer.getInteger("dm4.filerepo.user_quota", 150);
+    public static final long USER_QUOTA_BYTES = 1024 * 1024 * USER_QUOTA_MB;
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in global POM.
 
@@ -392,7 +393,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void init() {
         configService.registerConfigDefinition(new TypeConfigDefinition("dm4.accesscontrol.username",
-            "dm4.files.disk_quota", ModificationRole.ADMIN));
+            new TopicModel("dm4.files.disk_quota", new SimpleValue(USER_QUOTA_MB)), ModificationRole.ADMIN));
         //
         publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, null);      // resourceMapper=null
     }
