@@ -376,8 +376,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     service = super.addingService(serviceRef);
                     addService(service, serviceInterface);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "Adding service " + serviceInterface.getName() + " to " +
-                        pluginContext + " failed", e);
+                    logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
+                        " to " + pluginContext + ":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -390,8 +390,8 @@ public class PluginImpl implements Plugin, EventHandler {
                     removeService(service, serviceInterface);
                     super.removedService(ref, service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "Removing service " + serviceInterface.getName() + " from " +
-                        pluginContext + " failed", e);
+                    logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
+                        " from " + pluginContext + ":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -515,7 +515,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             postPluginActivatedEvent();
             //
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new RuntimeException("Activation of " + this + " failed", e);
         }
     }
@@ -916,8 +916,8 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this);
             checkRequirementsForActivation();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "Handling PLUGIN_ACTIVATED event from \"" + pluginUri + "\" for " + this +
-                " failed", e);
+            logger.log(Level.SEVERE, "An error occurred while handling PLUGIN_ACTIVATED event from \"" + pluginUri +
+                "\" for " + this + ":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }

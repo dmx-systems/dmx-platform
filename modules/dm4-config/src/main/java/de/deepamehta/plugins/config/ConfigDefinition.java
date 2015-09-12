@@ -1,26 +1,32 @@
 package de.deepamehta.plugins.config;
 
+import de.deepamehta.core.model.TopicModel;
+
 
 
 public abstract class ConfigDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String configTypeUri;
+    private TopicModel defaultConfigTopic;
     private ModificationRole role;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ConfigDefinition(String configTypeUri, ModificationRole role) {
-        this.configTypeUri = configTypeUri;
+    ConfigDefinition(TopicModel defaultConfigTopic, ModificationRole role) {
+        this.defaultConfigTopic = defaultConfigTopic;
         this.role = role;
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract String getConfigurableUri();
 
     String getConfigTypeUri() {
-        return configTypeUri;
+        return defaultConfigTopic.getTypeUri();
+    }
+
+    TopicModel getDefaultConfigTopic() {
+        return defaultConfigTopic;
     }
 }

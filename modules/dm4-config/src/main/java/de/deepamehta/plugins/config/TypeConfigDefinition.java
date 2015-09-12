@@ -1,5 +1,7 @@
 package de.deepamehta.plugins.config;
 
+import de.deepamehta.core.model.TopicModel;
+
 
 
 public class TypeConfigDefinition extends ConfigDefinition {
@@ -10,8 +12,8 @@ public class TypeConfigDefinition extends ConfigDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TypeConfigDefinition(String topicTypeUri, String configTypeUri, ModificationRole role) {
-        super(configTypeUri, role);
+    public TypeConfigDefinition(String topicTypeUri, TopicModel defaultConfigTopic, ModificationRole role) {
+        super(defaultConfigTopic, role);
         this.topicTypeUri = topicTypeUri;
     }
 
