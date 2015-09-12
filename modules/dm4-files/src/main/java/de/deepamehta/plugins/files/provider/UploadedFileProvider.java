@@ -63,7 +63,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Qu
 
     @Override
     public void check(long fileSize) {
-        CoreActivator.getDeepaMehtaService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.USER_QUOTA_BYTES);
+        CoreActivator.getDeepaMehtaService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.DISK_QUOTA_BYTES);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
