@@ -123,7 +123,9 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     public void stop() {
-        pluginContext.shutdown();
+        // Note: plugins often use the shutdown() hook to unregister things at certain services.
+        // So the shutdown() hook must be invoked _before_ the service trackers are closed.
+        invokeShutdownHook();
         closeServiceTrackers();
     }
 
@@ -494,8 +496,8 @@ public class PluginImpl implements Plugin, EventHandler {
      * Activates this plugin and then posts the PLUGIN_ACTIVATED OSGi event.
      *
      * Activation comprises:
-     *   - install the plugin in the database (includes migrations, post-install hook, type introduction)
-     *   - initialize the plugin
+     *   - install the plugin in the database (includes plugin topic, migrations, type introduction)
+     *   - invoke the plugin's init() hook
      *   - register the plugin's event listeners
      *   - register the plugin's OSGi service
      */
@@ -504,7 +506,7 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("----- Activating " + this + " -----");
             //
             installPluginInDB();
-            initializePlugin();
+            invokeInitHook();
             registerListeners();
             registerPluginService();
             // Note: the event listeners must be registered *after* the plugin is installed in the database (see
@@ -542,9 +544,8 @@ public class PluginImpl implements Plugin, EventHandler {
             boolean isCleanInstall = createPluginTopicIfNotExists();
             // 2) run migrations
             dms.migrationManager.runPluginMigrations(this, isCleanInstall);
-            //
+            // 3) type introduction
             if (isCleanInstall) {
-                // 3) type introduction
                 introduceTopicTypesToPlugin();
                 introduceAssociationTypesToPlugin();
             }
@@ -619,10 +620,19 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
-    // === Initialization ===
+    // === Life Cycle ===
 
-    private void initializePlugin() {
+    private void invokeInitHook() {
         pluginContext.init();
+    }
+
+    private void invokeShutdownHook() {
+        try {
+            pluginContext.shutdown();
+        } catch (Exception e) {
+            // Note: we don't throw here. Stopping the plugin must proceed.
+            logger.log(Level.SEVERE, "An error occurred in the shutdown() hook of " + this + ":", e);
+        }
     }
 
 

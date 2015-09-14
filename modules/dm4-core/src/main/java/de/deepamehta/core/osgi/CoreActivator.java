@@ -55,7 +55,7 @@ public class CoreActivator implements BundleActivator {
             storageServiceTracker.open();
             httpServiceTracker.open();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "Starting \"DeepaMehta 4 Core\" failed", e);
+            logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 Core\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
@@ -72,7 +72,7 @@ public class CoreActivator implements BundleActivator {
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "Stopping \"DeepaMehta 4 Core\" failed", e);
+            logger.log(Level.SEVERE, "An error occurred while stopping \"DeepaMehta 4 Core\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }

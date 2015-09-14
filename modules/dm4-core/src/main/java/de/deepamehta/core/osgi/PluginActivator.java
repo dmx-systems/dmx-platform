@@ -55,7 +55,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
             plugin = new PluginImpl(this);
             plugin.start();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "Starting " + this + " failed", e);
+            logger.log(Level.SEVERE, "An error occurred while starting " + this + ":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
@@ -73,7 +73,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
             logger.info("========== Stopping " + this + " ==========");
             plugin.stop();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "Stopping " + this + " failed", e);
+            logger.log(Level.SEVERE, "An error occurred while stopping " + this + ":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }

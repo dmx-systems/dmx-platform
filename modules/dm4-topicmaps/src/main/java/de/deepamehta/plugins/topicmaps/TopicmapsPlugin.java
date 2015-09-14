@@ -68,8 +68,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     public TopicmapsPlugin() {
-        // Note: registering the default renderer in the InitializePluginListener would be too late.
-        // The renderer is already needed in the PostInstallPluginListener.
+        // Note: registering the default renderer in the init() hook would be too late.
+        // The renderer is already needed at install-in-DB time ### Still true?
         registerTopicmapRenderer(new DefaultTopicmapRenderer());
     }
 
