@@ -3,7 +3,7 @@ package de.deepamehta.plugins.accesscontrol;
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.files.event.CheckQuotaListener;
+import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
 import de.deepamehta.plugins.files.service.FilesService;
 import de.deepamehta.plugins.workspaces.service.WorkspacesService;
 
@@ -82,7 +82,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                          PostUpdateAssociationListener,
                                                                                          ServiceRequestFilterListener,
                                                                                          ResourceRequestFilterListener,
-                                                                                         CheckQuotaListener {
+                                                                                         CheckDiskQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -487,22 +487,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void checkQuota(long fileSize, long userQuota) {
-        String username = getUsername();
-        //
-        if (username == null) {
-            throw new RuntimeException("User <anonymous> is not allowed to upload files");
-        }
-        //
+    public void checkDiskQuota(String username, long fileSize, long diskQuota) {
         long occupiedSpace = getOccupiedSpace(username);
-        boolean quotaOK = occupiedSpace + fileSize <= userQuota;
+        boolean quotaOK = occupiedSpace + fileSize <= diskQuota;
         //
         logger.info("### File size: " + fileSize + " bytes, " + userInfo(username) + " occupies " + occupiedSpace +
-            " bytes, user quota: " + userQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
+            " bytes, disk quota: " + diskQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {
             throw new RuntimeException("File upload quota of " + userInfo(username) + " exceeded. Quota is " +
-                userQuota + " bytes.");
+                diskQuota + " bytes.");
         }
     }
 

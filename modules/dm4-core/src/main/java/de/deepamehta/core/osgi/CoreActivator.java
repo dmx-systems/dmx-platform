@@ -21,8 +21,8 @@ public class CoreActivator implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private static DeepaMehtaService dms;
-    private BundleContext bundleContext;
+    private DeepaMehtaService dms;
+    private static BundleContext bundleContext;
 
     // consumed services
     private DeepaMehtaStorage storageService;
@@ -81,10 +81,15 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     public static DeepaMehtaService getDeepaMehtaService() {
-        if (dms == null) {
-            throw new RuntimeException("DeepaMehtaService not available");
+        return getService(DeepaMehtaService.class);
+    }
+
+    public static <S> S getService(Class<S> clazz) {
+        S serviceObject = bundleContext.getService(bundleContext.getServiceReference(clazz));
+        if (serviceObject == null) {
+            throw new RuntimeException("Service \"" + clazz.getName() + "\" is not available");
         }
-        return dms;
+        return serviceObject;
     }
 
 
@@ -102,8 +107,8 @@ public class CoreActivator implements BundleActivator {
                     service = super.addingService(serviceRef);
                     addService(service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "Adding service " + serviceInterface.getName() +
-                        " to \"DeepaMehta 4 Core\" failed", e);
+                    logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
+                        " to \"DeepaMehta 4 Core\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -116,8 +121,8 @@ public class CoreActivator implements BundleActivator {
                     removeService(service);
                     super.removedService(ref, service);
                 } catch (Throwable e) {
-                    logger.log(Level.SEVERE, "Removing service " + serviceInterface.getName() +
-                        " from \"DeepaMehta 4 Core\" failed", e);
+                    logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
+                        " from \"DeepaMehta 4 Core\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }

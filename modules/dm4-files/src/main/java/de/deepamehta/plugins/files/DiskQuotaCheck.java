@@ -2,7 +2,7 @@ package de.deepamehta.plugins.files;
 
 
 
-public interface QuotaCheck {
+public interface DiskQuotaCheck {
 
     void check(long fileSize);
 }

@@ -104,16 +104,6 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
-    @Override
-    public Topic getUsernameTopic(String username) {
-        TopicModel usernameTopic = _getUsernameTopic(username);
-        if (usernameTopic == null) {
-            return null;
-        }
-        // instantiate topic without performing permission check
-        return new AttachedTopic(usernameTopic, dms);
-    }
-
     // ---
 
     @Override
@@ -162,6 +152,22 @@ class AccessControlImpl implements AccessControl {
     }
 
     // ---
+
+    @Override
+    public Topic getUsernameTopic(String username) {
+        TopicModel usernameTopic = _getUsernameTopic(username);
+        if (usernameTopic == null) {
+            return null;
+        }
+        // instantiate topic without performing permission check
+        return new AttachedTopic(usernameTopic, dms);
+    }
+
+    @Override
+    public Topic getUsernameTopic(HttpServletRequest request) {
+        String username = getUsername(request);
+        return username != null ? getUsernameTopic(username) : null;
+    }
 
     @Override
     public String getUsername(HttpServletRequest request) {

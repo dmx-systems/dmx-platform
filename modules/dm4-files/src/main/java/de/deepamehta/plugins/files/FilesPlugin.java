@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.files;
 
-import de.deepamehta.plugins.files.event.CheckQuotaListener;
+import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
 import de.deepamehta.plugins.files.service.FilesService;
 import de.deepamehta.plugins.config.ModificationRole;
 import de.deepamehta.plugins.config.TypeConfigDefinition;
@@ -55,18 +55,17 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", 150);
-    public static final long DISK_QUOTA_BYTES = 1024 * 1024 * DISK_QUOTA_MB;
-    // Note: the default value is required in case no config file is in effect. This applies when DM is started
+    // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in global POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
     // Events
-    public static DeepaMehtaEvent CHECK_QUOTA = new DeepaMehtaEvent(CheckQuotaListener.class) {
+    public static DeepaMehtaEvent CHECK_DISK_QUOTA = new DeepaMehtaEvent(CheckDiskQuotaListener.class) {
         @Override
         public void deliver(EventListener listener, Object... params) {
-            ((CheckQuotaListener) listener).checkQuota(
-                (Long) params[0], (Long) params[1]
+            ((CheckDiskQuotaListener) listener).checkDiskQuota(
+                (String) params[0], (Long) params[1], (Long) params[2]
             );
         }
     };

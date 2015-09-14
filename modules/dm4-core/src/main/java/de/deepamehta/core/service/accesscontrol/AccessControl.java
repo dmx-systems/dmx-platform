@@ -22,8 +22,6 @@ public interface AccessControl {
      */
     boolean hasPermission(String username, Operation operation, long objectId);
 
-    Topic getUsernameTopic(String username);
-
     // ---
 
     /**
@@ -39,6 +37,26 @@ public interface AccessControl {
 
     // ---
 
+    /**
+     * Returns the Username topic that corresponds to a username.
+     *
+     * @return  the Username topic, or <code>null</code> if no such Username topic exists.
+     */
+    Topic getUsernameTopic(String username);
+
+    /**
+     * Convenience method that returns the Username topic that corresponds to a request.
+     * Basically it calls <code>getUsernameTopic(getUsername(request))</code>.
+     *
+     * @return  the Username topic, or <code>null</code> if no such Username topic exists.
+     */
+    Topic getUsernameTopic(HttpServletRequest request);
+
+    /**
+     * Returns the username that is associated with a request.
+     *
+     * @return  the username, or <code>null</code> if no user is associated with the request.
+     */
     String getUsername(HttpServletRequest request);
 
     String username(HttpSession session);

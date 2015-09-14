@@ -1,9 +1,13 @@
 package de.deepamehta.plugins.files.provider;
 
-import de.deepamehta.core.osgi.CoreActivator;
+import de.deepamehta.plugins.files.DiskQuotaCheck;
 import de.deepamehta.plugins.files.FilesPlugin;
-import de.deepamehta.plugins.files.QuotaCheck;
 import de.deepamehta.plugins.files.UploadedFile;
+
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.osgi.CoreActivator;
+import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.plugins.config.service.ConfigService;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -29,7 +33,7 @@ import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, QuotaCheck {
+public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, DiskQuotaCheck {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -59,11 +63,16 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Qu
         }
     }
 
-    // *** QuotaCheck Implementation ***
+    // *** DiskQuotaCheck Implementation ***
 
     @Override
     public void check(long fileSize) {
-        CoreActivator.getDeepaMehtaService().fireEvent(FilesPlugin.CHECK_QUOTA, fileSize, FilesPlugin.DISK_QUOTA_BYTES);
+        DeepaMehtaService dms = CoreActivator.getDeepaMehtaService();
+        String username = dms.getAccessControl().getUsername(request);
+        if (username == null) {
+            throw new RuntimeException("User <anonymous> has no disk quota");
+        }
+        dms.fireEvent(FilesPlugin.CHECK_DISK_QUOTA, username, fileSize, diskQuota(username));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -100,5 +109,12 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Qu
         } catch (Exception e) {
             throw new RuntimeException("Parsing multipart/form-data request failed", e);
         }
+    }
+
+    private long diskQuota(String username) {
+        Topic usernameTopic = CoreActivator.getDeepaMehtaService().getAccessControl().getUsernameTopic(username);
+        ConfigService cs = CoreActivator.getService(ConfigService.class);
+        Topic configTopic = cs.getConfigTopic(usernameTopic.getId(), "dm4.files.disk_quota");
+        return 1024 * 1024 * configTopic.getSimpleValue().intValue();
     }
 }
