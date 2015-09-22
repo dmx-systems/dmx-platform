@@ -6,5 +6,5 @@ public enum ModificationRole {
     ADMIN,
     CREATOR,
     OWNER,
-    MEMBERS
+    MEMBER
 }

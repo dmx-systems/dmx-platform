@@ -29,4 +29,8 @@ public abstract class ConfigDefinition {
     TopicModel getDefaultConfigTopic() {
         return defaultConfigTopic;
     }
+
+    ModificationRole getModificationRole() {
+        return role;
+    }
 }

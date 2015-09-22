@@ -9,6 +9,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.service.accesscontrol.AccessControl;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -110,12 +111,28 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
     }
 
     private RelatedTopic createConfigTopic(long topicId, String configTypeUri) {
-        Topic configTopic = dms.createTopic(getConfigDefinitionOrThrow(configTypeUri).getDefaultConfigTopic());
+        ConfigDefinition configDef = getConfigDefinitionOrThrow(configTypeUri);
+        Topic configTopic = dms.createTopic(configDef.getDefaultConfigTopic());
         dms.createAssociation(new AssociationModel(ASSOC_TYPE_CONFIGURATION,
             new TopicRoleModel(topicId, ROLE_TYPE_CONFIGURABLE),
             new TopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
         // ### TODO: extend Core API to avoid re-retrieval
+        assignConfigTopicToWorkspace(configTopic, configDef.getModificationRole());
+        //
         return _getConfigTopic(topicId, configTypeUri);
+    }
+
+    private void assignConfigTopicToWorkspace(Topic configTopic, ModificationRole role) {
+        long workspaceId;
+        AccessControl ac = dms.getAccessControl();
+        switch (role) {
+        case ADMIN:
+            workspaceId = ac.getSystemWorkspaceId();
+            break;
+        default:
+            throw new RuntimeException("Modification role \"" + role + "\" not yet implemented");
+        }
+        ac.assignToWorkspace(configTopic, workspaceId);
     }
 
     // ---

@@ -31,8 +31,17 @@ public interface AccessControl {
      */
     boolean isMember(String username, long workspaceId);
 
+    /**
+     * Performs the initial workspace assignment for an object.
+     * <p>
+     * Use this method only for objects which have no workspace assignment already, that is e.g. objects
+     * created in a migration or objects created while workspace assignment is deliberately suppressed.
+     */
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
 
+    /**
+     * Returns the ID of the "System" workspace.
+     */
     long getSystemWorkspaceId();
 
     // ---
