@@ -26,6 +26,7 @@ import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
@@ -65,6 +66,7 @@ import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -187,15 +189,23 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/user_account")
     @Transactional
     @Override
-    public Topic createUserAccount(Credentials cred) {
+    public Topic createUserAccount(final Credentials cred) {
         try {
-            String username = cred.username;
+            final String username = cred.username;
             logger.info("Creating user account \"" + username + "\"");
             //
             // 1) create user account
-            Topic userAccount = dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
-                .put("dm4.accesscontrol.username", username)
-                .put("dm4.accesscontrol.password", cred.password)));
+            AccessControl ac = dms.getAccessControl();
+            // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
+            // special assignments. See steps 3) and 4) below.
+            Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+                @Override
+                public Topic call() {
+                    return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+                        .put("dm4.accesscontrol.username", username)
+                        .put("dm4.accesscontrol.password", cred.password)));
+                }
+            });
             ChildTopics childTopics = userAccount.getChildTopics();
             Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
@@ -213,14 +223,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Note: the current user has no READ access to the private workspace just created.
             // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
             long privateWorkspaceId = privateWorkspace.getId();
-            dms.getAccessControl().assignToWorkspace(userAccount, privateWorkspaceId);
-            dms.getAccessControl().assignToWorkspace(passwordTopic, privateWorkspaceId);
+            ac.assignToWorkspace(userAccount, privateWorkspaceId);
+            ac.assignToWorkspace(passwordTopic, privateWorkspaceId);
             //
             // 4) assign username to "System" workspace
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
             // This is to support the "DM4 Sign-up" 3rd-party plugin.
-            long systemWorkspaceId = dms.getAccessControl().getSystemWorkspaceId();
-            dms.getAccessControl().assignToWorkspace(usernameTopic, systemWorkspaceId);
+            long systemWorkspaceId = ac.getSystemWorkspaceId();
+            ac.assignToWorkspace(usernameTopic, systemWorkspaceId);
             //
             return usernameTopic;
         } catch (Exception e) {
@@ -425,6 +435,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (typeUri.equals("dm4.workspaces.workspace")) {
             setWorkspaceOwner(topic);
         } else if (typeUri.equals("dm4.webclient.search")) {
+            // ### TODO: refactoring. The Access Control module must not know about the Webclient.
+            // Let the Webclient do the workspace assignment instead.
             assignSearchTopic(topic);
         }
         //

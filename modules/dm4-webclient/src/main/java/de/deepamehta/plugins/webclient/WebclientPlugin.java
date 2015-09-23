@@ -25,7 +25,6 @@ import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -38,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -86,8 +86,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
-            Topic searchTopic = createSearchTopic(searchTerm, topics);
-            return searchTopic;
+            return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed", e);
         }
@@ -109,8 +108,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
             List<RelatedTopic> topics = dms.getTopics(typeUri, 0).getItems();   // maxResultSize=0
             //
-            Topic searchTopic = createSearchTopic(searchTerm, topics);
-            return searchTopic;
+            return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed", e);
         }
@@ -225,19 +223,30 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Creates a "Search" topic.
      */
-    private Topic createSearchTopic(String searchTerm, Collection<? extends Topic> resultItems) {
-        Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
-            .put("dm4.webclient.search_term", searchTerm)
-        ));
-        // associate result items
-        for (Topic resultItem : resultItems) {
-            dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
-                new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
-                new TopicRoleModel(resultItem.getId(), "dm4.core.default")
-            ));
+    private Topic createSearchTopic(final String searchTerm, final Collection<? extends Topic> resultItems) {
+        try {
+            // We suppress standard workspace assignment here as a Search topic requires a special assignment.
+            // That is done by the Access Control module. ### TODO: refactoring. Do the assignment here.
+            return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+                @Override
+                public Topic call() {
+                    Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
+                        .put("dm4.webclient.search_term", searchTerm)
+                    ));
+                    // associate result items
+                    for (Topic resultItem : resultItems) {
+                        dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
+                            new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
+                            new TopicRoleModel(resultItem.getId(), "dm4.core.default")
+                        ));
+                    }
+                    //
+                    return searchTopic;
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Creating search topic for \"" + searchTerm + "\" failed", e);
         }
-        //
-        return searchTopic;
     }
 
     // ---

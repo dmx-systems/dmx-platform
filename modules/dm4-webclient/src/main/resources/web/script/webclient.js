@@ -42,14 +42,14 @@ dm4c = new function() {
     // === REST Client Extension ===
 
     this.restc.search_topics_and_create_bucket = function(text, field_uri) {
-        var params = this.createRequestParameter({search: text, field: field_uri, no_workspace_assignment: true})
+        var params = this.createRequestParameter({search: text, field: field_uri})
         return this.request("GET", "/webclient/search" + params.to_query_string())
     }
     // Note: this method is actually part of the Type Search plugin.
     // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
     // another namespace again) or make the Type Search plugin an integral part of the Client plugin.
     this.restc.get_topics_and_create_bucket = function(type_uri) {
-        return this.request("GET", "/webclient/search/by_type/" + type_uri + "?no_workspace_assignment=true")
+        return this.request("GET", "/webclient/search/by_type/" + type_uri)
     }
     this.restc.get_related_topics = function(topic_id, sort) {
         var result = this.request("GET", "/webclient/topic/" + topic_id + "/related_topics")

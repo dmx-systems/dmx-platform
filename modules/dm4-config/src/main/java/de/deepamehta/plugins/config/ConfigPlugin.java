@@ -21,6 +21,8 @@ import javax.ws.rs.Produces;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 
 
@@ -37,6 +39,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, ConfigDefinition> configDefs = new HashMap();
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -110,16 +114,29 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
             ROLE_TYPE_DEFAULT, configTypeUri);
     }
 
-    private RelatedTopic createConfigTopic(long topicId, String configTypeUri) {
-        ConfigDefinition configDef = getConfigDefinitionOrThrow(configTypeUri);
-        Topic configTopic = dms.createTopic(configDef.getDefaultConfigTopic());
-        dms.createAssociation(new AssociationModel(ASSOC_TYPE_CONFIGURATION,
-            new TopicRoleModel(topicId, ROLE_TYPE_CONFIGURABLE),
-            new TopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
-        // ### TODO: extend Core API to avoid re-retrieval
-        assignConfigTopicToWorkspace(configTopic, configDef.getModificationRole());
-        //
-        return _getConfigTopic(topicId, configTypeUri);
+    private RelatedTopic createConfigTopic(final long topicId, final String configTypeUri) {
+        try {
+            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topicId);
+            // We suppress standard workspace assignment here as a config topic requires a special assignment.
+            // See assignConfigTopicToWorkspace() below.
+            return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
+                @Override
+                public RelatedTopic call() {
+                    ConfigDefinition configDef = getConfigDefinitionOrThrow(configTypeUri);
+                    Topic configTopic = dms.createTopic(configDef.getDefaultConfigTopic());
+                    dms.createAssociation(new AssociationModel(ASSOC_TYPE_CONFIGURATION,
+                        new TopicRoleModel(topicId, ROLE_TYPE_CONFIGURABLE),
+                        new TopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
+                    // ### TODO: extend Core API to avoid re-retrieval
+                    assignConfigTopicToWorkspace(configTopic, configDef.getModificationRole());
+                    //
+                    return _getConfigTopic(topicId, configTypeUri);
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " + topicId +
+                " failed", e);
+        }
     }
 
     private void assignConfigTopicToWorkspace(Topic configTopic, ModificationRole role) {
