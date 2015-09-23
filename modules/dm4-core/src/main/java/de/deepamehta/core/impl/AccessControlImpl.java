@@ -15,6 +15,7 @@ import de.deepamehta.core.service.accesscontrol.SharingMode;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -41,6 +42,14 @@ class AccessControlImpl implements AccessControl {
     private long systemWorkspaceId = -1;    // initialized lazily
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    // standard workspace assignment suppression
+    private ThreadLocal<Integer> suppressionLevel = new ThreadLocal() {
+        @Override
+        protected Integer initialValue() {
+            return 0;
+        }
+    };
 
     private EmbeddedService dms;
 
@@ -149,6 +158,22 @@ class AccessControlImpl implements AccessControl {
         systemWorkspaceId = workspace.getId();
         //
         return systemWorkspaceId;
+    }
+
+    @Override
+    public <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception {
+        int level = suppressionLevel.get();
+        try {
+            suppressionLevel.set(level + 1);
+            return callable.call();     // throws exception
+        } finally {
+            suppressionLevel.set(level - 1);
+        }
+    }
+
+    @Override
+    public boolean workspaceAssignmentIsSuppressed() {
+        return suppressionLevel.get() > 0;
     }
 
     // ---

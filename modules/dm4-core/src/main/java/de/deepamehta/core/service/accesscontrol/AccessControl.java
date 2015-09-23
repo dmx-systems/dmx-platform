@@ -6,6 +6,8 @@ import de.deepamehta.core.Topic;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.util.concurrent.Callable;
+
 
 
 public interface AccessControl {
@@ -43,6 +45,17 @@ public interface AccessControl {
      * Returns the ID of the "System" workspace.
      */
     long getSystemWorkspaceId();
+
+    /**
+     * Runs a code block while suppressing the standard workspace assignment for all topics/associations
+     * created within that code block.
+     */
+    <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception;
+
+    /**
+     * Returns true if standard workspace assignment is currently suppressed for the current thread.
+     */
+    boolean workspaceAssignmentIsSuppressed();
 
     // ---
 

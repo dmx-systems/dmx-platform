@@ -39,7 +39,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     dm4c.restc.create_workspace = function(name, uri, sharing_mode_uri) {
         return this.request("POST", "/workspace/" + encodeURIComponent(name) + "/" + (uri || "") + "/" +
-            sharing_mode_uri + "?no_workspace_assignment=true")
+            sharing_mode_uri)
     }
     dm4c.restc.get_workspace = function(uri, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})

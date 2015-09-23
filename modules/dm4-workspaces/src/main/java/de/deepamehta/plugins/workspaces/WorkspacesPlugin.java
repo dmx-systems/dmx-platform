@@ -37,9 +37,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -57,9 +57,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Property URIs
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
-    // Query parameter
-    private static final String PARAM_NO_WORKSPACE_ASSIGNMENT = "no_workspace_assignment";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
@@ -67,9 +64,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Inject
     private TopicmapsService topicmapsService;
-
-    @Context
-    private UriInfo uriInfo;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -87,23 +81,38 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{name}/{uri:[^/]*?}/{sharing_mode_uri}")    // Note: default is [^/]+?     // +? is a "reluctant" quantifier
     @Transactional
     @Override
-    public Topic createWorkspace(@PathParam("name") String name, @PathParam("uri") String uri,
-                                 @PathParam("sharing_mode_uri") SharingMode sharingMode) {
-        logger.info("Creating workspace \"" + name + "\" (uri=\"" + uri + "\", sharingMode=" + sharingMode + ")");
-        // 1) create workspace
-        Topic workspace = dms.createTopic(new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
-            .put("dm4.workspaces.name", name)
-            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())
-        ));
-        // 2) create default topicmap and assign to workspace
-        Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
-            TopicmapsService.DEFAULT_TOPICMAP_RENDERER);
-        // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
-        // So we must use the privileged assignToWorkspace() call here.
-        // This is to support the "DM4 Sign-up" 3rd-party plugin.
-        dms.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
-        //
-        return workspace;
+    public Topic createWorkspace(@PathParam("name") final String name, @PathParam("uri") final String uri,
+                                 @PathParam("sharing_mode_uri") final SharingMode sharingMode) {
+        final String operation = "Creating workspace \"" + name + "\" ";
+        final String info = "(uri=\"" + uri + "\", sharingMode=" + sharingMode + ")";
+        try {
+            // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
+            // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
+            return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+                @Override
+                public Topic call() {
+                    logger.info(operation + info);
+                    //
+                    // 1) create workspace
+                    Topic workspace = dms.createTopic(
+                        new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
+                            .put("dm4.workspaces.name", name)
+                            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
+                    //
+                    // 2) create default topicmap and assign to workspace
+                    Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
+                        TopicmapsService.DEFAULT_TOPICMAP_RENDERER);
+                    // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
+                    // So we must use the privileged assignToWorkspace() call here. This is to support the
+                    // "DM4 Sign-up" 3rd-party plugin.
+                    dms.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
+                    //
+                    return workspace;
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException(operation + "failed " + info, e);
+        }
     }
 
     // ---
@@ -240,7 +249,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateTopic(Topic topic) {
-        if (abortAssignment(topic)) {
+        if (workspaceAssignmentIsSuppressed(topic)) {
             return;
         }
         // Note: we must avoid a vicious circle that would occur when editing a workspace. A Description topic
@@ -269,7 +278,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void postCreateAssociation(Association assoc) {
-        if (abortAssignment(assoc)) {
+        if (workspaceAssignmentIsSuppressed(assoc)) {
             return;
         }
         // Note: we must avoid a vicious circle that would occur when the association is an workspace assignment.
@@ -381,28 +390,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
     }
 
-    // ### TODO: abort topic and association assignments separately?
-    private boolean abortAssignment(DeepaMehtaObject object) {
-        try {
-            String value = uriInfo.getQueryParameters().getFirst(PARAM_NO_WORKSPACE_ASSIGNMENT);
-            if (value == null) {
-                // no such parameter in request
-                return false;
-            }
-            if (!value.equals("false") && !value.equals("true")) {
-                throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" +
-                    PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter (expected are \"false\" or \"true\")");
-            }
-            boolean abort = value.equals("true");
-            if (abort) {
-                logger.info("### Workspace assignment for " + info(object) + " ABORTED -- \"" +
-                    PARAM_NO_WORKSPACE_ASSIGNMENT + "\" query parameter detected");
-            }
-            return abort;
-        } catch (IllegalStateException e) {
-            // Note: this happens if a UriInfo method is called outside request scope
-            return false;
+    /**
+     * Returns true if standard workspace assignment is currently suppressed for the current thread.
+     */
+    private boolean workspaceAssignmentIsSuppressed(DeepaMehtaObject object) {
+        boolean abort = dms.getAccessControl().workspaceAssignmentIsSuppressed();
+        if (abort) {
+            logger.info("### Standard workspace assignment for " + info(object) + " SUPPRESSED");
         }
+        return abort;
     }
 
     // ---
