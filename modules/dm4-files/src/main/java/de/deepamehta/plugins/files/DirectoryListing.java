@@ -41,8 +41,7 @@ public class DirectoryListing implements JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            return dirInfo.toJSON()
-                .put("items", DeepaMehtaUtils.objectsToJSON(fileItems));
+            return dirInfo.toJSON().put("items", DeepaMehtaUtils.toJSONArray(fileItems));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -99,7 +98,7 @@ public class DirectoryListing implements JSONEnabled {
                 item.put("kind", kind.stringify());
                 item.put("name", name);
                 item.put("path", path);
-                if (kind.equals("file")) {  // ### FIXME
+                if (kind == ItemKind.FILE) {
                     item.put("size", size);
                     item.put("type", type);
                 }

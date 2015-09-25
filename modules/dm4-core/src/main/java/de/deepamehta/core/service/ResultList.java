@@ -83,10 +83,9 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = new JSONObject();
-            o.put("total_count", totalCount);
-            o.put("items", DeepaMehtaUtils.objectsToJSON(items));
-            return o;
+            return new JSONObject()
+                .put("total_count", totalCount)
+                .put("items", DeepaMehtaUtils.toJSONArray(items));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

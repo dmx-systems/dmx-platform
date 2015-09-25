@@ -55,6 +55,19 @@ public class JSONTest {
     }
 
     @Test
+    public void stringsArray() throws JSONException {
+        List<String> strings = Arrays.asList("abc", "[123]", "{abc: 123}");
+        JSONArray a = new JSONArray(strings);
+        assertTrue(a.get(0) instanceof String);
+        assertTrue(a.get(1) instanceof String);
+        assertTrue(a.get(2) instanceof String);
+        assertEquals("abc",        a.getString(0));
+        assertEquals("[123]",      a.getString(1));
+        assertEquals("{abc: 123}", a.getString(2));
+        assertEquals("[\"abc\",\"[123]\",\"{abc: 123}\"]", a.toString());
+    }
+
+    @Test
     public void classWithToStringMethod() throws JSONException {
         JSONObject o = new JSONObject();
         o.put("id", 123);

@@ -480,7 +480,7 @@ public class ChildTopicsModel implements Iterable<String> {
                 if (value instanceof RelatedTopicModel) {
                     json.put(childTypeUri, ((RelatedTopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(childTypeUri, DeepaMehtaUtils.objectsToJSON((List<RelatedTopicModel>) value));
+                    json.put(childTypeUri, DeepaMehtaUtils.toJSONArray((List<RelatedTopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
                 }

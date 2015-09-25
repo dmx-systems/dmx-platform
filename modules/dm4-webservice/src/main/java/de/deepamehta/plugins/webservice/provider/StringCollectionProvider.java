@@ -94,7 +94,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            DeepaMehtaUtils.stringsToJson(strings).write(writer);
+            new JSONArray(strings).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new RuntimeException("Writing message body failed (" + strings + ")", e);

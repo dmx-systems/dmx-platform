@@ -50,9 +50,7 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
 
     public JSONObject toJSON() {
         try {
-            JSONObject obj = new JSONObject();
-            obj.put("directives", DeepaMehtaUtils.objectsToJSON(directives));
-            return obj;
+            return new JSONObject().put("directives", DeepaMehtaUtils.toJSONArray(directives));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

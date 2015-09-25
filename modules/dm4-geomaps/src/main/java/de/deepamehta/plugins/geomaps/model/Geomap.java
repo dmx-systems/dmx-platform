@@ -66,10 +66,9 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject topicmap = new JSONObject();
-            topicmap.put("info", geomapTopic.toJSON());
-            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(geoCoords.values()));
-            return topicmap;
+            return new JSONObject()
+                .put("info", geomapTopic.toJSON())
+                .put("topics", DeepaMehtaUtils.toJSONArray(geoCoords.values()));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

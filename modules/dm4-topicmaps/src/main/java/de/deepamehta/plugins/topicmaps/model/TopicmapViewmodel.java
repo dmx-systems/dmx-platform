@@ -69,11 +69,10 @@ public class TopicmapViewmodel implements JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject topicmap = new JSONObject();
-            topicmap.put("info", topicmapTopic.toJSON());
-            topicmap.put("topics", DeepaMehtaUtils.objectsToJSON(topics.values()));
-            topicmap.put("assocs", DeepaMehtaUtils.objectsToJSON(assocs.values()));
-            return topicmap;
+            return new JSONObject()
+                .put("info", topicmapTopic.toJSON())
+                .put("topics", DeepaMehtaUtils.toJSONArray(topics.values()))
+                .put("assocs", DeepaMehtaUtils.toJSONArray(assocs.values()));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

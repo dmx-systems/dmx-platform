@@ -180,7 +180,7 @@ public abstract class TypeModel extends TopicModel {
             o.put("data_type_uri", getDataTypeUri());
             IndexMode.toJSON(indexModes, o);
             AssociationDefinitionModel.toJSON(assocDefs.values(), o);
-            o.put("label_config", DeepaMehtaUtils.stringsToJson(getLabelConfig()));
+            o.put("label_config", new JSONArray(getLabelConfig()));
             getViewConfigModel().toJSON(o);
             //
             return o;

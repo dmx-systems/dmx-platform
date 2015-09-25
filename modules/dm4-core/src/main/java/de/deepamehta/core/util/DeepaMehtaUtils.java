@@ -126,21 +126,9 @@ public class DeepaMehtaUtils {
         }
     }
 
-    // ---
-
-    // ### TODO: drop this method? There is a JSONArray(Collection) constructor.
-    public static JSONArray stringsToJson(Collection<String> strings) {
-        JSONArray array = new JSONArray();
-        for (String string : strings) {
-            array.put(string);
-        }
-        return array;
-    }
-
     // === DeepaMehta specific ===
 
-    // ### TODO: rename to toJSONArray()
-    public static JSONArray objectsToJSON(Iterable<? extends JSONEnabled> items) {
+    public static JSONArray toJSONArray(Iterable<? extends JSONEnabled> items) {
         JSONArray array = new JSONArray();
         for (JSONEnabled item : items) {
             array.put(item.toJSON());
