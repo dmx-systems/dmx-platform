@@ -41,7 +41,7 @@
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
 
         <!-- File Repository -->
-        <dm4.filerepo.path></dm4.filerepo.path>
+        <dm4.filerepo.path>/</dm4.filerepo.path>
 
         <!-- a plugin should provide a logging configuration -->
         <java.util.logging.config.file>

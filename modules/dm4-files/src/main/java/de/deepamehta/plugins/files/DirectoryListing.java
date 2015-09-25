@@ -1,9 +1,9 @@
 package de.deepamehta.plugins.files;
 
 import de.deepamehta.core.JSONEnabled;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.io.File;
@@ -16,23 +16,17 @@ public class DirectoryListing implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String basePath;
+    private PathMapper pathMapper;
     private FileItem dirInfo;
     private List<FileItem> fileItems = new ArrayList<FileItem>();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public DirectoryListing(File directory, String basePath) {
-        this.basePath = basePath;
-        dirInfo = new FileItem(directory.getName(), directory.getPath());
+    public DirectoryListing(File directory, PathMapper pathMapper) {
+        this.pathMapper = pathMapper;
+        this.dirInfo = new FileItem(directory);
         for (File file : directory.listFiles()) {
-            String name = file.getName();
-            String path = file.getPath();
-            if (file.isDirectory()) {
-                fileItems.add(new FileItem(name, path));
-            } else {
-                fileItems.add(new FileItem(name, path, file.length(), JavaUtils.getFileType(file.getName())));
-            }
+            fileItems.add(new FileItem(file));
         }
     }
 
@@ -47,13 +41,8 @@ public class DirectoryListing implements JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject dir = dirInfo.toJSON();
-            JSONArray items = new JSONArray();
-            for (FileItem item : fileItems) {
-                items.put(item.toJSON());
-            }
-            dir.put("items", items);
-            return dir;
+            return dirInfo.toJSON()
+                .put("items", DeepaMehtaUtils.objectsToJSON(fileItems));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -69,24 +58,14 @@ public class DirectoryListing implements JSONEnabled {
         long size;      // for files only
         String type;    // for files only
 
-        /**
-         * Constructs a DIRECTORY item.
-         */
-        FileItem(String name, String path) {
-            this.kind = ItemKind.DIRECTORY;
-            this.name = name;
-            this.path = repoPath(path);
-        }
-
-        /**
-         * Constructs a FILE item.
-         */
-        FileItem(String name, String path, long size, String type) {
-            this.kind = ItemKind.FILE;
-            this.name = name;
-            this.path = repoPath(path);
-            this.size = size;
-            this.type = type;
+        FileItem(File file) {
+            this.kind = file.isDirectory() ? ItemKind.DIRECTORY : ItemKind.FILE;
+            this.name = file.getName();
+            this.path = pathMapper.repoPath(file);
+            if (kind == ItemKind.FILE) {
+                this.size = file.length();
+                this.type = JavaUtils.getFileType(name);
+            }
         }
 
         // ---
@@ -113,16 +92,6 @@ public class DirectoryListing implements JSONEnabled {
 
         // ---
 
-        private String repoPath(String path) {
-            if (!path.startsWith(basePath)) {
-                throw new RuntimeException("Path \"" + path + "\" is not a file repository path");
-            }
-            //
-            return JavaUtils.stripDriveLetter(path.substring(basePath.length()));
-        }
-
-        // ---
-
         @Override
         public JSONObject toJSON() {
             try {
@@ -130,7 +99,7 @@ public class DirectoryListing implements JSONEnabled {
                 item.put("kind", kind.stringify());
                 item.put("name", name);
                 item.put("path", path);
-                if (kind.equals("file")) {
+                if (kind.equals("file")) {  // ### FIXME
                     item.put("size", size);
                     item.put("type", type);
                 }

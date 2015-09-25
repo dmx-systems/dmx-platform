@@ -50,11 +50,11 @@ import java.util.logging.Logger;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener {
+public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener, PathMapper {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "");
+    public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "/");
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", 150);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
@@ -101,10 +101,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         String operation = "Creating file topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
-            // ### FIXME: drag'n'drop files from arbitrary locations (in particular different Windows drives)
-            // collides with the concept of a single-rooted file repository (as realized by the Files module).
-            // For the moment we just strip a possible drive letter to be compatible with the Files module.
-            path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
             File file = absolutePath(path);     // throws FileRepositoryException
@@ -133,10 +129,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         String operation = "Creating folder topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
-            // ### FIXME: drag'n'drop folders from arbitrary locations (in particular different Windows drives)
-            // collides with the concept of a single-rooted file repository (as realized by the Files module).
-            // For the moment we just strip a possible drive letter to be compatible with the Files module.
-            path = JavaUtils.stripDriveLetter(path);
             //
             // 1) pre-checks
             File file = absolutePath(path);     // throws FileRepositoryException
@@ -295,7 +287,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             File directory = absolutePath(path);    // throws FileRepositoryException
             checkExistence(directory);              // throws FileRepositoryException
             //
-            return new DirectoryListing(directory, FILE_REPOSITORY_PATH);
+            return new DirectoryListing(directory, this);
             // ### TODO: if directory is no directory send NOT FOUND
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
@@ -439,6 +431,36 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         }
     }
 
+
+
+    // *********************************
+    // *** PathMapper Implementation ***
+    // *********************************
+
+
+
+    @Override
+    public String repoPath(File path) {
+        try {
+            String repoPath = path.getPath();
+            //
+            if (!repoPath.startsWith(FILE_REPOSITORY_PATH)) {
+                throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path");
+            }
+            //
+            if (!FILE_REPOSITORY_PATH.equals("/")) {
+                repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
+            }
+            // ### FIXME: Windows drive letter?
+            return repoPath;
+        } catch (Exception e) {
+            throw new RuntimeException("Mapping absolute path \"" + path + "\" to a repository path failed", e);
+        }
+    }
+
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
@@ -546,13 +568,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // === File Repository ===
 
     /**
-     * Constructs an absolute path from a repository path.
+     * Maps a repository path to an absolute path.
      * Checks the repository path to fight directory traversal attacks.
      *
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *
-     * @return  The constructed absolute path.
+     * @return  The absolute path.
      */
     private File absolutePath(String repoPath) throws FileRepositoryException {
         try {
@@ -573,8 +595,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         } catch (FileRepositoryException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Constructing an absolute path from repository path \"" + repoPath + "\" failed",
-                e);
+            throw new RuntimeException("Mapping repository path \"" + repoPath + "\" to an absolute path failed", e);
         }
     }
 
@@ -638,6 +659,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         }
     }
 
+    /**
+     * Checks if the user associated with a request is authorized to access a repository file.
+     * If not authorized a FileRepositoryException (401 Unauthorized) is thrown.
+     *
+     * @param   path        The absolute path of the file to check (as calculated already from the repository path).
+     * @param   repoPath    The repository path of the file to check.
+     * @param   request     The request.
+     */
     private void checkAuthorization(File path, String repoPath, HttpServletRequest request)
                                                                                         throws FileRepositoryException {
         try {
@@ -653,9 +682,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                     // Note: checkAuthorization() is called (indirectly) from OSGi HTTP service's static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
                     String username = dms.getAccessControl().getUsername(request);
-                    if (!dms.getAccessControl().hasPermission(username, Operation.READ, fileTopic.getId())) {
+                    long fileTopicId = fileTopic.getId();
+                    if (!dms.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
                         throw new FileRepositoryException(userInfo(username) + " has no READ permission for " +
-                            "repository path \"" + repoPath + "\"", Status.UNAUTHORIZED);
+                            "repository path \"" + repoPath + "\" (File topic ID=" + fileTopicId + ")",
+                            Status.UNAUTHORIZED);
                     }
                 } else {
                     throw new RuntimeException("Missing File topic for repository path \"" + repoPath + "\"");
@@ -700,23 +731,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     }
 
     // ---
-
-    /**
-     * Returns the repository path that corresponds to an absolute path.
-     *
-     * @param   path    An absolute path.
-     */
-    private String repoPath(File path) {
-        String repoPath = path.getPath().substring(FILE_REPOSITORY_PATH.length());
-        // root folder needs special treatment
-        if (repoPath.equals("")) {
-            repoPath = "/";
-        }
-        //
-        return repoPath;
-        // ### TODO: there is a principle copy in DirectoryListing
-        // ### FIXME: Windows drive letter? See DirectoryListing
-    }
 
     /**
      * Returns the repository path of a File/Folder topic.
