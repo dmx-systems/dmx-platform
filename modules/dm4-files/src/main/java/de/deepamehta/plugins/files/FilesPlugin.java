@@ -93,11 +93,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // === File System Representation ===
 
-    @POST
+    @GET
     @Path("/file/{path}")
     @Transactional
     @Override
-    public Topic createFileTopic(@PathParam("path") String path) {
+    public Topic getFileTopic(@PathParam("path") String path) {
         String operation = "Creating file topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
@@ -121,11 +121,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         }
     }
 
-    @POST
+    @GET
     @Path("/folder/{path}")
     @Transactional
     @Override
-    public Topic createFolderTopic(@PathParam("path") String path) {
+    public Topic getFolderTopic(@PathParam("path") String path) {
         String operation = "Creating folder topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
@@ -151,22 +151,22 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // ---
 
-    @POST
+    @GET
     @Path("/parent/{id}/file/{path}")
     @Transactional
     @Override
-    public Topic createChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = createFileTopic(path);
+    public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
+        Topic childTopic = getFileTopic(path);
         associateChildTopic(folderTopicId, childTopic.getId());
         return childTopic;
     }
 
-    @POST
+    @GET
     @Path("/parent/{id}/folder/{path}")
     @Transactional
     @Override
-    public Topic createChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = createFolderTopic(path);
+    public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
+        Topic childTopic = getFolderTopic(path);
         associateChildTopic(folderTopicId, childTopic.getId());
         return childTopic;
     }
@@ -220,7 +220,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             // 3) create topic
             // ### TODO: think about overwriting an existing file.
             // ### FIXME: in this case the existing file topic is not updated and might reflect e.g. the wrong size.
-            return createFileTopic(path);
+            return getFileTopic(path);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }

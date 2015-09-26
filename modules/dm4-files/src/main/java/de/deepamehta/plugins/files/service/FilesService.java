@@ -21,30 +21,58 @@ public interface FilesService extends PluginService {
     // === File System Representation ===
 
     /**
-     * Creates and returns a File topic representing the file at a given repository path.
-     * If such a File topic exists already that topic is returned.
-     * In any case the returned topic includes its child topics.
+     * Returns the File topic representing the file at a given repository path.
+     * If no such File topic exists it is created.
      *
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
+     *
+     * @return  The File topic. Its child topics ("File Name", "Path", "Media Type", "Size") are included.
      */
-    Topic createFileTopic(String path);
+    Topic getFileTopic(String path);
 
     /**
-     * Creates and returns a Folder topic representing the folder at a given repository path.
-     * If such a Folder topic exists already that topic is returned.
-     * In any case the returned topic includes its child topics.
+     * Returns the Folder topic representing the folder at a given repository path.
+     * If no such Folder topic exists it is created.
      *
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
+     *
+     * @return  The Folder topic. Its child topics ("Folder Name", "Path") are included.
      */
-    Topic createFolderTopic(String path);
+    Topic getFolderTopic(String path);
 
     // ---
 
-    Topic createChildFileTopic(long folderTopicId, String path);
+    /**
+     * Returns the File topic representing the file at a given repository path.
+     * If no such File topic exists it is created.
+     * <p>
+     * Creates an association (type "Aggregation") between the File topic (role type "Child")
+     * and its parent Folder topic (role type "Parent"), if not exists already.
+     *
+     * @param   path            A repository path. Relative to the repository base path.
+     *                          Must begin with slash, no slash at the end.
+     * @param   folderTopicId   ID of the parent Folder topic.
+     *
+     * @return  The File topic. Its child topics ("File Name", "Path", "Media Type", "Size") are included.
+     */
+    Topic getChildFileTopic(long folderTopicId, String path);
 
-    Topic createChildFolderTopic(long folderTopicId, String path);
+    /**
+     * Returns the Folder topic representing the folder at a given repository path.
+     * If no such Folder topic exists it is created.
+     * <p>
+     * Creates an association (type "Aggregation") between the Folder topic (role type "Child")
+     * and its parent Folder topic (role type "Parent"), if not exists already.
+     *
+     * @param   path            A repository path. Relative to the repository base path.
+     *                          Must begin with slash, no slash at the end.
+     * @param   folderTopicId   ID of the parent Folder topic.
+     *
+     * @return  The Folder topic. Its child topics ("Folder Name", "Path") are included.
+     */
+    Topic getChildFolderTopic(long folderTopicId, String path);
 
 
 

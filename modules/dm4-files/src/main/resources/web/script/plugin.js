@@ -5,17 +5,17 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
-        return this.request("POST", "/files/file/" + encodeURIComponent(path))
+        return this.request("GET", "/files/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_folder_topic = function(path) {
-        return this.request("POST", "/files/folder/" + encodeURIComponent(path))
+        return this.request("GET", "/files/folder/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.create_child_file_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/parent/" + folder_topic_id + "/file/" + encodeURIComponent(path))
+        return this.request("GET", "/files/parent/" + folder_topic_id + "/file/" + encodeURIComponent(path))
     }
     dm4c.restc.create_child_folder_topic = function(folder_topic_id, path) {
-        return this.request("POST", "/files/parent/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
+        return this.request("GET", "/files/parent/" + folder_topic_id + "/folder/" + encodeURIComponent(path))
     }
     //
     dm4c.restc.get_file = function(path) {
@@ -165,11 +165,11 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * Creates a File topic for the given file and shows the topic on the canvas.
+     * Creates a File topic for the given file and shows the topic in the topicmap panel.
      *
      * @param   file        A File object (with "name", "path", "type", and "size" properties).
-     * @param   do_select   Optional: if evaluates to true the File topic is selected on the canvas.
-     * @param   do_center   Optional: if evaluates to true the File topic is centered on the canvas.
+     * @param   do_select   Optional: if trueish the File topic is selected in the topicmap panel.
+     * @param   do_center   Optional: if trueish the File topic is centered in the topicmap panel.
      */
     this.create_file_topic = function(file, do_select, do_center) {
         var file_topic = dm4c.restc.create_file_topic(file.path)
@@ -177,11 +177,11 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
 
     /**
-     * Creates a Folder topic for the given directory and shows the topic on the canvas.
+     * Creates a Folder topic for the given directory and shows the topic in the topicmap panel.
      *
      * @param   dir         A Directory object (with "name", "path", and "items" properties).
-     * @param   do_select   Optional: if evaluates to true the Folder topic is selected on the canvas.
-     * @param   do_center   Optional: if evaluates to true the Folder topic is centered on the canvas.
+     * @param   do_select   Optional: if trueish the Folder topic is selected in the topicmap panel.
+     * @param   do_center   Optional: if trueish the Folder topic is centered in the topicmap panel.
      */
     this.create_folder_topic = function(dir, do_select, do_center) {
         var folder_topic = dm4c.restc.create_folder_topic(dir.path)
@@ -190,10 +190,10 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
     /**
      * Creates respective File and Folder topics for all items contained in the given directory
-     * and shows the topics on the canvas.
+     * and shows the topics in the topicmap panel.
      *
      * @param   dir                 A Directory object (with "name", "path", and "items" properties).
-     * @param   select_first_topic  Optional: if evaluates to true the first created topic is selected on the canvas.
+     * @param   select_first_topic  Optional: if trueish the first created topic is selected in the topicmap panel.
      */
     this.create_file_topics = function(dir, select_first_topic) {
         for (var i = 0, item; item = dir.items[i]; i++) {
