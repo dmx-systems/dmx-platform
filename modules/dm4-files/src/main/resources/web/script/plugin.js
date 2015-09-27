@@ -243,11 +243,23 @@ dm4c.add_plugin("de.deepamehta.files", function() {
             function upload_complete() {
                 upload_dialog.close()
                 // Note: iframes must be accessed via window.frames
-                var response = $("pre", window.frames["upload-target"].document).text()
+                var response_text = $("pre", window.frames["upload-target"].document).text()
                 try {
-                    callback(JSON.parse(response))
+                    var response = JSON.parse(response_text)
+                    if (response.exception) {
+                        dm4c.open_error_dialog({
+                            content_type: "application/json",
+                            content: response_text,
+                            status_code: "?",
+                            status_text: ""
+                        })
+                        // Note: the upload request is no AJAX request.
+                        // We have no knowledge about the server status code here, have we?
+                    } else {
+                        callback(response)
+                    }
                 } catch (e) {
-                    alert("Upload failed: \"" + response + "\"\n\nException=" + JSON.stringify(e))
+                    alert("Upload failed: \"" + response_text + "\"\n\nException=" + JSON.stringify(e))
                 }
             }
         }

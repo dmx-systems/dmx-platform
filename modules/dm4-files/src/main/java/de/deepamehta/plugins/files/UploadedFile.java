@@ -116,6 +116,6 @@ public class UploadedFile {
 
     @Override
     public String toString() {
-        return "file \"" + getName() + "\" (" + getMediaType() + "), " + getSize() + " bytes";
+        return "file \"" + getName() + "\" (" + getMediaType() + ", " + getSize() + " bytes)";
     }
 }

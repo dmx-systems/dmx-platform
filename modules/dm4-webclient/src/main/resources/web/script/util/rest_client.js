@@ -13,7 +13,7 @@
  *                      The caller can manipulate the request before it is sent.
  *                  on_request_error
  *                      Optional: the "global error handler" to be invoked when a request fails (a function).
- *                      One argument is passed: the error response, an object with 4 properties:
+ *                      One argument is passed: the server response, an object with 4 properties:
  *                          content_type -- (string)
  *                          content      -- (string)
  *                          status_code  -- (number)
@@ -338,7 +338,7 @@ function RESTClient(config) {
      *                                  "json" - the response data is parsed into a JavaScript object. The default.
      *                                  "text" - the response data is returned as is.
      * @param   on_error            Optional: the "per-request error handler" to be invoked when the request fails
-     *                              (a function). One argument is passed: the error response (see global error handler
+     *                              (a function). One argument is passed: the server response (see global error handler
      *                              in RESTClient constructor).
      *                              By returning false the per-request error handler can prevent the global error
      *                              handler from being invoked.
@@ -386,17 +386,17 @@ function RESTClient(config) {
             response_data = data
         })
         .fail(function(jq_xhr, text_status, error_thrown) {
-            var error_response = {
+            var server_response = {
                 content_type: jq_xhr.getResponseHeader("Content-Type"),
                 content:      jq_xhr.responseText,
                 status_code:  jq_xhr.status,
                 status_text:  jq_xhr.statusText
             }
-            console.error("Error response:", error_response)
+            console.error("Server response:", server_response)
             // Note: by returning false the per-request error handler can prevent the global error handler
-            var prevent_default_error = on_error && on_error(error_response) == false
+            var prevent_default_error = on_error && on_error(server_response) == false
             if (!prevent_default_error && config && config.on_request_error) {
-                config.on_request_error(error_response)
+                config.on_request_error(server_response)
             }
             // Note: since at least jQuery 2.0.3 an exception thrown from the "error" callback (as registered in the
             // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the

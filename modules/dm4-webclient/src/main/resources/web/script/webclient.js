@@ -907,26 +907,53 @@ dm4c = new function() {
         dm4c.fire_event("pre_send_request", request)
     }
 
-    function on_request_error(error_response) {
+    function on_request_error(server_response) {
+        dm4c.open_error_dialog(server_response)
+    }
 
-        var content = render_error()
-            .add($("<div>").text("Server status: " + error_response.status_code + " " + error_response.status_text))
+    /**
+     * Opens an error dialog and renders a server response.
+     *
+     * The server response will be rendered as
+     * 1) either arbitrary error text or as a chain of exceptions, and
+     * 2) the server status.
+     *
+     * A chain of exceptions is rendered if the server response meets these conditions: "content_type" is
+     * "application/json" and "content" is the JSON representation of a Java exception (as occurred at server-side):
+     * an object with "exception", "message", and "cause" properties. The "cause" value is again an exception object.
+     * The final exception has no "cause" property.
+     *
+     * @param   server_response  The server response to render. An object with 4 properties:
+     *              content_type -- media type of the error content (string)
+     *              content      -- the error content (string)
+     *              status_code  -- the server status code (number)
+     *              status_text  -- the server status text (string)
+     */
+    this.open_error_dialog = function(server_response) {
 
         dm4c.ui.dialog({
             id: "error-dialog",
             title: "Sorry!",
-            content: content
+            content: render_content()
         })
 
-        function render_error() {
-            if (error_response.content_type == "application/json") {
-                var error = JSON.parse(error_response.content)
+        function render_content() {
+            var content
+            // render exception
+            if (server_response.content_type == "application/json") {
+                var error = JSON.parse(server_response.content)
                 if (error.exception) {
-                    return render_exception(error)
+                    content = render_exception(error)
                 } 
             }
-            // fallback
-            return $("<div>").text(error_response.content)
+            // render text
+            if (!content) {
+                content = $("<div>").text(server_response.content)
+            }
+            // render status
+            return content.add(
+                $("<div>").text("Server status: " + server_response.status_code + " " + server_response.status_text)
+            )
         }
 
         function render_exception(exception) {
