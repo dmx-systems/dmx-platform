@@ -167,7 +167,7 @@ class AccessControlImpl implements AccessControl {
             suppressionLevel.set(level + 1);
             return callable.call();     // throws exception
         } finally {
-            suppressionLevel.set(level - 1);
+            suppressionLevel.set(level);
         }
     }
 
