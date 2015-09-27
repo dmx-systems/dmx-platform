@@ -7,6 +7,8 @@ import de.deepamehta.plugins.config.ModificationRole;
 import de.deepamehta.plugins.config.TypeConfigDefinition;
 import de.deepamehta.plugins.config.service.ConfigService;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -20,6 +22,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -44,7 +47,10 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.File;
 import java.net.URL;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 
@@ -61,6 +67,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // via feature:install from Karaf. The default value must match the value defined in global POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
+
+    private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile("/workspace-(\\d+).*");
 
     // Events
     public static DeepaMehtaEvent CHECK_DISK_QUOTA = new DeepaMehtaEvent(CheckDiskQuotaListener.class) {
@@ -98,7 +106,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Transactional
     @Override
     public Topic getFileTopic(@PathParam("path") String path) {
-        String operation = "Creating file topic for repository path \"" + path + "\"";
+        String operation = "Creating File topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             //
@@ -126,7 +134,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Transactional
     @Override
     public Topic getFolderTopic(@PathParam("path") String path) {
-        String operation = "Creating folder topic for repository path \"" + path + "\"";
+        String operation = "Creating Folder topic for repository path \"" + path + "\"";
         try {
             logger.info(operation);
             //
@@ -156,9 +164,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Transactional
     @Override
     public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = getFileTopic(path);
-        associateChildTopic(folderTopicId, childTopic.getId());
-        return childTopic;
+        Topic topic = getFileTopic(path);
+        createFolderAssociation(folderTopicId, topic);
+        return topic;
     }
 
     @GET
@@ -166,9 +174,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Transactional
     @Override
     public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic childTopic = getFolderTopic(path);
-        associateChildTopic(folderTopicId, childTopic.getId());
-        return childTopic;
+        Topic topic = getFolderTopic(path);
+        createFolderAssociation(folderTopicId, topic);
+        return topic;
     }
 
 
@@ -341,7 +349,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(long fileTopicId) {
-        String operation = "Accessing the file of file topic " + fileTopicId;
+        String operation = "Accessing the file of File topic " + fileTopicId;
         try {
             logger.info(operation);
             //
@@ -360,7 +368,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Path("/open/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {
-        String operation = "Opening the file of file topic " + fileTopicId;
+        String operation = "Opening the file of File topic " + fileTopicId;
         try {
             logger.info(operation);
             //
@@ -513,7 +521,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      *
      * @param   path            An absolute path.
      */
-    private Topic createFileTopic(File path) {
+    private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = new ChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
             .put("dm4.files.path", repoPath(path))
@@ -524,7 +532,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             childTopics.put("dm4.files.media_type", mediaType);
         }
         //
-        return dms.createTopic(new TopicModel("dm4.files.file", childTopics));
+        return createFileOrFolderTopic(new TopicModel("dm4.files.file", childTopics));      // throws Exception
     }
 
     /**
@@ -532,7 +540,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      *
      * @param   path            An absolute path.
      */
-    private Topic createFolderTopic(File path) {
+    private Topic createFolderTopic(File path) throws Exception {
         String folderName = path.getName();
         String repoPath = repoPath(path);
         //
@@ -545,22 +553,76 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             .put("dm4.files.folder_name", folderName)
             .put("dm4.files.path",        repoPath);
         //
-        return dms.createTopic(new TopicModel("dm4.files.folder", childTopics));
+        return createFileOrFolderTopic(new TopicModel("dm4.files.folder", childTopics));    // throws Exception
     }
 
     // ---
 
-    private void associateChildTopic(long folderTopicId, long childTopicId) {
-        if (!childAssociationExists(folderTopicId, childTopicId)) {
-            dms.createAssociation(new AssociationModel("dm4.core.aggregation",
-                new TopicRoleModel(folderTopicId, "dm4.core.parent"),
-                new TopicRoleModel(childTopicId,  "dm4.core.child")
-            ));
+    private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
+        // We suppress standard workspace assignment here as File and Folder topics require a special assignment
+        Topic topic = dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
+            @Override
+            public Topic call() {
+                return dms.createTopic(model);
+            }
+        });
+        createWorkspaceAssignment(topic, repoPath(topic));
+        return topic;
+    }
+
+    /**
+     * @param   topic   a File topic, or a Folder topic.
+     */
+    private void createFolderAssociation(final long folderTopicId, Topic topic) {
+        try {
+            final long topicId = topic.getId();
+            boolean exists = dms.getAssociations(folderTopicId, topicId, "dm4.core.aggregation").size() > 0;
+            if (!exists) {
+                // We suppress standard workspace assignment as the folder association requires a special assignment
+                Association assoc = dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
+                    @Override
+                    public Association call() {
+                        return dms.createAssociation(new AssociationModel("dm4.core.aggregation",
+                            new TopicRoleModel(folderTopicId, "dm4.core.parent"),
+                            new TopicRoleModel(topicId,       "dm4.core.child")
+                        ));
+                    }
+                });
+                createWorkspaceAssignment(assoc, repoPath(topic));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Creating association to Folder topic " + folderTopicId + " failed", e);
         }
     }
 
-    private boolean childAssociationExists(long folderTopicId, long childTopicId) {
-        return dms.getAssociations(folderTopicId, childTopicId, "dm4.core.aggregation").size() > 0;
+    // ---
+
+    /**
+     * Creates a workspace assignment for a File topic, a Folder topic, or a folder association (type "Aggregation").
+     * The workspce is calculated from both, the "dm4.filerepo.per_workspace" flag and the given repository path.
+     *
+     * @param   object  a File topic, a Folder topic, or a folder association (type "Aggregation").
+     */
+    private void createWorkspaceAssignment(DeepaMehtaObject object, String repoPath) {
+        try {
+            long workspaceId;
+            AccessControl ac = dms.getAccessControl();
+            if (FILE_REPOSITORY_PER_WORKSPACE) {
+                Matcher m = PER_WORKSPACE_PATH_PATTERN.matcher(repoPath);
+                if (m.matches()) {
+                    workspaceId = Long.parseLong(m.group(1));
+                } else {
+                    throw new RuntimeException("No workspace recognized in repository path \"" + repoPath + "\"");
+                }
+            } else {
+                workspaceId = ac.getDeepaMehtaWorkspaceId();
+            }
+            //
+            ac.assignToWorkspace(object, workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating workspace assignment for File/Folder topic or folder association " +
+                "failed", e);
+        }
     }
 
 
@@ -736,7 +798,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * Returns the repository path of a File/Folder topic.
      */
     private String repoPath(long fileTopicId) {
-        return dms.getTopic(fileTopicId).getChildTopics().getString("dm4.files.path");
+        return repoPath(dms.getTopic(fileTopicId));
+    }
+
+    private String repoPath(Topic topic) {
+        return topic.getChildTopics().getString("dm4.files.path");
     }
 
     /**

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -31,5 +32,17 @@ public class CachingTest {
     public void date() {
         logger.info("### Date(0)=" + new Date(0) + "\n          " +
                         "Date(-1)=" + new Date(-1));
+    }
+
+    @Test
+    public void parent() {
+        File f = new File("/home/terry");
+        assertEquals("/home/terry", f.getPath());
+        f = f.getParentFile();
+        assertEquals("/home", f.getPath());
+        f = f.getParentFile();
+        assertEquals("/", f.getPath());
+        f = f.getParentFile();
+        assertNull(f);
     }
 }

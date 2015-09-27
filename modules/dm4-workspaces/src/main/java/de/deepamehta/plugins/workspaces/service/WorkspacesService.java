@@ -29,9 +29,10 @@ public interface WorkspacesService extends PluginService {
 
     /**
      * Returns a workspace by URI.
-     * If no workspace exists for the given URI a runtime exception is thrown.
      *
      * @return  The workspace (a topic of type "Workspace").
+     *
+     * @throws  RuntimeException    If no workspace exists for the given URI.
      */
     Topic getWorkspace(String uri);
 

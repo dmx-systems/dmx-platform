@@ -37,8 +37,12 @@ class AccessControlImpl implements AccessControl {
     // ### TODO: copy in WorkspacesPlugin.java
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
+    // Workspace URIs
+    // ### TODO: copy in WorkspaceService.java
+    private static final String DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
     // ### TODO: copy in AccessControlPlugin.java
     private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+
     private long systemWorkspaceId = -1;    // initialized lazily
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -113,6 +117,43 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
+
+
+    // === Workspaces ===
+
+    @Override
+    public Topic getWorkspace(String uri) {
+        Topic workspace = dms.getTopic("uri", new SimpleValue(uri));
+        if (workspace == null) {
+            throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
+        }
+        return workspace;
+    }
+
+    // ---
+
+    @Override
+    public long getDeepaMehtaWorkspaceId() {
+        return getWorkspace(DEEPAMEHTA_WORKSPACE_URI).getId();
+    }
+
+    @Override
+    public long getSystemWorkspaceId() {
+        if (systemWorkspaceId == -1) {
+            // Note: fetching the System workspace topic though the Core service would involve a permission check
+            // and run in a vicious circle. So direct storage access is required here.
+            TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
+            // Note: the Access Control plugin creates the System workspace before it performs its first permission
+            // check.
+            if (workspace == null) {
+                throw new RuntimeException("The System workspace does not exist");
+            }
+            //
+            systemWorkspaceId = workspace.getId();
+        }
+        return systemWorkspaceId;
+    }
+
     // ---
 
     @Override
@@ -142,23 +183,7 @@ class AccessControlImpl implements AccessControl {
         object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
     }
 
-    @Override
-    public long getSystemWorkspaceId() {
-        if (systemWorkspaceId != -1) {
-            return systemWorkspaceId;
-        }
-        // Note: fetching the System workspace topic though the Core service would involve a permission check
-        // and run in a vicious circle. So direct storage access is required here.
-        TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
-        // Note: the Access Control plugin creates the System workspace before it performs its first permission check.
-        if (workspace == null) {
-            throw new RuntimeException("The System workspace does not exist");
-        }
-        //
-        systemWorkspaceId = workspace.getId();
-        //
-        return systemWorkspaceId;
-    }
+    // ---
 
     @Override
     public <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception {
@@ -176,7 +201,9 @@ class AccessControlImpl implements AccessControl {
         return suppressionLevel.get() > 0;
     }
 
-    // ---
+
+
+    // === Usernames ===
 
     @Override
     public Topic getUsernameTopic(String username) {

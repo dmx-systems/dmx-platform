@@ -24,6 +24,31 @@ public interface AccessControl {
      */
     boolean hasPermission(String username, Operation operation, long objectId);
 
+
+
+    // === Workspaces ===
+
+    /**
+     * Returns a workspace by URI.
+     *
+     * @return  The workspace (a topic of type "Workspace").
+     *
+     * @throws  RuntimeException    If no workspace exists for the given URI.
+     */
+    Topic getWorkspace(String uri);
+
+    // ---
+
+    /**
+     * Returns the ID of the "DeepaMehta" workspace.
+     */
+    long getDeepaMehtaWorkspaceId();
+
+    /**
+     * Returns the ID of the "System" workspace.
+     */
+    long getSystemWorkspaceId();
+
     // ---
 
     /**
@@ -41,10 +66,7 @@ public interface AccessControl {
      */
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
 
-    /**
-     * Returns the ID of the "System" workspace.
-     */
-    long getSystemWorkspaceId();
+    // ---
 
     /**
      * Runs a code block while suppressing the standard workspace assignment for all topics/associations
@@ -57,7 +79,9 @@ public interface AccessControl {
      */
     boolean workspaceAssignmentIsSuppressed();
 
-    // ---
+
+
+    // === Usernames ===
 
     /**
      * Returns the Username topic that corresponds to a username.
@@ -70,7 +94,7 @@ public interface AccessControl {
      * Convenience method that returns the Username topic that corresponds to a request.
      * Basically it calls <code>getUsernameTopic(getUsername(request))</code>.
      *
-     * @return  the Username topic, or <code>null</code> if no such Username topic exists.
+     * @return  the Username topic, or <code>null</code> if no user is associated with the request.
      */
     Topic getUsernameTopic(HttpServletRequest request);
 
