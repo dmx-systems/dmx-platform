@@ -755,7 +755,7 @@ public class PluginImpl implements Plugin, EventHandler {
             staticResources = webPublishingService.publishStaticResources(pluginBundle, uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException("Publishing static resources of " + this + " failed " +
-                "(uriNamespace=\"" + uriNamespace + "\")", e);
+                "(URI namespace=\"" + uriNamespace + "\")", e);
         }
     }
 
@@ -785,7 +785,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void unpublishDirectoryResource() {
         if (directoryResource != null) {
             logger.info("Unpublishing directory resource of " + this);
-            webPublishingService.unpublishStaticResources(directoryResource);
+            webPublishingService.unpublishDirectoryResource(directoryResource);
         }
     }
 

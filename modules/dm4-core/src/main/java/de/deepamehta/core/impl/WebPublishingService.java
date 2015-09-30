@@ -49,7 +49,7 @@ public class WebPublishingService {
     private boolean isJerseyServletRegistered = false;
 
     private HttpService httpService;
-    private MasterHttpContext httpContext = new MasterHttpContext();
+    private MasterHttpContext masterContext = new MasterHttpContext();
 
     private DeepaMehtaService dms;
 
@@ -87,21 +87,20 @@ public class WebPublishingService {
     // === Static Resources ===
 
     /**
-     * Publishes the static resources of the given bundle's /web directory.
+     * Publishes the bundle's web resources.
+     * Web resources are found in the bundle's /web directory.
      */
-    StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
-        try {
-            // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", httpContext);
-            httpContext.add(uriNamespace, new BundleHTTPContext(bundle));
-            return new StaticResources(uriNamespace);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    StaticResources publishStaticResources(Bundle bundle, String uriNamespace) throws Exception {
+        // Note: registerResources() throws org.osgi.service.http.NamespaceException
+        httpService.registerResources(uriNamespace, "/", masterContext);
+        masterContext.add(uriNamespace, new BundleHTTPContext(bundle));
+        return new StaticResources(uriNamespace);
     }
 
     void unpublishStaticResources(StaticResources staticResources) {
-        httpService.unregister(staticResources.uriNamespace);
+        String uriNamespace = staticResources.uriNamespace;
+        httpService.unregister(uriNamespace);
+        masterContext.remove(uriNamespace);
     }
 
     // ---
@@ -111,15 +110,17 @@ public class WebPublishingService {
      *
      * @param   path    An absolute path to a directory.
      */
-    StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
-        try {
-            // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", httpContext);
-            httpContext.add(uriNamespace, new DirectoryHTTPContext(path, resourceMapper));
-            return new StaticResources(uriNamespace);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper)
+                                                                                                       throws Exception{
+        // Note: registerResources() throws org.osgi.service.http.NamespaceException
+        httpService.registerResources(uriNamespace, "/", masterContext);
+        masterContext.add(uriNamespace, new DirectoryHTTPContext(path, resourceMapper));
+        return new StaticResources(uriNamespace);
+    }
+
+    void unpublishDirectoryResource(StaticResources directoryResource) {
+        // Note: from HTTP service perspective a directory resource is a static resource
+        unpublishStaticResources(directoryResource);
     }
 
 
@@ -248,12 +249,12 @@ public class WebPublishingService {
             logger.fine("########## Registering Jersey servlet at HTTP service (URI namespace=\"" +
                 ROOT_APPLICATION_PATH + "\")");
             // Note: registerServlet() throws javax.servlet.ServletException
-            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, httpContext);
-            httpContext.add(ROOT_APPLICATION_PATH, httpService.createDefaultHttpContext());
+            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, masterContext);
+            masterContext.add(ROOT_APPLICATION_PATH, httpService.createDefaultHttpContext());
             isJerseyServletRegistered = true;
         } catch (Exception e) {
-            // unregister...();     // ### TODO?
-            throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
+            throw new RuntimeException("Registering Jersey servlet at HTTP service failed (URI namespace=\"" +
+                ROOT_APPLICATION_PATH + "\")", e);
         }
     }
 
@@ -261,6 +262,7 @@ public class WebPublishingService {
         logger.fine("########## Unregistering Jersey servlet at HTTP service (URI namespace=\"" +
             ROOT_APPLICATION_PATH + "\")");
         httpService.unregister(ROOT_APPLICATION_PATH);
+        masterContext.remove(ROOT_APPLICATION_PATH);
         isJerseyServletRegistered = false;
     }
 

@@ -59,9 +59,18 @@ class MasterHttpContext implements HttpContext {
 
     void add(String uriNamespace, HttpContext httpContext) {
         if (httpContexts.get(uriNamespace) != null) {
-            throw new RuntimeException("HttpContext for URI namespace \"" + uriNamespace + "\" already added");
+            throw new RuntimeException("Master context already contains a HttpContext for URI namespace \"" +
+                uriNamespace + "\"");
         }
         httpContexts.put(uriNamespace, httpContext);
+    }
+
+    void remove(String uriNamespace) {
+        if (httpContexts.get(uriNamespace) == null) {
+            throw new RuntimeException("Master context contains no HttpContext for URI namespace \"" +
+                uriNamespace + "\"");
+        }
+        httpContexts.remove(uriNamespace);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
