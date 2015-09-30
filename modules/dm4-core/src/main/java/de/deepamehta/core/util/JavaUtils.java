@@ -257,6 +257,22 @@ public class JavaUtils {
         return dump.toString();
     }
 
+    public static String requestDumpLong(HttpServletRequest request) {
+        String dump = "\n  Request="  + request.getClass().getName() +
+            "\n  ServletPath=\""      + request.getServletPath() +
+            "\"\n  ContextPath=\""    + request.getContextPath() +
+            "\"\n  PathInfo=\""       + request.getPathInfo() +
+            "\"\n  PathTranslated=\"" + request.getPathTranslated() +
+            "\"\n  RequestURI=\""     + request.getRequestURI() +
+            "\"\n  RequestURL=\""     + request.getRequestURL() +
+            "\"\n  Cookies:\n";
+        for (Cookie cookie : request.getCookies()) {
+            dump += "    " + cookie.getName() + "=" + cookie.getValue() + "\n";
+        }
+        dump += "\n  Session=" + request.getSession(false) + "\n";
+        return dump;
+    }
+
 
 
     // === Encoding ===

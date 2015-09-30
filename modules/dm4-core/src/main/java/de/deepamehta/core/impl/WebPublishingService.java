@@ -49,6 +49,7 @@ public class WebPublishingService {
     private boolean isJerseyServletRegistered = false;
 
     private HttpService httpService;
+    private MasterHttpContext httpContext = new MasterHttpContext();
 
     private DeepaMehtaService dms;
 
@@ -91,7 +92,8 @@ public class WebPublishingService {
     StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
+            httpService.registerResources(uriNamespace, "/", httpContext);
+            httpContext.add(uriNamespace, new BundleHTTPContext(bundle));
             return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -112,7 +114,8 @@ public class WebPublishingService {
     StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(path, resourceMapper));
+            httpService.registerResources(uriNamespace, "/", httpContext);
+            httpContext.add(uriNamespace, new DirectoryHTTPContext(path, resourceMapper));
             return new StaticResources(uriNamespace);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -245,7 +248,8 @@ public class WebPublishingService {
             logger.fine("########## Registering Jersey servlet at HTTP service (URI namespace=\"" +
                 ROOT_APPLICATION_PATH + "\")");
             // Note: registerServlet() throws javax.servlet.ServletException
-            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
+            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, httpContext);
+            httpContext.add(ROOT_APPLICATION_PATH, httpService.createDefaultHttpContext());
             isJerseyServletRegistered = true;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
@@ -301,17 +305,11 @@ public class WebPublishingService {
 
         @Override
         public URL getResource(String name) {
-            // 1) map "/" to "/index.html"
-            //
-            // Note: for the bundle's web root resource Pax Web passes "/web/" or "/web",
-            // depending whether the request URL has a slash at the end or not.
-            // Felix HTTP Jetty 2.2.0 in contrast passes "web/" and version 2.3.0 passes "/web/"
-            // (regardless whether the request URL has a slash at the end or not).
-            if (name.equals("/web") || name.equals("/web/")) {
-                name = "/web/index.html";
+            if (name.equals("/")) {
+                name = "/index.html";
             }
-            // 2) access resource from context bundle
-            return bundle.getResource(name);
+            // access resource from context bundle
+            return bundle.getResource("/web" + name);
         }
 
         @Override
