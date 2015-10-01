@@ -1,4 +1,4 @@
-package de.deepamehta.core.service;
+package de.deepamehta.core.service.webpublishing;
 
 import java.net.MalformedURLException;
 import java.net.URL;

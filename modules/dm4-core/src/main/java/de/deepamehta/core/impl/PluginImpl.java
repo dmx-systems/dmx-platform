@@ -10,12 +10,15 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.webpublishing.DirectoryResourceMapper;
+import de.deepamehta.core.service.webpublishing.RestResources;
+import de.deepamehta.core.service.webpublishing.StaticResources;
+import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.Bundle;
@@ -640,16 +643,20 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Events ===
 
     private void registerListeners() {
-        List<DeepaMehtaEvent> events = getEvents();
-        //
-        if (events.size() == 0) {
-            logger.info("Registering event listeners of " + this + " ABORTED -- no event listeners implemented");
-            return;
-        }
-        //
-        logger.info("Registering " + events.size() + " event listeners of " + this);
-        for (DeepaMehtaEvent event : events) {
-            dms.eventManager.addListener(event, (EventListener) pluginContext);
+        try {
+            List<DeepaMehtaEvent> events = getEvents();
+            //
+            if (events.size() == 0) {
+                logger.info("Registering event listeners of " + this + " ABORTED -- no event listeners implemented");
+                return;
+            }
+            //
+            logger.info("Registering " + events.size() + " event listeners of " + this);
+            for (DeepaMehtaEvent event : events) {
+                dms.eventManager.addListener(event, (EventListener) pluginContext);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Registering event listeners of " + this + " failed", e);
         }
     }
 

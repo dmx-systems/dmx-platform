@@ -1,19 +1,19 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.service.webpublishing;
 
 import java.util.List;
 
 
 
-class RestResources {
+public class RestResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    List<Object> singletons;
-    List<Class<?>> classes;
+    public List<Object> singletons;
+    public List<Class<?>> classes;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResources(List<Object> singletons, List<Class<?>> classes) {
+    public RestResources(List<Object> singletons, List<Class<?>> classes) {
         this.singletons = singletons;
         this.classes = classes;
     }

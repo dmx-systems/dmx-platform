@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.webpublishing.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Transactional;

@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Files</name>
+    <name>DeepaMehta 4 WebPublishing</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-files</artifactId>
+    <artifactId>deepamehta-webpublishing</artifactId>
     <version>4.6.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -23,25 +23,7 @@
             <artifactId>deepamehta-core</artifactId>
             <version>4.6.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-webpublishing</artifactId>
-            <version>4.6.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-config</artifactId>
-            <version>4.6.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version><!-- ### TODO: add to deepamehta-parent dependency management -->
-        </dependency>
+        <!-- Servlet API -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -56,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.files.FilesPlugin
+                            de.deepamehta.webpublishing.WebPublishingActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

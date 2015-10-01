@@ -1,4 +1,4 @@
-package de.deepamehta.core.service.event;
+package de.deepamehta.webpublishing.listeners;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.EventListener;

@@ -1,7 +1,10 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.webpublishing.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.DirectoryResourceMapper;
+import de.deepamehta.core.service.webpublishing.DirectoryResourceMapper;
+import de.deepamehta.core.service.webpublishing.RestResources;
+import de.deepamehta.core.service.webpublishing.StaticResources;
+import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -30,12 +33,18 @@ import java.util.logging.Logger;
 
 
 
-public class WebPublishingService {
+public class WebPublishingServiceImpl implements WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Note: OPS4J Pax Web needs "/*". Felix HTTP Jetty in contrast needs "/".
     private static final String ROOT_APPLICATION_PATH = "/*";
+
+    // Note: actually the class WebPublishingEvents does not need to be instantiated as it contains only statics.
+    // But if not instantiated OSGi apparently does not load the class at all.
+    static {
+        new WebPublishingEvents();
+    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -56,7 +65,7 @@ public class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public WebPublishingService(DeepaMehtaService dms, HttpService httpService) {
+    public WebPublishingServiceImpl(DeepaMehtaService dms, HttpService httpService) {
         try {
             logger.info("Setting up the Web Publishing service");
             this.dms = dms;
@@ -88,7 +97,8 @@ public class WebPublishingService {
     /**
      * Publishes the static resources of the given bundle's /web directory.
      */
-    StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
+    @Override
+    public StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
             httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
@@ -98,7 +108,8 @@ public class WebPublishingService {
         }
     }
 
-    void unpublishStaticResources(StaticResources staticResources) {
+    @Override
+    public void unpublishStaticResources(StaticResources staticResources) {
         httpService.unregister(staticResources.uriNamespace);
     }
 
@@ -109,7 +120,8 @@ public class WebPublishingService {
      *
      * @param   path    An absolute path to a directory.
      */
-    StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
+    @Override
+    public StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
         try {
             // Note: registerResources() throws org.osgi.service.http.NamespaceException
             httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(path, resourceMapper));
@@ -133,7 +145,8 @@ public class WebPublishingService {
      * @param   singletons  the set of root resource and provider singletons, may be empty.
      * @param   classes     the set of root resource and provider classes, may be empty.
      */
-    synchronized RestResources publishRestResources(List<Object> singletons, List<Class<?>> classes) {
+    @Override
+    public synchronized RestResources publishRestResources(List<Object> singletons, List<Class<?>> classes) {
         RestResources restResources = new RestResources(singletons, classes);
         try {
             addToApplication(restResources);
@@ -158,7 +171,8 @@ public class WebPublishingService {
         }
     }
 
-    synchronized void unpublishRestResources(RestResources restResources) {
+    @Override
+    public synchronized void unpublishRestResources(RestResources restResources) {
         removeFromApplication(restResources);
         //
         // Note: once all root resources are removed we must unregister the Jersey servlet.
@@ -173,18 +187,19 @@ public class WebPublishingService {
 
     // ---
 
-    boolean isRootResource(Object object) {
+    @Override
+    public boolean isRootResource(Object object) {
         return getUriNamespace(object) != null;
     }
 
-    String getUriNamespace(Object object) {
+    @Override
+    public String getUriNamespace(Object object) {
         Path path = object.getClass().getAnnotation(Path.class);
         return path != null ? path.value() : null;
     }
 
-    // ---
-
-    boolean isProviderClass(Class clazz) {
+    @Override
+    public boolean isProviderClass(Class clazz) {
         return clazz.isAnnotationPresent(Provider.class);
     }
 
@@ -273,7 +288,7 @@ public class WebPublishingService {
 
     private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
+            dms.fireEvent(WebPublishingEvents.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (Throwable e) {
             // Note: resourceRequestFilter() is called from OSGi HTTP service's static resource HttpContext.

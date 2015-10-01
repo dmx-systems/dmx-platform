@@ -1,16 +1,16 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.core.service.webpublishing;
 
 
 
-class StaticResources {
+public class StaticResources {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    String uriNamespace;
+    public String uriNamespace;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    StaticResources(String uriNamespace) {
+    public StaticResources(String uriNamespace) {
         this.uriNamespace = uriNamespace;
     }
 }

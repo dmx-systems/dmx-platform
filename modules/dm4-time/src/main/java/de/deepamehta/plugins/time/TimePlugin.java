@@ -14,9 +14,9 @@ import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicRequestListener;
-import de.deepamehta.core.service.event.PreSendAssociationListener;
-import de.deepamehta.core.service.event.PreSendTopicListener;
-import de.deepamehta.core.service.event.ServiceResponseFilterListener;
+import de.deepamehta.webpublishing.listeners.PreSendAssociationListener;
+import de.deepamehta.webpublishing.listeners.PreSendTopicListener;
+import de.deepamehta.webpublishing.listeners.ServiceResponseFilterListener;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerResponse;

@@ -40,10 +40,10 @@ import de.deepamehta.core.service.event.PreCreateTopicListener;
 import de.deepamehta.core.service.event.PreGetAssociationListener;
 import de.deepamehta.core.service.event.PreGetTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
-import de.deepamehta.core.service.event.ResourceRequestFilterListener;
-import de.deepamehta.core.service.event.ServiceRequestFilterListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JavaUtils;
+import de.deepamehta.webpublishing.listeners.ResourceRequestFilterListener;
+import de.deepamehta.webpublishing.listeners.ServiceRequestFilterListener;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;

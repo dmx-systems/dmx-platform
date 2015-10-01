@@ -1,8 +1,8 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.DirectoryResourceMapper;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.webpublishing.DirectoryResourceMapper;
 import de.deepamehta.core.impl.PluginImpl;
 
 import org.osgi.framework.Bundle;

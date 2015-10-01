@@ -1,13 +1,14 @@
-package de.deepamehta.core.osgi;
+package de.deepamehta.webpublishing;
 
-import de.deepamehta.core.impl.EmbeddedService;
-import de.deepamehta.core.impl.StorageDecorator;
+import de.deepamehta.webpublishing.impl.WebPublishingServiceImpl;
+
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
+import de.deepamehta.core.service.webpublishing.WebPublishingService;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import java.util.logging.Level;
@@ -15,13 +16,18 @@ import java.util.logging.Logger;
 
 
 
-public class CoreActivator implements BundleActivator {
+public class WebPublishingActivator implements BundleActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private static BundleContext bundleContext;
 
-    private ServiceTracker storageServiceTracker;
+    // consumed services
+    private DeepaMehtaService dms;
+    private HttpService httpService;
+
+    private ServiceTracker coreServiceTracker;
+    private ServiceTracker httpServiceTracker;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -38,12 +44,13 @@ public class CoreActivator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) {
         try {
-            logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
+            logger.info("========== Starting \"DeepaMehta 4 WebPublishing\" ==========");
             this.bundleContext = bundleContext;
             //
-            (storageServiceTracker = createServiceTracker(DeepaMehtaStorage.class)).open();
+            (coreServiceTracker = createServiceTracker(DeepaMehtaService.class)).open();
+            (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 Core\":", e);
+            logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 WebPublishing\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
@@ -53,30 +60,17 @@ public class CoreActivator implements BundleActivator {
     @Override
     public void stop(BundleContext bundleContext) {
         try {
-            logger.info("========== Stopping \"DeepaMehta 4 Core\" ==========");
-            storageServiceTracker.close();
+            logger.info("========== Stopping \"DeepaMehta 4 WebPublishing\" ==========");
+            coreServiceTracker.close();
+            httpServiceTracker.close();
             //
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while stopping \"DeepaMehta 4 Core\":", e);
+            logger.log(Level.SEVERE, "An error occurred while stopping \"DeepaMehta 4 WebPublishing\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }
-    }
-
-    // ---
-
-    public static DeepaMehtaService getDeepaMehtaService() {
-        return getService(DeepaMehtaService.class);
-    }
-
-    public static <S> S getService(Class<S> clazz) {
-        S serviceObject = bundleContext.getService(bundleContext.getServiceReference(clazz));
-        if (serviceObject == null) {
-            throw new RuntimeException("Service \"" + clazz.getName() + "\" is not available");
-        }
-        return serviceObject;
     }
 
 
@@ -95,7 +89,7 @@ public class CoreActivator implements BundleActivator {
                     addService(service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
-                        " to \"DeepaMehta 4 Core\":", e);
+                        " to \"DeepaMehta 4 WebPublishing\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -109,7 +103,7 @@ public class CoreActivator implements BundleActivator {
                     super.removedService(ref, service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
-                        " from \"DeepaMehta 4 Core\":", e);
+                        " from \"DeepaMehta 4 WebPublishing\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -120,14 +114,35 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     private void addService(Object service) {
-        logger.info("Adding storage service to DeepaMehta 4 Core");
-        DeepaMehtaStorage storageService = (DeepaMehtaStorage) service;
-        DeepaMehtaService dms = new EmbeddedService(new StorageDecorator(storageService), bundleContext);
-        logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-        bundleContext.registerService(DeepaMehtaService.class.getName(), dms, null);
+        if (service instanceof DeepaMehtaService) {
+            logger.info("Adding DeepaMehta 4 core service to DeepaMehta 4 WebPublishing");
+            dms = (DeepaMehtaService) service;
+            checkRequirementsForActivation();
+        } else if (service instanceof HttpService) {
+            logger.info("Adding HTTP service to DeepaMehta 4 WebPublishing");
+            httpService = (HttpService) service;
+            checkRequirementsForActivation();
+        }
     }
 
     private void removeService(Object service) {
-        logger.info("Removing storage service from DeepaMehta 4 Core");
+        if (service == dms) {
+            logger.info("Removing DeepaMehta 4 core service from DeepaMehta 4 WebPublishing");
+            dms = null;
+        } else if (service == httpService) {
+            logger.info("Removing HTTP service from DeepaMehta 4 WebPublishing");
+            // ### TODO: unregister WebPublishingService
+            httpService = null;
+        }
+    }
+
+    // ---
+
+    private void checkRequirementsForActivation() {
+        if (dms != null && httpService != null) {
+            WebPublishingService wpService = new WebPublishingServiceImpl(dms, httpService);
+            logger.info("Registering DeepaMehta 4 WebPublishing service at OSGi framework");
+            bundleContext.registerService(WebPublishingService.class.getName(), wpService, null);
+        }
     }
 }

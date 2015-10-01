@@ -1,4 +1,4 @@
-package de.deepamehta.core.impl;
+package de.deepamehta.webpublishing.impl;
 
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -25,7 +25,7 @@ class JerseyRequestFilter implements ContainerRequestFilter {
     @Override
     public ContainerRequest filter(ContainerRequest request) {
         Cookies.set(request);
-        dms.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
+        dms.fireEvent(WebPublishingEvents.SERVICE_REQUEST_FILTER, request);
         return request;
     }
 }
