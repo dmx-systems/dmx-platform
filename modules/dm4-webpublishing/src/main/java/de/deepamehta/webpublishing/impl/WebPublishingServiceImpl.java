@@ -38,7 +38,7 @@ public class WebPublishingServiceImpl implements WebPublishingService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Note: OPS4J Pax Web needs "/*". Felix HTTP Jetty in contrast needs "/".
-    private static final String ROOT_APPLICATION_PATH = "/*";
+    private static final String ROOT_APPLICATION_PATH = "/";
 
     // Note: actually the class WebPublishingEvents does not need to be instantiated as it contains only statics.
     // But if not instantiated OSGi apparently does not load the class at all.
