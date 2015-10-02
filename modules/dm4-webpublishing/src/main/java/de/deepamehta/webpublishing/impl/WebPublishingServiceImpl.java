@@ -1,5 +1,7 @@
 package de.deepamehta.webpublishing.impl;
 
+import de.deepamehta.webpublishing.WebPublishingActivator;
+
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
 import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
@@ -57,15 +59,13 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
     private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
-    private HttpService httpService;
-
     private DeepaMehtaService dms;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public WebPublishingServiceImpl(DeepaMehtaService dms, HttpService httpService) {
+    public WebPublishingServiceImpl(DeepaMehtaService dms) {
         try {
             logger.info("Setting up the Web Publishing service");
             this.dms = dms;
@@ -81,7 +81,6 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);
-            this.httpService = httpService;
         } catch (Exception e) {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Setting up the Web Publishing service failed", e);
@@ -97,19 +96,24 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
     @Override
     public StaticResourcesPublication publishWebResources(String uriNamespace, Bundle bundle)
                                                                                           throws NamespaceException {
-        httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
+        getHttpService().registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
         return new StaticResourcesPublicationImpl(uriNamespace, this);
     }
 
     @Override
     public StaticResourcesPublication publishFileSystem(String uriNamespace, String path) throws NamespaceException {
-        httpService.registerResources(uriNamespace, "/", new FileSystemHTTPContext(path));
+        getHttpService().registerResources(uriNamespace, "/", new FileSystemHTTPContext(path));
         return new StaticResourcesPublicationImpl(uriNamespace, this);
     }
 
     @Override
     public void unpublishStaticResources(String uriNamespace) {
-        httpService.unregister(uriNamespace);
+        HttpService httpService = getHttpService();
+        if (httpService != null) {
+            httpService.unregister(uriNamespace);
+        } else {
+            logger.warning("HTTP service is already gone");
+        }
     }
 
 
@@ -176,6 +180,10 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private HttpService getHttpService() {
+        return WebPublishingActivator.getHttpService();
+    }
+
 
 
     // === Jersey application ===
@@ -231,7 +239,7 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
             logger.fine("########## Registering Jersey servlet at HTTP service (URI namespace=\"" +
                 ROOT_APPLICATION_PATH + "\")");
             // Note: registerServlet() throws javax.servlet.ServletException
-            httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
+            getHttpService().registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
             isJerseyServletRegistered = true;
         } catch (Exception e) {
             throw new RuntimeException("Registering Jersey servlet at HTTP service failed (URI namespace=\"" +
@@ -242,7 +250,12 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
     private void unregisterJerseyServlet() {
         logger.fine("########## Unregistering Jersey servlet at HTTP service (URI namespace=\"" +
             ROOT_APPLICATION_PATH + "\")");
-        httpService.unregister(ROOT_APPLICATION_PATH);
+        HttpService httpService = getHttpService();
+        if (httpService != null) {
+            httpService.unregister(ROOT_APPLICATION_PATH);
+        } else {
+            logger.warning("HTTP service is already gone");
+        }
         isJerseyServletRegistered = false;
     }
 

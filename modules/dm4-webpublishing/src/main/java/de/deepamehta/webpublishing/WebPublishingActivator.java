@@ -24,7 +24,7 @@ public class WebPublishingActivator implements BundleActivator {
 
     // consumed services
     private DeepaMehtaService dms;
-    private HttpService httpService;
+    private static HttpService httpService;
 
     private ServiceTracker coreServiceTracker;
     private ServiceTracker httpServiceTracker;
@@ -71,6 +71,12 @@ public class WebPublishingActivator implements BundleActivator {
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }
+    }
+
+    // ---
+
+    public static HttpService getHttpService() {
+        return httpService;
     }
 
 
@@ -140,7 +146,10 @@ public class WebPublishingActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (dms != null && httpService != null) {
-            WebPublishingService wpService = new WebPublishingServiceImpl(dms, httpService);
+            // Note: we don't pass httpService to WebPublishingServiceImpl() to let it not operate on a stale
+            // service object when unregistering resources/servlet. Instead WebPublishingServiceImpl accesses
+            // this class's httpService object.
+            WebPublishingService wpService = new WebPublishingServiceImpl(dms);
             logger.info("Registering DeepaMehta 4 WebPublishing service at OSGi framework");
             bundleContext.registerService(WebPublishingService.class.getName(), wpService, null);
         }
