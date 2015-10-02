@@ -15,9 +15,8 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.webpublishing.DirectoryResourceMapper;
-import de.deepamehta.core.service.webpublishing.RestResources;
-import de.deepamehta.core.service.webpublishing.StaticResources;
+import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
+import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
 import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -87,9 +86,9 @@ public class PluginImpl implements Plugin, EventHandler {
     private ServiceRegistration registration;
 
     // Provided resources
-    private StaticResources staticResources;
-    private StaticResources directoryResource;
-    private RestResources restResources;
+    private StaticResourcesPublication webResources;
+    private StaticResourcesPublication fileSystemResources;
+    private RestResourcesPublication restResources;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -137,20 +136,20 @@ public class PluginImpl implements Plugin, EventHandler {
     /**
      * Publishes a directory of the server's file system.
      *
-     * @param   path    An absolute path to a directory.
+     * @param   path    An absolute path to the directory to be published.
      */
-    public void publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
+    public void publishFileSystem(String uriNamespace, String path) {
         try {
-            logger.info("### Publishing directory \"" + path + "\" at URI namespace \"" + uriNamespace + "\"");
+            logger.info("### Publishing file system \"" + path + "\" at URI namespace \"" + uriNamespace + "\"");
             //
-            if (directoryResource != null) {
-                throw new RuntimeException(this + " has already published a directory; only one per plugin is " +
-                    "supported");
+            if (fileSystemResources != null) {
+                throw new RuntimeException(this + " has already published file system resources; " +
+                    "only one directory per plugin is supported");
             }
             //
-            directoryResource = webPublishingService.publishDirectory(path, uriNamespace, resourceMapper);
+            fileSystemResources = webPublishingService.publishFileSystem(uriNamespace, path);
         } catch (Exception e) {
-            throw new RuntimeException("Publishing directory \"" + path + "\" at URI namespace \"" + uriNamespace +
+            throw new RuntimeException("Publishing file system \"" + path + "\" at URI namespace \"" + uriNamespace +
                 "\" failed", e);
         }
     }
@@ -428,7 +427,7 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service instanceof WebPublishingService) {
             logger.info("Adding Web Publishing service to " + this);
             webPublishingService = (WebPublishingService) service;
-            publishStaticResources();
+            publishWebResources();
             publishRestResources();
             checkRequirementsForActivation();
         } else if (service instanceof EventAdmin) {
@@ -451,8 +450,8 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service == webPublishingService) {
             logger.info("Removing Web Publishing service from " + this);
             unpublishRestResources();
-            unpublishStaticResources();
-            unpublishDirectoryResource();
+            unpublishWebResources();
+            unpublishFileSystem();
             webPublishingService = null;
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
@@ -743,39 +742,39 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
-    // === Static Resources ===
+    // === Web Resources ===
 
     /**
-     * Publishes this plugin's static resources (via Web Publishing service).
-     * If the plugin doesn't provide static resources nothing is performed.
+     * Publishes this plugin's web resources (via Web Publishing service).
+     * If the plugin doesn't provide web resources nothing is performed.
      */
-    private void publishStaticResources() {
+    private void publishWebResources() {
         String uriNamespace = null;
         try {
-            uriNamespace = getStaticResourcesNamespace();
+            uriNamespace = getWebResourcesNamespace();
             if (uriNamespace == null) {
-                logger.info("Publishing static resources of " + this + " ABORTED -- no static resources provided");
+                logger.info("Publishing web resources of " + this + " ABORTED -- no web resources provided");
                 return;
             }
             //
-            logger.info("Publishing static resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            staticResources = webPublishingService.publishStaticResources(pluginBundle, uriNamespace);
+            logger.info("Publishing web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            webResources = webPublishingService.publishWebResources(uriNamespace, pluginBundle);
         } catch (Exception e) {
-            throw new RuntimeException("Publishing static resources of " + this + " failed " +
-                "(uriNamespace=\"" + uriNamespace + "\")", e);
+            throw new RuntimeException("Publishing web resources of " + this + " failed " +
+                "(URI namespace=\"" + uriNamespace + "\")", e);
         }
     }
 
-    private void unpublishStaticResources() {
-        if (staticResources != null) {
-            logger.info("Unpublishing static resources of " + this);
-            webPublishingService.unpublishStaticResources(staticResources);
+    private void unpublishWebResources() {
+        if (webResources != null) {
+            logger.info("Unpublishing web resources of " + this);
+            webResources.unpublish();
         }
     }
 
     // ---
 
-    private String getStaticResourcesNamespace() {
+    private String getWebResourcesNamespace() {
         return getBundleEntry("/web") != null ? "/" + pluginUri : null;
     }
 
@@ -785,14 +784,14 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
-    // === Directory Resources ===
+    // === File System Resources ===
 
-    // Note: registration is performed by public method publishDirectory()
+    // Note: publishing is performed by public method publishFileSystem()
 
-    private void unpublishDirectoryResource() {
-        if (directoryResource != null) {
-            logger.info("Unpublishing directory resource of " + this);
-            webPublishingService.unpublishStaticResources(directoryResource);
+    private void unpublishFileSystem() {
+        if (fileSystemResources != null) {
+            logger.info("Unpublishing file system resources of " + this);
+            fileSystemResources.unpublish();
         }
     }
 
@@ -826,7 +825,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 restResources = webPublishingService.publishRestResources(rootResources, providerClasses);
             }
         } catch (Exception e) {
-            unpublishStaticResources();
+            unpublishWebResources();
             throw new RuntimeException("Publishing REST resources (including provider classes) of " + this +
                 " failed", e);
         }
@@ -835,7 +834,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void unpublishRestResources() {
         if (restResources != null) {
             logger.info("Unpublishing REST resources (including provider classes) of " + this);
-            webPublishingService.unpublishRestResources(restResources);
+            restResources.unpublish();
         }
     }
 

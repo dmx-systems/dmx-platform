@@ -1,9 +1,8 @@
 package de.deepamehta.webpublishing.impl;
 
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.webpublishing.DirectoryResourceMapper;
-import de.deepamehta.core.service.webpublishing.RestResources;
-import de.deepamehta.core.service.webpublishing.StaticResources;
+import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
+import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
 import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
@@ -14,6 +13,7 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import org.osgi.framework.Bundle;
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.osgi.service.http.NamespaceException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 
 
-public class WebPublishingServiceImpl implements WebPublishingService {
+public class WebPublishingServiceImpl implements WebPublishingService, WebUnpublishing {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -94,62 +94,33 @@ public class WebPublishingServiceImpl implements WebPublishingService {
 
     // === Static Resources ===
 
-    /**
-     * Publishes the static resources of the given bundle's /web directory.
-     */
     @Override
-    public StaticResources publishStaticResources(Bundle bundle, String uriNamespace) {
-        try {
-            // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
-            return new StaticResources(uriNamespace);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public StaticResourcesPublication publishWebResources(String uriNamespace, Bundle bundle)
+                                                                                          throws NamespaceException {
+        httpService.registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
+        return new StaticResourcesPublicationImpl(uriNamespace, this);
     }
 
     @Override
-    public void unpublishStaticResources(StaticResources staticResources) {
-        httpService.unregister(staticResources.uriNamespace);
+    public StaticResourcesPublication publishFileSystem(String uriNamespace, String path) throws NamespaceException {
+        httpService.registerResources(uriNamespace, "/", new FileSystemHTTPContext(path));
+        return new StaticResourcesPublicationImpl(uriNamespace, this);
     }
 
-    // ---
-
-    /**
-     * Publishes a directory of the server's file system.
-     *
-     * @param   path    An absolute path to a directory.
-     */
     @Override
-    public StaticResources publishDirectory(String path, String uriNamespace, DirectoryResourceMapper resourceMapper) {
-        try {
-            // Note: registerResources() throws org.osgi.service.http.NamespaceException
-            httpService.registerResources(uriNamespace, "/", new DirectoryHTTPContext(path, resourceMapper));
-            return new StaticResources(uriNamespace);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void unpublishStaticResources(String uriNamespace) {
+        httpService.unregister(uriNamespace);
     }
 
 
 
     // === REST Resources ===
 
-    /**
-     * Publishes REST resources. This is done by adding JAX-RS root resource and provider classes/singletons
-     * to the Jersey application and reloading the Jersey servlet.
-     * <p>
-     * Note: synchronizing this method prevents creation of multiple Jersey servlet instances due to parallel plugin
-     * initialization.
-     *
-     * @param   singletons  the set of root resource and provider singletons, may be empty.
-     * @param   classes     the set of root resource and provider classes, may be empty.
-     */
+    // Note: synchronizing prevents creation of multiple Jersey servlet instances due to parallel plugin initialization
     @Override
-    public synchronized RestResources publishRestResources(List<Object> singletons, List<Class<?>> classes) {
-        RestResources restResources = new RestResources(singletons, classes);
+    public synchronized RestResourcesPublication publishRestResources(List<Object> singletons, List<Class<?>> classes) {
         try {
-            addToApplication(restResources);
+            addToApplication(singletons, classes);
             //
             // Note: we must register the Jersey servlet lazily, that is not before any root resources are added.
             // An "empty" application would fail (com.sun.jersey.api.container.ContainerException:
@@ -164,16 +135,16 @@ public class WebPublishingServiceImpl implements WebPublishingService {
                 reloadJerseyServlet();
             }
             //
-            return restResources;
+            return new RestResourcesPublicationImpl(singletons, classes, this);
         } catch (Exception e) {
-            unpublishRestResources(restResources);
+            unpublishRestResources(singletons, classes);
             throw new RuntimeException("Adding classes/singletons to Jersey application failed", e);
         }
     }
 
     @Override
-    public synchronized void unpublishRestResources(RestResources restResources) {
-        removeFromApplication(restResources);
+    public synchronized void unpublishRestResources(List<Object> singletons, List<Class<?>> classes) {
+        removeFromApplication(singletons, classes);
         //
         // Note: once all root resources are removed we must unregister the Jersey servlet.
         // Reloading it with an "empty" application would fail (com.sun.jersey.api.container.ContainerException:
@@ -209,22 +180,22 @@ public class WebPublishingServiceImpl implements WebPublishingService {
 
     // === Jersey application ===
 
-    private void addToApplication(RestResources restResources) {
-        getClasses().addAll(restResources.classes);
-        getSingletons().addAll(restResources.singletons);
+    private void addToApplication(List<Object> singletons, List<Class<?>> classes) {
+        getClasses().addAll(classes);
+        getSingletons().addAll(singletons);
         //
-        classCount     += restResources.classes.size();
-        singletonCount += restResources.singletons.size();
+        classCount     += classes.size();
+        singletonCount += singletons.size();
         //
         logResourceInfo();
     }
 
-    private void removeFromApplication(RestResources restResources) {
-        getClasses().removeAll(restResources.classes);
-        getSingletons().removeAll(restResources.singletons);
+    private void removeFromApplication(List<Object> singletons, List<Class<?>> classes) {
+        getClasses().removeAll(classes);
+        getSingletons().removeAll(singletons);
         //
-        classCount -= restResources.classes.size();
-        singletonCount -= restResources.singletons.size();
+        classCount -= classes.size();
+        singletonCount -= singletons.size();
         //
         logResourceInfo();
     }
@@ -263,8 +234,8 @@ public class WebPublishingServiceImpl implements WebPublishingService {
             httpService.registerServlet(ROOT_APPLICATION_PATH, jerseyServlet, null, null);
             isJerseyServletRegistered = true;
         } catch (Exception e) {
-            // unregister...();     // ### TODO?
-            throw new RuntimeException("Registering Jersey servlet at HTTP service failed", e);
+            throw new RuntimeException("Registering Jersey servlet at HTTP service failed (URI namespace=\"" +
+                ROOT_APPLICATION_PATH + "\")", e);
         }
     }
 
@@ -291,7 +262,7 @@ public class WebPublishingServiceImpl implements WebPublishingService {
             dms.fireEvent(WebPublishingEvents.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (Throwable e) {
-            // Note: resourceRequestFilter() is called from OSGi HTTP service's static resource HttpContext.
+            // Note: resourceRequestFilter() is called from an OSGi HTTP service static resource HttpContext.
             // JAX-RS is not involved here. No JAX-RS exception mapper kicks in. Though the application's
             // ResourceRequestFilterListener can throw a WebApplicationException (which is JAX-RS API)
             // in order to provide error response info.
@@ -341,17 +312,15 @@ public class WebPublishingServiceImpl implements WebPublishingService {
         }
     }
 
-    private class DirectoryHTTPContext implements HttpContext {
+    private class FileSystemHTTPContext implements HttpContext {
 
         private String path;
-        private DirectoryResourceMapper resourceMapper;
 
         /**
          * @param   path    An absolute path to a directory.
          */
-        private DirectoryHTTPContext(String path, DirectoryResourceMapper resourceMapper) {
+        private FileSystemHTTPContext(String path) {
             this.path = path;
-            this.resourceMapper = resourceMapper;
         }
 
         // ---
@@ -359,13 +328,7 @@ public class WebPublishingServiceImpl implements WebPublishingService {
         @Override
         public URL getResource(String name) {
             try {
-                URL url;
-                if (resourceMapper != null) {
-                    url = resourceMapper.getResource(name);
-                } else {
-                    // default mapping
-                    url = new URL("file:" + path + "/" + name);     // throws java.net.MalformedURLException
-                }
+                URL url = new URL("file:" + path + "/" + name);     // throws java.net.MalformedURLException
                 logger.info("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
                 return url;
             } catch (Exception e) {

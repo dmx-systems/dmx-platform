@@ -395,7 +395,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @Override
     public void init() {
-        publishDirectory(FILE_REPOSITORY_PATH, FILE_REPOSITORY_URI, null);      // resourceMapper=null
+        publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
     }
 
     @Override
@@ -741,7 +741,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                     // Although the AccessControlPlugin's PreGetTopicListener kicks in, the request is *not* injected
                     // into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
                     //
-                    // Note: checkAuthorization() is called (indirectly) from OSGi HTTP service's static resource
+                    // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
                     String username = dms.getAccessControl().getUsername(request);
                     long fileTopicId = fileTopic.getId();
