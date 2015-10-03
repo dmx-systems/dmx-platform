@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.PluginService;
 
 import java.lang.reflect.Field;
 
@@ -12,15 +11,14 @@ class InjectableService {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private PluginContext pluginContext;
-    private Class<? extends PluginService> serviceInterface;
+    private Class<?> serviceInterface;
     private Field injectableField;
 
-    private PluginService service;
+    private Object service;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    InjectableService(PluginContext pluginContext, Class<? extends PluginService> serviceInterface,
-                                                   Field injectableField) {
+    InjectableService(PluginContext pluginContext, Class<?> serviceInterface, Field injectableField) {
         this.pluginContext = pluginContext;
         this.serviceInterface = serviceInterface;
         this.injectableField = injectableField;
@@ -35,11 +33,11 @@ class InjectableService {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    Class<? extends PluginService> getServiceInterface() {
+    Class<?> getServiceInterface() {
         return serviceInterface;
     }
 
-    PluginService getService() {
+    Object getService() {
         if (!isServiceAvailable()) {
             throw new RuntimeException("Service " + this + " is not available (consumed by " + pluginContext + ")");
         }
@@ -50,7 +48,7 @@ class InjectableService {
         return service != null;
     }
 
-    void injectService(PluginService service) {
+    void injectService(Object service) {
         this.service = service;
         injectValue(service);
     }

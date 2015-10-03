@@ -1,7 +1,6 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.PluginService;
 
 import org.osgi.framework.BundleContext;
 
@@ -15,9 +14,9 @@ public interface PluginContext {
 
     void shutdown();
 
-    void serviceArrived(PluginService service);
+    void serviceArrived(Object service);
 
-    void serviceGone(PluginService service);
+    void serviceGone(Object service);
 
     // --- Internal ---
 

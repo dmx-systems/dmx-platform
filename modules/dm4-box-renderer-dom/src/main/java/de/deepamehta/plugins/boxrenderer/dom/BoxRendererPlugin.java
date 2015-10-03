@@ -8,7 +8,6 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.PluginService;
 
 import java.util.logging.Logger;
 
@@ -35,12 +34,12 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     // *** Hook Implementations ***
 
     @Override
-    public void serviceArrived(PluginService service) {
+    public void serviceArrived(Object service) {
         ((TopicmapsService) service).registerViewmodelCustomizer(this);
     }
 
     @Override
-    public void serviceGone(PluginService service) {
+    public void serviceGone(Object service) {
         // Note 1: unregistering is crucial. Otherwise the Topicmaps plugin would hold a viewmodel customizer with
         // a stale dms instance as soon as the Box Renderer is redeployed. A subsequent storeViewProperties() call
         // (see below) would fail.

@@ -6,7 +6,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.Plugin;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -151,14 +150,14 @@ class MigrationManager {
     private void injectServices(Migration migration, String migrationInfo, PluginImpl plugin) {
         try {
             for (Field field : PluginImpl.getInjectableFields(migration.getClass())) {
-                Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
-                PluginService service;
+                Class<?> serviceInterface = field.getType();
+                Object service;
                 // 
                 if (serviceInterface.getName().equals(plugin.getProvidedServiceInterface())) {
                     // the migration consumes the plugin's own service
-                    service = (PluginService) plugin.getContext();
+                    service = plugin.getContext();
                 } else {
-                    service = plugin.getPluginService(serviceInterface);
+                    service = plugin.getInjectedService(serviceInterface);
                 }
                 //
                 logger.info("Injecting service " + serviceInterface.getName() + " into " + migrationInfo);

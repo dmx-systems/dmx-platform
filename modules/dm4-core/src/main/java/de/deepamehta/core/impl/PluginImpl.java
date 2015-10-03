@@ -14,7 +14,6 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
 import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
 import de.deepamehta.core.service.webpublishing.WebPublishingService;
@@ -73,12 +72,12 @@ public class PluginImpl implements Plugin, EventHandler {
     private WebPublishingService webPublishingService;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
-    // Consumed plugin services
+    // Consumed services (injected)
     //      key: service interface (a class object),
-    //      value: service object. Is null if the service is not yet available. ### FIXDOC
-    private Map<Class<? extends PluginService>, InjectableService> consumedPluginServices = new HashMap();
+    //      value: an InjectableService
+    private Map<Class<?>, InjectableService> injectableServices = new HashMap();
 
-    // Trackers for the consumed services (DeepaMehta Core, OSGi, and plugin services)
+    // Trackers for the consumed services (DeepaMehta Core, OSGi, and injected services)
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     // Provided OSGi service
@@ -119,7 +118,7 @@ public class PluginImpl implements Plugin, EventHandler {
         }
         //
         createCoreServiceTrackers();
-        createPluginServiceTrackers();
+        createInjectedServiceTrackers();
         //
         openServiceTrackers();
     }
@@ -296,19 +295,18 @@ public class PluginImpl implements Plugin, EventHandler {
         serviceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
-    private void createPluginServiceTrackers() {
+    private void createInjectedServiceTrackers() {
         List<InjectableService> injectableServices = createInjectableServices();
         //
         if (injectableServices.isEmpty()) {
-            logger.info("Tracking plugin services for " + this + " ABORTED -- no services consumed");
+            logger.info("Tracking services for " + this + " ABORTED -- no services consumed");
             return;
         }
         //
-        logger.info("Tracking " + injectableServices.size() + " plugin services for " + this + " " +
-            injectableServices);
+        logger.info("Tracking " + injectableServices.size() + " services for " + this + " " + injectableServices);
         for (InjectableService injectableService : injectableServices) {
-            Class<? extends PluginService> serviceInterface = injectableService.getServiceInterface();
-            consumedPluginServices.put(serviceInterface, injectableService);
+            Class<?> serviceInterface = injectableService.getServiceInterface();
+            this.injectableServices.put(serviceInterface, injectableService);
             serviceTrackers.add(createServiceTracker(serviceInterface));
         }
     }
@@ -319,14 +317,14 @@ public class PluginImpl implements Plugin, EventHandler {
         List<InjectableService> injectableServices = new ArrayList();
         //
         for (Field field : getInjectableFields(pluginContext.getClass())) {
-            Class<? extends PluginService> serviceInterface = (Class<? extends PluginService>) field.getType();
+            Class<?> serviceInterface = field.getType();
             injectableServices.add(new InjectableService(pluginContext, serviceInterface, field));
         }
         return injectableServices;
     }
 
-    private boolean pluginServicesAvailable() {
-        for (InjectableService injectableService : consumedPluginServices.values()) {
+    private boolean injectedServicesAvailable() {
+        for (InjectableService injectableService : injectableServices.values()) {
             if (!injectableService.isServiceAvailable()) {
                 return false;
             }
@@ -339,18 +337,9 @@ public class PluginImpl implements Plugin, EventHandler {
     // called also from MigrationManager
     static List<Field> getInjectableFields(Class<?> clazz) {
         List<Field> injectableFields = new ArrayList();
-        //
         // Note: we use getDeclaredFields() (instead of getFields()) to *not* search the super classes
         for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(Inject.class)) {
-                Class<?> fieldType = field.getType();
-                //
-                if (!PluginService.class.isAssignableFrom(fieldType)) {
-                    throw new RuntimeException("@Inject annotated field \"" + field.getName() +
-                        "\" has unsupported type (" + fieldType.getName() + "). Use @Inject " +
-                        "only for injecting plugin services.");
-                }
-                //
                 field.setAccessible(true);  // allow injection into private fields
                 injectableFields.add(field);
             }
@@ -359,10 +348,10 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     // called from MigrationManager
-    PluginService getPluginService(Class<? extends PluginService> serviceInterface) {
-        InjectableService injectableService = consumedPluginServices.get(serviceInterface);
+    Object getInjectedService(Class<?> serviceInterface) {
+        InjectableService injectableService = injectableServices.get(serviceInterface);
         if (injectableService == null) {
-            throw new RuntimeException("Service " + serviceInterface.getName() + " is not consumed by " + this);
+            throw new RuntimeException("Service " + serviceInterface.getName() + " is not tracked by " + this);
         }
         return injectableService.getService();
     }
@@ -434,10 +423,10 @@ public class PluginImpl implements Plugin, EventHandler {
             logger.info("Adding Event Admin service to " + this);
             eventService = (EventAdmin) service;
             checkRequirementsForActivation();
-        } else if (service instanceof PluginService) {
-            logger.info("Adding service " + serviceInterface.getName() + " to " + this);
-            consumedPluginServices.get(serviceInterface).injectService((PluginService) service);
-            pluginContext.serviceArrived((PluginService) service);
+        } else {
+            logger.info("Adding " + serviceInterface.getName() + " to " + this);
+            injectableServices.get(serviceInterface).injectService(service);
+            pluginContext.serviceArrived(service);
             checkRequirementsForActivation();
         }
     }
@@ -456,10 +445,10 @@ public class PluginImpl implements Plugin, EventHandler {
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
             eventService = null;
-        } else if (service instanceof PluginService) {
-            logger.info("Removing service " + serviceInterface.getName() + " from " + this);
-            pluginContext.serviceGone((PluginService) service);
-            consumedPluginServices.get(serviceInterface).injectService(null);
+        } else {
+            logger.info("Removing " + serviceInterface.getName() + " from " + this);
+            pluginContext.serviceGone(service);
+            injectableServices.get(serviceInterface).injectService(null);
         }
     }
 
@@ -477,14 +466,14 @@ public class PluginImpl implements Plugin, EventHandler {
      *
      * The requirements:
      *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
-     *   - the plugin services (according to the "ConsumesService" annotation ### FIXDOC) are available.
+     *   - the injected services (according to the "Inject" annotation) are available.
      *   - the plugin dependencies (according to the "importModels" config property) are active.
      *
      * Note: The Web Publishing service is not strictly required for activation, but we must ensure
      * ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
      */
     private void checkRequirementsForActivation() {
-        if (dms != null && webPublishingService != null && eventService != null && pluginServicesAvailable()
+        if (dms != null && webPublishingService != null && eventService != null && injectedServicesAvailable()
                                                                                 && dependenciesAvailable()) {
             dms.pluginManager.activatePlugin(this);
         }
@@ -510,7 +499,7 @@ public class PluginImpl implements Plugin, EventHandler {
             installPluginInDB();
             invokeInitHook();
             registerListeners();
-            registerPluginService();
+            registerProvidedService();
             // Note: the event listeners must be registered *after* the plugin is installed in the database (see
             // installPluginInDB() below).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
@@ -708,13 +697,13 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
 
-    // === Plugin Service ===
+    // === Provided Service ===
 
     /**
-     * Registers this plugin's OSGi service at the OSGi framework.
-     * If the plugin doesn't provide an OSGi service nothing is performed.
+     * Registers the provided service at the OSGi framework.
+     * If this plugin doesn't provide a service nothing is performed.
      */
-    private void registerPluginService() {
+    private void registerProvidedService() {
         try {
             if (providedServiceInterface == null) {
                 logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");

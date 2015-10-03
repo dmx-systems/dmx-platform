@@ -20,7 +20,6 @@ import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
@@ -399,7 +398,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     }
 
     @Override
-    public void serviceArrived(PluginService service) {
+    public void serviceArrived(Object service) {
         ((ConfigService) service).registerConfigDefinition(new TypeConfigDefinition(
             "dm4.accesscontrol.username",
             new TopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
@@ -408,7 +407,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     }
 
     @Override
-    public void serviceGone(PluginService service) {
+    public void serviceGone(Object service) {
         // Note 1: unregistering is crucial e.g. for redeploying the Files plugin. The next register call (at plugin
         // start time) would fail as the Config service holds a registration for that config type URI already.
         // Note 2: we must unregister via serviceGone() hook, that is immediately when the Config service is about
