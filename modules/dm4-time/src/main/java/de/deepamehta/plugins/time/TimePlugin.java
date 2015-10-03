@@ -9,6 +9,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
@@ -43,6 +44,7 @@ import java.util.logging.Logger;
 @Path("/time")
 @Consumes("application/json")
 @Produces("application/json")
+@ProvidesService(TimeService.class)
 public class TimePlugin extends PluginActivator implements TimeService, PostCreateTopicListener,
                                                                         PostCreateAssociationListener,
                                                                         PostUpdateTopicListener,

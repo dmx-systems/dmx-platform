@@ -4,13 +4,12 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 
 
-public interface WorkspacesService extends PluginService {
+public interface WorkspacesService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

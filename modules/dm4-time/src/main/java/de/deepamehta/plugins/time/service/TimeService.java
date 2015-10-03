@@ -2,13 +2,12 @@ package de.deepamehta.plugins.time.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 
 import java.util.Collection;
 
 
 
-public interface TimeService extends PluginService {
+public interface TimeService {
 
     // === Timestamps ===
 

@@ -16,6 +16,7 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 
@@ -41,6 +42,7 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
+@ProvidesService(TopicmapsService.class)
 public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants

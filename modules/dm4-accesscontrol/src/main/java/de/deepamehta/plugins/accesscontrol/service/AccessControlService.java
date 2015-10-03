@@ -2,7 +2,6 @@ package de.deepamehta.plugins.accesscontrol.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
@@ -11,7 +10,7 @@ import java.util.Collection;
 
 
 
-public interface AccessControlService extends PluginService {
+public interface AccessControlService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

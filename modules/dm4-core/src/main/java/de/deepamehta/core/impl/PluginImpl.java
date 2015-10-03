@@ -14,6 +14,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
 import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
 import de.deepamehta.core.service.webpublishing.WebPublishingService;
@@ -22,7 +23,6 @@ import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -82,7 +82,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // Provided OSGi service
     private String providedServiceInterface;
-    private ServiceRegistration registration;
 
     // Provided resources
     private StaticResourcesPublication webResources;
@@ -704,6 +703,9 @@ public class PluginImpl implements Plugin, EventHandler {
      * If this plugin doesn't provide a service nothing is performed.
      */
     private void registerProvidedService() {
+        // Note: "providedServiceInterface" is initialized in constructor. Initializing it here would be
+        // too late as the MigrationManager accesses it. In activate() the MigrationManager is called
+        // *before* registerProvidedService().
         try {
             if (providedServiceInterface == null) {
                 logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");
@@ -711,22 +713,15 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Registering service \"" + providedServiceInterface + "\" at OSGi framework");
-            registration = bundleContext.registerService(providedServiceInterface, pluginContext, null);
+            bundleContext.registerService(providedServiceInterface, pluginContext, null);
         } catch (Exception e) {
             throw new RuntimeException("Registering service of " + this + " at OSGi framework failed", e);
         }
     }
 
     private String providedServiceInterface() {
-        List<String> serviceInterfaces = scanPackage("/service");
-        switch (serviceInterfaces.size()) {
-        case 0:
-            return null;
-        case 1:
-            return serviceInterfaces.get(0);
-        default:
-            throw new RuntimeException("Only one service interface per plugin is supported");
-        }
+        ProvidesService a = pluginContext.getClass().getAnnotation(ProvidesService.class);
+        return a != null ? a.value().getName() : null;
     }
 
 

@@ -25,6 +25,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
@@ -74,6 +75,7 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
+@ProvidesService(AccessControlService.class)
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreCreateTopicListener,
                                                                                          PreUpdateTopicListener,
                                                                                          PreGetTopicListener,

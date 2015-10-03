@@ -5,14 +5,13 @@ import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
 
 
 
-public interface FacetsService extends PluginService {
+public interface FacetsService {
 
     // ### TODO: rename to getFacetValue
     // ### TODO: add fetchComposite parameter

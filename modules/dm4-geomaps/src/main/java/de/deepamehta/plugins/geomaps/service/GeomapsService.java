@@ -3,11 +3,10 @@ package de.deepamehta.plugins.geomaps.service;
 import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geomaps.model.Geomap;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 
 
 
-public interface GeomapsService extends PluginService {
+public interface GeomapsService {
 
     Geomap getGeomap(long geomapId);
 

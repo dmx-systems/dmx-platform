@@ -6,7 +6,6 @@ import de.deepamehta.plugins.files.StoredFile;
 import de.deepamehta.plugins.files.UploadedFile;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 
 import java.io.File;
 import java.io.InputStream;
@@ -14,7 +13,7 @@ import java.net.URL;
 
 
 
-public interface FilesService extends PluginService {
+public interface FilesService {
 
 
 

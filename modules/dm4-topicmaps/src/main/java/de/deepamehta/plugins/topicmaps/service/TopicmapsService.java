@@ -7,11 +7,10 @@ import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.PluginService;
 
 
 
-public interface TopicmapsService extends PluginService {
+public interface TopicmapsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 

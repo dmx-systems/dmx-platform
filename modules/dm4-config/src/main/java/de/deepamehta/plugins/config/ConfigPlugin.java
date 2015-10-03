@@ -8,6 +8,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 
 @Path("/config")
 @Produces("application/json")
+@ProvidesService(ConfigService.class)
 public class ConfigPlugin extends PluginActivator implements ConfigService {
 
     // ------------------------------------------------------------------------------------------------------- Constants

@@ -20,6 +20,7 @@ import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
@@ -55,6 +56,7 @@ import java.util.regex.Pattern;
 
 @Path("/files")
 @Produces("application/json")
+@ProvidesService(FilesService.class)
 public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener, PathMapper {
 
     // ------------------------------------------------------------------------------------------------------- Constants
