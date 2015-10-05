@@ -4,7 +4,6 @@ import de.deepamehta.plugins.topicmaps.model.AssociationViewmodel;
 import de.deepamehta.plugins.topicmaps.model.TopicViewmodel;
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.model.ViewProperties;
-import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;

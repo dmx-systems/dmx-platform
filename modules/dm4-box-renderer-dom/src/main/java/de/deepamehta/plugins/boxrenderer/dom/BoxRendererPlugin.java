@@ -1,8 +1,8 @@
 package de.deepamehta.plugins.boxrenderer.dom;
 
+import de.deepamehta.plugins.topicmaps.TopicmapsService;
 import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.plugins.topicmaps.model.ViewProperties;
-import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;

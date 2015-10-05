@@ -7,7 +7,7 @@ import de.deepamehta.plugins.files.UploadedFile;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.osgi.CoreActivator;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.plugins.config.service.ConfigService;
+import de.deepamehta.plugins.config.ConfigService;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;

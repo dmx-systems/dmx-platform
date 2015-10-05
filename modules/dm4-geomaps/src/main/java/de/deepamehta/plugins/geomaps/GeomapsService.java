@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.geomaps.service;
+package de.deepamehta.plugins.geomaps;
 
 import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geomaps.model.Geomap;

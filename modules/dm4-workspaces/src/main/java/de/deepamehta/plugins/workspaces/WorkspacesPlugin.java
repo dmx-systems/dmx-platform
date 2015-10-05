@@ -1,9 +1,8 @@
 package de.deepamehta.plugins.workspaces;
 
-import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.facets.FacetsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
-import de.deepamehta.plugins.facets.service.FacetsService;
-import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
+import de.deepamehta.plugins.topicmaps.TopicmapsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;

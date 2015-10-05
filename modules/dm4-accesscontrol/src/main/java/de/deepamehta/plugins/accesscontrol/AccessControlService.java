@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.accesscontrol.service;
+package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;

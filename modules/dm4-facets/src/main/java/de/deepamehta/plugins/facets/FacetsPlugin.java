@@ -1,7 +1,6 @@
 package de.deepamehta.plugins.facets;
 
 import de.deepamehta.plugins.facets.model.FacetValue;
-import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;

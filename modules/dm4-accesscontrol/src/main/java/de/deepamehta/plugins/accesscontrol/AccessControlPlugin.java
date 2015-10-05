@@ -2,10 +2,9 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
-import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.files.FilesService;
 import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
-import de.deepamehta.plugins.files.service.FilesService;
-import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.workspaces.WorkspacesService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
@@ -42,7 +41,6 @@ import de.deepamehta.core.service.event.PreGetTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.

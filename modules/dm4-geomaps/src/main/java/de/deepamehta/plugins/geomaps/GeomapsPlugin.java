@@ -2,10 +2,9 @@ package de.deepamehta.plugins.geomaps;
 
 import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geomaps.model.Geomap;
-import de.deepamehta.plugins.geomaps.service.GeomapsService;
-import de.deepamehta.plugins.topicmaps.service.TopicmapsService;
+import de.deepamehta.plugins.topicmaps.TopicmapsService;
+import de.deepamehta.plugins.facets.FacetsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
-import de.deepamehta.plugins.facets.service.FacetsService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;

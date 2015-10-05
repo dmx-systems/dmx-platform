@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.accesscontrol.migrations;
 
-import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
+import de.deepamehta.plugins.accesscontrol.AccessControlService;
 
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;

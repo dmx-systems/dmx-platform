@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.workspaces.migrations;
 
-import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.workspaces.WorkspacesService;
 
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;

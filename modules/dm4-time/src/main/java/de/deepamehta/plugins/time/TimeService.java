@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.time.service;
+package de.deepamehta.plugins.time;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;

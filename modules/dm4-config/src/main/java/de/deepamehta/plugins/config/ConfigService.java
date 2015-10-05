@@ -1,7 +1,6 @@
-package de.deepamehta.plugins.config.service;
+package de.deepamehta.plugins.config;
 
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.plugins.config.ConfigDefinition;
 import de.deepamehta.plugins.config.ConfigPlugin.ConfigDefinitions;
 
 

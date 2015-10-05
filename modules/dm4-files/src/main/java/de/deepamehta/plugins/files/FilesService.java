@@ -1,9 +1,4 @@
-package de.deepamehta.plugins.files.service;
-
-import de.deepamehta.plugins.files.DirectoryListing;
-import de.deepamehta.plugins.files.ResourceInfo;
-import de.deepamehta.plugins.files.StoredFile;
-import de.deepamehta.plugins.files.UploadedFile;
+package de.deepamehta.plugins.files;
 
 import de.deepamehta.core.Topic;
 

@@ -1,8 +1,5 @@
-package de.deepamehta.plugins.topicmaps.service;
+package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.plugins.topicmaps.ClusterCoords;
-import de.deepamehta.plugins.topicmaps.TopicmapRenderer;
-import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
 import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 

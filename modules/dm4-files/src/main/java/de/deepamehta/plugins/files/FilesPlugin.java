@@ -1,11 +1,9 @@
 package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
-import de.deepamehta.plugins.files.service.FilesService;
-
+import de.deepamehta.plugins.config.ConfigService;
 import de.deepamehta.plugins.config.ModificationRole;
 import de.deepamehta.plugins.config.TypeConfigDefinition;
-import de.deepamehta.plugins.config.service.ConfigService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;

@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.facets.service;
+package de.deepamehta.plugins.facets;
 
 import de.deepamehta.plugins.facets.model.FacetValue;
 

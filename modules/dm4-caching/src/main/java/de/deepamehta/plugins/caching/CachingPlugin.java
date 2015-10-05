@@ -1,6 +1,6 @@
 package de.deepamehta.plugins.caching;
 
-import de.deepamehta.plugins.time.service.TimeService;
+import de.deepamehta.plugins.time.TimeService;
 
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.osgi.PluginActivator;

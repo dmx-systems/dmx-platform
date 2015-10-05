@@ -1,7 +1,5 @@
 package de.deepamehta.plugins.time;
 
-import de.deepamehta.plugins.time.service.TimeService;
-
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;

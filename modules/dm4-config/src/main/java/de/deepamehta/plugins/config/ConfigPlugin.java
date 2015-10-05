@@ -1,7 +1,5 @@
 package de.deepamehta.plugins.config;
 
-import de.deepamehta.plugins.config.service.ConfigService;
-
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;

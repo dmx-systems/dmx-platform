@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.workspaces.service;
+package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;

@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.accesscontrol.migrations;
 
-import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
-import de.deepamehta.plugins.workspaces.service.WorkspacesService;
+import de.deepamehta.plugins.accesscontrol.AccessControlService;
+import de.deepamehta.plugins.workspaces.WorkspacesService;
 
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
