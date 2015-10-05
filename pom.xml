@@ -117,7 +117,6 @@
                 <!-- As a workaround we setup 2 (empty) bogus paths at the beginning and end.                       -->
                 <felix.fileinstall.dir>,
                     ${project.basedir}/modules/dm4-core/target,
-                    ${project.basedir}/modules/dm4-webpublishing/target,
                     ${project.basedir}/modules/dm4-webservice/target,
                     ${project.basedir}/modules/dm4-webclient/target,
                     ${project.basedir}/modules/dm4-webbrowser/target,
@@ -189,7 +188,6 @@
             <id>all</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <module>modules/dm4-webpublishing</module>
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>
@@ -263,7 +261,6 @@
             <id>release</id>
             <modules>
                 <module>modules/dm4-core</module>
-                <module>modules/dm4-webpublishing</module>
                 <module>modules/dm4-webservice</module>
                 <module>modules/dm4-webclient</module>
                 <module>modules/dm4-webbrowser</module>

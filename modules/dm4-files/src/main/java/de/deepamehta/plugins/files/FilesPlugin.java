@@ -24,9 +24,9 @@ import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
+import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.webpublishing.listeners.ResourceRequestFilterListener;
 
 import org.apache.commons.io.IOUtils;
 

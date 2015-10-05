@@ -23,11 +23,6 @@
             <artifactId>deepamehta-core</artifactId>
             <version>4.6.2-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-webpublishing</artifactId>
-            <version>4.6.2-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>

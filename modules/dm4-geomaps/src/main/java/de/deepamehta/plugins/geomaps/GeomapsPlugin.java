@@ -25,8 +25,8 @@ import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreSendTopicListener;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.webpublishing.listeners.PreSendTopicListener;
 
 import org.codehaus.jettison.json.JSONObject;
 

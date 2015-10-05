@@ -1,32 +1,29 @@
-package de.deepamehta.webpublishing.impl;
-
-import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
+package de.deepamehta.core.impl;
 
 import java.util.List;
 
 
 
-class RestResourcesPublicationImpl implements RestResourcesPublication {
+class RestResourcesPublication {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private List<Object> singletons;
     private List<Class<?>> classes;
 
-    private WebUnpublishing webUnpublishing;
+    private WebPublishingService wpService;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RestResourcesPublicationImpl(List<Object> singletons, List<Class<?>> classes, WebUnpublishing webUnpublishing) {
+    RestResourcesPublication(List<Object> singletons, List<Class<?>> classes, WebPublishingService wpService) {
         this.singletons = singletons;
         this.classes = classes;
-        this.webUnpublishing = webUnpublishing;
+        this.wpService = wpService;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    @Override
-    public void unpublish() {
-        webUnpublishing.unpublishRestResources(singletons, classes);
+    void unpublish() {
+        wpService.unpublishRestResources(singletons, classes);
     }
 }

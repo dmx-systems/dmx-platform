@@ -5,9 +5,9 @@ import de.deepamehta.plugins.time.service.TimeService;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.event.ServiceRequestFilterListener;
+import de.deepamehta.core.service.event.ServiceResponseFilterListener;
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.webpublishing.listeners.ServiceRequestFilterListener;
-import de.deepamehta.webpublishing.listeners.ServiceResponseFilterListener;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;

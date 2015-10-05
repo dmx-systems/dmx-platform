@@ -1,4 +1,4 @@
-package de.deepamehta.webpublishing.impl;
+package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
@@ -40,7 +40,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
         try {
-            dms.fireEvent(WebPublishingEvents.SERVICE_RESPONSE_FILTER, response);
+            dms.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
             boolean includeChilds = getIncludeChilds(request);
@@ -140,19 +140,19 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     // === Firing PRE_SEND events ===
 
     private void firePreSend(Topic topic) {
-        dms.fireEvent(WebPublishingEvents.PRE_SEND_TOPIC, topic);
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic);
     }
 
     private void firePreSend(Association assoc) {
-        dms.fireEvent(WebPublishingEvents.PRE_SEND_ASSOCIATION, assoc);
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc);
     }
 
     private void firePreSend(TopicType topicType) {
-        dms.fireEvent(WebPublishingEvents.PRE_SEND_TOPIC_TYPE, topicType);
+        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType);
     }
 
     private void firePreSend(AssociationType assocType) {
-        dms.fireEvent(WebPublishingEvents.PRE_SEND_ASSOCIATION_TYPE, assocType);
+        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, assocType);
     }
 
     private void firePreSend(Directives directives) {

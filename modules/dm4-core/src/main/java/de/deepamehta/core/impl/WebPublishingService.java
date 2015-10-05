@@ -1,11 +1,7 @@
-package de.deepamehta.webpublishing.impl;
+package de.deepamehta.core.impl;
 
-import de.deepamehta.webpublishing.WebPublishingActivator;
-
+import de.deepamehta.core.osgi.CoreActivator;
 import de.deepamehta.core.service.DeepaMehtaService;
-import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
-import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
-import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -35,18 +31,12 @@ import java.util.logging.Logger;
 
 
 
-public class WebPublishingServiceImpl implements WebPublishingService, WebUnpublishing {
+class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Note: OPS4J Pax Web needs "/*". Felix HTTP Jetty in contrast needs "/".
     private static final String ROOT_APPLICATION_PATH = "/";
-
-    // Note: actually the class WebPublishingEvents does not need to be instantiated as it contains only statics.
-    // But if not instantiated OSGi apparently does not load the class at all.
-    static {
-        new WebPublishingEvents();
-    }
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -65,9 +55,9 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public WebPublishingServiceImpl(DeepaMehtaService dms) {
+    WebPublishingService(DeepaMehtaService dms) {
         try {
-            logger.info("Setting up the Web Publishing service");
+            logger.info("Setting up the WebPublishingService");
             this.dms = dms;
             //
             // create Jersey application
@@ -83,7 +73,7 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
             this.jerseyServlet = new ServletContainer(jerseyApplication);
         } catch (Exception e) {
             // unregister...();     // ### TODO?
-            throw new RuntimeException("Setting up the Web Publishing service failed", e);
+            throw new RuntimeException("Setting up the WebPublishingService failed", e);
         }
     }
 
@@ -93,21 +83,26 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     // === Static Resources ===
 
-    @Override
-    public StaticResourcesPublication publishWebResources(String uriNamespace, Bundle bundle)
-                                                                                          throws NamespaceException {
+    /**
+     * Publishes the bundle's web resources.
+     * Web resources are found in the bundle's /web directory.
+     */
+    StaticResourcesPublication publishWebResources(String uriNamespace, Bundle bundle) throws NamespaceException {
         getHttpService().registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
-        return new StaticResourcesPublicationImpl(uriNamespace, this);
+        return new StaticResourcesPublication(uriNamespace, this);
     }
 
-    @Override
-    public StaticResourcesPublication publishFileSystem(String uriNamespace, String path) throws NamespaceException {
+    /**
+     * Publishes a directory of the server's file system.
+     *
+     * @param   path    An absolute path to the directory to be published.
+     */
+    StaticResourcesPublication publishFileSystem(String uriNamespace, String path) throws NamespaceException {
         getHttpService().registerResources(uriNamespace, "/", new FileSystemHTTPContext(path));
-        return new StaticResourcesPublicationImpl(uriNamespace, this);
+        return new StaticResourcesPublication(uriNamespace, this);
     }
 
-    @Override
-    public void unpublishStaticResources(String uriNamespace) {
+    void unpublishStaticResources(String uriNamespace) {
         HttpService httpService = getHttpService();
         if (httpService != null) {
             httpService.unregister(uriNamespace);
@@ -120,9 +115,16 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     // === REST Resources ===
 
-    // Note: synchronizing prevents creation of multiple Jersey servlet instances due to parallel plugin initialization
-    @Override
-    public synchronized RestResourcesPublication publishRestResources(List<Object> singletons, List<Class<?>> classes) {
+    /**
+     * Publishes REST resources. This is done by adding JAX-RS root resource and provider classes/singletons
+     * to the Jersey application and reloading the Jersey servlet.
+     * <p>
+     * Note: synchronizing prevents creation of multiple Jersey servlet instances due to parallel plugin initialization.
+     *
+     * @param   singletons  the set of root resource and provider singletons, may be empty.
+     * @param   classes     the set of root resource and provider classes, may be empty.
+     */
+    synchronized RestResourcesPublication publishRestResources(List<Object> singletons, List<Class<?>> classes) {
         try {
             addToApplication(singletons, classes);
             //
@@ -139,15 +141,14 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
                 reloadJerseyServlet();
             }
             //
-            return new RestResourcesPublicationImpl(singletons, classes, this);
+            return new RestResourcesPublication(singletons, classes, this);
         } catch (Exception e) {
             unpublishRestResources(singletons, classes);
             throw new RuntimeException("Adding classes/singletons to Jersey application failed", e);
         }
     }
 
-    @Override
-    public synchronized void unpublishRestResources(List<Object> singletons, List<Class<?>> classes) {
+    synchronized void unpublishRestResources(List<Object> singletons, List<Class<?>> classes) {
         removeFromApplication(singletons, classes);
         //
         // Note: once all root resources are removed we must unregister the Jersey servlet.
@@ -162,26 +163,23 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     // ---
 
-    @Override
-    public boolean isRootResource(Object object) {
+    boolean isRootResource(Object object) {
         return getUriNamespace(object) != null;
     }
 
-    @Override
-    public String getUriNamespace(Object object) {
+    String getUriNamespace(Object object) {
         Path path = object.getClass().getAnnotation(Path.class);
         return path != null ? path.value() : null;
     }
 
-    @Override
-    public boolean isProviderClass(Class clazz) {
+    boolean isProviderClass(Class clazz) {
         return clazz.isAnnotationPresent(Provider.class);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private HttpService getHttpService() {
-        return WebPublishingActivator.getHttpService();
+        return CoreActivator.getHttpService();
     }
 
 
@@ -272,7 +270,7 @@ public class WebPublishingServiceImpl implements WebPublishingService, WebUnpubl
 
     private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            dms.fireEvent(WebPublishingEvents.RESOURCE_REQUEST_FILTER, request);
+            dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (Throwable e) {
             // Note: resourceRequestFilter() is called from an OSGi HTTP service static resource HttpContext.

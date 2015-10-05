@@ -15,9 +15,6 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ProvidesService;
-import de.deepamehta.core.service.webpublishing.RestResourcesPublication;
-import de.deepamehta.core.service.webpublishing.StaticResourcesPublication;
-import de.deepamehta.core.service.webpublishing.WebPublishingService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.Bundle;
@@ -69,7 +66,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // Consumed services (DeepaMehta Core and OSGi)
     private EmbeddedService dms;
-    private WebPublishingService webPublishingService;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Consumed services (injected)
@@ -145,7 +141,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     "only one directory per plugin is supported");
             }
             //
-            fileSystemResources = webPublishingService.publishFileSystem(uriNamespace, path);
+            fileSystemResources = dms.wpService.publishFileSystem(uriNamespace, path);
         } catch (Exception e) {
             throw new RuntimeException("Publishing file system \"" + path + "\" at URI namespace \"" + uriNamespace +
                 "\" failed", e);
@@ -290,7 +286,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void createCoreServiceTrackers() {
         serviceTrackers.add(createServiceTracker(DeepaMehtaService.class));
-        serviceTrackers.add(createServiceTracker(WebPublishingService.class));
         serviceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
@@ -411,10 +406,6 @@ public class PluginImpl implements Plugin, EventHandler {
         if (service instanceof DeepaMehtaService) {
             logger.info("Adding DeepaMehta 4 core service to " + this);
             setCoreService((EmbeddedService) service);
-            checkRequirementsForActivation();
-        } else if (service instanceof WebPublishingService) {
-            logger.info("Adding Web Publishing service to " + this);
-            webPublishingService = (WebPublishingService) service;
             publishWebResources();
             publishRestResources();
             checkRequirementsForActivation();
@@ -433,14 +424,11 @@ public class PluginImpl implements Plugin, EventHandler {
     private void removeService(Object service, Class serviceInterface) {
         if (service == dms) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
-            dms.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
-            setCoreService(null);
-        } else if (service == webPublishingService) {
-            logger.info("Removing Web Publishing service from " + this);
             unpublishRestResources();
             unpublishWebResources();
             unpublishFileSystem();
-            webPublishingService = null;
+            dms.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
+            setCoreService(null);
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
             eventService = null;
@@ -464,16 +452,12 @@ public class PluginImpl implements Plugin, EventHandler {
      * Checks if this plugin's requirements are met, and if so, activates this plugin.
      *
      * The requirements:
-     *   - the 3 core services are available (DeepaMehtaService, WebPublishingService, EventAdmin).
+     *   - the 2 core services are available (DeepaMehtaService, EventAdmin).
      *   - the injected services (according to the "Inject" annotation) are available.
      *   - the plugin dependencies (according to the "importModels" config property) are active.
-     *
-     * Note: The Web Publishing service is not strictly required for activation, but we must ensure
-     * ALL_PLUGINS_ACTIVE is not fired before the Web Publishing service becomes available.
      */
     private void checkRequirementsForActivation() {
-        if (dms != null && webPublishingService != null && eventService != null && injectedServicesAvailable()
-                                                                                && dependenciesAvailable()) {
+        if (dms != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
             dms.pluginManager.activatePlugin(this);
         }
     }
@@ -729,7 +713,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Web Resources ===
 
     /**
-     * Publishes this plugin's web resources (via Web Publishing service).
+     * Publishes this plugin's web resources (via WebPublishingService).
      * If the plugin doesn't provide web resources nothing is performed.
      */
     private void publishWebResources() {
@@ -742,7 +726,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Publishing web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            webResources = webPublishingService.publishWebResources(uriNamespace, pluginBundle);
+            webResources = dms.wpService.publishWebResources(uriNamespace, pluginBundle);
         } catch (Exception e) {
             throw new RuntimeException("Publishing web resources of " + this + " failed " +
                 "(URI namespace=\"" + uriNamespace + "\")", e);
@@ -784,7 +768,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === REST Resources ===
 
     /**
-     * Publishes this plugin's REST resources (via Web Publishing service).
+     * Publishes this plugin's REST resources (via WebPublishingService).
      * If the plugin doesn't provide REST resources nothing is performed.
      */
     private void publishRestResources() {
@@ -792,7 +776,7 @@ public class PluginImpl implements Plugin, EventHandler {
             // root resources
             List<Object> rootResources = getRootResources();
             if (rootResources.size() != 0) {
-                String uriNamespace = webPublishingService.getUriNamespace(pluginContext);
+                String uriNamespace = dms.wpService.getUriNamespace(pluginContext);
                 logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
             } else {
                 logger.info("Publishing REST resources of " + this + " ABORTED -- no REST resources provided");
@@ -806,7 +790,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
-                restResources = webPublishingService.publishRestResources(rootResources, providerClasses);
+                restResources = dms.wpService.publishRestResources(rootResources, providerClasses);
             }
         } catch (Exception e) {
             unpublishWebResources();
@@ -826,7 +810,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private List<Object> getRootResources() {
         List<Object> rootResources = new ArrayList();
-        if (webPublishingService.isRootResource(pluginContext)) {
+        if (dms.wpService.isRootResource(pluginContext)) {
             rootResources.add(pluginContext);
         }
         return rootResources;
@@ -838,7 +822,7 @@ public class PluginImpl implements Plugin, EventHandler {
             Class clazz = loadClass(className);
             if (clazz == null) {
                 throw new RuntimeException("Loading provider class \"" + className + "\" failed");
-            } else if (!webPublishingService.isProviderClass(clazz)) {
+            } else if (!dms.wpService.isProviderClass(clazz)) {
                 // Note: scanPackage() also returns nested classes, so we check explicitly.
                 continue;
             }

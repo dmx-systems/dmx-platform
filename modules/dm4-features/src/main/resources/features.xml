@@ -17,7 +17,6 @@
 
         <!-- DeepaMehta platform -->
         <bundle>mvn:de.deepamehta/deepamehta-core/${project.version}</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-webpublishing/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webservice/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webclient/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-workspaces/${project.version}</bundle>

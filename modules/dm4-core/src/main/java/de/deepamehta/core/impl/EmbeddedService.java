@@ -60,6 +60,7 @@ public class EmbeddedService implements DeepaMehtaService {
     TypeStorageImpl typeStorage;
     ValueStorage valueStorage;
     AccessControl accessControl;
+    WebPublishingService wpService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -78,6 +79,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
         this.accessControl = new AccessControlImpl(this);
+        this.wpService = new WebPublishingService(this);
         //
         bootstrapTypeCache();
         setupDB();
