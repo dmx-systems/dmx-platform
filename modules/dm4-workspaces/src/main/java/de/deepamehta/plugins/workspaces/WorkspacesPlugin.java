@@ -20,7 +20,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
@@ -48,7 +47,6 @@ import java.util.logging.Logger;
 @Path("/workspace")
 @Consumes("application/json")
 @Produces("application/json")
-@ProvidesService(WorkspacesService.class)
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssociationTypeListener,
                                                                                     PostCreateTopicListener,

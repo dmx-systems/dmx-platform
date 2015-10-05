@@ -14,7 +14,6 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.Bundle;
@@ -704,8 +703,15 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private String providedServiceInterface() {
-        ProvidesService a = pluginContext.getClass().getAnnotation(ProvidesService.class);
-        return a != null ? a.value().getName() : null;
+        List<Class<?>> serviceInterfaces = getInterfaces("Service");
+        switch (serviceInterfaces.size()) {
+        case 0:
+            return null;
+        case 1:
+            return serviceInterfaces.get(0).getName();
+        default:
+            throw new RuntimeException("Only one service interface per plugin is supported");
+        }
     }
 
 
@@ -913,6 +919,16 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private String pluginName() {
         return pluginContext.getPluginName();
+    }
+
+    private List<Class<?>> getInterfaces(String suffix) {
+        List<Class<?>> interfaces = new ArrayList();
+        for (Class<?> interfaze : pluginContext.getClass().getInterfaces()) {
+            if (interfaze.getName().endsWith(suffix)) {
+                interfaces.add(interfaze);
+            }
+        }
+        return interfaces;
     }
 
     // ---

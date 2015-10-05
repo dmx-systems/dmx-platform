@@ -20,7 +20,6 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
@@ -49,7 +48,6 @@ import java.util.logging.Logger;
 @Path("/geomap")
 @Consumes("application/json")
 @Produces("application/json")
-@ProvidesService(GeomapsService.class)
 public class GeomapsPlugin extends PluginActivator implements GeomapsService, PostCreateTopicListener,
                                                                               PostUpdateTopicListener,
                                                                               PreSendTopicListener {

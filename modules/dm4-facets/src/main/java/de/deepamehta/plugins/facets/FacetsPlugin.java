@@ -13,7 +13,6 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ProvidesService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
@@ -36,7 +35,6 @@ import java.util.logging.Logger;
 @Path("/facet")
 @Consumes("application/json")
 @Produces("application/json")
-@ProvidesService(FacetsService.class)
 public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
