@@ -8,12 +8,12 @@ Client-side events
 Webclient
 ---------
 
-// Plugin
+// Plugin Lifecycle
 "init"
 "init_2"
 "init_3"
 
-// Commands
+// Providing Commands
 "topic_commands"
 "association_commands"
 "canvas_commands"
@@ -42,8 +42,6 @@ Webclient
 "post_hide_association"
 
 // Toolbar
-"searchmode_widget"
-"search"
 "post_refresh_create_menu"
 
 // Page Panel

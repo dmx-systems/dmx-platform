@@ -134,15 +134,6 @@ dm4c = new function() {
 
     // ---
 
-    this.do_search = function(searchmode) {
-        dm4c.page_panel.save()
-        //
-        var search_topic = build_topic(dm4c.fire_event("search", searchmode)[0])
-        dm4c.show_topic(search_topic, "show", undefined, true)      // coordinates=undefined, do_center=true
-    }
-
-    // ---
-
     /**
      * Reveals a topic that is related to the selected topic.
      * Precondition: a topic is selected.
@@ -811,9 +802,9 @@ dm4c = new function() {
 
 
 
-    // *********************
-    // *** Plugin Helper ***
-    // *********************
+    // **********************
+    // *** Plugin Support ***
+    // **********************
 
 
 

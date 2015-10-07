@@ -1,36 +1,38 @@
 /**
- * Provides the "By Type" search mode.
+ * Provides the "By Type" searchmode.
  */
 dm4c.add_plugin("de.deepamehta.typesearch", function() {
 
+    var SEARCHMODE_URI = "dm4.typesearch.by_type"
+
     var type_menu
 
-    // === Webclient Listeners ===
+    dm4c.toolbar.add_searchmode(SEARCHMODE_URI, function() {
 
-    dm4c.add_listener("init", function() {
-        dm4c.toolbar.searchmode_menu.add_item({label: "By Type", value: "by-type"})
-    })
+        this.label = "By Type"
 
-    dm4c.add_listener("searchmode_widget", function(searchmode) {
-        if (searchmode == "by-type") {
-            // enable search button
-            dm4c.toolbar.search_button.button("enable")
-            // create type menu
-            type_menu = dm4c.ui.menu(do_search_by_type)
+        this.widget = function() {
+            dm4c.toolbar.enable_search_button(true)
+            // Note: once an element is detached from document it looses its event handlers.
+            // So we recreate the menu here.
+            type_menu = dm4c.ui.menu(dm4c.toolbar.do_search)
             refresh_type_menu()
             //
             return type_menu.dom
         }
-    })
 
-    dm4c.add_listener("search", function(searchmode) {
-        if (searchmode == "by-type") {
-            return dm4c.restc.get_topics_and_create_bucket(get_type_uri())
+        this.search = function() {
+            var type_uri = type_menu.get_selection().value
+            return dm4c.restc.get_topics_and_create_bucket(type_uri)
         }
     })
 
+
+
+    // === Webclient Listeners ===
+
     /**
-     * Once a topic type is created we refresh the type menu.
+     * Refresh the type menu once a topic type is created.
      */
     dm4c.add_listener("post_create_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
@@ -39,7 +41,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     })
 
     /**
-     * Once a topic type is updated we refresh the type menu.
+     * Refresh the type menu once a topic type is updated.
      */
     dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
@@ -48,7 +50,7 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
     })
 
     /**
-     * Once a topic type is deleted we refresh the type menu.
+     * Refresh the type menu once a topic type is deleted.
      */
     dm4c.add_listener("post_delete_topic_type", function(type_uri) {
         refresh_type_menu()
@@ -56,26 +58,10 @@ dm4c.add_plugin("de.deepamehta.typesearch", function() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    // === Event Handler ===
-
-    function do_search_by_type() {
-        dm4c.do_search("by-type")
-    }
-
-    // === Helper ===
-
     function refresh_type_menu() {
-        // Note: refreshing the type menu is only required if the "By Type" searchmode is selected
-        if (is_searchmode_selected()) {
-            dm4c.refresh_type_menu(type_menu)   // no type list specified
+        // Note: refreshing the type menu is only required if our searchmode is selected
+        if (dm4c.toolbar.get_searchmode_uri() == SEARCHMODE_URI) {
+            dm4c.refresh_type_menu(type_menu)
         }
-    }
-
-    function is_searchmode_selected() {
-        return dm4c.toolbar.searchmode_menu.get_selection().value == "by-type"
-    }
-
-    function get_type_uri() {
-        return type_menu.get_selection().value
     }
 })
