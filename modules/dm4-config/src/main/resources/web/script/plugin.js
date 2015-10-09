@@ -7,6 +7,7 @@ dm4c.add_plugin("de.deepamehta.config", function() {
     }
 
     dm4c.add_listener("topic_commands", function(topic) {
+        var sub_commands = config_commands()
         return [
             {
                 is_separator: true,
@@ -14,20 +15,26 @@ dm4c.add_plugin("de.deepamehta.config", function() {
             },
             {
                 label:   "Configure",
-                sub_commands: config_commands(),
+                sub_commands: sub_commands,
+                disabled: !sub_commands.length,
                 context: "context-menu"
             }
         ]
 
         function config_commands() {
             var commands = []
-            var config_type_uris = config_defs[topic.type_uri]
+            add_config_commands(topic.uri, commands)
+            add_config_commands(topic.type_uri, commands)
+            return commands
+        }
+
+        function add_config_commands(configurable_uri, commands) {
+            var config_type_uris = config_defs[configurable_uri]
             if (config_type_uris) {
                 for (var i = 0, config_type_uri; config_type_uri = config_type_uris[i]; i++) {
                     commands.push(config_command(config_type_uri))
                 }
             }
-            return commands
         }
 
         function config_command(config_type_uri) {

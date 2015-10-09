@@ -23,6 +23,10 @@
     overflow: auto;
 }
 
+.ui-menu .ui-state-disabled {
+    margin: 0;                  /* jQuery UI default is: top 0.4em, bottom 0.2em */
+}
+
 .ui-menu .ui-menu-divider {
     margin-top: 2px;            /* jQuery UI default is 5 pixel and leads to unequal    */
     margin-bottom: 2px;         /* top/bottom margin of first/last menu items           */

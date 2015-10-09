@@ -2,7 +2,7 @@ package de.deepamehta.plugins.config;
 
 
 
-public enum ModificationRole {
+public enum ConfigModificationRole {
     ADMIN,
     CREATOR,
     OWNER,

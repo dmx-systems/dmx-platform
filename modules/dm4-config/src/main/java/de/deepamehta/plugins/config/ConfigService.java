@@ -7,13 +7,17 @@ import de.deepamehta.plugins.config.ConfigPlugin.ConfigDefinitions;
 
 public interface ConfigService {
 
-    ConfigDefinitions getConfigDefinitions();
-
-    RelatedTopic getConfigTopic(long topicId, String configTypeUri);
-
-    // ---
-
     void registerConfigDefinition(ConfigDefinition configDef);
 
     void unregisterConfigDefinition(String configTypeUri);
+
+    // ---
+
+    RelatedTopic getConfigTopic(long topicId, String configTypeUri);
+
+    RelatedTopic getConfigTopic(String topicUri, String configTypeUri);
+
+    // ---
+
+    ConfigDefinitions getConfigDefinitions();
 }

@@ -12,7 +12,7 @@ public class TopicConfigDefinition extends ConfigDefinition {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicConfigDefinition(String topicUri, TopicModel defaultConfigTopic, ModificationRole role) {
+    public TopicConfigDefinition(String topicUri, TopicModel defaultConfigTopic, ConfigModificationRole role) {
         super(defaultConfigTopic, role);
         this.topicUri = topicUri;
     }

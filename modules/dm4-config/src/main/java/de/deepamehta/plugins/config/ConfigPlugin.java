@@ -4,6 +4,7 @@ import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
@@ -50,29 +51,6 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
 
 
 
-    @GET
-    @Override    
-    public ConfigDefinitions getConfigDefinitions() {
-        return new ConfigDefinitions();
-    }
-
-    @GET
-    @Path("/{config_type_uri}/topic/{topic_id}")
-    @Transactional
-    @Override    
-    public RelatedTopic getConfigTopic(@PathParam("topic_id") long topicId,
-                                       @PathParam("config_type_uri") String configTypeUri) {
-        RelatedTopic configTopic = _getConfigTopic(topicId, configTypeUri);
-        //
-        if (configTopic == null) {
-            configTopic = createConfigTopic(topicId, configTypeUri);
-        }
-        //
-        return configTopic;
-    }
-
-    // ---
-
     @Override
     public void registerConfigDefinition(ConfigDefinition configDef) {
         try {
@@ -105,16 +83,51 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
         }
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
-    private RelatedTopic _getConfigTopic(long topicId, String configTypeUri) {
-        return dms.getTopic(topicId).getRelatedTopic(ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE,
-            ROLE_TYPE_DEFAULT, configTypeUri);
+    @GET
+    @Path("/{config_type_uri}/topic/{topic_id}")
+    @Transactional
+    @Override    
+    public RelatedTopic getConfigTopic(@PathParam("topic_id") long topicId,
+                                       @PathParam("config_type_uri") String configTypeUri) {
+        return getConfigTopic(dms.getTopic(topicId), configTypeUri);
     }
 
-    private RelatedTopic createConfigTopic(final long topicId, final String configTypeUri) {
+    @Transactional
+    @Override    
+    public RelatedTopic getConfigTopic(String topicUri, String configTypeUri) {
+        return getConfigTopic(dms.getTopic("uri", new SimpleValue(topicUri)), configTypeUri);
+    }
+
+    // ---
+
+    @GET
+    @Override    
+    public ConfigDefinitions getConfigDefinitions() {
+        return new ConfigDefinitions();
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private RelatedTopic getConfigTopic(Topic topic, String configTypeUri) {
+        RelatedTopic configTopic = _getConfigTopic(topic, configTypeUri);
+        //
+        if (configTopic == null) {
+            configTopic = createConfigTopic(topic, configTypeUri);
+        }
+        //
+        return configTopic;
+    }
+
+    private RelatedTopic _getConfigTopic(Topic topic, String configTypeUri) {
+        return topic.getRelatedTopic(ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT,
+            configTypeUri);
+    }
+
+    private RelatedTopic createConfigTopic(final Topic topic, final String configTypeUri) {
         try {
-            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topicId);
+            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             // We suppress standard workspace assignment here as a config topic requires a special assignment.
             // See assignConfigTopicToWorkspace() below.
             return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
@@ -123,21 +136,20 @@ public class ConfigPlugin extends PluginActivator implements ConfigService {
                     ConfigDefinition configDef = getConfigDefinitionOrThrow(configTypeUri);
                     Topic configTopic = dms.createTopic(configDef.getDefaultConfigTopic());
                     dms.createAssociation(new AssociationModel(ASSOC_TYPE_CONFIGURATION,
-                        new TopicRoleModel(topicId, ROLE_TYPE_CONFIGURABLE),
+                        new TopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
                         new TopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
+                    assignConfigTopicToWorkspace(configTopic, configDef.getConfigModificationRole());
                     // ### TODO: extend Core API to avoid re-retrieval
-                    assignConfigTopicToWorkspace(configTopic, configDef.getModificationRole());
-                    //
-                    return _getConfigTopic(topicId, configTypeUri);
+                    return _getConfigTopic(topic, configTypeUri);
                 }
             });
         } catch (Exception e) {
-            throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " + topicId +
-                " failed", e);
+            throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " +
+                topic.getId() + " failed", e);
         }
     }
 
-    private void assignConfigTopicToWorkspace(Topic configTopic, ModificationRole role) {
+    private void assignConfigTopicToWorkspace(Topic configTopic, ConfigModificationRole role) {
         long workspaceId;
         AccessControl ac = dms.getAccessControl();
         switch (role) {

@@ -9,11 +9,11 @@ public abstract class ConfigDefinition {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicModel defaultConfigTopic;
-    private ModificationRole role;
+    private ConfigModificationRole role;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ConfigDefinition(TopicModel defaultConfigTopic, ModificationRole role) {
+    ConfigDefinition(TopicModel defaultConfigTopic, ConfigModificationRole role) {
         this.defaultConfigTopic = defaultConfigTopic;
         this.role = role;
     }
@@ -30,7 +30,7 @@ public abstract class ConfigDefinition {
         return defaultConfigTopic;
     }
 
-    ModificationRole getModificationRole() {
+    ConfigModificationRole getConfigModificationRole() {
         return role;
     }
 }
