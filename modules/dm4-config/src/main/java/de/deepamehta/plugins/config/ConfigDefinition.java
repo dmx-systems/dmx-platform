@@ -18,6 +18,18 @@ public abstract class ConfigDefinition {
         this.role = role;
     }
 
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    @Override
+    public boolean equals(Object o) {
+        return getConfigTypeUri().equals(((ConfigDefinition) o).getConfigTypeUri());
+    }
+
+    @Override
+    public int hashCode() {
+        return getConfigTypeUri().hashCode();
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract String getConfigurableUri();

@@ -114,7 +114,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
     private long diskQuota(String username) {
         Topic usernameTopic = CoreActivator.getDeepaMehtaService().getAccessControl().getUsernameTopic(username);
         ConfigService cs = CoreActivator.getService(ConfigService.class);
-        Topic configTopic = cs.getConfigTopic(usernameTopic.getId(), "dm4.files.disk_quota");
+        Topic configTopic = cs.getConfigTopic("dm4.files.disk_quota", usernameTopic.getId());
         return 1024 * 1024 * configTopic.getSimpleValue().intValue();
     }
 }

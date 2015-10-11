@@ -602,7 +602,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private void invokeShutdownHook() {
         try {
             pluginContext.shutdown();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // Note: we don't throw here. Stopping the plugin must proceed.
             logger.log(Level.SEVERE, "An error occurred in the shutdown() hook of " + this + ":", e);
         }

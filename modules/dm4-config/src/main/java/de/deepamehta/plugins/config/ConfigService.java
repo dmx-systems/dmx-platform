@@ -1,21 +1,27 @@
 package de.deepamehta.plugins.config;
 
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.plugins.config.ConfigPlugin.ConfigDefinitions;
+import de.deepamehta.core.Topic;
 
 
 
 public interface ConfigService {
 
-    void registerConfigDefinition(ConfigDefinition configDef);
+    RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
-    void unregisterConfigDefinition(String configTypeUri);
+    RelatedTopic getConfigTopic(String configTypeUri, String topicUri);
+
+    RelatedTopic getConfigTopic(String configTypeUri, Topic topic);
 
     // ---
 
-    RelatedTopic getConfigTopic(long topicId, String configTypeUri);
+    void createConfigTopic(String configTypeUri, Topic topic);
 
-    RelatedTopic getConfigTopic(String topicUri, String configTypeUri);
+    // ---
+
+    void registerConfigDefinition(ConfigDefinition configDef);
+
+    void unregisterConfigDefinition(String configTypeUri);
 
     // ---
 

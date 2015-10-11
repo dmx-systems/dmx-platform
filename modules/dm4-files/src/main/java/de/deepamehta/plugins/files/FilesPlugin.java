@@ -79,8 +79,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // Note: this instance variable is not used but we must declare it in order to initiate service tracking.
-    // The Config service is accessed only on-the-fly within the serviceArrived() and serviceGone() hooks.
     @Inject
     private ConfigService configService;
 
@@ -393,11 +391,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void init() {
         publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
-    }
-
-    @Override
-    public void serviceArrived(Object service) {
-        ((ConfigService) service).registerConfigDefinition(new TypeConfigDefinition(
+        //
+        configService.registerConfigDefinition(new TypeConfigDefinition(
             "dm4.accesscontrol.username",
             new TopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN
@@ -405,12 +400,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     }
 
     @Override
-    public void serviceGone(Object service) {
-        // Note 1: unregistering is crucial e.g. for redeploying the Files plugin. The next register call (at plugin
-        // start time) would fail as the Config service holds a registration for that config type URI already.
-        // Note 2: we must unregister via serviceGone() hook, that is immediately when the Config service is about
-        // to go away. Using the shutdown() hook instead would be too late as the Config service might already gone.
-        ((ConfigService) service).unregisterConfigDefinition("dm4.files.disk_quota");
+    public void shutdown() {
+        // Note 1: unregistering is crucial e.g. for redeploying the Files plugin. The next register call
+        // (at init() time) would fail as the Config service already holds such a registration.
+        // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
+        // Files plugin is stopped/started as well but at shutdown() time the Config service is already gone.
+        if (configService != null) {
+            configService.unregisterConfigDefinition("dm4.files.disk_quota");
+        } else {
+            logger.warning("Config service is already gone");
+        }
     }
 
 
