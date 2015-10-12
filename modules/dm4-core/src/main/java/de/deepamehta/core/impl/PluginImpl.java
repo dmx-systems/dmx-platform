@@ -478,8 +478,10 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             logger.info("----- Activating " + this + " -----");
             //
-            installPluginInDB();
+            // Note: the init() hook must be triggered *before* the plugin is installed in the database.
+            // Consider the Config plugin: config defs must be registered before migrations can create config topics.
             invokeInitHook();
+            installPluginInDB();
             registerListeners();
             registerProvidedService();
             // Note: the event listeners must be registered *after* the plugin is installed in the database (see
