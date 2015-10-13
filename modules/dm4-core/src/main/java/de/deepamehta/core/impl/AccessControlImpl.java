@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -27,8 +28,13 @@ class AccessControlImpl implements AccessControl {
     // Type URIs
     // ### TODO: move to dm4.core namespace?
     // ### TODO: copy in AccessControlPlugin.java
-    private static final String TYPE_MEMBERSHIP = "dm4.accesscontrol.membership";
-    private static final String TYPE_USERNAME   = "dm4.accesscontrol.username";
+    private static final String TYPE_MEMBERSHIP    = "dm4.accesscontrol.membership";
+    private static final String TYPE_USERNAME      = "dm4.accesscontrol.username";
+    private static String TOPIC_TYPE_LOGIN_ENABLED = "dm4.accesscontrol.login_enabled";
+    // ### TODO: copy in ConfigPlugin.java
+    private static String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
+    private static String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
+    private static String ROLE_TYPE_DEFAULT = "dm4.core.default";
 
     // Property URIs
     // ### TODO: move to dm4.core namespace?
@@ -68,18 +74,31 @@ class AccessControlImpl implements AccessControl {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public boolean checkCredentials(Credentials cred) {
-        TopicModel usernameTopic = null;
+    public Topic checkCredentials(Credentials cred) {
+        Topic usernameTopic = null;
         try {
-            usernameTopic = _getUsernameTopic(cred.username);
+            usernameTopic = getUsernameTopic(cred.username);
             if (usernameTopic == null) {
-                return false;
+                return null;
             }
-            return matches(usernameTopic, cred.password);
+            return matches(usernameTopic, cred.password) ? usernameTopic : null;
         } catch (Exception e) {
             throw new RuntimeException("Checking credentials for user \"" + cred.username +
                 "\" failed (usernameTopic=" + usernameTopic + ")", e);
         }
+    }
+
+    @Override
+    public boolean getLoginEnabled(Topic usernameTopic) {
+        // Note: "Login enabled" is checked by <anonymous> and this config topic belongs to System.
+        // So direct storage access is required here.
+        RelatedTopicModel loginEnabled = dms.storageDecorator.fetchTopicRelatedTopic(usernameTopic.getId(),
+            ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, TOPIC_TYPE_LOGIN_ENABLED);
+        if (loginEnabled == null) {
+            throw new RuntimeException("The \"Login enabled\" configuration topic of user \"" +
+                usernameTopic.getSimpleValue() + "\" is missing");
+        }
+        return loginEnabled.getSimpleValue().booleanValue();
     }
 
     @Override
@@ -174,13 +193,17 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        // 1) create assignment association
-        dms.associationFactory(new AssociationModel("dm4.core.aggregation",
-            object.getModel().createRoleModel("dm4.core.parent"),
-            new TopicRoleModel(workspaceId, "dm4.core.child")
-        ));
-        // 2) store assignment property
-        object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+        try {
+            // 1) create assignment association
+            dms.associationFactory(new AssociationModel("dm4.core.aggregation",
+                object.getModel().createRoleModel("dm4.core.parent"),
+                new TopicRoleModel(workspaceId, "dm4.core.child")
+            ));
+            // 2) store assignment property
+            object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
+        }
     }
 
     // ---
@@ -245,6 +268,8 @@ class AccessControlImpl implements AccessControl {
         return username;
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     /**
@@ -252,14 +277,14 @@ class AccessControlImpl implements AccessControl {
      *
      * @param   password    The encoded password.
      */
-    private boolean matches(TopicModel usernameTopic, String password) {
+    private boolean matches(Topic usernameTopic, String password) {
         return getPassword(getUserAccount(usernameTopic)).equals(password);
     }
 
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      */
-    private TopicModel getUserAccount(TopicModel usernameTopic) {
+    private TopicModel getUserAccount(Topic usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
         RelatedTopicModel userAccount = dms.storageDecorator.fetchTopicRelatedTopic(usernameTopic.getId(),

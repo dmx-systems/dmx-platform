@@ -15,8 +15,10 @@ import de.deepamehta.core.service.accesscontrol.Credentials;
  * Note: when UPDATEing to 4.5 the "admin" user account already exists.
  * It was created via postInstall() hook (which is obsolete in 4.5)
  * <p>
- * Part of DM 4.5
- * Moved from migration 4 to migration 10 as of DM 4.7
+ * Part of DM 4.7
+ * <p>
+ * Moved from migration 4 to migration 10 as the "Login enabled" config
+ * topic type (created in migration 9) must exist already.
  */
 public class Migration10 extends Migration {
 

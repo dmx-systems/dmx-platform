@@ -2,6 +2,10 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
+import de.deepamehta.plugins.config.ConfigDefinition;
+import de.deepamehta.plugins.config.ConfigModificationRole;
+import de.deepamehta.plugins.config.ConfigService;
+import de.deepamehta.plugins.config.ConfigTarget;
 import de.deepamehta.plugins.files.FilesService;
 import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
 import de.deepamehta.plugins.workspaces.WorkspacesService;
@@ -92,12 +96,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final boolean WRITE_REQUIRES_LOGIN = Boolean.parseBoolean(
         System.getProperty("dm4.security.write_requires_login", "true"));
     private static final String SUBNET_FILTER = System.getProperty("dm4.security.subnet_filter", "127.0.0.1/32");
+    private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.security.new_accounts_are_enabled", "true"));
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in global POM.
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
-    // Associations
+    // Type URIs
+    private static final String LOGIN_ENABLED_TYPE = "dm4.accesscontrol.login_enabled";
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
 
     // Property URIs
@@ -131,10 +138,20 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Inject
     private FilesService filesService;
 
+    @Inject
+    private ConfigService configService;
+
     @Context
     private HttpServletRequest request;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
+
+    static {
+        logger.info("Security settings:" +
+            "\n  dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
+            "\n  dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
+            "\n  dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"");
+    }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -386,10 +403,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void init() {
-        logger.info("Security settings:" +
-            "\ndm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
-            "\ndm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
-            "\ndm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"");
+        configService.registerConfigDefinition(new ConfigDefinition(
+            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
+            new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
+            ConfigModificationRole.ADMIN
+        ));
+    }
+
+    @Override
+    public void shutdown() {
+        // Note 1: unregistering is crucial e.g. for redeploying the Access Control plugin. The next register call
+        // (at init() time) would fail as the Config service already holds such a registration.
+        // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
+        // Access Control plugin is stopped/started as well but at shutdown() time the Config service is already gone.
+        if (configService != null) {
+            configService.unregisterConfigDefinition(LOGIN_ENABLED_TYPE);
+        } else {
+            logger.warning("Config service is already gone");
+        }
     }
 
 
@@ -615,13 +646,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     /**
-     * Checks weather the credentials are valid and if so logs the user in.
+     * Checks weather the credentials are valid and if the user account is enabled, and if both checks are positive
+     * logs the user in.
      *
-     * @return  true if the credentials are valid.
+     * @return  true if the user has logged in.
      */
     private boolean tryLogin(Credentials cred, HttpServletRequest request) {
         String username = cred.username;
-        if (checkCredentials(cred)) {
+        Topic usernameTopic = checkCredentials(cred);
+        if (usernameTopic != null && getLoginEnabled(usernameTopic)) {
             logger.info("##### Logging in as \"" + username + "\" => SUCCESSFUL!");
             _login(username, request);
             return true;
@@ -631,8 +664,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private boolean checkCredentials(Credentials cred) {
+    private Topic checkCredentials(Credentials cred) {
         return dms.getAccessControl().checkCredentials(cred);
+    }
+
+    private boolean getLoginEnabled(Topic usernameTopic) {
+        return dms.getAccessControl().getLoginEnabled(usernameTopic);
     }
 
     // ---

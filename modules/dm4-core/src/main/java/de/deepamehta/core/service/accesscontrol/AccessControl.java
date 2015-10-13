@@ -1,6 +1,7 @@
 package de.deepamehta.core.service.accesscontrol;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +13,21 @@ import java.util.concurrent.Callable;
 
 public interface AccessControl {
 
-    boolean checkCredentials(Credentials cred);
+    /**
+     * Checks if the given credentials are valid.
+     *
+     * @return  the corresponding Username topic if the credentials are valid, or <code>null</code> otherwise.
+     */
+    Topic checkCredentials(Credentials cred);
+
+    /**
+     * Returns the "Login enabled" configuration for the given user account.
+     *
+     * @param   usernameTopic   the username whose account to be checked.
+     *
+     * @return  <code>true</code> if the user account is enabled, <code>false</code> otherwise.
+     */
+    boolean getLoginEnabled(Topic usernameTopic);
 
     /**
      * Checks if a user is permitted to perform an operation on an object (topic or association).

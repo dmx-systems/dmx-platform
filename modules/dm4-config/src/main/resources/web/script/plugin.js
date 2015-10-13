@@ -23,8 +23,8 @@ dm4c.add_plugin("de.deepamehta.config", function() {
 
         function config_commands() {
             var commands = []
-            add_config_commands(topic.uri, commands)
-            add_config_commands(topic.type_uri, commands)
+            add_config_commands("topic_uri:" + topic.uri,      commands)
+            add_config_commands("type_uri:"  + topic.type_uri, commands)
             return commands
         }
 

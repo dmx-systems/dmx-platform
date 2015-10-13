@@ -1,0 +1,12 @@
+# Part of DM 4.7
+# Runs ALWAYS
+
+{
+    "topic_types": [
+        {
+            "value": "Login enabled",
+            "uri": "dm4.accesscontrol.login_enabled",
+            "data_type_uri": "dm4.core.boolean"
+        }
+    ]
+}
