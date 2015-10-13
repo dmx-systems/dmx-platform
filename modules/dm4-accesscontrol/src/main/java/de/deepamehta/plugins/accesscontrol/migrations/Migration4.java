@@ -1,10 +1,6 @@
 package de.deepamehta.plugins.accesscontrol.migrations;
 
-import de.deepamehta.plugins.accesscontrol.AccessControlService;
-
-import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.accesscontrol.Credentials;
 
 
 
@@ -19,18 +15,9 @@ import de.deepamehta.core.service.accesscontrol.Credentials;
  */
 public class Migration4 extends Migration {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    @Inject
-    private AccessControlService acService;
-
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
     @Override
     public void run() {
-        acService.createUserAccount(new Credentials(
-            AccessControlService.ADMIN_USERNAME,
-            AccessControlService.ADMIN_DEFAULT_PASSWORD
-        ));
+        // content moved to Migration10.java as the "Login enabled" config topic type (created
+        // in migration 9 as of DM 4.7) must exist already
     }
 }

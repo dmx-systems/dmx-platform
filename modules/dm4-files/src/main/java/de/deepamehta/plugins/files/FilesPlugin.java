@@ -1,9 +1,10 @@
 package de.deepamehta.plugins.files;
 
 import de.deepamehta.plugins.files.event.CheckDiskQuotaListener;
+import de.deepamehta.plugins.config.ConfigDefinition;
 import de.deepamehta.plugins.config.ConfigModificationRole;
 import de.deepamehta.plugins.config.ConfigService;
-import de.deepamehta.plugins.config.TypeConfigDefinition;
+import de.deepamehta.plugins.config.ConfigTarget;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
@@ -392,8 +393,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     public void init() {
         publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
         //
-        configService.registerConfigDefinition(new TypeConfigDefinition(
-            "dm4.accesscontrol.username",
+        configService.registerConfigDefinition(new ConfigDefinition(
+            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
             new TopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN
         ));
