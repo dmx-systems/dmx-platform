@@ -390,14 +390,17 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
     @Override
-    public void init() {
-        publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
-        //
+    public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
             new TopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN
         ));
+    }
+
+    @Override
+    public void init() {
+        publishFileSystem(FILE_REPOSITORY_URI, FILE_REPOSITORY_PATH);
     }
 
     @Override

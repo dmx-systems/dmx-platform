@@ -86,6 +86,10 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
 
     @Override
+    public void preInstall() {
+    }
+
+    @Override
     public void init() {
     }
 

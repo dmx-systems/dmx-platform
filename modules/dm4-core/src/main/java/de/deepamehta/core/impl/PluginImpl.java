@@ -469,21 +469,21 @@ public class PluginImpl implements Plugin, EventHandler {
      * Activates this plugin and then posts the PLUGIN_ACTIVATED OSGi event.
      *
      * Activation comprises:
+     *   - invoke the plugin's preInstall() hook
      *   - install the plugin in the database (includes plugin topic, migrations, type introduction)
-     *   - invoke the plugin's init() hook
      *   - register the plugin's event listeners
      *   - register the plugin's OSGi service
+     *   - invoke the plugin's init() hook
      */
     void activate() {
         try {
             logger.info("----- Activating " + this + " -----");
             //
-            // Note: the init() hook must be triggered *before* the plugin is installed in the database.
-            // Consider the Config plugin: config defs must be registered before migrations can create config topics.
-            invokeInitHook();
+            invokePreInstallHook();
             installPluginInDB();
             registerListeners();
             registerProvidedService();
+            invokeInitHook();
             // Note: the event listeners must be registered *after* the plugin is installed in the database (see
             // installPluginInDB() below).
             // Consider the Access Control plugin: it can't set a topic's creator before the "admin" user is created.
@@ -596,6 +596,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
 
     // === Life Cycle ===
+
+    private void invokePreInstallHook() {
+        pluginContext.preInstall();
+    }
 
     private void invokeInitHook() {
         pluginContext.init();

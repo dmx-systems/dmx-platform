@@ -10,6 +10,8 @@ public interface PluginContext {
 
     // --- Hooks to be overridden by the plugin developer ---
 
+    void preInstall();
+
     void init();
 
     void shutdown();

@@ -402,7 +402,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
-    public void init() {
+    public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
             new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
