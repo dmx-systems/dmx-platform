@@ -4,16 +4,21 @@ import de.deepamehta.core.model.TopicModel;
 
 
 
-public abstract class ConfigDefinition {
+public class ConfigDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private ConfigTarget target;
+    private String configurableUri;
     private TopicModel defaultConfigTopic;
     private ConfigModificationRole role;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ConfigDefinition(TopicModel defaultConfigTopic, ConfigModificationRole role) {
+    public ConfigDefinition(ConfigTarget target, String configurableUri, TopicModel defaultConfigTopic,
+                                                                         ConfigModificationRole role) {
+        this.target = target;
+        this.configurableUri = configurableUri;
         this.defaultConfigTopic = defaultConfigTopic;
         this.role = role;
     }
@@ -32,7 +37,9 @@ public abstract class ConfigDefinition {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract String getConfigurableUri();
+    String getHashKey() {
+        return target.hashKey(configurableUri);
+    }
 
     String getConfigTypeUri() {
         return defaultConfigTopic.getTypeUri();

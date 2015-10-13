@@ -37,7 +37,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Key: configurableUri, that is either a topic URI or a type URI.
+     * Key: the "configurable URI" as a config target's hash key, that is either "topic_uri:{uri}" or "type_uri:{uri}".
      */
     private Map<String, List<ConfigDefinition>> registry = new HashMap();
 
@@ -72,9 +72,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             RelatedTopic configTopic = _getConfigTopic(configTypeUri, topic);
             //
             if (configTopic == null) {
-                throw new RuntimeException("For topic " + topic.getId() + " (value=\"" +
-                    topic.getSimpleValue() + "\", typeUri=\"" + topic.getTypeUri() + "\", uri=\"" +
-                    topic.getUri() + "\") that configuration topic is missing");
+                throw new RuntimeException("For " + info(topic) + " that configuration topic is missing");
             }
             //
             return configTopic;
@@ -88,8 +86,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @Override
     public void createConfigTopic(String configTypeUri, Topic topic) {
-        ConfigDefinition configDef = getApplicableConfigDefinition(topic, configTypeUri);
-        createConfigTopic(topic, configDef);
+        createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic);
     }
 
     // ---
@@ -102,11 +99,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                     "\" is already registered");
             }
             //
-            String configurableUri = configDef.getConfigurableUri();
-            List<ConfigDefinition> configDefs = lookupConfigDefinitions(configurableUri);
+            String hashKey = configDef.getHashKey();
+            List<ConfigDefinition> configDefs = lookupConfigDefinitions(hashKey);
             if (configDefs == null) {
                 configDefs = new ArrayList();
-                registry.put(configurableUri, configDefs);
+                registry.put(hashKey, configDefs);
             }
             configDefs.add(configDef);
         } catch (Exception e) {
@@ -120,14 +117,13 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             for (List<ConfigDefinition> configDefs : registry.values()) {
                 ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
                 if (configDef != null) {
-                    boolean removed = configDefs.remove(configDef);
-                    if (!removed) {
+                    if (!configDefs.remove(configDef)) {
                         throw new RuntimeException("Configuration definition could not be removed from registry");
                     }
                     return;
                 }
             }
-            throw new RuntimeException("Definition for configuration type \"" + configTypeUri + "\" not registered");
+            throw new RuntimeException("No such configuration definition registered");
         } catch (Exception e) {
             throw new RuntimeException("Unregistering definition for configuration type \"" + configTypeUri +
                 "\" failed", e);
@@ -152,11 +148,8 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @Override
     public void postCreateTopic(Topic topic) {
-        List<ConfigDefinition> configDefs = getApplicableConfigDefinitions(topic);
-        if (configDefs != null) {
-            for (ConfigDefinition configDef : configDefs) {
-                createConfigTopic(topic, configDef);
-            }
+        for (ConfigDefinition configDef : getApplicableConfigDefinitions(topic)) {
+            createConfigTopic(configDef, topic);
         }
     }
 
@@ -165,12 +158,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private RelatedTopic _getConfigTopic(String configTypeUri, Topic topic) {
-        /* ### return dms.getAccessControl().getConfigTopic(configTypeUri, topic); */
         return topic.getRelatedTopic(ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT,
             configTypeUri);
     }
 
-    private RelatedTopic createConfigTopic(final Topic topic, final ConfigDefinition configDef) {
+    private RelatedTopic createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
         final String configTypeUri = configDef.getConfigTypeUri();
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
@@ -211,36 +203,41 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     /**
      * Returns all configuration definitions applicable to a given topic.
+     *
+     * @return  a list of configuration definitions, possibly empty.
      */
     private List<ConfigDefinition> getApplicableConfigDefinitions(Topic topic) {
-        List<ConfigDefinition> configDefs1 = lookupConfigDefinitions(topic.getUri());
-        List<ConfigDefinition> configDefs2 = lookupConfigDefinitions(topic.getTypeUri());
+        List<ConfigDefinition> configDefs1 = lookupConfigDefinitions(ConfigTarget.SINGLETON.hashKey(topic));
+        List<ConfigDefinition> configDefs2 = lookupConfigDefinitions(ConfigTarget.TYPE_INSTANCES.hashKey(topic));
         if (configDefs1 != null && configDefs2 != null) {
             List<ConfigDefinition> configDefs = new ArrayList();
             configDefs.addAll(configDefs1);
             configDefs.addAll(configDefs2);
             return configDefs;
         }
-        return configDefs1 != null ? configDefs1 : configDefs2 != null ? configDefs2 : null;
+        return configDefs1 != null ? configDefs1 : configDefs2 != null ? configDefs2 : new ArrayList();
     }
 
     /**
-     * Returns the configuration definition for the given config type that is applicable to a given topic.
+     * Returns the configuration definition for the given config type that is applicable to the given topic.
+     *
+     * @throws RuntimeException     if no such configuration definition is registered.
      */
     private ConfigDefinition getApplicableConfigDefinition(Topic topic, String configTypeUri) {
         List<ConfigDefinition> configDefs = getApplicableConfigDefinitions(topic);
-        if (configDefs == null) {
-            throw new RuntimeException("None of the registered configuration definitions are applicable to topic " +
-                topic.getId() + " (typeUri=\"" + topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")");
+        if (configDefs.size() == 0) {
+            throw new RuntimeException("None of the registered configuration definitions are applicable to " +
+                info(topic));
         }
         ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
         if (configDef == null) {
-            throw new RuntimeException("For topic " + topic.getId() + " (typeUri=\"" + topic.getTypeUri() +
-                "\", uri=\"" + topic.getUri() + "\") no configuration definition for type \"" + configTypeUri +
-                "\" registered");
+            throw new RuntimeException("For " + info(topic) + " no configuration definition for type \"" +
+                configTypeUri + "\" registered");
         }
         return configDef;
     }
+
+    // ---
 
     private boolean isRegistered(ConfigDefinition configDef) {
         for (List<ConfigDefinition> configDefs : registry.values()) {
@@ -260,7 +257,14 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return null;
     }
 
-    private List<ConfigDefinition> lookupConfigDefinitions(String configurableUri) {
-        return registry.get(configurableUri);
+    private List<ConfigDefinition> lookupConfigDefinitions(String hashKey) {
+        return registry.get(hashKey);
+    }
+
+    // ---
+
+    private String info(Topic topic) {
+        return "topic " + topic.getId() + " (value=\"" + topic.getSimpleValue() + "\", typeUri=\"" +
+            topic.getTypeUri() + "\", uri=\"" + topic.getUri() + "\")";
     }
 }
