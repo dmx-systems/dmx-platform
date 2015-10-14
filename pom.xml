@@ -77,7 +77,10 @@
         <org.ops4j.pax.web.ssl.password></org.ops4j.pax.web.ssl.password>
         <org.ops4j.pax.web.ssl.keypassword></org.ops4j.pax.web.ssl.keypassword>
 
-        <!-- Request Filter -->
+        <!-- Webservice -->
+        <dm4.webservice.path>/</dm4.webservice.path>
+
+        <!-- Security -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>

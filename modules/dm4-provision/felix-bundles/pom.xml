@@ -53,7 +53,8 @@
         <!--dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>
-            <version>3.1.2</version>
+            <version>3.2.6</version>
         </dependency-->
+        <!-- Note: when replacing Felix HTTP with Pax Web you must set dm4.webservice.path=/* -->
     </dependencies>
 </project>
