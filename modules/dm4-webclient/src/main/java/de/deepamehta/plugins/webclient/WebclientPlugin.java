@@ -333,7 +333,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === Webclient Start ===
 
     private String getWebclientUrl() {
-        boolean isHttpsEnabled = Boolean.getBoolean("org.osgi.service.http.secure.enabled");
+        boolean isHttpsEnabled = Boolean.getBoolean("org.apache.felix.https.enable");
         String protocol, port;
         if (isHttpsEnabled) {
             // Note: if both protocols are enabled HTTPS takes precedence

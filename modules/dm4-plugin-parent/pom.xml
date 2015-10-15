@@ -22,17 +22,22 @@
 
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
-        <org.osgi.service.http.port.secure>4433</org.osgi.service.http.port.secure>
-        <!-- ### TODO: adapt to Pax Web (see global pom.xml) -->
         <org.apache.felix.http.enable>true</org.apache.felix.http.enable>
+        <org.apache.felix.http.session.timeout>0</org.apache.felix.http.session.timeout>
+        <!-- HTTPS -->
+        <org.osgi.service.http.port.secure>8443</org.osgi.service.http.port.secure>
         <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
 
-        <!-- Request Filter -->
+        <!-- Webservice -->
+        <dm4.webservice.path>/</dm4.webservice.path>
+
+        <!-- Security -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
+        <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
 
         <!-- Host -->
         <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
@@ -42,6 +47,8 @@
 
         <!-- File Repository -->
         <dm4.filerepo.path>/</dm4.filerepo.path>
+        <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
+        <dm4.filerepo.disk_quota>150</dm4.filerepo.disk_quota>
 
         <!-- a plugin should provide a logging configuration -->
         <java.util.logging.config.file>
@@ -49,6 +56,7 @@
         </java.util.logging.config.file>
         <felix.log.level>1</felix.log.level>
 
+        <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
