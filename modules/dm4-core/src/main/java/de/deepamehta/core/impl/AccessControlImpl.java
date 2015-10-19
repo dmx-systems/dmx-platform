@@ -16,6 +16,7 @@ import de.deepamehta.core.service.accesscontrol.SharingMode;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -31,6 +32,8 @@ class AccessControlImpl implements AccessControl {
     private static final String TYPE_MEMBERSHIP    = "dm4.accesscontrol.membership";
     private static final String TYPE_USERNAME      = "dm4.accesscontrol.username";
     private static String TOPIC_TYPE_LOGIN_ENABLED = "dm4.accesscontrol.login_enabled";
+    //
+    private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
     private static String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
     private static String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
@@ -161,7 +164,7 @@ class AccessControlImpl implements AccessControl {
         if (systemWorkspaceId == -1) {
             // Note: fetching the System workspace topic though the Core service would involve a permission check
             // and run in a vicious circle. So direct storage access is required here.
-            TopicModel workspace = dms.storageDecorator.fetchTopic("uri", new SimpleValue(SYSTEM_WORKSPACE_URI));
+            TopicModel workspace = fetchTopic("uri", SYSTEM_WORKSPACE_URI);
             // Note: the Access Control plugin creates the System workspace before it performs its first permission
             // check.
             if (workspace == null) {
@@ -266,6 +269,15 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
         }
         return username;
+    }
+
+
+
+    // === Email Addresses ===
+
+    @Override
+    public boolean emailAddressExists(String emailAddress) {
+        return !queryTopics(TYPE_EMAIL_ADDRESS, emailAddress).isEmpty();
     }
 
 
@@ -428,7 +440,7 @@ class AccessControlImpl implements AccessControl {
     private TopicModel _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
-        return dms.storageDecorator.fetchTopic(TYPE_USERNAME, new SimpleValue(username));
+        return fetchTopic(TYPE_USERNAME, username);
     }
 
     private TopicModel getUsernameTopicOrThrow(String username) {
@@ -437,6 +449,31 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
+    }
+
+    // ---
+
+    /**
+     * Fetches a topic by key/value via direct storage access.
+     * <p>
+     * IMPORTANT: only applicable to values indexed with <code>dm4.core.key</code>.
+     *
+     * @return  the topic, or <code>null</code> if no such topic exists.
+     */
+    private TopicModel fetchTopic(String key, Object value) {
+        return dms.storageDecorator.fetchTopic(key, new SimpleValue(value));
+    }
+
+    /**
+     * Queries topics by key/value via direct storage access.
+     * <p>
+     * IMPORTANT: only applicable to values indexed with <code>dm4.core.fulltext</code> or
+     * <code>dm4.core.fulltext_key</code>.
+     *
+     * @return  a list, possibly empty.
+     */
+    private List<TopicModel> queryTopics(String key, Object value) {
+        return dms.storageDecorator.queryTopics(key, new SimpleValue(value));
     }
 
 

@@ -71,8 +71,8 @@ public class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    List<TopicModel> queryTopics(String searchTerm, String fieldUri) {
-        return storage.queryTopics(fieldUri, searchTerm);
+    List<TopicModel> queryTopics(String key, SimpleValue value) {
+        return storage.queryTopics(key, value.value());
     }
 
     // ---

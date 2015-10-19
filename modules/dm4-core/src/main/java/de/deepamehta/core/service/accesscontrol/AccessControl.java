@@ -121,4 +121,16 @@ public interface AccessControl {
     String getUsername(HttpServletRequest request);
 
     String username(HttpSession session);
+
+
+
+    // === Email Addresses ===
+
+    /**
+     * Returns true if an "Email Address" (dm4.contacts.email_address) topic with the given value exists,
+     * false otherwise.
+     * <p>
+     * This is a privileged method, it runs as "System".
+     */
+    boolean emailAddressExists(String emailAddress);
 }

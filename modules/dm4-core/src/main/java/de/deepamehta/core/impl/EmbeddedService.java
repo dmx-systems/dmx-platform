@@ -138,7 +138,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return instantiateTopics(storageDecorator.queryTopics(searchTerm, fieldUri));
+            return instantiateTopics(storageDecorator.queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\")", e);
