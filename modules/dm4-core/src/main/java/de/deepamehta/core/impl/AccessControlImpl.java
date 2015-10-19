@@ -78,13 +78,16 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic checkCredentials(Credentials cred) {
-        Topic usernameTopic = null;
+        TopicModel usernameTopic = null;
         try {
-            usernameTopic = getUsernameTopic(cred.username);
+            usernameTopic = _getUsernameTopic(cred.username);
             if (usernameTopic == null) {
                 return null;
             }
-            return matches(usernameTopic, cred.password) ? usernameTopic : null;
+            if (!matches(usernameTopic, cred.password)) {
+                return null;
+            }
+            return instantiate(usernameTopic);
         } catch (Exception e) {
             throw new RuntimeException("Checking credentials for user \"" + cred.username +
                 "\" failed (usernameTopic=" + usernameTopic + ")", e);
@@ -141,7 +144,7 @@ class AccessControlImpl implements AccessControl {
 
 
 
-    // === Workspaces ===
+    // === Workspaces / Memberships ===
 
     @Override
     public Topic getWorkspace(String uri) {
@@ -186,7 +189,7 @@ class AccessControlImpl implements AccessControl {
             }
             // Note: direct storage access is required here
             AssociationModel membership = dms.storageDecorator.fetchAssociation(TYPE_MEMBERSHIP,
-                getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
+                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
             return membership != null;
         } catch (Exception e) {
             throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
@@ -229,22 +232,21 @@ class AccessControlImpl implements AccessControl {
 
 
 
-    // === Usernames ===
+    // === User Accounts ===
 
     @Override
     public Topic getUsernameTopic(String username) {
         TopicModel usernameTopic = _getUsernameTopic(username);
-        if (usernameTopic == null) {
-            return null;
-        }
-        // instantiate topic without performing permission check
-        return new AttachedTopic(usernameTopic, dms);
+        return usernameTopic != null ? instantiate(usernameTopic) : null;
     }
 
     @Override
     public Topic getUsernameTopic(HttpServletRequest request) {
         String username = getUsername(request);
-        return username != null ? getUsernameTopic(username) : null;
+        if (username == null) {
+            return null;
+        }
+        return instantiate(_getUsernameTopicOrThrow(username));
     }
 
     @Override
@@ -271,6 +273,18 @@ class AccessControlImpl implements AccessControl {
         return username;
     }
 
+    // ---
+
+    @Override
+    public Topic getPrivateWorkspace(String username) {
+        TopicModel passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(username));
+        long workspaceId = getAssignedWorkspaceId(passwordTopic.getId());
+        if (workspaceId == -1) {
+            throw new RuntimeException("User \"" + username + "\" has no private workspace");
+        }
+        return instantiate(dms.storageDecorator.fetchTopic(workspaceId));
+    }
+
 
 
     // === Email Addresses ===
@@ -289,14 +303,22 @@ class AccessControlImpl implements AccessControl {
      *
      * @param   password    The encoded password.
      */
-    private boolean matches(Topic usernameTopic, String password) {
-        return getPassword(getUserAccount(usernameTopic)).equals(password);
+    private boolean matches(TopicModel usernameTopic, String password) {
+        String _password = getPasswordTopic(usernameTopic).getSimpleValue().toString();  // encoded
+        return _password.equals(password);
     }
 
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      */
-    private TopicModel getUserAccount(Topic usernameTopic) {
+    private TopicModel getPasswordTopic(TopicModel usernameTopic) {
+        return _getPasswordTopic(_getUserAccount(usernameTopic));
+    }
+
+    /**
+     * Prerequisite: usernameTopic is not <code>null</code>.
+     */
+    private TopicModel _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
         RelatedTopicModel userAccount = dms.storageDecorator.fetchTopicRelatedTopic(usernameTopic.getId(),
@@ -309,9 +331,9 @@ class AccessControlImpl implements AccessControl {
     }
 
     /**
-     * @return  The encoded password of the specified User Account.
+     * Prerequisite: userAccount is not <code>null</code>.
      */
-    private String getPassword(TopicModel userAccount) {
+    private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
         RelatedTopicModel password = dms.storageDecorator.fetchTopicRelatedTopic(userAccount.getId(),
@@ -320,7 +342,7 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
                 userAccount.getSimpleValue() + "\" (userAccount=" + userAccount + ")");
         }
-        return password.getSimpleValue().toString();
+        return password;
     }
 
     // ---
@@ -443,7 +465,7 @@ class AccessControlImpl implements AccessControl {
         return fetchTopic(TYPE_USERNAME, username);
     }
 
-    private TopicModel getUsernameTopicOrThrow(String username) {
+    private TopicModel _getUsernameTopicOrThrow(String username) {
         TopicModel usernameTopic = _getUsernameTopic(username);
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
@@ -474,6 +496,15 @@ class AccessControlImpl implements AccessControl {
      */
     private List<TopicModel> queryTopics(String key, Object value) {
         return dms.storageDecorator.queryTopics(key, new SimpleValue(value));
+    }
+
+    // ---
+
+    /**
+     * Instantiates a topic without performing permission check.
+     */
+    private Topic instantiate(TopicModel model) {
+        return new AttachedTopic(model, dms);
     }
 
 

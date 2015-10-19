@@ -41,7 +41,7 @@ public interface AccessControl {
 
 
 
-    // === Workspaces ===
+    // === Workspaces / Memberships ===
 
     /**
      * Returns a workspace by URI.
@@ -96,7 +96,7 @@ public interface AccessControl {
 
 
 
-    // === Usernames ===
+    // === User Accounts ===
 
     /**
      * Returns the Username topic that corresponds to a username.
@@ -122,6 +122,18 @@ public interface AccessControl {
 
     String username(HttpSession session);
 
+    // ---
+
+    /**
+     * Returns the private workspace of the given user.
+     * <p>
+     * Note: a user can have more than one private workspace. The workspace returned
+     * by this method is the one that holds the user's password topic.
+     * <p>
+     * This is a privileged method, it bypasses the access control system.
+     */
+    Topic getPrivateWorkspace(String username);
+
 
 
     // === Email Addresses ===
@@ -130,7 +142,7 @@ public interface AccessControl {
      * Returns true if an "Email Address" (dm4.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>
-     * This is a privileged method, it runs as "System".
+     * This is a privileged method, it bypasses the access control system.
      */
     boolean emailAddressExists(String emailAddress);
 }

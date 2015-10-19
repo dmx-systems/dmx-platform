@@ -261,13 +261,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (username == null) {
             throw new IllegalStateException("No user is logged in");
         }
-        //
-        Topic passwordTopic = getPasswordTopic(getUserAccount(getUsernameTopic(username)));
-        Topic workspace = wsService.getAssignedWorkspace(passwordTopic.getId());
-        if (workspace == null) {
-            throw new RuntimeException("User \"" + username + "\" has no private workspace");
-        }
-        return workspace;
+        return dms.getAccessControl().getPrivateWorkspace(username);
     }
 
     @GET
@@ -544,15 +538,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private Topic getUserAccount(Topic usernameTopic) {
-        return usernameTopic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-            "dm4.accesscontrol.user_account");
-    }
-
-    private Topic getPasswordTopic(Topic userAccount) {
-        return userAccount.getChildTopics().getTopic("dm4.accesscontrol.password");
-    }
 
     private Topic getUsernameTopicOrThrow(String username) {
         Topic usernameTopic = getUsernameTopic(username);
