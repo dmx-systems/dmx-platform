@@ -3,7 +3,15 @@
         {
             "value": "Configuration",
             "uri": "dm4.config.configuration",
-            "data_type_uri": "dm4.core.text"
+            "data_type_uri": "dm4.core.text",
+            "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.color": "hsl(240, 66%, 66%)"
+                    }
+                }
+            ]
         }
     ],
 

@@ -406,7 +406,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void shutdown() {
         // Note 1: unregistering is crucial e.g. for redeploying the Files plugin. The next register call
-        // (at init() time) would fail as the Config service already holds such a registration.
+        // (at preInstall() time) would fail as the Config service already holds such a registration.
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Files plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
