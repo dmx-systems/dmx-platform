@@ -654,7 +654,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
-        return dms.getAccessControl().getLoginEnabled(usernameTopic);
+        Topic loginEnabled = dms.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
+        return loginEnabled.getSimpleValue().booleanValue();
     }
 
     // ---

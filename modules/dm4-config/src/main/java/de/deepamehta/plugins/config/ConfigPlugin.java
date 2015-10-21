@@ -58,35 +58,12 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     @Override    
     public RelatedTopic getConfigTopic(@PathParam("config_type_uri") String configTypeUri,
                                        @PathParam("topic_id") long topicId) {
-        return getConfigTopic(configTypeUri, dms.getTopic(topicId));
+        return _getConfigTopic(configTypeUri, topicId);
     }
-
-    @Override    
-    public RelatedTopic getConfigTopic(String configTypeUri, String topicUri) {
-        return getConfigTopic(configTypeUri, dms.getTopic("uri", new SimpleValue(topicUri)));
-    }
-
-    @Override    
-    public RelatedTopic getConfigTopic(String configTypeUri, Topic topic) {
-        try {
-            RelatedTopic configTopic = _getConfigTopic(configTypeUri, topic);
-            //
-            if (configTopic == null) {
-                throw new RuntimeException("For " + info(topic) + " that configuration topic is missing");
-            }
-            //
-            return configTopic;
-        } catch (Exception e) {
-            throw new RuntimeException("Getting the configuration topic of type \"" + configTypeUri +
-                "\" for topic " + topic.getId() + " failed", e);
-        }
-    }
-
-    // ---
 
     @Override
     public void createConfigTopic(String configTypeUri, Topic topic) {
-        createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic);
+        createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic.getId());
     }
 
     // ---
@@ -149,7 +126,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     @Override
     public void postCreateTopic(Topic topic) {
         for (ConfigDefinition configDef : getApplicableConfigDefinitions(topic)) {
-            createConfigTopic(configDef, topic);
+            createConfigTopic(configDef, topic.getId());
         }
     }
 
@@ -157,15 +134,14 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private RelatedTopic _getConfigTopic(String configTypeUri, Topic topic) {
-        return topic.getRelatedTopic(ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT,
-            configTypeUri);
+    private RelatedTopic _getConfigTopic(String configTypeUri, long topicId) {
+        return dms.getAccessControl().getConfigTopic(configTypeUri, topicId);
     }
 
-    private RelatedTopic createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
+    private RelatedTopic createConfigTopic(final ConfigDefinition configDef, final long topicId) {
         final String configTypeUri = configDef.getConfigTypeUri();
         try {
-            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
+            logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topicId);
             // We suppress standard workspace assignment here as a config topic requires a special assignment.
             // See assignConfigTopicToWorkspace() below.
             return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
@@ -173,16 +149,16 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                 public RelatedTopic call() {
                     Topic configTopic = dms.createTopic(configDef.getDefaultConfigTopic());
                     dms.createAssociation(new AssociationModel(ASSOC_TYPE_CONFIGURATION,
-                        new TopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
+                        new TopicRoleModel(topicId, ROLE_TYPE_CONFIGURABLE),
                         new TopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
                     assignConfigTopicToWorkspace(configTopic, configDef.getConfigModificationRole());
                     // ### TODO: extend Core API to avoid re-retrieval
-                    return _getConfigTopic(configTypeUri, topic);
+                    return _getConfigTopic(configTypeUri, topicId);
                 }
             });
         } catch (Exception e) {
             throw new RuntimeException("Creating config topic of type \"" + configTypeUri + "\" for topic " +
-                topic.getId() + " failed", e);
+                topicId + " failed", e);
         }
     }
 

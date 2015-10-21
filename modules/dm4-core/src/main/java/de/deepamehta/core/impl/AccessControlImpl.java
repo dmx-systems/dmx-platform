@@ -31,7 +31,6 @@ class AccessControlImpl implements AccessControl {
     // ### TODO: copy in AccessControlPlugin.java
     private static final String TYPE_MEMBERSHIP    = "dm4.accesscontrol.membership";
     private static final String TYPE_USERNAME      = "dm4.accesscontrol.username";
-    private static String TOPIC_TYPE_LOGIN_ENABLED = "dm4.accesscontrol.login_enabled";
     //
     private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
@@ -92,19 +91,6 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("Checking credentials for user \"" + cred.username +
                 "\" failed (usernameTopic=" + usernameTopic + ")", e);
         }
-    }
-
-    @Override
-    public boolean getLoginEnabled(Topic usernameTopic) {
-        // Note: "Login enabled" is checked by <anonymous> and this config topic belongs to System.
-        // So direct storage access is required here.
-        RelatedTopicModel loginEnabled = dms.storageDecorator.fetchTopicRelatedTopic(usernameTopic.getId(),
-            ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, TOPIC_TYPE_LOGIN_ENABLED);
-        if (loginEnabled == null) {
-            throw new RuntimeException("The \"Login enabled\" configuration topic of user \"" +
-                usernameTopic.getSimpleValue() + "\" is missing");
-        }
-        return loginEnabled.getSimpleValue().booleanValue();
     }
 
     @Override
@@ -283,6 +269,26 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("User \"" + username + "\" has no private workspace");
         }
         return instantiate(dms.storageDecorator.fetchTopic(workspaceId));
+    }
+
+
+
+    // === Config Service ===
+
+    @Override
+    public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
+        try {
+            RelatedTopicModel configTopic = dms.storageDecorator.fetchTopicRelatedTopic(topicId,
+                ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
+            if (configTopic == null) {
+                throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
+                    " is missing");
+            }
+            return new AttachedRelatedTopic(configTopic, dms);
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the \"" + configTypeUri + "\" configuration topic for topic " +
+                topicId + " failed", e);
+        }
     }
 
 

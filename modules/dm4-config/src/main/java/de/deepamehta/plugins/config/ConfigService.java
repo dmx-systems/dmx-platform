@@ -9,12 +9,6 @@ public interface ConfigService {
 
     RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
-    RelatedTopic getConfigTopic(String configTypeUri, String topicUri);
-
-    RelatedTopic getConfigTopic(String configTypeUri, Topic topic);
-
-    // ---
-
     void createConfigTopic(String configTypeUri, Topic topic);
 
     // ---

@@ -21,15 +21,6 @@ public interface AccessControl {
     Topic checkCredentials(Credentials cred);
 
     /**
-     * Returns the "Login enabled" configuration for the given user account.
-     *
-     * @param   usernameTopic   the username whose account to be checked.
-     *
-     * @return  <code>true</code> if the user account is enabled, <code>false</code> otherwise.
-     */
-    boolean getLoginEnabled(Topic usernameTopic);
-
-    /**
      * Checks if a user is permitted to perform an operation on an object (topic or association).
      *
      * @param   username    the logged in user, or <code>null</code> if no user is logged in.
@@ -133,6 +124,19 @@ public interface AccessControl {
      * This is a privileged method, it bypasses the access control system.
      */
     Topic getPrivateWorkspace(String username);
+
+
+
+    // === Config Service ===
+
+    /**
+     * Returns the configuration topic of the given type for the given topic.
+     * <p>
+     * This is a privileged method, it bypasses the access control system.
+     *
+     * @throws  RuntimeException    if no such configuration topic exists.
+     */
+    RelatedTopic getConfigTopic(String configTypeUri, long topicId);
 
 
 
