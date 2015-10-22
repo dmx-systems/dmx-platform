@@ -14,7 +14,7 @@ dm4c.add_plugin("de.deepamehta.config", function() {
                 context: "context-menu"
             },
             {
-                label:   "Configure",
+                label:   "Show Configuration",
                 sub_commands: sub_commands,
                 disabled: !sub_commands.length,
                 context: "context-menu"
