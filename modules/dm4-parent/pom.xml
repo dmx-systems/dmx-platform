@@ -76,7 +76,6 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>3.0.1</version>
-                <scope>provided</scope><!-- ### TODO: drop scope to let standard plugins inherit? -->
                 <optional>true</optional>
             </dependency>
             <!-- Testing -->
