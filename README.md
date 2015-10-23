@@ -5,7 +5,7 @@ DeepaMehta 4
 DeepaMehta 4 is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content. The goal of DeepaMehta is to provide knowledge workers of all kind a cognitive adequate work environment, right after your desktop computer or laptop has booted up.
 
 Technically DeepaMehta 4 is made of  
-Server-side: Java, Neo4j, Lucene, Apache Felix (OSGi), Pax Web, Jetty, Jersey, Thymeleaf (optional), Neo4j Spatial (optional), Jetty WebSocket (optional), Karaf (optional).  
+Server-side: Java, Neo4j, Lucene, Apache Felix (OSGi), Jetty, Jersey, Thymeleaf (optional), Neo4j Spatial (optional), Jetty WebSocket (optional), Karaf (optional), Pax Web (optional).  
 Client-side: Javascript, jQuery, jQuery-UI, HTML5 Canvas, CKEditor, OpenLayers (optional), D3.js (optional).
 
 DeepaMehta 4 is a rewrite of DeepaMehta 2.  
@@ -55,7 +55,7 @@ To install and use DeepaMehta follow 5 mandatory steps:
   If you don't know weather Java is already installed on your computer or what Java is at all go to
   <http://www.java.com>.
 
-* A "modern" **webbrowser**.
+* A **webbrowser**.
 
   DeepaMehta works fine at least with Firefox, Google Chrome, or Safari 5 (or newer).  
   Doesn't work with IE8. Possibly works with IE9 or IE10 (not tested).
@@ -64,13 +64,13 @@ To install and use DeepaMehta follow 5 mandatory steps:
 2. Download DeepaMehta
 ----------------------
 
-<http://download.deepamehta.de/deepamehta-4.6.1.zip> (8.3 MB)
+<http://download.deepamehta.de/deepamehta-4.7.zip> (7.0 MB)
 
 
 3. Install DeepaMehta
 ---------------------
 
-Unzip the downloaded file. A folder `deepamehta-4.6.1` is created.  
+Unzip the downloaded file. A folder `deepamehta-4.7` is created.  
 You can move that folder to any place you want.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
@@ -79,7 +79,7 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 4. Start DeepaMehta
 -------------------
 
-Open the `deepamehta-4.6.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.7` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -113,11 +113,11 @@ Auxiliary tasks follow:
 Updating DeepaMehta
 -------------------
 
-You can update from DeepaMehta 4.1 or newer to 4.6.1 while keeping your existing DeepaMehta content:
+You can update from DeepaMehta 4.1 or newer to 4.7 while keeping your existing DeepaMehta content:
 
-1. Install DeepaMehta 4.6.1 (see steps 2. and 3. above).
-2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.6.1 if already started.)
-3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.6.1` folder.
+1. Install DeepaMehta 4.7 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.7 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.7` folder.
    (Replace as necessary.)
 4. Proceed with "Start DeepaMehta" (see step 4. above).
 
@@ -149,7 +149,7 @@ Uninstall DeepaMehta
 --------------------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.6.1` folder.
+2. Delete the entire `deepamehta-4.7` folder.
 
 This removes DeepaMehta completely from your computer, including all your DeepaMehta content.
 
@@ -165,6 +165,19 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.7** -- Oct 23, 2015
+
+* New features:
+    * Access controlled file repositories.
+    * Per-user disk quota (for file uploads).
+    * Enabling/disabling user accounts.
+    * Webclient works also on touch devices.
+* Plugin development framework:
+    * Configuration facility.
+    * Webclient support for hierarchical menus.
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.6.1** -- Jul 15, 2015
 
@@ -590,4 +603,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Jul 15, 2015
+Oct 23, 2015
