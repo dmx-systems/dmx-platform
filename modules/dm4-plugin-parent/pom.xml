@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Plugin Parent</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-plugin-parent</artifactId>
-    <version>4.7</version>
+    <version>4.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-global</artifactId>
-        <version>4.7</version>
+        <version>4.8-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.7</version>
+            <version>4.8-SNAPSHOT</version>
         </dependency>
 
         <!-- Testing -->
@@ -137,9 +137,9 @@
                     <runner>1.7.5</runner>
                     <widenScope>true</widenScope>
                     <deployURLs>
-                        mvn:de.deepamehta/3rd-party-bundles/4.7/pom,
-                        mvn:de.deepamehta/felix-bundles/4.7/pom,
-                        mvn:de.deepamehta/deepamehta-bundles/4.7/pom
+                        mvn:de.deepamehta/3rd-party-bundles/4.8-SNAPSHOT/pom,
+                        mvn:de.deepamehta/felix-bundles/4.8-SNAPSHOT/pom,
+                        mvn:de.deepamehta/deepamehta-bundles/4.8-SNAPSHOT/pom
                     </deployURLs>
                 </configuration>
             </plugin>
@@ -152,7 +152,7 @@
                     <show>private</show>
                     <linksource>true</linksource>
                     <links>
-                        <link>http://api.deepamehta.de/deepamehta/4.7</link>
+                        <link>http://api.deepamehta.de/deepamehta/4.8-SNAPSHOT</link>
                     </links>
                     <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
                     <docletArtifact>
