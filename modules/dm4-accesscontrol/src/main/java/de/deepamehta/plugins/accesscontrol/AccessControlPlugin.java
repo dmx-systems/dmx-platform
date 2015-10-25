@@ -150,7 +150,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         logger.info("Security settings:" +
             "\n  dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
             "\n  dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
-            "\n  dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"");
+            "\n  dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"" +
+            "\n  dm4.security.new_accounts_are_enabled=" + NEW_ACCOUNTS_ARE_ENABLED);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

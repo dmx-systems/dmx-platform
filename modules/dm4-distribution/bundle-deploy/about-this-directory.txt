@@ -1,0 +1,12 @@
+
+About the bundle-deploy directory
+---------------------------------
+
+This is the hot deploy directory.
+
+Drop bundles here to deploy them.
+Remove to undeploy.
+
+So, to install e.g. a DeepaMehta plugin (.jar file) just drop it here.
+Restarting DeepaMehta is not required.
+

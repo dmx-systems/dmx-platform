@@ -26,6 +26,7 @@
                 <include>commons-fileupload:*</include>
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.eventadmin</include>
+                <include>org.apache.felix:org.apache.felix.fileinstall</include>
                 <include>org.apache.felix:org.apache.felix.http.jetty</include>
                 <include>org.apache.felix:org.apache.felix.http.api</include>
                 <include>org.apache.felix:org.apache.felix.http.servlet-api</include>
@@ -56,6 +57,11 @@
         <file>
             <source>conf/logging.properties</source>
             <outputDirectory>conf</outputDirectory>
+        </file>
+        <!-- add bundle-deploy directory -->
+        <file>
+            <source>bundle-deploy/about-this-directory.txt</source>
+            <outputDirectory>bundle-deploy</outputDirectory>
         </file>
     </files>
 
