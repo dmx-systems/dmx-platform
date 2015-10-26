@@ -63,6 +63,11 @@
             <source>bundle-deploy/about-this-directory.txt</source>
             <outputDirectory>bundle-deploy</outputDirectory>
         </file>
+        <!-- add bundle-dev directory -->
+        <file>
+            <source>bundle-dev/about-this-directory.txt</source>
+            <outputDirectory>bundle-dev</outputDirectory>
+        </file>
     </files>
 
     <fileSets>

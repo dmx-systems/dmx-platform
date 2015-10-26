@@ -130,6 +130,32 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>hot-deploy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>../../bundle-deploy</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.ops4j</groupId>
                 <artifactId>maven-pax-plugin</artifactId>
                 <version>1.4</version>
