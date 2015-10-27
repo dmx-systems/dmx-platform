@@ -129,6 +129,7 @@
                 </configuration>
             </plugin>
 
+            <!-- copied from dm4-parent -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

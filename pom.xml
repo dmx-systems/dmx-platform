@@ -114,47 +114,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <!-- IMPORTANT: The leading and trailing commas represent a workaround for Felix 4 and must not     -->
-                <!-- be deleted (this was not required with Felix 3). Felix 4 apparently surrounds the entire       -->
-                <!-- property value with double quotes, rendering the first and last paths invalid (very strange!). -->
-                <!-- As a workaround we setup 2 (empty) bogus paths at the beginning and end.                       -->
-                <felix.fileinstall.dir>,
-                    ${project.basedir}/modules/dm4-core/target,
-                    ${project.basedir}/modules/dm4-webservice/target,
-                    ${project.basedir}/modules/dm4-webclient/target,
-                    ${project.basedir}/modules/dm4-webbrowser/target,
-                    ${project.basedir}/modules/dm4-notes/target,
-                    ${project.basedir}/modules/dm4-contacts/target,
-                    ${project.basedir}/modules/dm4-workspaces/target,
-                    ${project.basedir}/modules/dm4-typeeditor/target,
-                    ${project.basedir}/modules/dm4-iconpicker/target,
-                    ${project.basedir}/modules/dm4-typesearch/target,
-                    ${project.basedir}/modules/dm4-topicmaps/target,
-                    ${project.basedir}/modules/dm4-files/target,
-                    ${project.basedir}/modules/dm4-filemanager/target,
-                    ${project.basedir}/modules/dm4-help/target,
-                    ${project.basedir}/modules/dm4-accesscontrol/target,
-                    ${project.basedir}/modules/dm4-facets/target,
-                    ${project.basedir}/modules/dm4-geomaps/target,
-                    ${project.basedir}/modules/dm4-time/target,
-                    ${project.basedir}/modules/dm4-caching/target,
-                    ${project.basedir}/modules/dm4-config/target,
-                    ${project.basedir}/modules/dm4-storage-neo4j/target,
-                    ${project.basedir}/modules/dm4-box-renderer-dom/target,
-                    <!-- Note: Although the dm4-storage-neo4j module can not be hot-REdeployed it must be          -->
-                    <!-- hot-deployed. It can not be statically deployed (via 3rd-party-bundles) because it        -->
-                    <!-- depends on Core and Core would be not yet available (as it is hot-deployed).              -->
-                    <!-- The reason why dm4-storage-neo4j module can not be hot-REdeployed is that the Core        -->
-                    <!-- would not stop (as it has no dependency on dm4-storage-neo4j).                            -->
-                </felix.fileinstall.dir>
-                <!-- Watching only for jar files suppresses deployment of exploded bundles (which often fails).    -->
-                <felix.fileinstall.filter>.*\\.jar</felix.fileinstall.filter>
-                <!-- Setting "noInitialDelay" to true causes *synchronous* bundle starts in the order the watch    -->
-                <!-- directories are defined! Furthermore the STARTED framework event is eventually fired. Default -->
-                <!-- is noInitialDelay=false, which causes *asynchronous* bundle starts in arbitrary order.        -->
-                <felix.fileinstall.noInitialDelay>false</felix.fileinstall.noInitialDelay>
-                <!-- To see any File Install logging set the level to at least 4.                                  -->
-                <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
+                <felix.fileinstall.dir>${project.basedir}/bundle-deploy</felix.fileinstall.dir>
             </properties>
             <build>
                 <plugins>

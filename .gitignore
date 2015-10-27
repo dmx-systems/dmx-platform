@@ -3,6 +3,7 @@ deepamehta-db/
 deepamehta-files/
 runner/
 target/
+bundle-deploy/
 
 *~
 .project
