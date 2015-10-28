@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Global</name>
+    <name>DeepaMehta 4 Project</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-global</artifactId>
+    <artifactId>deepamehta-project</artifactId>
     <version>4.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -107,6 +107,89 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- OSGi -->
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.compendium</artifactId>
+                <version>5.0.0</version>
+            </dependency>
+            <!-- Jersey -->
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-core</artifactId>
+                <version>1.14</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-server</artifactId>
+                <version>1.14</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-servlet</artifactId>
+                <version>1.14</version>
+            </dependency>
+            <!-- Jettison -->
+            <dependency>
+                <groupId>org.codehaus.jettison</groupId>
+                <artifactId>jettison</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+            <!-- Commons FileUpload -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>1.2.2</version>
+            </dependency>
+            <!-- JAX-RS API-->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+            <!-- Servlet API -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>3.0.1</version>
+                <optional>true</optional>
+            </dependency>
+            <!-- Testing -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>3.1</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>run</id>
@@ -178,7 +261,7 @@
                 <!-- Note: modules/dm4-distribution is not included here.              -->
                 <!-- We don't want to build the distribution with every reactor build. -->
                 <!-- To build the distribution use "mvn clean install -P dist".        -->
-                <module>modules/dm4-parent</module>
+                <module>modules/dm4-standard-module</module>
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
             </modules>
@@ -248,7 +331,7 @@
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects -->
-                <module>modules/dm4-parent</module>
+                <module>modules/dm4-standard-module</module>
                 <module>modules/dm4-plugin-parent</module>
                 <module>modules/dm4-provision</module>
                 <module>modules/dm4-distribution</module>

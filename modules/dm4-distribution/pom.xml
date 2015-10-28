@@ -13,7 +13,7 @@
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-global</artifactId>
+        <artifactId>deepamehta-project</artifactId>
         <version>4.8-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
