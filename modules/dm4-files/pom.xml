@@ -12,9 +12,9 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>standard-module</artifactId>
+        <artifactId>deepamehta-module</artifactId>
         <version>4.8-SNAPSHOT</version>
-        <relativePath>../dm4-standard-module/pom.xml</relativePath>
+        <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 
     <dependencies>
@@ -35,7 +35,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.3.2</version><!-- ### TODO: add to standard-module dependency management -->
         </dependency>
     </dependencies>
 

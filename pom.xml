@@ -142,11 +142,17 @@
                 <artifactId>jettison</artifactId>
                 <version>1.3.2</version>
             </dependency>
-            <!-- Commons FileUpload -->
+            <!-- Commons -->
             <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>1.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>1.3.2</version>
+                <scope>provided</scope>
             </dependency>
             <!-- JAX-RS API-->
             <dependency>
@@ -189,6 +195,26 @@
             <artifactId>easymock</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.4</version>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -261,8 +287,8 @@
                 <!-- Note: modules/dm4-distribution is not included here.              -->
                 <!-- We don't want to build the distribution with every reactor build. -->
                 <!-- To build the distribution use "mvn clean install -P dist".        -->
-                <module>modules/dm4-standard-module</module>
-                <module>modules/dm4-plugin-parent</module>
+                <module>modules/dm4-module</module>
+                <module>modules/dm4-plugin</module>
                 <module>modules/dm4-provision</module>
             </modules>
             <build>
@@ -331,8 +357,8 @@
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects -->
-                <module>modules/dm4-standard-module</module>
-                <module>modules/dm4-plugin-parent</module>
+                <module>modules/dm4-module</module>
+                <module>modules/dm4-plugin</module>
                 <module>modules/dm4-provision</module>
                 <module>modules/dm4-distribution</module>
                 <module>modules/dm4-features</module>

@@ -12,8 +12,8 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>standard-module</artifactId>
+        <artifactId>deepamehta-module</artifactId>
         <version>4.8-SNAPSHOT</version>
-        <relativePath>../dm4-standard-module/pom.xml</relativePath>
+        <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 </project>
