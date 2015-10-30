@@ -16,8 +16,4 @@ public interface ConfigService {
     void registerConfigDefinition(ConfigDefinition configDef);
 
     void unregisterConfigDefinition(String configTypeUri);
-
-    // ---
-
-    ConfigDefinitions getConfigDefinitions();
 }
