@@ -172,7 +172,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
         function update_gui_logout() {
             // update model
-            decrease_authority()
+            decrease_authority(true)    // is_logout=true
             // update view
             login_widget.show_login()
         }
@@ -347,23 +347,26 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // ---
 
     function increase_authority(username) {
-        // Note: the types must be reloaded *before* the authority_increased event is fired.
+        // Note: the types must be reloaded *before* the logged_in event is fired.
         // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
         dm4c.reload_types(function() {
             // update model
             clear_permissions_cache()
             // signal authority change
-            dm4c.fire_event("authority_increased", username)
+            dm4c.fire_event("logged_in", username)
         })
     }
 
-    function decrease_authority() {
+    function decrease_authority(is_logout) {
         // Note: the types must be reloaded *before* the authority_decreased events are fired.
         // Consider the Workspaces plugin: refreshing the workspace menu relies on the type cache.
         dm4c.reload_types(function() {
             // update model
             clear_permissions_cache()
             // signal authority change
+            if (is_logout) {
+                dm4c.fire_event("logged_out")
+            }
             dm4c.fire_event("authority_decreased")
             dm4c.fire_event("authority_decreased_2")
         })

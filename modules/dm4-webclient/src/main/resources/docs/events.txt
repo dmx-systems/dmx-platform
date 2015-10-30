@@ -77,7 +77,8 @@ Webclient
 Access Control plugin
 ---------------------
 
-"authority_increased"
+"logged_in"
+"logged_out"
 "authority_decreased"
 "authority_decreased_2"
 
