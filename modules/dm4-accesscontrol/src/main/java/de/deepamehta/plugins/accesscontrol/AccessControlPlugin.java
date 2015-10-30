@@ -433,7 +433,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (!topic.getTypeUri().equals("dm4.accesscontrol.username")) {
             throw new RuntimeException("Unexpected configurable topic: " + topic);
         }
-        //
+        // the "admin" account must be enabled regardless of the "dm4.security.new_accounts_are_enabled" setting
         if (topic.getSimpleValue().toString().equals(ADMIN_USERNAME)) {
             return new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
         }
