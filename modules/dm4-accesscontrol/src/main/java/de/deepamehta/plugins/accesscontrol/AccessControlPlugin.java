@@ -2,6 +2,7 @@ package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.plugins.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.plugins.accesscontrol.event.PostLogoutUserListener;
+import de.deepamehta.plugins.config.ConfigCustomizer;
 import de.deepamehta.plugins.config.ConfigDefinition;
 import de.deepamehta.plugins.config.ConfigModificationRole;
 import de.deepamehta.plugins.config.ConfigService;
@@ -76,17 +77,18 @@ import java.util.logging.Logger;
 @Path("/accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
-public class AccessControlPlugin extends PluginActivator implements AccessControlService, PreCreateTopicListener,
-                                                                                         PreUpdateTopicListener,
-                                                                                         PreGetTopicListener,
-                                                                                         PreGetAssociationListener,
-                                                                                         PostCreateTopicListener,
-                                                                                         PostCreateAssociationListener,
-                                                                                         PostUpdateTopicListener,
-                                                                                         PostUpdateAssociationListener,
-                                                                                         ServiceRequestFilterListener,
-                                                                                         ResourceRequestFilterListener,
-                                                                                         CheckDiskQuotaListener {
+public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
+                                                                                          PreCreateTopicListener,
+                                                                                          PreUpdateTopicListener,
+                                                                                          PreGetTopicListener,
+                                                                                          PreGetAssociationListener,
+                                                                                          PostCreateTopicListener,
+                                                                                          PostCreateAssociationListener,
+                                                                                          PostUpdateTopicListener,
+                                                                                          PostUpdateAssociationListener,
+                                                                                          ServiceRequestFilterListener,
+                                                                                          ResourceRequestFilterListener,
+                                                                                          CheckDiskQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -401,7 +403,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
             new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
-            ConfigModificationRole.ADMIN
+            ConfigModificationRole.ADMIN, this
         ));
     }
 
@@ -416,6 +418,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } else {
             logger.warning("Config service is already gone");
         }
+    }
+
+
+
+    // ****************************************
+    // *** ConfigCustomizer Implementations ***
+    // ****************************************
+
+
+
+    @Override
+    public TopicModel getConfigValue(Topic topic) {
+        if (!topic.getTypeUri().equals("dm4.accesscontrol.username")) {
+            throw new RuntimeException("Unexpected configurable topic: " + topic);
+        }
+        //
+        if (topic.getSimpleValue().toString().equals(ADMIN_USERNAME)) {
+            return new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
+        }
+        // don't customize
+        return null;
     }
 
 
