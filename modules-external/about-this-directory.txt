@@ -1,0 +1,12 @@
+
+About the modules-external directory
+------------------------------------
+
+This is where you develop your own DeepaMehta plugins.
+
+Create a new directory here for each plugin.
+Every time you build your plugin it gets automatically (re)deployed.
+
+Use the modules-external directory when you've build DeepaMehta from source
+and want develop 3rd-party plugins and DeepaMehta standard plugins in parallel.
+
