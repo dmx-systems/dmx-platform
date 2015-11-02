@@ -64,7 +64,7 @@ To install and use DeepaMehta follow 5 mandatory steps:
 2. Download DeepaMehta
 ----------------------
 
-<http://download.deepamehta.de/deepamehta-4.7.zip> (7.0 MB)
+<http://download.deepamehta.de/deepamehta-4.7.zip> (7.1 MB)
 
 
 3. Install DeepaMehta

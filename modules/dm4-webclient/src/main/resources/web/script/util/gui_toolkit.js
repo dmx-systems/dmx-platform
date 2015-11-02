@@ -525,7 +525,7 @@ function GUIToolkit(config) {
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item_value      Value of the menu item to select.
-             *                          If there is not such menu item nothing is performed. ### TODO: throw exception?
+             *                          If there is not such menu item nothing is performed. ### TODO: throw exception
              */
             this.select = function(item_value) {
                 select_item(base_menu.find_item(item_value))

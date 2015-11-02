@@ -284,6 +284,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     function fetch_workspaces() {
         workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // include_childs=false
                                                                                             // sort=true
+        // suppress System workspace from appearing in menu
+        js.delete(workspaces, function(workspace) {
+            return workspace.uri == "dm4.workspaces.system"
+        })
     }
 
     function is_workspace_readable(workspace_id) {
