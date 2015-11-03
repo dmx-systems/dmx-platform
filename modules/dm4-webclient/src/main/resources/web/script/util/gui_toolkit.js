@@ -528,7 +528,11 @@ function GUIToolkit(config) {
              *                          If there is not such menu item nothing is performed. ### TODO: throw exception
              */
             this.select = function(item_value) {
-                select_item(base_menu.find_item(item_value))
+                var item = base_menu.find_item(item_value)
+                if (!item) {
+                    throw "MenuError: item with value \"" + item_value + "\" not found in menu (select() method)"
+                }
+                select_item(item)
             }
 
             // ---
@@ -620,11 +624,11 @@ function GUIToolkit(config) {
              * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
-             * @param   item    object with "label", "value", ... properties. If undefined nothing is performed.
+             * @param   item    object with "label", "value", ... properties.
              */
             function select_item(item) {
                 // Note: only stateful menus have selection state.
-                if (stateful && item && !item.is_trigger) {
+                if (stateful && !item.is_trigger) {
                     // update model
                     selection = item
                     // update GUI

@@ -90,13 +90,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     })
 
     /**
-     * Note: the Workspaces plugin initializes at init(1).
-     * Initializing the topicmaps model at init_2 ensures a selected workspace is already known.
+     * Note: the Workspaces plugin initializes at init(1). Initializing the topicmaps model at init_2 ensures
+     * the workspace widget is already added to the toolbar and a selected workspace is already known.
      */
     dm4c.add_listener("init_2", function() {
 
+        init_model()
+
+        // init view
         create_topicmap_menu()
-        init_model()    // Note: the topicmap menu must already be created
+        refresh_topicmap_menu()
 
         function create_topicmap_menu() {
             // build topicmap widget
@@ -106,11 +109,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 .append(topicmap_label)
                 .append(topicmap_menu.dom)
             // put in toolbar
-            if ($("#workspace-widget").length) {
-                $("#workspace-widget").after(topicmap_widget)
-            } else {
-                dm4c.toolbar.dom.prepend(topicmap_widget)
-            }
+            $("#workspace-widget").after(topicmap_widget)
 
             function do_select_topicmap(menu_item) {
                 var topicmap_id = menu_item.value
@@ -178,15 +177,21 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.topicmaps.topicmap") {
+            var is_current_topicmp = topic.id == topicmap.get_id()
+            //
             // 1) update model
             invalidate_topicmap_cache(topic.id)
             //
-            // 2) update model + view
-            fetch_topicmap_topics_and_refresh_menu()
-            // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
-            // Note: if the last topicmap was deleted another one is already created.
-            if (topic.id == topicmap.get_id()) {
-                select_topicmap(get_topicmap_id_from_menu())
+            fetch_topicmap_topics()
+            if (is_current_topicmp) {
+                // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
+                // Note: if the last topicmap was deleted another one is already created.
+                set_selected_topicmap(get_first_topicmap_id())
+            }
+            // 2) update view
+            refresh_topicmap_menu()
+            if (is_current_topicmp) {
+                display_topicmap()
             }
         }
     })
@@ -219,15 +224,17 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Workspace Listeners ===
 
     dm4c.add_listener("post_select_workspace", function(workspace_id) {
-        fetch_topicmap_topics_and_refresh_menu()    // update model + view
-        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
+        // update model
+        fetch_topicmap_topics() // topicmap permissions are refreshed in the course of refetching the topicmap topics
         //
         var topicmap_id = selected_topicmap_ids[workspace_id]
         if (!topicmap_id) {
-            topicmap_id = get_topicmap_id_from_menu()
+            topicmap_id = get_first_topicmap_id()
         }
-        //
-        self.select_topicmap(topicmap_id)           // update model + view
+        set_selected_topicmap(topicmap_id)
+        // update view
+        refresh_topicmap_menu()
+        display_topicmap()
     })
 
 
@@ -360,8 +367,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * This is called when a new topicmap is created at server-side and now should be displayed.
      */
     function add_topicmap(topicmap_id) {
-        fetch_topicmap_topics_and_refresh_menu()    // update model + view
-        self.select_topicmap(topicmap_id)           // update model + view
+        // update model
+        fetch_topicmap_topics()
+        set_selected_topicmap(topicmap_id)
+        // update view
+        refresh_topicmap_menu()
+        display_topicmap()
     }
 
     /**
@@ -378,14 +389,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     function fetch_topicmap_topics_and_refresh_menu() {
-        // 1) update model
-        var count = fetch_topicmap_topics()
-        // create default topicmap
-        if (!count) {
-            create_topicmap_topic("untitled")
-            fetch_topicmap_topics()
-        }
-        // 2) update view
+        // update model
+        fetch_topicmap_topics()
+        // update view
         refresh_topicmap_menu()
     }
 
@@ -398,18 +404,17 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     function init_model() {
-        fetch_topicmap_topics_and_refresh_menu()
+        fetch_topicmap_topics()
         //
         var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
         if (groups) {
             var topicmap_id = groups[1]
             var topic_id    = groups[3]
-            select_menu_item(topicmap_id)
         } else {
-            var topicmap_id = get_topicmap_id_from_menu()
+            var topicmap_id = get_first_topicmap_id()
         }
-        // update model
         set_selected_topicmap(topicmap_id)
+        //
         if (topic_id) {
             topicmap.set_topic_selection(topic_id)
         }
@@ -444,16 +449,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Prerequisite: the specified topicmap must be assigned to the currently selected workspace.
      */
     function get_topicmap_topic(topicmap_id) {
-        var workspace_id = get_selected_workspace_id()
-        var topicmap_topic = find_topic(get_topicmap_topics(workspace_id), topicmap_id)
+        var topicmap_topic = find_topic(get_topicmap_topics(), topicmap_id)
         if (!topicmap_topic) {
-            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " + workspace_id
+            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " +
+                get_selected_workspace_id()
         }
         return topicmap_topic
-    }
-
-    function get_topicmap_topics(workspace_id) {
-        return topicmap_topics[workspace_id]
     }
 
     /**
@@ -487,12 +488,44 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // ---
 
+    /**
+     * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
+     *
+     * If no Topicmap topics are assigned a default topicmap is created. This happens when the user had deleted
+     * the workspace's last topicmap.
+     */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
+        // create default topicmap
+        if (!topics.length) {
+            var topicmap_topic = create_topicmap_topic("untitled")
+            console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
+            topics.push(topicmap_topic)
+        }
+        //
         topicmap_topics[workspace_id] = dm4c.build_topics(topics)
         // ### TODO: sort topicmaps by name
-        return topics.length
+    }
+
+    function get_topicmap_topics() {
+        return topicmap_topics[get_selected_workspace_id()]
+    }
+
+    function get_first_topicmap_id() {
+        var topicmap_topic = get_topicmap_topics()[0]
+        if (!topicmap_topic) {
+            throw "TopicmapsError: no topicmap available"
+        }
+        return topicmap_topic.id
+    }
+
+    function get_selected_topicmap_id() {
+        var topicmap_id = selected_topicmap_ids[get_selected_workspace_id()]
+        if (!topicmap_id) {
+            throw "TopicmapsError: no topicmap is selected yet"
+        }
+        return topicmap_id
     }
 
     function get_selected_workspace_id() {
@@ -582,10 +615,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function refresh_topicmap_menu() {
         var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
-        var topicmap_id = get_topicmap_id_from_menu()   // save selection
         topicmap_menu.empty()
         // add topicmaps to menu
-        var topicmap_topics = get_topicmap_topics(get_selected_workspace_id())
+        var topicmap_topics = get_topicmap_topics()
         for (var i = 0, topicmap_topic; topicmap_topic = topicmap_topics[i]; i++) {
             topicmap_menu.add_item({label: topicmap_topic.value, value: topicmap_topic.id, icon: icon_src})
         }
@@ -595,7 +627,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }
         // restore selection
-        select_menu_item(topicmap_id)
+        select_menu_item(get_selected_topicmap_id())
         //
         dm4c.fire_event("post_refresh_topicmap_menu", topicmap_menu)
     }
@@ -605,14 +637,5 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function select_menu_item(topicmap_id) {
         topicmap_menu.select(topicmap_id)
-    }
-
-    /**
-     * Reads out the topicmap menu and returns the topicmap ID.
-     * If the topicmap menu has no items yet, undefined is returned.
-     */
-    function get_topicmap_id_from_menu() {
-        var item = topicmap_menu.get_selection()
-        return item && item.value
     }
 })

@@ -1,7 +1,5 @@
 dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
-    var self = this
-
     // Model
     var workspaces              // All workspaces readable by the current user (array of topic-like objects)
     var selected_workspace_id   // ID of the selected workspace
@@ -107,11 +105,14 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      */
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
-            fetch_workspaces_and_refresh_menu()
+            // 1) update model
+            fetch_workspaces()
             // if the deleted workspace was the selected one select another workspace
             if (topic.id == get_selected_workspace_id()) {
                 select_workspace(get_first_workspace_id())
             }
+            // 2) update view
+            refresh_workspace_menu()
         }
     })
 
@@ -127,7 +128,8 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // authority_decreased_2 ensures the Topicmaps plugin loads an up-to-date topicmap (in its "post_select_workspace"
     // listener).
     dm4c.add_listener("authority_decreased_2", function() {
-        fetch_workspaces_and_refresh_menu()
+        // 1) update model
+        fetch_workspaces()
         //
         var selected_workspace_id = get_selected_workspace_id()
         if (is_workspace_readable(selected_workspace_id)) {
@@ -141,6 +143,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         // Even when we stay in the selected workspace the Topicmaps plugin must adjust the current topicmap
         // according to decreased authority.
         select_workspace(workspace_id)
+        //
+        // 2) update view
+        refresh_workspace_menu()
     })
 
 
@@ -224,8 +229,11 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * This is called when a new workspace is created at server-side and now should be displayed.
      */
     function add_workspace(workspace_id) {
-        fetch_workspaces_and_refresh_menu()     // update model + view
-        self.select_workspace(workspace_id)     // update model + view
+        // update model
+        fetch_workspaces()
+        select_workspace(workspace_id)
+        // update view
+        refresh_workspace_menu()
     }
 
     function fetch_workspaces_and_refresh_menu() {
@@ -257,7 +265,6 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         } else {
             var workspace_id = get_first_workspace_id()
         }
-        //
         set_selected_workspace(workspace_id)
     }
 
@@ -335,7 +342,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     }
 
     /**
-     * Refreshes the workspace menu based on the model ("workspaces").
+     * Refreshes the workspace menu based on the model ("workspaces", "selected_workspace_id").
      */
     function refresh_workspace_menu() {
         workspace_menu.empty()
