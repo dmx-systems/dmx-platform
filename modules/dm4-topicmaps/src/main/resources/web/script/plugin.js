@@ -282,8 +282,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * @param   no_history_update   Optional: boolean.
      */
     this.select_topicmap = function(topicmap_id, no_history_update) {
-        select_menu_item(topicmap_id)
+        // update model + view
         select_topicmap(topicmap_id, no_history_update)
+        // update view
+        select_menu_item()
     }
 
     // ---
@@ -320,7 +322,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Updates the model to reflect the given topicmap is now selected, and displays it.
-     *
+     * <p>
      * Prerequisite: the topicmap menu already shows the selected topicmap.
      *
      * @param   no_history_update   Optional: boolean.
@@ -423,7 +425,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Updates the model to reflect the given topicmap is now selected. That includes setting a cookie
      * and updating 3 model objects ("topicmap", "topicmap_renderer", "selected_topicmap_ids").
-     *
+     * <p>
      * Prerequisite: the topicmap topic for the specified topicmap is already loaded/up-to-date.
      */
     function set_selected_topicmap(topicmap_id) {
@@ -445,7 +447,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Looks up a topicmap topic from the model and returns it.
-     *
+     * <p>
      * Prerequisite: the specified topicmap must be assigned to the currently selected workspace.
      */
     function get_topicmap_topic(topicmap_id) {
@@ -471,7 +473,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Loads a topicmap from DB and caches it.
-     *
+     * <p>
      * Prerequisite: the topicmap renderer responsible for loading is already set.
      *
      * @return  the loaded topicmap (a TopicmapViewmodel).
@@ -588,7 +590,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Displays the selected topicmap based on the model ("topicmap", "topicmap_renderer").
-     *
+     * <p>
      * Prerequisite: the topicmap menu already shows the selected topicmap.
      *
      * @param   no_history_update   Optional: boolean.
@@ -611,7 +613,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Topicmap Menu ===
 
     /**
-     * Refreshes the topicmap menu based on the model ("topicmap_topics").
+     * Refreshes the topicmap menu based on the model ("topicmap_topics", "selected_topicmap_ids").
      */
     function refresh_topicmap_menu() {
         var icon_src = dm4c.get_type_icon_src("dm4.topicmaps.topicmap")
@@ -626,16 +628,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
             topicmap_menu.add_separator()
             topicmap_menu.add_item({label: "New Topicmap...", value: "_new", is_trigger: true})
         }
-        // restore selection
-        select_menu_item(get_selected_topicmap_id())
+        //
+        select_menu_item()
         //
         dm4c.fire_event("post_refresh_topicmap_menu", topicmap_menu)
     }
 
     /**
-     * Selects an item from the topicmap menu.
+     * Selects an item from the topicmap menu based on the model ("selected_topicmap_ids").
      */
-    function select_menu_item(topicmap_id) {
-        topicmap_menu.select(topicmap_id)
+    function select_menu_item() {
+        topicmap_menu.select(get_selected_topicmap_id())
     }
 })

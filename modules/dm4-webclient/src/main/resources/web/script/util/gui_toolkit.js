@@ -519,13 +519,14 @@ function GUIToolkit(config) {
 
             /**
              * Sets the selected menu item by value.
+             * If there is not such menu item an exception is thrown.
+             * <p>
              * Note: no handler is triggered.
              * <p>
              * Only applicable for stateful menus.
              * (For stateless action-trigger menus nothing is performed.)
              *
              * @param   item_value      Value of the menu item to select.
-             *                          If there is not such menu item nothing is performed. ### TODO: throw exception
              */
             this.select = function(item_value) {
                 var item = base_menu.find_item(item_value)

@@ -164,8 +164,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
      * The respective item from the workspace menu is selected and the workspace is displayed.
      */
     this.select_workspace = function(workspace_id) {
-        select_menu_item(workspace_id)
+        // update model
         select_workspace(workspace_id)
+        // update view
+        select_menu_item()
     }
 
     this.get_workspace = function(uri, include_childs) {
@@ -189,18 +191,6 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // *************************
 
 
-
-    /**
-     * Updates the model to reflect the given workspace is now selected, and fires the "post_select_workspace" event.
-     *
-     * Prerequisite: the workspace menu already shows the selected workspace.
-     */
-    function select_workspace(workspace_id) {
-        // update model
-        set_selected_workspace(workspace_id)
-        //
-        dm4c.fire_event("post_select_workspace", workspace_id)
-    }
 
     /**
      * Creates a workspace with the given name and sharing mode, puts it in the workspace menu, and selects it.
@@ -271,8 +261,16 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // ---
 
     /**
-     * Updates the model to reflect the given workspace is now selected. That includes setting a cookie
-     * and updating 1 model object ("selected_workspace_id").
+     * Updates the model to reflect the given workspace is now selected, and fires the "post_select_workspace" event.
+     */
+    function select_workspace(workspace_id) {
+        set_selected_workspace(workspace_id)
+        dm4c.fire_event("post_select_workspace", workspace_id)
+    }
+
+    /**
+     * Updates the model to reflect the given workspace is now selected.
+     * That includes setting a cookie and updating 1 model object ("selected_workspace_id").
      */
     function set_selected_workspace(workspace_id) {
         js.set_cookie("dm4_workspace_id", workspace_id)
@@ -352,15 +350,15 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             workspace_menu.add_separator()
             workspace_menu.add_item({label: "New Workspace...", value: "_new", is_trigger: true})
         }
-        // restore selection
-        select_menu_item(get_selected_workspace_id())
+        //
+        select_menu_item()
     }
 
     /**
-     * Selects an item from the workspace menu.
+     * Selects an item from the workspace menu based on the model ("selected_workspace_id").
      */
-    function select_menu_item(workspace_id) {
-        workspace_menu.select(workspace_id)
+    function select_menu_item() {
+        workspace_menu.select(get_selected_workspace_id())
     }
 
 
