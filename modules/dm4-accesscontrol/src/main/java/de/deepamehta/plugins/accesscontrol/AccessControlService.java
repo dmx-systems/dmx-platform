@@ -18,6 +18,11 @@ public interface AccessControlService {
     static final String ADMIN_USERNAME = "admin";
     static final String ADMIN_DEFAULT_PASSWORD = "";
 
+    // Administration workspace
+    static final String ADMINISTRATION_WORKSPACE_NAME = "Administration";
+    static final String ADMINISTRATION_WORKSPACE_URI = "dm4.workspaces.administration";
+    static final SharingMode ADMINISTRATION_WORKSPACE_SHARING_MODE = SharingMode.COLLABORATIVE;
+
     // System workspace
     static final String SYSTEM_WORKSPACE_NAME = "System";
     static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";

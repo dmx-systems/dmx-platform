@@ -51,6 +51,11 @@ public interface AccessControl {
     long getDeepaMehtaWorkspaceId();
 
     /**
+     * Returns the ID of the "Administration" workspace.
+     */
+    long getAdministrationWorkspaceId();
+
+    /**
      * Returns the ID of the "System" workspace.
      */
     long getSystemWorkspaceId();

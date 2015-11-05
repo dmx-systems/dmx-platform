@@ -48,7 +48,8 @@ class AccessControlImpl implements AccessControl {
     // Workspace URIs
     // ### TODO: copy in WorkspaceService.java
     private static final String DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
-    // ### TODO: copy in AccessControlPlugin.java
+    // ### TODO: copy in AccessControlService.java
+    private static final String ADMINISTRATION_WORKSPACE_URI = "dm4.workspaces.administration";
     private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
 
     private long systemWorkspaceId = -1;    // initialized lazily
@@ -146,6 +147,11 @@ class AccessControlImpl implements AccessControl {
     @Override
     public long getDeepaMehtaWorkspaceId() {
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI).getId();
+    }
+
+    @Override
+    public long getAdministrationWorkspaceId() {
+        return getWorkspace(ADMINISTRATION_WORKSPACE_URI).getId();
     }
 
     @Override

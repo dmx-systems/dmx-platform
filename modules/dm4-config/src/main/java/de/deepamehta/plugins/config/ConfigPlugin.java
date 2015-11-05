@@ -166,6 +166,9 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         AccessControl ac = dms.getAccessControl();
         switch (role) {
         case ADMIN:
+            workspaceId = ac.getAdministrationWorkspaceId();
+            break;
+        case SYSTEM:
             workspaceId = ac.getSystemWorkspaceId();
             break;
         default:
