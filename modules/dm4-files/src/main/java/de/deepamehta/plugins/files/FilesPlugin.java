@@ -427,7 +427,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void resourceRequestFilter(HttpServletRequest request) {
         try {
-            String repoPath = repoPath(request);    // Note: the repository path is not canonized
+            String repoPath = repoPath(request);    // Note: the path is not canonized
             if (repoPath != null) {
                 logger.info("### Checking access to repository path \"" + repoPath + "\"");
                 File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
@@ -521,7 +521,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     /**
      * Creates a File topic representing the file at the given absolute path.
      *
-     * @param   path            An absolute path.
+     * @param   path    A canonized absolute path.
      */
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = new ChildTopicsModel()
@@ -540,22 +540,38 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     /**
      * Creates a Folder topic representing the directory at the given absolute path.
      *
-     * @param   path            An absolute path.
+     * @param   path    A canonized absolute path.
      */
     private Topic createFolderTopic(File path) throws Exception {
-        String folderName = path.getName();         // Note: getName() of "/" returns ""
-        String repoPath = repoPath(path);           // Note: repo path is already calculated by caller. Could be passed.
+        String folderName = null;
+        String repoPath = repoPath(path);   // Note: repo path is already calculated by caller. Could be passed.
         //
-        // root folder needs special treatment ### TODO: drop this
-        if (repoPath.equals("/")) {
-            folderName = "";
+        // if the repo path represents a workspace root directory the workspace name is used as Folder Name
+        if (FILE_REPOSITORY_PER_WORKSPACE) {
+            if (new File(repoPath).getParent().equals("/")) {
+                String workspaceName = dms.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
+                folderName = workspaceName;
+            }
+        }
+        // by default the directory name is used as Folder Name
+        if (folderName == null) {
+            folderName = path.getName();    // Note: getName() of "/" returns ""
         }
         //
-        ChildTopicsModel childTopics = new ChildTopicsModel()
+        return createFolderTopic(folderName, repoPath);    // throws Exception
+    }
+
+    /**
+     * Creates a Folder topic.
+     *
+     * @param   folderName  The folder name.
+     * @param   repoPath    The folder repository path.
+     */
+    private Topic createFolderTopic(String folderName, String repoPath) throws Exception {
+        return createFileOrFolderTopic(new TopicModel("dm4.files.folder", new ChildTopicsModel()
             .put("dm4.files.folder_name", folderName)
-            .put("dm4.files.path",        repoPath);
-        //
-        return createFileOrFolderTopic(new TopicModel("dm4.files.folder", childTopics));    // throws Exception
+            .put("dm4.files.path", repoPath)
+        ));    // throws Exception
     }
 
     // ---
@@ -607,24 +623,22 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      */
     private void createWorkspaceAssignment(DeepaMehtaObject object, String repoPath) {
         try {
-            long workspaceId;
             AccessControl ac = dms.getAccessControl();
-            if (FILE_REPOSITORY_PER_WORKSPACE) {
-                Matcher m = PER_WORKSPACE_PATH_PATTERN.matcher(repoPath);
-                if (m.matches()) {
-                    workspaceId = Long.parseLong(m.group(1));
-                } else {
-                    throw new RuntimeException("No workspace recognized in repository path \"" + repoPath + "\"");
-                }
-            } else {
-                workspaceId = ac.getDeepaMehtaWorkspaceId();
-            }
-            //
+            long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDeepaMehtaWorkspaceId();
             ac.assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Creating workspace assignment for File/Folder topic or folder association " +
                 "failed", e);
         }
+    }
+
+    private long getWorkspaceId(String repoPath) {
+        Matcher m = PER_WORKSPACE_PATH_PATTERN.matcher(repoPath);
+        if (!m.matches()) {
+            throw new RuntimeException("No workspace recognized in repository path \"" + repoPath + "\"");
+        }
+        long workspaceId = Long.parseLong(m.group(1));
+        return workspaceId;
     }
 
 
@@ -638,7 +652,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *
-     * @return  The absolute path.
+     * @return  The canonized absolute path.
      */
     private File absolutePath(String repoPath) throws FileRepositoryException {
         try {
@@ -784,9 +798,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * is stored with a unique name (by adding a number).
      *
      * @param   directory   The directory to store the uploaded file to.
-     *                      An absolute path.
+     *                      An canonized absolute path.
      *
-     * @return  The constructed absolute path.
+     * @return  The canonized absolute path.
      */
     private File unusedPath(File directory, UploadedFile file) {
         return JavaUtils.findUnusedFile(path(directory, file.getName()));
@@ -796,7 +810,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     /**
      * Returns the repository path of a File/Folder topic.
-     * Note: the returned repository path is canonized.
+     * Note: the returned path is canonized.
      */
     private String repoPath(long fileTopicId) {
         return repoPath(dms.getTopic(fileTopicId));
@@ -804,7 +818,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     /**
      * Returns the repository path of a File/Folder topic.
-     * Note: the returned repository path is canonized.
+     * Note: the returned path is canonized.
      */
     private String repoPath(Topic topic) {
         return topic.getChildTopics().getString("dm4.files.path");
@@ -814,7 +828,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * Returns the repository path of a filerepo request.
      *
      * @return  The repository path or <code>null</code> if the request is not a filerepo request.
-     *          Note: the returned repository path is <i>not</i> canonized.
+     *          Note: the returned path is <i>not</i> canonized.
      */
     public String repoPath(HttpServletRequest request) {
         String repoPath = null;

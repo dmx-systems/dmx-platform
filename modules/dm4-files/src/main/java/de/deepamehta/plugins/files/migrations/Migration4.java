@@ -1,0 +1,62 @@
+package de.deepamehta.plugins.files.migrations;
+
+import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.ResultList;
+
+import java.util.logging.Logger;
+
+
+
+/**
+ * Rename root Folder topics, in case of dm4.filerepo.per_workspace=true.
+ * Runs only in UPDATE mode.
+ * <p>
+ * Part of DM 4.8-SNAPSHOT
+ */
+public class Migration4 extends Migration {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+    @Override
+    public void run() {
+        if (FILE_REPOSITORY_PER_WORKSPACE) {
+            ResultList<RelatedTopic> workspaces = dms.getTopics("dm4.workspaces.workspace", 0);
+            logger.info("########## Renaming root Folder topics of " + workspaces.getSize() + " possible workspaces");
+            int renamed = 0;
+            for (Topic workspace : workspaces) {
+                Topic folderTopic = fetchFolderTopic("/workspace-" + workspace.getId());
+                if (folderTopic != null) {
+                    folderTopic.getChildTopics().set("dm4.files.folder_name", workspace.getSimpleValue().toString());
+                    renamed++;
+                }
+            }
+            logger.info("########## Root Folder topics renamed: " + renamed);
+        } else {
+            logger.info("########## Renaming root Folder topics ABORTED -- per-workspace file repositories are " +
+                "switched off");
+        }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * Fetches the Folder topic representing the directory at the given repository path.
+     * If no such Folder topic exists <code>null</code> is returned.
+     */
+    private Topic fetchFolderTopic(String repoPath) {
+        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(repoPath));
+        return topic != null ? topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
+            "dm4.files.folder") : null;
+    }
+}
