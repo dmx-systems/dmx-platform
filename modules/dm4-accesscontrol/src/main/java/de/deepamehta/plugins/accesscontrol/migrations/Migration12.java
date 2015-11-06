@@ -35,7 +35,7 @@ public class Migration12 extends Migration {
     @Inject
     private WorkspacesService wsService;
 
-    long administrationWorkspaceId;
+    private long administrationWorkspaceId;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -60,8 +60,8 @@ public class Migration12 extends Migration {
         administrationWorkspaceId = dms.getAccessControl().getAdministrationWorkspaceId();
         assignConfigTopics("dm4.accesscontrol.login_enabled");
         assignConfigTopics("dm4.files.disk_quota");
-        // Note: the Files plugin is activated before the Access Control plugin (as the latter waits for the former
-        // due to dependencies). So, the "dm4.files.disk_quota" type exists already for sure.
+        // Note: the Access Control plugin depends on the Files plugin (indirectly). So, the Files plugin
+        // is activated before and the "dm4.files.disk_quota" type is guaranteed to exist already.
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

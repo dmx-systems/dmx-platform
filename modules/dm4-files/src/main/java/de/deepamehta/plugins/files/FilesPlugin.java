@@ -111,7 +111,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             checkExistence(file);               // throws FileRepositoryException
             //
             // 2) check if topic already exists
-            Topic fileTopic = fetchFileTopic(file);
+            Topic fileTopic = fetchFileTopic(repoPath(file));
             if (fileTopic != null) {
                 logger.info(operation + " ABORTED -- already exists");
                 return fileTopic.loadChildTopics();
@@ -139,7 +139,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             checkExistence(file);               // throws FileRepositoryException
             //
             // 2) check if topic already exists
-            Topic folderTopic = fetchFolderTopic(file);
+            Topic folderTopic = fetchFolderTopic(repoPath(file));
             if (folderTopic != null) {
                 logger.info(operation + " ABORTED -- already exists");
                 return folderTopic.loadChildTopics();
@@ -427,12 +427,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Override
     public void resourceRequestFilter(HttpServletRequest request) {
         try {
-            String repoPath = repoPath(request);
+            String repoPath = repoPath(request);    // Note: the repository path is not canonized
             if (repoPath != null) {
                 logger.info("### Checking access to repository path \"" + repoPath + "\"");
                 File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
                 checkExistence(path);                           // throws FileRepositoryException 404 Not Found
-                checkAuthorization(path, repoPath, request);    // throws FileRepositoryException 401 Unauthorized
+                checkAuthorization(repoPath(path), request);    // throws FileRepositoryException 401 Unauthorized
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(e, e.getStatus());
@@ -455,7 +455,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             if (!repoPath.startsWith(FILE_REPOSITORY_PATH)) {
                 throw new RuntimeException("Absolute path \"" + path + "\" is not a repository path");
             }
-            //
+            // The repository path is calculated by removing the repository base path from the absolute path.
+            // Because the base path never ends with a slash the calculated repo path will always begin with a slash
+            // (it is never removed). There is one exception: the base path *does* end with a slash if it represents
+            // the entire file system, that is "/". In that case it must *not* be removed from the absolute path.
+            // In that case the repository path is the same as the absolute path.
             if (!FILE_REPOSITORY_PATH.equals("/")) {
                 repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
             }
@@ -476,40 +480,38 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // === File System Representation ===
 
     /**
-     * Fetches the File topic representing the file at the given absolute path.
+     * Fetches the File topic representing the file at the given repository path.
      * If no such File topic exists <code>null</code> is returned.
      *
-     * @param   path   An absolute path.
+     * @param   repoPath        A repository path. Must be canonized.
      */
-    private Topic fetchFileTopic(File path) {
-        return fetchTopic(path, "dm4.files.file");
+    private Topic fetchFileTopic(String repoPath) {
+        return fetchTopic(repoPath, "dm4.files.file");
     }
 
     /**
-     * Fetches the Folder topic representing the folder at the given absolute path.
+     * Fetches the Folder topic representing the folder at the given repository path.
      * If no such Folder topic exists <code>null</code> is returned.
      *
-     * @param   path   An absolute path.
+     * @param   repoPath        A repository path. Must be canonized.
      */
-    private Topic fetchFolderTopic(File path) {
-        return fetchTopic(path, "dm4.files.folder");
+    private Topic fetchFolderTopic(String repoPath) {
+        return fetchTopic(repoPath, "dm4.files.folder");
     }
 
     // ---
 
     /**
-     * Fetches the File/Folder topic representing the file/directory at the given absolute path.
+     * Fetches the File/Folder topic representing the file/directory at the given repository path.
      * If no such File/Folder topic exists <code>null</code> is returned.
      *
-     * @param   path            An absolute path.
+     * @param   repoPath        A repository path. Must be canonized.
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
-    private Topic fetchTopic(File path, String topicTypeUri) {
-        String repoPath = repoPath(path);
+    private Topic fetchTopic(String repoPath, String topicTypeUri) {
         Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(repoPath));
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
-                // ### FIXME: had fetchComposite=true
         }
         return null;
     }
@@ -524,7 +526,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = new ChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
-            .put("dm4.files.path", repoPath(path))
+            .put("dm4.files.path", repoPath(path))  // Note: repo path is already calculated by caller. Could be passed.
             .put("dm4.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
@@ -541,10 +543,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   path            An absolute path.
      */
     private Topic createFolderTopic(File path) throws Exception {
-        String folderName = path.getName();
-        String repoPath = repoPath(path);
+        String folderName = path.getName();         // Note: getName() of "/" returns ""
+        String repoPath = repoPath(path);           // Note: repo path is already calculated by caller. Could be passed.
         //
-        // root folder needs special treatment
+        // root folder needs special treatment ### TODO: drop this
         if (repoPath.equals("/")) {
             folderName = "";
         }
@@ -693,7 +695,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      *
      * @param   path    The absolute path to check.
      *
-     * @return  The canonical form of the absolute path.
+     * @return  The canonized absolute path.
      */
     private File checkPath(File path) throws FileRepositoryException, IOException {
         // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
@@ -725,16 +727,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * Checks if the user associated with a request is authorized to access a repository file.
      * If not authorized a FileRepositoryException (401 Unauthorized) is thrown.
      *
-     * @param   path        The absolute path of the file to check (as calculated already from the repository path).
-     * @param   repoPath    The repository path of the file to check.
+     * @param   repoPath    The repository path of the file to check. Must be canonized.
      * @param   request     The request.
      */
-    private void checkAuthorization(File path, String repoPath, HttpServletRequest request)
-                                                                                        throws FileRepositoryException {
+    private void checkAuthorization(String repoPath, HttpServletRequest request) throws FileRepositoryException {
         try {
             if (FILE_REPOSITORY_PER_WORKSPACE) {
                 // We check authorization for the repository path by checking access to the corresponding File topic.
-                Topic fileTopic = fetchFileTopic(path);
+                Topic fileTopic = fetchFileTopic(repoPath);
                 if (fileTopic != null) {
                     // We must perform access control for the fetchFileTopic() call manually here.
                     //
@@ -796,11 +796,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     /**
      * Returns the repository path of a File/Folder topic.
+     * Note: the returned repository path is canonized.
      */
     private String repoPath(long fileTopicId) {
         return repoPath(dms.getTopic(fileTopicId));
     }
 
+    /**
+     * Returns the repository path of a File/Folder topic.
+     * Note: the returned repository path is canonized.
+     */
     private String repoPath(Topic topic) {
         return topic.getChildTopics().getString("dm4.files.path");
     }
@@ -809,6 +814,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * Returns the repository path of a filerepo request.
      *
      * @return  The repository path or <code>null</code> if the request is not a filerepo request.
+     *          Note: the returned repository path is <i>not</i> canonized.
      */
     public String repoPath(HttpServletRequest request) {
         String repoPath = null;

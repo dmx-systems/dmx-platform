@@ -145,8 +145,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     // ### FIXME: no UPDATE directives are added. No UPDATE events are fired.
-    // Should we call the abstract updateChildTopics() instead?
-    // Should we drop setChildTopics() completely as its semantics is too unclear?
+    // Should we call the abstract updateChildTopics() instead? -> Yes!
+    // Should we drop setChildTopics() completely as its semantics is too unclear? -> No!
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
