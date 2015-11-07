@@ -798,7 +798,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * is stored with a unique name (by adding a number).
      *
      * @param   directory   The directory to store the uploaded file to.
-     *                      An canonized absolute path.
+     *                      A canonized absolute path.
      *
      * @return  The canonized absolute path.
      */

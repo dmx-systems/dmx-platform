@@ -224,6 +224,19 @@ var js = {
 
 
 
+    // ***************
+    // *** Numbers ***
+    // ***************
+
+
+
+    round: function(val, decimals) {
+        var factor = Math.pow(10, decimals)
+        return Math.round(factor * val) / factor
+    },
+
+
+
     // ************
     // *** Text ***
     // ************
@@ -282,6 +295,25 @@ var js = {
 
     format_timestamp: function(timestamp) {
         return new Date(timestamp).toLocaleString()
+    },
+
+    /**
+     * @param   size    File size in bytes.
+     */
+    format_file_size: function(size) {
+        var units = ["bytes", "KB", "MB", "GB"]
+        for (var i = 0; i <= 2; i++) {
+            if (size < 1024) {
+                return result()
+            }
+            size /= 1024
+        }
+        return result()
+
+        function result() {
+            var decimals = Math.max(i - 1, 0)
+            return js.round(size, decimals) + " " + units[i]
+        }
     },
 
     absolute_http_url: function(url) {
