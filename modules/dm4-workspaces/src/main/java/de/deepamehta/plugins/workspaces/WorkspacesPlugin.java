@@ -1,5 +1,9 @@
 package de.deepamehta.plugins.workspaces;
 
+import de.deepamehta.plugins.config.ConfigDefinition;
+import de.deepamehta.plugins.config.ConfigModificationRole;
+import de.deepamehta.plugins.config.ConfigService;
+import de.deepamehta.plugins.config.ConfigTarget;
 import de.deepamehta.plugins.facets.FacetsService;
 import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.topicmaps.TopicmapsService;
@@ -63,6 +67,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @Inject
     private TopicmapsService topicmapsService;
+
+    @Inject
+    private ConfigService configService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -184,6 +191,42 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {
                 _assignToWorkspace(configTopic, workspaceId);
             }
+        }
+    }
+
+
+
+    // ****************************
+    // *** Hook Implementations ***
+    // ****************************
+
+
+
+    @Override
+    public void preInstall() {
+        configService.registerConfigDefinition(new ConfigDefinition(
+            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
+            new TopicModel("dm4.workspaces.enabled_sharing_modes", new ChildTopicsModel()
+                .put("dm4.workspaces.private.enabled",       true)
+                .put("dm4.workspaces.confidential.enabled",  true)
+                .put("dm4.workspaces.collaborative.enabled", true)
+                .put("dm4.workspaces.public.enabled",        true)
+                .put("dm4.workspaces.common.enabled",        true)
+            ),
+            ConfigModificationRole.ADMIN
+        ));
+    }
+
+    @Override
+    public void shutdown() {
+        // Note 1: unregistering is crucial e.g. for redeploying the Workspaces plugin. The next register call
+        // (at preInstall() time) would fail as the Config service already holds such a registration.
+        // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
+        // Workspaces plugin is stopped/started as well but at shutdown() time the Config service is already gone.
+        if (configService != null) {
+            configService.unregisterConfigDefinition("dm4.workspaces.enabled_sharing_modes");
+        } else {
+            logger.warning("Config service is already gone");
         }
     }
 
