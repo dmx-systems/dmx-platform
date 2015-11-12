@@ -462,6 +462,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             // In that case the repository path is the same as the absolute path.
             if (!FILE_REPOSITORY_PATH.equals("/")) {
                 repoPath = repoPath.substring(FILE_REPOSITORY_PATH.length());
+                if (repoPath.equals("")) {
+                    repoPath = "/";
+                }
             }
             // ### FIXME: Windows drive letter?
             return repoPath;
@@ -545,17 +548,18 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     private Topic createFolderTopic(File path) throws Exception {
         String folderName = null;
         String repoPath = repoPath(path);   // Note: repo path is already calculated by caller. Could be passed.
+        File repoPathFile = new File(repoPath);
         //
         // if the repo path represents a workspace root directory the workspace name is used as Folder Name
         if (FILE_REPOSITORY_PER_WORKSPACE) {
-            if (new File(repoPath).getParent().equals("/")) {
+            if (repoPathFile.getParent().equals("/")) {
                 String workspaceName = dms.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
                 folderName = workspaceName;
             }
         }
         // by default the directory name is used as Folder Name
         if (folderName == null) {
-            folderName = path.getName();    // Note: getName() of "/" returns ""
+            folderName = repoPathFile.getName();    // Note: getName() of "/" returns ""
         }
         //
         return createFolderTopic(folderName, repoPath);    // throws Exception
