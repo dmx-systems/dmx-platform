@@ -38,7 +38,7 @@ class WebPublishingService {
     // Note: OPS4J Pax Web needs "/*". Felix HTTP Jetty in contrast needs "/".
     private static final String ROOT_APPLICATION_PATH = System.getProperty("dm4.webservice.path", "/");
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default values must match the values defined in global POM.
+    // via feature:install from Karaf. The default values must match the values defined in project POM.
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

@@ -20,7 +20,7 @@ import java.util.List;
 public class FilesTest {
 
     // ### FIXME: enable the tests
-    // ### They rely on the dm4.filerepo.path system property as defined in global POM
+    // ### They rely on the dm4.filerepo.path system property as defined in project POM
 
     @Ignore @Test
     public void directoryListing() {

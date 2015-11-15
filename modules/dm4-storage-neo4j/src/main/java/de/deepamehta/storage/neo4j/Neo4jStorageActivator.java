@@ -16,7 +16,7 @@ public class Neo4jStorageActivator implements BundleActivator {
 
     private static final String DATABASE_PATH = System.getProperty("dm4.database.path", "deepamehta-db");
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default value must match the value defined in global POM.
+    // via feature:install from Karaf. The default value must match the value defined in project POM.
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

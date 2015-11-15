@@ -101,7 +101,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
         System.getProperty("dm4.security.new_accounts_are_enabled", "true"));
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default values must match the values defined in global POM.
+    // via feature:install from Karaf. The default values must match the values defined in project POM.
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 

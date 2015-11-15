@@ -96,6 +96,13 @@
         <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
         <dm4.filerepo.disk_quota>150</dm4.filerepo.disk_quota>
 
+        <!-- Workspace Sharing Modes -->
+        <dm4.workspaces.private.enabled>true</dm4.workspaces.private.enabled>
+        <dm4.workspaces.confidential.enabled>true</dm4.workspaces.confidential.enabled>
+        <dm4.workspaces.collaborative.enabled>true</dm4.workspaces.collaborative.enabled>
+        <dm4.workspaces.public.enabled>true</dm4.workspaces.public.enabled>
+        <dm4.workspaces.common.enabled>true</dm4.workspaces.common.enabled>
+
         <!-- Logging -->
         <java.util.logging.config.file>
             ${project.basedir}/modules/dm4-distribution/conf/logging.properties

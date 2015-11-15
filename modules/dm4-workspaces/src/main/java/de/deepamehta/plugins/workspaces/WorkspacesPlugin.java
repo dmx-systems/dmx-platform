@@ -57,6 +57,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final boolean SHARING_MODE_PRIVATE_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.workspaces.private.enabled", "true"));
+    private static final boolean SHARING_MODE_CONFIDENTIAL_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.workspaces.confidential.enabled", "true"));
+    private static final boolean SHARING_MODE_COLLABORATIVE_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.workspaces.collaborative.enabled", "true"));
+    private static final boolean SHARING_MODE_PUBLIC_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.workspaces.public.enabled", "true"));
+    private static final boolean SHARING_MODE_COMMON_ENABLED = Boolean.parseBoolean(
+        System.getProperty("dm4.workspaces.common.enabled", "true"));
+    // Note: the default values are required in case no config file is in effect. This applies when DM is started
+    // via feature:install from Karaf. The default values must match the values defined in project POM.
+
     // Property URIs
     private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
 
@@ -207,11 +220,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
             new TopicModel("dm4.workspaces.enabled_sharing_modes", new ChildTopicsModel()
-                .put("dm4.workspaces.private.enabled",       true)
-                .put("dm4.workspaces.confidential.enabled",  true)
-                .put("dm4.workspaces.collaborative.enabled", true)
-                .put("dm4.workspaces.public.enabled",        true)
-                .put("dm4.workspaces.common.enabled",        true)
+                .put("dm4.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
+                .put("dm4.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
+                .put("dm4.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
+                .put("dm4.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
+                .put("dm4.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
             ),
             ConfigModificationRole.ADMIN
         ));

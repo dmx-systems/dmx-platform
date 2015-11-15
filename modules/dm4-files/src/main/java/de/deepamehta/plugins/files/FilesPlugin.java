@@ -62,7 +62,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
     public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", 150);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
-    // via feature:install from Karaf. The default value must match the value defined in global POM.
+    // via feature:install from Karaf. The default value must match the value defined in project POM.
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
