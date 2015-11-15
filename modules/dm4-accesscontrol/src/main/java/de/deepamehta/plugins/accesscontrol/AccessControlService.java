@@ -69,14 +69,15 @@ public interface AccessControlService {
      */
     String getUsername();
 
-
-
-    // === User Accounts ===
-
     /**
-     * @return  The "Username" topic of the created user account.
+     * Returns the "Username" topic of the logged in user.
+     *
+     * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
+     *          or <code>null</code> if no user is logged in.
      */
-    Topic createUserAccount(Credentials cred);
+    Topic getUsernameTopic();
+
+    // ---
 
     /**
      * Returns the private workspace of the logged in user.
@@ -87,8 +88,19 @@ public interface AccessControlService {
      */
     Topic getPrivateWorkspace();
 
+
+
+    // === User Accounts ===
+
+    /**
+     * @return  The "Username" topic of the created user account.
+     */
+    Topic createUserAccount(Credentials cred);
+
     /**
      * Returns the "Username" topic for the specified username.
+     *
+     * @param   username    a username. Must not be null.
      *
      * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
      *          or <code>null</code> if no such username exists.

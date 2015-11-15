@@ -377,23 +377,48 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         })
 
         function sharing_mode_selector() {
+            var enabled_sharing_modes = get_enabled_sharing_modes()
+            var _checked
             var selector = $()
-            add_option("Private",       "dm4.workspaces.private", true)
-            add_option("Confidential",  "dm4.workspaces.confidential")
-            add_option("Collaborative", "dm4.workspaces.collaborative")
-            add_option("Public",        "dm4.workspaces.public")
-            add_option("Common",        "dm4.workspaces.common")
+            add_sharing_mode("Private",       "dm4.workspaces.private")
+            add_sharing_mode("Confidential",  "dm4.workspaces.confidential")
+            add_sharing_mode("Collaborative", "dm4.workspaces.collaborative")
+            add_sharing_mode("Public",        "dm4.workspaces.public")
+            add_sharing_mode("Common",        "dm4.workspaces.common")
             return selector
 
-            function add_option(label, value, checked) {
+            function get_enabled_sharing_modes() {
+                var username_topic        = dm4c.get_plugin("de.deepamehta.accesscontrol").get_username_topic()
+                var enabled_sharing_modes = dm4c.get_plugin("de.deepamehta.config").get_config_topic(username_topic.id,
+                    "dm4.workspaces.enabled_sharing_modes")
+                return enabled_sharing_modes
+            }
+
+            function add_sharing_mode(name, sharing_mode_uri) {
+                var enabled = is_sharing_mode_enabled(sharing_mode_uri)
+                var checked = get_checked(enabled)
                 selector = selector
-                    .add($("<label>").attr("title", sharing_mode_help[value])
+                    .add($("<label>").attr("title", sharing_mode_help[sharing_mode_uri])
                         .append($("<input>").attr({
-                            type: "radio", name: "sharing-mode", value: value, checked: checked
+                            type: "radio", name: "sharing-mode", value: sharing_mode_uri, disabled: !enabled,
+                            checked: checked
                         }))
-                        .append(label)
+                        .append($("<span>").toggleClass("ui-state-disabled", !enabled).text(name))
                     )
                     .add($("<br>"))
+            }
+
+            function is_sharing_mode_enabled(sharing_mode_uri) {
+                return enabled_sharing_modes.childs[sharing_mode_uri + ".enabled"].value
+            }
+
+            function get_checked(enabled) {
+                if (!_checked) {
+                    if (enabled) {
+                        _checked = true
+                        return true
+                    }
+                }
             }
         }
 

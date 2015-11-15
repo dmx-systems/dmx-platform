@@ -19,7 +19,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     }
     dm4c.restc.get_username = function() {
         return this.request("GET", "/accesscontrol/user", undefined, undefined, undefined, "text")
-        // Note: response 204 No Content yields to null result
+        // Note: response 204 No Content yields to undefined result
+    }
+    dm4c.restc.get_username_topic = function() {
+        return this.request("GET", "/accesscontrol/username")
+        // Note: response 204 No Content yields to undefined result
     }
     dm4c.restc.create_user_account = function(username, password) { // password is expected to be SHA256 encoded
         return this.request("POST", "/accesscontrol/user_account", {username: username, password: password})
@@ -298,11 +302,20 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
-     * Returns the username (string) of the logged in user, or null if no user is logged in.
+     * Returns the username (string) of the logged in user, or undefined if no user is logged in.
      */
     this.get_username = function() {
         return dm4c.restc.get_username()
     }
+
+    /**
+     * Returns the Username topic of the logged in user, or undefined if no user is logged in.
+     */
+    this.get_username_topic = function() {
+        return dm4c.restc.get_username_topic()
+    }
+
+    // ---
 
     /**
      * @param   password    unencoded

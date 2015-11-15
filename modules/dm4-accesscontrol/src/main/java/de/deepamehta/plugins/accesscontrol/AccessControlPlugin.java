@@ -199,6 +199,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return dms.getAccessControl().getUsername(request);
     }
 
+    @GET
+    @Path("/username")
+    @Override
+    public Topic getUsernameTopic() {
+        return dms.getAccessControl().getUsernameTopic(request);
+    }
+
+    // ---
+
+    @GET
+    @Path("/user/workspace")
+    @Override
+    public Topic getPrivateWorkspace() {
+        String username = getUsername();
+        if (username == null) {
+            throw new IllegalStateException("No user is logged in");
+        }
+        return dms.getAccessControl().getPrivateWorkspace(username);
+    }
+
 
 
     // === User Accounts ===
@@ -254,17 +274,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
         }
-    }
-
-    @GET
-    @Path("/user/workspace")
-    @Override
-    public Topic getPrivateWorkspace() {
-        String username = getUsername();
-        if (username == null) {
-            throw new IllegalStateException("No user is logged in");
-        }
-        return dms.getAccessControl().getPrivateWorkspace(username);
     }
 
     @GET
