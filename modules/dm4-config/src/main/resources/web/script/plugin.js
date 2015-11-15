@@ -3,7 +3,7 @@ dm4c.add_plugin("de.deepamehta.config", function() {
     var config_defs = dm4c.restc.request("GET", "/config")
 
     function get_config_topic(topic_id, config_type_uri) {
-        return dm4c.restc.request("GET", "/config/" + config_type_uri + "/topic/" + topic_id)
+        return dm4c.restc.request("GET", "/config/" + config_type_uri + "/topic/" + topic_id + "?include_childs=true")
     }
 
     dm4c.add_listener("topic_commands", function(topic) {
