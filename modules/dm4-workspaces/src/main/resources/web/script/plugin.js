@@ -413,11 +413,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             }
 
             function get_checked(enabled) {
-                if (!_checked) {
-                    if (enabled) {
-                        _checked = true
-                        return true
-                    }
+                if (enabled && !_checked) {
+                    _checked = true
+                    return true
                 }
             }
         }
