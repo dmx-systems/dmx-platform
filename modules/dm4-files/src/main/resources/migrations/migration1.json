@@ -38,7 +38,15 @@
         {
             "value": "Size",
             "uri": "dm4.files.size",
-            "data_type_uri": "dm4.core.number"
+            "data_type_uri": "dm4.core.number",
+            "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.simple_renderer_uri": "dm4.files.file_size_renderer",
+                    }
+                }
+            ]
         },
         {
             "value": "File",

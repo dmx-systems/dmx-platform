@@ -69,7 +69,7 @@ public class Migration12 extends Migration {
         //
         // 3) create "Enabled Sharing Modes" config topics
         ResultList<RelatedTopic> usernames = dms.getTopics("dm4.accesscontrol.username", 0);
-        logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" to " +
+        logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" for " +
             usernames.getSize() + " usernames");
         for (Topic username : usernames) {
             configService.createConfigTopic("dm4.workspaces.enabled_sharing_modes", username);

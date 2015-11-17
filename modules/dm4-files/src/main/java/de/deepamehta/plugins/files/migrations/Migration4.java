@@ -11,7 +11,10 @@ import java.util.logging.Logger;
 
 
 /**
- * Rename root Folder topics, in case of dm4.filerepo.per_workspace=true.
+ * Renames root Folder topics, in case of dm4.filerepo.per_workspace=true.
+ * Renames topic type "Disk Quota" -> "Disk Quota (MB)".
+ * Installs the file size renderer.
+ * <p>
  * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.8-SNAPSHOT
@@ -30,6 +33,7 @@ public class Migration4 extends Migration {
 
     @Override
     public void run() {
+        // 1) Rename root Folder topics
         if (FILE_REPOSITORY_PER_WORKSPACE) {
             ResultList<RelatedTopic> workspaces = dms.getTopics("dm4.workspaces.workspace", 0);
             logger.info("########## Renaming root Folder topics of " + workspaces.getSize() + " possible workspaces");
@@ -46,6 +50,12 @@ public class Migration4 extends Migration {
             logger.info("########## Renaming root Folder topics ABORTED -- per-workspace file repositories are " +
                 "switched off");
         }
+        //
+        // 2) Rename topic type "Disk Quota"
+        dms.getTopicType("dm4.files.disk_quota").setSimpleValue("Disk Quota (MB)");
+        //
+        // 3) Install file size renderer
+        addTopicTypeSetting("dm4.files.size", "simple_renderer_uri", "dm4.files.file_size_renderer");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
