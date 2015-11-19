@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -34,6 +35,7 @@ import static java.util.Arrays.asList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -238,6 +240,70 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
             //
             tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
+    public void uriUniquenessCreateTopic() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            assertEquals("dm4.my.uri", topic.getUri());
+            //
+            dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            fail("\"URI not unique\" exception not thrown");
+            //
+            tx.success();
+        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            assertNotNull(cause);
+            assertEquals("URI \"dm4.my.uri\" is not unique", cause.getMessage());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void uriUniquenessSetUri() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic1 = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            assertEquals("dm4.my.uri", topic1.getUri());
+            //
+            Topic topic2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            assertEquals("", topic2.getUri());
+            //
+            topic2.setUri("dm4.my.uri");
+            fail("\"URI not unique\" exception not thrown");
+            //
+            tx.success();
+        } catch (Exception e) {
+            assertEquals("URI \"dm4.my.uri\" is not unique", e.getMessage());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void uriUniquenessUpdate() {
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic topic1 = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            assertEquals("dm4.my.uri", topic1.getUri());
+            //
+            Topic topic2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            assertEquals("", topic2.getUri());
+            //
+            topic2.update(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            fail("\"URI not unique\" exception not thrown");
+            //
+            tx.success();
+        } catch (Exception e) {
+            assertEquals("URI \"dm4.my.uri\" is not unique", e.getMessage());
         } finally {
             tx.finish();
         }

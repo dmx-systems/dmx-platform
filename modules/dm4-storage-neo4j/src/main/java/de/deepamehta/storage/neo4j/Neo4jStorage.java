@@ -152,14 +152,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopic(TopicModel topicModel) {
         setDefaults(topicModel);
-        String uri = topicModel.getUri();
-        checkUriUniqueness(uri);
         //
         // 1) update DB
         Node topicNode = neo4j.createNode();
         topicNode.setProperty(KEY_NODE_TYPE, "topic");
         //
-        storeAndIndexTopicUri(topicNode, uri);
+        storeAndIndexTopicUri(topicNode, topicModel.getUri());
         storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
         //
         // 2) update model
@@ -271,14 +269,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public void storeAssociation(AssociationModel assocModel) {
         setDefaults(assocModel);
-        String uri = assocModel.getUri();
-        checkUriUniqueness(uri);
         //
         // 1) update DB
         Node assocNode = neo4j.createNode();
         assocNode.setProperty(KEY_NODE_TYPE, "assoc");
         //
-        storeAndIndexAssociationUri(assocNode, uri);
+        storeAndIndexAssociationUri(assocNode, assocModel.getUri());
         storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
         //
         RoleModel role1 = assocModel.getRoleModel1();
@@ -574,10 +570,12 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Value Storage ===
 
     private void storeAndIndexTopicUri(Node topicNode, String uri) {
+        checkUriUniqueness(uri);
         storeAndIndexExactValue(topicNode, KEY_URI, uri, topicContentExact);
     }
 
     private void storeAndIndexAssociationUri(Node assocNode, String uri) {
+        checkUriUniqueness(uri);
         storeAndIndexExactValue(assocNode, KEY_URI, uri, assocContentExact);
     }
 
