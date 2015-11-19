@@ -30,6 +30,10 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <dm4.deploy.dir>../../bundle-deploy</dm4.deploy.dir>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -53,7 +57,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>../../bundle-deploy</directory>
+                            <directory>${dm4.deploy.dir}</directory>
                             <includes>
                                 <include>${project.artifactId}*.jar</include>
                             </includes>
@@ -82,7 +86,7 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>../../bundle-deploy</outputDirectory>
+                            <outputDirectory>${dm4.deploy.dir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
