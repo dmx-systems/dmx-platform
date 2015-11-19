@@ -30,10 +30,6 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <dm4.deploy.dir>../../bundle-deploy</dm4.deploy.dir>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -49,48 +45,65 @@
                     </instructions>
                 </configuration>
             </plugin>
+        </plugins>
+    </build>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${dm4.deploy.dir}</directory>
-                            <includes>
-                                <include>${project.artifactId}*.jar</include>
-                            </includes>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
-                    <execution>
-                        <id>hot-deploy</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
+    <profiles>
+        <profile>
+            <id>hot-deploy</id>
+            <activation>
+                <property>
+                    <name>!dm4.deploy.disable</name>
+                </property>
+            </activation>
+            <properties>
+                <dm4.deploy.dir>../../bundle-deploy</dm4.deploy.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.4.1</version>
                         <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>target</directory>
+                            <filesets>
+                                <fileset>
+                                    <directory>${dm4.deploy.dir}</directory>
                                     <includes>
                                         <include>${project.artifactId}*.jar</include>
                                     </includes>
-                                </resource>
-                            </resources>
-                            <outputDirectory>${dm4.deploy.dir}</outputDirectory>
+                                </fileset>
+                            </filesets>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.7</version>
+                        <executions>
+                            <execution>
+                                <id>hot-deploy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>target</directory>
+                                            <includes>
+                                                <include>${project.artifactId}*.jar</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <outputDirectory>${dm4.deploy.dir}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
