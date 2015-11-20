@@ -6,7 +6,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // View
     var workspace_menu          // A GUIToolkit Menu object
-    var sharing_mode_help = {
+
+    var WORKSPACE_INFO_BUTTON_TITLE = "Reveal the selected workspace on the topicmap.\n\n" +
+        "Use this to rename/delete the workspace or to inspect its settings."
+    var SHARING_MODE_HELP = {
         "dm4.workspaces.private":
             "Only you get access to the workspace content.\n\n" +
             "Use this for your privacy.",
@@ -65,7 +68,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         init_model()
 
         // init view
-        create_workspace_menu()
+        create_workspace_widget()
         refresh_workspace_menu()
     })
 
@@ -319,13 +322,15 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Workspace Menu ===
 
-    function create_workspace_menu() {
-        // build workspace widget
+    function create_workspace_widget() {
         var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
         workspace_menu = dm4c.ui.menu(do_select_workspace)
+        var workspace_info_button = dm4c.ui.button({on_click: do_reveal_workspace, icon: "info"})
+            .attr({title: WORKSPACE_INFO_BUTTON_TITLE})
         var workspace_widget = $("<div>").attr("id", "workspace-widget")
             .append(workspace_label)
             .append(workspace_menu.dom)
+            .append(workspace_info_button)
         // put in toolbar
         dm4c.toolbar.dom.prepend(workspace_widget)
 
@@ -336,6 +341,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             } else {
                 select_workspace(workspace_id)
             }
+        }
+
+        function do_reveal_workspace() {
+            dm4c.do_reveal_topic(get_selected_workspace_id(), "show")
         }
     }
 
@@ -398,7 +407,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
                 var enabled = is_sharing_mode_enabled(sharing_mode_uri)
                 var checked = get_checked(enabled)
                 selector = selector
-                    .add($("<label>").attr("title", sharing_mode_help[sharing_mode_uri])
+                    .add($("<label>").attr("title", SHARING_MODE_HELP[sharing_mode_uri])
                         .append($("<input>").attr({
                             type: "radio", name: "sharing-mode", value: sharing_mode_uri, disabled: !enabled,
                             checked: checked
