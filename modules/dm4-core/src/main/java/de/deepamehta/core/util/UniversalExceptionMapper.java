@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.core.Response.StatusType;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,23 +129,18 @@ public class UniversalExceptionMapper {
      * Transfers status code, headers, and entity of a JAX-RS Response to a HttpServletResponse and sends the response.
      */
     private void transferResponse(Response response, HttpServletResponse servletResponse) throws IOException {
-        // transfer status code
+        // status code
         servletResponse.setStatus(response.getStatus());
-        //
-        // ### TODO: transfering headers and entity.
-        // ### When we write and flush the response here Jetty issues warnings about "already comitted" afterwards.
-        //
-        // transfer headers
-        /* MultivaluedMap<String, Object> metadata = response.getMetadata();
+        // headers
+        MultivaluedMap<String, Object> metadata = response.getMetadata();
         for (String header : metadata.keySet()) {
             for (Object value : metadata.get(header)) {
                 servletResponse.addHeader(header, value.toString());
             }
-        } */
-        // transfer entity
-        /* PrintWriter writer = servletResponse.getWriter();
-        writer.write(response.getEntity().toString());     // throws IOException
-        writer.flush(); */
+        }
+        // entity
+        servletResponse.getWriter().write(response.getEntity().toString());     // throws IOException
+        // servletResponse.sendError(response.getStatus(), (String) response.getEntity()); // throws IOException
     }
 
     // --------------------------------------------------------------------------------------------------- Private Class
