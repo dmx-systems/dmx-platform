@@ -159,5 +159,23 @@ public interface FilesService {
 
     // ---
 
+    /**
+     * Returns a prefix that can be used for constructing a repository path.
+     * In case of per-workspace file repos are activated (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * represents the <i>current</i> workspace (e.g. <code>/workspace-1234</code>), based on the workspace cookie.
+     * In case of per-workspace file repos are <i>not</i> activated an empty string is returned.
+     */
+    String pathPrefix();
+
+    /**
+     * Returns a prefix that can be used for constructing a repository path.
+     * In case of per-workspace file repos are activated (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * represents the <i>given</i> workspace (e.g. <code>/workspace-1234</code>).
+     * In case of per-workspace file repos are <i>not</i> activated an empty string is returned.
+     */
+    String pathPrefix(long workspaceId);
+
+    // ---
+
     void openFile(long fileTopicId);
 }

@@ -66,7 +66,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     private static final String FILE_REPOSITORY_URI = "/filerepo";
 
-    private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile("/workspace-(\\d+).*");
+    private static final String WORKSPACE_DIRECTORY_PREFIX = "/workspace-";
+    private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile(WORKSPACE_DIRECTORY_PREFIX + "(\\d+).*");
 
     // Events
     public static DeepaMehtaEvent CHECK_DISK_QUOTA = new DeepaMehtaEvent(CheckDiskQuotaListener.class) {
@@ -375,6 +376,23 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // ---
 
+    @Override
+    public String pathPrefix() {
+        String operation = "Constructing the repository path prefix";
+        try {
+            return FILE_REPOSITORY_PER_WORKSPACE ? _pathPrefix(getWorkspaceId()) : "";
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    @Override
+    public String pathPrefix(long workspaceId) {
+        return FILE_REPOSITORY_PER_WORKSPACE ? _pathPrefix(workspaceId) : "";
+    }
+
+    // ---
+
     @POST
     @Path("/open/{id}")
     @Override
@@ -651,15 +669,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         }
     }
 
-    private long getWorkspaceId(String repoPath) {
-        Matcher m = PER_WORKSPACE_PATH_PATTERN.matcher(repoPath);
-        if (!m.matches()) {
-            throw new RuntimeException("No workspace recognized in repository path \"" + repoPath + "\"");
-        }
-        long workspaceId = Long.parseLong(m.group(1));
-        return workspaceId;
-    }
-
 
 
     // === File Repository ===
@@ -682,7 +691,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             }
             //
             if (FILE_REPOSITORY_PER_WORKSPACE && repoPath.equals("/")) {
-                repo = new File(repo, "/workspace-" + getWorkspaceId());
+                repo = new File(repo, _pathPrefix(getWorkspaceId()));
                 createWorkspaceFileRepository(repo);
             }
             //
@@ -693,30 +702,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Mapping repository path \"" + repoPath + "\" to an absolute path failed", e);
-        }
-    }
-
-    private long getWorkspaceId() {
-        Cookies cookies = Cookies.get();
-        if (!cookies.has("dm4_workspace_id")) {
-            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
-                "\"dm4_workspace_id\" cookie");
-        }
-        return cookies.getLong("dm4_workspace_id");
-    }
-
-    private void createWorkspaceFileRepository(File repo) {
-        try {
-            if (!repo.exists()) {
-                boolean created = repo.mkdir();
-                if (created) {
-                    logger.info("### Per-workspace file repository created: \"" + repo + "\"");
-                } else {
-                    throw new RuntimeException("Directory \"" + repo + "\" not created successfully");
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Creating per-workspace file repository failed", e);
         }
     }
 
@@ -857,5 +842,47 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             repoPath = JavaUtils.decodeURIComponent(repoPath);
         }
         return repoPath;
+    }
+
+    // --- Per-workspace file repositories ---
+
+    private void createWorkspaceFileRepository(File repo) {
+        try {
+            if (!repo.exists()) {
+                if (repo.mkdir()) {
+                    logger.info("### Per-workspace file repository created: \"" + repo + "\"");
+                } else {
+                    throw new RuntimeException("Directory \"" + repo + "\" not created successfully");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Creating per-workspace file repository failed", e);
+        }
+    }
+
+    // ---
+
+    private long getWorkspaceId() {
+        Cookies cookies = Cookies.get();
+        if (!cookies.has("dm4_workspace_id")) {
+            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
+                "\"dm4_workspace_id\" cookie");
+        }
+        return cookies.getLong("dm4_workspace_id");
+    }
+
+    private long getWorkspaceId(String repoPath) {
+        Matcher m = PER_WORKSPACE_PATH_PATTERN.matcher(repoPath);
+        if (!m.matches()) {
+            throw new RuntimeException("No workspace recognized in repository path \"" + repoPath + "\"");
+        }
+        long workspaceId = Long.parseLong(m.group(1));
+        return workspaceId;
+    }
+
+    // ---
+
+    private String _pathPrefix(long workspaceId) {
+        return WORKSPACE_DIRECTORY_PREFIX + workspaceId;
     }
 }
