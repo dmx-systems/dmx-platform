@@ -86,7 +86,7 @@ public interface FilesService {
     StoredFile storeFile(UploadedFile file, String path);
 
     /**
-     * Creates a file in the file repository, and creates a corresponding File topic.
+     * Creates a file in the file repository and a corresponding File topic.
      *
      * @param   in      The input stream the file content is read from.
      * @param   path    The path and filename of the file to be created.
@@ -100,7 +100,7 @@ public interface FilesService {
 
     /**
      * Creates a folder in the file repository.
-     * Note: to corresponding Folder topic is created.
+     * Note: no corresponding Folder topic is created.
      *
      * @param   path    The directory where to create the folder.
      *                  A repository path. Relative to the repository base path.
@@ -126,17 +126,36 @@ public interface FilesService {
 
     /**
      * Accesses a file/directory in the file repository by the given repository path.
-     * Note: this method doesn't require the corresponding File/Folder topic to exist.
+     * If no such file/directory exists a FileRepositoryException is thrown.
+     * <p>
+     * Note: this method does not require the corresponding File/Folder <i>topic</i> to exist.
      *
      * @param   path    A repository path. Relative to the repository base path.
      *                  Must begin with slash, no slash at the end.
+     *
+     * @throws  FileRepositoryException with status code 404 if no such file/directory exists in the file repository.
      */
     File getFile(String path);
 
     /**
-     * Accesses a file/directory in the file repository that is represented by the given File/Folder topic.
+     * Convenience method to access the file/directory in the file repository that is represented by the given
+     * File/Folder topic.
+     *
+     * @param   fileTopicId     ID of a File/Folder topic.
      */
     File getFile(long fileTopicId);
+
+    // ---
+
+    /**
+     * Checks if a file/directory with the given repository path exists in the file repository.
+     *
+     * @param   path    A repository path. Relative to the repository base path.
+     *                  Must begin with slash, no slash at the end.
+     *
+     * @return  <code>true</code> if the file exists, <code>false</code> otherwise.
+     */
+    boolean fileExists(String path);
 
     // ---
 

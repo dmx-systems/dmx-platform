@@ -329,7 +329,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(String path) {
-        String operation = "Accessing the file at \"" + path + "\"";
+        String operation = "Accessing the file/directory at repository path \"" + path + "\"";
         try {
             logger.info(operation);
             //
@@ -345,7 +345,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // To access a file remotely use the /filerepo resource.
     @Override
     public File getFile(long fileTopicId) {
-        String operation = "Accessing the file of File topic " + fileTopicId;
+        String operation = "Accessing the file/directory of File/Folder topic " + fileTopicId;
         try {
             logger.info(operation);
             //
@@ -353,6 +353,21 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             File file = absolutePath(path);     // throws FileRepositoryException
             checkExistence(file);               // throws FileRepositoryException
             return file;
+        } catch (Exception e) {
+            throw new RuntimeException(operation + " failed", e);
+        }
+    }
+
+    // ---
+
+    @Override
+    public boolean fileExists(String path) {
+        String operation = "Checking existence of file/directory at repository path \"" + path + "\"";
+        try {
+            logger.info(operation);
+            //
+            File file = absolutePath(path);     // throws FileRepositoryException
+            return file.exists();
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
