@@ -7,8 +7,9 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // View
     var workspace_menu          // A GUIToolkit Menu object
 
-    var WORKSPACE_INFO_BUTTON_TITLE = "Reveal the selected workspace on the topicmap.\n\n" +
+    var WORKSPACE_INFO_BUTTON_HELP = "Reveal the selected workspace on the topicmap.\n\n" +
         "Use this to rename/delete the workspace or to inspect its settings."
+
     var SHARING_MODE_HELP = {
         "dm4.workspaces.private":
             "Only you get access to the workspace content.\n\n" +
@@ -320,13 +321,13 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
 
 
-    // === Workspace Menu ===
+    // === Workspace Widget ===
 
     function create_workspace_widget() {
         var workspace_label = $("<span>").attr("id", "workspace-label").text("Workspace")
         workspace_menu = dm4c.ui.menu(do_select_workspace)
         var workspace_info_button = dm4c.ui.button({on_click: do_reveal_workspace, icon: "info"})
-            .attr({title: WORKSPACE_INFO_BUTTON_TITLE})
+            .attr({title: WORKSPACE_INFO_BUTTON_HELP})
         var workspace_widget = $("<div>").attr("id", "workspace-widget")
             .append(workspace_label)
             .append(workspace_menu.dom)

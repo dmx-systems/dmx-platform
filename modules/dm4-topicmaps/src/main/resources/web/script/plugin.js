@@ -21,6 +21,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // View
     var topicmap_menu               // A GUIToolkit Menu object
 
+    var TOPICMAP_INFO_BUTTON_HELP = "Reveal the selected topicmap on the topicmap itself.\n\n" +
+        "Use this to rename/delete the topicmap."
 
 
     // === REST Client Extension ===
@@ -98,58 +100,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         init_model()
 
         // init view
-        create_topicmap_menu()
+        create_topicmap_widget()
         refresh_topicmap_menu()
-
-        function create_topicmap_menu() {
-            // build topicmap widget
-            var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
-            topicmap_menu = dm4c.ui.menu(do_select_topicmap)
-            var topicmap_widget = $("<div>").attr("id", "topicmap-widget")
-                .append(topicmap_label)
-                .append(topicmap_menu.dom)
-            // put in toolbar
-            $("#workspace-widget").after(topicmap_widget)
-
-            function do_select_topicmap(menu_item) {
-                var topicmap_id = menu_item.value
-                if (topicmap_id == "_new") {
-                    do_open_topicmap_dialog()
-                } else {
-                    select_topicmap(topicmap_id)
-                }
-            }
-        }
-
-        function do_open_topicmap_dialog() {
-            var title_input = dm4c.render.input(undefined, 30)
-            var type_menu = create_maptype_menu()
-            var dialog_content = dm4c.render.label("Title").add(title_input)
-            if (type_menu.get_item_count() > 1) {
-                dialog_content = dialog_content.add(dm4c.render.label("Type")).add(type_menu.dom)
-            }
-            dm4c.ui.dialog({
-                title: "New Topicmap",
-                content: dialog_content,
-                button_label: "Create",
-                button_handler: do_create_topicmap
-            })
-
-            function create_maptype_menu() {
-                var menu = dm4c.ui.menu()
-                iterate_topicmap_renderers(function(renderer) {
-                    var info = renderer.get_info()
-                    menu.add_item({label: info.name, value: info.uri})
-                })
-                return menu
-            }
-
-            function do_create_topicmap() {
-                var name = title_input.val()
-                var topicmap_renderer_uri = type_menu.get_selection().value
-                create_topicmap(name, topicmap_renderer_uri)
-            }
-        }
     })
 
     /**
@@ -492,7 +444,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
-     *
+     * <p>
      * If no Topicmap topics are assigned a default topicmap is created. This happens when the user had deleted
      * the workspace's last topicmap.
      */
@@ -510,6 +462,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // ### TODO: sort topicmaps by name
     }
 
+    /**
+     * Looks up the topicmap topics for the selected workspace from the model and returns them.
+     */
     function get_topicmap_topics() {
         return topicmap_topics[get_selected_workspace_id()]
     }
@@ -610,7 +565,35 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     }
 
-    // === Topicmap Menu ===
+
+
+    // === Topicmap Widget ===
+
+    function create_topicmap_widget() {
+        var topicmap_label = $("<span>").attr("id", "topicmap-label").text("Topicmap")
+        topicmap_menu = dm4c.ui.menu(do_select_topicmap)
+        var topicmap_info_button = dm4c.ui.button({on_click: do_reveal_topicmap, icon: "info"})
+            .attr({title: TOPICMAP_INFO_BUTTON_HELP})
+        var topicmap_widget = $("<div>").attr("id", "topicmap-widget")
+            .append(topicmap_label)
+            .append(topicmap_menu.dom)
+            .append(topicmap_info_button)
+        // put in toolbar
+        $("#workspace-widget").after(topicmap_widget)
+
+        function do_select_topicmap(menu_item) {
+            var topicmap_id = menu_item.value
+            if (topicmap_id == "_new") {
+                open_topicmap_dialog()
+            } else {
+                select_topicmap(topicmap_id)
+            }
+        }
+
+        function do_reveal_topicmap() {
+            dm4c.do_reveal_topic(get_selected_topicmap_id(), "show")
+        }
+    }
 
     /**
      * Refreshes the topicmap menu based on the model ("topicmap_topics", "selected_topicmap_ids").
@@ -639,5 +622,39 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function select_menu_item() {
         topicmap_menu.select(get_selected_topicmap_id())
+    }
+
+
+
+    // === Topicmap Dialog ===
+
+    function open_topicmap_dialog() {
+        var title_input = dm4c.render.input(undefined, 30)
+        var type_menu = create_maptype_menu()
+        var dialog_content = dm4c.render.label("Title").add(title_input)
+        if (type_menu.get_item_count() > 1) {
+            dialog_content = dialog_content.add(dm4c.render.label("Type")).add(type_menu.dom)
+        }
+        dm4c.ui.dialog({
+            title: "New Topicmap",
+            content: dialog_content,
+            button_label: "Create",
+            button_handler: do_create_topicmap
+        })
+
+        function create_maptype_menu() {
+            var menu = dm4c.ui.menu()
+            iterate_topicmap_renderers(function(renderer) {
+                var info = renderer.get_info()
+                menu.add_item({label: info.name, value: info.uri})
+            })
+            return menu
+        }
+
+        function do_create_topicmap() {
+            var name = title_input.val()
+            var topicmap_renderer_uri = type_menu.get_selection().value
+            create_topicmap(name, topicmap_renderer_uri)
+        }
     }
 })
