@@ -18,23 +18,43 @@ public interface FilesService {
      * Returns the File topic representing the file at a given repository path.
      * If no such File topic exists it is created.
      *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
+     * @param   repoPath    A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  The File topic. Its child topics ("File Name", "Path", "Media Type", "Size") are included.
      */
-    Topic getFileTopic(String path);
+    Topic getFileTopic(String repoPath);
 
     /**
      * Returns the Folder topic representing the folder at a given repository path.
      * If no such Folder topic exists it is created.
      *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
+     * @param   repoPath    A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  The Folder topic. Its child topics ("Folder Name", "Path") are included.
      */
-    Topic getFolderTopic(String path);
+    Topic getFolderTopic(String repoPath);
 
     // ---
 
@@ -45,13 +65,24 @@ public interface FilesService {
      * Creates an association (type "Aggregation") between the File topic (role type "Child")
      * and its parent Folder topic (role type "Parent"), if not exists already.
      *
-     * @param   path            A repository path. Relative to the repository base path.
+     * @param   repoPath        A repository path. Relative to the repository base path.
      *                          Must begin with slash, no slash at the end.
+     *                          <p>
+     *                          If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                          the repository path must contain the workspace prefix as the first path segment,
+     *                          e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                          <p>
+     *                          However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                          as the repository path the workspace prefix is determined automatically with the
+     *                          semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                          <p>
+     *                          For support with constructing a repository path see the {@link pathPrefix} methods.
+     *
      * @param   folderTopicId   ID of the parent Folder topic.
      *
      * @return  The File topic. Its child topics ("File Name", "Path", "Media Type", "Size") are included.
      */
-    Topic getChildFileTopic(long folderTopicId, String path);
+    Topic getChildFileTopic(long folderTopicId, String repoPath);
 
     /**
      * Returns the Folder topic representing the folder at a given repository path.
@@ -60,13 +91,24 @@ public interface FilesService {
      * Creates an association (type "Aggregation") between the Folder topic (role type "Child")
      * and its parent Folder topic (role type "Parent"), if not exists already.
      *
-     * @param   path            A repository path. Relative to the repository base path.
+     * @param   repoPath        A repository path. Relative to the repository base path.
      *                          Must begin with slash, no slash at the end.
+     *                          <p>
+     *                          If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                          the repository path must contain the workspace prefix as the first path segment,
+     *                          e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                          <p>
+     *                          However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                          as the repository path the workspace prefix is determined automatically with the
+     *                          semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                          <p>
+     *                          For support with constructing a repository path see the {@link pathPrefix} methods.
+     *
      * @param   folderTopicId   ID of the parent Folder topic.
      *
      * @return  The Folder topic. Its child topics ("Folder Name", "Path") are included.
      */
-    Topic getChildFolderTopic(long folderTopicId, String path);
+    Topic getChildFolderTopic(long folderTopicId, String repoPath);
 
 
 
@@ -75,44 +117,77 @@ public interface FilesService {
     /**
      * Receives an uploaded file, stores it in the file repository, and creates a corresponding File topic.
      *
-     * @param   path    The directory where to store the uploaded file.
-     *                  A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
-     *                  The directory must exist.
+     * @param   repoPath    The directory where to store the uploaded file.
+     *                      The directory must exist.
+     *                      <p>
+     *                      A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  a StoredFile object which holds 2 information: the name of the uploaded file, and the ID
      *          of the created File topic.
      */
-    StoredFile storeFile(UploadedFile file, String path);
+    StoredFile storeFile(UploadedFile file, String repoPath);
 
     /**
      * Creates a file in the file repository and a corresponding File topic.
      *
-     * @param   in      The input stream the file content is read from.
-     * @param   path    The path and filename of the file to be created.
-     *                  A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
-     *                  If that file exists already it is overwritten. ### TODO: rethink overwriting
+     * @param   in          The input stream the file content is read from.
+     * @param   repoPath    The path and filename of the file to be created.
+     *                      If that file exists already it is overwritten. ### TODO: rethink overwriting
+     *                      <p>
+     *                      A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  the File topic that corresponds to the created file.
      */
-    Topic createFile(InputStream in, String path);
+    Topic createFile(InputStream in, String repoPath);
 
     /**
      * Creates a folder in the file repository.
      * Note: no corresponding Folder topic is created.
      *
-     * @param   path    The directory where to create the folder.
-     *                  A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
+     * @param   repoPath    The directory where to create the folder.
+     *                      <p>
+     *                      A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      */
-    void createFolder(String folderName, String path);
+    void createFolder(String folderName, String repoPath);
 
     // ---
 
-    ResourceInfo getResourceInfo(String path);
+    ResourceInfo getResourceInfo(String repoPath);
 
-    DirectoryListing getDirectoryListing(String path);
+    DirectoryListing getDirectoryListing(String repoPath);
 
     /**
      * Checks if the given URL refers to the file repository of this DeepaMehta installation.
@@ -130,12 +205,22 @@ public interface FilesService {
      * <p>
      * Note: this method does not require the corresponding File/Folder <i>topic</i> to exist.
      *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
+     * @param   repoPath    A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @throws  FileRepositoryException with status code 404 if no such file/directory exists in the file repository.
      */
-    File getFile(String path);
+    File getFile(String repoPath);
 
     /**
      * Convenience method to access the file/directory in the file repository that is represented by the given
@@ -150,28 +235,38 @@ public interface FilesService {
     /**
      * Checks if a file/directory with the given repository path exists in the file repository.
      *
-     * @param   path    A repository path. Relative to the repository base path.
-     *                  Must begin with slash, no slash at the end.
+     * @param   repoPath    A repository path. Relative to the repository base path.
+     *                      Must begin with slash, no slash at the end.
+     *                      <p>
+     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      the repository path must contain the workspace prefix as the first path segment,
+     *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
+     *                      <p>
+     *                      However there is one exception to that rule: if and only if <code>"/"</code> is passed
+     *                      as the repository path the workspace prefix is determined automatically with the
+     *                      semantics of <i>current workspace</i>, based on the request's workspace cookie.
+     *                      <p>
+     *                      For support with constructing a repository path see the {@link pathPrefix} methods.
      *
      * @return  <code>true</code> if the file exists, <code>false</code> otherwise.
      */
-    boolean fileExists(String path);
+    boolean fileExists(String repoPath);
 
     // ---
 
     /**
      * Returns a prefix that can be used for constructing a repository path.
-     * In case of per-workspace file repos are activated (<code>dm4.filerepo.per_workspace=true</code>) the prefix
-     * represents the <i>current</i> workspace (e.g. <code>/workspace-1234</code>), based on the workspace cookie.
-     * In case of per-workspace file repos are <i>not</i> activated an empty string is returned.
+     * In case of per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * represents the <i>current</i> workspace (e.g. <code>"/workspace-1234"</code>), based on the workspace cookie.
+     * In case of per-workspace file repos are <i>not</i> active an empty string is returned.
      */
     String pathPrefix();
 
     /**
      * Returns a prefix that can be used for constructing a repository path.
-     * In case of per-workspace file repos are activated (<code>dm4.filerepo.per_workspace=true</code>) the prefix
-     * represents the <i>given</i> workspace (e.g. <code>/workspace-1234</code>).
-     * In case of per-workspace file repos are <i>not</i> activated an empty string is returned.
+     * In case of per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * represents the <i>given</i> workspace (e.g. <code>"/workspace-1234"</code>).
+     * In case of per-workspace file repos are <i>not</i> active an empty string is returned.
      */
     String pathPrefix(long workspaceId);
 

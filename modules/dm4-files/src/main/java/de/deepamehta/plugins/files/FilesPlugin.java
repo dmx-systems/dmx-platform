@@ -102,14 +102,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Path("/file/{path}")
     @Transactional
     @Override
-    public Topic getFileTopic(@PathParam("path") String path) {
-        String operation = "Creating File topic for repository path \"" + path + "\"";
+    public Topic getFileTopic(@PathParam("path") String repoPath) {
+        String operation = "Creating File topic for repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
             // 1) pre-checks
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkExistence(file);               // throws FileRepositoryException
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(repoPath(file));
@@ -130,14 +130,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Path("/folder/{path}")
     @Transactional
     @Override
-    public Topic getFolderTopic(@PathParam("path") String path) {
-        String operation = "Creating Folder topic for repository path \"" + path + "\"";
+    public Topic getFolderTopic(@PathParam("path") String repoPath) {
+        String operation = "Creating Folder topic for repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
             // 1) pre-checks
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkExistence(file);               // throws FileRepositoryException
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             //
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(repoPath(file));
@@ -160,8 +160,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Path("/parent/{id}/file/{path}")
     @Transactional
     @Override
-    public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic topic = getFileTopic(path);
+    public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
+        Topic topic = getFileTopic(repoPath);
         createFolderAssociation(folderTopicId, topic);
         return topic;
     }
@@ -170,8 +170,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Path("/parent/{id}/folder/{path}")
     @Transactional
     @Override
-    public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String path) {
-        Topic topic = getFolderTopic(path);
+    public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
+        Topic topic = getFolderTopic(repoPath);
         createFolderAssociation(folderTopicId, topic);
         return topic;
     }
@@ -185,13 +185,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @Consumes("multipart/form-data")
     @Transactional
     @Override
-    public StoredFile storeFile(UploadedFile file, @PathParam("path") String path) {
-        String operation = "Storing " + file + " at repository path \"" + path + "\"";
+    public StoredFile storeFile(UploadedFile file, @PathParam("path") String repoPath) {
+        String operation = "Storing " + file + " at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = absolutePath(path);    // throws FileRepositoryException
-            checkExistence(directory);              // throws FileRepositoryException
+            File directory = absolutePath(repoPath);    // throws FileRepositoryException
+            checkExistence(directory);                  // throws FileRepositoryException
             //
             // 2) store file
             File repoFile = unusedPath(directory, file);
@@ -209,12 +209,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     @Override
-    public Topic createFile(InputStream in, String path) {
-        String operation = "Creating file (from input stream) at repository path \"" + path + "\"";
+    public Topic createFile(InputStream in, String repoPath) {
+        String operation = "Creating file (from input stream) at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             // 1) pre-checks
-            File file = absolutePath(path);         // throws FileRepositoryException
+            File file = absolutePath(repoPath);         // throws FileRepositoryException
             //
             // 2) store file
             FileOutputStream out = new FileOutputStream(file);
@@ -225,7 +225,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             // 3) create topic
             // ### TODO: think about overwriting an existing file.
             // ### FIXME: in this case the existing file topic is not updated and might reflect e.g. the wrong size.
-            return getFileTopic(path);
+            return getFileTopic(repoPath);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -234,13 +234,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @POST
     @Path("/{path}/folder/{folder_name}")
     @Override
-    public void createFolder(@PathParam("folder_name") String folderName, @PathParam("path") String path) {
-        String operation = "Creating folder \"" + folderName + "\" at repository path \"" + path + "\"";
+    public void createFolder(@PathParam("folder_name") String folderName, @PathParam("path") String repoPath) {
+        String operation = "Creating folder \"" + folderName + "\" at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             // 1) pre-checks
-            File directory = absolutePath(path);    // throws FileRepositoryException
-            checkExistence(directory);              // throws FileRepositoryException
+            File directory = absolutePath(repoPath);    // throws FileRepositoryException
+            checkExistence(directory);                  // throws FileRepositoryException
             //
             // 2) create directory
             File repoFile = path(directory, folderName);
@@ -265,12 +265,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @GET
     @Path("/{path}/info")
     @Override
-    public ResourceInfo getResourceInfo(@PathParam("path") String path) {
-        String operation = "Getting resource info for repository path \"" + path + "\"";
+    public ResourceInfo getResourceInfo(@PathParam("path") String repoPath) {
+        String operation = "Getting resource info for repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
-            File file = absolutePath(path);         // throws FileRepositoryException
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
             checkExistence(file);                   // throws FileRepositoryException
             //
             return new ResourceInfo(file);
@@ -284,13 +284,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @GET
     @Path("/{path}")
     @Override
-    public DirectoryListing getDirectoryListing(@PathParam("path") String path) {
-        String operation = "Getting directory listing for repository path \"" + path + "\"";
+    public DirectoryListing getDirectoryListing(@PathParam("path") String repoPath) {
+        String operation = "Getting directory listing for repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
-            File directory = absolutePath(path);    // throws FileRepositoryException
-            checkExistence(directory);              // throws FileRepositoryException
+            File directory = absolutePath(repoPath);    // throws FileRepositoryException
+            checkExistence(directory);                  // throws FileRepositoryException
             //
             return new DirectoryListing(directory, this);
             // ### TODO: if directory is no directory send NOT FOUND
@@ -329,13 +329,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // Note: this is not a resource method. So we don't throw a WebApplicationException here.
     // To access a file remotely use the /filerepo resource.
     @Override
-    public File getFile(String path) {
-        String operation = "Accessing the file/directory at repository path \"" + path + "\"";
+    public File getFile(String repoPath) {
+        String operation = "Accessing the file/directory at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkExistence(file);               // throws FileRepositoryException
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -350,9 +350,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            String path = repoPath(fileTopicId);
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkExistence(file);               // throws FileRepositoryException
+            String repoPath = repoPath(fileTopicId);
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             return file;
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -362,12 +362,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // ---
 
     @Override
-    public boolean fileExists(String path) {
-        String operation = "Checking existence of file/directory at repository path \"" + path + "\"";
+    public boolean fileExists(String repoPath) {
+        String operation = "Checking existence of file/directory at repository path \"" + repoPath + "\"";
         try {
             logger.info(operation);
             //
-            File file = absolutePath(path);     // throws FileRepositoryException
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
             return file.exists();
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
@@ -401,9 +401,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             logger.info(operation);
             //
-            String path = repoPath(fileTopicId);
-            File file = absolutePath(path);     // throws FileRepositoryException
-            checkExistence(file);               // throws FileRepositoryException
+            String repoPath = repoPath(fileTopicId);
+            File file = absolutePath(repoPath);     // throws FileRepositoryException
+            checkExistence(file);                   // throws FileRepositoryException
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
