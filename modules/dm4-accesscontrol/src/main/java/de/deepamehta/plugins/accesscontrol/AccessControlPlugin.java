@@ -556,6 +556,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void checkDiskQuota(String username, long fileSize, long diskQuota) {
+        if (diskQuota < 0) {
+            logger.info("### Checking disk quota of " + userInfo(username) + " ABORTED -- disk quota is disabled");
+            return;
+        }
+        //
         long occupiedSpace = getOccupiedSpace(username);
         boolean quotaOK = occupiedSpace + fileSize <= diskQuota;
         //
@@ -563,8 +568,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             " bytes, disk quota: " + diskQuota + " bytes => QUOTA " + (quotaOK ? "OK" : "EXCEEDED"));
         //
         if (!quotaOK) {
-            throw new RuntimeException("File upload quota of " + userInfo(username) + " exceeded. Quota is " +
-                diskQuota + " bytes.");
+            throw new RuntimeException("Disk quota of " + userInfo(username) + " exceeded. Disk quota: " +
+                diskQuota + " bytes. Currently occupied: " + occupiedSpace + " bytes.");
         }
     }
 
@@ -598,7 +603,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    // --- File upload quota ---
+    // --- Disk quota ---
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
