@@ -52,19 +52,6 @@
         </developer>        
     </developers>
 
-    <repositories>
-        <repository>
-            <id>snapshots-repo</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <properties>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -76,26 +63,14 @@
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
 
-        <!-- Webservice -->
-        <dm4.webservice.path>/</dm4.webservice.path>
-
-        <!-- Security -->
+        <!-- Request Filter -->
         <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
         <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
+
+        <!-- User Accounts -->
         <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
-
-        <!-- Host -->
-        <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
-
-        <!-- Database -->
-        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
-
-        <!-- File Repository -->
-        <dm4.filerepo.path>/</dm4.filerepo.path>
-        <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
         <dm4.filerepo.disk_quota>150</dm4.filerepo.disk_quota>
-
         <!-- Workspace Sharing Modes -->
         <dm4.workspaces.private.enabled>true</dm4.workspaces.private.enabled>
         <dm4.workspaces.confidential.enabled>true</dm4.workspaces.confidential.enabled>
@@ -103,11 +78,35 @@
         <dm4.workspaces.public.enabled>true</dm4.workspaces.public.enabled>
         <dm4.workspaces.common.enabled>true</dm4.workspaces.common.enabled>
 
+        <!-- File Repository -->
+        <dm4.filerepo.path>/</dm4.filerepo.path>
+        <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
+
+        <!-- Host -->
+        <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
+
+        <!-- Webservice -->
+        <dm4.webservice.path>/</dm4.webservice.path>
+
+        <!-- Hot Deployment -->
+        <!-- DeepaMehta plugins (jar files) from this directory are hot deployed (like any other OSGi bundle).  -->
+        <!-- You can add further directories here, separated by comma.                                          -->
+        <!-- IMPORTANT: the trimmed value of felix.fileinstall.dir must not contain any spaces. Otherwise the   -->
+        <!-- first and the last directory is ignored. Line breaks and tab characters are allowed however.       -->
+        <felix.fileinstall.dir>
+            ${project.basedir}/bundle-deploy
+        </felix.fileinstall.dir>
+
+        <!-- Database -->
+        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+
         <!-- Logging -->
         <java.util.logging.config.file>
             ${project.basedir}/modules/dm4-distribution/conf/logging.properties
         </java.util.logging.config.file>
-        <felix.log.level>1</felix.log.level><!-- To see any Felix logging set the level to at least 4. -->
+        <!-- To see any Felix/File Install logging set the level to at least 4 -->
+        <felix.log.level>0</felix.log.level>
+        <felix.fileinstall.log.level>0</felix.fileinstall.log.level>
 
         <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
@@ -229,9 +228,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <felix.fileinstall.dir>${project.basedir}/bundle-deploy</felix.fileinstall.dir>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -370,6 +366,12 @@
                 <module>modules/dm4-distribution</module>
                 <module>modules/dm4-features</module>
             </modules>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -425,12 +427,6 @@
                     </plugin>
                 </plugins>
             </build>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-            </distributionManagement>
         </profile>
 
         <profile>
