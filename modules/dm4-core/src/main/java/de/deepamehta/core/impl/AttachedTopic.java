@@ -114,17 +114,17 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                                     String othersTopicTypeUri, int maxResultSize) {
-        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(),
-            assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri, maxResultSize);
+                                                                                            String othersTopicTypeUri) {
+        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUris,
+            myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         return dms.instantiateRelatedTopics(topics);
     }
 
     // --- Association Retrieval ---
 
     @Override
-    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
-                                                    String othersRoleTypeUri, String othersAssocTypeUri) {
+    public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                            String othersAssocTypeUri) {
         RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
@@ -229,10 +229,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri,
-                                                           int maxResultSize) {
+                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
         return dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize);
+            othersTopicTypeUri);
     }
 
     // ---

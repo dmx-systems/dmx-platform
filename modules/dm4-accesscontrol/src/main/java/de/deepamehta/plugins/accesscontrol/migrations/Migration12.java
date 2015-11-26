@@ -68,7 +68,7 @@ public class Migration12 extends Migration {
         // (as the Access Control plugin depends indirectly on the Files plugin).
         //
         // 3) create "Enabled Sharing Modes" config topics
-        ResultList<RelatedTopic> usernames = dms.getTopics("dm4.accesscontrol.username", 0);
+        ResultList<RelatedTopic> usernames = dms.getTopics("dm4.accesscontrol.username");
         logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" for " +
             usernames.getSize() + " usernames");
         for (Topic username : usernames) {
@@ -83,7 +83,7 @@ public class Migration12 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void assignConfigTopics(String configTypeUri) {
-        ResultList<RelatedTopic> configTopics = dms.getTopics(configTypeUri, 0);
+        ResultList<RelatedTopic> configTopics = dms.getTopics(configTypeUri);
         logger.info("########## Reassigning " + configTopics.getSize() + " config topics of type \"" + configTypeUri +
             "\" to workspace \"Administration\"");
         for (Topic configTopic : configTopics) {

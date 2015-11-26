@@ -511,9 +511,7 @@ function RenderHelper() {
         }
         //
         if (result_set) {
-            var c = result_set.items.length
-            var tc = result_set.total_count
-            label += " (" + c + (tc > c ? " of " + tc : "") + ")"
+            label += " (" + result_set.items.length + ")"
         }
         //
         parent_element.append(this.label(label))

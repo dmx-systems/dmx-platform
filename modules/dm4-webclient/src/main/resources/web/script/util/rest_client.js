@@ -62,15 +62,12 @@ function RESTClient(config) {
     /**
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
-     * @param   max_result_size     Optional: Result limitation (a number).
-     *                              If 0 or if not specified the result is not limited.
      *
-     * @return  An object with 2 properties:
+     * @return  An object with 1 property:
      *              "items"       - array of topics, possibly empty.
-     *              "total_count" - result set size before limitation.
      */
-    this.get_topics = function(type_uri, include_childs, sort, max_result_size) {
-        var params = new RequestParameter({include_childs: include_childs, max_result_size: max_result_size})
+    this.get_topics = function(type_uri, include_childs, sort) {
+        var params = new RequestParameter({include_childs: include_childs})
         var result = request("GET", "/core/topic/by_type/" + type_uri + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
@@ -88,16 +85,12 @@ function RESTClient(config) {
      *                              If not specified no filter is applied.
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
-     * @param   max_result_size     Optional: Result limitation (a number).
-     *                              If 0 or if not specified the result is not limited.
      *
-     * @return  An object with 2 properties:
+     * @return  An object with 1 property:
      *              "items"       - array of topics, possibly empty.
-     *              "total_count" - result set size before limitation.
      */
-    this.get_topic_related_topics = function(topic_id, traversal_filter, sort, max_result_size) {
+    this.get_topic_related_topics = function(topic_id, traversal_filter, sort) {
         var params = new RequestParameter(traversal_filter)
-        params.add("max_result_size", max_result_size)
         var result = request("GET", "/core/topic/" + topic_id + "/related_topics" + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)
@@ -170,16 +163,12 @@ function RESTClient(config) {
      *                              If not specified no filter is applied.
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
-     * @param   max_result_size     Optional: Result limitation (a number).
-     *                              If 0 or if not specified the result is not limited.
      *
-     * @return  An object with 2 properties:
+     * @return  An object with 1 property:
      *              "items"       - array of topics, possibly empty.
-     *              "total_count" - result set size before limitation.
      */
-    this.get_association_related_topics = function(assoc_id, traversal_filter, sort, max_result_size) {
+    this.get_association_related_topics = function(assoc_id, traversal_filter, sort) {
         var params = new RequestParameter(traversal_filter)
-        params.add("max_result_size", max_result_size)
         var result = request("GET", "/core/association/" + assoc_id + "/related_topics" + params.to_query_string())
         if (sort) {
             this.sort_topics(result.items)

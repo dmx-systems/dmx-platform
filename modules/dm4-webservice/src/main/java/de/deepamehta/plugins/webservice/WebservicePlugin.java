@@ -74,9 +74,8 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_type/{type_uri}")
-    public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri,
-                                              @QueryParam("max_result_size") int maxResultSize) {
-        return dms.getTopics(typeUri, maxResultSize);
+    public ResultList<RelatedTopic> getTopics(@PathParam("type_uri") String typeUri) {
+        return dms.getTopics(typeUri);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -318,14 +317,12 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/topic/{id}/related_topics")
     public ResultList<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                    long topicId,
-                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                         @QueryParam("max_result_size")       int maxResultSize) {
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
         Topic topic = dms.getTopic(topicId);
-        return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize);
+        return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -353,14 +350,13 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/association/{id}/related_topics")
     public ResultList<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")              long assocId,
-                                                         @QueryParam("assoc_type_uri")        String assocTypeUri,
-                                                         @QueryParam("my_role_type_uri")      String myRoleTypeUri,
-                                                         @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
-                                                         @QueryParam("others_topic_type_uri") String othersTopicTypeUri,
-                                                         @QueryParam("max_result_size")       int maxResultSize) {
+                                                       @QueryParam("assoc_type_uri")        String assocTypeUri,
+                                                       @QueryParam("my_role_type_uri")      String myRoleTypeUri,
+                                                       @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
+                                                       @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
         Association assoc = dms.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize);
+            othersTopicTypeUri);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -381,16 +377,13 @@ public class WebservicePlugin extends PluginActivator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private ResultList<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
-                                                      String myRoleTypeUri, String othersRoleTypeUri,
-                                                      String othersTopicTypeUri, int maxResultSize) {
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
-            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri +
-            "\", maxResultSize=" + maxResultSize + ")";
+            "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")";
         try {
             logger.info(operation + " " + paramInfo);
-            return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri,
-                maxResultSize);
+            return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
         }

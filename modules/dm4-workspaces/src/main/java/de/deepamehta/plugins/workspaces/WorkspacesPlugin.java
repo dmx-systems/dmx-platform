@@ -150,7 +150,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
                                                       @PathParam("type_uri") String topicTypeUri) {
-        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri, 0);   // maxResultSize=0
+        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
         return topics;
     }

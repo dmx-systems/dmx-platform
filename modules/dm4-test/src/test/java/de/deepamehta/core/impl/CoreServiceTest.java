@@ -643,7 +643,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
         comp1.loadChildTopics();
         assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
-        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
         //
         // update and check again
         tx = dms.beginTx();
@@ -660,7 +660,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
         assertEquals("Item 2",      comp1.getChildTopics().getString("dm4.test.item"));
         assertEquals(item2.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
         //
         // update and check again
         tx = dms.beginTx();
@@ -677,7 +677,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
         assertEquals("Item 1",      comp1.getChildTopics().getString("dm4.test.item"));
         assertEquals(item1.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
     }
 
     @Test
@@ -719,7 +719,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic facetValue = (Topic)  name.getChildTopics().get("dm4.test.item");
         assertEquals("Item 1",      facetValue.getSimpleValue().toString());
         assertEquals(item1.getId(), facetValue.getId());
-        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
         //
         // update facet again
         tx = dms.beginTx();
@@ -734,7 +734,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
         assertEquals("Item 2",      facetValue.getSimpleValue().toString());
         assertEquals(item2.getId(), facetValue.getId());
-        assertEquals(2, dms.getTopics("dm4.test.item", 0).getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
     }
 
     // ---
@@ -980,7 +980,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultList<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", type.getUri(), 0);
+            "dm4.core.type", "dm4.core.instance", type.getUri());
     }
 
     private ResultList<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
@@ -990,7 +990,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultList<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
-            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type", 0);
+            "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type");
     }
 
     // ---
@@ -1039,7 +1039,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     private ResultList<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
-            "dm4.core.default", "dm4.core.default", "dm4.core.plugin", 0);
+            "dm4.core.default", "dm4.core.default", "dm4.core.plugin");
     }
 
     private ResultList<RelatedAssociation> getTestAssociations(Topic topic) {

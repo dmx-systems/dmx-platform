@@ -97,17 +97,16 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                  String othersTopicTypeUri);
 
-    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize);
+    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
      * @param   myRoleTypeUri       may be null
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
-     * @param   maxResultSize       Result size limit. Pass 0 for no limit.
      */
     ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri, int maxResultSize);
+                                              String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUris       may *not* be null
@@ -116,7 +115,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersTopicTypeUri  may be null
      */
     ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri, int maxResultSize);
+                                              String othersTopicTypeUri);
 
     // --- Association Retrieval ---
 

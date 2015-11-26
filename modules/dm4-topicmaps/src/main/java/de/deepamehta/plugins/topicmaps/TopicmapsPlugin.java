@@ -303,8 +303,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewmodel> topics = new HashMap();
-        ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT,
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", null, 0);   // othersTopicTypeUri=null, maxResultSize=0
+        ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
+            "dm4.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
         if (includeChilds) {
             relTopics.loadChildTopics();
         }

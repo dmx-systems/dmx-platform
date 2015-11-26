@@ -227,7 +227,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private List<IndexMode> fetchIndexModes(long typeId) {
         ResultList<RelatedTopicModel> indexModes = dms.storageDecorator.fetchTopicRelatedTopics(typeId,
-            "dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.index_mode", 0);
+            "dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
         return IndexMode.fromTopics(indexModes.getItems());
     }
 
@@ -301,8 +301,8 @@ class TypeStorageImpl implements TypeStorage {
         // and "dm4.core.meta_type" (the latter is required e.g. by dm4-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
         ResultList<RelatedTopic> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null, 0);
-            // othersTopicTypeUri=null, maxResultSize=0
+            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null);
+            // othersTopicTypeUri=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
@@ -672,7 +672,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = typeTopic.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.type", "dm4.core.view_config", null, 0).loadChildTopics();
+                "dm4.core.type", "dm4.core.view_config", null).loadChildTopics();
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
@@ -684,7 +684,7 @@ class TypeStorageImpl implements TypeStorage {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             ResultList<RelatedTopic> configTopics = assocDef.getRelatedTopics("dm4.core.aggregation",
-                "dm4.core.assoc_def", "dm4.core.view_config", null, 0).loadChildTopics();
+                "dm4.core.assoc_def", "dm4.core.view_config", null).loadChildTopics();
             return new ViewConfigurationModel(DeepaMehtaUtils.toTopicModels(configTopics));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +

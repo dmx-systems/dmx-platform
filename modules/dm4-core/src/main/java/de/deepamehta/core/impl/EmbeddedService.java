@@ -126,10 +126,10 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultList<RelatedTopic> getTopics(String topicTypeUri, int maxResultSize) {
+    public ResultList<RelatedTopic> getTopics(String topicTypeUri) {
         try {
             return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", topicTypeUri, maxResultSize);
+                "dm4.core.instance", topicTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
@@ -321,7 +321,7 @@ public class EmbeddedService implements DeepaMehtaService {
             Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
                 new SimpleValue("dm4.core.topic_type")));
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.topic_type", 0);
+                "dm4.core.instance", "dm4.core.topic_type");
             List<String> topicTypeUris = new ArrayList();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
@@ -404,7 +404,7 @@ public class EmbeddedService implements DeepaMehtaService {
             Topic metaType = instantiateTopic(storageDecorator.fetchTopic("uri",
                 new SimpleValue("dm4.core.assoc_type")));
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.assoc_type", 0);
+                "dm4.core.instance", "dm4.core.assoc_type");
             List<String> assocTypeUris = new ArrayList();
             for (Topic assocType : assocTypes) {
                 assocTypeUris.add(assocType.getUri());
@@ -682,7 +682,7 @@ public class EmbeddedService implements DeepaMehtaService {
                 // don't add topic to result and continue
             }
         }
-        return new ResultList<RelatedTopic>(models.getTotalCount(), relTopics);
+        return new ResultList<RelatedTopic>(relTopics);
     }
 
     // ===

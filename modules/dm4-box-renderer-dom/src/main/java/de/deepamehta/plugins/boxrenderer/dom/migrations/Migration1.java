@@ -61,7 +61,7 @@ public class Migration1 extends Migration {
         if (color != null || expanded != null) {
             props++;
             for (RelatedTopic topicmap : topic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.topicmaps.topicmap_topic",
-                                                                "dm4.core.default", "dm4.topicmaps.topicmap", 0)) {
+                                                                "dm4.core.default", "dm4.topicmaps.topicmap")) {
                 Association mapcontextAssoc = topicmap.getRelatingAssociation();
                 if (color != null) {
                     mapcontextAssoc.setProperty(PROP_COLOR, color, false);          // addToIndex = false

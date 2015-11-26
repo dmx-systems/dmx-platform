@@ -16,18 +16,15 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private int totalCount;
     private List<T> items;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public ResultList() {
-        this.totalCount = 0;
         this.items = new ArrayList<T>();
     }
 
-    public ResultList(int totalCount, List<T> items) {
-        this.totalCount = totalCount;
+    public ResultList(List<T> items) {
         this.items = items;
     }
 
@@ -41,10 +38,6 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
         return items.size();
     }
 
-    public int getTotalCount() {
-        return totalCount;
-    }
-
     public List<T> getItems() {
         return items;
     }
@@ -52,12 +45,10 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
     // ---
 
     public void add(T item) {
-        totalCount++;
         items.add(item);
     }
 
     public void addAll(ResultList<T> result) {
-        totalCount += result.getTotalCount();
         items.addAll(result.getItems());
     }
 
@@ -83,9 +74,7 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
     @Override
     public JSONObject toJSON() {
         try {
-            return new JSONObject()
-                .put("total_count", totalCount)
-                .put("items", DeepaMehtaUtils.toJSONArray(items));
+            return new JSONObject().put("items", DeepaMehtaUtils.toJSONArray(items));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

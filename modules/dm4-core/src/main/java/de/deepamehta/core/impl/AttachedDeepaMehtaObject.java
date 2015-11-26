@@ -222,7 +222,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         for (AssociationDefinition assocDef : getType().getAssocDefs()) {
             if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
                 for (Topic childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
-                        "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri(), 0)) {
+                        "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
                     childTopic.delete();
                 }
             }
@@ -248,15 +248,15 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     }
 
     @Override
-    public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, int maxResultSize) {
-        return getRelatedTopics(assocTypeUri, null, null, null, maxResultSize);
+    public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri) {
+        return getRelatedTopics(assocTypeUri, null, null, null);
     }
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                            String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize) {
+                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri, maxResultSize);     // fetchRelatedTopics() is abstract
+            othersTopicTypeUri);    // fetchRelatedTopics() is abstract
         return dms.instantiateRelatedTopics(topics);
     }
 
@@ -352,7 +352,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
                                                  String othersRoleTypeUri, String othersTopicTypeUri);
 
     abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                String othersRoleTypeUri, String othersTopicTypeUri, int maxResultSize);
+                                                              String othersRoleTypeUri, String othersTopicTypeUri);
 
     // ---
 

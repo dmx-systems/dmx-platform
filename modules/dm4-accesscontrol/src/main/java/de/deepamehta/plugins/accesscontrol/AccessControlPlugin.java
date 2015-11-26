@@ -607,7 +607,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
-        for (Topic fileTopic : dms.getTopics("dm4.files.file", 0)) {
+        for (Topic fileTopic : dms.getTopics("dm4.files.file")) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
                 occupiedSpace += filesService.getFile(fileTopicId).length();

@@ -106,7 +106,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\"");
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<RelatedTopic> topics = dms.getTopics(typeUri, 0).getItems();   // maxResultSize=0
+            List<RelatedTopic> topics = dms.getTopics(typeUri).getItems();
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Path("/topic/{id}/related_topics")
     public ResultList getRelatedTopics(@PathParam("id") long topicId) {
         Topic topic = dms.getTopic(topicId);
-        ResultList<RelatedTopic> topics = topic.getRelatedTopics(null, 0);   // assocTypeUri=null, maxResultSize=0
+        ResultList<RelatedTopic> topics = topic.getRelatedTopics(null);     // assocTypeUri=null
         Iterator<RelatedTopic> i = topics.iterator();
         int removed = 0;
         while (i.hasNext()) {
@@ -209,7 +209,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 searchableUnits.add(topic);
             } else {
                 List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-                    "dm4.core.parent", null, 0).getItems();
+                    "dm4.core.parent", null).getItems();
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {

@@ -65,7 +65,7 @@ public class Migration4 extends Migration {
     private void deleteTopicType(String topicTypeUri) {
         typesDeleted++;
         // delete instances
-        for (Topic topic : dms.getTopics(topicTypeUri, 0)) {    // maxResultSize=0
+        for (Topic topic : dms.getTopics(topicTypeUri)) {
             topic.delete();
             topicsDeleted++;
         }

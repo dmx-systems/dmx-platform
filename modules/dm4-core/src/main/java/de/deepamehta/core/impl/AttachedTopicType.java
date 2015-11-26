@@ -87,6 +87,6 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
-        return dms.getTopics(getUri(), 0).getItems();
+        return dms.getTopics(getUri()).getItems();
     }
 }

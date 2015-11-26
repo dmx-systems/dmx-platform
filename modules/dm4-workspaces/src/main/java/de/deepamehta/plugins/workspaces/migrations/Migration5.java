@@ -60,7 +60,7 @@ public class Migration5 extends Migration {
         //
         // 4) Sets the sharing mode of all workspaces to "Public".
         //
-        for (Topic workspace : dms.getTopics("dm4.workspaces.workspace", 0)) {
+        for (Topic workspace : dms.getTopics("dm4.workspaces.workspace")) {
             workspace.update(new TopicModel(null, new ChildTopicsModel()
                 .putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
             ));
@@ -75,7 +75,7 @@ public class Migration5 extends Migration {
 
     private void initWorkspaceProperty(DeepaMehtaObject object) {
         ResultList<RelatedTopic> workspaces = object.getRelatedTopics("dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.workspace", 0);
+            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.workspace");
         objects++;
         switch (workspaces.getSize()) {
         case 0:

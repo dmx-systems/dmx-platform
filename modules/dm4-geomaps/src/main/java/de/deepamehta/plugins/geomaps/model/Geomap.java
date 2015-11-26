@@ -94,6 +94,6 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
 
     private ResultList<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic) {
         return geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext", "dm4.core.default",
-            "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate", 0).loadChildTopics();     // maxResultSize=0
+            "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate").loadChildTopics();
     }
 }
