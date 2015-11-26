@@ -70,7 +70,7 @@
 
         <!-- User Accounts -->
         <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
-        <dm4.filerepo.disk_quota>150</dm4.filerepo.disk_quota>
+        <dm4.filerepo.disk_quota>-1</dm4.filerepo.disk_quota>
         <!-- Workspace Sharing Modes -->
         <dm4.workspaces.private.enabled>true</dm4.workspaces.private.enabled>
         <dm4.workspaces.confidential.enabled>true</dm4.workspaces.confidential.enabled>
@@ -92,7 +92,7 @@
         <!-- DeepaMehta plugins (jar files) from this directory are hot deployed (like any other OSGi bundle).  -->
         <!-- You can add further directories here, separated by comma.                                          -->
         <!-- IMPORTANT: the trimmed value of felix.fileinstall.dir must not contain any spaces. Otherwise the   -->
-        <!-- first and the last directory is ignored. Line breaks and tab characters are allowed however.       -->
+        <!-- first and the last directory will be ignored. Line breaks and tab characters are allowed however.  -->
         <felix.fileinstall.dir>
             ${project.basedir}/bundle-deploy
         </felix.fileinstall.dir>
