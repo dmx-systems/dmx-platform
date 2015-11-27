@@ -65,6 +65,7 @@ function OpenLayersView(config) {
         OpenLayers.ImgPath = "/de.deepamehta.geomaps/script/vendor/openlayers/img/"
         //
         map = new OpenLayers.Map({
+            theme: null,    // we load stylesheet ourselves, see plugin.js
             controls: []
         })
         map.addLayers([
