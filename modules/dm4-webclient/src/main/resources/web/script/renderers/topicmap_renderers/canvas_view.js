@@ -561,19 +561,21 @@ function CanvasView() {
 
 
     function bind_canvas_event_listeners() {
-        // in contrast to addEventListener() jQuery's bind() method apparently prevents default behavior
-        var _canvas = $(canvas)
-        _canvas.bind("mousedown",   do_mousedown)
-        _canvas.bind("mouseup",     do_mouseup)
-        _canvas.bind("mousemove",   do_mousemove)
-        _canvas.bind("mouseleave",  do_mouseleave)
-        _canvas.bind("dblclick",    do_doubleclick)
-        _canvas.bind("touchstart",  do_touchstart)
-        _canvas.bind("touchend",    do_touchend)
-        _canvas.bind("touchmove",   do_touchmove)
-        _canvas.bind("contextmenu", do_contextmenu)
-        _canvas.bind("dragover",    do_dragover)
-        _canvas.bind("drop",        do_drop)
+        // Note: by delegating event handling of the canvas element to the parent element (topicmap-panel)
+        // we don't loose the event handlers when the canvas is detached from the document (which happens
+        // when switching to the geomaps renderer).
+        $("#topicmap-panel")
+        	.on("mousedown",   "#canvas", do_mousedown)
+        	.on("mouseup",     "#canvas", do_mouseup)
+        	.on("mousemove",   "#canvas", do_mousemove)
+        	.on("mouseleave",  "#canvas", do_mouseleave)
+        	.on("dblclick",    "#canvas", do_doubleclick)
+        	.on("touchstart",  "#canvas", do_touchstart)
+        	.on("touchend",    "#canvas", do_touchend)
+        	.on("touchmove",   "#canvas", do_touchmove)
+        	.on("contextmenu", "#canvas", do_contextmenu)
+        	.on("dragover",    "#canvas", do_dragover)
+        	.on("drop",        "#canvas", do_drop)
     }
 
 

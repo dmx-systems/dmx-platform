@@ -144,9 +144,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
         return childTopics;
     }
 
-    // ### FIXME: no UPDATE directives are added. No UPDATE events are fired.
-    // Should we call the abstract updateChildTopics() instead? -> Yes!
-    // Should we drop setChildTopics() completely as its semantics is too unclear? -> No!
+    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
+    // We should call the abstract updateChildTopics() instead.
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
@@ -196,11 +195,17 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---
 
+    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
+    // Directives/events is handled only in the high-level update() method.
+    // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         getChildTopics().updateChildTopics(newChildTopic, null, assocDef);      // newChildTopics=null
     }
 
+    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
+    // Directives/events is handled only in the high-level update() method.
+    // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
         getChildTopics().updateChildTopics(null, newChildTopics, assocDef);     // newChildTopic=null
