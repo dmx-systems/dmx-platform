@@ -503,6 +503,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
+    public void indexTopicProperty(long topicId, String propUri, Object propValue) {
+        indexExactValue(fetchTopicNode(topicId), propUri, propValue, topicContentExact);
+    }
+
+    @Override
+    public void indexAssociationProperty(long assocId, String propUri, Object propValue) {
+        storeAndIndexExactValue(fetchAssociationNode(assocId), propUri, propValue, assocContentExact);
+    }
+
+    // ---
+
+    @Override
     public void deleteTopicProperty(long topicId, String propUri) {
         Node topicNode = fetchTopicNode(topicId);
         topicNode.removeProperty(propUri);
@@ -605,12 +617,16 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         node.setProperty(key, value);
         // index
         if (exactIndex != null) {
-            // Note: numbers are indexed numerically to allow range queries.
-            if (value instanceof Number) {
-                value = ValueContext.numeric((Number) value);
-            }
-            indexNodeValue(node, value, asList(IndexMode.KEY), key, exactIndex, null);      // fulltextIndex=null
+            indexExactValue(node, key, value, exactIndex);
         }
+    }
+
+    private void indexExactValue(Node node, String key, Object value, Index<Node> exactIndex) {
+        // Note: numbers are indexed numerically to allow range queries.
+        if (value instanceof Number) {
+            value = ValueContext.numeric((Number) value);
+        }
+        indexNodeValue(node, value, asList(IndexMode.KEY), key, exactIndex, null);      // fulltextIndex=null
     }
 
     // ---

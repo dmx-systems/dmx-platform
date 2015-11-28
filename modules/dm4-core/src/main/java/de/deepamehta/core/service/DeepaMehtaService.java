@@ -256,6 +256,12 @@ public interface DeepaMehtaService {
 
     List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to);
 
+    // ---
+
+    void addTopicPropertyIndex(String propUri);
+
+    void addAssociationPropertyIndex(String propUri);
+
 
 
     // === Misc ===

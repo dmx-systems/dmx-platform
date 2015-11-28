@@ -572,6 +572,42 @@ public class EmbeddedService implements DeepaMehtaService {
         return instantiateAssociations(storageDecorator.fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
+    // ---
+
+    @Override
+    public void addTopicPropertyIndex(String propUri) {
+        int topics = 0;
+        int added = 0;
+        logger.info("########## Adding topic property index for \"" + propUri + "\"");
+        for (Topic topic : getAllTopics()) {
+            if (topic.hasProperty(propUri)) {
+                Object value = topic.getProperty(propUri);
+                storageDecorator.indexTopicProperty(topic.getId(), propUri, value);
+                added++;
+            }
+            topics++;
+        }
+        logger.info("########## Adding topic property index complete.\n    Topics processed: " + topics +
+            "\n    added to index: " + added);
+    }
+
+    @Override
+    public void addAssociationPropertyIndex(String propUri) {
+        int assocs = 0;
+        int added = 0;
+        logger.info("########## Adding association property index for \"" + propUri + "\"");
+        for (Association assoc : getAllAssociations()) {
+            if (assoc.hasProperty(propUri)) {
+                Object value = assoc.getProperty(propUri);
+                storageDecorator.indexAssociationProperty(assoc.getId(), propUri, value);
+                added++;
+            }
+            assocs++;
+        }
+        logger.info("########## Adding association property complete.\n    Associations processed: " + assocs +
+            "\n    added to index: " + added);
+    }
+
 
 
     // === Misc ===

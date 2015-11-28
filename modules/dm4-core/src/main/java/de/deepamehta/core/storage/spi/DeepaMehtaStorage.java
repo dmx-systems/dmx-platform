@@ -220,6 +220,12 @@ public interface DeepaMehtaStorage {
 
     // ---
 
+    void indexTopicProperty(long topicId, String propUri, Object propValue);
+
+    void indexAssociationProperty(long assocId, String propUri, Object propValue);
+
+    // ---
+
     void deleteTopicProperty(long topicId, String propUri);
 
     void deleteAssociationProperty(long assocId, String propUri);

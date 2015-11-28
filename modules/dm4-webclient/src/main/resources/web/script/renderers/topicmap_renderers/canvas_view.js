@@ -565,17 +565,17 @@ function CanvasView() {
         // we don't loose the event handlers when the canvas is detached from the document (which happens
         // when switching to the geomaps renderer).
         $("#topicmap-panel")
-        	.on("mousedown",   "#canvas", do_mousedown)
-        	.on("mouseup",     "#canvas", do_mouseup)
-        	.on("mousemove",   "#canvas", do_mousemove)
-        	.on("mouseleave",  "#canvas", do_mouseleave)
-        	.on("dblclick",    "#canvas", do_doubleclick)
-        	.on("touchstart",  "#canvas", do_touchstart)
-        	.on("touchend",    "#canvas", do_touchend)
-        	.on("touchmove",   "#canvas", do_touchmove)
-        	.on("contextmenu", "#canvas", do_contextmenu)
-        	.on("dragover",    "#canvas", do_dragover)
-        	.on("drop",        "#canvas", do_drop)
+            .on("mousedown",   "#canvas", do_mousedown)
+            .on("mouseup",     "#canvas", do_mouseup)
+            .on("mousemove",   "#canvas", do_mousemove)
+            .on("mouseleave",  "#canvas", do_mouseleave)
+            .on("dblclick",    "#canvas", do_doubleclick)
+            .on("touchstart",  "#canvas", do_touchstart)
+            .on("touchend",    "#canvas", do_touchend)
+            .on("touchmove",   "#canvas", do_touchmove)
+            .on("contextmenu", "#canvas", do_contextmenu)
+            .on("dragover",    "#canvas", do_dragover)
+            .on("drop",        "#canvas", do_drop)
     }
 
 
