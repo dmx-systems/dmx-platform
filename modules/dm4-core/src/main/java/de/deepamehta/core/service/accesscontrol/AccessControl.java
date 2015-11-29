@@ -70,6 +70,15 @@ public interface AccessControl {
     boolean isMember(String username, long workspaceId);
 
     /**
+     * Returns the ID of the workspace a topic or association is assigned to.
+     *
+     * @param   objectId    a topic ID, or an association ID
+     *
+     * @return  The workspace ID, or <code>-1</code> if no workspace is assigned.
+     */
+    long getAssignedWorkspaceId(long objectId);
+
+    /**
      * Performs the initial workspace assignment for an object.
      * <p>
      * Use this method only for objects which have no workspace assignment already, that is e.g. objects

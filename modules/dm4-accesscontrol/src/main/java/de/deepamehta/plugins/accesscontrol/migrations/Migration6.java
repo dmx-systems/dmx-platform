@@ -34,7 +34,7 @@ public class Migration6 extends Migration {
         for (Association assoc : dms.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
-        logger.info("########## Removing owner and acl properties complete.\n    Objects processed: " + objects +
+        logger.info("########## Removing owner and acl properties complete\n    Objects processed: " + objects +
             "\n    Owner properties removed: " + ownerRemoved + "\n    ACL properties removed: " + aclRemoved);
     }
 

@@ -23,11 +23,6 @@ import java.util.logging.Logger;
  */
 public class Migration6 extends Migration {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    // Note: copy in WorkspacesPlugin.java
-    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
@@ -55,7 +50,7 @@ public class Migration6 extends Migration {
         }
         //
         logger.info("########## Assigning standard association definitions (and their view config topics) to " +
-            "DeepaMehta workspace complete.\n    Types processed: " + types + "\n    Standard types: " +
+            "DeepaMehta workspace complete\n    Types processed: " + types + "\n    Standard types: " +
             standardTypes + "\n    Association definitions: " + assocDefs + "\n    View config topics: " +
             configTopics);
     }

@@ -190,6 +190,20 @@ class AccessControlImpl implements AccessControl {
     }
 
     @Override
+    public long getAssignedWorkspaceId(long objectId) {
+        long workspaceId = -1;
+        try {
+            if (dms.hasProperty(objectId, PROP_WORKSPACE_ID)) {
+                workspaceId = (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID);
+                checkWorkspaceId(workspaceId);
+            }
+            return workspaceId;
+        } catch (Exception e) {
+            throw new RuntimeException("Object " + objectId + " is assigned to workspace " + workspaceId, e);
+        }
+    }
+
+    @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         try {
             // 1) create assignment association
@@ -198,7 +212,7 @@ class AccessControlImpl implements AccessControl {
                 new TopicRoleModel(workspaceId, "dm4.core.child")
             ));
             // 2) store assignment property
-            object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+            object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
         }
@@ -420,11 +434,6 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    // ### TODO: copy in WorkspacesPlugin.java
-    private long getAssignedWorkspaceId(long objectId) {
-        return dms.hasProperty(objectId, PROP_WORKSPACE_ID) ? (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID) : -1;
-    }
-
     /**
      * Checks if a user is the owner of a workspace.
      *
@@ -452,6 +461,14 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
         return SharingMode.fromString(sharingMode.getUri());
+    }
+
+    private void checkWorkspaceId(long workspaceId) {
+        String typeUri = getTypeUri(workspaceId);
+        if (!typeUri.equals("dm4.workspaces.workspace")) {
+            throw new RuntimeException("Object " + workspaceId + " is not a workspace (but of type \"" + typeUri +
+                "\")");
+        }
     }
 
     // ---

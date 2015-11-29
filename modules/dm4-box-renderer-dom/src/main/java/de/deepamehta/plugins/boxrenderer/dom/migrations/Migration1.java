@@ -40,7 +40,7 @@ public class Migration1 extends Migration {
             migrateBoxRendererProperties(topic);
         }
         //
-        logger.info("########## Moving BoxRenderer properties complete.\n    Topics processed: " +
+        logger.info("########## Moving BoxRenderer properties complete\n    Topics processed: " +
             topics + "\n    Topics with BoxRenderer properties: " + props);
     }
 

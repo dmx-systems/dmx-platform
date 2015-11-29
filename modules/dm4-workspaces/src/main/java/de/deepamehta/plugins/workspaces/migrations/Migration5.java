@@ -46,7 +46,7 @@ public class Migration5 extends Migration {
         for (Association assoc : dms.getAllAssociations()) {
             initWorkspaceProperty(assoc);
         }
-        logger.info("########## Initializing workspace properties complete.\n    Objects processed: " + objects +
+        logger.info("########## Initializing workspace properties complete\n    Objects processed: " + objects +
             "\n    initialized: " + initialized + "\n    ambiguous: " + ambiguous);
         //
         // 2) Changes cardinality of the workspace facet to "one".

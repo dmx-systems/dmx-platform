@@ -587,7 +587,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             topics++;
         }
-        logger.info("########## Adding topic property index complete.\n    Topics processed: " + topics +
+        logger.info("########## Adding topic property index complete\n    Topics processed: " + topics +
             "\n    added to index: " + added);
     }
 
@@ -604,7 +604,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
             assocs++;
         }
-        logger.info("########## Adding association property complete.\n    Associations processed: " + assocs +
+        logger.info("########## Adding association property complete\n    Associations processed: " + assocs +
             "\n    added to index: " + added);
     }
 

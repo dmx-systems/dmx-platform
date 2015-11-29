@@ -12,6 +12,7 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -42,6 +43,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -134,8 +136,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
     }
 
-    // ---
-
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/{uri}")
@@ -144,16 +144,49 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dms.getAccessControl().getWorkspace(uri);
     }
 
+    // ---
+
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/{id}/topics/{type_uri}")
+    @Path("/{id}/topics")
+    @Override
+    public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId) {
+        return dms.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
+    }
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/assocs")
+    @Override
+    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId) {
+        return dms.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
+    }
+
+    // ---
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/topics/{topic_type_uri}")
     @Override
     public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
-                                                      @PathParam("type_uri") String topicTypeUri) {
+                                                      @PathParam("topic_type_uri") String topicTypeUri) {
         ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
         return topics;
     }
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/assocs/{assoc_type_uri}")
+    @Override
+    public ResultList<RelatedAssociation> getAssignedAssociations(@PathParam("id") long workspaceId,
+                                                                  @PathParam("assoc_type_uri") String assocTypeUri) {
+        ResultList<RelatedAssociation> assocs = dms.getAssociations(assocTypeUri);
+        applyWorkspaceFilter(assocs.iterator(), workspaceId);
+        return assocs;
+    }
+
+    // ---
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
@@ -165,11 +198,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return null;
         }
         return dms.getTopic(workspaceId);
-    }
-
-    @Override
-    public boolean isAssignedToWorkspace(long objectId, long workspaceId) {
-        return getAssignedWorkspaceId(objectId) == workspaceId;
     }
 
     // ---
@@ -372,9 +400,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    // ### TODO: copy in AccessControlImpl.java
     private long getAssignedWorkspaceId(long objectId) {
-        return dms.hasProperty(objectId, PROP_WORKSPACE_ID) ? (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID) : -1;
+        return dms.getAccessControl().getAssignedWorkspaceId(objectId);
     }
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
@@ -385,7 +412,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
             //
             // 2) store assignment property
-            object.setProperty(PROP_WORKSPACE_ID, workspaceId, false);      // addToIndex=false
+            object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed (" +
                 object + ")", e);
@@ -421,17 +448,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
     }
 
-    private void applyWorkspaceFilter(Iterator<? extends Topic> topics, long workspaceId) {
-        while (topics.hasNext()) {
-            Topic topic = topics.next();
-            if (!isAssignedToWorkspace(topic.getId(), workspaceId)) {
-                topics.remove();
+    private void applyWorkspaceFilter(Iterator<? extends DeepaMehtaObject> objects, long workspaceId) {
+        while (objects.hasNext()) {
+            DeepaMehtaObject object = objects.next();
+            if (getAssignedWorkspaceId(object.getId()) != workspaceId) {
+                objects.remove();
             }
         }
     }
 
     /**
      * Checks if the topic with the specified ID exists and is a Workspace. If not, an exception is thrown.
+     *
+     * ### TODO: principle copy in AccessControlImpl.checkWorkspaceId()
      */
     private void checkArgument(long topicId) {
         String typeUri = dms.getTopic(topicId).getTypeUri();

@@ -67,7 +67,7 @@ public class Migration2 extends Migration {
         for (Entry entry : phoneEntries)   convertPhoneEntry(entry);
         for (Entry entry : addressEntries) convertAddressEntry(entry);
         //
-        logger.info("########## Converting Phone Entry and Address Entry topics complete.\n    " +
+        logger.info("########## Converting Phone Entry and Address Entry topics complete\n    " +
             "Phone entries converted: " + phoneEntries.size() + "\n    " +
             "Address entries converted: " + addressEntries.size());
     }

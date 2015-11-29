@@ -1,11 +1,15 @@
 package de.deepamehta.plugins.workspaces;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
+
+import java.util.List;
 
 
 
@@ -13,8 +17,8 @@ public interface WorkspacesService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    static final String DEEPAMEHTA_WORKSPACE_NAME = "DeepaMehta";
-    static final String DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
+    static final String      DEEPAMEHTA_WORKSPACE_NAME = "DeepaMehta";
+    static final String      DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
     static final SharingMode DEEPAMEHTA_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -23,8 +27,6 @@ public interface WorkspacesService {
      * @param   uri     may be null
      */
     Topic createWorkspace(String name, String uri, SharingMode sharingMode);
-
-    // ---
 
     /**
      * Returns a workspace by URI.
@@ -35,10 +37,31 @@ public interface WorkspacesService {
      */
     Topic getWorkspace(String uri);
 
+    // ---
+
+    /**
+     * Returns all topics assigned to the given workspace.
+     */
+    List<Topic> getAssignedTopics(long workspaceId);
+
+    /**
+     * Returns all associations assigned to the given workspace.
+     */
+    List<Association> getAssignedAssociations(long workspaceId);
+
+    // ---
+
     /**
      * Returns all topics of the given type that are assigned to the given workspace.
      */
-    ResultList<RelatedTopic> getAssignedTopics(long workspaceId, String typeUri);
+    ResultList<RelatedTopic> getAssignedTopics(long workspaceId, String topicTypeUri);
+
+    /**
+     * Returns all associations of the given type that are assigned to the given workspace.
+     */
+    ResultList<RelatedAssociation> getAssignedAssociations(long workspaceId, String assocTypeUri);
+
+    // ---
 
     /**
      * Returns the workspace a topic or association is assigned to.
@@ -49,11 +72,6 @@ public interface WorkspacesService {
      *          or <code>null</code> if no workspace is assigned.
      */
     Topic getAssignedWorkspace(long objectId);
-
-    /**
-     * Checks weather the given topic or association is assigned to the given workspace.
-     */
-    boolean isAssignedToWorkspace(long objectId, long workspaceId);
 
     // ---
 

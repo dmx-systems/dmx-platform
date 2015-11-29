@@ -42,7 +42,7 @@ public class Migration4 extends Migration {
         // 3) make "Topic Mapcontext" a simple type
         dms.getAssociationType("dm4.topicmaps.topic_mapcontext").setDataTypeUri("dm4.core.text");
         //
-        logger.info("########## Converting \"Topic Mapcontext\" associations complete.\n    Associations processed: " +
+        logger.info("########## Converting \"Topic Mapcontext\" associations complete\n    Associations processed: " +
             assocs + "\n    X, Y, Visibility topics deleted: " + topicsDeleted + "\n    Topic types deleted: " +
             typesDeleted);
     }
