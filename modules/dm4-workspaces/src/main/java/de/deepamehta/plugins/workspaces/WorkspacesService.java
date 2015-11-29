@@ -28,6 +28,8 @@ public interface WorkspacesService {
      */
     Topic createWorkspace(String name, String uri, SharingMode sharingMode);
 
+    // ---
+
     /**
      * Returns a workspace by URI.
      *
@@ -36,6 +38,28 @@ public interface WorkspacesService {
      * @throws  RuntimeException    If no workspace exists for the given URI.
      */
     Topic getWorkspace(String uri);
+
+    /**
+     * Returns the workspace a topic or association is assigned to.
+     *
+     * @param   id      a topic ID, or an association ID
+     *
+     * @return  The assigned workspace (a topic of type "Workspace"),
+     *          or <code>null</code> if no workspace is assigned.
+     */
+    Topic getAssignedWorkspace(long objectId);
+
+    // ---
+
+    /**
+     * Assigns the given object to the given workspace.
+     */
+    void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+
+    /**
+     * Assigns the given type and all its view configuration topics to the given workspace.
+     */
+    void assignTypeToWorkspace(Type type, long workspaceId);
 
     // ---
 
@@ -60,28 +84,4 @@ public interface WorkspacesService {
      * Returns all associations of the given type that are assigned to the given workspace.
      */
     ResultList<RelatedAssociation> getAssignedAssociations(long workspaceId, String assocTypeUri);
-
-    // ---
-
-    /**
-     * Returns the workspace a topic or association is assigned to.
-     *
-     * @param   id      a topic ID, or an association ID
-     *
-     * @return  The assigned workspace (a topic of type "Workspace"),
-     *          or <code>null</code> if no workspace is assigned.
-     */
-    Topic getAssignedWorkspace(long objectId);
-
-    // ---
-
-    /**
-     * Assigns the given object to the given workspace.
-     */
-    void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
-
-    /**
-     * Assigns the given type and all its view configuration topics to the given workspace.
-     */
-    void assignTypeToWorkspace(Type type, long workspaceId);
 }

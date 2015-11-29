@@ -174,22 +174,6 @@ class AccessControlImpl implements AccessControl {
     // ---
 
     @Override
-    public boolean isMember(String username, long workspaceId) {
-        try {
-            if (username == null) {
-                return false;
-            }
-            // Note: direct storage access is required here
-            AssociationModel membership = dms.storageDecorator.fetchAssociation(TYPE_MEMBERSHIP,
-                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
-            return membership != null;
-        } catch (Exception e) {
-            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
-                workspaceId + " failed", e);
-        }
-    }
-
-    @Override
     public long getAssignedWorkspaceId(long objectId) {
         long workspaceId = -1;
         try {
@@ -289,6 +273,22 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("User \"" + username + "\" has no private workspace");
         }
         return instantiate(dms.storageDecorator.fetchTopic(workspaceId));
+    }
+
+    @Override
+    public boolean isMember(String username, long workspaceId) {
+        try {
+            if (username == null) {
+                return false;
+            }
+            // Note: direct storage access is required here
+            AssociationModel membership = dms.storageDecorator.fetchAssociation(TYPE_MEMBERSHIP,
+                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
+            return membership != null;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
     }
 
 

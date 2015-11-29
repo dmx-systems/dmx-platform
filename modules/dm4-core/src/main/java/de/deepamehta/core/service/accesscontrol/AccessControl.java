@@ -63,13 +63,6 @@ public interface AccessControl {
     // ---
 
     /**
-     * Checks if a user is a member of a given workspace.
-     *
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     */
-    boolean isMember(String username, long workspaceId);
-
-    /**
      * Returns the ID of the workspace a topic or association is assigned to.
      *
      * @param   objectId    a topic ID, or an association ID
@@ -138,6 +131,13 @@ public interface AccessControl {
      * This is a privileged method, it bypasses the access control system.
      */
     Topic getPrivateWorkspace(String username);
+
+    /**
+     * Checks if a user is a member of a given workspace.
+     *
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     */
+    boolean isMember(String username, long workspaceId);
 
 
 

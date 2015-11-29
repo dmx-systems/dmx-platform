@@ -31,6 +31,7 @@ import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
+import de.deepamehta.core.service.event.PreDeleteTopicListener;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
@@ -55,7 +56,8 @@ import java.util.logging.Logger;
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,
                                                                                     IntroduceAssociationTypeListener,
                                                                                     PostCreateTopicListener,
-                                                                                    PostCreateAssociationListener {
+                                                                                    PostCreateAssociationListener,
+                                                                                    PreDeleteTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -136,6 +138,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
     }
 
+    // ---
+
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/{uri}")
@@ -143,50 +147,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public Topic getWorkspace(@PathParam("uri") String uri) {
         return dms.getAccessControl().getWorkspace(uri);
     }
-
-    // ---
-
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
-    @GET
-    @Path("/{id}/topics")
-    @Override
-    public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId) {
-        return dms.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
-    }
-
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
-    @GET
-    @Path("/{id}/assocs")
-    @Override
-    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId) {
-        return dms.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
-    }
-
-    // ---
-
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
-    @GET
-    @Path("/{id}/topics/{topic_type_uri}")
-    @Override
-    public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
-                                                      @PathParam("topic_type_uri") String topicTypeUri) {
-        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri);
-        applyWorkspaceFilter(topics.iterator(), workspaceId);
-        return topics;
-    }
-
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
-    @GET
-    @Path("/{id}/assocs/{assoc_type_uri}")
-    @Override
-    public ResultList<RelatedAssociation> getAssignedAssociations(@PathParam("id") long workspaceId,
-                                                                  @PathParam("assoc_type_uri") String assocTypeUri) {
-        ResultList<RelatedAssociation> assocs = dms.getAssociations(assocTypeUri);
-        applyWorkspaceFilter(assocs.iterator(), workspaceId);
-        return assocs;
-    }
-
-    // ---
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
@@ -233,6 +193,48 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                 _assignToWorkspace(configTopic, workspaceId);
             }
         }
+    }
+
+    // ---
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/topics")
+    @Override
+    public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId) {
+        return dms.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
+    }
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/assocs")
+    @Override
+    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId) {
+        return dms.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
+    }
+
+    // ---
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/topics/{topic_type_uri}")
+    @Override
+    public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
+                                                      @PathParam("topic_type_uri") String topicTypeUri) {
+        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri);
+        applyWorkspaceFilter(topics.iterator(), workspaceId);
+        return topics;
+    }
+
+    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    @GET
+    @Path("/{id}/assocs/{assoc_type_uri}")
+    @Override
+    public ResultList<RelatedAssociation> getAssignedAssociations(@PathParam("id") long workspaceId,
+                                                                  @PathParam("assoc_type_uri") String assocTypeUri) {
+        ResultList<RelatedAssociation> assocs = dms.getAssociations(assocTypeUri);
+        applyWorkspaceFilter(assocs.iterator(), workspaceId);
+        return assocs;
     }
 
 
@@ -379,6 +381,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         assignToWorkspace(assoc, workspaceId);
     }
 
+    // ---
+
+    /**
+     * When a workspace is about to be deleted its entire content must be deleted.
+     */
+    @Override
+    public void preDeleteTopic(Topic topic) {
+        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+            long workspaceId = topic.getId();
+            deleteWorkspaceContent(workspaceId);
+        }
+    }
+
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -416,6 +431,21 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed (" +
                 object + ")", e);
+        }
+    }
+
+    // ---
+
+    private void deleteWorkspaceContent(long workspaceId) {
+        try {
+            for (Topic topic : getAssignedTopics(workspaceId)) {
+                topic.delete();
+            }
+            for (Association assoc : getAssignedAssociations(workspaceId)) {
+                assoc.delete();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting content of workspace " + workspaceId + " failed", e);
         }
     }
 
