@@ -857,6 +857,13 @@ public class PluginImpl implements Plugin, EventHandler {
                 pluginDependencies.add(pluginUris[i]);
             }
         }
+        //
+        if (!pluginDependencies.isEmpty()) {
+            logger.info("Tracking " + pluginDependencies.size() + " plugins for " + this + " " + pluginDependencies);
+        } else {
+            logger.info("Tracking plugins for " + this + " ABORTED -- no plugin dependencies declared");
+        }
+        //
         return pluginDependencies;
     }
 

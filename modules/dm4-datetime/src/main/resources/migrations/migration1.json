@@ -1,0 +1,88 @@
+{
+    "topic_types": [
+        # Date
+        {
+            "value":            "Year",
+            "uri":              "dm4.datetime.year",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
+            "value":            "Month",
+            "uri":              "dm4.datetime.month",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
+            "value":            "Day",
+            "uri":              "dm4.datetime.day",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
+            "value":            "Date",
+            "uri":              "dm4.datetime.date",
+            "data_type_uri":    "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":         "dm4.datetime.year",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "dm4.datetime.month",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "dm4.datetime.day",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                }
+            ]
+        },
+        # Time
+        {
+            "value":            "Hour",
+            "uri":              "dm4.datetime.hour",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
+            "value":            "Minute",
+            "uri":              "dm4.datetime.minute",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
+            "value":            "Time",
+            "uri":              "dm4.datetime.time",
+            "data_type_uri":    "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":         "dm4.datetime.hour",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "dm4.datetime.minute",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                }
+            ]
+        },
+        # Date/Time
+        {
+            "value":            "Date/Time",
+            "uri":              "dm4.datetime",
+            "data_type_uri":    "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":         "dm4.datetime.date",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "dm4.datetime.time",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                }
+            ]
+        }
+    ]
+}
