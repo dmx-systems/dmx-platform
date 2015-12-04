@@ -2,11 +2,6 @@
     "topic_types": [
         # Date
         {
-            "value":            "Year",
-            "uri":              "dm4.datetime.year",
-            "data_type_uri":    "dm4.core.number"
-        },
-        {
             "value":            "Month",
             "uri":              "dm4.datetime.month",
             "data_type_uri":    "dm4.core.number"
@@ -17,15 +12,15 @@
             "data_type_uri":    "dm4.core.number"
         },
         {
+            "value":            "Year",
+            "uri":              "dm4.datetime.year",
+            "data_type_uri":    "dm4.core.number"
+        },
+        {
             "value":            "Date",
             "uri":              "dm4.datetime.date",
             "data_type_uri":    "dm4.core.composite",
             "assoc_defs": [
-                {
-                    "child_type_uri":         "dm4.datetime.year",
-                    "child_cardinality_uri":  "dm4.core.one",
-                    "assoc_type_uri":         "dm4.core.composition_def"
-                },
                 {
                     "child_type_uri":         "dm4.datetime.month",
                     "child_cardinality_uri":  "dm4.core.one",
@@ -33,6 +28,11 @@
                 },
                 {
                     "child_type_uri":         "dm4.datetime.day",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.composition_def"
+                },
+                {
+                    "child_type_uri":         "dm4.datetime.year",
                     "child_cardinality_uri":  "dm4.core.one",
                     "assoc_type_uri":         "dm4.core.composition_def"
                 }
