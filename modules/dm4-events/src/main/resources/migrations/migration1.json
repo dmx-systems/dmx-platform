@@ -1,0 +1,58 @@
+[
+    {
+        "assoc_types": [
+            {
+                "value": "From",
+                "uri": "dm4.events.from",
+                "data_type_uri": "dm4.core.text"
+            },
+            {
+                "value": "To",
+                "uri": "dm4.events.to",
+                "data_type_uri": "dm4.core.text"
+            }
+        ]
+    },
+    {
+        "topic_types": [
+            # Event
+            {
+                "value":            "Title",
+                "uri":              "dm4.events.title",
+                "data_type_uri":    "dm4.core.text"
+            },
+            {
+                "value":            "Event",
+                "uri":              "dm4.events.event",
+                "data_type_uri":    "dm4.core.composite",
+                "assoc_defs": [
+                    {
+                        "child_type_uri":         "dm4.events.title",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "assoc_type_uri":         "dm4.core.composition_def"
+                    },
+                    {
+                        "child_type_uri":         "dm4.datetime",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "assoc_type_uri":         "dm4.core.composition_def",
+                        "custom_assoc_type_uri":  "dm4.events.from"
+                    },
+                    {
+                        "child_type_uri":         "dm4.datetime",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "assoc_type_uri":         "dm4.core.composition_def",
+                        "custom_assoc_type_uri":  "dm4.events.to"
+                    }
+                ],
+                "view_config_topics": [
+                    {
+                        "type_uri": "dm4.webclient.view_config",
+                        "childs": {
+                            "dm4.webclient.show_in_create_menu": true
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+]
