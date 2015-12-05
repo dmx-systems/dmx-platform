@@ -11,7 +11,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: make these private?
+    // ### TODO: make these private
     protected long id;                  // is -1 in models used for a create operation. ### FIXDOC
                                         // is never -1 in models used for an update operation.
     protected String uri;               // is never null in models used for a create operation, may be empty. ### FIXDOC

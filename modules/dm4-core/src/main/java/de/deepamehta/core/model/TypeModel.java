@@ -9,12 +9,13 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
-public abstract class TypeModel extends TopicModel {
+public abstract class TypeModel extends TopicModel implements Iterable<String> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -67,6 +68,8 @@ public abstract class TypeModel extends TopicModel {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
     // === Data Type ===
 
     public String getDataTypeUri() {
@@ -76,6 +79,8 @@ public abstract class TypeModel extends TopicModel {
     public void setDataTypeUri(String dataTypeUri) {
         this.dataTypeUri = dataTypeUri;
     }
+
+
 
     // === Index Modes ===
 
@@ -87,56 +92,96 @@ public abstract class TypeModel extends TopicModel {
         indexModes.add(indexMode);
     }
 
+
+
     // === Association Definitions ===
 
     public Collection<AssociationDefinitionModel> getAssocDefs() {
         return assocDefs.values();
     }
 
-    public AssociationDefinitionModel getAssocDef(String childTypeUri) {
-        AssociationDefinitionModel assocDef = assocDefs.get(childTypeUri);
-        if (assocDef == null) {
-            throw new RuntimeException("Schema violation: association definition \"" +
-                childTypeUri + "\" not found in " + this);
-        }
-        return assocDef;
-    }
-
-    public TypeModel addAssocDef(AssociationDefinitionModel assocDef) {
-        return addAssocDefBefore(assocDef, null);   // beforeChildTypeUri=null
+    public AssociationDefinitionModel getAssocDef(String assocDefUri) {
+        return getAssocDefOrThrow(assocDefUri);
     }
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     * @param   assocDef    the assoc def to add.
+     *                      Note: its ID might be uninitialized (-1).
+     */
+    public TypeModel addAssocDef(AssociationDefinitionModel assocDef) {
+        return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
+    }
+
+    /**
+     * @param   assocDef            the assoc def to add.
+     *                              Note: its ID might be uninitialized (-1).
+     * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
+    public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         // error check
-        String childTypeUri = assocDef.getChildTypeUri();
-        AssociationDefinitionModel existing = assocDefs.get(childTypeUri);
+        String assocDefUri = assocDef.getAssocDefUri();
+        AssociationDefinitionModel existing = _getAssocDef(assocDefUri);
         if (existing != null) {
-            throw new RuntimeException("Schema ambiguity: topic type \"" + uri +
-                "\" has more than one association definitions with uri \"" + childTypeUri + "\"");
+            throw new RuntimeException("Schema ambiguity: type \"" + getUri() + "\" has more than one \"" +
+                assocDefUri + "\" association definitions");
         }
         //
-        assocDefs.putBefore(assocDef.getChildTypeUri(), assocDef, beforeChildTypeUri);
+        assocDefs.putBefore(assocDefUri, assocDef, beforeAssocDefUri);
         return this;
     }
 
-    public void updateAssocDef(AssociationDefinitionModel assocDef) {
-        assocDefs.put(assocDef.getChildTypeUri(), assocDef);
-    }
-
-    public AssociationDefinitionModel removeAssocDef(String childTypeUri) {
-        // error check
-        getAssocDef(childTypeUri);
-        //
-        return assocDefs.remove(childTypeUri);
+    public TypeModel removeAssocDef(String assocDefUri) {
+        try {
+            if (assocDefs.remove(assocDefUri) == null) {
+                throw new RuntimeException("Schema violation: association definition \"" +
+                    assocDefUri + "\" not found in " + assocDefs.keySet());
+            }
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
+                getUri() + "\" failed", e);
+        }
     }
 
     public void removeAllAssocDefs() {
         assocDefs.clear();
     }
+
+    // ---
+
+    /**
+     * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
+     * assoc def as well (at index 1), or null if the found assoc def is the last one.
+     */
+    public String[] findAssocDefUris(long assocDefId) {
+        if (assocDefId == -1) {
+            throw new IllegalArgumentException("findAssocDefUris() called with assocDefId=-1");
+        }
+        String[] assocDefUris = new String[2];
+        Iterator<String> i = iterator();
+        while (i.hasNext()) {
+            String assocDefUri = i.next();
+            long _assocDefId = _getAssocDef(assocDefUri).getId();
+            if (_assocDefId == -1) {
+                throw new IllegalStateException("findAssocDefUris() called when assoc defs are not yet saved");
+            }
+            if (_assocDefId == assocDefId) {
+                assocDefUris[0] = assocDefUri;
+                if (i.hasNext()) {
+                    assocDefUris[1] = i.next();
+                }
+                break;
+            }
+        }
+        if (assocDefUris[0] == null) {
+            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" +
+                getUri() + "\" (" + assocDefs.keySet() + ")");
+        }
+        return assocDefUris;
+    }
+
+
 
     // === Label Configuration ===
 
@@ -147,6 +192,8 @@ public abstract class TypeModel extends TopicModel {
     public void setLabelConfig(List<String> labelConfig) {
         this.labelConfig = labelConfig;
     }
+
+
 
     // === View Configuration ===
 
@@ -162,6 +209,18 @@ public abstract class TypeModel extends TopicModel {
 
     public void setViewConfig(ViewConfigurationModel viewConfig) {
         this.viewConfig = viewConfig;
+    }
+
+
+
+    // === Iterable Implementation ===
+
+    /**
+     * Returns an interator which iterates this TypeModel's assoc def URIs.
+     */
+    @Override
+    public Iterator<String> iterator() {
+        return assocDefs.keySet().iterator();
     }
 
 
@@ -221,16 +280,23 @@ public abstract class TypeModel extends TopicModel {
             for (int i = 0; i < assocDefs.length(); i++) {
                 JSONObject assocDef = assocDefs.getJSONObject(i);
                 assocDef.put("parent_type_uri", this.uri);
-                addAssocDef(parseAssocDef(assocDef));
+                addAssocDef(new AssociationDefinitionModel(assocDef));
             }
         }
     }
 
-    private AssociationDefinitionModel parseAssocDef(JSONObject assocDef) {
-        try {
-            return new AssociationDefinitionModel(assocDef);
-        } catch (JSONException e) {
-            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
+    // ---
+
+    private AssociationDefinitionModel getAssocDefOrThrow(String assocDefUri) {
+        AssociationDefinitionModel assocDef = _getAssocDef(assocDefUri);
+        if (assocDef == null) {
+            throw new RuntimeException("Schema violation: association definition \"" + assocDefUri +
+                "\" not found in " + assocDefs.keySet());
         }
+        return assocDef;
+    }
+
+    private AssociationDefinitionModel _getAssocDef(String assocDefUri) {
+        return assocDefs.get(assocDefUri);
     }
 }

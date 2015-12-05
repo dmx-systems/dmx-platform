@@ -31,17 +31,17 @@ public interface Type extends Topic {
 
     Collection<AssociationDefinition> getAssocDefs();
 
-    AssociationDefinition getAssocDef(String childTypeUri);
+    AssociationDefinition getAssocDef(String assocDefUri);
 
-    boolean hasAssocDef(String childTypeUri);
+    boolean hasAssocDef(String assocDefUri);
 
     Type addAssocDef(AssociationDefinitionModel assocDef);
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri);
+    Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
 
     /**
      * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
@@ -63,7 +63,7 @@ public interface Type extends Topic {
      */
     void updateAssocDef(AssociationDefinitionModel assocDef);
 
-    Type removeAssocDef(String childTypeUri);
+    Type removeAssocDef(String assocDefUri);
 
     // --- Label Configuration ---
 

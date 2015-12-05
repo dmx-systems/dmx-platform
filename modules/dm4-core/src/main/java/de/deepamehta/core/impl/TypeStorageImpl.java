@@ -381,7 +381,8 @@ class TypeStorageImpl implements TypeStorage {
                 // 1a) custom association type
                 String customAssocTypeUri = assocDef.getCustomAssocTypeUri();
                 if (customAssocTypeUri != null) {
-                    assocDef.getChildTopicsModel().putRef("dm4.core.assoc_type", customAssocTypeUri);
+                    assocDef.getChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                        customAssocTypeUri);
                 }
                 //
                 dms.createAssociation(assocDef);
@@ -400,7 +401,7 @@ class TypeStorageImpl implements TypeStorage {
             // 3) view config
             storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
-            throw new RuntimeException("Storing association definition \"" + assocDef.getChildTypeUri() +
+            throw new RuntimeException("Storing association definition \"" + assocDef.getAssocDefUri() +
                 "\" of type \"" + assocDef.getParentTypeUri() + "\" failed", e);
         }
     }
@@ -544,18 +545,18 @@ class TypeStorageImpl implements TypeStorage {
 
     private void storeSequence(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
-        AssociationDefinitionModel lastAssocDef = null;
+        long lastAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            appendToSequence(typeId, assocDef.getId(), lastAssocDef);
-            lastAssocDef = assocDef;
+            appendToSequence(typeId, assocDef.getId(), lastAssocDefId);
+            lastAssocDefId = assocDef.getId();
         }
     }
 
-    void appendToSequence(long typeId, long assocDefId, AssociationDefinitionModel lastAssocDef) {
-        if (lastAssocDef == null) {
+    void appendToSequence(long typeId, long assocDefId, long lastAssocDefId) {
+        if (lastAssocDefId == -1) {
             storeSequenceStart(typeId, assocDefId);
         } else {
-            storeSequenceSegment(lastAssocDef.getId(), assocDefId);
+            storeSequenceSegment(lastAssocDefId, assocDefId);
         }
     }
 
@@ -618,7 +619,7 @@ class TypeStorageImpl implements TypeStorage {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             RelatedTopicModel includeInLabel = fetchLabelConfigTopic(assocDef.getId());
             if (includeInLabel != null && includeInLabel.getSimpleValue().booleanValue()) {
-                labelConfig.add(assocDef.getChildTypeUri());
+                labelConfig.add(assocDef.getAssocDefUri());
             }
         }
         return labelConfig;
@@ -636,7 +637,7 @@ class TypeStorageImpl implements TypeStorage {
      */
     private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
+            boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
             // Note: we don't do the storage in a type-driven fashion here (as in new AttachedAssociationDefinition(
             // assocDef, dms).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired for the
             // assoc def and the Type Editor plugin would react and try to access the assoc def's parent type.
@@ -653,10 +654,12 @@ class TypeStorageImpl implements TypeStorage {
     /**
      * Updates the label configuration of an <i>existing</i> type.
      */
-    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinition> assocDefs) {
-        for (AssociationDefinition assocDef : assocDefs) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getChildTypeUri());
-            assocDef.getChildTopics().set("dm4.core.include_in_label", includeInLabel);
+    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            // Note: the Type Editor plugin must not react
+            TopicModel includeInLabel = fetchLabelConfigTopic(assocDef.getId());
+            boolean value = labelConfig.contains(assocDef.getAssocDefUri());
+            dms.storageDecorator.storeTopicValue(includeInLabel.getId(), new SimpleValue(value));
         }
     }
 

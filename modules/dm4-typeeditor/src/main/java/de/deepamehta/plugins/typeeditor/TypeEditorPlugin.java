@@ -62,7 +62,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     private void createAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().createAssociationDefinition(assoc);
-        logger.info("### Adding association definition \"" + assocDef.getChildTypeUri() + "\" to type \"" +
+        logger.info("### Adding association definition \"" + assocDef.getAssocDefUri() + "\" to type \"" +
             parentType.getUri() + "\" (" + assocDef + ")");
         //
         parentType.addAssocDef(assocDef);
@@ -73,7 +73,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     private void updateAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
-        logger.info("### Updating association definition \"" + assocDef.getChildTypeUri() + "\" of type \"" +
+        logger.info("### Updating association definition \"" + assocDef.getAssocDefUri() + "\" of type \"" +
             parentType.getUri() + "\" (" + assocDef + ")");
         //
         parentType.updateAssocDef(assocDef);

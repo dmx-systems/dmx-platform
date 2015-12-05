@@ -313,20 +313,20 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         ChildTopics comp = topic.getChildTopics();
         TopicType topicType = dms.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
-            String childTypeUri   = assocDef.getChildTypeUri();
+            String assocDefUri    = assocDef.getAssocDefUri();
             String cardinalityUri = assocDef.getChildCardinalityUri();
             Topic childTopic = null;
             if (cardinalityUri.equals("dm4.core.one")) {
                 // Note: we don't want load child topics from DB. So we use has() before getTopic().
                 // The latter would load the child topic on-demand.
-                if (comp.has(childTypeUri)) {
-                    childTopic = comp.getTopic(childTypeUri);
+                if (comp.has(assocDefUri)) {
+                    childTopic = comp.getTopic(assocDefUri);
                 }
             } else if (cardinalityUri.equals("dm4.core.many")) {
                 // Note: we don't want load child topics from DB. So we use has() before getTopics().
                 // The latter would load the child topics on-demand.
-                if (comp.has(childTypeUri)) {
-                    List<RelatedTopic> childTopics = comp.getTopics(childTypeUri);
+                if (comp.has(assocDefUri)) {
+                    List<RelatedTopic> childTopics = comp.getTopics(assocDefUri);
                     if (!childTopics.isEmpty()) {
                         childTopic = childTopics.get(0);
                     }

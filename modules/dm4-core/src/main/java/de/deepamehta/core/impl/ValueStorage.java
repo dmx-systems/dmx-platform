@@ -69,24 +69,24 @@ class ValueStorage {
         try {
             ChildTopicsModel childTopics = parent.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
-            String childTypeUri   = assocDef.getChildTypeUri();
+            String assocDefUri    = assocDef.getAssocDefUri();
             if (cardinalityUri.equals("dm4.core.one")) {
                 RelatedTopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
-                    childTopics.put(childTypeUri, childTopic);
+                    childTopics.put(assocDefUri, childTopic);
                     fetchChildTopics(childTopic);    // recursion
                 }
             } else if (cardinalityUri.equals("dm4.core.many")) {
                 for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
-                    childTopics.add(childTypeUri, childTopic);
+                    childTopics.add(assocDefUri, childTopic);
                     fetchChildTopics(childTopic);    // recursion
                 }
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Fetching the \"" + assocDef.getChildTypeUri() + "\" child topics of object " +
+            throw new RuntimeException("Fetching the \"" + assocDef.getAssocDefUri() + "\" child topics of object " +
                 parent.getId() + " failed", e);
         }        
     }
@@ -202,15 +202,15 @@ class ValueStorage {
         try {
             model = parent.getChildTopicsModel();
             for (AssociationDefinitionModel assocDef : getType(parent).getAssocDefs()) {
-                String childTypeUri   = assocDef.getChildTypeUri();
+                String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    RelatedTopicModel childTopic = model.getTopic(childTypeUri, null);          // defaultValue=null
+                    RelatedTopicModel childTopic = model.getTopic(assocDefUri, null);          // defaultValue=null
                     if (childTopic != null) {   // skip if not contained in create request
                         storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<RelatedTopicModel> childTopics = model.getTopics(childTypeUri, null);  // defaultValue=null
+                    List<RelatedTopicModel> childTopics = model.getTopics(assocDefUri, null);  // defaultValue=null
                     if (childTopics != null) {  // skip if not contained in create request
                         for (RelatedTopicModel childTopic : childTopics) {
                             storeChildTopic(childTopic, parent, assocDef);
@@ -280,8 +280,8 @@ class ValueStorage {
         TypeModel type = getType(model);
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
             StringBuilder label = new StringBuilder();
-            for (String childTypeUri : getLabelChildTypeUris(model)) {
-                appendLabel(buildChildLabel(model, childTypeUri), label, LABEL_CHILD_SEPARATOR);
+            for (String assocDefUri : getLabelAssocDefUris(model)) {
+                appendLabel(buildChildLabel(model, assocDefUri), label, LABEL_CHILD_SEPARATOR);
             }
             return label.toString();
         } else {
@@ -292,24 +292,24 @@ class ValueStorage {
     /**
      * Prerequisite: parent is a composite model.
      */
-    List<String> getLabelChildTypeUris(DeepaMehtaObjectModel parent) {
+    List<String> getLabelAssocDefUris(DeepaMehtaObjectModel parent) {
         TypeModel type = getType(parent);
         List<String> labelConfig = type.getLabelConfig();
         if (labelConfig.size() > 0) {
             return labelConfig;
         } else {
-            List<String> childTypeUris = new ArrayList();
+            List<String> assocDefUris = new ArrayList();
             Iterator<AssociationDefinitionModel> i = type.getAssocDefs().iterator();
             // Note: types just created might have no child types yet
             if (i.hasNext()) {
-                childTypeUris.add(i.next().getChildTypeUri());
+                assocDefUris.add(i.next().getAssocDefUri());
             }
-            return childTypeUris;
+            return assocDefUris;
         }
     }
 
-    private String buildChildLabel(DeepaMehtaObjectModel parent, String childTypeUri) {
-        Object value = parent.getChildTopicsModel().get(childTypeUri);
+    private String buildChildLabel(DeepaMehtaObjectModel parent, String assocDefUri) {
+        Object value = parent.getChildTopicsModel().get(assocDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return "";

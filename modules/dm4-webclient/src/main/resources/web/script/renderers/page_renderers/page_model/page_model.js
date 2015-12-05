@@ -251,17 +251,17 @@ dm4c.render.page_model = new function() {
             return
         }
         //
-        var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.child_type_uri
+        var child_field_uri = field_uri + dm4c.COMPOSITE_PATH_SEPARATOR + assoc_def.assoc_def_uri
         var cardinality_uri = assoc_def.child_cardinality_uri
         if (cardinality_uri == "dm4.core.one") {
-            var child_topic = object.childs[assoc_def.child_type_uri] || dm4c.empty_topic(child_topic_type.uri)
-            page_model.childs[assoc_def.child_type_uri] = this.create_page_model(child_topic, assoc_def,
+            var child_topic = object.childs[assoc_def.assoc_def_uri] || dm4c.empty_topic(child_topic_type.uri)
+            page_model.childs[assoc_def.assoc_def_uri] = this.create_page_model(child_topic, assoc_def,
                 child_field_uri, render_mode, page_model)
         } else if (cardinality_uri == "dm4.core.many") {
             // ### TODO: server: don't send empty arrays
-            var child_topics = object.childs[assoc_def.child_type_uri] || []
+            var child_topics = object.childs[assoc_def.assoc_def_uri] || []
             if (!js.is_array(child_topics)) {
-                throw "PageModelError: field \"" + assoc_def.child_type_uri + "\" is defined as multi-value " +
+                throw "PageModelError: field \"" + assoc_def.assoc_def_uri + "\" is defined as multi-value " +
                     "but appears as single-value in " + JSON.stringify(object)
             }
             if (child_topics.length == 0) {
@@ -275,7 +275,7 @@ dm4c.render.page_model = new function() {
                 multi_model.values.push(this.create_page_model(child_topic, assoc_def, child_field_uri, render_mode,
                     page_model))
             }
-            page_model.childs[assoc_def.child_type_uri] = multi_model
+            page_model.childs[assoc_def.assoc_def_uri] = multi_model
         } else {
             throw "PageModelError: \"" + cardinality_uri + "\" is an unexpected cardinality URI"
         }

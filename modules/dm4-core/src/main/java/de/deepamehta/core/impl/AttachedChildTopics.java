@@ -34,7 +34,7 @@ class AttachedChildTopics implements ChildTopics {
 
     /**
      * Attached object cache.
-     * Key: child type URI (String), value: RelatedTopic or List<RelatedTopic>
+     * Key: assoc def URI (String), value: RelatedTopic or List<RelatedTopic>
      */
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
@@ -64,27 +64,27 @@ class AttachedChildTopics implements ChildTopics {
     // === Accessors ===
 
     @Override
-    public RelatedTopic getTopic(String childTypeUri) {
-        loadChildTopics(childTypeUri);
-        return _getTopic(childTypeUri);
+    public RelatedTopic getTopic(String assocDefUri) {
+        loadChildTopics(assocDefUri);
+        return _getTopic(assocDefUri);
     }
 
     @Override
-    public List<RelatedTopic> getTopics(String childTypeUri) {
-        loadChildTopics(childTypeUri);
-        return _getTopics(childTypeUri);
+    public List<RelatedTopic> getTopics(String assocDefUri) {
+        loadChildTopics(assocDefUri);
+        return _getTopics(assocDefUri);
     }
 
     // ---
 
     @Override
-    public Object get(String childTypeUri) {
-        return childTopics.get(childTypeUri);
+    public Object get(String assocDefUri) {
+        return childTopics.get(assocDefUri);
     }
 
     @Override
-    public boolean has(String childTypeUri) {
-        return childTopics.containsKey(childTypeUri);
+    public boolean has(String assocDefUri) {
+        return childTopics.containsKey(assocDefUri);
     }
 
     @Override
@@ -104,40 +104,40 @@ class AttachedChildTopics implements ChildTopics {
     // === Convenience Accessors ===
 
     @Override
-    public String getString(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().toString();
+    public String getString(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().toString();
     }
 
     @Override
-    public int getInt(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().intValue();
+    public int getInt(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().intValue();
     }
 
     @Override
-    public long getLong(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().longValue();
+    public long getLong(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().longValue();
     }
 
     @Override
-    public double getDouble(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().doubleValue();
+    public double getDouble(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().doubleValue();
     }
 
     @Override
-    public boolean getBoolean(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().booleanValue();
+    public boolean getBoolean(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().booleanValue();
     }
 
     @Override
-    public Object getObject(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().value();
+    public Object getObject(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().value();
     }
 
     // ---
 
     @Override
-    public ChildTopics getChildTopics(String childTypeUri) {
-        return getTopic(childTypeUri).getChildTopics();
+    public ChildTopics getChildTopics(String assocDefUri) {
+        return getTopic(assocDefUri).getChildTopics();
     }
 
     // Note: there are no convenience accessors for a multiple-valued child.
@@ -149,107 +149,107 @@ class AttachedChildTopics implements ChildTopics {
     // --- Single-valued Childs ---
 
     @Override
-    public ChildTopics set(String childTypeUri, TopicModel value) {
-        return _updateOne(childTypeUri, new RelatedTopicModel(value));
+    public ChildTopics set(String assocDefUri, TopicModel value) {
+        return _updateOne(assocDefUri, new RelatedTopicModel(value));
     }
 
     // ---
 
     @Override
-    public ChildTopics set(String childTypeUri, Object value) {
-        return _updateOne(childTypeUri, new RelatedTopicModel(childTypeUri, new SimpleValue(value)));
+    public ChildTopics set(String assocDefUri, Object value) {
+        return _updateOne(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
-    public ChildTopics set(String childTypeUri, ChildTopicsModel value) {
-        return _updateOne(childTypeUri, new RelatedTopicModel(childTypeUri, value));
-    }
-
-    // ---
-
-    @Override
-    public ChildTopics setRef(String childTypeUri, long refTopicId) {
-        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics setRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
-    }
-
-    @Override
-    public ChildTopics setRef(String childTypeUri, String refTopicUri) {
-        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicUri));
-    }
-
-    @Override
-    public ChildTopics setRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(childTypeUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    public ChildTopics set(String assocDefUri, ChildTopicsModel value) {
+        return _updateOne(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), value));
     }
 
     // ---
 
     @Override
-    public ChildTopics setDeletionRef(String childTypeUri, long refTopicId) {
-        return _updateOne(childTypeUri, new TopicDeletionModel(refTopicId));
+    public ChildTopics setRef(String assocDefUri, long refTopicId) {
+        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicId));
     }
 
     @Override
-    public ChildTopics setDeletionRef(String childTypeUri, String refTopicUri) {
-        return _updateOne(childTypeUri, new TopicDeletionModel(refTopicUri));
+    public ChildTopics setRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
+    public ChildTopics setRef(String assocDefUri, String refTopicUri) {
+        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics setRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics setDeletionRef(String assocDefUri, long refTopicId) {
+        return _updateOne(assocDefUri, new TopicDeletionModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics setDeletionRef(String assocDefUri, String refTopicUri) {
+        return _updateOne(assocDefUri, new TopicDeletionModel(refTopicUri));
     }
 
     // --- Multiple-valued Childs ---
 
     @Override
-    public ChildTopics add(String childTypeUri, TopicModel value) {
-        return _updateMany(childTypeUri, new RelatedTopicModel(value));
+    public ChildTopics add(String assocDefUri, TopicModel value) {
+        return _updateMany(assocDefUri, new RelatedTopicModel(value));
     }
 
     // ---
 
     @Override
-    public ChildTopics add(String childTypeUri, Object value) {
-        return _updateMany(childTypeUri, new RelatedTopicModel(childTypeUri, new SimpleValue(value)));
+    public ChildTopics add(String assocDefUri, Object value) {
+        return _updateMany(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
-    public ChildTopics add(String childTypeUri, ChildTopicsModel value) {
-        return _updateMany(childTypeUri, new RelatedTopicModel(childTypeUri, value));
-    }
-
-    // ---
-
-    @Override
-    public ChildTopics addRef(String childTypeUri, long refTopicId) {
-        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicId));
-    }
-
-    @Override
-    public ChildTopics addRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
-    }
-
-    @Override
-    public ChildTopics addRef(String childTypeUri, String refTopicUri) {
-        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicUri));
-    }
-
-    @Override
-    public ChildTopics addRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(childTypeUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    public ChildTopics add(String assocDefUri, ChildTopicsModel value) {
+        return _updateMany(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), value));
     }
 
     // ---
 
     @Override
-    public ChildTopics addDeletionRef(String childTypeUri, long refTopicId) {
-        return _updateMany(childTypeUri, new TopicDeletionModel(refTopicId));
+    public ChildTopics addRef(String assocDefUri, long refTopicId) {
+        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicId));
     }
 
     @Override
-    public ChildTopics addDeletionRef(String childTypeUri, String refTopicUri) {
-        return _updateMany(childTypeUri, new TopicDeletionModel(refTopicUri));
+    public ChildTopics addRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
+    }
+
+    @Override
+    public ChildTopics addRef(String assocDefUri, String refTopicUri) {
+        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicUri));
+    }
+
+    @Override
+    public ChildTopics addRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+    }
+
+    // ---
+
+    @Override
+    public ChildTopics addDeletionRef(String assocDefUri, long refTopicId) {
+        return _updateMany(assocDefUri, new TopicDeletionModel(refTopicId));
+    }
+
+    @Override
+    public ChildTopics addDeletionRef(String assocDefUri, String refTopicUri) {
+        return _updateMany(assocDefUri, new TopicDeletionModel(refTopicUri));
     }
 
 
@@ -268,18 +268,18 @@ class AttachedChildTopics implements ChildTopics {
     void update(ChildTopicsModel newComp) {
         try {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
-                String childTypeUri   = assocDef.getChildTypeUri();
+                String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 RelatedTopicModel newChildTopic        = null;  // only used for "one"
                 List<RelatedTopicModel> newChildTopics = null;  // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newComp.getTopic(childTypeUri, null);        // defaultValue=null
+                    newChildTopic = newComp.getTopic(assocDefUri, null);        // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newComp.getTopics(childTypeUri, null);      // defaultValue=null
+                    newChildTopics = newComp.getTopics(assocDefUri, null);      // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -334,8 +334,8 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    void loadChildTopics(String childTypeUri) {
-        loadChildTopics(getAssocDef(childTypeUri));
+    void loadChildTopics(String assocDefUri) {
+        loadChildTopics(getAssocDef(assocDefUri));
     }
 
 
@@ -352,20 +352,20 @@ class AttachedChildTopics implements ChildTopics {
      *                      type definition. It may originate from a facet definition as well.
      */
     private void loadChildTopics(AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        if (!has(childTypeUri)) {
-            logger.fine("### Lazy-loading \"" + childTypeUri + "\" child topic(s) of " + parent.className() + " " +
+        String assocDefUri = assocDef.getAssocDefUri();
+        if (!has(assocDefUri)) {
+            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + parent.className() + " " +
                 parent.getId());
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
-            initAttachedObjectCache(childTypeUri);
+            initAttachedObjectCache(assocDefUri);
         }
     }
 
     private void refreshParentLabel() {
         DeepaMehtaObjectModel parent = this.parent.getModel();
         //
-        for (String childTypeUri : dms.valueStorage.getLabelChildTypeUris(parent)) {
-            loadChildTopics(childTypeUri);
+        for (String assocDefUri : dms.valueStorage.getLabelAssocDefUris(parent)) {
+            loadChildTopics(assocDefUri);
         }
         //
         dms.valueStorage.refreshLabel(parent);
@@ -383,14 +383,20 @@ class AttachedChildTopics implements ChildTopics {
     // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
 
-    private ChildTopics _updateOne(String childTypeUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(new ChildTopicsModel().put(childTypeUri, newChildTopic));
+    private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
+        parent.updateChildTopics(new ChildTopicsModel().put(assocDefUri, newChildTopic));
         return this;
     }
 
-    private ChildTopics _updateMany(String childTypeUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(new ChildTopicsModel().add(childTypeUri, newChildTopic));
+    private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
+        parent.updateChildTopics(new ChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
+    }
+
+    // ---
+
+    private String childTypeUri(String assocDefUri) {
+        return model.childTypeUri(assocDefUri);
     }
 
 
@@ -400,7 +406,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Composition ---
 
     private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
@@ -432,7 +438,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Aggregation ---
 
     private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
             deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
@@ -466,7 +472,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Update ---
 
     private void updateChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getChildTypeUri(), null);
+        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -624,44 +630,44 @@ class AttachedChildTopics implements ChildTopics {
 
     // --- Access ---
 
-    private RelatedTopic _getTopic(String childTypeUri) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
+    private RelatedTopic _getTopic(String assocDefUri) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(assocDefUri);
         // error check
-        if (topic == null) {
-            throw new RuntimeException("Child topic of type \"" + childTypeUri + "\" not found in " + childTopics);
+        if (topic == null) {    // ### FIXME: wording
+            throw new RuntimeException("Child topic of type \"" + assocDefUri + "\" not found in " + childTopics);
         }
         //
         return topic;
     }
 
-    private RelatedTopic _getTopic(String childTypeUri, RelatedTopic defaultTopic) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(childTypeUri);
+    private RelatedTopic _getTopic(String assocDefUri, RelatedTopic defaultTopic) {
+        RelatedTopic topic = (RelatedTopic) childTopics.get(assocDefUri);
         return topic != null ? topic : defaultTopic;
     }
 
     // ---
 
-    private List<RelatedTopic> _getTopics(String childTypeUri) {
+    private List<RelatedTopic> _getTopics(String assocDefUri) {
         try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(assocDefUri);
             // error check
-            if (topics == null) {
-                throw new RuntimeException("Child topics of type \"" + childTypeUri + "\" not found in " + childTopics);
+            if (topics == null) {   // ### FIXME: wording
+                throw new RuntimeException("Child topics of type \"" + assocDefUri + "\" not found in " + childTopics);
             }
             //
             return topics;
         } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(childTypeUri, e);
+            getModel().throwInvalidAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
 
-    private List<RelatedTopic> _getTopics(String childTypeUri, List<RelatedTopic> defaultValue) {
+    private List<RelatedTopic> _getTopics(String assocDefUri, List<RelatedTopic> defaultValue) {
         try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(childTypeUri);
+            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(assocDefUri);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(childTypeUri, e);
+            getModel().throwInvalidAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -672,7 +678,7 @@ class AttachedChildTopics implements ChildTopics {
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
      */
     private RelatedTopic findChildTopicById(long childTopicId, AssociationDefinition assocDef) {
-        List<RelatedTopic> childTopics = _getTopics(assocDef.getChildTypeUri(), new ArrayList());
+        List<RelatedTopic> childTopics = _getTopics(assocDef.getAssocDefUri(), new ArrayList());
         for (RelatedTopic childTopic : childTopics) {
             if (childTopic.getId() == childTopicId) {
                 return childTopic;
@@ -687,14 +693,14 @@ class AttachedChildTopics implements ChildTopics {
      * @param   assocDef    the child topics according to this association definition are considered.
      */
     private RelatedTopic findChildTopicByRef(TopicReferenceModel topicRef, AssociationDefinition assocDef) {
-        return topicRef.findReferencedTopic(_getTopics(assocDef.getChildTypeUri(), new ArrayList()));
+        return topicRef.findReferencedTopic(_getTopics(assocDef.getAssocDefUri(), new ArrayList()));
     }
 
     // ---
 
-    private AssociationDefinition getAssocDef(String childTypeUri) {
+    private AssociationDefinition getAssocDef(String assocDefUri) {
         // Note: doesn't work for facets
-        return parent.getType().getAssocDef(childTypeUri);
+        return parent.getType().getAssocDef(assocDefUri);
     }
 
     // --- Update attached object cache + underlying model ---
@@ -703,36 +709,36 @@ class AttachedChildTopics implements ChildTopics {
      * For single-valued childs
      */
     private void putInChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        put(childTypeUri, childTopic);                              // attached object cache
-        getModel().put(childTypeUri, childTopic.getModel());        // underlying model
+        String assocDefUri = assocDef.getAssocDefUri();
+        put(assocDefUri, childTopic);                               // attached object cache
+        getModel().put(assocDefUri, childTopic.getModel());         // underlying model
     }
 
     /**
      * For single-valued childs
      */
     private void removeChildTopic(AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        remove(childTypeUri);                                       // attached object cache
-        getModel().remove(childTypeUri);                            // underlying model
+        String assocDefUri = assocDef.getAssocDefUri();
+        remove(assocDefUri);                                        // attached object cache
+        getModel().remove(assocDefUri);                             // underlying model
     }
 
     /**
      * For multiple-valued childs
      */
     private void addToChildTopics(RelatedTopic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        add(childTypeUri, childTopic);                              // attached object cache
-        getModel().add(childTypeUri, childTopic.getModel());        // underlying model
+        String assocDefUri = assocDef.getAssocDefUri();
+        add(assocDefUri, childTopic);                               // attached object cache
+        getModel().add(assocDefUri, childTopic.getModel());         // underlying model
     }
 
     /**
      * For multiple-valued childs
      */
     private void removeFromChildTopics(Topic childTopic, AssociationDefinition assocDef) {
-        String childTypeUri = assocDef.getChildTypeUri();
-        remove(childTypeUri, childTopic);                           // attached object cache
-        getModel().remove(childTypeUri, childTopic.getModel());     // underlying model
+        String assocDefUri = assocDef.getAssocDefUri();
+        remove(assocDefUri, childTopic);                            // attached object cache
+        getModel().remove(assocDefUri, childTopic.getModel());      // underlying model
     }
 
     // --- Update attached object cache ---
@@ -740,26 +746,26 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * Puts a single-valued child. An existing value is overwritten.
      */
-    private void put(String childTypeUri, Topic topic) {
-        childTopics.put(childTypeUri, topic);
+    private void put(String assocDefUri, Topic topic) {
+        childTopics.put(assocDefUri, topic);
     }
 
     /**
      * Removes a single-valued child.
      */
-    private void remove(String childTypeUri) {
-        childTopics.remove(childTypeUri);
+    private void remove(String assocDefUri) {
+        childTopics.remove(assocDefUri);
     }
 
     /**
      * Adds a value to a multiple-valued child.
      */
-    private void add(String childTypeUri, RelatedTopic topic) {
-        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+    private void add(String assocDefUri, RelatedTopic topic) {
+        List<RelatedTopic> topics = _getTopics(assocDefUri, null);      // defaultValue=null
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
-            childTopics.put(childTypeUri, topics);
+            childTopics.put(assocDefUri, topics);
         }
         topics.add(topic);
     }
@@ -767,8 +773,8 @@ class AttachedChildTopics implements ChildTopics {
     /**
      * Removes a value from a multiple-valued child.
      */
-    private void remove(String childTypeUri, Topic topic) {
-        List<RelatedTopic> topics = _getTopics(childTypeUri, null);        // defaultValue=null
+    private void remove(String assocDefUri, Topic topic) {
+        List<RelatedTopic> topics = _getTopics(assocDefUri, null);      // defaultValue=null
         if (topics != null) {
             topics.remove(topic);
         }
@@ -781,8 +787,8 @@ class AttachedChildTopics implements ChildTopics {
      * to the underlying model.
      */
     private void initAttachedObjectCache() {
-        for (String childTypeUri : model) {
-            initAttachedObjectCache(childTypeUri);
+        for (String assocDefUri : model) {
+            initAttachedObjectCache(assocDefUri);
         }
     }
 
@@ -790,8 +796,8 @@ class AttachedChildTopics implements ChildTopics {
      * Initializes this attached object cache selectively. Creates a hierarchy of attached topics (recursively) that is
      * isomorph to the underlying model, starting at the given child sub-tree.
      */
-    private void initAttachedObjectCache(String childTypeUri) {
-        Object value = model.get(childTypeUri);
+    private void initAttachedObjectCache(String assocDefUri) {
+        Object value = model.get(assocDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {
             return;
@@ -801,10 +807,10 @@ class AttachedChildTopics implements ChildTopics {
         // child-level. Finally attached topics are created for all child-levels.
         if (value instanceof RelatedTopicModel) {
             RelatedTopicModel childTopic = (RelatedTopicModel) value;
-            childTopics.put(childTypeUri, instantiateRelatedTopic(childTopic));
+            childTopics.put(assocDefUri, instantiateRelatedTopic(childTopic));
         } else if (value instanceof List) {
             List<RelatedTopic> topics = new ArrayList();
-            childTopics.put(childTypeUri, topics);
+            childTopics.put(assocDefUri, topics);
             for (RelatedTopicModel childTopic : (List<RelatedTopicModel>) value) {
                 topics.add(instantiateRelatedTopic(childTopic));
             }

@@ -143,68 +143,75 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     @Override
-    public AssociationDefinition getAssocDef(String childTypeUri) {
-        AssociationDefinition assocDef = assocDefs.get(childTypeUri);
-        if (assocDef == null) {
-            throw new RuntimeException("Schema violation: association definition \"" +
-                childTypeUri + "\" not found in " + this);
-        }
-        return assocDef;
+    public AssociationDefinition getAssocDef(String assocDefUri) {
+        return getAssocDefOrThrow(assocDefUri);
     }
 
     @Override
-    public boolean hasAssocDef(String childTypeUri) {
-        return assocDefs.get(childTypeUri) != null;
+    public boolean hasAssocDef(String assocDefUri) {
+        return _getAssocDef(assocDefUri) != null;
     }
 
     @Override
     public Type addAssocDef(AssociationDefinitionModel assocDef) {
-        return addAssocDefBefore(assocDef, null);   // beforeChildTypeUri=null
+        return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeChildTypeUri) {
+    public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         // Note: the last assoc def must be determined *before* the memory is updated
-        AssociationDefinitionModel lastAssocDef = lastAssocDef();
+        long lastAssocDefId = lastAssocDefId();
         // 1) update memory
-        getModel().addAssocDefBefore(assocDef, beforeChildTypeUri); // update model
-        _addAssocDefBefore(assocDef, beforeChildTypeUri);           // update attached object cache
+        getModel().addAssocDefBefore(assocDef, beforeAssocDefUri);  // update model
+        _addAssocDefBefore(assocDef, beforeAssocDefUri);            // update attached object cache
         // 2) update DB
         dms.typeStorage.storeAssociationDefinition(assocDef);
         // update sequence
         long assocDefId = assocDef.getId();
-        if (beforeChildTypeUri == null) {
+        if (beforeAssocDefUri == null) {
             // append at end
-            dms.typeStorage.appendToSequence(getId(), assocDefId, lastAssocDef);
+            dms.typeStorage.appendToSequence(getId(), assocDefId, lastAssocDefId);
         } else if (firstAssocDef().getId() == assocDefId) {
             // insert at start
             dms.typeStorage.insertAtSequenceStart(getId(), assocDefId);
         } else {
             // insert in the middle
-            long beforeAssocDefId = getAssocDef(beforeChildTypeUri).getId();
+            long beforeAssocDefId = getAssocDef(beforeAssocDefUri).getId();
             dms.typeStorage.insertIntoSequence(assocDefId, beforeAssocDefId);
         }
         return this;
     }
 
+    // ### TODO: refactor as mentioned in interface comment and drop this method
     @Override
     public void updateAssocDef(AssociationDefinitionModel assocDef) {
+        // ### FIXME: the "include in label" flag is not updated here as it is not part of the
+        // AssociationDefinitionModel passed. That's why its change is ignored when editing an assoc def manually
+        // (selecting the association on the topicmap).
+        // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
+        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
+        String[] assocDefUris = getModel().findAssocDefUris(assocDef.getId());
+        logger.info("################### type URI=\"" + getUri() + "\", new assoc def URI=\"" +
+            assocDef.getAssocDefUri() + "\", assoc def URI to remove=\"" + assocDefUris[0] +
+            "\", insert before assoc def URI=\"" + assocDefUris[1] + "\", assocDef=" + assocDef);
         // update memory
-        getModel().updateAssocDef(assocDef);    // update model
-        _addAssocDef(assocDef);                 // update attached object cache
+        getModel().removeAssocDef(assocDefUris[0]);                 // update model
+        getModel().addAssocDefBefore(assocDef, assocDefUris[1]);    // update model
+        _removeAssocDef(assocDefUris[0]);                           // update attached object cache
+        _addAssocDefBefore(assocDef, assocDefUris[1]);              // update attached object cache
         // update DB
         // ### Note: the DB is not updated here! In case of interactive assoc type change the association is
         // already updated in DB. => See interface comment.
     }
 
     @Override
-    public Type removeAssocDef(String childTypeUri) {
+    public Type removeAssocDef(String assocDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
         // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
-        getAssocDef(childTypeUri).delete();
+        getAssocDef(assocDefUri).delete();
         return this;
     }
 
@@ -220,7 +227,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());
+        dms.typeStorage.updateLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
     // --- View Configuration ---
@@ -259,10 +266,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---
 
-    void removeAssocDefFromMemoryAndRebuildSequence(String childTypeUri) {
+    void removeAssocDefFromMemoryAndRebuildSequence(String assocDefUri) {
         // update memory
-        getModel().removeAssocDef(childTypeUri);    // update model
-        _removeAssocDef(childTypeUri);              // update attached object cache
+        getModel().removeAssocDef(assocDefUri);     // update model
+        _removeAssocDef(assocDefUri);               // update attached object cache
         // update DB
         dms.typeStorage.rebuildSequence(this);
     }
@@ -322,7 +329,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            getAssocDef(assocDef.getChildTypeUri()).update(assocDef);
+            // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
+            // So we must identify the assoc def to update **by ID**.
+            // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
+            String[] assocDefUris = getModel().findAssocDefUris(assocDef.getId());
+            getAssocDef(assocDefUris[0]).update(assocDef);
         }
     }
 
@@ -352,7 +363,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         Iterator<AssociationDefinitionModel> i = newAssocDefs.iterator();
         for (AssociationDefinition assocDef : assocDefs) {
             AssociationDefinitionModel newAssocDef = i.next();
-            if (!assocDef.getChildTypeUri().equals(newAssocDef.getChildTypeUri())) {
+            if (!assocDef.getAssocDefUri().equals(newAssocDef.getAssocDefUri())) {
                 return true;
             }
         }
@@ -363,28 +374,32 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void updateLabelConfig(List<String> newLabelConfig) {
-        if (!getLabelConfig().equals(newLabelConfig)) {
-            logger.info("### Changing label configuration");
-            setLabelConfig(newLabelConfig);
+        try {
+            if (!getLabelConfig().equals(newLabelConfig)) {
+                logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
+                setLabelConfig(newLabelConfig);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
         }
     }
 
 
 
-    // === Helper ===
+    // === Association Definitions ===
 
     /**
-     * Returns the last association definition of this type or
-     * <code>null</code> if there are no association definitions.
+     * Returns the ID of the last association definition of this type or
+     * <code>-1</code> if there are no association definitions.
      *
      * ### TODO: move to class TypeModel?
      */
-    private AssociationDefinitionModel lastAssocDef() {
-        AssociationDefinitionModel lastAssocDef = null;
+    private long lastAssocDefId() {
+        long lastAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            lastAssocDef = assocDef;
+            lastAssocDefId = assocDef.getId();
         }
-        return lastAssocDef;
+        return lastAssocDefId;
     }
 
     private AssociationDefinitionModel firstAssocDef() {
@@ -401,23 +416,41 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
+    private AssociationDefinition getAssocDefOrThrow(String assocDefUri) {
+        AssociationDefinition assocDef = _getAssocDef(assocDefUri);
+        if (assocDef == null) {
+            throw new RuntimeException("Schema violation: association definition \"" + assocDefUri +
+                "\" not found in " + assocDefs.keySet());
+        }
+        return assocDef;
+    }
+
+    private AssociationDefinition _getAssocDef(String assocDefUri) {
+        return assocDefs.get(assocDefUri);
+    }
+
     private void _addAssocDef(AssociationDefinitionModel model) {
-        _addAssocDefBefore(model, null);    // beforeChildTypeUri=null
+        _addAssocDefBefore(model, null);    // beforeAssocDefUri=null
     }
 
     /**
-     * @param   beforeChildTypeUri  the assoc def <i>before</i> the assoc def is inserted into the sequence.
+     * @param   beforeAssocDefUri   the assoc def <i>before</i> the assoc def is inserted into the sequence.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    private void _addAssocDefBefore(AssociationDefinitionModel model, String beforeChildTypeUri) {
-        assocDefs.putBefore(model.getChildTypeUri(), new AttachedAssociationDefinition(model, dms), beforeChildTypeUri);
+    private void _addAssocDefBefore(AssociationDefinitionModel model, String beforeAssocDefUri) {
+        assocDefs.putBefore(model.getAssocDefUri(), new AttachedAssociationDefinition(model, dms), beforeAssocDefUri);
     }
 
-    private void _removeAssocDef(String childTypeUri) {
-        // error check
-        getAssocDef(childTypeUri);
-        //
-        assocDefs.remove(childTypeUri);
+    private void _removeAssocDef(String assocDefUri) {
+        try {
+            if (assocDefs.remove(assocDefUri) == null) {
+                throw new RuntimeException("Schema violation: association definition \"" +
+                    assocDefUri + "\" not found in " + assocDefs.keySet());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
+                getUri() + "\" failed", e);
+        }
     }
 
     // ---

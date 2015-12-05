@@ -34,7 +34,7 @@ function TypeRenderer() {
             editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = type.assoc_defs[i]; i++) {
-                var label_state = type.get_label_config(assoc_def.child_type_uri)
+                var label_state = type.get_label_config(assoc_def.assoc_def_uri)
                 editors_list.append(new AssociationDefEditor(assoc_def, label_state).dom)
             }
             editors_list.sortable()
@@ -93,15 +93,6 @@ function TypeRenderer() {
             }
 
             function build_assoc_def_model() {
-                var val = custom_assoc_type_menu.get_selection()
-                if (typeof(val) == "object") {
-                    var custom_assoc_type_uri = val.value
-                } else {
-                    if (val) {
-                        alert("Custom Association Type \"" + val + "\" ignored")
-                    }
-                    var custom_assoc_type_uri = null
-                }
                 return {
                     assoc_def: {
                         id:                     assoc_def.id,
@@ -109,9 +100,21 @@ function TypeRenderer() {
                         child_cardinality_uri:  child_card_menu.get_selection().value,
                         parent_cardinality_uri: parent_card_menu.get_selection().value,
                         assoc_type_uri:         assoc_type_menu.get_selection().value,
-                        custom_assoc_type_uri:  custom_assoc_type_uri
+                        custom_assoc_type_uri:  custom_assoc_type_uri()
                     },
                     label_state: label_config_checkbox.get(0).checked
+                }
+
+                function custom_assoc_type_uri() {
+                    var val = custom_assoc_type_menu.get_selection()
+                    if (typeof(val) == "object") {
+                        return val.value
+                    } else {
+                        if (val) {
+                            alert("Custom Association Type \"" + val + "\" ignored")
+                        }
+                        return null
+                    }
                 }
             }
         }
@@ -145,7 +148,8 @@ function TypeRenderer() {
                     var assoc_def = editor_model.assoc_def
                     assoc_defs.push(assoc_def)
                     if (editor_model.label_state) {
-                        label_config.push(assoc_def.child_type_uri)
+                        label_config.push(assoc_def.child_type_uri +
+                            (assoc_def.custom_assoc_type_uri ? "#" + assoc_def.custom_assoc_type_uri : ""))
                     }
                 })
                 return {

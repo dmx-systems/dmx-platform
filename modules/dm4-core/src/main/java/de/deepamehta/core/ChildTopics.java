@@ -17,19 +17,19 @@ public interface ChildTopics extends Iterable<String> {
      * Accesses a single-valued child.
      * Throws if there is no such child.
      */
-    RelatedTopic getTopic(String childTypeUri);
+    RelatedTopic getTopic(String assocDefUri);
 
     /**
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
-    List<RelatedTopic> getTopics(String childTypeUri);
+    List<RelatedTopic> getTopics(String assocDefUri);
 
     // ---
 
-    Object get(String childTypeUri);
+    Object get(String assocDefUri);
 
-    boolean has(String childTypeUri);
+    boolean has(String assocDefUri);
 
     int size();
 
@@ -45,37 +45,37 @@ public interface ChildTopics extends Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    String getString(String childTypeUri);
+    String getString(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    int getInt(String childTypeUri);
+    int getInt(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    long getLong(String childTypeUri);
+    long getLong(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    double getDouble(String childTypeUri);
+    double getDouble(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    boolean getBoolean(String childTypeUri);
+    boolean getBoolean(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    Object getObject(String childTypeUri);
+    Object getObject(String assocDefUri);
 
     // ---
 
@@ -83,7 +83,7 @@ public interface ChildTopics extends Iterable<String> {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    ChildTopics getChildTopics(String childTypeUri);
+    ChildTopics getChildTopics(String assocDefUri);
 
     // Note: there are no convenience accessors for a multiple-valued child.
 
@@ -96,7 +96,7 @@ public interface ChildTopics extends Iterable<String> {
     /**
      * Sets a child.
      */
-    ChildTopics set(String childTypeUri, TopicModel value);
+    ChildTopics set(String assocDefUri, TopicModel value);
 
     // ---
 
@@ -106,52 +106,52 @@ public interface ChildTopics extends Iterable<String> {
      * @param   value   The simple value.
      *                  Either String, Integer, Long, Double, or Boolean. Primitive values are auto-boxed.
      */
-    ChildTopics set(String childTypeUri, Object value);
+    ChildTopics set(String assocDefUri, Object value);
 
     /**
      * Convenience method to set the composite value of a child.
      */
-    ChildTopics set(String childTypeUri, ChildTopicsModel value);
+    ChildTopics set(String assocDefUri, ChildTopicsModel value);
 
     // ---
 
-    ChildTopics setRef(String childTypeUri, long refTopicId);
+    ChildTopics setRef(String assocDefUri, long refTopicId);
 
-    ChildTopics setRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
+    ChildTopics setRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
 
-    ChildTopics setRef(String childTypeUri, String refTopicUri);
+    ChildTopics setRef(String assocDefUri, String refTopicUri);
 
-    ChildTopics setRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
+    ChildTopics setRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
 
     // ---
 
-    ChildTopics setDeletionRef(String childTypeUri, long refTopicId);
+    ChildTopics setDeletionRef(String assocDefUri, long refTopicId);
 
-    ChildTopics setDeletionRef(String childTypeUri, String refTopicUri);
+    ChildTopics setDeletionRef(String assocDefUri, String refTopicUri);
 
     // --- Multiple-valued Childs ---
 
-    ChildTopics add(String childTypeUri, TopicModel value);
+    ChildTopics add(String assocDefUri, TopicModel value);
 
     // ---
 
-    ChildTopics add(String childTypeUri, Object value);
+    ChildTopics add(String assocDefUri, Object value);
 
-    ChildTopics add(String childTypeUri, ChildTopicsModel value);
-
-    // ---
-
-    ChildTopics addRef(String childTypeUri, long refTopicId);
-
-    ChildTopics addRef(String childTypeUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
-
-    ChildTopics addRef(String childTypeUri, String refTopicUri);
-
-    ChildTopics addRef(String childTypeUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
+    ChildTopics add(String assocDefUri, ChildTopicsModel value);
 
     // ---
 
-    ChildTopics addDeletionRef(String childTypeUri, long refTopicId);
+    ChildTopics addRef(String assocDefUri, long refTopicId);
 
-    ChildTopics addDeletionRef(String childTypeUri, String refTopicUri);
+    ChildTopics addRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics);
+
+    ChildTopics addRef(String assocDefUri, String refTopicUri);
+
+    ChildTopics addRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics);
+
+    // ---
+
+    ChildTopics addDeletionRef(String assocDefUri, long refTopicId);
+
+    ChildTopics addDeletionRef(String assocDefUri, String refTopicUri);
 }

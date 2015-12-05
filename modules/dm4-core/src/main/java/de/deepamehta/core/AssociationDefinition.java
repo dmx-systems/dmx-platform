@@ -12,6 +12,8 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
  */
 public interface AssociationDefinition extends Association {
 
+    String getAssocDefUri();
+
     /**
      * @return  The custom association type, or <code>null</code> if not set.
      */

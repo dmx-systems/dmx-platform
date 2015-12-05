@@ -33,7 +33,7 @@ public class ChildTopicsModel implements Iterable<String> {
 
     /**
      * Internal representation.
-     * Key: String, value: RelatedTopicModel or List<RelatedTopicModel>
+     * Key: assoc def URI (String), value: RelatedTopicModel or List<RelatedTopicModel>
      */
     private Map<String, Object> childTopics = new HashMap();
     // Note: it must be List<RelatedTopicModel>, not Set<RelatedTopicModel>.
@@ -52,15 +52,16 @@ public class ChildTopicsModel implements Iterable<String> {
         try {
             Iterator<String> i = values.keys();
             while (i.hasNext()) {
-                String childTypeUri = i.next();
-                Object value = values.get(childTypeUri);
-                if (value instanceof JSONArray) {
+                String assocDefUri = i.next();
+                String childTypeUri = childTypeUri(assocDefUri);
+                Object value = values.get(assocDefUri);
+                if (!(value instanceof JSONArray)) {
+                    put(assocDefUri, createTopicModel(childTypeUri, value));
+                } else {
                     JSONArray valueArray = (JSONArray) value;
                     for (int j = 0; j < valueArray.length(); j++) {
-                        add(childTypeUri, createTopicModel(childTypeUri, valueArray.get(j)));
+                        add(assocDefUri, createTopicModel(childTypeUri, valueArray.get(j)));
                     }
-                } else {
-                    put(childTypeUri, createTopicModel(childTypeUri, value));
                 }
             }
         } catch (Exception e) {
@@ -78,11 +79,11 @@ public class ChildTopicsModel implements Iterable<String> {
      * Accesses a single-valued child.
      * Throws if there is no such child.
      */
-    public RelatedTopicModel getTopic(String childTypeUri) {
-        RelatedTopicModel topic = (RelatedTopicModel) get(childTypeUri);
+    public RelatedTopicModel getTopic(String assocDefUri) {
+        RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + childTypeUri +
+            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
                 "\": no such entry in\n" + this);
         }
         //
@@ -93,8 +94,8 @@ public class ChildTopicsModel implements Iterable<String> {
      * Accesses a single-valued child.
      * Returns a default value if there is no such child.
      */
-    public RelatedTopicModel getTopic(String childTypeUri, RelatedTopicModel defaultValue) {
-        RelatedTopicModel topic = (RelatedTopicModel) get(childTypeUri);
+    public RelatedTopicModel getTopic(String assocDefUri, RelatedTopicModel defaultValue) {
+        RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
         return topic != null ? topic : defaultValue;
     }
 
@@ -104,18 +105,18 @@ public class ChildTopicsModel implements Iterable<String> {
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
-    public List<RelatedTopicModel> getTopics(String childTypeUri) {
+    public List<RelatedTopicModel> getTopics(String assocDefUri) {
         try {
-            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(childTypeUri);
+            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
             // error check
             if (topics == null) {
-                throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + childTypeUri +
+                throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
                     "\": no such entry in\n" + this);
             }
             //
             return topics;
         } catch (ClassCastException e) {
-            throwInvalidAccess(childTypeUri, e);
+            throwInvalidAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -124,12 +125,12 @@ public class ChildTopicsModel implements Iterable<String> {
      * Accesses a multiple-valued child.
      * Returns a default value if there is no such child.
      */
-    public List<RelatedTopicModel> getTopics(String childTypeUri, List<RelatedTopicModel> defaultValue) {
+    public List<RelatedTopicModel> getTopics(String assocDefUri, List<RelatedTopicModel> defaultValue) {
         try {
-            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(childTypeUri);
+            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
-            throwInvalidAccess(childTypeUri, e);
+            throwInvalidAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -142,15 +143,15 @@ public class ChildTopicsModel implements Iterable<String> {
      *
      * @return  A RelatedTopicModel or List<RelatedTopicModel>, or null if there is no such child.
      */
-    public Object get(String childTypeUri) {
-        return childTopics.get(childTypeUri);
+    public Object get(String assocDefUri) {
+        return childTopics.get(assocDefUri);
     }
 
     /**
      * Checks if a child is contained in this ChildTopicsModel.
      */
-    public boolean has(String childTypeUri) {
-        return childTopics.containsKey(childTypeUri);
+    public boolean has(String assocDefUri) {
+        return childTopics.containsKey(assocDefUri);
     }
 
     /**
@@ -169,16 +170,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public String getString(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().toString();
+    public String getString(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().toString();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public String getString(String childTypeUri, String defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public String getString(String assocDefUri, String defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
 
@@ -188,16 +189,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public int getInt(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().intValue();
+    public int getInt(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().intValue();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public int getInt(String childTypeUri, int defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public int getInt(String assocDefUri, int defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
 
@@ -207,16 +208,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public long getLong(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().longValue();
+    public long getLong(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().longValue();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public long getLong(String childTypeUri, long defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public long getLong(String assocDefUri, long defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
 
@@ -226,16 +227,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public double getDouble(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().doubleValue();
+    public double getDouble(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().doubleValue();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public double getDouble(String childTypeUri, double defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public double getDouble(String assocDefUri, double defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
 
@@ -245,16 +246,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public boolean getBoolean(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().booleanValue();
+    public boolean getBoolean(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().booleanValue();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public boolean getBoolean(String childTypeUri, boolean defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public boolean getBoolean(String assocDefUri, boolean defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
@@ -264,16 +265,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public Object getObject(String childTypeUri) {
-        return getTopic(childTypeUri).getSimpleValue().value();
+    public Object getObject(String assocDefUri) {
+        return getTopic(assocDefUri).getSimpleValue().value();
     }
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public Object getObject(String childTypeUri, Object defaultValue) {
-        TopicModel topic = getTopic(childTypeUri, null);
+    public Object getObject(String assocDefUri, Object defaultValue) {
+        TopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
@@ -283,16 +284,16 @@ public class ChildTopicsModel implements Iterable<String> {
      * Convenience accessor for the *composite* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
-    public ChildTopicsModel getChildTopicsModel(String childTypeUri) {
-        return getTopic(childTypeUri).getChildTopicsModel();
+    public ChildTopicsModel getChildTopicsModel(String assocDefUri) {
+        return getTopic(assocDefUri).getChildTopicsModel();
     }
 
     /**
      * Convenience accessor for the *composite* value of a single-valued child.
      * Returns a default value if the child doesn't exist.
      */
-    public ChildTopicsModel getChildTopicsModel(String childTypeUri, ChildTopicsModel defaultValue) {
-        RelatedTopicModel topic = getTopic(childTypeUri, null);
+    public ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
+        RelatedTopicModel topic = getTopic(assocDefUri, null);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }
 
@@ -308,23 +309,23 @@ public class ChildTopicsModel implements Iterable<String> {
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
      */
-    public ChildTopicsModel put(String childTypeUri, RelatedTopicModel value) {
+    public ChildTopicsModel put(String assocDefUri, RelatedTopicModel value) {
         try {
             // check argument
             if (value == null) {
                 throw new IllegalArgumentException("Tried to put null in a ChildTopicsModel");
             }
             //
-            childTopics.put(childTypeUri, value);
+            childTopics.put(assocDefUri, value);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (childTypeUri=\"" +
-                childTypeUri + "\", value=" + value + ")", e);
+            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (assocDefUri=\"" +
+                assocDefUri + "\", value=" + value + ")", e);
         }
     }
 
-    public ChildTopicsModel put(String childTypeUri, TopicModel value) {
-        return put(childTypeUri, new RelatedTopicModel(value));
+    public ChildTopicsModel put(String assocDefUri, TopicModel value) {
+        return put(assocDefUri, new RelatedTopicModel(value));
     }
 
     // ---
@@ -337,12 +338,12 @@ public class ChildTopicsModel implements Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    public ChildTopicsModel put(String childTypeUri, Object value) {
+    public ChildTopicsModel put(String assocDefUri, Object value) {
         try {
-            return put(childTypeUri, new TopicModel(childTypeUri, new SimpleValue(value)));
+            return put(assocDefUri, new TopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
         } catch (Exception e) {
-            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (childTypeUri=\"" +
-                childTypeUri + "\", value=" + value + ")", e);
+            throw new RuntimeException("Putting a value in a ChildTopicsModel failed (assocDefUri=\"" +
+                assocDefUri + "\", value=" + value + ")", e);
         }
     }
 
@@ -352,8 +353,8 @@ public class ChildTopicsModel implements Iterable<String> {
      *
      * @return  this ChildTopicsModel.
      */
-    public ChildTopicsModel put(String childTypeUri, ChildTopicsModel value) {
-        return put(childTypeUri, new TopicModel(childTypeUri, value));
+    public ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
+        return put(assocDefUri, new TopicModel(childTypeUri(assocDefUri), value));
     }
 
     // ---
@@ -362,8 +363,8 @@ public class ChildTopicsModel implements Iterable<String> {
      * Puts a by-ID topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    public ChildTopicsModel putRef(String childTypeUri, long refTopicId) {
-        put(childTypeUri, new TopicReferenceModel(refTopicId));
+    public ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
+        put(assocDefUri, new TopicReferenceModel(refTopicId));
         return this;
     }
 
@@ -371,8 +372,8 @@ public class ChildTopicsModel implements Iterable<String> {
      * Puts a by-URI topic reference in a single-valued child.
      * An existing reference is overwritten.
      */
-    public ChildTopicsModel putRef(String childTypeUri, String refTopicUri) {
-        put(childTypeUri, new TopicReferenceModel(refTopicUri));
+    public ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
+        put(assocDefUri, new TopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -381,8 +382,8 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Removes a single-valued child.
      */
-    public ChildTopicsModel remove(String childTypeUri) {
-        childTopics.remove(childTypeUri);
+    public ChildTopicsModel remove(String assocDefUri) {
+        childTopics.remove(assocDefUri);
         return this;
     }
 
@@ -391,12 +392,12 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Adds a value to a multiple-valued child.
      */
-    public ChildTopicsModel add(String childTypeUri, RelatedTopicModel value) {
-        List<RelatedTopicModel> topics = getTopics(childTypeUri, null);     // defaultValue=null
+    public ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
+        List<RelatedTopicModel> topics = getTopics(assocDefUri, null);      // defaultValue=null
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
-            childTopics.put(childTypeUri, topics);
+            childTopics.put(assocDefUri, topics);
         }
         //
         topics.add(value);
@@ -404,24 +405,24 @@ public class ChildTopicsModel implements Iterable<String> {
         return this;
     }
 
-    public ChildTopicsModel add(String childTypeUri, TopicModel value) {
-        return add(childTypeUri, new RelatedTopicModel(value));
+    public ChildTopicsModel add(String assocDefUri, TopicModel value) {
+        return add(assocDefUri, new RelatedTopicModel(value));
     }
 
     /**
      * Sets the values of a multiple-valued child.
      * Existing values are overwritten.
      */
-    public ChildTopicsModel put(String childTypeUri, List<RelatedTopicModel> values) {
-        childTopics.put(childTypeUri, values);
+    public ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values) {
+        childTopics.put(assocDefUri, values);
         return this;
     }
 
     /**
      * Removes a value from a multiple-valued child.
      */
-    public ChildTopicsModel remove(String childTypeUri, TopicModel value) {
-        List<RelatedTopicModel> topics = getTopics(childTypeUri, null);     // defaultValue=null
+    public ChildTopicsModel remove(String assocDefUri, TopicModel value) {
+        List<RelatedTopicModel> topics = getTopics(assocDefUri, null);      // defaultValue=null
         if (topics != null) {
             topics.remove(value);
         }
@@ -433,16 +434,16 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Adds a by-ID topic reference to a multiple-valued child.
      */
-    public ChildTopicsModel addRef(String childTypeUri, long refTopicId) {
-        add(childTypeUri, new TopicReferenceModel(refTopicId));
+    public ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
+        add(assocDefUri, new TopicReferenceModel(refTopicId));
         return this;
     }
 
     /**
      * Adds a by-URI topic reference to a multiple-valued child.
      */
-    public ChildTopicsModel addRef(String childTypeUri, String refTopicUri) {
-        add(childTypeUri, new TopicReferenceModel(refTopicUri));
+    public ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
+        add(assocDefUri, new TopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -451,8 +452,8 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      */
-    public ChildTopicsModel addDeletionRef(String childTypeUri, long refTopicId) {
-        add(childTypeUri, new TopicDeletionModel(refTopicId));
+    public ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
+        add(assocDefUri, new TopicDeletionModel(refTopicId));
         return this;
     }
 
@@ -461,7 +462,7 @@ public class ChildTopicsModel implements Iterable<String> {
     // === Iterable Implementation ===
 
     /**
-     * Returns an interator which iterates this ChildTopicsModel's child type URIs.
+     * Returns an interator which iterates this ChildTopicsModel's assoc def URIs.
      */
     @Override
     public Iterator<String> iterator() {
@@ -475,12 +476,12 @@ public class ChildTopicsModel implements Iterable<String> {
     public JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
-            for (String childTypeUri : this) {
-                Object value = get(childTypeUri);
+            for (String assocDefUri : this) {
+                Object value = get(assocDefUri);
                 if (value instanceof RelatedTopicModel) {
-                    json.put(childTypeUri, ((RelatedTopicModel) value).toJSON());
+                    json.put(assocDefUri, ((RelatedTopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(childTypeUri, DeepaMehtaUtils.toJSONArray((List<RelatedTopicModel>) value));
+                    json.put(assocDefUri, DeepaMehtaUtils.toJSONArray((List<RelatedTopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
                 }
@@ -489,6 +490,10 @@ public class ChildTopicsModel implements Iterable<String> {
         } catch (Exception e) {
             throw new RuntimeException("Serialization of a ChildTopicsModel failed (" + this + ")", e);
         }
+    }
+
+    public String childTypeUri(String assocDefUri) {
+        return assocDefUri.split("#")[0];
     }
 
 
@@ -502,14 +507,14 @@ public class ChildTopicsModel implements Iterable<String> {
     @Override
     public ChildTopicsModel clone() {
         ChildTopicsModel clone = new ChildTopicsModel();
-        for (String childTypeUri : this) {
-            Object value = get(childTypeUri);
+        for (String assocDefUri : this) {
+            Object value = get(assocDefUri);
             if (value instanceof RelatedTopicModel) {
                 RelatedTopicModel model = (RelatedTopicModel) value;
-                clone.put(childTypeUri, model.clone());
+                clone.put(assocDefUri, model.clone());
             } else if (value instanceof List) {
                 for (RelatedTopicModel model : (List<RelatedTopicModel>) value) {
-                    clone.add(childTypeUri, model.clone());
+                    clone.add(assocDefUri, model.clone());
                 }
             } else {
                 throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
@@ -537,7 +542,7 @@ public class ChildTopicsModel implements Iterable<String> {
     private RelatedTopicModel createTopicModel(String childTypeUri, Object value) throws JSONException {
         if (value instanceof JSONObject) {
             JSONObject val = (JSONObject) value;
-            // we detect the canonic format by checking for a mandatory topic properties
+            // we detect the canonic format by checking for mandatory topic properties
             if (val.has("value") || val.has("childs")) {
                 // canonic format (topic or topic reference)
                 AssociationModel relatingAssoc = null;
@@ -630,12 +635,12 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * ### TODO: should not be public. Specify interfaces also for model classes?
      */
-    public void throwInvalidAccess(String childTypeUri, ClassCastException e) {
+    public void throwInvalidAccess(String assocDefUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + childTypeUri +
+            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
                 "\": the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
         } else {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + childTypeUri +
+            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
                 "\" in\n" + this, e);
         }
     }

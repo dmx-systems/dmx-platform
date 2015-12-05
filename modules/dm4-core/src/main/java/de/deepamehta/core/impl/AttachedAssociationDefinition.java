@@ -39,6 +39,11 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
 
     @Override
+    public String getAssocDefUri() {
+        return getModel().getAssocDefUri();
+    }
+
+    @Override
     public String getCustomAssocTypeUri() {
         return getModel().getCustomAssocTypeUri();
     }
@@ -84,10 +89,13 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     @Override
     public void setCustomAssocTypeUri(String customAssocTypeUri) {
+        logger.info("##################################### customAssocTypeUri=\"" + customAssocTypeUri + "\"");
+        // Note: calling high-level methods lets the Type Editor kick in which is not intended. It refetches the
+        // entire assoc def then and adds it to the type. This is more work than required, but is not really a problem.
         if (customAssocTypeUri != null) {
-            getChildTopics().setRef("dm4.core.assoc_type", customAssocTypeUri);
+            getChildTopics().setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocTypeUri);
         } else {
-            getChildTopics().setDeletionRef("dm4.core.assoc_type", customAssocTypeUri);
+            getChildTopics().setDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocTypeUri);
         }
     }
 

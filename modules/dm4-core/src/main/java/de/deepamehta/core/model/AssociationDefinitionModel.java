@@ -22,10 +22,10 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String customAssocTypeUri;
+    private String customAssocTypeUri;  // may be null
 
-    private String parentTypeUri;   // derived, not serialized
-    private String childTypeUri;    // derived, not serialized
+    private String parentTypeUri;       // derived, not serialized
+    private String childTypeUri;        // derived, not serialized
 
     private String parentCardinalityUri;
     private String childCardinalityUri;
@@ -71,23 +71,31 @@ public class AssociationDefinitionModel extends AssociationModel {
     AssociationDefinitionModel(JSONObject assocDef) throws JSONException {
         super(assocDef.optLong("id", -1), null, assocDef.getString("assoc_type_uri"), parentRoleModel(assocDef),
                                                                                       childRoleModel(assocDef));
-        // Note: getString() called on a key with JSON null value would return the string "null"
-        this.customAssocTypeUri = assocDef.isNull("custom_assoc_type_uri") ? null :
-            assocDef.getString("custom_assoc_type_uri");
-        //
-        this.parentTypeUri = parentTypeUri();
-        this.childTypeUri = childTypeUri();
-        //
-        if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
-            throw new RuntimeException("\"parent_cardinality_uri\" is missing");
+        try {
+            // Note: getString() called on a key with JSON null value would return the string "null"
+            this.customAssocTypeUri = assocDef.isNull("custom_assoc_type_uri") ? null :
+                assocDef.getString("custom_assoc_type_uri");
+            //
+            this.parentTypeUri = parentTypeUri();
+            this.childTypeUri = childTypeUri();
+            //
+            if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
+                throw new RuntimeException("\"parent_cardinality_uri\" is missing");
+            }
+            this.parentCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
+            this.childCardinalityUri  = assocDef.getString("child_cardinality_uri");
+            //
+            this.viewConfigModel = new ViewConfigurationModel(assocDef);
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
-        this.parentCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
-        this.childCardinalityUri  = assocDef.getString("child_cardinality_uri");
-        //
-        this.viewConfigModel = new ViewConfigurationModel(assocDef);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public String getAssocDefUri() {
+        return childTypeUri + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
+    }
 
     public String getCustomAssocTypeUri() {
         return customAssocTypeUri;
