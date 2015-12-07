@@ -5,6 +5,8 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -34,9 +36,10 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
-        if (isAssocDef(assoc.getModel())) {
+        AssociationModel newModel = assoc.getModel();
+        if (isAssocDef(newModel)) {
             if (isAssocDef(oldModel)) {
-                updateAssocDef(assoc);
+                updateAssocDef(newModel);
             } else {
                 createAssocDef(assoc);
             }
@@ -60,9 +63,9 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void createAssocDef(Association assoc) {
-        Type parentType = fetchParentType(assoc);
+        Type parentType = fetchParentType(assoc.getModel());
         AssociationDefinitionModel assocDef = dms.getTypeStorage().createAssociationDefinition(assoc);
-        logger.info("### Adding association definition \"" + assocDef.getAssocDefUri() + "\" to type \"" +
+        logger.info("##### Adding association definition \"" + assocDef.getAssocDefUri() + "\" to type \"" +
             parentType.getUri() + "\" (" + assocDef + ")");
         //
         parentType.addAssocDef(assocDef);
@@ -70,23 +73,23 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef(Association assoc) {
+    private void updateAssocDef(AssociationModel assoc) {
         Type parentType = fetchParentType(assoc);
-        AssociationDefinitionModel assocDef = dms.getTypeStorage().fetchAssociationDefinition(assoc);
-        logger.info("### Updating association definition \"" + assocDef.getAssocDefUri() + "\" of type \"" +
-            parentType.getUri() + "\" (" + assocDef + ")");
+        logger.info("##### Updating association definition " + assoc.getId() + " of type \"" +
+            parentType.getUri() + "\"");
         //
-        parentType.updateAssocDef(assocDef);
+        parentType.updateAssocDef(assoc);
         //
         addUpdateTypeDirective(parentType);
     }
 
     private void removeAssocDef(Association assoc) {
-        Type parentType = fetchParentType(assoc);
-        String childTypeUri = fetchChildType(assoc).getUri();
-        logger.info("### Removing association definition \"" + childTypeUri + "\" from type \"" + parentType.getUri() +
-            "\"");
+        Type parentType = fetchParentType(assoc.getModel());
+        String childTypeUri = fetchChildType(assoc.getModel()).getUri();
+        logger.info("##### Removing association definition \"" + childTypeUri + "\" from type \"" +
+            parentType.getUri() + "\"");
         //
+        // ### FIXME: must receive an assocDefUri instead a childTypeUri
         dms.getTypeStorage().removeAssociationDefinitionFromMemoryAndRebuildSequence(parentType, childTypeUri);
         //
         addUpdateTypeDirective(parentType);
@@ -115,7 +118,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     }
 
     // ### TODO: adding the UPDATE directive should be the responsibility of a type. The Type interface's
-    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter.
+    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter ### FIXDOC
     private void addUpdateTypeDirective(Type type) {
         if (type.getTypeUri().equals("dm4.core.topic_type")) {
             Directives.get().add(Directive.UPDATE_TOPIC_TYPE, type);
@@ -127,8 +130,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ---
 
-    private Type fetchParentType(Association assoc) {
-        Topic type = dms.getTypeStorage().fetchParentType(assoc);
+    private Type fetchParentType(AssociationModel assoc) {
+        TopicModel type = dms.getTypeStorage().fetchParentType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {
             return dms.getTopicType(type.getUri());
@@ -140,7 +143,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         }
     }
 
-    private Topic fetchChildType(Association assoc) {
+    private TopicModel fetchChildType(AssociationModel assoc) {
         return dms.getTypeStorage().fetchChildType(assoc);
     }
 }

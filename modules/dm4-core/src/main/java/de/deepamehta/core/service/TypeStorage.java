@@ -1,8 +1,9 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
+import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 
 
@@ -15,9 +16,21 @@ public interface TypeStorage {
 
     // ---
 
-    Topic fetchParentType(Association assoc);
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the parent type topic.
+     *          A topic representing either a topic type or an association type.
+     */
+    TopicModel fetchParentType(AssociationModel assoc);
 
-    Topic fetchChildType(Association assoc);
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the child type topic.
+     *          A topic representing a topic type.
+     */
+    TopicModel fetchChildType(AssociationModel assoc);
 
     // ---
 

@@ -1,6 +1,7 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TypeModel;
 
@@ -55,13 +56,13 @@ public interface Type extends Topic {
      * ### TODO: get rid of this peculiar situation and remove this method. This might be achieved by using
      * the PRE_UPDATE_ASSOCIATION hook instead the POST_UPDATE_ASSOCIATION hook in the Type Editor module.
      * On pre-update we would perform a regular {@link AssociationDefinition#update} and suppress further
-     * processing by returning false.
+     * processing by returning false. ### FIXDOC
      *
      * @param   assocDef    the new association definition.
      *                      Note: in contrast to the other "update" methods this one does not support partial updates.
-     *                      That is all association definition fields must be initialized.
+     *                      That is all association definition fields must be initialized. ### FIXDOC
      */
-    void updateAssocDef(AssociationDefinitionModel assocDef);
+    void updateAssocDef(AssociationModel assoc);
 
     Type removeAssocDef(String assocDefUri);
 

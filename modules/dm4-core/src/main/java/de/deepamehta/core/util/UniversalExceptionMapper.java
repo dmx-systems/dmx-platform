@@ -158,9 +158,10 @@ public class UniversalExceptionMapper {
         }
 
         private JSONObject createJSONObject(Throwable e) throws JSONException {
+            String message = e.getMessage();    // may be null
             JSONObject json = new JSONObject()
                 .put("exception", e.getClass().getName())
-                .put("message", e.getMessage());
+                .put("message", message != null ? message : "");
             //
             Throwable cause = e.getCause();
             if (cause != null) {

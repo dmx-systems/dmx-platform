@@ -976,8 +976,8 @@ dm4c = new function() {
 
             function _render_exception(exception, is_top_level) {
                 content = content.add($("<div>").addClass("exception")
-                    .text(exception.message)
-                    .prepend($("<div>").text(is_top_level ? "" : "Reason:"))
+                    .append($("<div>").text(is_top_level ? "" : "Reason:"))
+                    .append(js.render_text(exception.message))
                     .append($("<div>").addClass("class").text("(" + exception.exception + ")"))
                 )
                 if (exception.cause) {

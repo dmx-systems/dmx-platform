@@ -50,7 +50,7 @@ class ValueStorage {
      * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
      * overhead in others (e.g. when updating composite structures).
      */
-    private void fetchChildTopics(DeepaMehtaObjectModel parent) {
+    void fetchChildTopics(DeepaMehtaObjectModel parent) {
         for (AssociationDefinitionModel assocDef : getType(parent).getAssocDefs()) {
             fetchChildTopics(parent, assocDef);
         }

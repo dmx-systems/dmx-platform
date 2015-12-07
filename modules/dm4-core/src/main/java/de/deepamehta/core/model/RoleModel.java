@@ -34,6 +34,7 @@ public abstract class RoleModel implements Cloneable {
 
     // ---
 
+    // ### TODO: to be dropped?
     public void setPlayerId(long playerId) {
         this.playerId = playerId;
     }

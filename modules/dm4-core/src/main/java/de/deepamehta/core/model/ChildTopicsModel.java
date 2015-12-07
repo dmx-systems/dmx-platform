@@ -383,7 +383,7 @@ public class ChildTopicsModel implements Iterable<String> {
      * Removes a single-valued child.
      */
     public ChildTopicsModel remove(String assocDefUri) {
-        childTopics.remove(assocDefUri);
+        childTopics.remove(assocDefUri);    // ### TODO: throw if not in map?
         return this;
     }
 

@@ -48,7 +48,7 @@ class AttachedChildTopics implements ChildTopics {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
-        initAttachedObjectCache();
+        initChildTopics();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -328,14 +328,25 @@ class AttachedChildTopics implements ChildTopics {
 
     // ---
 
+    /**
+     * Loads the child topics which are not loaded already.
+     */
     void loadChildTopics() {
         for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
             loadChildTopics(assocDef);
         }
     }
 
+    /**
+     * Loads the child topics for the given assoc def, provided they are not loaded already.
+     */
     void loadChildTopics(String assocDefUri) {
-        loadChildTopics(getAssocDef(assocDefUri));
+        try {
+            loadChildTopics(getAssocDef(assocDefUri));
+        } catch (Exception e) {
+            throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + parent.className() + " " +
+                parent.getId() + " failed", e);
+        }
     }
 
 
@@ -357,18 +368,26 @@ class AttachedChildTopics implements ChildTopics {
             logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + parent.className() + " " +
                 parent.getId());
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
-            initAttachedObjectCache(assocDefUri);
+            initChildTopics(assocDefUri);
         }
     }
 
     private void refreshParentLabel() {
-        DeepaMehtaObjectModel parent = this.parent.getModel();
-        //
-        for (String assocDefUri : dms.valueStorage.getLabelAssocDefUris(parent)) {
-            loadChildTopics(assocDefUri);
+        List<String> labelAssocDefUris = null;
+        try {
+            DeepaMehtaObjectModel parent = this.parent.getModel();
+            //
+            // load required childs
+            labelAssocDefUris = dms.valueStorage.getLabelAssocDefUris(parent);
+            for (String assocDefUri : labelAssocDefUris) {
+                loadChildTopics(assocDefUri);
+            }
+            //
+            dms.valueStorage.refreshLabel(parent);
+        } catch (Exception e) {
+            throw new RuntimeException("Refreshing the label of " + parent.className() + " " + parent.getId() +
+                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
         }
-        //
-        dms.valueStorage.refreshLabel(parent);
     }
 
     // ---
@@ -786,9 +805,9 @@ class AttachedChildTopics implements ChildTopics {
      * Initializes this attached object cache. Creates a hierarchy of attached topics (recursively) that is isomorph
      * to the underlying model.
      */
-    private void initAttachedObjectCache() {
+    private void initChildTopics() {
         for (String assocDefUri : model) {
-            initAttachedObjectCache(assocDefUri);
+            initChildTopics(assocDefUri);
         }
     }
 
@@ -796,7 +815,7 @@ class AttachedChildTopics implements ChildTopics {
      * Initializes this attached object cache selectively. Creates a hierarchy of attached topics (recursively) that is
      * isomorph to the underlying model, starting at the given child sub-tree.
      */
-    private void initAttachedObjectCache(String assocDefUri) {
+    private void initChildTopics(String assocDefUri) {
         Object value = model.get(assocDefUri);
         // Note: topics just created have no child topics yet
         if (value == null) {

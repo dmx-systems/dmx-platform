@@ -91,6 +91,12 @@ public class AssociationModel extends DeepaMehtaObjectModel {
 
     // --- Convenience Methods ---
 
+    /**
+     * @teturn  this association's role that matches the given role type.
+     *          If no role matches, null is returned.
+     *          <p>
+     *          If both roles are matching an exception is thrown.
+     */
     public RoleModel getRoleModel(String roleTypeUri) {
         boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);

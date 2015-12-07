@@ -24,6 +24,8 @@ function Type(type) {
             var assoc = new Association(assoc_def)
             assoc_def.parent_type_uri = assoc.get_role("dm4.core.parent_type").topic_uri
             assoc_def.child_type_uri  = assoc.get_role("dm4.core.child_type").topic_uri
+            var custom_assoc_type = assoc_def.childs["dm4.core.assoc_type#dm4.core.custom_assoc_type"]
+            assoc_def.custom_assoc_type_uri = custom_assoc_type && custom_assoc_type.uri
             assoc_def.assoc_def_uri = assoc_def.child_type_uri +
                 (assoc_def.custom_assoc_type_uri ? "#" + assoc_def.custom_assoc_type_uri : "")
         }

@@ -119,25 +119,31 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
      *                              If <code>null</code> the assoc def is appended at the end.
      */
     public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        // error check
-        String assocDefUri = assocDef.getAssocDefUri();
-        AssociationDefinitionModel existing = _getAssocDef(assocDefUri);
-        if (existing != null) {
-            throw new RuntimeException("Schema ambiguity: type \"" + getUri() + "\" has more than one \"" +
-                assocDefUri + "\" association definitions");
+        try {
+            // error check
+            String assocDefUri = assocDef.getAssocDefUri();
+            AssociationDefinitionModel existing = _getAssocDef(assocDefUri);
+            if (existing != null) {
+                throw new RuntimeException("Schema ambiguity: type \"" + getUri() + "\" has more than one \"" +
+                    assocDefUri + "\" association definitions");
+            }
+            //
+            assocDefs.putBefore(assocDefUri, assocDef, beforeAssocDefUri);
+            return this;
+        } catch (Exception e) {
+            throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
+                beforeAssocDefUri + "\" failed" + assocDef, e);
         }
-        //
-        assocDefs.putBefore(assocDefUri, assocDef, beforeAssocDefUri);
-        return this;
     }
 
-    public TypeModel removeAssocDef(String assocDefUri) {
+    public AssociationDefinitionModel removeAssocDef(String assocDefUri) {
         try {
-            if (assocDefs.remove(assocDefUri) == null) {
-                throw new RuntimeException("Schema violation: association definition \"" +
-                    assocDefUri + "\" not found in " + assocDefs.keySet());
+            AssociationDefinitionModel assocDef = assocDefs.remove(assocDefUri);
+            if (assocDef == null) {
+                throw new RuntimeException("Schema violation: association definition \"" + assocDefUri +
+                    "\" not found in " + assocDefs.keySet());
             }
-            return this;
+            return assocDef;
         } catch (Exception e) {
             throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
                 getUri() + "\" failed", e);

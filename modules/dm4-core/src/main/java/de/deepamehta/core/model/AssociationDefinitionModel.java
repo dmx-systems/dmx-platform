@@ -22,11 +22,6 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String customAssocTypeUri;  // may be null
-
-    private String parentTypeUri;       // derived, not serialized
-    private String childTypeUri;        // derived, not serialized
-
     private String parentCardinalityUri;
     private String childCardinalityUri;
 
@@ -55,12 +50,8 @@ public class AssociationDefinitionModel extends AssociationModel {
                                                            String parentTypeUri, String childTypeUri,
                                                            String parentCardinalityUri, String childCardinalityUri,
                                                            ViewConfigurationModel viewConfigModel) {
-        super(id, uri, assocTypeUri, parentRoleModel(parentTypeUri), childRoleModel(childTypeUri));
-        //
-        this.customAssocTypeUri = customAssocTypeUri;
-        //
-        this.parentTypeUri = parentTypeUri;
-        this.childTypeUri = childTypeUri;
+        super(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri), null,
+            childTopics(customAssocTypeUri));
         //
         this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri = childCardinalityUri;
@@ -68,17 +59,33 @@ public class AssociationDefinitionModel extends AssociationModel {
         this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
     }
 
+    /**
+     * @param   assoc   the underlying association.
+     *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID).
+     */
+    public AssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
+                                                              ViewConfigurationModel viewConfigModel) {
+        super(assoc);
+        //
+        this.parentCardinalityUri = parentCardinalityUri;
+        this.childCardinalityUri = childCardinalityUri;
+        //
+        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
+    }
+
+    /**
+     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
+     * which is OK for an update assoc def operation. It can not be used for a create operation.
+     */
+    public AssociationDefinitionModel(AssociationModel assoc) {
+        // ### FIXME: the assoc must identify its players **by URI**
+        super(assoc);
+    }
+
     AssociationDefinitionModel(JSONObject assocDef) throws JSONException {
-        super(assocDef.optLong("id", -1), null, assocDef.getString("assoc_type_uri"), parentRoleModel(assocDef),
-                                                                                      childRoleModel(assocDef));
+        super(assocDef.optLong("id", -1), null, assocDef.getString("assoc_type_uri"), parentRole(assocDef),
+            childRole(assocDef), null, childTopics(assocDef));
         try {
-            // Note: getString() called on a key with JSON null value would return the string "null"
-            this.customAssocTypeUri = assocDef.isNull("custom_assoc_type_uri") ? null :
-                assocDef.getString("custom_assoc_type_uri");
-            //
-            this.parentTypeUri = parentTypeUri();
-            this.childTypeUri = childTypeUri();
-            //
             if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
                 throw new RuntimeException("\"parent_cardinality_uri\" is missing");
             }
@@ -94,26 +101,33 @@ public class AssociationDefinitionModel extends AssociationModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public String getAssocDefUri() {
-        return childTypeUri + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
+        String customAssocTypeUri = getCustomAssocTypeUri();
+        return getChildTypeUri() + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
     }
 
     public String getCustomAssocTypeUri() {
-        return customAssocTypeUri;
+        TopicModel typeTopic = getCustomAssocType();
+        return typeTopic != null ? typeTopic.getUri() : null;
+    }
+
+    public RelatedTopicModel getCustomAssocType() {
+        return getChildTopicsModel().getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
     }
 
     /**
      * The type to be used to create an association instance based on this association definition.
      */
     public String getInstanceLevelAssocTypeUri() {
+        String customAssocTypeUri = getCustomAssocTypeUri();
         return customAssocTypeUri !=null ? customAssocTypeUri : defaultInstanceLevelAssocTypeUri();
     }
 
     public String getParentTypeUri() {
-        return parentTypeUri;
+        return ((TopicRoleModel) getRoleModel("dm4.core.parent_type")).getTopicUri();
     }
 
     public String getChildTypeUri() {
-        return childTypeUri;
+        return ((TopicRoleModel) getRoleModel("dm4.core.child_type")).getTopicUri();
     }
 
     public String getParentCardinalityUri() {
@@ -129,10 +143,6 @@ public class AssociationDefinitionModel extends AssociationModel {
     }
 
     // ---
-
-    public void setCustomAssocTypeUri(String customAssocTypeUri) {
-        this.customAssocTypeUri = customAssocTypeUri;
-    }
 
     public void setParentCardinalityUri(String parentCardinalityUri) {
         this.parentCardinalityUri = parentCardinalityUri;
@@ -150,10 +160,9 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON();
-            o.put("parent_cardinality_uri", parentCardinalityUri);
-            o.put("child_cardinality_uri", childCardinalityUri);
-            o.put("custom_assoc_type_uri", customAssocTypeUri != null ? customAssocTypeUri : JSONObject.NULL);
+            JSONObject o = super.toJSON()
+                .put("parent_cardinality_uri", parentCardinalityUri)
+                .put("child_cardinality_uri", childCardinalityUri);
             viewConfigModel.toJSON(o);
             return o;
         } catch (Exception e) {
@@ -168,7 +177,6 @@ public class AssociationDefinitionModel extends AssociationModel {
         return "\n    association definition (" + super.toString() +
             ",\n        parent cardinality=\"" + parentCardinalityUri +
             "\",\n        child cardinality=\"" + childCardinalityUri +
-            "\",\n        custom association type=\"" + customAssocTypeUri +
             "\",\n        " + viewConfigModel + ")\n";
     }
 
@@ -184,32 +192,45 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private static TopicRoleModel parentRoleModel(JSONObject assocDef) throws JSONException {
-        return parentRoleModel(assocDef.getString("parent_type_uri"));
+    private static TopicRoleModel parentRole(JSONObject assocDef) throws JSONException {
+        return parentRole(assocDef.getString("parent_type_uri"));
     }
 
-    private static TopicRoleModel childRoleModel(JSONObject assocDef) throws JSONException {
-        return childRoleModel(assocDef.getString("child_type_uri"));
+    private static TopicRoleModel parentRole(String parentTypeUri) {
+        return new TopicRoleModel(parentTypeUri, "dm4.core.parent_type");
     }
 
     // ---
 
-    private static TopicRoleModel parentRoleModel(String parentTypeUri) {
-        return new TopicRoleModel(parentTypeUri, "dm4.core.parent_type");
+    private static TopicRoleModel childRole(JSONObject assocDef) throws JSONException {
+        return childRole(assocDef.getString("child_type_uri"));
     }
 
-    private static TopicRoleModel childRoleModel(String childTypeUri) {
+    private static TopicRoleModel childRole(String childTypeUri) {
         return new TopicRoleModel(childTypeUri, "dm4.core.child_type");
     }
 
     // ---
 
-    private String parentTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dm4.core.parent_type")).getTopicUri();
+    private static ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
+        // Note: getString() called on a key with JSON null value would return the string "null"
+        return childTopics(assocDef.isNull("custom_assoc_type_uri") ? null :
+            assocDef.getString("custom_assoc_type_uri"));
     }
 
-    private String childTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dm4.core.child_type")).getTopicUri();
+    private static ChildTopicsModel childTopics(String customAssocTypeUri) {
+        if (customAssocTypeUri != null) {
+            // ### TODO: is putRef() correct here? What about put()?
+            // Is the assoc def model being used for create/update or for retrieve?
+            return new ChildTopicsModel().put("dm4.core.assoc_type#dm4.core.custom_assoc_type", new RelatedTopicModel(
+                new TopicModel(customAssocTypeUri, "dm4.core.assoc_type"),
+                new AssociationModel(null,      /* ### TODO */
+                    new TopicRoleModel(-1, ""),
+                    new TopicRoleModel(-1, ""))
+            ));
+        } else {
+            return null;
+        }
     }
 
     // ---

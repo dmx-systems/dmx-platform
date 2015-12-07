@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
+import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.RoleModel;
@@ -17,14 +18,17 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private Type parentType;    // ### TODO: needed for rehashing while update?
+
     private AttachedViewConfiguration viewConfig;   // attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationDefinition(AssociationDefinitionModel model, EmbeddedService dms) {
+    AttachedAssociationDefinition(AssociationDefinitionModel model, Type parentType, EmbeddedService dms) {
         super(model, dms);
+        this.parentType = parentType;
         initViewConfig();
     }
 
@@ -87,6 +91,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ---
 
+    // ### TODO: drop this method
     @Override
     public void setCustomAssocTypeUri(String customAssocTypeUri) {
         logger.info("##################################### customAssocTypeUri=\"" + customAssocTypeUri + "\"");

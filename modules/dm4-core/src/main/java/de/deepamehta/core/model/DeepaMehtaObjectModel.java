@@ -73,7 +73,7 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
      * @param   id          Optional (-1 is a valid value and represents "not set").
      * @param   uri         Optional (<code>null</code> is a valid value).
      * @param   typeUri     Mandatory in the context of a create operation.
-     *                      Optional (<code>null</code> is a valid value) in the context of an update opereation.
+     *                      Optional (<code>null</code> is a valid value) in the context of an update operation.
      * @param   value       Optional (<code>null</code> is a valid value).
      * @param   childTopics Optional (<code>null</code> is a valid value and is transformed into an empty composite).
      */
@@ -164,12 +164,10 @@ public abstract class DeepaMehtaObjectModel implements Identifiable, JSONEnabled
 
     // --- Child Topics ---
 
-    // ### TODO: rename to getChildTopics()
     public ChildTopicsModel getChildTopicsModel() {
         return childTopics;
     }
 
-    // ### TODO: rename to setChildTopics()
     public void setChildTopicsModel(ChildTopicsModel childTopics) {
         this.childTopics = childTopics;
     }

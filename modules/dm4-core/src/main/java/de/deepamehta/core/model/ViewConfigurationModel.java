@@ -28,7 +28,7 @@ public class ViewConfigurationModel {
     public ViewConfigurationModel() {
     }
 
-    public ViewConfigurationModel(List<TopicModel> configTopics) {
+    public ViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
         for (TopicModel topic : configTopics) {
             addConfigTopic(topic);
         }
