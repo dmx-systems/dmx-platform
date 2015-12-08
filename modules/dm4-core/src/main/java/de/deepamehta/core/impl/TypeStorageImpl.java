@@ -258,7 +258,7 @@ class TypeStorageImpl implements TypeStorage {
         // creating the underlying association (see storeAssociationDefinition()).
         return new AssociationDefinitionModel(assoc.getId(), assoc.getUri(),
             assoc.getTypeUri(), fetchCustomAssocTypeUri(assoc.getId()),
-            fetchParentType(assoc.getModel()).getUri(), fetchChildType(assoc.getModel()).getUri(),
+            fetchParentType(assoc).getUri(), fetchChildType(assoc).getUri(),
             defaultCardinalityUri(assoc, PARENT_CARDINALITY),
             defaultCardinalityUri(assoc, CHILD_CARDINALITY), null);   // viewConfigModel=null
     }
@@ -324,8 +324,8 @@ class TypeStorageImpl implements TypeStorage {
     // ### TODO: to be dropped
     @Override
     public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
-        return fetchAssociationDefinition(assoc.getModel(), fetchParentType(assoc.getModel()).getUri(),
-            fetchChildType(assoc.getModel()).getUri());
+        return fetchAssociationDefinition(assoc.getModel(), fetchParentType(assoc).getUri(),
+            fetchChildType(assoc).getUri());
     }
 
     // Note: the assoc is **not** required to identify its players by URI (by ID is OK)
@@ -443,27 +443,27 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     @Override
-    public TopicModel fetchParentType(AssociationModel assoc) {
-        RoleModel topicRole = assoc.getRoleModel("dm4.core.parent_type");
+    public TopicModel fetchParentType(Association assoc) {
+        Topic parentType = assoc.getTopic("dm4.core.parent_type");
         // error check
-        if (topicRole == null) {
+        if (parentType == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
                 "is missing in " + assoc);
         }
         //
-        return dms.storageDecorator.fetchTopic(topicRole.getPlayerId());     // ### FIXME: support "by URI" as well?
+        return parentType.getModel();
     }
 
     @Override
-    public TopicModel fetchChildType(AssociationModel assoc) {
-        RoleModel topicRole = assoc.getRoleModel("dm4.core.child_type");
+    public TopicModel fetchChildType(Association assoc) {
+        Topic childType = assoc.getTopic("dm4.core.child_type");
         // error check
-        if (topicRole == null) {
+        if (childType == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
                 "is missing in " + assoc);
         }
         //
-        return dms.storageDecorator.fetchTopic(topicRole.getPlayerId());     // ### FIXME: support "by URI" as well?
+        return childType.getModel();
     }
 
 

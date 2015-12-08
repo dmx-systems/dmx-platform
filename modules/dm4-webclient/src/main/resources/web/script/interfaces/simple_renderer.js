@@ -22,7 +22,7 @@ function SimpleRenderer() {
 
     /**
      * @return  The form reading function: called to read out the form element's value.
-     *          This function is expected to return a simple value or a topic reference (in REF_PREFIX notation).
+     *          This function is expected to return a simple value or a topic reference (in REF_ID_PREFIX notation).
      */
     this.render_form = function(parent_element) {}
 }

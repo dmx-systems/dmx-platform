@@ -159,6 +159,8 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
     /**
      * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
      * assoc def as well (at index 1), or null if the found assoc def is the last one.
+     *
+     * ### TODO: remove from public API
      */
     public String[] findAssocDefUris(long assocDefId) {
         if (assocDefId == -1) {
@@ -168,10 +170,7 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
         Iterator<String> i = iterator();
         while (i.hasNext()) {
             String assocDefUri = i.next();
-            long _assocDefId = _getAssocDef(assocDefUri).getId();
-            if (_assocDefId == -1) {
-                throw new IllegalStateException("findAssocDefUris() called when assoc defs are not yet saved");
-            }
+            long _assocDefId = checkAssocDefId(_getAssocDef(assocDefUri));
             if (_assocDefId == assocDefId) {
                 assocDefUris[0] = assocDefUri;
                 if (i.hasNext()) {
@@ -185,6 +184,35 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
                 getUri() + "\" (" + assocDefs.keySet() + ")");
         }
         return assocDefUris;
+    }
+
+    // ### TODO: remove from public API
+    public boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs) {
+        Collection<AssociationDefinitionModel> _assocDefs = getAssocDefs();
+        if (assocDefs.size() != _assocDefs.size()) {
+            return false;
+        }
+        //
+        Iterator<AssociationDefinitionModel> i = assocDefs.iterator();
+        for (AssociationDefinitionModel _assocDef : _assocDefs) {
+            AssociationDefinitionModel assocDef = i.next();
+            // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
+            // So we must identify the assoc defs to compare **by ID**.
+            long assocDefId  = checkAssocDefId(assocDef);
+            long _assocDefId = checkAssocDefId(_assocDef);            
+            if (assocDefId != _assocDefId) {
+                return false;
+            }
+        }
+        //
+        return true;
+    }
+
+    // ### TODO: remove from public API
+    public void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
+        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() + "\"");
+        addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 
 
@@ -304,5 +332,15 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
 
     private AssociationDefinitionModel _getAssocDef(String assocDefUri) {
         return assocDefs.get(assocDefUri);
+    }
+
+    // ---
+
+    private long checkAssocDefId(AssociationDefinitionModel assocDef) {
+        long assocDefId = assocDef.getId();
+        if (assocDefId == -1) {
+            throw new RuntimeException("The assoc def ID is uninitialized (-1): " + assocDef);
+        }
+        return assocDefId;
     }
 }

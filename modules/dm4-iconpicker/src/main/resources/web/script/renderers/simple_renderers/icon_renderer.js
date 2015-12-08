@@ -21,7 +21,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
             if (page_model.uri) {
                 // An instance of an Icon's parent type is edited.
                 // Note: aggregation is assumed ### FIXME: support composition as well
-                return dm4c.REF_PREFIX + picked_icon.id
+                return dm4c.REF_ID_PREFIX + picked_icon.id
             } else {
                 // An Icon instance itself is edited.
                 return picked_icon.value

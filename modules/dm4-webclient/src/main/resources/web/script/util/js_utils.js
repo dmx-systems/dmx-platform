@@ -244,7 +244,7 @@ var js = {
 
 
     begins_with: function(text, str) {
-        return text.search("^" + str) != -1
+        return text.indexOf(str) == 0
     },
 
     render_text: function(text) {

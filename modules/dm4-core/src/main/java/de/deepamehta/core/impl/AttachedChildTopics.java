@@ -291,7 +291,7 @@ class AttachedChildTopics implements ChildTopics {
                 updateChildTopics(newChildTopic, newChildTopics, assocDef);
             }
             //
-            refreshParentLabel();
+            recalculateParentLabel();
             //
         } catch (Exception e) {
             throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
@@ -372,7 +372,7 @@ class AttachedChildTopics implements ChildTopics {
         }
     }
 
-    private void refreshParentLabel() {
+    private void recalculateParentLabel() {
         List<String> labelAssocDefUris = null;
         try {
             DeepaMehtaObjectModel parent = this.parent.getModel();
@@ -383,9 +383,9 @@ class AttachedChildTopics implements ChildTopics {
                 loadChildTopics(assocDefUri);
             }
             //
-            dms.valueStorage.refreshLabel(parent);
+            dms.valueStorage.recalculateLabel(parent);
         } catch (Exception e) {
-            throw new RuntimeException("Refreshing the label of " + parent.className() + " " + parent.getId() +
+            throw new RuntimeException("Recalculating the label of " + parent.className() + " " + parent.getId() +
                 " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
         }
     }

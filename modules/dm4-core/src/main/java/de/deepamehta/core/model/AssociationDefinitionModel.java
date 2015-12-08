@@ -20,6 +20,11 @@ import java.util.logging.Logger;
  */
 public class AssociationDefinitionModel extends AssociationModel {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    // ### TODO: copy in ChildTopicsModel
+    private static final String DEL_URI_PREFIX = "del_uri:";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String parentCardinalityUri;
@@ -44,6 +49,8 @@ public class AssociationDefinitionModel extends AssociationModel {
     }
 
     /**
+     * ### TODO: add include-in-label parameter?
+     *
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
     public AssociationDefinitionModel(long id, String uri, String assocTypeUri, String customAssocTypeUri,
@@ -105,13 +112,21 @@ public class AssociationDefinitionModel extends AssociationModel {
         return getChildTypeUri() + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
     }
 
-    public String getCustomAssocTypeUri() {
-        TopicModel typeTopic = getCustomAssocType();
-        return typeTopic != null ? typeTopic.getUri() : null;
+    public RelatedTopicModel getCustomAssocType() {
+        RelatedTopicModel customAssocType = getChildTopicsModel().getTopic(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
+        // Note: we can't do this sanity check because a type model would not even deserialize.
+        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI.
+        /* if (customAssocType instanceof TopicDeletionModel) {
+            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
+                "reference (" + this + ")");
+        } */
+        return customAssocType;
     }
 
-    public RelatedTopicModel getCustomAssocType() {
-        return getChildTopicsModel().getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
+    public String getCustomAssocTypeUri() {
+        TopicModel customAssocType = getCustomAssocType();
+        return customAssocType != null ? customAssocType.getUri() : null;
     }
 
     /**
@@ -154,6 +169,31 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     public void setViewConfigModel(ViewConfigurationModel viewConfigModel) {
         this.viewConfigModel = viewConfigModel;
+    }
+
+    // ---
+
+    // ### TODO: remove from public API
+    public boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
+        String _customAssocTypeUri = getCustomAssocTypeUri();
+        String customAssocTypeUri = assocDef.getCustomAssocTypeUriOrNull();
+        if (customAssocTypeUri == null) {
+            // compare our value to null if his value is a deletion ref or null
+            return _customAssocTypeUri == null;
+        } else {
+            // his value is neither a deletion ref nor null, compare it to our value (which may be null)
+            return customAssocTypeUri.equals(_customAssocTypeUri);
+        }
+    }
+
+    /**
+     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
+     *          Otherwise returns the custom assoc type URI.
+     *
+     *  ### TODO: remove from public API
+     */
+    public String getCustomAssocTypeUriOrNull() {
+        return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
     }
 
     // ---
@@ -222,15 +262,27 @@ public class AssociationDefinitionModel extends AssociationModel {
         if (customAssocTypeUri != null) {
             // ### TODO: is putRef() correct here? What about put()?
             // Is the assoc def model being used for create/update or for retrieve?
-            return new ChildTopicsModel().put("dm4.core.assoc_type#dm4.core.custom_assoc_type", new RelatedTopicModel(
+            if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
+                return new ChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                    delTopicUri(customAssocTypeUri));
+            } else {
+                return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                    customAssocTypeUri);
+            }
+            /*new RelatedTopicModel(
                 new TopicModel(customAssocTypeUri, "dm4.core.assoc_type"),
-                new AssociationModel(null,      /* ### TODO */
+                new AssociationModel(null,
                     new TopicRoleModel(-1, ""),
                     new TopicRoleModel(-1, ""))
-            ));
+            );*/
         } else {
             return null;
         }
+    }
+
+    // ### TODO: copy in ChildTopicsModel
+    private static String delTopicUri(String val) {
+        return val.substring(DEL_URI_PREFIX.length());
     }
 
     // ---

@@ -12,6 +12,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -44,10 +45,17 @@ class TransactionFactory implements ResourceFilterFactory {
             return null;
         }
         //
-        logger.fine("### Adding transaction support to " + method);
+        logger.fine("### Adding transaction support to " + info(method));
         List<ResourceFilter> filters = new ArrayList();
         filters.add(new TransactionResourceFilter(method));
         return filters;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private String info(AbstractMethod method) {
+        Method m = method.getMethod();
+        return m.getDeclaringClass().getName() + "#" + m.getName() + "()";
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
@@ -66,7 +74,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
-                    logger.fine("### Begining transaction of " + method);
+                    logger.fine("### Begining transaction of " + info(method));
                     DeepaMehtaTransaction tx = dms.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
@@ -83,10 +91,10 @@ class TransactionFactory implements ResourceFilterFactory {
                     boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
                     DeepaMehtaTransaction tx = threadLocalTransaction.get();
                     if (success) {
-                        logger.fine("### Comitting transaction of " + method);
+                        logger.fine("### Comitting transaction of " + info(method));
                         tx.success();
                     } else {
-                        logger.warning("### Rollback transaction of " + method);
+                        logger.warning("### Rollback transaction of " + info(method));
                     }
                     tx.finish();
                     return response;

@@ -299,7 +299,7 @@ function RenderHelper() {
                 var val = form_element.get_selection()  // either a menu item (object) or the text entered,
                 if (typeof(val) == "object") {                                          // trimmed (string)
                     // user selected existing topic
-                    return dm4c.REF_PREFIX + val.value
+                    return dm4c.REF_ID_PREFIX + val.value
                 }
             }
             return check_input(val)
@@ -319,7 +319,7 @@ function RenderHelper() {
                 if (topic_id != -1) {
                     if (page_model.parent) {
                         // a child was assigned before -- delete it (composition) resp. the assignment (aggregagtion)
-                        return dm4c.DEL_PREFIX + topic_id
+                        return dm4c.DEL_ID_PREFIX + topic_id
                     } else {
                         // a top-level field (of a simple topic) was emptied -- accept that change
                         // Note: we allow empty Number fields instead of filling 0 automatically (no check_number())

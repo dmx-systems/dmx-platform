@@ -105,15 +105,27 @@ function TypeRenderer() {
                     label_state: label_config_checkbox.get(0).checked
                 }
 
+                // compare to form_element_function() in webclient's render_helper.js
                 function custom_assoc_type_uri() {
                     var val = custom_assoc_type_menu.get_selection()
                     if (typeof(val) == "object") {
+                        // user selected assoc type from menu
                         return val.value
                     } else {
                         if (val) {
+                            // user entered non-empty value
                             alert("Custom Association Type \"" + val + "\" ignored")
+                            return null         // no update
+                        } else {
+                            // user entered empty value
+                            if (assoc_def.custom_assoc_type_uri) {
+                                // an assoc type was selected before -- delete the assignment
+                                return dm4c.DEL_URI_PREFIX + assoc_def.custom_assoc_type_uri
+                            } else {
+                                // no assoc type was selected before
+                                return null     // no update
+                            }
                         }
-                        return null
                     }
                 }
             }
@@ -148,8 +160,9 @@ function TypeRenderer() {
                     var assoc_def = editor_model.assoc_def
                     assoc_defs.push(assoc_def)
                     if (editor_model.label_state) {
-                        label_config.push(assoc_def.child_type_uri +
-                            (assoc_def.custom_assoc_type_uri ? "#" + assoc_def.custom_assoc_type_uri : ""))
+                        var type_uri = assoc_def.custom_assoc_type_uri
+                        var qualifier = type_uri && !js.begins_with(type_uri, dm4c.DEL_URI_PREFIX) ? "#" + type_uri : ""
+                        label_config.push(assoc_def.child_type_uri + qualifier)
                     }
                 })
                 return {

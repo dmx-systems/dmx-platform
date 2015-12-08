@@ -11,8 +11,10 @@ dm4c = new function() {
 
     // constants
     this.COMPOSITE_PATH_SEPARATOR = "/"
-    this.REF_PREFIX = "ref_id:"
-    this.DEL_PREFIX = "del_id:"
+    this.REF_ID_PREFIX  = "ref_id:"
+    this.REF_URI_PREFIX = "ref_uri:"
+    this.DEL_ID_PREFIX  = "del_id:"
+    this.DEL_URI_PREFIX = "del_uri:"
 
     // model
     this.selected_object = null     // A Topic or an Association object, or null if there is no selection ### needed?

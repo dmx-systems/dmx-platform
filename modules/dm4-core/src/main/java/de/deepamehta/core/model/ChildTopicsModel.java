@@ -25,9 +25,10 @@ public class ChildTopicsModel implements Iterable<String> {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String REF_ID_PREFIX = "ref_id:";
+    private static final String REF_ID_PREFIX  = "ref_id:";
     private static final String REF_URI_PREFIX = "ref_uri:";
-    private static final String DEL_PREFIX = "del_id:";
+    private static final String DEL_ID_PREFIX  = "del_id:";
+    private static final String DEL_URI_PREFIX = "del_uri:";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -380,6 +381,26 @@ public class ChildTopicsModel implements Iterable<String> {
     // ---
 
     /**
+     * Puts a by-ID topic deletion reference to a single-valued child.
+     * An existing value is overwritten.
+     */
+    public ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
+        put(assocDefUri, new TopicDeletionModel(refTopicId));
+        return this;
+    }
+
+    /**
+     * Puts a by-URI topic deletion reference to a single-valued child.
+     * An existing value is overwritten.
+     */
+    public ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
+        put(assocDefUri, new TopicDeletionModel(refTopicUri));
+        return this;
+    }
+
+    // ---
+
+    /**
      * Removes a single-valued child.
      */
     public ChildTopicsModel remove(String assocDefUri) {
@@ -454,6 +475,14 @@ public class ChildTopicsModel implements Iterable<String> {
      */
     public ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
         add(assocDefUri, new TopicDeletionModel(refTopicId));
+        return this;
+    }
+
+    /**
+     * Adds a by-URI topic deletion reference to a multiple-valued child.
+     */
+    public ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
+        add(assocDefUri, new TopicDeletionModel(refTopicUri));
         return this;
     }
 
@@ -596,8 +625,10 @@ public class ChildTopicsModel implements Iterable<String> {
                 } else {
                     return new TopicReferenceModel(topicUri);
                 }
-            } else if (val.startsWith(DEL_PREFIX)) {
+            } else if (val.startsWith(DEL_ID_PREFIX)) {
                 return new TopicDeletionModel(delTopicId(val));
+            } else if (val.startsWith(DEL_URI_PREFIX)) {
+                return new TopicDeletionModel(delTopicUri(val));
             }
         }
         return null;
@@ -627,7 +658,11 @@ public class ChildTopicsModel implements Iterable<String> {
     }
 
     private long delTopicId(String val) {
-        return Long.parseLong(val.substring(DEL_PREFIX.length()));
+        return Long.parseLong(val.substring(DEL_ID_PREFIX.length()));
+    }
+
+    private String delTopicUri(String val) {
+        return val.substring(DEL_URI_PREFIX.length());
     }
 
     // ---

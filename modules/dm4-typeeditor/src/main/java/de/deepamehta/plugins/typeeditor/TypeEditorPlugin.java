@@ -39,7 +39,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         AssociationModel newModel = assoc.getModel();
         if (isAssocDef(newModel)) {
             if (isAssocDef(oldModel)) {
-                updateAssocDef(newModel);
+                // updateAssocDef(assoc);   ### TODO
             } else {
                 createAssocDef(assoc);
             }
@@ -63,7 +63,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void createAssocDef(Association assoc) {
-        Type parentType = fetchParentType(assoc.getModel());
+        Type parentType = fetchParentType(assoc);
         AssociationDefinitionModel assocDef = dms.getTypeStorage().createAssociationDefinition(assoc);
         logger.info("##### Adding association definition \"" + assocDef.getAssocDefUri() + "\" to type \"" +
             parentType.getUri() + "\" (" + assocDef + ")");
@@ -73,19 +73,19 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef(AssociationModel assoc) {
+    private void updateAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
         logger.info("##### Updating association definition " + assoc.getId() + " of type \"" +
             parentType.getUri() + "\"");
         //
-        parentType.updateAssocDef(assoc);
+        parentType.updateAssocDef(assoc.getModel());
         //
         addUpdateTypeDirective(parentType);
     }
 
     private void removeAssocDef(Association assoc) {
-        Type parentType = fetchParentType(assoc.getModel());
-        String childTypeUri = fetchChildType(assoc.getModel()).getUri();
+        Type parentType = fetchParentType(assoc);
+        String childTypeUri = fetchChildType(assoc).getUri();
         logger.info("##### Removing association definition \"" + childTypeUri + "\" from type \"" +
             parentType.getUri() + "\"");
         //
@@ -130,7 +130,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ---
 
-    private Type fetchParentType(AssociationModel assoc) {
+    private Type fetchParentType(Association assoc) {
         TopicModel type = dms.getTypeStorage().fetchParentType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {
@@ -143,7 +143,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         }
     }
 
-    private TopicModel fetchChildType(AssociationModel assoc) {
+    private TopicModel fetchChildType(Association assoc) {
         return dms.getTypeStorage().fetchChildType(assoc);
     }
 }

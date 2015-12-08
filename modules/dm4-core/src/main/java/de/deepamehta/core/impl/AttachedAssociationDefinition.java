@@ -18,7 +18,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Type parentType;    // ### TODO: needed for rehashing while update?
+    private AttachedType parentType;
 
     private AttachedViewConfiguration viewConfig;   // attached object cache
 
@@ -26,7 +26,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationDefinition(AssociationDefinitionModel model, Type parentType, EmbeddedService dms) {
+    AttachedAssociationDefinition(AssociationDefinitionModel model, AttachedType parentType, EmbeddedService dms) {
         super(model, dms);
         this.parentType = parentType;
         initViewConfig();
@@ -82,26 +82,9 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
         return viewConfig;
     }
 
-    // ---
-
     @Override
     public AssociationDefinitionModel getModel() {
         return (AssociationDefinitionModel) super.getModel();
-    }
-
-    // ---
-
-    // ### TODO: drop this method
-    @Override
-    public void setCustomAssocTypeUri(String customAssocTypeUri) {
-        logger.info("##################################### customAssocTypeUri=\"" + customAssocTypeUri + "\"");
-        // Note: calling high-level methods lets the Type Editor kick in which is not intended. It refetches the
-        // entire assoc def then and adds it to the type. This is more work than required, but is not really a problem.
-        if (customAssocTypeUri != null) {
-            getChildTopics().setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocTypeUri);
-        } else {
-            getChildTopics().setDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocTypeUri);
-        }
     }
 
     // ---
@@ -128,13 +111,28 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     @Override
     public void update(AssociationDefinitionModel newModel) {
-        // assoc type
-        updateAssocTypeUri(newModel);
-        // custom assoc type
-        updateCustomAssocTypeUri(newModel.getCustomAssocTypeUri());
-        // cardinality
-        updateParentCardinality(newModel.getParentCardinalityUri());
-        updateChildCardinality(newModel.getChildCardinalityUri());
+        try {
+            boolean changeCustomAssocType = !getModel().hasSameCustomAssocType(newModel);
+            if (changeCustomAssocType) {
+                logger.info("### Changing custom association type URI from \"" + getCustomAssocTypeUri() +
+                    "\" -> \"" + newModel.getCustomAssocTypeUriOrNull() + "\"");
+            }
+            //
+            super.update(newModel);
+            //
+            // cardinality
+            updateParentCardinality(newModel.getParentCardinalityUri());
+            updateChildCardinality(newModel.getChildCardinalityUri());
+            //
+            // rehash
+            if (changeCustomAssocType) {
+                String[] assocDefUris = parentType.getModel().findAssocDefUris(newModel.getId());
+                parentType.rehashAssocDef(assocDefUris[0], assocDefUris[1]);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating association definition \"" + getAssocDefUri() +
+                "\" failed (" + newModel + ")", e);
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -142,36 +140,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
 
     // === Update ===
-
-    private void updateAssocTypeUri(AssociationDefinitionModel newModel) {
-        String newTypeUri = newModel.getTypeUri();
-        // abort if no update is requested
-        if (newTypeUri == null) {
-            return;
-        }
-        //
-        String typeUri = getTypeUri();
-        if (!typeUri.equals(newTypeUri)) {
-            super.update(newModel);
-        }
-    }
-
-    private void updateCustomAssocTypeUri(String newCustomAssocTypeUri) {
-        /* abort if no update is requested ### TODO
-        if (newCustomAssocTypeUri == null) {
-            return;
-        } */
-        //
-        String customAssocTypeUri = getCustomAssocTypeUri();
-        if (customAssocTypeUri != null ? !customAssocTypeUri.equals(newCustomAssocTypeUri) :
-                                          newCustomAssocTypeUri != null) {
-            logger.info("### Changing custom association type URI from \"" + customAssocTypeUri + "\" -> \"" +
-                newCustomAssocTypeUri + "\"");
-            setCustomAssocTypeUri(newCustomAssocTypeUri);
-        }
-    }
-
-    // ---
 
     private void updateParentCardinality(String newParentCardinalityUri) {
         // abort if no update is requested

@@ -102,7 +102,7 @@ class ValueStorage {
     void storeValue(DeepaMehtaObjectModel model) {
         if (getType(model).getDataTypeUri().equals("dm4.core.composite")) {
             storeChildTopics(model);
-            refreshLabel(model);
+            recalculateLabel(model);
         } else {
             storeSimpleValue(model);
         }
@@ -140,12 +140,13 @@ class ValueStorage {
      *
      * @param   parent  The object model the label is calculated for. This is expected to be a composite model.
      */
-    void refreshLabel(DeepaMehtaObjectModel parent) {
+    void recalculateLabel(DeepaMehtaObjectModel parent) {
         try {
-            String label = buildLabel(parent);
+            String label = calculateLabel(parent);
             setSimpleValue(parent, new SimpleValue(label));
         } catch (Exception e) {
-            throw new RuntimeException("Refreshing label of object " + parent.getId() + " failed (" + parent + ")", e);
+            throw new RuntimeException("Recalculating label of object " + parent.getId() + " failed (" + parent + ")",
+                e);
         }
     }
 
@@ -276,7 +277,7 @@ class ValueStorage {
 
     // === Label ===
 
-    private String buildLabel(DeepaMehtaObjectModel model) {
+    private String calculateLabel(DeepaMehtaObjectModel model) {
         TypeModel type = getType(model);
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
             StringBuilder label = new StringBuilder();
@@ -317,11 +318,11 @@ class ValueStorage {
         //
         if (value instanceof TopicModel) {
             TopicModel childTopic = (TopicModel) value;
-            return buildLabel(childTopic);                                          // recursion
+            return calculateLabel(childTopic);                                          // recursion
         } else if (value instanceof List) {
             StringBuilder label = new StringBuilder();
             for (TopicModel childTopic : (List<TopicModel>) value) {
-                appendLabel(buildLabel(childTopic), label, LABEL_TOPIC_SEPARATOR);  // recursion
+                appendLabel(calculateLabel(childTopic), label, LABEL_TOPIC_SEPARATOR);  // recursion
             }
             return label.toString();
         } else {

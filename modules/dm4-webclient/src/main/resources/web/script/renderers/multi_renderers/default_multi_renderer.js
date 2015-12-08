@@ -19,7 +19,7 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
             //
             for (var i = 0; i < page_models.length; i++) {
                 if (page_models[i].object.delete) {
-                    values.push(dm4c.DEL_PREFIX + page_models[i].object.id)
+                    values.push(dm4c.DEL_ID_PREFIX + page_models[i].object.id)
                 } else {
                     var value = dm4c.render.page_model.build_object_model(page_models[i])
                     if (value != null) {

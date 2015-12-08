@@ -22,7 +22,7 @@ public interface TypeStorage {
      * @return  the parent type topic.
      *          A topic representing either a topic type or an association type.
      */
-    TopicModel fetchParentType(AssociationModel assoc);
+    TopicModel fetchParentType(Association assoc);
 
     /**
      * @param   assoc   an association representing an association definition
@@ -30,7 +30,7 @@ public interface TypeStorage {
      * @return  the child type topic.
      *          A topic representing a topic type.
      */
-    TopicModel fetchChildType(AssociationModel assoc);
+    TopicModel fetchChildType(Association assoc);
 
     // ---
 

@@ -255,11 +255,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // 4) rehash
         if (customAssocTypeChanged) {
             // Note: if the custom association type has changed we must rehash (remove + add)
-            AssociationDefinitionModel assocDef = getModel().removeAssocDef(assocDefUris[0]);   // update model
-            getModel().addAssocDefBefore(assocDef, assocDefUris[1]);                            // update model
-            AssociationDefinition _assocDef = _removeAssocDef(assocDefUris[0]);     // update attached object cache
-            _addAssocDefBefore(_assocDef, assocDefUris[1]);                         // update attached object cache   
-            logger.info("### Rehashing assoc def \"" + assocDefUris[0] + "\" -> \"" + assocDef.getAssocDefUri() + "\"");
+            rehashAssocDef(assocDefUris[0], assocDefUris[1]);
         }
     }
 
@@ -334,6 +330,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
         dms.typeStorage.rebuildSequence(this);
     }
 
+    void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        getModel().rehashAssocDef(assocDefUri, beforeAssocDefUri);      // update model
+        _rehashAssocDef(assocDefUri, beforeAssocDefUri);                // update attached object cache
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
@@ -397,38 +398,22 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
-    // ---
-
     private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
-        if (!hasSequenceChanged(newAssocDefs)) {
+        if (getAssocDefs().size() != newAssocDefs.size()) {
+            throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
+        }
+        if (getModel().hasSameAssocDefSequence(newAssocDefs)) {
             return;
         }
-        logger.info("### Changing assoc def sequence");
         // update memory
-        getModel().removeAllAssocDefs();
+        logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
+        getModel().removeAllAssocDefs();    // ### TODO: reorder existing instances instead of creating new ones!
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             getModel().addAssocDef(assocDef);
         }
         initAssocDefs();    // attached object cache
         // update DB
         dms.typeStorage.rebuildSequence(this);
-    }
-
-    private boolean hasSequenceChanged(Collection<AssociationDefinitionModel> newAssocDefs) {
-        Collection<AssociationDefinition> assocDefs = getAssocDefs();
-        if (assocDefs.size() != newAssocDefs.size()) {
-            throw new RuntimeException("adding/removing of assoc defs not yet supported via updateTopicType() call");
-        }
-        //
-        Iterator<AssociationDefinitionModel> i = newAssocDefs.iterator();
-        for (AssociationDefinition assocDef : assocDefs) {
-            AssociationDefinitionModel newAssocDef = i.next();
-            if (!assocDef.getAssocDefUri().equals(newAssocDef.getAssocDefUri())) {
-                return true;
-            }
-        }
-        //
-        return false;
     }
 
     // ---
@@ -509,6 +494,10 @@ abstract class AttachedType extends AttachedTopic implements Type {
             throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
                 getUri() + "\" failed", e);
         }
+    }
+
+    private void _rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        _addAssocDefBefore(_removeAssocDef(assocDefUri), beforeAssocDefUri);
     }
 
     // ---

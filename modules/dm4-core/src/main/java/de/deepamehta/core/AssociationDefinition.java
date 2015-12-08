@@ -37,13 +37,7 @@ public interface AssociationDefinition extends Association {
 
     ViewConfiguration getViewConfig();
 
-    // ---
-
     AssociationDefinitionModel getModel();
-
-    // ---
-
-    void setCustomAssocTypeUri(String customAssocTypeUri);
 
     // ---
 
