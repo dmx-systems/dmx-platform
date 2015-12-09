@@ -451,6 +451,7 @@ dm4c.render.page_model = new function() {
             throw "PageModelError: invalid page model"
         }
 
+        // ### FIXME: must handle by-uri del refs as well?
         function is_del_ref(value) {
             // Note: value can be a boolean or number as well. js.begins_with() would fail.
             return typeof(value) == "string" && js.begins_with(value, dm4c.DEL_ID_PREFIX)

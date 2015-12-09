@@ -108,7 +108,7 @@ public class AssociationDefinitionModel extends AssociationModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     public String getAssocDefUri() {
-        String customAssocTypeUri = getCustomAssocTypeUri();
+        String customAssocTypeUri = getCustomAssocTypeUriOrNull();
         return getChildTypeUri() + (customAssocTypeUri !=null ? "#" + customAssocTypeUri : "");
     }
 
@@ -269,7 +269,7 @@ public class AssociationDefinitionModel extends AssociationModel {
                 return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     customAssocTypeUri);
             }
-            /*new RelatedTopicModel(
+            /*new RelatedTopicModel(    ### TODO?
                 new TopicModel(customAssocTypeUri, "dm4.core.assoc_type"),
                 new AssociationModel(null,
                     new TopicRoleModel(-1, ""),

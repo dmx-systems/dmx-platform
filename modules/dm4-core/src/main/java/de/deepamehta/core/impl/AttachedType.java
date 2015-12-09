@@ -399,21 +399,22 @@ abstract class AttachedType extends AttachedTopic implements Type {
     }
 
     private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
-        if (getAssocDefs().size() != newAssocDefs.size()) {
-            throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
+        try {
+            if (getAssocDefs().size() != newAssocDefs.size()) {
+                throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
+            }
+            if (getModel().hasSameAssocDefSequence(newAssocDefs)) {
+                return;
+            }
+            // update memory
+            logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
+            getModel().rehashAssocDefs(newAssocDefs);   // update model
+            _rehashAssocDefs(newAssocDefs);             // update attached object cache
+            // update DB
+            dms.typeStorage.rebuildSequence(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating the assoc def sequence failed", e);
         }
-        if (getModel().hasSameAssocDefSequence(newAssocDefs)) {
-            return;
-        }
-        // update memory
-        logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
-        getModel().removeAllAssocDefs();    // ### TODO: reorder existing instances instead of creating new ones!
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            getModel().addAssocDef(assocDef);
-        }
-        initAssocDefs();    // attached object cache
-        // update DB
-        dms.typeStorage.rebuildSequence(this);
     }
 
     // ---
@@ -498,6 +499,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void _rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
         _addAssocDefBefore(_removeAssocDef(assocDefUri), beforeAssocDefUri);
+    }
+
+    private void _rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            _rehashAssocDef(assocDef.getAssocDefUri(), null);
+        }
     }
 
     // ---

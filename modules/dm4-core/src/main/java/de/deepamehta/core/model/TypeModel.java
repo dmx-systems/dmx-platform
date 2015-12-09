@@ -150,10 +150,6 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
         }
     }
 
-    public void removeAllAssocDefs() {
-        assocDefs.clear();
-    }
-
     // ---
 
     /**
@@ -211,8 +207,16 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
     // ### TODO: remove from public API
     public void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
         AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
-        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() + "\"");
+        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
+            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
         addAssocDefBefore(assocDef, beforeAssocDefUri);
+    }
+
+    // ### TODO: remove from public API
+    public void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            rehashAssocDef(assocDef.getAssocDefUri(), null);
+        }
     }
 
 
