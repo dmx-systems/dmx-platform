@@ -845,7 +845,7 @@ class AttachedChildTopics implements ChildTopics {
         try {
             return new AttachedRelatedTopic(model, dms);
         } catch (Exception e) {
-            throw new RuntimeException("RelatedTopic instantiation failed (" + model + ")", e);
+            throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
         }
     }
 }

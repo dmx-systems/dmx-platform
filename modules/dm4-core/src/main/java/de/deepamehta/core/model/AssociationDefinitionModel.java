@@ -260,21 +260,16 @@ public class AssociationDefinitionModel extends AssociationModel {
 
     private static ChildTopicsModel childTopics(String customAssocTypeUri) {
         if (customAssocTypeUri != null) {
-            // ### TODO: is putRef() correct here? What about put()?
-            // Is the assoc def model being used for create/update or for retrieve?
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
                 return new ChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
-                return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
-                    customAssocTypeUri);
+                return new ChildTopicsModel().put("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                    new TopicReferenceModel(customAssocTypeUri, new AssociationModel(null,
+                        new TopicRoleModel(-1, ""), new TopicRoleModel(-1, "")
+                    ))  // ### TODO: creating that dummy assoc should not be required
+                );
             }
-            /*new RelatedTopicModel(    ### TODO?
-                new TopicModel(customAssocTypeUri, "dm4.core.assoc_type"),
-                new AssociationModel(null,
-                    new TopicRoleModel(-1, ""),
-                    new TopicRoleModel(-1, ""))
-            );*/
         } else {
             return null;
         }
