@@ -163,26 +163,31 @@ abstract class AttachedType extends AttachedTopic implements Type {
     @Override
     public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         try {
-            // Note: the last assoc def must be determined *before* the memory is updated
-            long lastAssocDefId = lastAssocDefId();
-            // 1) update memory
-            getModel().addAssocDefBefore(assocDef, beforeAssocDefUri);                       // update model
-            _addAssocDefBefore(new AttachedAssociationDefinition(assocDef, this, dms), beforeAssocDefUri);  // update ..
-            // 2) update DB                                                                  // .. attached object cache
+            long lastAssocDefId = lastAssocDefId();             // must be determined *before* the memory is updated
+            //
+            // 1) update memory (model)
+            // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
+            // adds "Association Type" as a child to the "Composition Definition" and "Aggregation Definition"
+            // association types has itself a custom association type (named "Custom Association Type"), see migration
+            // 5. It would not be stored as storage is model driven and the (meta) model doesn't know about custom
+            // associations as this very concept is introduced only by the assoc def being added here. So, the model
+            // must be updated (in-memory) *before* the assoc def is stored.
+            getModel().addAssocDefBefore(assocDef, beforeAssocDefUri);
+            //
+            // 2) update DB
             dms.typeStorage.storeAssociationDefinition(assocDef);
-            // update sequence
-            long assocDefId = assocDef.getId();
-            if (beforeAssocDefUri == null) {
-                // append at end
-                dms.typeStorage.appendToSequence(getId(), assocDefId, lastAssocDefId);
-            } else if (firstAssocDef().getId() == assocDefId) {
-                // insert at start
-                dms.typeStorage.insertAtSequenceStart(getId(), assocDefId);
-            } else {
-                // insert in the middle
-                long beforeAssocDefId = getAssocDef(beforeAssocDefUri).getId();
-                dms.typeStorage.insertIntoSequence(assocDefId, beforeAssocDefId);
-            }
+            String[] assocDefUris = getModel().findAssocDefUris(assocDef.getId());  // ID is known only afer storing
+            long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
+            long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
+            dms.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
+                                                                                               lastAssocDefId);
+            // 3) update memory (attached object cache)
+            // Note: attaching an assoc def involves attaching the 2 roles of the association that assigns the assoc
+            // def's custom association type (the "relating association"). These roles are only initialized while
+            // storing (see ValueStorage#associateChildTopic()). (The AssociationDefinitionModel constructors leave
+            // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
+            // def must be attached *after* the assoc def is stored.
+            _addAssocDefBefore(new AttachedAssociationDefinition(assocDef, this, dms), beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +

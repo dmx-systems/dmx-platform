@@ -403,22 +403,15 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeAssociationDefinition(AssociationDefinitionModel assocDef) {
         try {
+            long assocDefId = assocDef.getId();
+            //
             // 1) create association
             // Note: if the association definition has been created interactively the underlying association
-            // exists already. Its ID is already known. A possible Custom Association Type assignment is
-            // already stored as well.
-            if (assocDef.getId() == -1) {
-                // 1a) custom association type ### TODO: to be dropped
-                String customAssocTypeUri = assocDef.getCustomAssocTypeUri();
-                if (customAssocTypeUri != null) {
-                    assocDef.getChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
-                        customAssocTypeUri);
-                }
-                //
+            // exists already. We must not create it again. We detect this case by inspecting the ID.
+            if (assocDefId == -1) {
                 dms.createAssociation(assocDef);
+                assocDefId = assocDef.getId();  // after storage the ID is initialized
             }
-            // Note: the assoc def ID is definitely known only after creating the association
-            long assocDefId = assocDef.getId();
             //
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
@@ -575,22 +568,47 @@ class TypeStorageImpl implements TypeStorage {
 
     private void storeSequence(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
-        long lastAssocDefId = -1;
+        long predAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            appendToSequence(typeId, assocDef.getId(), lastAssocDefId);
-            lastAssocDefId = assocDef.getId();
+            addAssocDefToSequence(typeId, assocDef.getId(), -1, -1, predAssocDefId);
+            predAssocDefId = assocDef.getId();
         }
     }
 
-    void appendToSequence(long typeId, long assocDefId, long lastAssocDefId) {
-        if (lastAssocDefId == -1) {
+    /**
+     * Adds an assoc def to the sequence. Depending on the last 3 arguments either appends it at end, inserts it at
+     * start, or inserts it in the middle.
+     *
+     * @param   beforeAssocDefId    the ID of the assoc def <i>before</i> the assoc def is added
+     *                              If <code>-1</code> the assoc def is <b>appended at end</b>.
+     *                              In this case <code>lastAssocDefId</code> must identify the end.
+     *                              (<code>firstAssocDefId</code> is not relevant in this case.)
+     * @param   firstAssocDefId     Identifies the first assoc def. If this equals the ID of the assoc def to add
+     *                              the assoc def is <b>inserted at start</b>.
+     */
+    void addAssocDefToSequence(long typeId, long assocDefId, long beforeAssocDefId, long firstAssocDefId,
+                                                                                    long lastAssocDefId) {
+        if (beforeAssocDefId == -1) {
+            // append at end
+            appendToSequence(typeId, assocDefId, lastAssocDefId);
+        } else if (firstAssocDefId == assocDefId) {
+            // insert at start
+            insertAtSequenceStart(typeId, assocDefId);
+        } else {
+            // insert in the middle
+            insertIntoSequence(assocDefId, beforeAssocDefId);
+        }
+    }
+
+    private void appendToSequence(long typeId, long assocDefId, long predAssocDefId) {
+        if (predAssocDefId == -1) {
             storeSequenceStart(typeId, assocDefId);
         } else {
-            storeSequenceSegment(lastAssocDefId, assocDefId);
+            storeSequenceSegment(predAssocDefId, assocDefId);
         }
     }
 
-    void insertAtSequenceStart(long typeId, long assocDefId) {
+    private void insertAtSequenceStart(long typeId, long assocDefId) {
         // delete sequence start
         RelatedAssociationModel assocDef = fetchSequenceStart(typeId);
         dms.deleteAssociation(assocDef.getRelatingAssociation().getId());
@@ -599,7 +617,7 @@ class TypeStorageImpl implements TypeStorage {
         storeSequenceSegment(assocDefId, assocDef.getId());
     }
 
-    void insertIntoSequence(long assocDefId, long beforeAssocDefId) {
+    private void insertIntoSequence(long assocDefId, long beforeAssocDefId) {
         // delete sequence segment
         RelatedAssociationModel assocDef = fetchPredecessor(beforeAssocDefId);
         dms.deleteAssociation(assocDef.getRelatingAssociation().getId());
