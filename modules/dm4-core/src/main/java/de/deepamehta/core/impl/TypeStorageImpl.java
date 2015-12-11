@@ -321,13 +321,6 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    // ### TODO: to be dropped
-    @Override
-    public AssociationDefinitionModel fetchAssociationDefinition(Association assoc) {
-        return fetchAssociationDefinition(assoc.getModel(), fetchParentType(assoc).getUri(),
-            fetchChildType(assoc).getUri());
-    }
-
     // Note: the assoc is **not** required to identify its players by URI (by ID is OK)
     private AssociationDefinitionModel fetchAssociationDefinition(AssociationModel assoc, String parentTypeUri,
                                                                                           String childTypeUri) {

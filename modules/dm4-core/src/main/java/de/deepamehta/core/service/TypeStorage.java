@@ -10,12 +10,6 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 
 public interface TypeStorage {
 
-    AssociationDefinitionModel createAssociationDefinition(Association assoc);
-
-    AssociationDefinitionModel fetchAssociationDefinition(Association assoc);
-
-    // ---
-
     /**
      * @param   assoc   an association representing an association definition
      *
@@ -33,6 +27,8 @@ public interface TypeStorage {
     TopicModel fetchChildType(Association assoc);
 
     // ---
+
+    AssociationDefinitionModel createAssociationDefinition(Association assoc);
 
     // Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
     // association is *not* removed from DB.

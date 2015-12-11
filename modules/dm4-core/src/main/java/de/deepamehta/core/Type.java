@@ -62,7 +62,7 @@ public interface Type extends Topic {
      *                      Note: in contrast to the other "update" methods this one does not support partial updates.
      *                      That is all association definition fields must be initialized. ### FIXDOC
      */
-    void updateAssocDef(AssociationModel assoc);
+    void updateAssocDef(Association assoc);
 
     Type removeAssocDef(String assocDefUri);
 

@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
@@ -198,70 +199,51 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // Note: the assoc is required to identify its players by URI (not by ID).
     // ### TODO: actually this is not fulfilled at the moment. As a consequence you can't
-    // call getParentTypeUri(), getChildTypeUri(), or getAssocDefUri() on "newAssocDef".
+    // call getParentTypeUri(), getChildTypeUri(), or getAssocDefUri() on "newAssocDef". ### FIXDOC
     //
     // Note: only memory updates here, mostly type model and little attached object cache (rehashing).
-    // The DB is already updated.
-    //
-    // ### TODO: refactor this method in smaller ones
+    // The DB is already updated. ### FIXDOC
     @Override
-    public void updateAssocDef(AssociationModel assoc) {
+    public void updateAssocDef(Association assoc) {
         // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
         // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
         String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
-        AssociationDefinitionModel oldAssocDef = getModel().getAssocDef(assocDefUris[0]);
-        AssociationDefinitionModel newAssocDef = new AssociationDefinitionModel(assoc);
-        //
-        // 1) type URI
-        String oldTypeUri = oldAssocDef.getTypeUri();
-        String newTypeUri = newAssocDef.getTypeUri();
-        if (!oldTypeUri.equals(newTypeUri)) {
-            logger.info("### Changing type URI of assoc def \"" + oldAssocDef.getAssocDefUri() + "\" from \"" +
-                oldTypeUri + "\" -> \"" + newTypeUri + "\"");
-            oldAssocDef.setTypeUri(newTypeUri);
+        AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
+        if (assoc == oldAssocDef) {
+            logger.info("######################### Edited via TYPE Topic!! -- ABORTED");
+            return;
         }
-        //
-        // 2) custom assoc type
-        RelatedTopicModel oldCustomAssocType = oldAssocDef.getCustomAssocType();
-        RelatedTopicModel newCustomAssocType = newAssocDef.getCustomAssocType();
-        boolean oldIsSet = oldCustomAssocType != null;
-        boolean newIsSet = newCustomAssocType != null;
-        boolean customAssocTypeChanged = false;
-        if (newIsSet && (!oldIsSet || !oldCustomAssocType.equals(newCustomAssocType))) {
-            logger.info("### Changing custom association type of assoc def \"" + oldAssocDef.getAssocDefUri() +
-                "\" from " + (oldIsSet ? "\"" + oldCustomAssocType.getUri() + "\"" : "<unset>") +
-                " -> \"" + newCustomAssocType.getUri() + "\"");
-            oldAssocDef.getChildTopicsModel().put("dm4.core.assoc_type#dm4.core.custom_assoc_type",
-                newCustomAssocType);
-            customAssocTypeChanged = true;
-        } else if (oldIsSet && !newIsSet) {
-            logger.info("### Changing custom association type of assoc def \"" + oldAssocDef.getAssocDefUri() +
-                "\" from \"" + oldCustomAssocType.getUri() + "\" -> <unset>");
-            oldAssocDef.getChildTopicsModel().remove("dm4.core.assoc_type#dm4.core.custom_assoc_type");
-            customAssocTypeChanged = true;
-        }
-        //
-        // ### TODO: include in label flag
-        //
-        // 3) label config
-        if (customAssocTypeChanged) {
+        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
+        AssociationModel newAssocModel = new AssociationModel(assoc.getModel());
+        AssociationModel oldAssocModel = oldAssocDef.getModel();
+        // Note: an assoc def expects by-URI roles.
+        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
+        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
+        AssociationDefinition newAssocDef = new AttachedAssociationDefinition(
+            new AssociationDefinitionModel(newAssocModel,
+                oldAssocDef.getParentCardinalityUri(),
+                oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
+            ),
+            this, dms
+        );
+        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
+        String newAssocDefUri = newAssocDef.getAssocDefUri();
+        logger.info("######################### Edited via ASSOC DEF!! oldAssocDefUri=\"" + oldAssocDefUri +
+            "\", newAssocDefUri=\"" + newAssocDefUri + "\", beforeAssocDefUri=\"" + assocDefUris[1] + "\"");
+        if (oldAssocDefUri.equals(newAssocDefUri)) {
+            replaceAssocDef(newAssocDef);
+        } else {
+            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
+            //
             // Note: if the custom association type has changed and the assoc def is part the label config
             // we must replace the assoc def URI in the label config
             List<String> labelConfig = getLabelConfig();
-            String oldAssocDefUri = assocDefUris[0];
             int i = labelConfig.indexOf(oldAssocDefUri);
             if (i != -1) {
-                String newAssocDefUri = oldAssocDef.getAssocDefUri();   // ### see method comment
                 logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
                     "\" (position " + i + ")");
                 labelConfig.set(i, newAssocDefUri);
             }
-        }
-        //
-        // 4) rehash
-        if (customAssocTypeChanged) {
-            // Note: if the custom association type has changed we must rehash (remove + add)
-            rehashAssocDef(assocDefUris[0], assocDefUris[1]);
         }
     }
 
@@ -458,27 +440,42 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return getModel().getAssocDefs().iterator().next();
     }
 
+    // ---
+
+    private void replaceAssocDef(AssociationDefinition assocDef) {
+        getModel().addAssocDef(assocDef.getModel());    // update model
+        _addAssocDef(assocDef);         // update attached object cache
+    }
+
+    private void replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
+        getModel().replaceAssocDef(assocDef.getModel(), oldAssocDefUri, beforeAssocDefUri);     // update model
+        _replaceAssocDef(assocDef, oldAssocDefUri, beforeAssocDefUri);          // update attached object cache
+    }
+
     // --- Attached Object Cache ---
 
-    // ### FIXME: make it private
-    protected void initAssocDefs() {
+    private void initAssocDefs() {
         this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            _addAssocDefBefore(new AttachedAssociationDefinition(assocDef, this, dms), null);  // beforeAssocDefUri=null
+            _addAssocDef(new AttachedAssociationDefinition(assocDef, this, dms));
         }
     }
 
     private AssociationDefinition getAssocDefOrThrow(String assocDefUri) {
         AssociationDefinition assocDef = _getAssocDef(assocDefUri);
         if (assocDef == null) {
-            throw new RuntimeException("Schema violation: association definition \"" + assocDefUri +
-                "\" not found in " + assocDefs.keySet());
+            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
+                assocDefs.keySet());
         }
         return assocDef;
     }
 
     private AssociationDefinition _getAssocDef(String assocDefUri) {
         return assocDefs.get(assocDefUri);
+    }
+
+    private void _addAssocDef(AssociationDefinition assocDef) {
+        _addAssocDefBefore(assocDef, null);     // beforeAssocDefUri=null
     }
 
     /**
@@ -493,8 +490,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
         try {
             AssociationDefinition assocDef = assocDefs.remove(assocDefUri);
             if (assocDef == null) {
-                throw new RuntimeException("Schema violation: association definition \"" + assocDefUri +
-                    "\" not found in " + assocDefs.keySet());
+                throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
+                    assocDefs.keySet());
             }
             return assocDef;
         } catch (Exception e) {
@@ -511,6 +508,11 @@ abstract class AttachedType extends AttachedTopic implements Type {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             _rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
+    }
+
+    private void _replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
+        _removeAssocDef(oldAssocDefUri);
+        _addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 
     // ---

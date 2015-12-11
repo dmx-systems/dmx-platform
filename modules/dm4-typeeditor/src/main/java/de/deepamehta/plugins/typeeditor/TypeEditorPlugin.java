@@ -39,7 +39,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         AssociationModel newModel = assoc.getModel();
         if (isAssocDef(newModel)) {
             if (isAssocDef(oldModel)) {
-                // updateAssocDef(assoc);   ### TODO
+                updateAssocDef(assoc);
             } else {
                 createAssocDef(assoc);
             }
@@ -78,7 +78,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         logger.info("##### Updating association definition " + assoc.getId() + " of type \"" +
             parentType.getUri() + "\"");
         //
-        parentType.updateAssocDef(assoc.getModel());
+        parentType.updateAssocDef(assoc);
         //
         addUpdateTypeDirective(parentType);
     }

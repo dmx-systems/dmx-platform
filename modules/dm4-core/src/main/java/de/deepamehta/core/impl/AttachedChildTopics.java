@@ -265,7 +265,7 @@ class AttachedChildTopics implements ChildTopics {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void update(ChildTopicsModel newComp) {
+    void update(ChildTopicsModel model) {
         try {
             for (AssociationDefinition assocDef : parent.getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
@@ -273,13 +273,13 @@ class AttachedChildTopics implements ChildTopics {
                 RelatedTopicModel newChildTopic        = null;  // only used for "one"
                 List<RelatedTopicModel> newChildTopics = null;  // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newComp.getTopic(assocDefUri, null);        // defaultValue=null
+                    newChildTopic = model.getTopic(assocDefUri, null);        // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newComp.getTopics(assocDefUri, null);      // defaultValue=null
+                    newChildTopics = model.getTopics(assocDefUri, null);      // defaultValue=null
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -295,7 +295,7 @@ class AttachedChildTopics implements ChildTopics {
             //
         } catch (Exception e) {
             throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
-                " failed (newComp=" + newComp + ")", e);
+                " failed", e);
         }
     }
 
