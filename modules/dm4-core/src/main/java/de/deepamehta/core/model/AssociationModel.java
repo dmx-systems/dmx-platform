@@ -26,12 +26,12 @@ public class AssociationModel extends DeepaMehtaObjectModel {
         this(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
-    // ### TODO: don't leave the roles uninitialized
+    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     public AssociationModel() {
         super(-1);
     }
 
-    // ### TODO: don't leave the roles uninitialized
+    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     public AssociationModel(ChildTopicsModel childTopics) {
         super(childTopics);
     }

@@ -51,6 +51,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    // ### TODO: check if we can drop the type model cache if we attach *before* storing a type
     private Map<String, TypeModel> typeCache = new HashMap();   // type model cache
 
     private EmbeddedService dms;
@@ -71,26 +72,38 @@ class TypeStorageImpl implements TypeStorage {
 
     TopicTypeModel getTopicType(String topicTypeUri) {
         TopicTypeModel topicType = (TopicTypeModel) getType(topicTypeUri);
-        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
+        if (topicType == null) {
+            // logger.info("##################### Loading topic type \"" + topicTypeUri + "\"");
+            topicType = fetchTopicType(topicTypeUri);
+            putInTypeCache(topicType);
+        }
+        return topicType;
     }
 
     AssociationTypeModel getAssociationType(String assocTypeUri) {
         AssociationTypeModel assocType = (AssociationTypeModel) getType(assocTypeUri);
-        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
+        if (assocType == null) {
+            // logger.info("##################### Loading association type \"" + assocTypeUri + "\"");
+            assocType = fetchAssociationType(assocTypeUri);
+            putInTypeCache(assocType);
+        }
+        return assocType;
+    }
+
+    // ---
+
+    void putInTypeCache(TypeModel type) {
+        typeCache.put(type.getUri(), type);
+    }
+
+    void removeFromTypeCache(String typeUri) {
+        typeCache.remove(typeUri);
     }
 
     // ---
 
     private TypeModel getType(String typeUri) {
         return typeCache.get(typeUri);
-    }
-
-    private void putInTypeCache(TypeModel type) {
-        typeCache.put(type.getUri(), type);
-    }
-
-    void removeFromTypeCache(String typeUri) {
-        typeCache.remove(typeUri);
     }
 
 
@@ -104,21 +117,14 @@ class TypeStorageImpl implements TypeStorage {
         Topic typeTopic = dms.getTopic("uri", new SimpleValue(topicTypeUri));
         checkTopicType(topicTypeUri, typeTopic);
         //
-        // 1) fetch type components
+        // fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
         List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic.getModel());
         //
-        // 2) build type model
-        TopicTypeModel topicType = new TopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
-            assocDefs, labelConfig, viewConfig);
-        //
-        // 3) put in type model cache
-        putInTypeCache(topicType);
-        //
-        return topicType;
+        return new TopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
     // ### TODO: unify with previous method
@@ -126,21 +132,15 @@ class TypeStorageImpl implements TypeStorage {
         Topic typeTopic = dms.getTopic("uri", new SimpleValue(assocTypeUri));
         checkAssociationType(assocTypeUri, typeTopic);
         //
-        // 1) fetch type components
+        // fetch type components
         String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
         List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
         List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic.getModel());
         //
-        // 2) build type model
-        AssociationTypeModel assocType = new AssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes,
-            assocDefs, labelConfig, viewConfig);
-        //
-        // 3) put in type model cache
-        putInTypeCache(assocType);
-        //
-        return assocType;
+        return new AssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig);
     }
 
     // ---
@@ -409,8 +409,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: if the association definition has been created interactively the underlying association
             // exists already. We must not create it again. We detect this case by inspecting the ID.
             if (assocDefId == -1) {
-                dms.createAssociation(assocDef);
-                assocDefId = assocDef.getId();  // after storage the ID is initialized
+                assocDefId = dms.createAssociation(assocDef).getId();
             }
             //
             // 2) cardinality

@@ -63,10 +63,26 @@ class TypeCache {
 
     void putTopicType(TopicType topicType) {
         topicTypes.put(topicType.getUri(), topicType);
+        // ### TODO: put in type model cache as well, analogous the cache removal (see below).
+        // At the moment we could not do this as the type model must be in cache *before* the topic type is stored
+        // (see EmbeddedService#topicTypeFactory()). The aim is to attach the topic type *before* it is stored.
+        // But at the moment this in turn is not possible because the relating associations are initialized only
+        // while storing (see ValueStorage#associateChildTopic()). The aim is to fully initialize the relating
+        // association model *at construction time*, that is when a RelatedTopicModel is constructed. This in turn
+        // is not possible as the model classes have no access to the type definitions. The eventual solution is to
+        // introduce a model factory which have access to the type definitions.        
     }
 
     void putAssociationType(AssociationType assocType) {
         assocTypes.put(assocType.getUri(), assocType);
+        // ### TODO: put in type model cache as well, analogous the cache removal (see below).
+        // At the moment we could not do this as the type model must be in cache *before* the assoc type is stored
+        // (see EmbeddedService#associationTypeFactory()). The aim is to attach the assoc type *before* it is stored.
+        // But at the moment this in turn is not possible because the relating associations are initialized only
+        // while storing (see ValueStorage#associateChildTopic()). The aim is to fully initialize the relating
+        // association model *at construction time*, that is when a RelatedTopicModel is constructed. This in turn
+        // is not possible as the model classes have no access to the type definitions. The eventual solution is to
+        // introduce a model factory which have access to the type definitions.
     }
 
     // ---

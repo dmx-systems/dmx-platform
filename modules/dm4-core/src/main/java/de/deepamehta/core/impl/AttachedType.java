@@ -66,6 +66,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         //
         if (uriChanged) {
             putInTypeCache();   // abstract
+            dms.typeStorage.putInTypeCache(getModel());  // ### TODO: refactoring. See comment in TypeCache#put methods.
         }
         //
         updateDataTypeUri(model.getDataTypeUri());
@@ -176,7 +177,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
             //
             // 2) update DB
             dms.typeStorage.storeAssociationDefinition(assocDef);
-            String[] assocDefUris = getModel().findAssocDefUris(assocDef.getId());  // ID is known only afer storing
             long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
             long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
             dms.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
@@ -187,6 +187,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             // storing (see ValueStorage#associateChildTopic()). (The AssociationDefinitionModel constructors leave
             // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
             // def must be attached *after* the assoc def is stored.
+            // ### TODO: attach before store. Refactoring needed. See comment in TypeCache#put methods.
             _addAssocDefBefore(new AttachedAssociationDefinition(assocDef, this, dms), beforeAssocDefUri);
             return this;
         } catch (Exception e) {
