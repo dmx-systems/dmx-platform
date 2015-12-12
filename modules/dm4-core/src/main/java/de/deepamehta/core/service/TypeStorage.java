@@ -17,22 +17,4 @@ public interface TypeStorage {
      *          A topic representing either a topic type or an association type.
      */
     TopicModel fetchParentType(Association assoc);
-
-    /**
-     * @param   assoc   an association representing an association definition
-     *
-     * @return  the child type topic.
-     *          A topic representing a topic type.
-     */
-    TopicModel fetchChildType(Association assoc);
-
-    // ---
-
-    AssociationDefinitionModel createAssociationDefinition(Association assoc);
-
-    // Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
-    // association is *not* removed from DB.
-    // This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
-    // deletion of an association that represents an association definition is imminent.
-    void removeAssociationDefinitionFromMemoryAndRebuildSequence(Type type, String childTypeUri);
 }

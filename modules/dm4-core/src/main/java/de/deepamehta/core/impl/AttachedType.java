@@ -197,56 +197,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
         }
     }
 
-    // Note: the assoc is required to identify its players by URI (not by ID).
-    // ### TODO: actually this is not fulfilled at the moment. As a consequence you can't
-    // call getParentTypeUri(), getChildTypeUri(), or getAssocDefUri() on "newAssocDef". ### FIXDOC
-    //
-    // Note: only memory updates here, mostly type model and little attached object cache (rehashing).
-    // The DB is already updated. ### FIXDOC
-    @Override
-    public void updateAssocDef(Association assoc) {
-        // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
-        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
-        String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
-        AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc == oldAssocDef) {
-            logger.info("######################### Edited via TYPE Topic!! -- ABORTED");
-            return;
-        }
-        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel newAssocModel = new AssociationModel(assoc.getModel());
-        AssociationModel oldAssocModel = oldAssocDef.getModel();
-        // Note: an assoc def expects by-URI roles.
-        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
-        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
-        AssociationDefinition newAssocDef = new AttachedAssociationDefinition(
-            new AssociationDefinitionModel(newAssocModel,
-                oldAssocDef.getParentCardinalityUri(),
-                oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
-            ),
-            this, dms
-        );
-        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
-        String newAssocDefUri = newAssocDef.getAssocDefUri();
-        logger.info("######################### Edited via ASSOC DEF!! oldAssocDefUri=\"" + oldAssocDefUri +
-            "\", newAssocDefUri=\"" + newAssocDefUri + "\", beforeAssocDefUri=\"" + assocDefUris[1] + "\"");
-        if (oldAssocDefUri.equals(newAssocDefUri)) {
-            replaceAssocDef(newAssocDef);
-        } else {
-            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
-            //
-            // Note: if the custom association type has changed and the assoc def is part the label config
-            // we must replace the assoc def URI in the label config
-            List<String> labelConfig = getLabelConfig();
-            int i = labelConfig.indexOf(oldAssocDefUri);
-            if (i != -1) {
-                logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
-                    "\" (position " + i + ")");
-                labelConfig.set(i, newAssocDefUri);
-            }
-        }
-    }
-
     @Override
     public Type removeAssocDef(String assocDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
@@ -256,6 +206,62 @@ abstract class AttachedType extends AttachedTopic implements Type {
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
         getAssocDef(assocDefUri).delete();
         return this;
+    }
+
+    // ---
+
+    @Override
+    public void _addAssocDef(Association assoc) {
+        addAssocDef(dms.typeStorage.createAssociationDefinition(assoc));
+    }
+
+    @Override
+    public void _updateAssocDef(Association assoc) {
+        // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
+        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
+        String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
+        AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
+        if (assoc == oldAssocDef) {
+            // edited via type topic -- abort
+            return;
+        }
+        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
+        AssociationModel newAssocModel = new AssociationModel(assoc.getModel());
+        AssociationModel oldAssocModel = oldAssocDef.getModel();
+        // Note: an assoc def expects by-URI roles.
+        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
+        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
+        //
+        AssociationDefinition newAssocDef = new AttachedAssociationDefinition(
+            new AssociationDefinitionModel(newAssocModel,
+                oldAssocDef.getParentCardinalityUri(),
+                oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
+            ),
+            this, dms
+        );
+        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
+        String newAssocDefUri = newAssocDef.getAssocDefUri();
+        if (oldAssocDefUri.equals(newAssocDefUri)) {
+            replaceAssocDef(newAssocDef);
+        } else {
+            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
+            //
+            // Note: if the custom association type has changed and the assoc def is part the label config
+            // we must replace the assoc def URI in the label config
+            getModel().replaceInLabelConfig(newAssocDefUri, oldAssocDefUri);
+        }
+    }
+
+    @Override
+    public void _removeAssocDefFromMemoryAndRebuildSequence(Association assoc) {
+        String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
+        String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();
+        // update memory
+        getModel().removeAssocDef(assocDefUri);             // update model
+        getModel().removeFromLabelConfig(assocDefUri);      // update model
+        _removeAssocDef(assocDefUri);                       // update attached object cache
+        // update DB
+        dms.typeStorage.rebuildSequence(this);
     }
 
     // --- Label Configuration ---
@@ -280,7 +286,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
         return viewConfig;
     }
 
-    // FIXME: to be dropped
     @Override
     public Object getViewConfig(String typeUri, String settingUri) {
         return getModel().getViewConfig(typeUri, settingUri);
@@ -308,15 +313,6 @@ abstract class AttachedType extends AttachedTopic implements Type {
     abstract List<? extends DeepaMehtaObject> getAllInstances();
 
     // ---
-
-    // ### TODO: check if actually an assocDefUri is passed (not a childTypeUri)
-    void removeAssocDefFromMemoryAndRebuildSequence(String assocDefUri) {
-        // update memory
-        getModel().removeAssocDef(assocDefUri);     // update model
-        _removeAssocDef(assocDefUri);               // update attached object cache
-        // update DB
-        dms.typeStorage.rebuildSequence(this);
-    }
 
     void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
         getModel().rehashAssocDef(assocDefUri, beforeAssocDefUri);      // update model
@@ -443,8 +439,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     private void replaceAssocDef(AssociationDefinition assocDef) {
-        getModel().addAssocDef(assocDef.getModel());    // update model
-        _addAssocDef(assocDef);         // update attached object cache
+        getModel().replaceAssocDef(assocDef.getModel());    // update model
+        _replaceAssocDef(assocDef);         // update attached object cache
     }
 
     private void replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
@@ -508,6 +504,12 @@ abstract class AttachedType extends AttachedTopic implements Type {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             _rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
+    }
+
+    // ---
+
+    private void _replaceAssocDef(AssociationDefinition assocDef) {
+        _replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
     }
 
     private void _replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {

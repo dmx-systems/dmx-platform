@@ -220,6 +220,11 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
     }
 
     // ### TODO: remove from public API
+    public void replaceAssocDef(AssociationDefinitionModel assocDef) {
+        replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
+    }
+
+    // ### TODO: remove from public API
     public void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
         removeAssocDef(oldAssocDefUri);
         addAssocDefBefore(assocDef, beforeAssocDefUri);
@@ -235,6 +240,29 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
 
     public void setLabelConfig(List<String> labelConfig) {
         this.labelConfig = labelConfig;
+    }
+
+    // ---
+
+    // ### TODO: remove from public API
+    public void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
+        List<String> labelConfig = getLabelConfig();
+        int i = labelConfig.indexOf(oldAssocDefUri);
+        if (i != -1) {
+            logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
+                "\" (position " + i + ")");
+            labelConfig.set(i, newAssocDefUri);
+        }
+    }
+
+    // ### TODO: remove from public API
+    public void removeFromLabelConfig(String assocDefUri) {
+        List<String> labelConfig = getLabelConfig();
+        int i = labelConfig.indexOf(assocDefUri);
+        if (i != -1) {
+            logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
+            labelConfig.remove(i);
+        }
     }
 
 

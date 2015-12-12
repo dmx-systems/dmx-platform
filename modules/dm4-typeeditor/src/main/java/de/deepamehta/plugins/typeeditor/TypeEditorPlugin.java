@@ -64,11 +64,10 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     private void createAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
-        AssociationDefinitionModel assocDef = dms.getTypeStorage().createAssociationDefinition(assoc);
-        logger.info("##### Adding association definition \"" + assocDef.getAssocDefUri() + "\" to type \"" +
-            parentType.getUri() + "\" (" + assocDef + ")");
+        logger.info("##### Adding association definition \"" + assoc.getId() + "\" to type \"" +
+            parentType.getUri() + "\"");
         //
-        parentType.addAssocDef(assocDef);
+        parentType._addAssocDef(assoc);
         //
         addUpdateTypeDirective(parentType);
     }
@@ -78,19 +77,17 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         logger.info("##### Updating association definition " + assoc.getId() + " of type \"" +
             parentType.getUri() + "\"");
         //
-        parentType.updateAssocDef(assoc);
+        parentType._updateAssocDef(assoc);
         //
         addUpdateTypeDirective(parentType);
     }
 
     private void removeAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
-        String childTypeUri = fetchChildType(assoc).getUri();
-        logger.info("##### Removing association definition \"" + childTypeUri + "\" from type \"" +
+        logger.info("##### Removing association definition \"" + assoc.getId() + "\" from type \"" +
             parentType.getUri() + "\"");
         //
-        // ### FIXME: must receive an assocDefUri instead a childTypeUri
-        dms.getTypeStorage().removeAssociationDefinitionFromMemoryAndRebuildSequence(parentType, childTypeUri);
+        parentType._removeAssocDefFromMemoryAndRebuildSequence(assoc);
         //
         addUpdateTypeDirective(parentType);
     }
@@ -141,9 +138,5 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
             throw new RuntimeException("Invalid association definition: the dm4.core.parent_type " +
                 "player is not a type but of type \"" + typeUri + "\" (" + assoc + ")");
         }
-    }
-
-    private TopicModel fetchChildType(Association assoc) {
-        return dms.getTypeStorage().fetchChildType(assoc);
     }
 }
