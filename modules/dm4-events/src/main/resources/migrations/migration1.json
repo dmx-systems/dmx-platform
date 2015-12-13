@@ -19,7 +19,14 @@
             {
                 "value":            "Title",
                 "uri":              "dm4.events.title",
-                "data_type_uri":    "dm4.core.text"
+                "data_type_uri":    "dm4.core.text",
+                "index_mode_uris": ["dm4.core.fulltext"]
+            },
+            {
+                "value":            "Notes",
+                "uri":              "dm4.events.notes",
+                "data_type_uri":    "dm4.core.html",
+                "index_mode_uris": ["dm4.core.fulltext"]
             },
             {
                 "value":            "Event",
@@ -42,6 +49,22 @@
                         "child_cardinality_uri":  "dm4.core.one",
                         "assoc_type_uri":         "dm4.core.composition_def",
                         "custom_assoc_type_uri":  "dm4.events.to"
+                    },
+                    {
+                        "child_type_uri":         "dm4.contacts.address",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "parent_cardinality_uri": "dm4.core.many",
+                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                    },
+                    {
+                        "child_type_uri":         "dm4.events.notes",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "assoc_type_uri":         "dm4.core.composition_def"
+                    },
+                    {
+                        "child_type_uri":         "dm4.webbrowser.url",
+                        "child_cardinality_uri":  "dm4.core.one",
+                        "assoc_type_uri":         "dm4.core.composition_def"
                     }
                 ],
                 "view_config_topics": [
