@@ -1229,6 +1229,8 @@ dm4c = new function() {
                     return "dm4.webclient.number_renderer"
                 case "dm4.core.boolean":
                     return "dm4.webclient.boolean_renderer"
+                case "dm4.core.composite":
+                    return "dm4.webclient.default_composite_renderer"
                 default:
                     throw "WebclientError: \"" + configurable.data_type_uri + "\" is an unsupported data type URI"
                 }

@@ -19,7 +19,7 @@ public class Migration2 extends Migration {
         addIconToTopicType("dm4.core.plugin",      "puzzle.png");
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
-        // Update: this is because HSB is not same as HSL. The values here are actually HSB, but CSS uses HSL.
+        // Update: this is because HSB is not same as HSL. The values here are actually HSB, but CSS expects HSL.
         addColorToAssociationType("dm4.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);
         addColorToAssociationType("dm4.core.aggregation",     "rgb(53, 223, 59)"   /*"hsl(120, 65%, 90%)"*/);
         addColorToAssociationType("dm4.core.composition",     "rgb(231, 62, 60)"   /*"hsl(  0, 65%, 90%)"*/);

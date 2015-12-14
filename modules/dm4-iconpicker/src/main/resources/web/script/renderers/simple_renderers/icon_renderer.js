@@ -6,6 +6,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
     },
 
     render_form: function(page_model, parent_element) {
+        dm4c.render.field_label(page_model, parent_element)
         var picked_icon = null                  // a topic of type "dm4.webclient.icon"
         var image = dm4c.render.icon(page_model.value, page_model.value)
         parent_element.addClass("iconpicker")
