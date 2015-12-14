@@ -10,6 +10,11 @@
                 "value": "To",
                 "uri": "dm4.events.to",
                 "data_type_uri": "dm4.core.text"
+            },
+            {
+                "value": "Participant",
+                "uri": "dm4.events.participant",
+                "data_type_uri": "dm4.core.text"
             }
         ]
     },
