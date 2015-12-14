@@ -36,6 +36,11 @@
                     "child_cardinality_uri":  "dm4.core.one",
                     "assoc_type_uri":         "dm4.core.composition_def"
                 }
+            ],
+            "label_config": [
+                "dm4.datetime.month",
+                "dm4.datetime.day",
+                "dm4.datetime.year"
             ]
         },
         # Time
@@ -64,6 +69,10 @@
                     "child_cardinality_uri":  "dm4.core.one",
                     "assoc_type_uri":         "dm4.core.composition_def"
                 }
+            ],
+            "label_config": [
+                "dm4.datetime.hour",
+                "dm4.datetime.minute"
             ]
         },
         # Date/Time
@@ -82,6 +91,10 @@
                     "child_cardinality_uri":  "dm4.core.one",
                     "assoc_type_uri":         "dm4.core.composition_def"
                 }
+            ],
+            "label_config": [
+                "dm4.datetime.date",
+                "dm4.datetime.time"
             ]
         }
     ]
