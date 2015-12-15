@@ -268,6 +268,8 @@
                 <module>modules/dm4-webbrowser</module>
                 <module>modules/dm4-notes</module>
                 <module>modules/dm4-contacts</module>
+                <module>modules/dm4-events</module>
+                <module>modules/dm4-datetime</module>
                 <module>modules/dm4-workspaces</module>
                 <module>modules/dm4-typeeditor</module>
                 <module>modules/dm4-iconpicker</module>
@@ -341,6 +343,8 @@
                 <module>modules/dm4-webbrowser</module>
                 <module>modules/dm4-notes</module>
                 <module>modules/dm4-contacts</module>
+                <module>modules/dm4-events</module>
+                <module>modules/dm4-datetime</module>
                 <module>modules/dm4-workspaces</module>
                 <module>modules/dm4-typeeditor</module>
                 <module>modules/dm4-iconpicker</module>

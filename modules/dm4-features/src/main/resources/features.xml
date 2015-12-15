@@ -42,6 +42,8 @@
 
         <bundle>mvn:de.deepamehta/deepamehta-notes/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-contacts/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-events/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-datetime/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-webbrowser/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-geomaps/${project.version}</bundle>
     </feature>
