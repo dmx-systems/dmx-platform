@@ -14,7 +14,15 @@
             {
                 "value": "Participant",
                 "uri": "dm4.events.participant",
-                "data_type_uri": "dm4.core.text"
+                "data_type_uri": "dm4.core.text",
+                "view_config_topics": [
+                    {
+                        "type_uri": "dm4.webclient.view_config",
+                        "childs": {
+                            "dm4.webclient.color": "hsl(340, 80%, 60%)"
+                        }
+                    }
+                ]
             }
         ]
     },
@@ -76,6 +84,7 @@
                     {
                         "type_uri": "dm4.webclient.view_config",
                         "childs": {
+                            "dm4.webclient.icon": "/de.deepamehta.events/images/calendar.png",
                             "dm4.webclient.show_in_create_menu": true
                         }
                     }
