@@ -12,8 +12,24 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-module</artifactId>
+        <artifactId>deepamehta-plugin</artifactId>
         <version>4.8-SNAPSHOT</version>
-        <relativePath>../dm4-module/pom.xml</relativePath>
+        <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.plugins.events.EventsPlugin
+                        </Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
