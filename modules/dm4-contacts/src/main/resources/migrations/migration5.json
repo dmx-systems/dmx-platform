@@ -1,0 +1,68 @@
+# Part of DM 4.8-SNAPSHOT
+# Runs ALWAYS
+{
+    "topic_types": [
+        {
+            "value": "Organizational Role",
+            "uri": "dm4.contacts.organizational_role",
+            "data_type_uri": "dm4.core.text"
+        }
+    ],
+    "assoc_types": [
+        {
+            "value": "Organization Association",
+            "uri": "dm4.contacts.organization_association",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
+                {
+                    "child_type_uri":         "dm4.contacts.organizational_role",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.many",
+                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                }
+            ],
+            "view_config_topics": [
+                {
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.color": "hsl(48, 80%, 50%)"
+                    }
+                }
+            ]
+        }
+    ],
+    "topics": [
+        {
+            "value": "Executive Director",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Founder",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Chairman",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Partner",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Collaborator",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Employee",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Member",
+            "type_uri": "dm4.contacts.organizational_role"
+        },
+        {
+            "value": "Associate",
+            "type_uri": "dm4.contacts.organizational_role"
+        }
+    ]
+}
