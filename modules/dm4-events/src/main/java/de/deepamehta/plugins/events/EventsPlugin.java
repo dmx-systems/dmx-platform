@@ -34,18 +34,18 @@ public class EventsPlugin extends PluginActivator implements EventsService {
 
 
     @GET
-    @Path("/{id}/participants")
+    @Path("/participant/{id}")
     @Override
-    public ResultList<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
-        return dms.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
-            "dm4.contacts.person");
+    public ResultList<RelatedTopic> getEventsOfParticipant(@PathParam("id") long personId) {
+        return dms.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
+            "dm4.events.event");
     }
 
     @GET
-    @Path("/participant/{id}")
+    @Path("/{id}/participants")
     @Override
-    public ResultList<RelatedTopic> getEventsByParticipant(@PathParam("id") long personId) {
-        return dms.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
-            "dm4.events.event");
+    public ResultList<RelatedTopic> getParticipantsOfEvent(@PathParam("id") long eventId) {
+        return dms.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
+            "dm4.contacts.person");
     }
 }

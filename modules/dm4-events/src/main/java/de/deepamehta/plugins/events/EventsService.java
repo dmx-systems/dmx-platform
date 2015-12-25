@@ -7,7 +7,7 @@ import de.deepamehta.core.service.ResultList;
 
 public interface EventsService {
 
-    ResultList<RelatedTopic> getParticipants(long eventId);
+    ResultList<RelatedTopic> getEventsOfParticipant(long personId);
 
-    ResultList<RelatedTopic> getEventsByParticipant(long personId);
+    ResultList<RelatedTopic> getParticipantsOfEvent(long eventId);
 }
