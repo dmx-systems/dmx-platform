@@ -250,9 +250,13 @@ class ValueStorage {
         // Note: the resolved topic must be fetched including its composite value.
         // It might be required at client-side. ### TODO
         if (topicRef.isReferenceById()) {
-            return dms.getTopic(topicRef.getId());                          // ### FIXME: had fetchComposite=true
+            return dms.getTopic(topicRef.getId());                                 // ### FIXME: had fetchComposite=true
         } else if (topicRef.isReferenceByUri()) {
-            return dms.getTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had fetchComposite=true
+            Topic topic = dms.getTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had fetchComposite=true
+            if (topic == null) {
+                throw new RuntimeException("Topic with URI \"" + topicRef.getUri() + "\" not found");
+            }
+            return topic;
         } else {
             throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
         }

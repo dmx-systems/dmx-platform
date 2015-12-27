@@ -2,7 +2,33 @@
 CKEditor DeepaMehta Customization
 =================================
 
-This is a custom build of CKEditor 4.3.1 as configured via http://ckeditor.com/builder
+
+DM 4.8
+------
+
+This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/builder
+
+    - Preset: Basic
+    - Remove plugins:
+        - About CKEditor (about)
+    - Add plugins:
+        - AutoGrow            *) Useful with framed editing
+        - Enhanced Image
+        - Media Embed
+        - Table
+        - Table Tools         *) required to e.g. add a row to existing table
+    - Skin: "Flat"
+    - Languages: English
+    - Source: optimized
+
+config.js:
+    - No DeepaMehta specific configurations so far.
+
+
+DM 4.2
+------
+
+This is a custom build of CKEditor 4.3.2 as configured via http://ckeditor.com/builder
 
     - Preset: Standard
     - Remove plugins:
@@ -24,8 +50,5 @@ This is a custom build of CKEditor 4.3.1 as configured via http://ckeditor.com/b
     - Languages: English
     - Source: optimized
 
-
-CKEditor Configuration
-----------------------
-
-No DeepaMehta specific configurations so far.
+config.js:
+    - No DeepaMehta specific configurations so far.

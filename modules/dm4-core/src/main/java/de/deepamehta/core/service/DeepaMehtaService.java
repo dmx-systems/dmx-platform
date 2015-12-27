@@ -40,18 +40,27 @@ public interface DeepaMehtaService {
 
     // === Topics ===
 
+    /**
+     * Accesses a topic by ID.
+     *
+     * @return  the topic.
+     *
+     * @throws  RuntimeException    if no such topic exists.
+     */
     Topic getTopic(long topicId);
 
     /**
      * Looks up a single topic by exact value.
-     * If no such topic exists <code>null</code> is returned.
-     * If more than one topic is found a runtime exception is thrown.
      * <p>
      * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
      * Compare to {@link #getTopics(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
+     *
+     * @return  the topic, or <code>null</code> if no such topic exists.
+     *
+     * @throws  RuntimeException    If more than one topic is found.
      */
     Topic getTopic(String key, SimpleValue value);
 
