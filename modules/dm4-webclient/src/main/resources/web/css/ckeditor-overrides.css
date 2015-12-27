@@ -1,0 +1,4 @@
+/* Make the content area look like an input field */
+.cke_wysiwyg_frame {
+    box-shadow: inset 0px 1px 2px #444;
+}
