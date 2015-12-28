@@ -521,7 +521,7 @@ function CanvasView() {
         return is_valid
 
         function log(flavor) {
-            console.log("CanvasView:", flavor, "flavor detected for view customizer", js.class_name(customizer))
+            // console.log("CanvasView:", flavor, "flavor detected for view customizer", js.class_name(customizer))
         }
     }
 

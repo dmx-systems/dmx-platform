@@ -1,32 +1,11 @@
 # Part of DM 4.8-SNAPSHOT
 # Runs ALWAYS
 {
-    "topic_types": [
-        {
-            "value": "Gender",
-            "uri": "dm4.contacts.gender",
-            "data_type_uri": "dm4.core.text"
-        }
-    ],
     "assoc_types": [
         {
             "value": "Date of Birth",
             "uri": "dm4.contacts.date_of_birth",
             "data_type_uri": "dm4.core.text"
-        }
-    ],
-    "topics": [
-        {
-            "value": "male",
-            "type_uri": "dm4.contacts.gender"
-        },
-        {
-            "value": "female",
-            "type_uri": "dm4.contacts.gender"
-        },
-        {
-            "value": "other",
-            "type_uri": "dm4.contacts.gender"
         }
     ]
 }
