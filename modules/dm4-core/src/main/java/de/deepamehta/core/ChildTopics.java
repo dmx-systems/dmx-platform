@@ -19,11 +19,15 @@ public interface ChildTopics extends Iterable<String> {
      */
     RelatedTopic getTopic(String assocDefUri);
 
+    RelatedTopic getTopicOrNull(String assocDefUri);
+
     /**
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
     List<RelatedTopic> getTopics(String assocDefUri);
+
+    List<RelatedTopic> getTopicsOrNull(String assocDefUri);
 
     // ---
 
@@ -47,11 +51,15 @@ public interface ChildTopics extends Iterable<String> {
      */
     String getString(String assocDefUri);
 
+    String getStringOrNull(String assocDefUri);
+
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     int getInt(String assocDefUri);
+
+    Integer getIntOrNull(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -59,11 +67,15 @@ public interface ChildTopics extends Iterable<String> {
      */
     long getLong(String assocDefUri);
 
+    Long getLongOrNull(String assocDefUri);
+
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     double getDouble(String assocDefUri);
+
+    Double getDoubleOrNull(String assocDefUri);
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -71,11 +83,15 @@ public interface ChildTopics extends Iterable<String> {
      */
     boolean getBoolean(String assocDefUri);
 
+    Boolean getBooleanOrNull(String assocDefUri);
+
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.
      */
     Object getObject(String assocDefUri);
+
+    Object getObjectOrNull(String assocDefUri);
 
     // ---
 

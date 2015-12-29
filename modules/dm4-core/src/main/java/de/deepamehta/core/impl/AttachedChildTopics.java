@@ -70,9 +70,21 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public RelatedTopic getTopicOrNull(String assocDefUri) {
+        loadChildTopics(assocDefUri);
+        return _getTopicOrNull(assocDefUri);
+    }
+
+    @Override
     public List<RelatedTopic> getTopics(String assocDefUri) {
         loadChildTopics(assocDefUri);
         return _getTopics(assocDefUri);
+    }
+
+    @Override
+    public List<RelatedTopic> getTopicsOrNull(String assocDefUri) {
+        loadChildTopics(assocDefUri);
+        return _getTopicsOrNull(assocDefUri);
     }
 
     // ---
@@ -109,8 +121,20 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public String getStringOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().toString() : null;
+    }
+
+    @Override
     public int getInt(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().intValue();
+    }
+
+    @Override
+    public Integer getIntOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().intValue() : null;
     }
 
     @Override
@@ -119,8 +143,20 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public Long getLongOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().longValue() : null;
+    }
+
+    @Override
     public double getDouble(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().doubleValue();
+    }
+
+    @Override
+    public Double getDoubleOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().doubleValue() : null;
     }
 
     @Override
@@ -129,8 +165,20 @@ class AttachedChildTopics implements ChildTopics {
     }
 
     @Override
+    public Boolean getBooleanOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().booleanValue() : null;
+    }
+
+    @Override
     public Object getObject(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().value();
+    }
+
+    @Override
+    public Object getObjectOrNull(String assocDefUri) {
+        Topic topic = getTopicOrNull(assocDefUri);
+        return topic != null ? topic.getSimpleValue().value() : null;
     }
 
     // ---
@@ -425,7 +473,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Composition ---
 
     private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
+        RelatedTopic childTopic = _getTopicOrNull(assocDef.getAssocDefUri());
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
@@ -457,7 +505,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Aggregation ---
 
     private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
+        RelatedTopic childTopic = _getTopicOrNull(assocDef.getAssocDefUri());
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
             deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
@@ -491,7 +539,7 @@ class AttachedChildTopics implements ChildTopics {
     // --- Update ---
 
     private void updateChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        RelatedTopic childTopic = _getTopic(assocDef.getAssocDefUri(), null);
+        RelatedTopic childTopic = _getTopicOrNull(assocDef.getAssocDefUri());
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
@@ -650,43 +698,41 @@ class AttachedChildTopics implements ChildTopics {
     // --- Access ---
 
     private RelatedTopic _getTopic(String assocDefUri) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(assocDefUri);
+        RelatedTopic topic = _getTopicOrNull(assocDefUri);
         // error check
-        if (topic == null) {    // ### FIXME: wording
-            throw new RuntimeException("Child topic of type \"" + assocDefUri + "\" not found in " + childTopics);
+        if (topic == null) {
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topic;
     }
 
-    private RelatedTopic _getTopic(String assocDefUri, RelatedTopic defaultTopic) {
-        RelatedTopic topic = (RelatedTopic) childTopics.get(assocDefUri);
-        return topic != null ? topic : defaultTopic;
+    private RelatedTopic _getTopicOrNull(String assocDefUri) {
+        try {
+            return (RelatedTopic) childTopics.get(assocDefUri);
+        } catch (ClassCastException e) {
+            getModel().throwInvalidSingleAccess(assocDefUri, e);
+            return null;    // never reached
+        }
     }
 
     // ---
 
     private List<RelatedTopic> _getTopics(String assocDefUri) {
-        try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(assocDefUri);
-            // error check
-            if (topics == null) {   // ### FIXME: wording
-                throw new RuntimeException("Child topics of type \"" + assocDefUri + "\" not found in " + childTopics);
-            }
-            //
-            return topics;
-        } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(assocDefUri, e);
-            return null;    // never reached
+        List<RelatedTopic> topics = _getTopicsOrNull(assocDefUri);
+        // error check
+        if (topics == null) {
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
         }
+        //
+        return topics;
     }
 
-    private List<RelatedTopic> _getTopics(String assocDefUri, List<RelatedTopic> defaultValue) {
+    private List<RelatedTopic> _getTopicsOrNull(String assocDefUri) {
         try {
-            List<RelatedTopic> topics = (List<RelatedTopic>) childTopics.get(assocDefUri);
-            return topics != null ? topics : defaultValue;
+            return (List<RelatedTopic>) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
-            getModel().throwInvalidAccess(assocDefUri, e);
+            getModel().throwInvalidMultiAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -697,10 +743,12 @@ class AttachedChildTopics implements ChildTopics {
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID.
      */
     private RelatedTopic findChildTopicById(long childTopicId, AssociationDefinition assocDef) {
-        List<RelatedTopic> childTopics = _getTopics(assocDef.getAssocDefUri(), new ArrayList());
-        for (RelatedTopic childTopic : childTopics) {
-            if (childTopic.getId() == childTopicId) {
-                return childTopic;
+        List<RelatedTopic> childTopics = _getTopicsOrNull(assocDef.getAssocDefUri());
+        if (childTopics != null) {
+            for (RelatedTopic childTopic : childTopics) {
+                if (childTopic.getId() == childTopicId) {
+                    return childTopic;
+                }
             }
         }
         return null;
@@ -712,7 +760,11 @@ class AttachedChildTopics implements ChildTopics {
      * @param   assocDef    the child topics according to this association definition are considered.
      */
     private RelatedTopic findChildTopicByRef(TopicReferenceModel topicRef, AssociationDefinition assocDef) {
-        return topicRef.findReferencedTopic(_getTopics(assocDef.getAssocDefUri(), new ArrayList()));
+        List<RelatedTopic> childTopics = _getTopicsOrNull(assocDef.getAssocDefUri());
+        if (childTopics != null) {
+            return topicRef.findReferencedTopic(childTopics);
+        }
+        return null;
     }
 
     // ---
@@ -780,7 +832,7 @@ class AttachedChildTopics implements ChildTopics {
      * Adds a value to a multiple-valued child.
      */
     private void add(String assocDefUri, RelatedTopic topic) {
-        List<RelatedTopic> topics = _getTopics(assocDefUri, null);      // defaultValue=null
+        List<RelatedTopic> topics = _getTopicsOrNull(assocDefUri);
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
@@ -793,7 +845,7 @@ class AttachedChildTopics implements ChildTopics {
      * Removes a value from a multiple-valued child.
      */
     private void remove(String assocDefUri, Topic topic) {
-        List<RelatedTopic> topics = _getTopics(assocDefUri, null);      // defaultValue=null
+        List<RelatedTopic> topics = _getTopicsOrNull(assocDefUri);
         if (topics != null) {
             topics.remove(topic);
         }

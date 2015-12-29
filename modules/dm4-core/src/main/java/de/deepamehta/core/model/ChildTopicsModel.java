@@ -93,7 +93,7 @@ public class ChildTopicsModel implements Iterable<String> {
 
     /**
      * Accesses a single-valued child.
-     * Returns a default value if there is no such child.
+     * Returns a default value if there is no such child. ### TODO: make it getTopicOrNull(), catch ClassCastException
      */
     public RelatedTopicModel getTopic(String assocDefUri, RelatedTopicModel defaultValue) {
         RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
@@ -117,21 +117,21 @@ public class ChildTopicsModel implements Iterable<String> {
             //
             return topics;
         } catch (ClassCastException e) {
-            throwInvalidAccess(assocDefUri, e);
+            throwInvalidMultiAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
 
     /**
      * Accesses a multiple-valued child.
-     * Returns a default value if there is no such child.
+     * Returns a default value if there is no such child. ### TODO: make it getTopicsOrNull()
      */
     public List<RelatedTopicModel> getTopics(String assocDefUri, List<RelatedTopicModel> defaultValue) {
         try {
             List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
             return topics != null ? topics : defaultValue;
         } catch (ClassCastException e) {
-            throwInvalidAccess(assocDefUri, e);
+            throwInvalidMultiAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -670,13 +670,22 @@ public class ChildTopicsModel implements Iterable<String> {
     /**
      * ### TODO: should not be public. Specify interfaces also for model classes?
      */
-    public void throwInvalidAccess(String assocDefUri, ClassCastException e) {
-        if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
-                "\": the caller assumes it to be multiple-value but it is single-value in\n" + this, e);
+    public void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
+        if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but it is defined as multi", e);
         } else {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
-                "\" in\n" + this, e);
+            throw new RuntimeException("Accessing \"" + assocDefUri + "\" failed", e);
+        }
+    }
+
+    /**
+     * ### TODO: should not be public. Specify interfaces also for model classes?
+     */
+    public void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
+        if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but it is defined as single", e);
+        } else {
+            throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
         }
     }
 }
