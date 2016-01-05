@@ -84,8 +84,7 @@ public class ChildTopicsModel implements Iterable<String> {
         RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
-                "\": no such entry in\n" + this);
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
         }
         //
         return topic;
@@ -111,8 +110,8 @@ public class ChildTopicsModel implements Iterable<String> {
             List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
             // error check
             if (topics == null) {
-                throw new RuntimeException("Invalid access to ChildTopicsModel entry \"" + assocDefUri +
-                    "\": no such entry in\n" + this);
+                throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " +
+                    childTopics.keySet());
             }
             //
             return topics;
@@ -672,7 +671,7 @@ public class ChildTopicsModel implements Iterable<String> {
      */
     public void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
         if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but it is defined as multi", e);
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but is defined as multi", e);
         } else {
             throw new RuntimeException("Accessing \"" + assocDefUri + "\" failed", e);
         }
@@ -683,7 +682,7 @@ public class ChildTopicsModel implements Iterable<String> {
      */
     public void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but it is defined as single", e);
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but is defined as single", e);
         } else {
             throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
         }
