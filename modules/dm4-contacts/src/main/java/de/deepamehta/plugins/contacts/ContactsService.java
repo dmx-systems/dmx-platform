@@ -9,5 +9,5 @@ public interface ContactsService {
 
     ResultList<RelatedTopic> getInstitutions(long personId);
 
-    ResultList<RelatedTopic> getPersons(long institutionId);
+    ResultList<RelatedTopic> getPersons(long instId);
 }

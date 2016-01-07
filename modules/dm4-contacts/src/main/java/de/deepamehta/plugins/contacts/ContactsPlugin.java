@@ -36,8 +36,8 @@ public class ContactsPlugin extends PluginActivator implements ContactsService {
     @GET
     @Path("/{id}/persons")
     @Override
-    public ResultList<RelatedTopic> getPersons(@PathParam("id") long institutionId) {
-        return dms.getTopic(institutionId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
+    public ResultList<RelatedTopic> getPersons(@PathParam("id") long instId) {
+        return dms.getTopic(instId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
             "dm4.core.default", "dm4.contacts.person");
     }
 }

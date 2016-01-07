@@ -42,6 +42,10 @@ public class ResultList<T extends JSONEnabled> implements Iterable<T>, JSONEnabl
         return items;
     }
 
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
     // ---
 
     public void add(T item) {
