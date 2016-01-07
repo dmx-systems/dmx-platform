@@ -54,11 +54,11 @@ dm4c.render.page_model = new function() {
 
         // === Simple Renderer ===
 
-        this.render_info_simple = function(parent_element, level) {
+        this.render_info_single = function(parent_element, level) {
             renderer.render_info(this, parent_element, level)
         }
 
-        this.render_form_simple = function(parent_element, level) {
+        this.render_form_single = function(parent_element, level) {
             form_reading_function = renderer.render_form(this, parent_element, level)
         }
 
@@ -167,12 +167,12 @@ dm4c.render.page_model = new function() {
     this.mode = {
         INFO: {
             render_setting: "hidden",
-            render_func_name_simple: "render_info_simple",
+            render_func_name_single: "render_info_single",
             render_func_name_multi:  "render_info_multi"
         },
         FORM: {
             render_setting: "locked",
-            render_func_name_simple: "render_form_simple",
+            render_func_name_single: "render_form_single",
             render_func_name_multi:  "render_form_multi"
         }
     }
@@ -295,7 +295,7 @@ dm4c.render.page_model = new function() {
     /**
      * Renders a page model. Called recursively.
      *
-     * @param   page_model      The page model to render (a PageModel object).
+     * @param   page_model      The page model to render (a PageModel object, type SIMPLE or COMPOSITE).
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
      * @param   level           The nesting level (integer). Starts at 0.
      * @param   ref_element     The page element the rendering is attached to (a jQuery object).
@@ -308,17 +308,12 @@ dm4c.render.page_model = new function() {
             return
         }
         //
-        if (page_model.type == self.type.SIMPLE) {
-            var box = this.render_box(page_model, ref_element, render_mode, level, incremental, is_removable())
-            page_model[render_mode.render_func_name_simple](box, level)
-        } else if (page_model.type == self.type.COMPOSITE) {
-            var box = this.render_box(page_model, ref_element, render_mode, level, incremental, is_removable())
-            page_model[render_mode.render_func_name_simple](box, level)    // ### former composite renderer context
-        } else {
+        if (page_model.type != this.type.SIMPLE && page_model.type != this.type.COMPOSITE) {
             throw "PageModelError: invalid page model"
         }
-
-        // ### former render_box context
+        //
+        var box = this.render_box(page_model, ref_element, render_mode, level, incremental, is_removable())
+        page_model[render_mode.render_func_name_single](box, level)
 
         // === "Remove" Button ===
 
@@ -405,13 +400,6 @@ dm4c.render.page_model = new function() {
      *          on the other hand never represents a topic reference.
      */
     this.build_object_model = function(page_model) {
-        var object_model = {
-            id:       page_model.object.id,
-            type_uri: page_model.object.type_uri
-            // Note: the type URI is not strictly required for server-side processing, but for the client-side
-            // "pre_update_topic"/"pre_update_association" listeners as they usually examine the topic's/association's
-            // type.
-        }
         if (page_model.type == self.type.SIMPLE) {
             var value = page_model.read_form_value()
             // Note: undefined form value is an error (means: simple renderer returned no value). Already thrown.
@@ -419,14 +407,20 @@ dm4c.render.page_model = new function() {
             if (value == null) {
                 return null
             }
+            var object_model = {
+                type_uri: page_model.object.type_uri,
+                // Note: the type URI is not strictly required for server-side processing, but for the
+                // client-side "pre_update_topic"/"pre_update_association" listeners as they usually
+                // examine the topic's/association's type.
+                value: value
+            }
             // Note: we never want *update* an aggregated simple child. Instead we either want *create* a new child
             // or *assign* an existing child. So we remove the ID from the object model. At server-side the update vs.
             // create decision is based on the existence of an ID.
-            if (page_model.assoc_def && page_model.assoc_def.type_uri == "dm4.core.aggregation_def" ||
-                                                                                    is_del_ref(value)) {
-                delete object_model.id
+            if ((!page_model.assoc_def || page_model.assoc_def.type_uri != "dm4.core.aggregation_def") &&
+                                                                                    !is_del_ref(value)) {
+                object_model.id = page_model.object.id
             }
-            object_model.value = value
             return object_model
         } else if (page_model.type == self.type.COMPOSITE) {
             if (is_related_topic_page_model(page_model)) {
@@ -439,21 +433,7 @@ dm4c.render.page_model = new function() {
                 }
                 return topic_model
             } else {
-                object_model.childs = {}
-                for (var child_type_uri in page_model.childs) {
-                    var child_model = page_model.childs[child_type_uri]
-                    if (child_model.type == self.type.MULTI) {
-                        // cardinality "many"
-                        var values = child_model.read_form_values()
-                        object_model.childs[child_type_uri] = values
-                    } else {
-                        // cardinality "one"
-                        var value = this.build_object_model(child_model)
-                        if (value != null) {
-                            object_model.childs[child_type_uri] = value
-                        }
-                    }
-                }
+                var object_model = page_model.read_form_value()
                 return object_model
             }
         } else {
