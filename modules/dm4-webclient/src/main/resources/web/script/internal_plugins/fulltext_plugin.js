@@ -4,7 +4,6 @@
 dm4c.add_plugin("de.deepamehta.webclient.fulltext", function() {
 
     var SEARCHMODE_URI = "dm4.webclient.by_text"
-    var SEARCH_FIELD_WIDTH = 25    // in chars
 
     dm4c.toolbar.add_searchmode(SEARCHMODE_URI, function() {
 
@@ -23,7 +22,7 @@ dm4c.add_plugin("de.deepamehta.webclient.fulltext", function() {
 
         // ---
 
-        var search_field = $('<input type="text">').attr("size", SEARCH_FIELD_WIDTH)
+        var search_field = $('<input type="text">')
 
         function do_process_key(event) {
             if (event.which == 13) {

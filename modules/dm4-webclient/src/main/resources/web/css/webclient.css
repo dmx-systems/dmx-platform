@@ -8,11 +8,13 @@ body {
 
 #main-toolbar {
     background-color: #e8e8e8;
+    height: 1.6em;
     padding: 0.3em;
 }
 
 #main-toolbar input[type=text] {
     margin: 0;
+    width: 10em;
     height: 1.4em;
     font-size: 0.75em;
 }
