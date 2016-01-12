@@ -352,19 +352,26 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private boolean isDirectModelledChildTopic(RelatedTopic childTopic, Topic parentTopic) {
         // association definition
+        if (hasAssocDef(parentTopic, childTopic)) {
+            // role types
+            Association assoc = childTopic.getRelatingAssociation();
+            if (assoc.isPlayer(new TopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
+                assoc.isPlayer(new TopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasAssocDef(Topic parentTopic, RelatedTopic childTopic) {
         TopicType parentType = dms.getTopicType(parentTopic.getTypeUri());
         String childTypeUri = childTopic.getTypeUri();
-        if (parentType.hasAssocDef(childTypeUri)) {
-            // association type
-            AssociationDefinition assocDef = parentType.getAssocDef(childTypeUri);
-            Association assoc = childTopic.getRelatingAssociation();
-            if (assocDef.getInstanceLevelAssocTypeUri().equals(assoc.getTypeUri())) {
-                // role types
-                if (assoc.isPlayer(new TopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
-                    assoc.isPlayer(new TopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
-                    return true;
-                }
-            }
+        String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();
+        String assocDefUri = childTypeUri + "#" + assocTypeUri;
+        if (parentType.hasAssocDef(assocDefUri)) {
+            return true;
+        } else if (parentType.hasAssocDef(childTypeUri)) {
+            return parentType.getAssocDef(childTypeUri).getInstanceLevelAssocTypeUri().equals(assocTypeUri);
         }
         return false;
     }
