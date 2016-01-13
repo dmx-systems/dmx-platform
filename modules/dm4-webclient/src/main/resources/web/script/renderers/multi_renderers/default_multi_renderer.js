@@ -1,18 +1,14 @@
-dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
+dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", new function() {
 
-    render_info: function(page_models, parent_element, level) {
-        for (var i = 0; i < page_models.length; i++) {
-            dm4c.render.page_model.render_page_model(page_models[i], dm4c.render.page_model.mode.INFO, level,
-                parent_element)
-        }
-    },
+    this.render_info = function(page_models, parent_element, level) {
+        render_page_models(page_models, parent_element, dm4c.render.page_model.mode.INFO, level)
+    }
 
-    render_form: function(page_models, parent_element, level) {
-        for (var i = 0; i < page_models.length; i++) {
-            dm4c.render.page_model.render_page_model(page_models[i], dm4c.render.page_model.mode.FORM, level,
-                parent_element)
-        }
-        render_add_button(page_models, level, parent_element)
+    this.render_form = function(page_models, parent_element, level) {
+        var single_values_div = $("<div>")      // new instances are added to this element ("Add" button)
+        parent_element.append(single_values_div)
+        render_page_models(page_models, single_values_div, dm4c.render.page_model.mode.FORM, level)
+        render_add_button()
         //
         return function() {
             var values = []
@@ -30,7 +26,7 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
             return values
         }
 
-        function render_add_button(page_models, level, parent_element) {
+        function render_add_button() {
             var topic_type = page_models[0].object_type
             var add_button = dm4c.ui.button({on_click: do_add, label: "Add " + topic_type.value})
             var add_button_div = $("<div>").addClass("add-button").append(add_button)
@@ -46,9 +42,15 @@ dm4c.add_multi_renderer("dm4.webclient.default_multi_renderer", {
                     dm4c.render.page_model.mode.FORM, parent_page_model)
                 page_models.push(page_model)
                 // render page model
-                dm4c.render.page_model.render_page_model(page_model, dm4c.render.page_model.mode.FORM, level,
-                    add_button_div, true)   // incremental=true
+                dm4c.render.page_model.render_page_model(page_model, single_values_div,
+                    dm4c.render.page_model.mode.FORM, level)
             }
+        }
+    }
+
+    function render_page_models(page_models, parent_element, render_mode, level) {
+        for (var i = 0; i < page_models.length; i++) {
+            dm4c.render.page_model.render_page_model(page_models[i], parent_element, render_mode, level)
         }
     }
 })

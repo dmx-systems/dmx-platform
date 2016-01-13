@@ -296,13 +296,12 @@ dm4c.render.page_model = new function() {
      * Renders a page model. Called recursively.
      *
      * @param   page_model      The page model to render (a PageModel object, type SIMPLE or COMPOSITE).
+     * @param   parent_element  The element the rendering is appended to (a jQuery object).
+     *                          Precondition: this element is already attached to the document.
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
      * @param   level           The nesting level (integer). Starts at 0.
-     * @param   ref_element     The page element the rendering is attached to (a jQuery object).
-     *                          Precondition: this element is already part of the DOM.
-     * @param   incremental     (boolean).
      */
-    this.render_page_model = function(page_model, render_mode, level, ref_element, incremental) {
+    this.render_page_model = function(page_model, parent_element, render_mode, level) {
         // Note: if the topic is hidden/locked the page model is undefined
         if (!page_model) {
             return
@@ -312,7 +311,7 @@ dm4c.render.page_model = new function() {
             throw "PageModelError: invalid page model"
         }
         //
-        var box = this.render_box(page_model, ref_element, render_mode, level, incremental, is_removable())
+        var box = this.render_box(page_model, parent_element, render_mode, level, is_removable())
         page_model[render_mode.render_func_name_single](box, level)
 
         // === "Remove" Button ===
@@ -336,15 +335,13 @@ dm4c.render.page_model = new function() {
     /**
      * Renders a box and attaches it to the DOM.
      *
-     * @param   box_type        PageModel.SIMPLE, PageModel.COMPOSITE, or PageModel.MULTI
-     * @param   topic_id        The ID of the topic represented by the box. Undefined in case of PageModel.MULTI
-     * @param   ref_element     The page element to attach the box to (a jQuery object).
-     *                          Precondition: this element is already part of the DOM.
+     * @param   parent_element  The element the box is appended to (a jQuery object).
+     *                          Precondition: this element is already attached to the document.
      */
-    this.render_box = function(page_model, ref_element, render_mode, level, incremental, is_removable) {
+    this.render_box = function(page_model, parent_element, render_mode, level, is_removable) {
         var box = $("<div>").addClass("box")
-        var box_type = page_model.type
-        var topic_id = page_model.object.id
+        var box_type = page_model.type          // SIMPLE, COMPOSITE, or MULTI
+        var topic_id = page_model.object.id     // ID of the topic represented by the box. Undefined for MULTI.
         // Note: a SIMPLE box or a MULTI box doesn't get a "level" class to let it inherit the background color
         box.toggleClass("level" + level, box_type == this.type.COMPOSITE)
         // Note: only a SIMPLE and a COMPOSITE box represents a revealable child topic. A MULTI box does not.
@@ -357,32 +354,28 @@ dm4c.render.page_model = new function() {
             })
         }
         // attach to DOM
-        if (incremental) {
-            ref_element.before(box)
-        } else {
-            ref_element.append(box)
-        }
+        parent_element.append(box)
         //
         if (is_removable) {
-            render_remove_button(box)
+            render_remove_button()
         }
         //
         return box
 
         /**
-         * @param   parent_element  The element the remove button is appended to.
-         *                          This element is removed from the page when the remove button is pressed.
+         * Renders a remove button and appends it to the box.
+         * When the button is pressed the box is removed from the document.
          */
-        function render_remove_button(parent_element) {
+        function render_remove_button() {
             var remove_button = dm4c.ui.button({on_click: do_remove, icon: "circle-minus"})
             var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
-            parent_element.append(remove_button_div)
+            box.append(remove_button_div)
 
             function do_remove() {
                 // update model
                 page_model.object.delete = true
                 // update view
-                parent_element.remove()
+                box.remove()
             }
         }
     }

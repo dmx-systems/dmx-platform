@@ -52,6 +52,6 @@
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object). ### FIXDOC
      */
     function render_page_model(page_model, render_mode) {
-        dm4c.render.page_model.render_page_model(page_model, render_mode, 0, $("#page-content"))
+        dm4c.render.page_model.render_page_model(page_model, $("#page-content"), render_mode, 0)
     }
 })()
