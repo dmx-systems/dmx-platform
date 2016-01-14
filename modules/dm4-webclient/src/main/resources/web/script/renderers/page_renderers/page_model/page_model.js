@@ -5,7 +5,7 @@ dm4c.render.page_model = new function() {
     var self = this
 
     /**
-     * @paran   page_model_type     PageModel.SIMPLE, PageModel.COMPOSITE, or PageModel.MULTI
+     * @paran   page_model_type     SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI
      * @param   object              The object underlying this field (a Topic or an Association). Its "value" is
      *                              rendered through this page model.
      *                              If no underlying object exists in the DB this field is about to be rendered anyway
@@ -37,9 +37,9 @@ dm4c.render.page_model = new function() {
     function PageModel(page_model_type, object, assoc_def, field_uri, parent_page_model) {
 
         var _self = this
-        this.type = page_model_type // page model type (SIMPLE, COMPOSITE, MULTI)
-        this.childs = {}            // used for COMPOSITE: page models (SIMPLE or COMPOSITE or MULTI)
-        this.values = []            // used for MULTI: page models (SIMPLE or COMPOSITE)
+        this.type = page_model_type // page model type (SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI)
+        this.childs = {}            // used for COMPOSITE and RELATED_TOPIC: page models (SIMPLE or COMPOSITE or MULTI)
+        this.values = []            // used for MULTI: page models (SIMPLE, COMPOSITE, or RELATED_TOPIC)
         this.object = object        // the SIMPLE topic, the COMPOSITE topic, or the 1st MULTI topic ### FIXDOC
         this.object_type = object.get_type()
         this.value = object.value
@@ -122,16 +122,13 @@ dm4c.render.page_model = new function() {
         function lookup_renderer() {
             switch (page_model_type) {
             case self.type.SIMPLE:
+            case self.type.COMPOSITE:
                 renderer_uri = dm4c.get_view_config(_self.object_type, "simple_renderer_uri", assoc_def)
                 return dm4c.get_simple_renderer(renderer_uri)
-            case self.type.COMPOSITE:
-                if (has_related_topic_page_model(assoc_def)) {
-                    // Note: in case a related topic model underlies this page model it must always rendered
-                    // by the default composite renderer, and not the object's one. The object may be simple.
-                    renderer_uri = "dm4.webclient.default_composite_renderer"
-                } else {
-                    renderer_uri = dm4c.get_view_config(_self.object_type, "simple_renderer_uri", assoc_def)
-                }
+            case self.type.RELATED_TOPIC:
+                // Note: in case a related topic model underlies this page model it must always rendered
+                // by the default composite renderer, and not the object's one. The object may be simple.
+                renderer_uri = "dm4.webclient.default_composite_renderer"
                 return dm4c.get_simple_renderer(renderer_uri)
             case self.type.MULTI:
                 renderer_uri = dm4c.get_view_config(_self.object_type, "multi_renderer_uri", assoc_def)
@@ -142,26 +139,13 @@ dm4c.render.page_model = new function() {
         }
     }
 
-    function has_related_topic_page_model(assoc_def) {
-        return assoc_def && assoc_def.custom_assoc_type_uri &&
-            dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()
-    }
-
-    /**
-     * A "Related Topic Page Model" is a page model of type COMPOSITE which has exactly 2 childs:
-     *     - "dm4.webclient.topic"
-     *     - "dm4.webclient.relating_assoc"
-     */
-    function is_related_topic_page_model(page_model) {
-        return page_model.childs["dm4.webclient.relating_assoc"]
-    }
-
     // ------------------------------------------------------------------------------------------------------ Public API
 
     this.type = {
         SIMPLE: 1,
         COMPOSITE: 2,
-        MULTI: 3
+        RELATED_TOPIC: 3,
+        MULTI: 4
     }
 
     this.mode = {
@@ -178,8 +162,8 @@ dm4c.render.page_model = new function() {
     }
 
     /**
-     * Creates a page model for a topic or an association.
-     * Depending on the topic's/associatios's type a SIMPLE or a COMPOSITE page model is created.
+     * Creates a page model for a topic or an association. Depending on the topic/associatios type and the assoc def
+     * a SIMPLE, COMPOSITE, or RELATED_TOPIC page model is created.
      *
      * A page model comprises all the information required to render a topic in the page panel (a.k.a. detail
      * panel). ### FIXDOC
@@ -202,14 +186,15 @@ dm4c.render.page_model = new function() {
      *          Undefined is returned if the object is a simple one and is hidden/locked.
      */
     this.create_page_model = function(object, assoc_def, field_uri, render_mode, parent_page_model) {
-        if (has_related_topic_page_model(assoc_def)) {
+        if (has_related_topic_page_model()) {
             return create_related_topic_page_model()
         } else {
             return create_page_model(object, parent_page_model)
         }
 
         function create_related_topic_page_model() {
-            var page_model = new PageModel(self.type.COMPOSITE, object, assoc_def, field_uri, parent_page_model)
+            // A "Related Topic Page Model" has exactly 2 childs: "dm4.webclient.topic", "dm4.webclient.relating_assoc"
+            var page_model = new PageModel(self.type.RELATED_TOPIC, object, assoc_def, field_uri, parent_page_model)
             var relating_assoc = object.assoc && new Association(object.assoc) ||
                 dm4c.empty_association(assoc_def.custom_assoc_type_uri)
             // Note: the Related Topic Page Model is set as the parent for its 2 childs. This is different than
@@ -223,7 +208,7 @@ dm4c.render.page_model = new function() {
         function create_page_model(object, parent_page_model) {
             var object_type = object.get_type()
             if (object_type.is_simple()) {
-                //
+                // for hidden/locked fields the page model remain undefined
                 if (dm4c.get_view_config(object_type, render_mode.render_setting, assoc_def)) {
                     return
                 }
@@ -236,6 +221,11 @@ dm4c.render.page_model = new function() {
                 }
                 return page_model;
             }
+        }
+
+        function has_related_topic_page_model() {
+            return assoc_def && assoc_def.custom_assoc_type_uri &&
+                dm4c.get_association_type(assoc_def.custom_assoc_type_uri).is_composite()
         }
     }
 
@@ -257,7 +247,7 @@ dm4c.render.page_model = new function() {
      */
     this.extend_composite_page_model = function(object, assoc_def, field_uri, render_mode, page_model) {
         var child_topic_type = dm4c.get_topic_type(assoc_def.child_type_uri)
-        //
+        // for hidden/locked fields the page model remain undefined
         if (dm4c.get_view_config(child_topic_type, render_mode.render_setting, assoc_def)) {
             return
         }
@@ -295,7 +285,7 @@ dm4c.render.page_model = new function() {
     /**
      * Renders a page model. Called recursively.
      *
-     * @param   page_model      The page model to render (a PageModel object, type SIMPLE or COMPOSITE).
+     * @param   page_model      The page model to render (a PageModel object, type SIMPLE, COMPOSITE, or RELATED_TOPIC).
      * @param   parent_element  The element the rendering is appended to (a jQuery object).
      *                          Precondition: this element is already attached to the document.
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
@@ -307,7 +297,7 @@ dm4c.render.page_model = new function() {
             return
         }
         //
-        if (page_model.type != this.type.SIMPLE && page_model.type != this.type.COMPOSITE) {
+        if (page_model.type == this.type.MULTI) {
             throw "PageModelError: invalid page model"
         }
         //
@@ -316,8 +306,8 @@ dm4c.render.page_model = new function() {
 
         // === "Remove" Button ===
 
-        // Note: subject of removal is always a SIMPLE or a COMPOSITE, never a MULTI. So, the remove button
-        // aspect is handled here at framework level. In contrast, the "Add" button is always bound to a MULTI.
+        // Note: subject of removal is always a SIMPLE, COMPOSITE, or RELATED_TOPIC, never a MULTI. So, the remove
+        // button aspect is handled here at framework level. In contrast, the "Add" button is always bound to a MULTI.
         // So, the add button aspect is handled by the respective multi renderers.
 
         /**
@@ -327,33 +317,37 @@ dm4c.render.page_model = new function() {
             return render_mode == dm4c.render.page_model.mode.FORM &&
                 page_model.assoc_def &&     // Note: the top-level page model has no assoc_def
                 page_model.assoc_def.child_cardinality_uri == "dm4.core.many" &&
-                !is_related_topic_page_model(page_model.parent)
+                page_model.parent.type != self.type.RELATED_TOPIC
                 // Note: for childs of a Related Topic Page Model the remove button is already rendered there
         }
     }
 
     /**
-     * Renders a box and attaches it to the DOM.
+     * Creates a box (a <div> with class "box") and attaches it to the document.
      *
      * @param   parent_element  The element the box is appended to (a jQuery object).
      *                          Precondition: this element is already attached to the document.
      */
     this.render_box = function(page_model, parent_element, render_mode, level, is_removable) {
         var box = $("<div>").addClass("box")
-        var box_type = page_model.type          // SIMPLE, COMPOSITE, or MULTI
+        var box_type = page_model.type          // SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI
         var topic_id = page_model.object.id     // ID of the topic represented by the box. Undefined for MULTI.
-        // Note: a SIMPLE box or a MULTI box doesn't get a "level" class to let it inherit the background color
-        box.toggleClass("level" + level, box_type == this.type.COMPOSITE)
-        // Note: only a SIMPLE and a COMPOSITE box represents a revealable child topic. A MULTI box does not.
+        //
+        // Note: only a COMPOSITE or RELATED_TOPIC box get a background of increasing darkness.
+        // A SIMPLE or MULTI box inherit the background color from its parent box.
+        if (box_type == this.type.COMPOSITE || box_type == this.type.RELATED_TOPIC) {
+            box.addClass("level" + level)
+        }
+        //
+        // Note: only a SIMPLE, COMPOSITE, or RELATED_TOPIC box represents a revealable topic. A MULTI box does not.
         // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
         // topic's Search Result field.
-        if (render_mode == this.mode.INFO && level == 1 && topic_id != -1 &&
-                            (box_type == this.type.COMPOSITE || box_type == this.type.SIMPLE)) {
+        if (render_mode == this.mode.INFO && level == 1 && topic_id != -1 && box_type != this.type.MULTI) {
             box.addClass("topic").click(function() {
                 dm4c.do_reveal_related_topic(topic_id, "show")
             })
         }
-        // attach to DOM
+        // attach to document
         parent_element.append(box)
         //
         if (is_removable) {
@@ -393,7 +387,8 @@ dm4c.render.page_model = new function() {
      *          on the other hand never represents a topic reference.
      */
     this.build_object_model = function(page_model) {
-        if (page_model.type == self.type.SIMPLE) {
+        switch (page_model.type) {
+        case this.type.SIMPLE:
             var value = page_model.read_form_value()
             // Note: undefined form value is an error (means: simple renderer returned no value). Already thrown.
             // null is a valid form value (means: simple renderer prevents the field from being updated).
@@ -415,21 +410,19 @@ dm4c.render.page_model = new function() {
                 object_model.id = page_model.object.id
             }
             return object_model
-        } else if (page_model.type == self.type.COMPOSITE) {
-            if (is_related_topic_page_model(page_model)) {
-                var topic_model = this.build_object_model(page_model.childs["dm4.webclient.topic"])
-                // Note: if updating the topic field is prevented the relating assoc form input is ignored as well.
-                if (topic_model != null) {
-                    var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
-                    // ### FIXME: check assoc_model for null?
-                    topic_model.assoc = assoc_model
-                }
-                return topic_model
-            } else {
-                var object_model = page_model.read_form_value()
-                return object_model
+        case this.type.COMPOSITE:
+            var object_model = page_model.read_form_value()
+            return object_model
+        case this.type.RELATED_TOPIC:
+            var topic_model = this.build_object_model(page_model.childs["dm4.webclient.topic"])
+            // Note: if updating the topic field is prevented the relating assoc form input is ignored as well.
+            if (topic_model != null) {
+                var assoc_model = this.build_object_model(page_model.childs["dm4.webclient.relating_assoc"])
+                // ### FIXME: check assoc_model for null?
+                topic_model.assoc = assoc_model
             }
-        } else {
+            return topic_model
+        default:
             throw "PageModelError: invalid page model"
         }
 
