@@ -1,0 +1,44 @@
+/* === Date === */
+
+.dm4\.datetime\.month,
+.dm4\.datetime\.day,
+.dm4\.datetime\.year {
+    display: inline-block;
+}
+
+.dm4\.datetime\.day,
+.dm4\.datetime\.year {
+    margin-top: 0 !important;
+    margin-left: 1em;
+}
+
+/* Form */
+
+.dm4\.datetime\.month input,
+.dm4\.datetime\.day   input {
+    width: 2em !important;
+}
+
+.dm4\.datetime\.year input {
+    width: 3em !important;
+}
+
+
+/* === Time === */
+
+.dm4\.datetime\.hour,
+.dm4\.datetime\.minute {
+    display: inline-block;
+}
+
+.dm4\.datetime\.minute {
+    margin-top: 0 !important;
+    margin-left: 1em;
+}
+
+/* Form */
+
+.dm4\.datetime\.hour   input,
+.dm4\.datetime\.minute input {
+    width: 2em !important;
+}
