@@ -293,10 +293,11 @@ function RESTClient(config) {
                 return compare(topic_1.type_uri, topic_2.type_uri)
             } else {
                 // 2nd sort criteria: topic value
-                return compare(topic_1.value.toString().toLowerCase(),
-                               topic_2.value.toString().toLowerCase())
-                // Note 1: toString() is required for non-string topic values
-                // Note 2: to keep things simple we sort everything alphanumerically ### FIXME?
+                if (typeof topic_1.value == "string") {
+                    return compare(topic_1.value.toLowerCase(), topic_2.value.toLowerCase())
+                } else {
+                    return compare(topic_1.value, topic_2.value)
+                }
             }
 
             function compare(val_1, val_2) {
