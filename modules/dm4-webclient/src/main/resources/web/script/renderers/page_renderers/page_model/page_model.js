@@ -126,8 +126,8 @@ dm4c.render.page_model = new function() {
                 renderer_uri = dm4c.get_view_config(_self.object_type, "simple_renderer_uri", assoc_def)
                 return dm4c.get_simple_renderer(renderer_uri)
             case self.type.RELATED_TOPIC:
-                // Note: in case a related topic model underlies this page model it must always rendered
-                // by the default composite renderer, and not the object's one. The object may be simple.
+                // Note: a related topic page model must always be rendered by the default
+                // composite renderer, and not the object's one. The object may be simple.
                 renderer_uri = "dm4.webclient.default_composite_renderer"
                 return dm4c.get_simple_renderer(renderer_uri)
             case self.type.MULTI:
@@ -286,7 +286,7 @@ dm4c.render.page_model = new function() {
      * Renders a page model. Called recursively.
      *
      * @param   page_model      The page model to render (a PageModel object, type SIMPLE, COMPOSITE, or RELATED_TOPIC).
-     * @param   parent_element  The element the rendering is appended to (a jQuery object).
+     * @param   parent_element  The element the rendering is appended to (jQuery object).
      *                          Precondition: this element is already attached to the document.
      * @param   render_mode     this.mode.INFO or this.mode.FORM (object).
      * @param   level           The nesting level (integer). Starts at 0.
@@ -323,22 +323,32 @@ dm4c.render.page_model = new function() {
     }
 
     /**
-     * Creates a box (a <div> with class "box") and attaches it to the document.
+     * Creates a box (a <div> with class "box") that represents an underlying topic and attaches it to the document.
+     * The box fulfills various purposes:
+     *   1) Make the composite structure visible through backgrounds of increasing darkness.
+     *   2) Reveal the underlying topic when clicked. If clickable hint with blue frame on mouseover.
+     *   3) Semantic markup: attach the type URI of the underlying topic as a CSS class.
+     *   4) Show a minus button that removes the box from document and updates the underlying page model.
+     *   5) Layout: adjacent boxes get a margin to separate each other (see webclient.css).
      *
-     * @param   parent_element  The element the box is appended to (a jQuery object).
+     * @param   page_model      The underlying page model (contains the underlying topic)
+     * @param   parent_element  The element the box is appended to (jQuery object).
      *                          Precondition: this element is already attached to the document.
+     *
+     * @return  The created box
      */
     this.render_box = function(page_model, parent_element, render_mode, level, is_removable) {
         var box = $("<div>").addClass("box")
         var box_type = page_model.type          // SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI
         var topic_id = page_model.object.id     // ID of the topic represented by the box. Undefined for MULTI.
         //
+        // 1) Make the composite structure visible
         // Note: only a COMPOSITE or RELATED_TOPIC box get a background of increasing darkness.
         // A SIMPLE or MULTI box inherit the background color from its parent box.
         if (box_type == this.type.COMPOSITE || box_type == this.type.RELATED_TOPIC) {
             box.addClass("level" + level)
         }
-        //
+        // 2) Reveal underlying topic when box is clicked
         // Note: only a SIMPLE, COMPOSITE, or RELATED_TOPIC box represents a revealable topic. A MULTI box does not.
         // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
         // topic's Search Result field.
@@ -347,31 +357,24 @@ dm4c.render.page_model = new function() {
                 dm4c.do_reveal_related_topic(topic_id, "show")
             })
         }
+        // 3) Semantic markup
+        if (box_type == this.type.SIMPLE || box_type == this.type.COMPOSITE) {
+            box.addClass(page_model.object.type_uri)
+        }
+        // 4) Render remove button
+        if (is_removable) {
+            box.append($("<div>").addClass("remove-button").append(dm4c.ui.button({
+                icon: "circle-minus",
+                on_click: function() {
+                    page_model.object.delete = true     // update model
+                    box.remove()                        // update view
+                }
+            })))
+        }
         // attach to document
         parent_element.append(box)
         //
-        if (is_removable) {
-            render_remove_button()
-        }
-        //
         return box
-
-        /**
-         * Renders a remove button and appends it to the box.
-         * When the button is pressed the box is removed from the document.
-         */
-        function render_remove_button() {
-            var remove_button = dm4c.ui.button({on_click: do_remove, icon: "circle-minus"})
-            var remove_button_div = $("<div>").addClass("remove-button").append(remove_button)
-            box.append(remove_button_div)
-
-            function do_remove() {
-                // update model
-                page_model.object.delete = true
-                // update view
-                box.remove()
-            }
-        }
     }
 
     /**
