@@ -4,20 +4,15 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
 /**
- * Collection of the data that makes up an {@link AssociationType}.
+ * Data that underlies a {@link AssociationType}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class AssociationTypeModel extends TypeModel {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

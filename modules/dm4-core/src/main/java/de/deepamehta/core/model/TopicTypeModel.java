@@ -4,29 +4,20 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
 /**
- * Collection of the data that makes up a {@link TopicType}.
+ * Data that underlies a {@link TopicType}.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
 public class TopicTypeModel extends TypeModel {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     public TopicTypeModel(String uri, String value, String dataTypeUri) {
-        this(uri, "dm4.core.topic_type", value, dataTypeUri);
-    }
-
-    public TopicTypeModel(String uri, String topicTypeUri, String value, String dataTypeUri) {
-        super(uri, topicTypeUri, new SimpleValue(value), dataTypeUri);
+        super(uri, "dm4.core.topic_type", new SimpleValue(value), dataTypeUri);
     }
 
     public TopicTypeModel(TopicModel topic, String dataTypeUri, List<IndexMode> indexModes,

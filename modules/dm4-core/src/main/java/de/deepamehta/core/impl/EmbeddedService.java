@@ -1005,7 +1005,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void bootstrapTypeCache() {
-        typeCache.putTopicType(new AttachedTopicType(new TopicTypeModel("dm4.core.meta_meta_type",
-            "dm4.core.meta_meta_meta_type", "Meta Meta Type", "dm4.core.text"), this));
+        TopicTypeModel metaMetaType = new TopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type", "dm4.core.text");
+        metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
+        typeCache.putTopicType(new AttachedTopicType(metaMetaType, this));
     }
 }

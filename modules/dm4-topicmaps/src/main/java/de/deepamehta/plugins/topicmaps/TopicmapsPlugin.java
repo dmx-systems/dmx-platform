@@ -81,16 +81,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     @POST
-    @Path("/{name}/{topicmap_renderer_uri}")
     @Transactional
     @Override
-    public Topic createTopicmap(@PathParam("name") String name,
-                                @PathParam("topicmap_renderer_uri") String topicmapRendererUri) {
-        ChildTopicsModel topicmapState = getTopicmapRenderer(topicmapRendererUri).initialTopicmapState();
+    public Topic createTopicmap(@QueryParam("name") String name,
+                                @QueryParam("renderer_uri") String topicmapRendererUri,
+                                @QueryParam("private") boolean isPrivate) {
+        logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
+            "\", isPrivate=" + isPrivate +")");
         return dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new ChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.state", topicmapState)
+            .put("dm4.topicmaps.private", isPrivate)
+            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState())
         ));
     }
 

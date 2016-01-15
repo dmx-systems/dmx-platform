@@ -59,6 +59,24 @@ function GUIToolkit(config) {
 
 
 
+    // === Checkbox ===
+
+    this.checkbox = function(checked) {
+        var checkbox = $("<input type='checkbox'>")
+        if (checked) {
+            checkbox.attr("checked", "checked")
+        }
+        return {
+            dom: checkbox,
+
+            get checked() {
+                return checkbox.get(0).checked
+            }
+        }
+    }
+
+
+
     // === Dialog Box ===
 
     /**
@@ -415,8 +433,6 @@ function GUIToolkit(config) {
             }
         }
     }
-
-    // ------------------------------------------------------------------------------------------------------ Public API
 
     /**
      * Creates and returns a menu.

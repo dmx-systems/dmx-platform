@@ -16,7 +16,7 @@ public interface TopicmapsService {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    Topic createTopicmap(String name, String topicmapRendererUri);
+    Topic createTopicmap(String name, String topicmapRendererUri, boolean isPrivate);
 
     // ---
 

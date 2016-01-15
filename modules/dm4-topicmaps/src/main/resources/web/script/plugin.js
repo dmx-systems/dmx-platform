@@ -27,8 +27,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     // === REST Client Extension ===
 
-    dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri) {
-        return this.request("POST", "/topicmap/" + encodeURIComponent(name) + "/" + topicmap_renderer_uri)
+    dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri, private) {
+        var params = this.createRequestParameter({
+            name:         name,
+            renderer_uri: topicmap_renderer_uri,
+            private:      private,
+        })
+        return this.request("POST", "/topicmap" + params.to_query_string())
     }
 
     /**
@@ -250,8 +255,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * @return  the topicmap topic.
      */
-    this.create_topicmap = function(name, topicmap_renderer_uri) {
-        return create_topicmap(name, topicmap_renderer_uri)
+    this.create_topicmap = function(name, topicmap_renderer_uri, private) {
+        return create_topicmap(name, topicmap_renderer_uri, private)
     }
 
     /**
@@ -294,9 +299,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * @return  the topicmap topic.
      */
-    function create_topicmap(name, topicmap_renderer_uri) {
+    function create_topicmap(name, topicmap_renderer_uri, private) {
         // update DB
-        var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri)
+        var topicmap_topic = create_topicmap_topic(name, topicmap_renderer_uri, private)
         // update model + view
         add_topicmap(topicmap_topic.id)
         //
@@ -312,8 +317,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *
      * @return  The created Topicmap topic.
      */
-    function create_topicmap_topic(name, topicmap_renderer_uri) {
-        return dm4c.restc.create_topicmap(name, topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer")
+    function create_topicmap_topic(name, topicmap_renderer_uri, private) {
+        return dm4c.restc.create_topicmap(name, topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer",
+            private)
     }
 
     /**
@@ -453,7 +459,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
         // create default topicmap
         if (!topics.length) {
-            var topicmap_topic = create_topicmap_topic("untitled")
+            var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
             console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
             topics.push(topicmap_topic)
         }
@@ -631,10 +637,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     function open_topicmap_dialog() {
         var title_input = dm4c.render.input(undefined, 30)
         var type_menu = create_maptype_menu()
+        var private_checkbox = dm4c.ui.checkbox(true)    // checked=true
         var dialog_content = dm4c.render.label("Title").add(title_input)
         if (type_menu.get_item_count() > 1) {
             dialog_content = dialog_content.add(dm4c.render.label("Type")).add(type_menu.dom)
         }
+        dialog_content = dialog_content.add(dm4c.render.label("Private")).add(private_checkbox.dom)
+        //
         dm4c.ui.dialog({
             title: "New Topicmap",
             content: dialog_content,
@@ -654,7 +663,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         function do_create_topicmap() {
             var name = title_input.val()
             var topicmap_renderer_uri = type_menu.get_selection().value
-            create_topicmap(name, topicmap_renderer_uri)
+            var private = private_checkbox.checked
+            create_topicmap(name, topicmap_renderer_uri, private)
         }
     }
 })
