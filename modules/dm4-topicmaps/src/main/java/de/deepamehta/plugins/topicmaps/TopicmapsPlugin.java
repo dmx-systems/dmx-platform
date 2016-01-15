@@ -372,7 +372,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void storeViewProperties(Association mapcontextAssoc, ViewProperties viewProps) {
-        for (String propUri : viewProps.propUris()) {
+        for (String propUri : viewProps) {
             mapcontextAssoc.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
         }
     }

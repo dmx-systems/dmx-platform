@@ -62,7 +62,7 @@ public class TopicViewmodel extends TopicModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("view_props", viewProps);
+            o.put("view_props", viewProps.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

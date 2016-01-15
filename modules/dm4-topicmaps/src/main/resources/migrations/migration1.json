@@ -1,101 +1,101 @@
 {
-    topic_types: [
+    "topic_types": [
         {
-            value:           "Name",
-            uri:             "dm4.topicmaps.name",
-            data_type_uri:   "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+            "value":           "Name",
+            "uri":             "dm4.topicmaps.name",
+            "data_type_uri":   "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
-            value:           "Description",
-            uri:             "dm4.topicmaps.description",
-            data_type_uri:   "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value":           "Description",
+            "uri":             "dm4.topicmaps.description",
+            "data_type_uri":   "dm4.core.html",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value:           "Topicmap Renderer URI",
-            uri:             "dm4.topicmaps.topicmap_renderer_uri",
-            data_type_uri:   "dm4.core.text",
-            view_config_topics: [
+            "value":           "Topicmap Renderer URI",
+            "uri":             "dm4.topicmaps.topicmap_renderer_uri",
+            "data_type_uri":   "dm4.core.text",
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.hidden: true,
-                        dm4.webclient.locked: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.hidden": true,
+                        "dm4.webclient.locked": true
                     }
                 }
             ]
         },
         {
-            value:           "Topicmap",
-            uri:             "dm4.topicmaps.topicmap",
-            data_type_uri:   "dm4.core.composite",
-            assoc_defs: [
+            "value":           "Topicmap",
+            "uri":             "dm4.topicmaps.topicmap",
+            "data_type_uri":   "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.topicmaps.name",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.topicmaps.name",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.topicmaps.description",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.topicmaps.description",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.topicmaps.topicmap_renderer_uri",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.topicmaps.topicmap_renderer_uri",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:         "dm4.files.file",
-                    child_cardinality_uri:  "dm4.core.one",
-                    parent_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:         "dm4.core.aggregation_def",
-                    view_config_topics: [
+                    "child_type_uri":         "dm4.files.file",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "view_config_topics": [
                         {
-                            type_uri: "dm4.webclient.view_config",
-                            childs: {
-                                dm4.webclient.hidden: true
+                            "type_uri": "dm4.webclient.view_config",
+                            "childs": {
+                                "dm4.webclient.hidden": true
                             }
                         }
                     ]
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.icon: "/de.deepamehta.topicmaps/images/network.png"
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.icon": "/de.deepamehta.topicmaps/images/network.png"
                     }
                 }
             ]
         }
     ],
 
-    assoc_types: [
+    "assoc_types": [
         {
-            value:         "Topic Mapcontext",
-            uri:           "dm4.topicmaps.topic_mapcontext",
-            data_type_uri: "dm4.core.text"
+            "value":         "Topic Mapcontext",
+            "uri":           "dm4.topicmaps.topic_mapcontext",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value:         "Association Mapcontext",
-            uri:           "dm4.topicmaps.association_mapcontext",
-            data_type_uri: "dm4.core.text"
+            "value":         "Association Mapcontext",
+            "uri":           "dm4.topicmaps.association_mapcontext",
+            "data_type_uri": "dm4.core.text"
         }
     ],
 
-    topics: [
+    "topics": [
         ### Role Types ###
         {
-            value:    "Topicmap Topic",
-            uri:      "dm4.topicmaps.topicmap_topic",
-            type_uri: "dm4.core.role_type"
+            "value":    "Topicmap Topic",
+            "uri":      "dm4.topicmaps.topicmap_topic",
+            "type_uri": "dm4.core.role_type"
         },
         {
-            value:    "Topicmap Association",
-            uri:      "dm4.topicmaps.topicmap_association",
-            type_uri: "dm4.core.role_type"
+            "value":    "Topicmap Association",
+            "uri":      "dm4.topicmaps.topicmap_association",
+            "type_uri": "dm4.core.role_type"
         }
     ]
 }
