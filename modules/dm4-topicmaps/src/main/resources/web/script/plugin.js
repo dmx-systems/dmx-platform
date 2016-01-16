@@ -456,7 +456,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
-        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
+        var topics = dm4c.restc.get_topicmaps(workspace_id, true)   // include_childs=true (Access Control service)
         // create default topicmap
         if (!topics.length) {
             var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
@@ -668,3 +668,5 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     }
 })
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=topicmaps_plugin.js

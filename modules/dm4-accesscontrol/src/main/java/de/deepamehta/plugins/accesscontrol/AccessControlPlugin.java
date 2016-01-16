@@ -29,6 +29,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
@@ -69,6 +70,7 @@ import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -327,6 +329,26 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public boolean isMember(String username, long workspaceId) {
         return dms.getAccessControl().isMember(username, workspaceId);
+    }
+
+
+
+    // === Topicmaps ===
+
+    @GET
+    @Path("/workspace/{workspace_id}/topicmaps")
+    @Override
+    public ResultList<RelatedTopic> getTopicmaps(@PathParam("workspace_id") long workspaceId) {
+        ResultList<RelatedTopic> topicmaps = wsService.getAssignedTopics(workspaceId, "dm4.topicmaps.topicmap");
+        // filter topicmaps according to Private flag
+        Iterator<RelatedTopic> i = topicmaps.iterator();
+        while (i.hasNext()) {
+            Topic topicmap = i.next();
+            if (isTopicmapPrivate(topicmap) && !isCreator(topicmap.getId())) {
+                i.remove();
+            }
+        }
+        return topicmaps;
     }
 
 
@@ -601,6 +623,19 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Assigning search topic to workspace failed", e);
         }
+    }
+
+    // --- Topicmaps ---
+
+    private boolean isTopicmapPrivate(Topic topicmap) {
+        // Note: migrated topicmaps might not have a Private child topic ### TODO?
+        Boolean isPrivate = topicmap.getChildTopics().getBooleanOrNull("dm4.topicmaps.private");
+        return isPrivate != null ? isPrivate : false;
+    }
+
+    private boolean isCreator(long objectId) {
+        String username = getUsername();
+        return username != null ? username.equals(getCreator(objectId)) : false;
     }
 
     // --- Disk quota ---

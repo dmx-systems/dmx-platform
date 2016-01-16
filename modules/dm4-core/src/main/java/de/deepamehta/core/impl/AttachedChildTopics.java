@@ -342,8 +342,7 @@ class AttachedChildTopics implements ChildTopics {
             recalculateParentLabel();
             //
         } catch (Exception e) {
-            throw new RuntimeException("Updating the child topics of " + parent.className() + " " + parent.getId() +
-                " failed", e);
+            throw new RuntimeException("Updating the child topics of " + parentInfo() + " failed", e);
         }
     }
 
@@ -392,8 +391,8 @@ class AttachedChildTopics implements ChildTopics {
         try {
             loadChildTopics(getAssocDef(assocDefUri));
         } catch (Exception e) {
-            throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + parent.className() + " " +
-                parent.getId() + " failed", e);
+            throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + parentInfo() + " failed",
+                e);
         }
     }
 
@@ -413,8 +412,7 @@ class AttachedChildTopics implements ChildTopics {
     private void loadChildTopics(AssociationDefinition assocDef) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!has(assocDefUri)) {
-            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + parent.className() + " " +
-                parent.getId());
+            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + parentInfo());
             dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
             initChildTopics(assocDefUri);
         }
@@ -433,7 +431,7 @@ class AttachedChildTopics implements ChildTopics {
             //
             dms.valueStorage.recalculateLabel(parent);
         } catch (Exception e) {
-            throw new RuntimeException("Recalculating the label of " + parent.className() + " " + parent.getId() +
+            throw new RuntimeException("Recalculating the label of " + parentInfo() +
                 " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
         }
     }
@@ -543,7 +541,7 @@ class AttachedChildTopics implements ChildTopics {
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                parent.className() + " " + parent.getId() + " according to " + assocDef);
+                parentInfo() + " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);
@@ -555,7 +553,7 @@ class AttachedChildTopics implements ChildTopics {
         //
         if (childTopic == null) {
             throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                parent.className() + " " + parent.getId() + " according to " + assocDef);
+                parentInfo() + " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);
@@ -701,7 +699,8 @@ class AttachedChildTopics implements ChildTopics {
         RelatedTopic topic = _getTopicOrNull(assocDefUri);
         // error check
         if (topic == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet() +
+                " (" + parentInfo() + ")");
         }
         //
         return topic;
@@ -722,7 +721,8 @@ class AttachedChildTopics implements ChildTopics {
         List<RelatedTopic> topics = _getTopicsOrNull(assocDefUri);
         // error check
         if (topics == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet() +
+                " (" + parentInfo() + ")");
         }
         //
         return topics;
@@ -899,5 +899,11 @@ class AttachedChildTopics implements ChildTopics {
         } catch (Exception e) {
             throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
         }
+    }
+
+    // ---
+
+    private String parentInfo() {
+        return parent.className() + " " + parent.getId();
     }
 }
