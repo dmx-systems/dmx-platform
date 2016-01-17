@@ -183,14 +183,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     dm4c.add_listener("post_select_workspace", function(workspace_id) {
         // 1) update model
         //
-        // topicmap permissions are refreshed in the course of refetching the topicmap topics
-        fetch_topicmap_topics()
+        // load topicmap topics for that workspace, if not done already
+        if (!get_topicmap_topics()) {
+            fetch_topicmap_topics()
+        }
         //
-        // restore the topicmap that was recently selected in that workspace
+        // restore recently selected topicmap for that workspace
         var topicmap_id = selected_topicmap_ids[workspace_id]
-        // choose an alternate topicmap if either no topicmap was selected in that workspace ever,
-        // or if the formerly selected topicmap is not available anymore. The latter happens e.g.
-        // if the user logs out while a public/common workspace and a private topicmap is selected.
+        // choose an alternate topicmap if either no topicmap was selected in that workspace ever, or if
+        // the formerly selected topicmap is not available anymore. The latter is the case e.g. when the
+        // user logs out while a public/common workspace and a private topicmap is selected.
         if (!topicmap_id || !get_topicmap_topic(topicmap_id)) {
             topicmap_id = get_first_topicmap_id()
         }
@@ -206,16 +208,39 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Access Control Listeners ===
 
     dm4c.add_listener("logged_in", function(username) {
-        fetch_topicmap_topics_and_refresh_menu()
-        // Note: the topicmap permissions are refreshed in the course of refetching the topicmap topics.
+        // 1) update model
         //
+        // Note: a user can have private topicmaps in several workspaces.
+        // So, when the authority changes the topicmap topics for ALL workspaces must be invalidated.
+        clear_topicmap_topics()
+        // Note: when the authority changes the contents of ALL topicmaps in ALL workspaces are affected.
+        // So, the entire topicmap cache must be invalidated.
         clear_topicmap_cache()
+        //
+        // Note: when logging in the user always stays in the selected workspace.
+        // The workspace is never programmatically switched in response to a login.
+        // So, we refetch the topicmap topics for the CURRENT workspace.
+        fetch_topicmap_topics()
+        // Note: when logging in the user always stays in the selected topicmap.
+        // The topic is never programmatically switched in response to a login.
+        // So, we reload the CURRENT topicmap.
         reload_topicmap()
+        //
+        // 2) update view
+        refresh_topicmap_menu()
+        display_topicmap()
     })
 
     dm4c.add_listener("authority_decreased", function() {
+        // Note: a user can have private topicmaps in several workspaces.
+        // So, when the authority changes the topicmap topics for ALL workspaces must be invalidated.
+        clear_topicmap_topics()
+        // Note: when the authority changes the contents of ALL topicmaps in ALL workspaces are affected.
+        // So, the entire topicmap cache must be invalidated.
         clear_topicmap_cache()
-        // Note: the topicmap is switched/reloaded by the "post_select_workspace" listener (above)
+        //
+        // Note: when the authority decreases the workspace and/or the topicmap may programmatically switch.
+        // The topicmap menu and the topicmap is refreshed by the "post_select_workspace" listener (above)
     })
 
 
@@ -342,19 +367,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         display_topicmap()
     }
 
-    /**
-     * Reloads the current topicmap from DB and displays it.
-     */
-    function reload_topicmap() {
-        // 1) update model
-        // Note: the cookie and the renderer are already up-to-date
-        var topicmap_id = topicmap.get_id()
-        invalidate_topicmap_cache(topicmap_id)
-        topicmap = get_topicmap(topicmap_id)
-        // 2) update view
-        display_topicmap()
-    }
-
     function fetch_topicmap_topics_and_refresh_menu() {
         // update model
         fetch_topicmap_topics()
@@ -438,31 +450,38 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Returns a topicmap from the cache.
-     * If not in cache, the topicmap is loaded and cached before.
+     * If not in cache, the topicmap is loaded from DB (and then cached).
      */
     function get_topicmap(topicmap_id) {
         var topicmap = topicmap_cache[topicmap_id]
         if (!topicmap) {
             topicmap = load_topicmap(topicmap_id)
+            topicmap_cache[topicmap_id] = topicmap
         }
         return topicmap
     }
 
     /**
-     * Loads a topicmap from DB and caches it.
+     * Loads a topicmap from DB.
      * <p>
      * Prerequisite: the topicmap renderer responsible for loading is already set.
      *
      * @return  the loaded topicmap (a TopicmapViewmodel).
      */
     function load_topicmap(topicmap_id) {
-        var config = {
+        return topicmap_renderer.load_topicmap(topicmap_id, {
             is_writable: dm4c.has_write_permission_for_topic(topicmap_id)
-        }
-        var topicmap = topicmap_renderer.load_topicmap(topicmap_id, config)
-        put_in_cache(topicmap)
-        //
-        return topicmap
+        })
+    }
+
+    /**
+     * Reloads the current topicmap from DB.
+     */
+    function reload_topicmap() {
+        // Note: the cookie and the renderer are already up-to-date
+        var topicmap_id = topicmap.get_id()
+        invalidate_topicmap_cache(topicmap_id)
+        topicmap = get_topicmap(topicmap_id)
     }
 
     // ---
@@ -475,6 +494,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
+        console.log("Loading topicmap topics for workspace", workspace_id)
         var topics = dm4c.restc.get_topicmaps(workspace_id, true)   // include_childs=true (Access Control service)
         // create default topicmap
         if (!topics.length) {
@@ -488,7 +508,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     /**
-     * Looks up the topicmap topics for the selected workspace from the model and returns them.
+     * Returns the loaded topicmap topics for the selected workspace.
      */
     function get_topicmap_topics() {
         return topicmap_topics[get_selected_workspace_id()]
@@ -501,6 +521,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
         return topicmap_topic.id
     }
+
+    function clear_topicmap_topics() {
+        topicmap_topics = {}
+    }
+
+    // ---
 
     function get_selected_topicmap_id() {
         var topicmap_id = selected_topicmap_ids[get_selected_workspace_id()]
@@ -537,10 +563,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
 
     // === Topicmap Cache ===
-
-    function put_in_cache(topicmap) {
-        topicmap_cache[topicmap.get_id()] = topicmap
-    }
 
     function clear_topicmap_cache() {
         topicmap_cache = {}

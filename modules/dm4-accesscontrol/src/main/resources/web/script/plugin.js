@@ -1,5 +1,18 @@
 dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 
+    /**
+     * Key is a topic/association ID.
+     * Value is an object:
+     *     {
+     *         "dm4.accesscontrol.operation.write": true
+     *     }
+     *
+     * Note: at client-side there is no explicit READ permission.
+     * The Webclient never gets hold of an object the user is not allowed to read.
+     * The server would not send it in the first place.
+     */
+    var permissions_cache = {}
+
     var ENCODED_PASSWORD_PREFIX = "-SHA256-"
     var system_workspace_id                     // constant
     var self = this
@@ -418,19 +431,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     }
 
     // === Permissions Cache ===
-
-    /**
-     * Key is a topic/association ID.
-     * Value is an object:
-     *     {
-     *         "dm4.accesscontrol.operation.write": true
-     *     }
-     *
-     * Note: at client-side there is no explicit READ permission.
-     * The Webclient never gets hold of an object the user is not allowed to read.
-     * The server would not send it in the first place.
-     */
-    var permissions_cache = {}
 
     function get_topic_permissions(topic_id) {
         return get_permissions(topic_id, dm4c.restc.get_topic_permissions, "topic")
