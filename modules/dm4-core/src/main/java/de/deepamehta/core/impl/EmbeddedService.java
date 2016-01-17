@@ -162,7 +162,8 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             getTopic(model.getId()).update(model);
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic failed (" + model + ")", e);
+            throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
+                "\")", e);
         }
     }
 
@@ -298,7 +299,8 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             getAssociation(model.getId()).update(model);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association failed (" + model + ")", e);
+            throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
+                model.getTypeUri() + "\")", e);
         }
     }
 
@@ -773,7 +775,8 @@ public class EmbeddedService implements DeepaMehtaService {
             fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic failed (" + model + ")", e);
+            throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
+                "\")", e);
         }
     }
 

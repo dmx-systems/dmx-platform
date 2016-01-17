@@ -69,7 +69,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
         // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
         // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
         // Per request exactly one association is updated. Its childs are always topics (never associations).
-        logger.info("Updating association " + getId() + " (new " + model + ")");
+        logger.info("Updating association " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
         //
         dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
         //

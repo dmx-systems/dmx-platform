@@ -178,7 +178,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
     void _update(TopicModel model) {
-        logger.info("Updating topic " + getId() + " (new " + model + ")");
+        logger.info("Updating topic " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
         //
         dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
         //

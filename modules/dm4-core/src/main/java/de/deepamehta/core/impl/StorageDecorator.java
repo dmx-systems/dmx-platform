@@ -86,7 +86,8 @@ public class StorageDecorator {
     /**
      * Creates a topic.
      * <p>
-     * The topic's URI is stored and indexed.
+     * Actually only the topic URI and type URI are stored and indexed.
+     * The topic value is not stored.
      *
      * @return  FIXDOC ### the created topic. Note:
      *          - the topic URI   is initialzed and     persisted.

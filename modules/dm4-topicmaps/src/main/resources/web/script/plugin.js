@@ -222,7 +222,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // So, we refetch the topicmap topics for the CURRENT workspace.
         fetch_topicmap_topics()
         // Note: when logging in the user always stays in the selected topicmap.
-        // The topic is never programmatically switched in response to a login.
+        // The topicmap is never programmatically switched in response to a login.
         // So, we reload the CURRENT topicmap.
         reload_topicmap()
         //
@@ -239,7 +239,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // So, the entire topicmap cache must be invalidated.
         clear_topicmap_cache()
         //
-        // Note: when the authority decreases the workspace and/or the topicmap may programmatically switch.
+        // Note: when the authority decreases the workspace and/or the topicmap may switch programmatically.
         // The topicmap menu and the topicmap is refreshed by the "post_select_workspace" listener (above)
     })
 
