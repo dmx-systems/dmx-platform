@@ -181,15 +181,22 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Workspace Listeners ===
 
     dm4c.add_listener("post_select_workspace", function(workspace_id) {
-        // update model
-        fetch_topicmap_topics() // topicmap permissions are refreshed in the course of refetching the topicmap topics
+        // 1) update model
         //
+        // topicmap permissions are refreshed in the course of refetching the topicmap topics
+        fetch_topicmap_topics()
+        //
+        // restore the topicmap that was recently selected in that workspace
         var topicmap_id = selected_topicmap_ids[workspace_id]
-        if (!topicmap_id) {
+        // choose an alternate topicmap if either no topicmap was selected in that workspace ever,
+        // or if the formerly selected topicmap is not available anymore. The latter happens e.g.
+        // if the user logs out while a public/common workspace and a private topicmap is selected.
+        if (!topicmap_id || !get_topicmap_topic(topicmap_id)) {
             topicmap_id = get_first_topicmap_id()
         }
         set_selected_topicmap(topicmap_id)
-        // update view
+        //
+        // 2) update view
         refresh_topicmap_menu()
         display_topicmap()
     })
@@ -395,7 +402,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // 2) update "topicmap_renderer"
         // Note: the renderer must be set *before* the topicmap is loaded.
         // The renderer is responsible for loading.
-        var renderer_uri = get_topicmap_topic(topicmap_id).get("dm4.topicmaps.topicmap_renderer_uri")
+        var renderer_uri = get_topicmap_topic_or_throw(topicmap_id).get("dm4.topicmaps.topicmap_renderer_uri")
         topicmap_renderer = get_topicmap_renderer(renderer_uri)
         //
         // 3) update "topicmap" and "selected_topicmap_ids"
@@ -404,17 +411,29 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     /**
-     * Looks up a topicmap topic from the model and returns it.
-     * <p>
-     * Prerequisite: the specified topicmap must be assigned to the currently selected workspace.
+     * Looks up a topicmap topic for the selected workspace.
+     * If no such topicmap is available in the selected workspace an exception is thrown.
+     *
+     * @return  the topicmap topic.
      */
-    function get_topicmap_topic(topicmap_id) {
-        var topicmap_topic = find_topic(get_topicmap_topics(), topicmap_id)
+    function get_topicmap_topic_or_throw(topicmap_id) {
+        var topicmap_topic = get_topicmap_topic(topicmap_id)
         if (!topicmap_topic) {
             throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " +
                 get_selected_workspace_id()
         }
         return topicmap_topic
+    }
+
+    /**
+     * Looks up a topicmap topic for the selected workspace.
+     *
+     * @return  the topicmap topic, or undefined if no such topicmap is available in the selected workspace.
+     */
+    function get_topicmap_topic(topicmap_id) {
+        return js.find(get_topicmap_topics(), function(topic) {
+            return topic.id == topicmap_id
+        })
     }
 
     /**
@@ -513,16 +532,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         for (var renderer_uri in topicmap_renderers) {
             visitor_func(topicmap_renderers[renderer_uri])
         }
-    }
-
-
-
-    // === Helper ===
-
-    function find_topic(topics, id) {
-        return js.find(topics, function(topic) {
-            return topic.id == id
-        })
     }
 
 

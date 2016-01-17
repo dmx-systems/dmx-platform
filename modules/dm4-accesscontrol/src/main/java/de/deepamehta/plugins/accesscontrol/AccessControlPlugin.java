@@ -340,7 +340,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public ResultList<RelatedTopic> getTopicmaps(@PathParam("workspace_id") long workspaceId) {
         ResultList<RelatedTopic> topicmaps = wsService.getAssignedTopics(workspaceId, "dm4.topicmaps.topicmap");
-        // filter topicmaps according to Private flag
+        // filter topicmaps according to Private flag and creator
         Iterator<RelatedTopic> i = topicmaps.iterator();
         while (i.hasNext()) {
             Topic topicmap = i.next();
