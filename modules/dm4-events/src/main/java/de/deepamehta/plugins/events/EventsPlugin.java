@@ -1,15 +1,14 @@
 package de.deepamehta.plugins.events;
 
-// import de.deepamehta.core.Association;
-// import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
-// import de.deepamehta.core.Role;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
-// import de.deepamehta.core.service.event.PostCreateAssociationListener;
-import de.deepamehta.core.service.event.PreCreateAssociationListener;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.event.PreCreateAssociationListener;
+import de.deepamehta.plugins.time.TimeService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -27,6 +26,9 @@ import java.util.logging.Logger;
 public class EventsPlugin extends PluginActivator implements EventsService, PreCreateAssociationListener {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    @Inject
+    private TimeService timeService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -77,7 +79,9 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
             roles[1].setRoleTypeUri("dm4.core.child");
             //
             long eventId = roles[0].getPlayerId();
-            dms.getTopic(eventId).getChildTopics().getTopic("dm4.contacts.address").getRelatingAssociation().delete();
+            Topic event = dms.getTopic(eventId);
+            event.getChildTopics().getTopic("dm4.contacts.address").getRelatingAssociation().delete();
+            timeService.setModified(event);
         }
     }    
 
@@ -104,26 +108,4 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
         }
         return m1 ? rm1 : m2 ? rm2 : null;
     }
-
-    /* private Role[] getRoles(Association assoc, String topicTypeUri1, String topicTypeUri2) {
-        Role r1 = assoc.getRole1();
-        Role r2 = assoc.getRole2();
-        DeepaMehtaObject p1 = r1.getPlayer();
-        DeepaMehtaObject p2 = r2.getPlayer();
-        Role role1 = getRole(r1, r2, p1, p2, topicTypeUri1);
-        Role role2 = getRole(r1, r2, p1, p2, topicTypeUri2);
-        if (role1 != null && role2 != null) {
-            return new Role[] {role1, role2};
-        }
-        return null;
-    }
-
-    private Role getRole(Role r1, Role r2, DeepaMehtaObject p1, DeepaMehtaObject p2, String topicTypeUri) {
-        boolean m1 = p1.getTypeUri().equals(topicTypeUri);
-        boolean m2 = p2.getTypeUri().equals(topicTypeUri);
-        if (m1 && m2) {
-            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri + "\"");
-        }
-        return m1 ? r1 : m2 ? r2 : null;
-    } */
 }

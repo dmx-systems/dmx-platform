@@ -209,16 +209,8 @@ function RenderHelper() {
      * @param   page_model      a boolean value or a TopicRenderer.PageModel of a boolean topic.
      */
     this.checkbox = function(page_model) {
-        var checkbox = $("<input type='checkbox'>")
-        if (typeof(page_model) == "boolean") {
-            var checked = page_model
-        } else {
-            var checked = page_model.value
-        }
-        if (checked) {
-            checkbox.attr("checked", "checked")
-        }
-        return checkbox
+        var checked = typeof(page_model) == "boolean" ? page_model : page_model.value
+        return dm4c.ui.checkbox(checked).dom
     }
 
     // ---
