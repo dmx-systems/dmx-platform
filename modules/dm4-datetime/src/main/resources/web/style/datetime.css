@@ -1,13 +1,13 @@
 /* === Date === */
 
-.dm4\.datetime\.month,
-.dm4\.datetime\.day,
-.dm4\.datetime\.year {
+.dm4\.datetime\.date .dm4\.datetime\.month,
+.dm4\.datetime\.date .dm4\.datetime\.day,
+.dm4\.datetime\.date .dm4\.datetime\.year {
     display: inline-block;
 }
 
-.dm4\.datetime\.day,
-.dm4\.datetime\.year {
+.dm4\.datetime\.date .dm4\.datetime\.day,
+.dm4\.datetime\.date .dm4\.datetime\.year {
     margin-top: 0 !important;
     margin-left: 1em;
 }
@@ -26,12 +26,12 @@
 
 /* === Time === */
 
-.dm4\.datetime\.hour,
-.dm4\.datetime\.minute {
+.dm4\.datetime\.time .dm4\.datetime\.hour,
+.dm4\.datetime\.time .dm4\.datetime\.minute {
     display: inline-block;
 }
 
-.dm4\.datetime\.minute {
+.dm4\.datetime\.time .dm4\.datetime\.minute {
     margin-top: 0 !important;
     margin-left: 1em;
 }
