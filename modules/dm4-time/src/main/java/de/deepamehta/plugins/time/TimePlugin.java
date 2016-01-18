@@ -92,6 +92,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         return dms.hasProperty(objectId, PROP_MODIFIED) ? (Long) dms.getProperty(objectId, PROP_MODIFIED) : 0;
     }
 
+    // ---
+
+    @Override
+    public void setModified(DeepaMehtaObject object) {
+        storeTimestamp(object);
+    }
+
 
 
     // === Retrieval ===
