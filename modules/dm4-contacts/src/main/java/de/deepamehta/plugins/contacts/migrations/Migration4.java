@@ -9,7 +9,7 @@ import de.deepamehta.core.service.Migration;
  * Adds "Date of Birth" to Person.
  * Runs ALWAYS.
  * <p>
- * Part of DM 4.8
+ * Part of DM 4.8-SNAPSHOT
  */
 public class Migration4 extends Migration {
 

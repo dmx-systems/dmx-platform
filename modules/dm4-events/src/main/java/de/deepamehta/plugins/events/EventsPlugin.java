@@ -69,6 +69,11 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
 
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
+        // Event <-> Person
+        DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.person",
+            "dm4.events.participant", "dm4.core.default", "dm4.core.default", dms);
+        //
+        // Event -> Address
         RoleModel[] roles = DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.address",
             "dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", dms);
         if (roles != null) {
