@@ -494,7 +494,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
-        console.log("Loading topicmap topics for workspace", workspace_id)
         var topics = dm4c.restc.get_topicmaps(workspace_id, true)   // include_childs=true (Access Control service)
         // create default topicmap
         if (!topics.length) {

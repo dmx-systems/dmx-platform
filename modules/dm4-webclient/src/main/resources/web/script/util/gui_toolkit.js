@@ -367,6 +367,13 @@ function GUIToolkit(config) {
          * If there is no such menu item undefined is returned.
          */
         this.find_item_by_label = function(label) {
+            // Note: if there is an item with label 0 (a number) combobox.get_selection() would mistakenly return that
+            // item when nothing is entered in the input field (string). This is because a find_item_by_label() search
+            // is performed and 0 == "" is true. So, we don't let empty input match any item.
+            if (label == "") {
+                return
+            }
+            //
             for (var i = 0, item; item = items[i]; i++) {
                 if (item.label == label) {
                     return item
