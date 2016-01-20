@@ -34,12 +34,14 @@ class AccessControlImpl implements AccessControl {
     //
     private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
-    private static String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
-    private static String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
-    private static String ROLE_TYPE_DEFAULT = "dm4.core.default";
+    private static final String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
+    private static final String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
+    private static final String ROLE_TYPE_DEFAULT = "dm4.core.default";
 
     // Property URIs
     // ### TODO: move to dm4.core namespace?
+    // ### TODO: copy in AccessControlPlugin.java
+    private static final String PROP_CREATOR  = "dm4.accesscontrol.creator";
     // ### TODO: copy in AccessControlPlugin.java
     private static final String PROP_OWNER = "dm4.accesscontrol.owner";
     // ### TODO: copy in WorkspacesPlugin.java
@@ -99,34 +101,34 @@ class AccessControlImpl implements AccessControl {
         String typeUri = null;
         try {
             typeUri = getTypeUri(objectId);
+            //
+            // Note: private topicmaps are treated special. The topicmap's workspace assignment doesn't matter here.
+            // Also "operation" doesn't matter as READ/WRITE access is always granted/denied together.
+            if (typeUri.equals("dm4.topicmaps.topicmap") && isTopicmapPrivate(objectId)) {
+                return isCreator(username, objectId);
+            }
+            //
             long workspaceId;
             if (typeUri.equals("dm4.workspaces.workspace")) {
                 workspaceId = objectId;
             } else {
                 workspaceId = getAssignedWorkspaceId(objectId);
-                //
                 if (workspaceId == -1) {
-                    switch (operation) {
-                    case READ:
-                        // ### TODO: remove this workaround
-                        logger.fine("Object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") is not assigned to any workspace -- READ permission is granted");
-                        return true;
-                    case WRITE:
-                        logger.warning("Object " + objectId + " (typeUri=\"" + typeUri +
-                            "\") is not assigned to any workspace -- WRITE permission is refused");
-                        return false;
-                    default:
-                        throw new RuntimeException(operation + " is an unsupported operation");
-                    }
+                    // fallback when no workspace is assigned
+                    return permissionIfNoWorkspaceIsAssigned(operation, objectId, typeUri);
                 }
             }
             //
             return _hasPermission(username, operation, workspaceId);
         } catch (Exception e) {
-            throw new RuntimeException("Checking permission for object " + objectId + " (typeUri=\"" + typeUri +
-                "\") failed (" + userInfo(username) + ", operation=" + operation + ")", e);
+            throw new RuntimeException("Checking permission for object " + objectId + " failed (typeUri=\"" + typeUri +
+                "\", " + userInfo(username) + ", operation=" + operation + ")", e);
         }
+    }
+
+    @Override
+    public String getCreator(long objectId) {
+        return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
     }
 
 
@@ -373,6 +375,22 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
+    // ### TODO: remove this workaround
+    private boolean permissionIfNoWorkspaceIsAssigned(Operation operation, long objectId, String typeUri) {
+        switch (operation) {
+        case READ:
+            logger.fine("Object " + objectId + " (typeUri=\"" + typeUri +
+                "\") is not assigned to any workspace -- READ permission is granted");
+            return true;
+        case WRITE:
+            logger.warning("Object " + objectId + " (typeUri=\"" + typeUri +
+                "\") is not assigned to any workspace -- WRITE permission is refused");
+            return false;
+        default:
+            throw new RuntimeException(operation + " is an unsupported operation");
+        }
+    }
+
     private boolean _hasPermission(String username, Operation operation, long workspaceId) {
         switch (operation) {
         case READ:
@@ -400,7 +418,7 @@ class AccessControlImpl implements AccessControl {
         case COLLABORATIVE:
             return isOwner(username, workspaceId) || isMember(username, workspaceId);
         case PUBLIC:
-            // Note: the System workspace is special: although it is a public workspace
+            // Note: the System workspace is treated special: although it is a public workspace
             // its content is readable only for logged in users.
             return workspaceId != getSystemWorkspaceId() || username != null;
         case COMMON:
@@ -469,6 +487,22 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("Object " + workspaceId + " is not a workspace (but of type \"" + typeUri +
                 "\")");
         }
+    }
+
+    // ---
+
+    private boolean isTopicmapPrivate(long topicmapId) {
+        TopicModel privateFlag = dms.storageDecorator.fetchTopicRelatedTopic(topicmapId, "dm4.core.composition",
+            "dm4.core.parent", "dm4.core.child", "dm4.topicmaps.private");
+        if (privateFlag == null) {
+            // Note: migrated topicmaps might not have a Private child topic ### TODO: throw exception?
+            return false;   // treat as non-private
+        }
+        return privateFlag.getSimpleValue().booleanValue();
+    }
+
+    private boolean isCreator(String username, long objectId) {
+        return username != null ? username.equals(getCreator(objectId)) : false;
     }
 
     // ---

@@ -29,7 +29,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
@@ -70,7 +69,6 @@ import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -112,9 +110,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
 
     // Property URIs
-    private static String PROP_CREATOR  = "dm4.accesscontrol.creator";
-    private static String PROP_OWNER    = "dm4.accesscontrol.owner";
-    private static String PROP_MODIFIER = "dm4.accesscontrol.modifier";
+    private static final String PROP_CREATOR  = "dm4.accesscontrol.creator";
+    private static final String PROP_OWNER    = "dm4.accesscontrol.owner";
+    private static final String PROP_MODIFIER = "dm4.accesscontrol.modifier";
 
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
@@ -333,26 +331,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Topicmaps ===
-
-    @GET
-    @Path("/workspace/{workspace_id}/topicmaps")
-    @Override
-    public ResultList<RelatedTopic> getTopicmaps(@PathParam("workspace_id") long workspaceId) {
-        ResultList<RelatedTopic> topicmaps = wsService.getAssignedTopics(workspaceId, "dm4.topicmaps.topicmap");
-        // filter topicmaps according to Private flag and creator
-        Iterator<RelatedTopic> i = topicmaps.iterator();
-        while (i.hasNext()) {
-            Topic topicmap = i.next();
-            if (isTopicmapPrivate(topicmap) && !isCreator(topicmap.getId())) {
-                i.remove();
-            }
-        }
-        return topicmaps;
-    }
-
-
-
     // === Permissions ===
 
     @GET
@@ -378,7 +356,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getCreator(@PathParam("id") long objectId) {
-        return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
+        return dms.getAccessControl().getCreator(objectId);
     }
 
     @GET
@@ -623,19 +601,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         } catch (Exception e) {
             throw new RuntimeException("Assigning search topic to workspace failed", e);
         }
-    }
-
-    // --- Topicmaps ---
-
-    private boolean isTopicmapPrivate(Topic topicmap) {
-        // Note: migrated topicmaps might not have a Private child topic ### TODO?
-        Boolean isPrivate = topicmap.getChildTopics().getBooleanOrNull("dm4.topicmaps.private");
-        return isPrivate != null ? isPrivate : false;
-    }
-
-    private boolean isCreator(long objectId) {
-        String username = getUsername();
-        return username != null ? username.equals(getCreator(objectId)) : false;
     }
 
     // --- Disk quota ---

@@ -1,9 +1,7 @@
 package de.deepamehta.plugins.accesscontrol;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
@@ -143,18 +141,6 @@ public interface AccessControlService {
      * @return  <code>true</code> if the user is a member, <code>false</code> otherwise.
      */
     boolean isMember(String username, long workspaceId);
-
-
-
-    // === Topicmaps ===
-
-    /**
-     * Returns the topicmaps assigned to the given workspace which are readable to the current user.
-     * The "readable" decision involves both, the topicmap's "Private" flag, and the topicmap's creator.
-     *
-     * @return  A list of Topicmap topics.
-     */
-    ResultList<RelatedTopic> getTopicmaps(long workspaceId);
 
 
 

@@ -30,6 +30,13 @@ public interface AccessControl {
      */
     boolean hasPermission(String username, Operation operation, long objectId);
 
+    /**
+     * Returns the creator of a topic or an association.
+     *
+     * @return  The username of the creator, or <code>null</code> if no creator is set.
+     */
+    String getCreator(long objectId);
+
 
 
     // === Workspaces / Memberships ===

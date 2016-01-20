@@ -48,11 +48,6 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.restc.create_membership = function(username, workspace_id) {
         this.request("POST", "/accesscontrol/user/" + username + "/workspace/" + workspace_id)
     }
-    dm4c.restc.get_topicmaps = function(workspace_id, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/accesscontrol/workspace/" + workspace_id + "/topicmaps" +
-            params.to_query_string()).items
-    }
     dm4c.restc.get_topic_permissions = function(topic_id) {
         return this.request("GET", "/accesscontrol/topic/" + topic_id)
     }
