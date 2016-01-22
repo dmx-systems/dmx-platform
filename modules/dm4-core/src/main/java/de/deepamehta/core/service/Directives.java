@@ -3,6 +3,7 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 
 
 
-public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
+public class Directives implements Iterable<Directives.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -36,6 +37,10 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
         directives.add(new Entry(dir, arg));
     }
 
+    public JSONArray toJSONArray() {
+        return DeepaMehtaUtils.toJSONArray(directives);
+    }
+
     // ---
 
     public static Directives get() {
@@ -43,17 +48,8 @@ public class Directives implements Iterable<Directives.Entry>, JSONEnabled {
     }
 
     public static void remove() {
+        logger.fine("### Removing tread-local directives");
         threadLocalDirectives.remove();
-    }
-
-    // *** JSONEnabled Implementation ***
-
-    public JSONObject toJSON() {
-        try {
-            return new JSONObject().put("directives", DeepaMehtaUtils.toJSONArray(directives));
-        } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
-        }
     }
 
     // *** Iterable Implementation ***

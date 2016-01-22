@@ -95,21 +95,21 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/topic/{id}")
     @Transactional
-    public Directives updateTopic(@PathParam("id") long topicId, TopicModel model) {
+    public DirectivesResponse updateTopic(@PathParam("id") long topicId, TopicModel model) {
         if (model.getId() != -1 && topicId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(topicId);
         dms.updateTopic(model);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/topic/{id}")
     @Transactional
-    public Directives deleteTopic(@PathParam("id") long topicId) {
+    public DirectivesResponse deleteTopic(@PathParam("id") long topicId) {
         dms.deleteTopic(topicId);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
 
@@ -177,21 +177,21 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/association/{id}")
     @Transactional
-    public Directives updateAssociation(@PathParam("id") long assocId, AssociationModel model) {
+    public DirectivesResponse updateAssociation(@PathParam("id") long assocId, AssociationModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(assocId);
         dms.updateAssociation(model);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/association/{id}")
     @Transactional
-    public Directives deleteAssociation(@PathParam("id") long assocId) {
+    public DirectivesResponse deleteAssociation(@PathParam("id") long assocId) {
         dms.deleteAssociation(assocId);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
 
@@ -226,17 +226,17 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/topictype")
     @Transactional
-    public Directives updateTopicType(TopicTypeModel model) {
+    public DirectivesResponse updateTopicType(TopicTypeModel model) {
         dms.updateTopicType(model);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/topictype/{uri}")
     @Transactional
-    public Directives deleteTopicType(@PathParam("uri") String uri) {
+    public DirectivesResponse deleteTopicType(@PathParam("uri") String uri) {
         dms.deleteTopicType(uri);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
 
@@ -271,17 +271,17 @@ public class WebservicePlugin extends PluginActivator {
     @PUT
     @Path("/assoctype")
     @Transactional
-    public Directives updateAssociationType(AssociationTypeModel model) {
+    public DirectivesResponse updateAssociationType(AssociationTypeModel model) {
         dms.updateAssociationType(model);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
     @DELETE
     @Path("/assoctype/{uri}")
     @Transactional
-    public Directives deleteAssociationType(@PathParam("uri") String uri) {
+    public DirectivesResponse deleteAssociationType(@PathParam("uri") String uri) {
         dms.deleteAssociationType(uri);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
 
