@@ -14,7 +14,7 @@ This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/b
     - Add plugins:
         - AutoGrow            *) Useful with framed editing
         - Enhanced Image
-        - Media Embed
+        - Media (oEmbed) Plugin
         - Table
         - Table Tools         *) required to e.g. add a row to existing table
     - Skin: "Flat"
@@ -24,6 +24,7 @@ This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/b
 config.js:
     - Remove toolbar group 'indent' from toolbar 'paragraph'.
       This removes the indent and outdent buttons. Indentation still works through tab and shift-tab keys.
+
 /web/css/ckeditor-overrides.css:
     - Apply a drop shadow to the content area to make it look like an input field.
 
