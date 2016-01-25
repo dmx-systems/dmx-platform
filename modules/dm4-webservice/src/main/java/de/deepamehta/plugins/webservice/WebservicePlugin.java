@@ -14,6 +14,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;

@@ -22,7 +22,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
-import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
@@ -32,7 +32,6 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PreDeleteTopicListener;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -166,10 +165,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @PUT
     @Path("/{workspace_id}/object/{object_id}")
     @Transactional
-    public Directives assignToWorkspace(@PathParam("object_id") long objectId,
-                                        @PathParam("workspace_id") long workspaceId) {
+    public DirectivesResponse assignToWorkspace(@PathParam("object_id") long objectId,
+                                                @PathParam("workspace_id") long workspaceId) {
         assignToWorkspace(dms.getObject(objectId), workspaceId);
-        return Directives.get();
+        return new DirectivesResponse();
     }
 
     @Override

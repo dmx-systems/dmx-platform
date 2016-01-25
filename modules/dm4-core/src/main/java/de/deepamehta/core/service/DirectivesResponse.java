@@ -1,33 +1,35 @@
-package de.deepamehta.plugins.webservice;
+package de.deepamehta.core.service;
 
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
 
 
-class DirectivesResponse implements JSONEnabled {
+public class DirectivesResponse implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    JSONEnabled object;
-    Directives directives;
+    private JSONEnabled object;
+    private Directives directives;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DirectivesResponse() {
+    public DirectivesResponse() {
         this.object = null;
         initDirectives();
     }
 
-    DirectivesResponse(JSONEnabled object) {
+    public DirectivesResponse(JSONEnabled object) {
         this.object = object;
         initDirectives();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public Directives getDirectives() {
+        return directives;
+    }
 
     // *** JSONEnabled Implementation ***
 

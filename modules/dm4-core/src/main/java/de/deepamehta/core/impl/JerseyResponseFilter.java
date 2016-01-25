@@ -9,6 +9,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.DirectivesResponse;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -48,6 +49,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             if (entity != null) {
                 //
                 // 1) Loading child topics
+                // ### TODO: move to Webservice module?
                 if (entity instanceof DeepaMehtaObject) {
                     loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -55,6 +57,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 }
                 //
                 // 2) Firing PRE_SEND events
+                // ### TODO: move to Webservice module?
                 if (entity instanceof TopicType) {          // Note: must take precedence over topic
                     firePreSend((TopicType) entity);
                 } else if (entity instanceof AssociationType) {
@@ -63,12 +66,14 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     firePreSend((Topic) entity);
                 } else if (entity instanceof Association) {
                     firePreSend((Association) entity);
-                } else if (entity instanceof Directives) {
-                    // Note: some plugins rely on the PRE_SEND event in order to enrich updated objects, others don't.
-                    // E.g. the Access Control plugin must enrich updated objects with permission information.
-                    // ### TODO: check if this is still required. Meanwhile permissions are not an enrichment anymore.
-                    // ### Update: Yes, it is still required, e.g. by the Time plugin when enriching with timestamps.
-                    firePreSend((Directives) entity);
+                } else if (entity instanceof DirectivesResponse) {
+                    // Note: some plugins rely on the PRE_SEND event to be fired for the individual DeepaMehta
+                    // objects contained in the set of directives. E.g. the Time plugin enriches updated objects
+                    // with  timestamps. The timestamps in turn are needed at client-side by the Caching plugin
+                    // in order to issue conditional PUT requests.
+                    // ### TODO: don't fire PRE_SEND events for the individual directives but only for the wrapped
+                    // DeepaMehtaObject? Let the update() Core Service calls return the updated object?
+                    firePreSend(((DirectivesResponse) entity).getDirectives());
                 } else if (isIterable(response, TopicType.class)) {
                     firePreSendTopicTypes((Iterable<TopicType>) entity);
                 } else if (isIterable(response, AssociationType.class)) {
