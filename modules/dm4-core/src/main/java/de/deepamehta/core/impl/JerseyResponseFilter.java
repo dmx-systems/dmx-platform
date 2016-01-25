@@ -58,15 +58,13 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 //
                 // 2) Firing PRE_SEND events
                 // ### TODO: move to Webservice module?
-                if (entity instanceof TopicType) {          // Note: must take precedence over topic
-                    firePreSend((TopicType) entity);
-                } else if (entity instanceof AssociationType) {
-                    firePreSend((AssociationType) entity);  // Note: must take precedence over topic
-                } else if (entity instanceof Topic) {
-                    firePreSend((Topic) entity);
-                } else if (entity instanceof Association) {
-                    firePreSend((Association) entity);
+                if (entity instanceof DeepaMehtaObject) {
+                    firePreSend((DeepaMehtaObject) entity);
+                } else if (isIterable(response, DeepaMehtaObject.class)) {
+                    firePreSend((Iterable<DeepaMehtaObject>) entity);
                 } else if (entity instanceof DirectivesResponse) {
+                    firePreSend(((DirectivesResponse) entity).getObject());
+                    //
                     // Note: some plugins rely on the PRE_SEND event to be fired for the individual DeepaMehta
                     // objects contained in the set of directives. E.g. the Time plugin enriches updated objects
                     // with  timestamps. The timestamps in turn are needed at client-side by the Caching plugin
@@ -74,13 +72,6 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     // ### TODO: don't fire PRE_SEND events for the individual directives but only for the wrapped
                     // DeepaMehtaObject? Let the update() Core Service calls return the updated object?
                     firePreSend(((DirectivesResponse) entity).getDirectives());
-                } else if (isIterable(response, TopicType.class)) {
-                    firePreSendTopicTypes((Iterable<TopicType>) entity);
-                } else if (isIterable(response, AssociationType.class)) {
-                    firePreSendAssociationTypes((Iterable<AssociationType>) entity);
-                } else if (isIterable(response, Topic.class)) {
-                    firePreSendTopics((Iterable<Topic>) entity);
-                // ### FIXME: for Iterable<Association> no PRE_SEND_ASSOCIATION events are fired
                 }
             }
             //
@@ -143,56 +134,34 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Firing PRE_SEND events ===
 
-    private void firePreSend(Topic topic) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, topic);
+    private void firePreSend(DeepaMehtaObject object) {
+        if (object instanceof TopicType) {                  // Note: must take precedence over topic
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, object);
+        } else if (object instanceof AssociationType) {     // Note: must take precedence over topic
+            dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, object);
+        } else if (object instanceof Topic) {
+            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);
+        } else if (object instanceof Association) {
+            dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, object);
+        }
     }
 
-    private void firePreSend(Association assoc) {
-        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, assoc);
-    }
-
-    private void firePreSend(TopicType topicType) {
-        dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, topicType);
-    }
-
-    private void firePreSend(AssociationType assocType) {
-        dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, assocType);
+    private void firePreSend(Iterable<DeepaMehtaObject> objects) {
+        for (DeepaMehtaObject object : objects) {
+            firePreSend(object);
+        }
     }
 
     private void firePreSend(Directives directives) {
         for (Directives.Entry entry : directives) {
             switch (entry.dir) {
             case UPDATE_TOPIC:
-                firePreSend((Topic) entry.arg);
-                break;
             case UPDATE_ASSOCIATION:
-                firePreSend((Association) entry.arg);
-                break;
             case UPDATE_TOPIC_TYPE:
-                firePreSend((TopicType) entry.arg);
-                break;
             case UPDATE_ASSOCIATION_TYPE:
-                firePreSend((AssociationType) entry.arg);
+                firePreSend((DeepaMehtaObject) entry.arg);
                 break;
             }
-        }
-    }
-
-    private void firePreSendTopics(Iterable<Topic> topics) {
-        for (Topic topic : topics) {
-            firePreSend(topic);
-        }
-    }
-
-    private void firePreSendTopicTypes(Iterable<TopicType> topicTypes) {
-        for (TopicType topicType : topicTypes) {
-            firePreSend(topicType);
-        }
-    }
-
-    private void firePreSendAssociationTypes(Iterable<AssociationType> assocTypes) {
-        for (AssociationType assocType : assocTypes) {
-            firePreSend(assocType);
         }
     }
 

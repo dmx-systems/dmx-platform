@@ -1,5 +1,6 @@
 package de.deepamehta.core.service;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -10,7 +11,7 @@ public class DirectivesResponse implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private JSONEnabled object;
+    private DeepaMehtaObject object;
     private Directives directives;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -20,12 +21,16 @@ public class DirectivesResponse implements JSONEnabled {
         initDirectives();
     }
 
-    public DirectivesResponse(JSONEnabled object) {
+    public DirectivesResponse(DeepaMehtaObject object) {
         this.object = object;
         initDirectives();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+    public DeepaMehtaObject getObject() {
+        return object;
+    }
 
     public Directives getDirectives() {
         return directives;

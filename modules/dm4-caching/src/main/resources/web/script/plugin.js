@@ -20,13 +20,6 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
                     // (dm4c.selected_object). Both may be different (namely when Geomap renderer is active),
                     // but the PUT request always relates to the object displayed in the page panel.
                     modified = page_panel_object_timestamp()
-                    //
-                    if (modified == undefined) {
-                        var displayed_object = dm4c.page_panel.get_displayed_object()
-                        throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
-                            "(uri=\"" + request.uri + "\", data=" + JSON.stringify(request.data) +
-                            ", page panel object=" + (displayed_object && displayed_object.id) + ")"
-                    }
                 }
                 //
                 var modified_utc = new Date(modified).toUTCString()
@@ -50,9 +43,20 @@ dm4c.add_plugin("de.deepamehta.caching", function() {
 
         function page_panel_object_timestamp() {
             var displayed_object = dm4c.page_panel.get_displayed_object()
-            if (displayed_object && displayed_object.id == object_id) {
-                return displayed_object.childs[PROP_MODIFIED].value
+            if (!displayed_object) {
+                throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
+                    "(nothing displayed in page panel)"
             }
+            if (displayed_object.id != object_id) {
+                throw "CachingError: modification timestamp missing while preparing conditional PUT request " +
+                    "(uri=\"" + request.uri + "\" while page panel displays object " + displayed_object.id + ")"
+            }
+            var modified = displayed_object.childs[PROP_MODIFIED]
+            if (!modified) {
+                throw "CachingError: can't prepare conditional PUT request (object " + object_id +
+                    " has no modification timestamp)"
+            }
+            return modified.value
         }
     })
 })

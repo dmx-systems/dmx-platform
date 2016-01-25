@@ -89,8 +89,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/topic")
     @Transactional
-    public Topic createTopic(TopicModel model) {
-        return dms.createTopic(model);
+    public DirectivesResponse createTopic(TopicModel model) {
+        return new DirectivesResponse(dms.createTopic(model));
     }
 
     @PUT
@@ -171,8 +171,8 @@ public class WebservicePlugin extends PluginActivator {
     @POST
     @Path("/association")
     @Transactional
-    public Association createAssociation(AssociationModel model) {
-        return dms.createAssociation(model);
+    public DirectivesResponse createAssociation(AssociationModel model) {
+        return new DirectivesResponse(dms.createAssociation(model));
     }
 
     @PUT

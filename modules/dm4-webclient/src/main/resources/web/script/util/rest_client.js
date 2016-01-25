@@ -408,11 +408,8 @@ function RESTClient(config) {
             if (directives && config && config.process_directives) {
                 // update client model and GUI
                 config.process_directives(directives, stay_in_edit_mode)
-                //
-                return directives
-            } else {
-                return response_data
             }
+            return response_data
         }
     }
 
