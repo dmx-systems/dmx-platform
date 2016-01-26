@@ -1109,7 +1109,7 @@ function CanvasView() {
     }
 
     function update_translation_dom() {
-        $("#topic-layer").css({         
+        $("#topic-layer").css({
             top:  topicmap.trans_y,
             left: topicmap.trans_x
         })

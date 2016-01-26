@@ -88,7 +88,7 @@ class ValueStorage {
         } catch (Exception e) {
             throw new RuntimeException("Fetching the \"" + assocDef.getAssocDefUri() + "\" child topics of object " +
                 parent.getId() + " failed", e);
-        }        
+        }
     }
 
     // ---

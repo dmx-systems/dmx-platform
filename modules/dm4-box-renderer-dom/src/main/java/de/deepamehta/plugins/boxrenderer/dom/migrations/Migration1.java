@@ -70,7 +70,7 @@ public class Migration1 extends Migration {
                     mapcontextAssoc.setProperty(PROP_EXPANDED, expanded, false);    // addToIndex = false
                 }
             }
-            // 
+            //
             topic.removeProperty(PROP_COLOR);
             topic.removeProperty(PROP_EXPANDED);
         }

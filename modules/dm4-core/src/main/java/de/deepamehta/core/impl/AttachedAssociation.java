@@ -249,7 +249,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         ResultList<RelatedAssociationModel> assocs = dms.storageDecorator.fetchAssociationRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return dms.instantiateRelatedAssociations(assocs); 
+        return dms.instantiateRelatedAssociations(assocs);
     }
 
     // ---

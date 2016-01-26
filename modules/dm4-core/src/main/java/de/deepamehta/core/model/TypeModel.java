@@ -195,7 +195,7 @@ public abstract class TypeModel extends TopicModel implements Iterable<String> {
             // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
             // So we must identify the assoc defs to compare **by ID**.
             long assocDefId  = checkAssocDefId(assocDef);
-            long _assocDefId = checkAssocDefId(_assocDef);            
+            long _assocDefId = checkAssocDefId(_assocDef);
             if (assocDefId != _assocDefId) {
                 return false;
             }

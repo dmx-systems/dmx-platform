@@ -82,5 +82,5 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
             event.getChildTopics().getTopic("dm4.contacts.address").getRelatingAssociation().delete();
             timeService.setModified(event);
         }
-    }    
+    }
 }

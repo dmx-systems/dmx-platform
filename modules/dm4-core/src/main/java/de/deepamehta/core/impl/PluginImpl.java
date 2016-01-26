@@ -968,6 +968,6 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private String entryPathToClassName(String entryPath) {
         entryPath = entryPath.substring(0, entryPath.length() - 6);     // strip ".class"
-        return entryPath.replace('/', '.');        
+        return entryPath.replace('/', '.');
     }
 }

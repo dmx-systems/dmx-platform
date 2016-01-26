@@ -194,5 +194,5 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     private boolean getBooleanQueryParameter(ContainerRequest request, String param) {
         return Boolean.parseBoolean(request.getQueryParameters().getFirst(param));
-    }    
+    }
 }

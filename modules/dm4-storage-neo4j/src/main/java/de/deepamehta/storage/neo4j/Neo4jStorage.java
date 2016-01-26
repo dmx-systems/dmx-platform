@@ -67,7 +67,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
             GraphDatabaseService neo4j = null;
     private RelationtypeCache relTypeCache;
-    
+
     private Index<Node> topicContentExact;      // topic URI, topic type URI, topic value (index mode KEY), properties
     private Index<Node> topicContentFulltext;   // topic value (index modes FULLTEXT or FULLTEXT_KEY)
     private Index<Node> assocContentExact;      // assoc URI, assoc type URI, assoc value (index mode KEY), properties
@@ -349,7 +349,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         assocNode.delete();
         //
         // 2) update index
-        removeAssociationFromIndex(assocNode);  
+        removeAssociationFromIndex(assocNode);
     }
 
 

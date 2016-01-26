@@ -1,5 +1,5 @@
 dm4c.add_page_renderer("dm4.typeeditor.roletype_renderer", {
-    
+
     // === Page Renderer Implementation ===
 
     render_page: function(topic) {

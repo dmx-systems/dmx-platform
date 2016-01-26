@@ -396,7 +396,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void getTopicsByType() { 
+    public void getTopicsByType() {
         Topic type = getTopicByUri("dm4.core.data_type");
         ResultList<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
         assertEquals(5, topics1.getSize());
@@ -405,7 +405,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void getAssociationsByType() { 
+    public void getAssociationsByType() {
         ResultList<RelatedAssociation> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");

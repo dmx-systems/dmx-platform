@@ -51,7 +51,7 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
         Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, this);
         //
         super.update(model);
-    } 
+    }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 

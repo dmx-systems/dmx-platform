@@ -350,7 +350,7 @@ function RenderHelper() {
      *              If the function returns a true-ish value the topic appears as enabled in the menu.
      *              Otherwise the topic appears as disabled in the menu.
      *              If no filter function is specified all topics appear as enabled.
-     * @param   handler 
+     * @param   handler
      *              Optional: the function that is called every time the user selects a menu item.
      *              One argument is passed: the selected menu item (an object with "value" and "label" properties).
      *

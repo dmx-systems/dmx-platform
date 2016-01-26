@@ -152,7 +152,7 @@ class MigrationManager {
             for (Field field : PluginImpl.getInjectableFields(migration.getClass())) {
                 Class<?> serviceInterface = field.getType();
                 Object service;
-                // 
+                //
                 if (serviceInterface.getName().equals(plugin.getProvidedServiceInterface())) {
                     // the migration consumes the plugin's own service
                     service = plugin.getContext();

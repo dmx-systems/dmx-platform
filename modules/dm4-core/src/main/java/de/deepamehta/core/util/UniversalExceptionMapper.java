@@ -39,7 +39,7 @@ public class UniversalExceptionMapper {
 
     // Note: status 405 is not defined by JAX-RS
     private static StatusType METHOD_NOT_ALLOWED = new StatusType() {
-        @Override public int getStatusCode() {return 405;} 
+        @Override public int getStatusCode() {return 405;}
         @Override public String getReasonPhrase() {return "Method Not Allowed";}
         @Override public Family getFamily() {return Family.CLIENT_ERROR;}
     };

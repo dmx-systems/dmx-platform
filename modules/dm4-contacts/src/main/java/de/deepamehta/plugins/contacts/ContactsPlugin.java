@@ -57,5 +57,5 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
         // Person <-> Institution
         DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.contacts.person", "dm4.contacts.institution",
             "dm4.contacts.organization_association", "dm4.core.default", "dm4.core.default", dms);
-    }    
+    }
 }

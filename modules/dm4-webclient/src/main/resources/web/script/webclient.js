@@ -959,7 +959,7 @@ dm4c = new function() {
                 var error = JSON.parse(server_response.content)
                 if (error.exception) {
                     content = render_exception(error)
-                } 
+                }
             }
             // render text
             if (!content) {
@@ -1300,7 +1300,7 @@ dm4c = new function() {
     // The READ permission for types is implicit: the Webclient loads all readable types into its type cache.
     // If a type is not readable, the server would not send it in the first place. The type cache is invalidated
     // once the login state changes. Thus the type cache always represents the set of readable types.
-    // The CREATE permission for types is synthesized: the type must the readable *and* the selected workspace 
+    // The CREATE permission for types is synthesized: the type must the readable *and* the selected workspace
     // must be writable.
 
     // ### TODO: add the same for association types?

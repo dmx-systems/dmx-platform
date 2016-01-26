@@ -70,7 +70,7 @@ class TypeCache {
         // while storing (see ValueStorage#associateChildTopic()). The aim is to fully initialize the relating
         // association model *at construction time*, that is when a RelatedTopicModel is constructed. This in turn
         // is not possible as the model classes have no access to the type definitions. The eventual solution is to
-        // introduce a model factory which have access to the type definitions.        
+        // introduce a model factory which have access to the type definitions.
     }
 
     void putAssociationType(AssociationType assocType) {

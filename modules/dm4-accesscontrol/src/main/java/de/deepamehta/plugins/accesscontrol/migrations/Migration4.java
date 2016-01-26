@@ -16,7 +16,7 @@ import de.deepamehta.core.service.Migration;
  * Part of DM 4.8-SNAPSHOT
  * <p>
  * Note: when UPDATEing to 4.8-SNAPSHOT the "Administration" workspace is created in migration 12.
- * 
+ *
  * ----------
  *
  * Originally this migration created the "admin" user account (part of DM 4.5).

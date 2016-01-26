@@ -298,7 +298,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     this.add_topicmap = function(topicmap_id) {
         add_topicmap(topicmap_id)
     }
-    
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 

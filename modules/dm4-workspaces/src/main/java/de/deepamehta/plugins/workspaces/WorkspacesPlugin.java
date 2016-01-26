@@ -284,7 +284,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
      * This is important in conjunction with access control.
      * Note: type introduction is aborted if at least one of these conditions apply:
-     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this 
+     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this
      *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
      *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).
@@ -305,7 +305,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
      * This is important in conjunction with access control.
      * Note: type introduction is aborted if at least one of these conditions apply:
-     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this 
+     *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this
      *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
      *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).

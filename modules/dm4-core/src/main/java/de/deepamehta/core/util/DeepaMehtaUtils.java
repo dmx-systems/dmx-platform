@@ -161,7 +161,7 @@ public class DeepaMehtaUtils {
             roles[1].setRoleTypeUri(roleTypeUri2);
         }
         return roles;
-    }    
+    }
 
     public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
                                                                                           DeepaMehtaService dms) {
