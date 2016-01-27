@@ -4,6 +4,7 @@
 .dm4\.datetime\.date .dm4\.datetime\.day,
 .dm4\.datetime\.date .dm4\.datetime\.year {
     display: inline-block;
+    vertical-align: top;
 }
 
 .dm4\.datetime\.date .dm4\.datetime\.day,
@@ -29,6 +30,7 @@
 .dm4\.datetime\.time .dm4\.datetime\.hour,
 .dm4\.datetime\.time .dm4\.datetime\.minute {
     display: inline-block;
+    vertical-align: top;
 }
 
 .dm4\.datetime\.time .dm4\.datetime\.minute {
