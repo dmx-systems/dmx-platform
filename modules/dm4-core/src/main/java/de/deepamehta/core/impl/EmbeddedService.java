@@ -22,6 +22,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ResultList;
@@ -53,6 +54,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     StorageDecorator storageDecorator;
     BundleContext bundleContext;
+    ModelFactory modelFactory;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     EventManager eventManager;
@@ -72,6 +74,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public EmbeddedService(StorageDecorator storageDecorator, BundleContext bundleContext) {
         this.storageDecorator = storageDecorator;
         this.bundleContext = bundleContext;
+        this.modelFactory = new ModelFactoryImpl(storageDecorator);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.eventManager = new EventManager(this);
