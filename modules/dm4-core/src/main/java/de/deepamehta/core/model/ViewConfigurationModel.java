@@ -1,82 +1,21 @@
 package de.deepamehta.core.model;
 
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.json.JSONArray;
+import de.deepamehta.core.JSONEnabled;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
+import org.codehaus.jettison.json.JSONObject;
 
 
 
 /**
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public class ViewConfigurationModel {
+public interface ViewConfigurationModel {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
+    Iterable<TopicModel> getConfigTopics();
 
-    /**
-     * Key: config topic type URI
-     */
-    private Map<String, TopicModel> viewConfig = new HashMap();
+    void addConfigTopic(TopicModel configTopic);
 
-    // ---------------------------------------------------------------------------------------------------- Constructors
-
-    public ViewConfigurationModel() {
-    }
-
-    public ViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
-        for (TopicModel topic : configTopics) {
-            addConfigTopic(topic);
-        }
-    }
-
-    /**
-     * @param   configurable    A topic type, an association type, or an association definition.
-     *                          ### FIXME: the sole JSONArray should be passed
-     */
-    public ViewConfigurationModel(JSONObject configurable) {
-        try {
-            JSONArray topics = configurable.optJSONArray("view_config_topics");
-            if (topics != null) {
-                for (int i = 0; i < topics.length(); i++) {
-                    addConfigTopic(new TopicModel(topics.getJSONObject(i)));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONObject=" + configurable + ")", e);
-        }
-    }
-
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public Iterable<TopicModel> getConfigTopics() {
-        return viewConfig.values();
-    }
-
-    public void addConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
-        // error check
-        if (getConfigTopic(configTypeUri) != null) {
-            throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
-        }
-        //
-        viewConfig.put(configTypeUri, configTopic);
-    }
-
-    public void updateConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
-        TopicModel confTopic = getConfigTopic(configTypeUri);
-        // error check
-        if (confTopic == null) {
-            throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
-        }
-        //
-        confTopic.set(configTopic);
-    }
+    void updateConfigTopic(TopicModel configTopic);
 
     // ---
 
@@ -92,38 +31,9 @@ public class ViewConfigurationModel {
      *
      * @return  The setting value, or <code>null</code> if there is no such setting
      */
-    public Object getSetting(String configTypeUri, String settingUri) {
-        TopicModel configTopic = getConfigTopic(configTypeUri);
-        if (configTopic == null) {
-            return null;
-        }
-        ChildTopicsModel childTopics = configTopic.getChildTopicsModel();
-        return childTopics.has(settingUri) ? childTopics.getObject(settingUri) : null;
-    }
+    Object getSetting(String configTypeUri, String settingUri);
 
     // ---
 
-    // ### FIXME: drop parameter, implement JSONEnabled
-    public void toJSON(JSONObject configurable) {
-        try {
-            List viewConfigTopics = new ArrayList();
-            for (TopicModel configTopic : getConfigTopics()) {
-                viewConfigTopics.add(configTopic.toJSON());
-            }
-            configurable.put("view_config_topics", viewConfigTopics);
-        } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "view configuration " + viewConfig;
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private TopicModel getConfigTopic(String configTypeUri) {
-        return viewConfig.get(configTypeUri);
-    }
+    void toJSON(JSONObject configurable);
 }

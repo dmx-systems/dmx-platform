@@ -710,7 +710,7 @@ class AttachedChildTopics implements ChildTopics {
         try {
             return (RelatedTopic) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
-            getModel().throwInvalidSingleAccess(assocDefUri, e);
+            ((ChildTopicsModelImpl) getModel()).throwInvalidSingleAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
@@ -732,7 +732,7 @@ class AttachedChildTopics implements ChildTopics {
         try {
             return (List<RelatedTopic>) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
-            getModel().throwInvalidMultiAccess(assocDefUri, e);
+            ((ChildTopicsModelImpl) getModel()).throwInvalidMultiAccess(assocDefUri, e);
             return null;    // never reached
         }
     }

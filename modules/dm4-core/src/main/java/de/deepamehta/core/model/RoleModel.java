@@ -1,51 +1,21 @@
 package de.deepamehta.core.model;
 
-import org.codehaus.jettison.json.JSONObject;
+import de.deepamehta.core.JSONEnabled;
 
 
 
-public abstract class RoleModel implements Cloneable {
+public interface RoleModel extends JSONEnabled, Cloneable {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
+    long getPlayerId();
 
-    protected long playerId;        // id of the player (a topic, or an association)
-    protected String roleTypeUri;   // is never null
-
-    // ---------------------------------------------------------------------------------------------------- Constructors
-
-    // ### TODO: drop this?
-    protected RoleModel() {
-    }
-
-    protected RoleModel(long playerId, String roleTypeUri) {
-        setPlayerId(playerId);
-        setRoleTypeUri(roleTypeUri);
-    }
-
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    public long getPlayerId() {
-        return playerId;
-    }
-
-    public final String getRoleTypeUri() {
-        return roleTypeUri;
-    }
+    String getRoleTypeUri();
 
     // ---
 
     // ### TODO: to be dropped?
-    public void setPlayerId(long playerId) {
-        this.playerId = playerId;
-    }
+    void setPlayerId(long playerId);
 
-    public final void setRoleTypeUri(String roleTypeUri) {
-        if (roleTypeUri == null) {
-            throw new IllegalArgumentException("\"roleTypeUri\" must not be null");
-        }
-        //
-        this.roleTypeUri = roleTypeUri;
-    }
+    void setRoleTypeUri(String roleTypeUri);
 
     // ---
 
@@ -57,18 +27,5 @@ public abstract class RoleModel implements Cloneable {
      *
      * @return  true if the given role model refers to the same object as this role model.
      */
-    public abstract boolean refsSameObject(RoleModel model);
-
-    public abstract JSONObject toJSON();
-
-    // === Java API ===
-
-    @Override
-    public RoleModel clone() {
-        try {
-            return (RoleModel) super.clone();
-        } catch (Exception e) {
-            throw new RuntimeException("Cloning a RoleModel failed", e);
-        }
-    }
+    boolean refsSameObject(RoleModel model);
 }
