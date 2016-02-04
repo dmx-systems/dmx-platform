@@ -213,8 +213,8 @@ class TypeStorageImpl implements TypeStorage {
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
             dms.createAssociation("dm4.core.aggregation",
-                new TopicRoleModel(typeUri,     "dm4.core.type"),
-                new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+                dms.mf.newTopicRoleModel(typeUri,     "dm4.core.type"),
+                dms.mf.newTopicRoleModel(dataTypeUri, "dm4.core.default"));
         } catch (Exception e) {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
                 dataTypeUri + "\" failed", e);
@@ -243,8 +243,8 @@ class TypeStorageImpl implements TypeStorage {
 
     void storeIndexMode(String typeUri, IndexMode indexMode) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(typeUri,           "dm4.core.type"),
-            new TopicRoleModel(indexMode.toUri(), "dm4.core.default"));
+            dms.mf.newTopicRoleModel(typeUri,           "dm4.core.type"),
+            dms.mf.newTopicRoleModel(indexMode.toUri(), "dm4.core.default"));
     }
 
 
@@ -312,7 +312,7 @@ class TypeStorageImpl implements TypeStorage {
      */
     AssociationDefinitionModel createAssociationDefinition(Association assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel model = new AssociationModel(assoc.getModel());
+        AssociationModel model = dms.mf.newAssociationModel(assoc.getModel());
         String parentTypeUri = fetchParentType(assoc).getUri();
         String childTypeUri = fetchChildType(assoc).getUri();
         prepareAssocModel(model, parentTypeUri, childTypeUri);

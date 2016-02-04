@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -9,6 +10,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ModelFactory;
 
 import org.codehaus.jettison.json.JSONException;
@@ -38,7 +40,7 @@ class ModelFactoryImpl implements ModelFactory {
     public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                          ChildTopicsModel childTopics) {
         if (childTopics == null) {
-            childTopics = new ChildTopicsModelImpl();
+            childTopics = newChildTopicsModelImpl();
         }
         return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics);
     }
@@ -125,7 +127,7 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ChildTopicsModel newChildTopicsModel() {
-        return new ChildTopicsModelImpl();
+        return new ChildTopicsModelImpl(new HashMap());
     }
 
     @Override
@@ -273,6 +275,8 @@ class ModelFactoryImpl implements ModelFactory {
         return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
     }
 
+    // ---
+
     /* TopicModelImpl(ChildTopicsModel childTopics) {
         super(childTopics);
     }
@@ -291,13 +295,14 @@ class ModelFactoryImpl implements ModelFactory {
 
     TopicModelImpl(String uri, String typeUri) {
         super(uri, typeUri);
+    } */
+
+    @Override
+    public TopicModel newTopicModel(String uri, String typeUri, SimpleValue value) {
+        return newTopicModel(-1, uri, typeUri, value, null);
     }
 
-    TopicModelImpl(String uri, String typeUri, SimpleValue value) {
-        super(uri, typeUri, value);
-    }
-
-    TopicModelImpl(String uri, String typeUri, ChildTopicsModel childTopics) {
+    /* TopicModelImpl(String uri, String typeUri, ChildTopicsModel childTopics) {
         super(uri, typeUri, childTopics);
     }
 
@@ -324,13 +329,6 @@ class ModelFactoryImpl implements ModelFactory {
             roleModel2);
     }
 
-    /* @Override
-    public AssociationModel newAssociationModel(AssociationModel assoc) {
-        super(assoc);
-        this.roleModel1 = assoc.getRoleModel1();
-        this.roleModel2 = assoc.getRoleModel2();
-    } */
-
     @Override
     public AssociationModel newAssociationModel(JSONObject assoc) {
         try {
@@ -342,6 +340,13 @@ class ModelFactoryImpl implements ModelFactory {
             throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
         }
     }
+
+    @Override
+    public AssociationModel newAssociationModel(AssociationModel assoc) {
+        return new AssociationModelImpl(assoc);
+    }
+
+    // ---
 
     @Override
     public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
@@ -458,4 +463,155 @@ class ModelFactoryImpl implements ModelFactory {
             throw new RuntimeException("Unexpected model object: " + object);
         }
     }
+
+
+
+    // === AssociationDefinitionModel ===
+
+    @Override
+    public AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
+                                                                String customAssocTypeUri,
+                                                                String parentTypeUri, String childTypeUri,
+                                                                String parentCardinalityUri, String childCardinalityUri,
+                                                                ViewConfigurationModel viewConfigModel) {
+        AssociationModel assoc = newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri),
+            childRole(childTypeUri), null, childTopics(customAssocTypeUri));
+        if (viewConfigModel == null) {
+            viewConfigModel = new ViewConfigurationModel();
+        }
+        return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
+    }
+
+    @Override
+    public AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef) {
+        try {
+            if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
+                throw new RuntimeException("\"parent_cardinality_uri\" is missing");
+            }
+            AssociationModel assoc = newAssociationModel(assocDef.optLong("id", -1), null,
+                assocDef.getString("assoc_type_uri"), parentRole(assocDef), childRole(assocDef), null,
+                childTopics(assocDef));
+            String parentCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
+            String childCardinalityUri  = assocDef.getString("child_cardinality_uri");
+            //
+            return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri,
+                new ViewConfigurationModel(assocDef));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
+        }
+    }
+
+    /* AssociationDefinitionModelImpl(String assocTypeUri, String parentTypeUri, String childTypeUri,
+                                                        String parentCardinalityUri, String childCardinalityUri) {
+        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
+    }
+
+    AssociationDefinitionModelImpl(String assocTypeUri, String customAssocTypeUri,
+                                                        String parentTypeUri, String childTypeUri,
+                                                        String parentCardinalityUri, String childCardinalityUri) {
+        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
+            childCardinalityUri, null);
+    } */
+
+    /**
+     * @param   assoc   the underlying association.
+     *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID).
+     *
+    AssociationDefinitionModelImpl(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
+                                                           ViewConfigurationModel viewConfigModel) {
+        super(assoc);
+        //
+        this.parentCardinalityUri = parentCardinalityUri;
+        this.childCardinalityUri = childCardinalityUri;
+        //
+        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
+    } */
+
+    /**
+     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
+     * which is OK for an update assoc def operation. It can not be used for a create operation.
+     *
+    AssociationDefinitionModelImpl(AssociationModel assoc) {
+        // ### FIXME: the assoc must identify its players **by URI**
+        super(assoc);
+    } */
+
+    // ---
+
+    private static TopicRoleModel parentRole(JSONObject assocDef) throws JSONException {
+        return parentRole(assocDef.getString("parent_type_uri"));
+    }
+
+    private static TopicRoleModel parentRole(String parentTypeUri) {
+        return new TopicRoleModel(parentTypeUri, "dm4.core.parent_type");
+    }
+
+    // ---
+
+    private static TopicRoleModel childRole(JSONObject assocDef) throws JSONException {
+        return childRole(assocDef.getString("child_type_uri"));
+    }
+
+    private static TopicRoleModel childRole(String childTypeUri) {
+        return new TopicRoleModel(childTypeUri, "dm4.core.child_type");
+    }
+
+    // ---
+
+    private static ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
+        // Note: getString() called on a key with JSON null value would return the string "null"
+        return childTopics(assocDef.isNull("custom_assoc_type_uri") ? null :
+            assocDef.getString("custom_assoc_type_uri"));
+    }
+
+    private static ChildTopicsModel childTopics(String customAssocTypeUri) {
+        if (customAssocTypeUri != null) {
+            if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
+                return new ChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                    delTopicUri(customAssocTypeUri));
+            } else {
+                return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                    customAssocTypeUri);
+            }
+        } else {
+            return null;
+        }
+    }
+
+
+
+    // === ViewConfigurationModel ===
+
+    @Override
+    public ViewConfigurationModel newViewConfigurationModel() {
+        return new ViewConfigurationModelImpl(new HashMap());
+    }    
+
+    @Override
+    public ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
+        Map<String, TopicModel> viewConfig = new HashMap();
+        for (TopicModel topic : configTopics) {
+            addConfigTopic(topic);      // ###
+        }
+        return new ViewConfigurationModelImpl(viewConfig);
+    }    
+
+    /**
+     * @param   configurable    A topic type, an association type, or an association definition.
+     *                          ### FIXME: the sole JSONArray should be passed
+     */
+    @Override
+    public ViewConfigurationModel newViewConfigurationModel(JSONObject configurable) {
+        try {
+            JSONArray topics = configurable.optJSONArray("view_config_topics");
+            if (topics != null) {
+                for (int i = 0; i < topics.length(); i++) {
+                    addConfigTopic(new TopicModel(topics.getJSONObject(i)));    // ###
+                }
+            }
+            return new ViewConfigurationModelImpl();                            // ###
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONObject=" + configurable + ")", e);
+        }
+    }    
 }

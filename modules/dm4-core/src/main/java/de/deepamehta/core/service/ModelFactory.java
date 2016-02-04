@@ -1,6 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -8,6 +9,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -79,6 +81,9 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(JSONObject topic);
 
+    // ---
+
+    TopicModel newTopicModel(String uri, String typeUri, SimpleValue value);
 
 
     // === AssociationModel ===
@@ -87,6 +92,10 @@ public interface ModelFactory {
                                          RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics);
 
     AssociationModel newAssociationModel(JSONObject assoc);
+
+    AssociationModel newAssociationModel(AssociationModel assoc);
+
+    // ---
 
     AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2);
 
@@ -122,4 +131,26 @@ public interface ModelFactory {
     // === RoleModel ===
 
     RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri);
+
+
+
+    // === AssociationDefinitionModel ===
+
+    AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
+                                                             String customAssocTypeUri,
+                                                             String parentTypeUri, String childTypeUri,
+                                                             String parentCardinalityUri, String childCardinalityUri,
+                                                             ViewConfigurationModel viewConfigModel);
+
+    AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
+
+
+
+    // === ViewConfigurationModel ===
+
+    ViewConfigurationModel newViewConfigurationModel();
+
+    ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics);
+
+    ViewConfigurationModel newViewConfigurationModel(JSONObject configurable);
 }

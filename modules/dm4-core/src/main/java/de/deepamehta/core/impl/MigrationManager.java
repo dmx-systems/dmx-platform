@@ -232,13 +232,13 @@ class MigrationManager {
 
     private void createTopics(JSONArray topics) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
-            dms.createTopic(new TopicModel(topics.getJSONObject(i)));
+            dms.createTopic(dms.mf.newTopicModel(topics.getJSONObject(i)));
         }
     }
 
     private void createAssociations(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            dms.createAssociation(new AssociationModel(assocs.getJSONObject(i)));
+            dms.createAssociation(dms.mf.newAssociationModel(assocs.getJSONObject(i)));
         }
     }
 

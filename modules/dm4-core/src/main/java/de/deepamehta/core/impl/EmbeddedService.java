@@ -54,7 +54,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     StorageDecorator storageDecorator;
     BundleContext bundleContext;
-    ModelFactory modelFactory;
+    ModelFactory mf;
     MigrationManager migrationManager;
     PluginManager pluginManager;
     EventManager eventManager;
@@ -74,7 +74,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public EmbeddedService(StorageDecorator storageDecorator, BundleContext bundleContext) {
         this.storageDecorator = storageDecorator;
         this.bundleContext = bundleContext;
-        this.modelFactory = new ModelFactoryImpl(storageDecorator);
+        this.mf = new ModelFactoryImpl(storageDecorator);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.eventManager = new EventManager(this);
@@ -647,9 +647,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(topicTypeUri, "dm4.core.type"),
-                new TopicRoleModel(topicId, "dm4.core.instance"));
+            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
+                mf.newTopicRoleModel(topicTypeUri, "dm4.core.type"),
+                mf.newTopicRoleModel(topicId, "dm4.core.instance"));
             storageDecorator.storeAssociation(assoc);   // direct storage calls used here ### explain
             storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
             createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
@@ -661,9 +661,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
     void createAssociationInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssociationModel assoc = new AssociationModel("dm4.core.instantiation",
-                new TopicRoleModel(assocTypeUri, "dm4.core.type"),
-                new AssociationRoleModel(assocId, "dm4.core.instance"));
+            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
+                mf.newTopicRoleModel(assocTypeUri, "dm4.core.type"),
+                mf.newAssociationRoleModel(assocId, "dm4.core.instance"));
             storageDecorator.storeAssociation(assoc);   // direct storage calls used here ### explain
             storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         } catch (Exception e) {
@@ -678,7 +678,7 @@ public class EmbeddedService implements DeepaMehtaService {
      * Convenience method. ### to be dropped?
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        return createAssociation(new AssociationModel(typeUri, roleModel1, roleModel2));
+        return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -903,9 +903,9 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             // Create meta types "Topic Type" and "Association Type" -- needed to create topic types and
             // asscociation types
-            TopicModel t = new TopicModel("dm4.core.topic_type", "dm4.core.meta_type",
+            TopicModel t = mf.newTopicModel("dm4.core.topic_type", "dm4.core.meta_type",
                 new SimpleValue("Topic Type"));
-            TopicModel a = new TopicModel("dm4.core.assoc_type", "dm4.core.meta_type",
+            TopicModel a = mf.newTopicModel("dm4.core.assoc_type", "dm4.core.meta_type",
                 new SimpleValue("Association Type"));
             _createTopic(t);
             _createTopic(a);
@@ -918,12 +918,12 @@ public class EmbeddedService implements DeepaMehtaService {
             _createTopic(dataType);
             _createTopic(roleType);
             // Create data type "Text"
-            TopicModel text = new TopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
+            TopicModel text = mf.newTopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
             _createTopic(text);
             // Create role types "Default", "Type", and "Instance"
-            TopicModel deflt = new TopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
-            TopicModel type  = new TopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
-            TopicModel inst  = new TopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
+            TopicModel deflt = mf.newTopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
+            TopicModel type  = mf.newTopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
+            TopicModel inst  = mf.newTopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
             _createTopic(deflt);
             _createTopic(type);
             _createTopic(inst);
@@ -1001,9 +1001,9 @@ public class EmbeddedService implements DeepaMehtaService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModel assoc = new AssociationModel("dm4.core.aggregation",
-            new TopicRoleModel(typeUri,     "dm4.core.type"),
-            new TopicRoleModel(dataTypeUri, "dm4.core.default"));
+        AssociationModel assoc = mf.newAssociationModel("dm4.core.aggregation",
+            mf.newTopicRoleModel(typeUri,     "dm4.core.type"),
+            mf.newTopicRoleModel(dataTypeUri, "dm4.core.default"));
         storageDecorator.storeAssociation(assoc);
         storageDecorator.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
     }

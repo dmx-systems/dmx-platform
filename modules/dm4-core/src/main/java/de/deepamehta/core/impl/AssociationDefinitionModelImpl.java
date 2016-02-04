@@ -44,73 +44,17 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionModelImpl(String assocTypeUri, String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
-    }
-
-    AssociationDefinitionModelImpl(String assocTypeUri, String customAssocTypeUri,
-                                                        String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
-            childCardinalityUri, null);
-    }
-
     /**
      * ### TODO: add include-in-label parameter?
      *
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
-    AssociationDefinitionModelImpl(long id, String uri, String assocTypeUri, String customAssocTypeUri,
-                                                        String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri,
-                                                        ViewConfigurationModel viewConfigModel) {
-        super(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri), null,
-            childTopics(customAssocTypeUri));
-        //
-        this.parentCardinalityUri = parentCardinalityUri;
-        this.childCardinalityUri = childCardinalityUri;
-        //
-        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
-    }
-
-    /**
-     * @param   assoc   the underlying association.
-     *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID).
-     */
     AssociationDefinitionModelImpl(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
-                                                           ViewConfigurationModel viewConfigModel) {
+                                                                               ViewConfigurationModel viewConfigModel) {
         super(assoc);
-        //
         this.parentCardinalityUri = parentCardinalityUri;
-        this.childCardinalityUri = childCardinalityUri;
-        //
-        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
-    }
-
-    /**
-     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
-     * which is OK for an update assoc def operation. It can not be used for a create operation.
-     */
-    AssociationDefinitionModelImpl(AssociationModel assoc) {
-        // ### FIXME: the assoc must identify its players **by URI**
-        super(assoc);
-    }
-
-    AssociationDefinitionModelImpl(JSONObject assocDef) throws JSONException {
-        super(assocDef.optLong("id", -1), null, assocDef.getString("assoc_type_uri"), parentRole(assocDef),
-            childRole(assocDef), null, childTopics(assocDef));
-        try {
-            if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
-                throw new RuntimeException("\"parent_cardinality_uri\" is missing");
-            }
-            this.parentCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
-            this.childCardinalityUri  = assocDef.getString("child_cardinality_uri");
-            //
-            this.viewConfigModel = new ViewConfigurationModel(assocDef);
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
-        }
+        this.childCardinalityUri  = childCardinalityUri;
+        this.viewConfigModel = viewConfigModel;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -254,53 +198,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private static TopicRoleModel parentRole(JSONObject assocDef) throws JSONException {
-        return parentRole(assocDef.getString("parent_type_uri"));
-    }
-
-    private static TopicRoleModel parentRole(String parentTypeUri) {
-        return new TopicRoleModel(parentTypeUri, "dm4.core.parent_type");
-    }
-
-    // ---
-
-    private static TopicRoleModel childRole(JSONObject assocDef) throws JSONException {
-        return childRole(assocDef.getString("child_type_uri"));
-    }
-
-    private static TopicRoleModel childRole(String childTypeUri) {
-        return new TopicRoleModel(childTypeUri, "dm4.core.child_type");
-    }
-
-    // ---
-
-    private static ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
-        // Note: getString() called on a key with JSON null value would return the string "null"
-        return childTopics(assocDef.isNull("custom_assoc_type_uri") ? null :
-            assocDef.getString("custom_assoc_type_uri"));
-    }
-
-    private static ChildTopicsModel childTopics(String customAssocTypeUri) {
-        if (customAssocTypeUri != null) {
-            if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                return new ChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
-                    delTopicUri(customAssocTypeUri));
-            } else {
-                return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
-                    customAssocTypeUri);
-            }
-        } else {
-            return null;
-        }
-    }
-
-    // ### TODO: copy in ChildTopicsModel
-    private static String delTopicUri(String val) {
-        return val.substring(DEL_URI_PREFIX.length());
-    }
-
-    // ---
 
     private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dm4.core.aggregation_def")) {

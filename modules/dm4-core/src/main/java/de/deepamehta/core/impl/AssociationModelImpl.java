@@ -32,11 +32,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         this.roleModel2 = roleModel2;
     }
 
-    /* AssociationModelImpl(AssociationModel assoc) {
-        super(assoc);
-        this.roleModel1 = assoc.getRoleModel1();
-        this.roleModel2 = assoc.getRoleModel2();
-    } */
+    AssociationModelImpl(AssociationModel assoc) {
+        this(assoc, assoc.getRoleModel1(), assoc.getRoleModel2());
+    }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

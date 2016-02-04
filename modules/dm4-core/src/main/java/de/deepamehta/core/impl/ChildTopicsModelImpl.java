@@ -44,9 +44,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsModelImpl() {
-    }
-
     ChildTopicsModelImpl(Map<String, Object> childTopics) {
         this.childTopics = childTopics;
     }

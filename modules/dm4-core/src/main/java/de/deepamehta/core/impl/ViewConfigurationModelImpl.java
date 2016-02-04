@@ -22,34 +22,12 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     /**
      * Key: config topic type URI
      */
-    private Map<String, TopicModel> viewConfig = new HashMap();
+    private Map<String, TopicModel> viewConfig;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationModelImpl() {
-    }
-
-    ViewConfigurationModelImpl(Iterable<? extends TopicModel> configTopics) {
-        for (TopicModel topic : configTopics) {
-            addConfigTopic(topic);
-        }
-    }
-
-    /**
-     * @param   configurable    A topic type, an association type, or an association definition.
-     *                          ### FIXME: the sole JSONArray should be passed
-     */
-    ViewConfigurationModelImpl(JSONObject configurable) {
-        try {
-            JSONArray topics = configurable.optJSONArray("view_config_topics");
-            if (topics != null) {
-                for (int i = 0; i < topics.length(); i++) {
-                    addConfigTopic(new TopicModel(topics.getJSONObject(i)));
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONObject=" + configurable + ")", e);
-        }
+    ViewConfigurationModelImpl(Map<String, TopicModel> viewConfig) {
+        this.viewConfig = viewConfig;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
