@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -25,54 +26,17 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationModelImpl(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this(typeUri, roleModel1, roleModel2, null);
-    }
-
-    AssociationModelImpl(String typeUri, RoleModel roleModel1, RoleModel roleModel2, ChildTopicsModel childTopics) {
-        this(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
-    }
-
-    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    AssociationModelImpl() {
-        super(-1);
-    }
-
-    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    AssociationModelImpl(ChildTopicsModel childTopics) {
-        super(childTopics);
-    }
-
-    AssociationModelImpl(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        this(id, uri, typeUri, roleModel1, roleModel2, null, null);
-    }
-
-    AssociationModelImpl(long id, String uri, String typeUri, RoleModel roleModel1, RoleModel roleModel2,
-                                                              SimpleValue value, ChildTopicsModel childTopics) {
-        super(id, uri, typeUri, value, childTopics);
+    AssociationModelImpl(DeepaMehtaObjectModel object, RoleModel roleModel1, RoleModel roleModel2) {
+        super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }
 
-    AssociationModelImpl(AssociationModel assoc) {
+    /* AssociationModelImpl(AssociationModel assoc) {
         super(assoc);
         this.roleModel1 = assoc.getRoleModel1();
         this.roleModel2 = assoc.getRoleModel2();
-    }
-
-    AssociationModelImpl(JSONObject assoc) {
-        super(assoc);
-        try {
-            if (assoc.has("role_1")) {
-                this.roleModel1 = parseRole(assoc.getJSONObject("role_1"));
-            }
-            if (assoc.has("role_2")) {
-                this.roleModel2 = parseRole(assoc.getJSONObject("role_2"));
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
-        }
-    }
+    } */
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -183,20 +147,5 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     @Override
     public String toString() {
         return "association (" + super.toString() + ", " + roleModel1 + ", " + roleModel2 + ")";
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private RoleModel parseRole(JSONObject roleModel) {
-        if (roleModel.has("topic_id") || roleModel.has("topic_uri")) {
-            return new TopicRoleModel(roleModel);
-        } else if (roleModel.has("assoc_id")) {
-            return new AssociationRoleModel(roleModel);
-        } else {
-            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed " +
-                "(JSONObject=" + roleModel + ")");
-        }
     }
 }

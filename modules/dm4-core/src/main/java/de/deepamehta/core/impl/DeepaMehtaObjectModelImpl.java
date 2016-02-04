@@ -26,82 +26,22 @@ abstract class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectModelImpl(ChildTopicsModel childTopics) {
-        this(null, childTopics);
-    }
-
-    DeepaMehtaObjectModelImpl(String typeUri) {
-        this(-1, typeUri);
-    }
-
-    DeepaMehtaObjectModelImpl(String typeUri, SimpleValue value) {
-        this(null, typeUri, value);
-    }
-
-    DeepaMehtaObjectModelImpl(String typeUri, ChildTopicsModel childTopics) {
-        this(null, typeUri, childTopics);
-    }
-
-    DeepaMehtaObjectModelImpl(String uri, String typeUri) {
-        this(-1, uri, typeUri, null, null);
-    }
-
-    DeepaMehtaObjectModelImpl(String uri, String typeUri, SimpleValue value) {
-        this(-1, uri, typeUri, value, null);
-    }
-
-    DeepaMehtaObjectModelImpl(String uri, String typeUri, ChildTopicsModel childTopics) {
-        this(-1, uri, typeUri, null, childTopics);
-    }
-
-    DeepaMehtaObjectModelImpl(long id) {
-        this(id, null, null);
-    }
-
-    DeepaMehtaObjectModelImpl(long id, ChildTopicsModel childTopics) {
-        this(id, null, childTopics);
-    }
-
-    DeepaMehtaObjectModelImpl(long id, String typeUri) {
-        this(id, typeUri, null);
-    }
-
-    DeepaMehtaObjectModelImpl(long id, String typeUri, ChildTopicsModel childTopics) {
-        this(id, null, typeUri, null, childTopics);
-    }
-
-    /**
-     * @param   id          Optional (-1 is a valid value and represents "not set").
-     * @param   uri         Optional (<code>null</code> is a valid value).
-     * @param   typeUri     Mandatory in the context of a create operation.
-     *                      Optional (<code>null</code> is a valid value) in the context of an update operation.
-     * @param   value       Optional (<code>null</code> is a valid value).
-     * @param   childTopics Optional (<code>null</code> is a valid value and is transformed into an empty composite).
-     */
     DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics) {
         this.id = id;
         this.uri = uri;
         this.typeUri = typeUri;
         this.value = value;
-        this.childTopics = childTopics != null ? childTopics : new ChildTopicsModel();
+        this.childTopics = childTopics;
     }
 
     DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {
-        this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel());
-    }
-
-    DeepaMehtaObjectModelImpl(JSONObject object) {
-        try {
-            this.id          = object.optLong("id", -1);
-            this.uri         = object.optString("uri", null);
-            this.typeUri     = object.optString("type_uri", null);
-            this.value       = object.has("value") ? new SimpleValue(object.get("value")) : null;
-            this.childTopics = object.has("childs") ? new ChildTopicsModel(object.getJSONObject("childs"))
-                                                    : new ChildTopicsModel();
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + object + ")", e);
-        }
+        this(
+            object.getId(),
+            object.getUri(),
+            object.getTypeUri(),
+            object.getSimpleValue(),
+            object.getChildTopicsModel()
+        );
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

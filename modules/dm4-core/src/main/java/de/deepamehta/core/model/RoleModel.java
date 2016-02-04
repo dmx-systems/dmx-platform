@@ -28,4 +28,8 @@ public interface RoleModel extends JSONEnabled, Cloneable {
      * @return  true if the given role model refers to the same object as this role model.
      */
     boolean refsSameObject(RoleModel model);
+
+    // ---
+
+    RoleModel clone();
 }

@@ -285,4 +285,8 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
     // ===
 
     String childTypeUri(String assocDefUri);
+
+    // ---
+
+    ChildTopicsModel clone();
 }
