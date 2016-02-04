@@ -105,15 +105,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
 
-    // === Implementation of the abstract methods ===
-
-    @Override
-    public RoleModel createRoleModel(String roleTypeUri) {
-        return new AssociationRoleModel(getId(), roleTypeUri);
-    }
-
-
-
     // === Serialization ===
 
     @Override

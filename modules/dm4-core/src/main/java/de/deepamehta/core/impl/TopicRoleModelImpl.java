@@ -28,24 +28,6 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
         this.topicIdentifiedByUri = true;
     }
 
-    TopicRoleModelImpl(JSONObject topicRoleModel) {
-        try {
-            this.playerId = topicRoleModel.optLong("topic_id", -1);
-            this.topicUri = topicRoleModel.optString("topic_uri", null);
-            this.roleTypeUri = topicRoleModel.getString("role_type_uri");
-            this.topicIdentifiedByUri = topicUri != null;
-            //
-            if (playerId == -1 && topicUri == null) {
-                throw new IllegalArgumentException("Neiter \"topic_id\" nor \"topic_uri\" is set");
-            }
-            if (playerId != -1 && topicUri != null) {
-                throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicRoleModel failed (JSONObject=" + topicRoleModel + ")", e);
-        }
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override

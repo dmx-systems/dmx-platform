@@ -1,13 +1,17 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ModelFactory;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 
@@ -118,6 +122,141 @@ class ModelFactoryImpl implements ModelFactory {
 
 
     // === ChildTopicsModel ===
+
+    @Override
+    public ChildTopicsModel newChildTopicsModel() {
+        return new ChildTopicsModelImpl();
+    }
+
+    @Override
+    public ChildTopicsModel newChildTopicsModel(JSONObject values) {
+        try {
+            Map<String, Object> childTopics = new HashMap();
+            Iterator<String> i = values.keys();
+            while (i.hasNext()) {
+                String assocDefUri = i.next();
+                String childTypeUri = childTypeUri(assocDefUri);
+                Object value = values.get(assocDefUri);
+                if (!(value instanceof JSONArray)) {
+                    put(assocDefUri, createTopicModel(childTypeUri, value));                    // ###
+                } else {
+                    JSONArray valueArray = (JSONArray) value;
+                    for (int j = 0; j < valueArray.length(); j++) {
+                        add(assocDefUri, createTopicModel(childTypeUri, valueArray.get(j)));    // ###
+                    }
+                }
+            }
+            return new ChildTopicsModelImpl(childTopics);
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
+        }
+    }
+
+    // ---
+
+    /**
+     * Creates a topic model from a JSON value.
+     *
+     * Both topic serialization formats are supported:
+     * 1) canonic format -- contains entire topic models.
+     * 2) simplified format -- contains the topic value only (simple or composite).
+     */
+    private RelatedTopicModel createTopicModel(String childTypeUri, Object value) throws JSONException {
+        if (value instanceof JSONObject) {
+            JSONObject val = (JSONObject) value;
+            // we detect the canonic format by checking for mandatory topic properties
+            if (val.has("value") || val.has("childs")) {
+                // canonic format (topic or topic reference)
+                AssociationModel relatingAssoc = null;
+                if (val.has("assoc")) {
+                    relatingAssoc = new AssociationModel(val.getJSONObject("assoc"));
+                }
+                if (val.has("value")) {
+                    RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
+                    if (topicRef != null) {
+                        return topicRef;
+                    }
+                }
+                //
+                initTypeUri(val, childTypeUri);
+                //
+                TopicModel topic = new TopicModel(val);
+                if (relatingAssoc != null) {
+                    return new RelatedTopicModel(topic, relatingAssoc);
+                } else {
+                    return new RelatedTopicModel(topic);
+                }
+            } else {
+                // simplified format (composite topic)
+                return new RelatedTopicModel(new TopicModel(childTypeUri, new ChildTopicsModel(val)));
+            }
+        } else {
+            // simplified format (simple topic or topic reference)
+            RelatedTopicModel topicRef = createReferenceModel(value, null);
+            if (topicRef != null) {
+                return topicRef;
+            }
+            // simplified format (simple topic)
+            return new RelatedTopicModel(new TopicModel(childTypeUri, new SimpleValue(value)));
+        }
+    }
+
+    private RelatedTopicModel createReferenceModel(Object value, AssociationModel relatingAssoc) {
+        if (value instanceof String) {
+            String val = (String) value;
+            if (val.startsWith(REF_ID_PREFIX)) {
+                long topicId = refTopicId(val);
+                if (relatingAssoc != null) {
+                    return new TopicReferenceModel(topicId, relatingAssoc);
+                } else {
+                    return new TopicReferenceModel(topicId);
+                }
+            } else if (val.startsWith(REF_URI_PREFIX)) {
+                String topicUri = refTopicUri(val);
+                if (relatingAssoc != null) {
+                    return new TopicReferenceModel(topicUri, relatingAssoc);
+                } else {
+                    return new TopicReferenceModel(topicUri);
+                }
+            } else if (val.startsWith(DEL_ID_PREFIX)) {
+                return new TopicDeletionModel(delTopicId(val));
+            } else if (val.startsWith(DEL_URI_PREFIX)) {
+                return new TopicDeletionModel(delTopicUri(val));
+            }
+        }
+        return null;
+    }
+
+    private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {
+        if (!value.has("type_uri")) {
+            value.put("type_uri", childTypeUri);
+        } else {
+            // sanity check
+            String typeUri = value.getString("type_uri");
+            if (!typeUri.equals(childTypeUri)) {
+                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has type_uri=\"" +
+                    typeUri + "\"");
+            }
+        }
+    }
+
+    // ---
+
+    private long refTopicId(String val) {
+        return Long.parseLong(val.substring(REF_ID_PREFIX.length()));
+    }
+
+    private String refTopicUri(String val) {
+        return val.substring(REF_URI_PREFIX.length());
+    }
+
+    private long delTopicId(String val) {
+        return Long.parseLong(val.substring(DEL_ID_PREFIX.length()));
+    }
+
+    private String delTopicUri(String val) {
+        return val.substring(DEL_URI_PREFIX.length());
+    }
 
 
 
@@ -233,7 +372,7 @@ class ModelFactoryImpl implements ModelFactory {
         return new AssociationModelImpl(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
     private RoleModel parseRole(JSONObject roleModel) {
         if (roleModel.has("topic_id") || roleModel.has("topic_uri")) {
@@ -243,6 +382,80 @@ class ModelFactoryImpl implements ModelFactory {
         } else {
             throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed " +
                 "(JSONObject=" + roleModel + ")");
+        }
+    }
+
+
+
+    // === TopicRoleModel ===
+
+    @Override
+    public TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri) {
+        return new TopicRoleModelImpl(topicId, roleTypeUri);
+    }
+
+    @Override
+    public TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri) {
+        return new TopicRoleModelImpl(topicUri, roleTypeUri);
+    }
+
+    @Override
+    public TopicRoleModel newTopicRoleModel(JSONObject topicRoleModel) {
+        try {
+            long topicId       = topicRoleModel.optLong("topic_id", -1);
+            String topicUri    = topicRoleModel.optString("topic_uri", null);
+            String roleTypeUri = topicRoleModel.getString("role_type_uri");
+            //
+            if (topicId == -1 && topicUri == null) {
+                throw new IllegalArgumentException("Neiter \"topic_id\" nor \"topic_uri\" is set");
+            }
+            if (topicId != -1 && topicUri != null) {
+                throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
+            }
+            //
+            if (topicId != -1) {
+                return newTopicRoleModel(topicId, roleTypeUri);
+            } else {
+                return newTopicRoleModel(topicUri, roleTypeUri);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing TopicRoleModel failed (JSONObject=" + topicRoleModel + ")", e);
+        }
+    }
+
+
+
+    // === AssociationRoleModel ===
+
+    @Override
+    public AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri) {
+        return new TopicRoleModelImpl(assocId, roleTypeUri);
+    }    
+
+    @Override
+    public AssociationRoleModel newAssociationRoleModel(JSONObject assocRoleModel) {
+        try {
+            long assocId       = assocRoleModel.getLong("assoc_id");
+            String roleTypeUri = assocRoleModel.getString("role_type_uri");
+            return newAssociationRoleModel(assocId, roleTypeUri);
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);
+        }
+    }    
+
+
+
+    // === RoleModel ===
+
+    @Override
+    public RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri) {
+        // Note: can't be located in model classes as models can't create models.
+        if (object instanceof TopicModel) {
+            return newTopicRoleModel(object.getId(), roleTypeUri);
+        } else if (object instanceof AssociationModel) {
+            return newAssociationRoleModel(object.getId(), roleTypeUri);
+        } else {
+            throw new RuntimeException("Unexpected model object: " + object);
         }
     }
 }

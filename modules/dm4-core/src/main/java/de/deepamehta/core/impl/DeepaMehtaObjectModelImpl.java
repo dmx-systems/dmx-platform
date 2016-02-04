@@ -139,10 +139,6 @@ abstract class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         setChildTopicsModel(object.getChildTopicsModel());
     }
 
-    // ---
-
-    // Note: createRoleModel() remains abstract
-
 
 
     // === Serialization ===

@@ -34,7 +34,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Internal representation.
      * Key: assoc def URI (String), value: RelatedTopicModel or List<RelatedTopicModel>
      */
-    private Map<String, Object> childTopics = new HashMap();
+    private Map<String, Object> childTopics;
     // Note: it must be List<RelatedTopicModel>, not Set<RelatedTopicModel>.
     // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
@@ -47,25 +47,8 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     ChildTopicsModelImpl() {
     }
 
-    ChildTopicsModelImpl(JSONObject values) {
-        try {
-            Iterator<String> i = values.keys();
-            while (i.hasNext()) {
-                String assocDefUri = i.next();
-                String childTypeUri = childTypeUri(assocDefUri);
-                Object value = values.get(assocDefUri);
-                if (!(value instanceof JSONArray)) {
-                    put(assocDefUri, createTopicModel(childTypeUri, value));
-                } else {
-                    JSONArray valueArray = (JSONArray) value;
-                    for (int j = 0; j < valueArray.length(); j++) {
-                        add(assocDefUri, createTopicModel(childTypeUri, valueArray.get(j)));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
-        }
+    ChildTopicsModelImpl(Map<String, Object> childTopics) {
+        this.childTopics = childTopics;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -612,111 +595,5 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         } else {
             throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
         }
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    /**
-     * Creates a topic model from a JSON value.
-     *
-     * Both topic serialization formats are supported:
-     * 1) canonic format -- contains entire topic models.
-     * 2) simplified format -- contains the topic value only (simple or composite).
-     */
-    private RelatedTopicModel createTopicModel(String childTypeUri, Object value) throws JSONException {
-        if (value instanceof JSONObject) {
-            JSONObject val = (JSONObject) value;
-            // we detect the canonic format by checking for mandatory topic properties
-            if (val.has("value") || val.has("childs")) {
-                // canonic format (topic or topic reference)
-                AssociationModel relatingAssoc = null;
-                if (val.has("assoc")) {
-                    relatingAssoc = new AssociationModel(val.getJSONObject("assoc"));
-                }
-                if (val.has("value")) {
-                    RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
-                    if (topicRef != null) {
-                        return topicRef;
-                    }
-                }
-                //
-                initTypeUri(val, childTypeUri);
-                //
-                TopicModel topic = new TopicModel(val);
-                if (relatingAssoc != null) {
-                    return new RelatedTopicModel(topic, relatingAssoc);
-                } else {
-                    return new RelatedTopicModel(topic);
-                }
-            } else {
-                // simplified format (composite topic)
-                return new RelatedTopicModel(new TopicModel(childTypeUri, new ChildTopicsModel(val)));
-            }
-        } else {
-            // simplified format (simple topic or topic reference)
-            RelatedTopicModel topicRef = createReferenceModel(value, null);
-            if (topicRef != null) {
-                return topicRef;
-            }
-            // simplified format (simple topic)
-            return new RelatedTopicModel(new TopicModel(childTypeUri, new SimpleValue(value)));
-        }
-    }
-
-    private RelatedTopicModel createReferenceModel(Object value, AssociationModel relatingAssoc) {
-        if (value instanceof String) {
-            String val = (String) value;
-            if (val.startsWith(REF_ID_PREFIX)) {
-                long topicId = refTopicId(val);
-                if (relatingAssoc != null) {
-                    return new TopicReferenceModel(topicId, relatingAssoc);
-                } else {
-                    return new TopicReferenceModel(topicId);
-                }
-            } else if (val.startsWith(REF_URI_PREFIX)) {
-                String topicUri = refTopicUri(val);
-                if (relatingAssoc != null) {
-                    return new TopicReferenceModel(topicUri, relatingAssoc);
-                } else {
-                    return new TopicReferenceModel(topicUri);
-                }
-            } else if (val.startsWith(DEL_ID_PREFIX)) {
-                return new TopicDeletionModel(delTopicId(val));
-            } else if (val.startsWith(DEL_URI_PREFIX)) {
-                return new TopicDeletionModel(delTopicUri(val));
-            }
-        }
-        return null;
-    }
-
-    private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {
-        if (!value.has("type_uri")) {
-            value.put("type_uri", childTypeUri);
-        } else {
-            // sanity check
-            String typeUri = value.getString("type_uri");
-            if (!typeUri.equals(childTypeUri)) {
-                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has type_uri=\"" +
-                    typeUri + "\"");
-            }
-        }
-    }
-
-    // ---
-
-    private long refTopicId(String val) {
-        return Long.parseLong(val.substring(REF_ID_PREFIX.length()));
-    }
-
-    private String refTopicUri(String val) {
-        return val.substring(REF_URI_PREFIX.length());
-    }
-
-    private long delTopicId(String val) {
-        return Long.parseLong(val.substring(DEL_ID_PREFIX.length()));
-    }
-
-    private String delTopicUri(String val) {
-        return val.substring(DEL_URI_PREFIX.length());
     }
 }

@@ -1,11 +1,13 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -65,6 +67,10 @@ public interface ModelFactory {
 
     // === ChildTopicsModel ===
 
+    ChildTopicsModel newChildTopicsModel();
+
+    ChildTopicsModel newChildTopicsModel(JSONObject values);
+
 
 
     // === TopicModel ===
@@ -94,4 +100,26 @@ public interface ModelFactory {
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                               RoleModel roleModel2);
 
+
+    // === TopicRoleModel ===
+    
+    TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri);
+
+    TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri);
+
+    TopicRoleModel newTopicRoleModel(JSONObject topicRoleModel);
+
+
+
+    // === AssociationRoleModel ===
+
+    AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri);
+
+    AssociationRoleModel newAssociationRoleModel(JSONObject assocRoleModel);
+
+
+
+    // === RoleModel ===
+
+    RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri);
 }

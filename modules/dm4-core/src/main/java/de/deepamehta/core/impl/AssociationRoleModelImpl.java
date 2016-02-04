@@ -15,15 +15,6 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
         super(assocId, roleTypeUri);
     }
 
-    AssociationRoleModelImpl(JSONObject assocRoleModel) {
-        try {
-            this.playerId = assocRoleModel.getLong("assoc_id");
-            this.roleTypeUri = assocRoleModel.getString("role_type_uri");
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);
-        }
-    }
-
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // === Implementation of abstract RoleModel methods ===
