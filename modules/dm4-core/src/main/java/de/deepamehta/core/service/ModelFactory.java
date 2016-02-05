@@ -3,15 +3,21 @@ package de.deepamehta.core.service;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.List;
 
 
 
@@ -131,6 +137,42 @@ public interface ModelFactory {
     // === RoleModel ===
 
     RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri);
+
+
+
+    // === TypeModel ===
+
+    TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri,
+                           List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                           List<String> labelConfig, ViewConfigurationModel viewConfig);
+
+    TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri);
+
+    TypeModel newTypeModel(JSONObject typeModel);
+
+
+
+    // === TopicTypeModel ===
+
+    TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
+                                     List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                     List<String> labelConfig, ViewConfigurationModel viewConfig);
+
+    TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
+
+    TopicTypeModel newTopicTypeModel(JSONObject topicType);
+
+
+
+    // === AssociationTypeModel ===
+
+    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
+                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                                 List<String> labelConfig, ViewConfigurationModel viewConfig);
+
+    AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
+
+    AssociationTypeModel newAssociationTypeModel(JSONObject assocType);
 
 
 

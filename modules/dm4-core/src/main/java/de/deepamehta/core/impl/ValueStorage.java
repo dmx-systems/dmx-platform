@@ -272,8 +272,8 @@ class ValueStorage {
                                                            AssociationDefinitionModel assocDef) {
         AssociationModel assoc = childTopic.getRelatingAssociation();
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
-        assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
-        assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
+        assoc.setRoleModel1(dms.mf.createRoleModel(parent, "dm4.core.parent"));
+        assoc.setRoleModel2(dms.mf.createRoleModel(childTopic, "dm4.core.child"));
         dms.createAssociation(assoc);
     }
 

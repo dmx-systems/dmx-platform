@@ -913,8 +913,8 @@ public class EmbeddedService implements DeepaMehtaService {
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
-            TopicModel dataType = new TopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
-            TopicModel roleType = new TopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
+            TopicModel dataType = mf.newTopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
+            TopicModel roleType = mf.newTopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
             _createTopic(dataType);
             _createTopic(roleType);
             // Create data type "Text"
@@ -928,10 +928,10 @@ public class EmbeddedService implements DeepaMehtaService {
             _createTopic(type);
             _createTopic(inst);
             // Create association type "Aggregation" -- needed to associate topic/association types with data types
-            TopicModel aggregation = new AssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
+            TopicModel aggregation = mf.newAssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
             _createTopic(aggregation);
             // Create association type "Instantiation" -- needed to associate topics with topic types
-            TopicModel instn = new AssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
+            TopicModel instn = mf.newAssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
             _createTopic(instn);
             //
             // 1) Postponed topic type association
@@ -1011,7 +1011,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void bootstrapTypeCache() {
-        TopicTypeModel metaMetaType = new TopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type", "dm4.core.text");
+        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type", "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
         typeCache.putTopicType(new AttachedTopicType(metaMetaType, this));
     }

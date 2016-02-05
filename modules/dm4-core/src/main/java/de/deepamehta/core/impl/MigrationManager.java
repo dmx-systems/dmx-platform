@@ -220,13 +220,13 @@ class MigrationManager {
 
     private void createTopicTypes(JSONArray topicTypes) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
-            dms.createTopicType(new TopicTypeModel(topicTypes.getJSONObject(i)));
+            dms.createTopicType(dms.mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
         }
     }
 
     private void createAssociationTypes(JSONArray assocTypes) throws JSONException {
         for (int i = 0; i < assocTypes.length(); i++) {
-            dms.createAssociationType(new AssociationTypeModel(assocTypes.getJSONObject(i)));
+            dms.createAssociationType(dms.mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
         }
     }
 

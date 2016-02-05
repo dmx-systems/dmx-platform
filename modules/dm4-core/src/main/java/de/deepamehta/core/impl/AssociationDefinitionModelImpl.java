@@ -28,11 +28,6 @@ import java.util.logging.Logger;
  */
 class AssociationDefinitionModelImpl extends AssociationModelImpl implements AssociationDefinitionModel {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    // ### TODO: copy in ChildTopicsModel
-    private static final String DEL_URI_PREFIX = "del_uri:";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String parentCardinalityUri;

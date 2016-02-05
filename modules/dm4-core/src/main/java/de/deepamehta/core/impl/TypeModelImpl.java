@@ -2,18 +2,14 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -35,41 +31,15 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(String uri, String topicTypeUri, SimpleValue value, String dataTypeUri) {
-        super(uri, topicTypeUri, value);
-        this.dataTypeUri = dataTypeUri;
-        this.indexModes = new ArrayList();
-        this.assocDefs = new SequencedHashMap();
-        this.labelConfig = new ArrayList();
-        this.viewConfig = new ViewConfigurationModel();
-    }
-
-    TypeModelImpl(TopicModel topic, String dataTypeUri, List<IndexMode> indexModes,
-                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+    TypeModelImpl(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
+                  SequencedHashMap<String, AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                   ViewConfigurationModel viewConfig) {
-        super(topic);
+        super(typeTopic);   // ### childTopics may null
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
-        this.assocDefs = new SequencedHashMap();
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            addAssocDef(assocDef);
-        }
+        this.assocDefs = assocDefs;
         this.labelConfig = labelConfig;
         this.viewConfig = viewConfig;
-    }
-
-    TypeModelImpl(JSONObject typeModel) {
-        super(typeModel);
-        try {
-            this.dataTypeUri = typeModel.getString("data_type_uri");
-            this.indexModes = IndexMode.parse(typeModel);
-            this.assocDefs = new SequencedHashMap();
-            this.labelConfig = parseLabelConfig(typeModel);
-            this.viewConfig = new ViewConfigurationModel(typeModel);
-            parseAssocDefs(typeModel);
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing TypeModel failed (JSONObject=" + typeModel + ")", e);
-        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -366,26 +336,6 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private List<String> parseLabelConfig(JSONObject typeModel) throws JSONException {
-        if (typeModel.has("label_config")) {
-            return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
-        }
-        return new ArrayList();
-    }
-
-    private void parseAssocDefs(JSONObject typeModel) throws JSONException {
-        JSONArray assocDefs = typeModel.optJSONArray("assoc_defs");
-        if (assocDefs != null) {
-            for (int i = 0; i < assocDefs.length(); i++) {
-                JSONObject assocDef = assocDefs.getJSONObject(i);
-                assocDef.put("parent_type_uri", this.uri);
-                addAssocDef(new AssociationDefinitionModel(assocDef));
-            }
-        }
-    }
-
-    // ---
 
     private AssociationDefinitionModel getAssocDefOrThrow(String assocDefUri) {
         AssociationDefinitionModel assocDef = _getAssocDef(assocDefUri);

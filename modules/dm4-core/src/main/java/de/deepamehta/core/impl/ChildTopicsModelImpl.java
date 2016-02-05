@@ -21,13 +21,6 @@ import java.util.logging.Logger;
 
 class ChildTopicsModelImpl implements ChildTopicsModel {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String REF_ID_PREFIX  = "ref_id:";
-    private static final String REF_URI_PREFIX = "ref_uri:";
-    private static final String DEL_ID_PREFIX  = "del_id:";
-    private static final String DEL_URI_PREFIX = "del_uri:";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**

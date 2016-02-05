@@ -124,7 +124,8 @@ class TypeStorageImpl implements TypeStorage {
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic.getModel());
         //
-        return new TopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        return dms.mf.newTopicTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig);
     }
 
     // ### TODO: unify with previous method
@@ -139,7 +140,7 @@ class TypeStorageImpl implements TypeStorage {
         List<String> labelConfig = fetchLabelConfig(assocDefs);
         ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic.getModel());
         //
-        return new AssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig,
+        return dms.mf.newAssociationTypeModel(typeTopic.getModel(), dataTypeUri, indexModes, assocDefs, labelConfig,
             viewConfig);
     }
 
@@ -344,8 +345,8 @@ class TypeStorageImpl implements TypeStorage {
      */
     private void prepareAssocModel(AssociationModel assoc, String parentTypeUri, String childTypeUri) {
         long assocDefId = assoc.getId();
-        assoc.setRoleModel1(new TopicRoleModel(parentTypeUri, "dm4.core.parent_type"));
-        assoc.setRoleModel2(new TopicRoleModel(childTypeUri,  "dm4.core.child_type"));
+        assoc.setRoleModel1(dms.mf.newTopicRoleModel(parentTypeUri, "dm4.core.parent_type"));
+        assoc.setRoleModel2(dms.mf.newTopicRoleModel(childTypeUri,  "dm4.core.child_type"));
         ChildTopicsModel childTopics = assoc.getChildTopicsModel();
         RelatedTopicModel customAssocType = fetchCustomAssocType(assocDefId);
         if (customAssocType != null) {
@@ -507,8 +508,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
-            new AssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
+            dms.mf.newTopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
+            dms.mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def"));
     }
 
 
@@ -622,14 +623,14 @@ class TypeStorageImpl implements TypeStorage {
 
     private void storeSequenceStart(long typeId, long assocDefId) {
         dms.createAssociation("dm4.core.aggregation",
-            new TopicRoleModel(typeId, "dm4.core.type"),
-            new AssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
+            dms.mf.newTopicRoleModel(typeId, "dm4.core.type"),
+            dms.mf.newAssociationRoleModel(assocDefId, "dm4.core.sequence_start"));
     }
 
     private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
         dms.createAssociation("dm4.core.sequence",
-            new AssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
-            new AssociationRoleModel(succAssocDefId, "dm4.core.successor"));
+            dms.mf.newAssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
+            dms.mf.newAssociationRoleModel(succAssocDefId, "dm4.core.successor"));
     }
 
     // ---
@@ -680,9 +681,9 @@ class TypeStorageImpl implements TypeStorage {
             // This means retrieving a type that is in-mid its storage process. Strange errors would occur.
             // As a workaround we create the child topic manually.
             Topic topic = dms.createTopic(new TopicModel("dm4.core.include_in_label", new SimpleValue(includeInLabel)));
-            dms.createAssociation(new AssociationModel("dm4.core.composition",
-                new AssociationRoleModel(assocDef.getId(), "dm4.core.parent"),
-                new TopicRoleModel(topic.getId(), "dm4.core.child")
+            dms.createAssociation(dms.mf.newAssociationModel("dm4.core.composition",
+                dms.mf.newAssociationRoleModel(assocDef.getId(), "dm4.core.parent"),
+                dms.mf.newTopicRoleModel(topic.getId(), "dm4.core.child")
             ));
         }
     }
@@ -731,7 +732,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private ViewConfigurationModel viewConfigModel(Iterable<? extends TopicModel> configTopics) {
         fetchChildTopics(configTopics);
-        return new ViewConfigurationModel(configTopics);
+        return dms.mf.newViewConfigurationModel(configTopics);
     }
 
     // --- Store ---
@@ -748,7 +749,7 @@ class TypeStorageImpl implements TypeStorage {
 
     Topic storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
         Topic topic = dms.createTopic(configTopic);
-        dms.createAssociation("dm4.core.aggregation", configurable, new TopicRoleModel(topic.getId(),
+        dms.createAssociation("dm4.core.aggregation", configurable, dms.mf.newTopicRoleModel(topic.getId(),
             "dm4.core.view_config"));
         return topic;
     }
@@ -764,10 +765,10 @@ class TypeStorageImpl implements TypeStorage {
     // ---
 
     RoleModel createConfigurableType(long typeId) {
-        return new TopicRoleModel(typeId, "dm4.core.type");
+        return dms.mf.newTopicRoleModel(typeId, "dm4.core.type");
     }
 
     RoleModel createConfigurableAssocDef(long assocDefId) {
-        return new AssociationRoleModel(assocDefId, "dm4.core.assoc_def");
+        return dms.mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def");
     }
 }

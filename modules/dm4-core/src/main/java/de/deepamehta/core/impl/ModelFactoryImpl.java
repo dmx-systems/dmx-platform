@@ -3,22 +3,42 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ModelFactory;
+import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.SequencedHashMap;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 
 class ModelFactoryImpl implements ModelFactory {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String REF_ID_PREFIX  = "ref_id:";
+    private static final String REF_URI_PREFIX = "ref_uri:";
+    private static final String DEL_ID_PREFIX  = "del_id:";
+    private static final String DEL_URI_PREFIX = "del_uri:";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -466,6 +486,111 @@ class ModelFactoryImpl implements ModelFactory {
 
 
 
+    // === TypeModel ===
+
+    @Override
+    public TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
+                                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                                  ViewConfigurationModel viewConfig) {
+        SequencedHashMap<String, AssociationDefinitionModel> _assocDefs = new SequencedHashMap();
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            addAssocDef(assocDef);      // ###
+        }
+        return new TypeModelImpl(typeTopic, dataTypeUri, indexModes, _assocDefs, labelConfig, viewConfig);
+    }
+
+    // ### internal?
+    @Override
+    public TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
+        return new TypeModelImpl(
+            newTopicModel(uri, typeUri, value), dataTypeUri,
+            new ArrayList(), new SequencedHashMap(), new ArrayList(), newViewConfigurationModel()
+        );
+    }
+
+    @Override
+    public TypeModel newTypeModel(JSONObject typeModel) {
+        try {
+            return new TypeModelImpl(
+                newTopicModel(typeModel), typeModel.getString("data_type_uri"),
+                IndexMode.parse(typeModel), parseAssocDefs(typeModel), parseLabelConfig(typeModel),
+                newViewConfigurationModel(typeModel)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing TypeModel failed (JSONObject=" + typeModel + ")", e);
+        }
+    }
+
+    // ---
+
+    private List<String> parseLabelConfig(JSONObject typeModel) throws JSONException {
+        if (typeModel.has("label_config")) {
+            return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
+        }
+        return new ArrayList();
+    }
+
+    private SequencedHashMap<String, AssociationDefinitionModel> parseAssocDefs(JSONObject typeModel)
+                                                                                                  throws JSONException {
+        SequencedHashMap<String, AssociationDefinitionModel> assocDefs = new SequencedHashMap();
+        JSONArray _assocDefs = typeModel.optJSONArray("assoc_defs");
+        if (_assocDefs != null) {
+            for (int i = 0; i < _assocDefs.length(); i++) {
+                JSONObject assocDef = _assocDefs.getJSONObject(i);
+                assocDef.put("parent_type_uri", this.uri);              // ###
+                addAssocDef(newAssociationDefinitionModel(assocDef));   // ###
+            }
+        }
+        return assocDefs;
+    }
+
+
+
+    // === TopicTypeModel ===
+
+    @Override
+    public TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
+                                            List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                            List<String> labelConfig, ViewConfigurationModel viewConfig) {
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig));
+    }
+
+    @Override
+    public TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri) {
+        return new TopicTypeModelImpl(newTypeModel(uri, "dm4.core.topic_type", new SimpleValue(value), dataTypeUri));
+    }
+
+    @Override
+    public TopicTypeModel newTopicTypeModel(JSONObject topicType) {
+        return new TopicTypeModelImpl(newTypeModel(topicType.put("type_uri", "dm4.core.topic_type")));
+    }
+
+
+
+    // === AssociationTypeModel ===
+
+    @Override
+    public AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
+                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                                 List<String> labelConfig, ViewConfigurationModel viewConfig) {
+        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig));
+    }
+
+    @Override
+    public AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri) {
+        return new AssociationTypeModelImpl(newTypeModel(uri, "dm4.core.assoc_type", new SimpleValue(value),
+            dataTypeUri));
+    }
+
+    @Override
+    public AssociationTypeModel newAssociationTypeModel(JSONObject assocType) {
+        return new AssociationTypeModelImpl(newTypeModel(assocType.put("type_uri", "dm4.core.assoc_type")));
+    }
+
+
+
     // === AssociationDefinitionModel ===
 
     @Override
@@ -598,7 +723,7 @@ class ModelFactoryImpl implements ModelFactory {
 
     /**
      * @param   configurable    A topic type, an association type, or an association definition.
-     *                          ### FIXME: the sole JSONArray should be passed
+     *                          ### TODO: pass sole JSONArray?
      */
     @Override
     public ViewConfigurationModel newViewConfigurationModel(JSONObject configurable) {
