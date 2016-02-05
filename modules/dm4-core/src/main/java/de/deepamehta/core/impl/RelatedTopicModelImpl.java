@@ -18,41 +18,6 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicModelImpl(long topicId) {
-        super(topicId);
-        this.relatingAssoc = new AssociationModel();
-    }
-
-    RelatedTopicModelImpl(long topicId, AssociationModel relatingAssoc) {
-        super(topicId);
-        this.relatingAssoc = relatingAssoc;
-    }
-
-    RelatedTopicModelImpl(String topicUri) {
-        super(topicUri, (String) null);     // topicTypeUri=null
-        this.relatingAssoc = new AssociationModel();
-    }
-
-    RelatedTopicModelImpl(String topicUri, AssociationModel relatingAssoc) {
-        super(topicUri, (String) null);     // topicTypeUri=null
-        this.relatingAssoc = relatingAssoc;
-    }
-
-    RelatedTopicModelImpl(String topicTypeUri, SimpleValue value) {
-        super(topicTypeUri, value);
-        this.relatingAssoc = new AssociationModel();
-    }
-
-    RelatedTopicModelImpl(String topicTypeUri, ChildTopicsModel childTopics) {
-        super(topicTypeUri, childTopics);
-        this.relatingAssoc = new AssociationModel();
-    }
-
-    RelatedTopicModelImpl(TopicModel topic) {
-        super(topic);
-        this.relatingAssoc = new AssociationModel();
-    }
-
     RelatedTopicModelImpl(TopicModel topic, AssociationModel relatingAssoc) {
         super(topic);
         this.relatingAssoc = relatingAssoc;

@@ -24,6 +24,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -60,7 +61,7 @@ class ModelFactoryImpl implements ModelFactory {
     public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                          ChildTopicsModel childTopics) {
         if (childTopics == null) {
-            childTopics = newChildTopicsModelImpl();
+            childTopics = newChildTopicsModel();
         }
         return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics);
     }
@@ -290,53 +291,56 @@ class ModelFactoryImpl implements ModelFactory {
         return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
     }
 
-    @Override
-    public TopicModel newTopicModel(JSONObject topic) {
-        return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
-    }
-
-    // ---
-
     /* TopicModelImpl(ChildTopicsModel childTopics) {
         super(childTopics);
     }
 
     TopicModelImpl(String typeUri) {
         super(typeUri);
-    }
-
-    TopicModelImpl(String typeUri, SimpleValue value) {
-        super(typeUri, value);
-    }
-
-    TopicModelImpl(String typeUri, ChildTopicsModel childTopics) {
-        super(typeUri, childTopics);
-    }
-
-    TopicModelImpl(String uri, String typeUri) {
-        super(uri, typeUri);
     } */
+
+    @Override
+    public TopicModel newTopicModel(String typeUri, SimpleValue value) {
+        return newTopicModel(-1, null, typeUri, value, null);
+    }
+
+    @Override
+    public TopicModel newTopicModel(String typeUri, ChildTopicsModel childTopics) {
+        return newTopicModel(-1, null, typeUri, null, childTopics);
+    }
+
+    @Override
+    public TopicModel newTopicModel(String uri, String typeUri) {
+        return newTopicModel(-1, uri, typeUri, null, null);
+    }
 
     @Override
     public TopicModel newTopicModel(String uri, String typeUri, SimpleValue value) {
         return newTopicModel(-1, uri, typeUri, value, null);
     }
 
-    /* TopicModelImpl(String uri, String typeUri, ChildTopicsModel childTopics) {
-        super(uri, typeUri, childTopics);
+    @Override
+    public TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics) {
+        return newTopicModel(-1, uri, typeUri, null, childTopics);
     }
 
-    TopicModelImpl(long id) {
-        super(id);
+    @Override
+    public TopicModel newTopicModel(long id) {
+        return newTopicModel(id, null, null, null, null);
     }
 
-    TopicModelImpl(long id, String typeUri) {
+    /* TopicModelImpl(long id, String typeUri) {
         super(id, typeUri);
     }
 
     TopicModelImpl(long id, ChildTopicsModel childTopics) {
         super(id, childTopics);
     } */
+
+    @Override
+    public TopicModel newTopicModel(JSONObject topic) {
+        return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
+    }
 
 
 
@@ -348,25 +352,6 @@ class ModelFactoryImpl implements ModelFactory {
         return new AssociationModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics), roleModel1,
             roleModel2);
     }
-
-    @Override
-    public AssociationModel newAssociationModel(JSONObject assoc) {
-        try {
-            return new AssociationModelImpl(newDeepaMehtaObjectModel(assoc),
-                assoc.has("role_1") ? parseRole(assoc.getJSONObject("role_1")) : null,
-                assoc.has("role_2") ? parseRole(assoc.getJSONObject("role_2")) : null
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
-        }
-    }
-
-    @Override
-    public AssociationModel newAssociationModel(AssociationModel assoc) {
-        return new AssociationModelImpl(assoc);
-    }
-
-    // ---
 
     @Override
     public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
@@ -395,6 +380,23 @@ class ModelFactoryImpl implements ModelFactory {
     public AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                                      RoleModel roleModel2) {
         return new AssociationModelImpl(id, uri, typeUri, roleModel1, roleModel2, null, null);
+    }
+
+    @Override
+    public AssociationModel newAssociationModel(AssociationModel assoc) {
+        return new AssociationModelImpl(assoc);
+    }
+
+    @Override
+    public AssociationModel newAssociationModel(JSONObject assoc) {
+        try {
+            return new AssociationModelImpl(newDeepaMehtaObjectModel(assoc),
+                assoc.has("role_1") ? parseRole(assoc.getJSONObject("role_1")) : null,
+                assoc.has("role_2") ? parseRole(assoc.getJSONObject("role_2")) : null
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
+        }
     }
 
     // ---
@@ -482,6 +484,90 @@ class ModelFactoryImpl implements ModelFactory {
         } else {
             throw new RuntimeException("Unexpected model object: " + object);
         }
+    }
+
+
+
+    // === RelatedTopicModel ===
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(long topicId) {
+        return new RelatedTopicModelImpl(newTopicModel(topicId), newAssociationModel());
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
+        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()
+        return new RelatedTopicModelImpl(newTopicModel(topicId), relatingAssoc);
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(String topicUri) {
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, null), newAssociationModel()); // topicTypeUri=null
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
+        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, null), relatingAssoc);         // topicTypeUri=null
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(String topicTypeUri, SimpleValue value) {
+        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, value), newAssociationModel());
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics) {
+        return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, childTopics), newAssociationModel());
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(TopicModel topic) {
+        // ### FIXME: topic's childTopics might be null, call newDeepaMehtaObjectModel()
+        return new RelatedTopicModelImpl(topic, newAssociationModel());
+    }
+
+    @Override
+    public RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
+        // ### FIXME: childTopics might be null, call newDeepaMehtaObjectModel()
+        return new RelatedTopicModelImpl(topic, relatingAssoc);
+    }
+
+
+
+    // === TopicReferenceModel ===
+
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(long topicId) {
+        return new TopicReferenceModelImpl(newRelatedTopicModel(topicId));
+    }
+
+    /* TopicReferenceModelImpl(long topicId, AssociationModel relatingAssoc) {
+        super(topicId, relatingAssoc);
+    } */
+
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(String topicUri) {
+        return new TopicReferenceModelImpl(newRelatedTopicModel(topicUri));
+    }
+
+    /* TopicReferenceModelImpl(String topicUri, AssociationModel relatingAssoc) {
+        super(topicUri, relatingAssoc);
+    } */
+
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {
+        return new TopicReferenceModelImpl(
+            newRelatedTopicModel(topicId, newAssociationModel(relatingAssocChildTopics))
+        );
+    }
+
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics) {
+        return new TopicReferenceModelImpl(
+            newRelatedTopicModel(topicUri, newAssociationModel(relatingAssocChildTopics))
+        );
     }
 
 
@@ -607,6 +693,39 @@ class ModelFactoryImpl implements ModelFactory {
         return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
     }
 
+    /* AssociationDefinitionModelImpl(String assocTypeUri, String parentTypeUri, String childTypeUri,
+                                                        String parentCardinalityUri, String childCardinalityUri) {
+        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
+    }
+
+    AssociationDefinitionModelImpl(String assocTypeUri, String customAssocTypeUri,
+                                                        String parentTypeUri, String childTypeUri,
+                                                        String parentCardinalityUri, String childCardinalityUri) {
+        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
+            childCardinalityUri, null);
+    } */
+
+    /**
+     * @param   assoc   the underlying association.
+     *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID). ### still true?
+     */
+    @Override
+    public AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri,
+                                                   String childCardinalityUri, ViewConfigurationModel viewConfigModel) {
+        // ### FIXME: may assoc's childTopics uninitialized? may viewConfigModel null?
+        // ### Should we call the canonic newAssociationDefinitionModel()?
+        return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
+    }
+
+    /**
+     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
+     * which is OK for an update assoc def operation. It can not be used for a create operation.
+     *
+    AssociationDefinitionModelImpl(AssociationModel assoc) {
+        // ### FIXME: the assoc must identify its players **by URI**
+        super(assoc);
+    } */
+
     @Override
     public AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef) {
         try {
@@ -625,41 +744,6 @@ class ModelFactoryImpl implements ModelFactory {
             throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
     }
-
-    /* AssociationDefinitionModelImpl(String assocTypeUri, String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
-    }
-
-    AssociationDefinitionModelImpl(String assocTypeUri, String customAssocTypeUri,
-                                                        String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
-            childCardinalityUri, null);
-    } */
-
-    /**
-     * @param   assoc   the underlying association.
-     *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID).
-     *
-    AssociationDefinitionModelImpl(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
-                                                           ViewConfigurationModel viewConfigModel) {
-        super(assoc);
-        //
-        this.parentCardinalityUri = parentCardinalityUri;
-        this.childCardinalityUri = childCardinalityUri;
-        //
-        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : new ViewConfigurationModel();
-    } */
-
-    /**
-     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
-     * which is OK for an update assoc def operation. It can not be used for a create operation.
-     *
-    AssociationDefinitionModelImpl(AssociationModel assoc) {
-        // ### FIXME: the assoc must identify its players **by URI**
-        super(assoc);
-    } */
 
     // ---
 

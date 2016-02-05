@@ -11,6 +11,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
+import de.deepamehta.core.service.ModelFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ class AttachedChildTopics implements ChildTopics {
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
     private EmbeddedService dms;
+    private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -48,6 +50,7 @@ class AttachedChildTopics implements ChildTopics {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
+        this.mf = dms.mf;
         initChildTopics();
     }
 
@@ -198,41 +201,41 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics set(String assocDefUri, TopicModel value) {
-        return _updateOne(assocDefUri, new RelatedTopicModel(value));
+        return _updateOne(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
     // ---
 
     @Override
     public ChildTopics set(String assocDefUri, Object value) {
-        return _updateOne(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
+        return _updateOne(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics set(String assocDefUri, ChildTopicsModel value) {
-        return _updateOne(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), value));
+        return _updateOne(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), value));
     }
 
     // ---
 
     @Override
     public ChildTopics setRef(String assocDefUri, long refTopicId) {
-        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicId));
+        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicId));
     }
 
     @Override
     public ChildTopics setRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
+        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
     }
 
     @Override
     public ChildTopics setRef(String assocDefUri, String refTopicUri) {
-        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicUri));
+        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
     }
 
     @Override
     public ChildTopics setRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateOne(assocDefUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+        return _updateOne(assocDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -251,41 +254,41 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics add(String assocDefUri, TopicModel value) {
-        return _updateMany(assocDefUri, new RelatedTopicModel(value));
+        return _updateMany(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
     // ---
 
     @Override
     public ChildTopics add(String assocDefUri, Object value) {
-        return _updateMany(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
+        return _updateMany(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics add(String assocDefUri, ChildTopicsModel value) {
-        return _updateMany(assocDefUri, new RelatedTopicModel(childTypeUri(assocDefUri), value));
+        return _updateMany(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), value));
     }
 
     // ---
 
     @Override
     public ChildTopics addRef(String assocDefUri, long refTopicId) {
-        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicId));
+        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicId));
     }
 
     @Override
     public ChildTopics addRef(String assocDefUri, long refTopicId, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicId, relatingAssocChildTopics));
+        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicId, relatingAssocChildTopics));
     }
 
     @Override
     public ChildTopics addRef(String assocDefUri, String refTopicUri) {
-        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicUri));
+        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
     }
 
     @Override
     public ChildTopics addRef(String assocDefUri, String refTopicUri, ChildTopicsModel relatingAssocChildTopics) {
-        return _updateMany(assocDefUri, new TopicReferenceModel(refTopicUri, relatingAssocChildTopics));
+        return _updateMany(assocDefUri, mf.newTopicReferenceModel(refTopicUri, relatingAssocChildTopics));
     }
 
     // ---
@@ -449,12 +452,12 @@ class AttachedChildTopics implements ChildTopics {
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
 
     private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(new ChildTopicsModel().put(assocDefUri, newChildTopic));
+        parent.updateChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
         return this;
     }
 
     private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(new ChildTopicsModel().add(assocDefUri, newChildTopic));
+        parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
     }
 

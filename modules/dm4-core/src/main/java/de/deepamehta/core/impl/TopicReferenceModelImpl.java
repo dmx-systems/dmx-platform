@@ -2,8 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 
 import java.util.List;
@@ -14,28 +13,8 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicReferenceModelImpl(long topicId) {
-        super(topicId);
-    }
-
-    TopicReferenceModelImpl(long topicId, AssociationModel relatingAssoc) {
-        super(topicId, relatingAssoc);
-    }
-
-    TopicReferenceModelImpl(String topicUri) {
-        super(topicUri);
-    }
-
-    TopicReferenceModelImpl(String topicUri, AssociationModel relatingAssoc) {
-        super(topicUri, relatingAssoc);
-    }
-
-    TopicReferenceModelImpl(long topicId, ChildTopicsModel relatingAssocChildTopics) {
-        super(topicId, new AssociationModel(relatingAssocChildTopics));
-    }
-
-    TopicReferenceModelImpl(String topicUri, ChildTopicsModel relatingAssocChildTopics) {
-        super(topicUri, new AssociationModel(relatingAssocChildTopics));
+    TopicReferenceModelImpl(RelatedTopicModel relatedTopic) {
+        super(relatedTopic);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

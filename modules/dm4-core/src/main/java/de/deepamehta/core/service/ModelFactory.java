@@ -7,9 +7,11 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
@@ -85,23 +87,26 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics);
 
-    TopicModel newTopicModel(JSONObject topic);
+    TopicModel newTopicModel(String typeUri, SimpleValue value);
 
-    // ---
+    TopicModel newTopicModel(String typeUri, ChildTopicsModel childTopics);
+
+    TopicModel newTopicModel(String uri, String typeUri);
 
     TopicModel newTopicModel(String uri, String typeUri, SimpleValue value);
+
+    TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics);
+
+    TopicModel newTopicModel(long id);
+
+    TopicModel newTopicModel(JSONObject topic);
+
 
 
     // === AssociationModel ===
 
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                          RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics);
-
-    AssociationModel newAssociationModel(JSONObject assoc);
-
-    AssociationModel newAssociationModel(AssociationModel assoc);
-
-    // ---
 
     AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2);
 
@@ -114,6 +119,11 @@ public interface ModelFactory {
 
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                               RoleModel roleModel2);
+
+    AssociationModel newAssociationModel(AssociationModel assoc);
+
+    AssociationModel newAssociationModel(JSONObject assoc);
+
 
 
     // === TopicRoleModel ===
@@ -137,6 +147,38 @@ public interface ModelFactory {
     // === RoleModel ===
 
     RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri);
+
+
+
+    // === RelatedTopicModel ===
+
+    RelatedTopicModel newRelatedTopicModel(long topicId);
+
+    RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc);
+
+    RelatedTopicModel newRelatedTopicModel(String topicUri);
+
+    RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc);
+
+    RelatedTopicModel newRelatedTopicModel(String topicTypeUri, SimpleValue value);
+
+    RelatedTopicModel newRelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics);
+
+    RelatedTopicModel newRelatedTopicModel(TopicModel topic);
+
+    RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc);
+
+
+
+    // === TopicReferenceModel ===
+
+    TopicReferenceModel newTopicReferenceModel(long topicId);
+
+    TopicReferenceModel newTopicReferenceModel(String topicUri);
+
+    TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics);
+
+    TopicReferenceModel newTopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics);
 
 
 
@@ -183,6 +225,9 @@ public interface ModelFactory {
                                                              String parentTypeUri, String childTypeUri,
                                                              String parentCardinalityUri, String childCardinalityUri,
                                                              ViewConfigurationModel viewConfigModel);
+
+    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri,
+                                                    String childCardinalityUri, ViewConfigurationModel viewConfigModel);
 
     AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
 

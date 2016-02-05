@@ -4,14 +4,13 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
@@ -41,6 +40,8 @@ import java.util.logging.Logger;
 
 
 
+// ### TODO: refactoring? This class does to much.
+// ### It lies about its dependencies. It depends on dms but dms is not passed to constructor.
 public class PluginImpl implements Plugin, EventHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -65,6 +66,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // Consumed services (DeepaMehta Core and OSGi)
     private EmbeddedService dms;
+    private ModelFactory mf;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
     // Consumed services (injected)
@@ -442,6 +444,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void setCoreService(EmbeddedService dms) {
         this.dms = dms;
+        this.mf = dms.mf;
         pluginContext.setCoreService(dms);
     }
 
@@ -553,7 +556,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private Topic createPluginTopic() {
-        return dms.createTopic(new TopicModel(pluginUri, "dm4.core.plugin", new ChildTopicsModel()
+        return dms.createTopic(mf.newTopicModel(pluginUri, "dm4.core.plugin", mf.newChildTopicsModel()
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
