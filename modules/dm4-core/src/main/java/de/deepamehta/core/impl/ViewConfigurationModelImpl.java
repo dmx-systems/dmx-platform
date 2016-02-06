@@ -22,19 +22,19 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     /**
      * Key: config topic type URI
      */
-    private Map<String, TopicModel> viewConfig;
+    private Map<String, TopicModel> configTopics;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationModelImpl(Map<String, TopicModel> viewConfig) {
-        this.viewConfig = viewConfig;
+    ViewConfigurationModelImpl(Map<String, TopicModel> configTopics) {
+        this.configTopics = configTopics;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public Iterable<TopicModel> getConfigTopics() {
-        return viewConfig.values();
+        return configTopics.values();
     }
 
     @Override
@@ -45,7 +45,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
             throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
-        viewConfig.put(configTypeUri, configTopic);
+        configTopics.put(configTypeUri, configTopic);
     }
 
     @Override
@@ -76,13 +76,13 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
 
     // ### FIXME: drop parameter, implement JSONEnabled
     @Override
-    public void toJSON(JSONObject configurable) {
+    public JSONArray toJSONArray() {
         try {
-            List viewConfigTopics = new ArrayList();
+            JSONArray configTopics = new JSONArray();
             for (TopicModel configTopic : getConfigTopics()) {
-                viewConfigTopics.add(configTopic.toJSON());
+                configTopics.put(configTopic.toJSON());
             }
-            configurable.put("view_config_topics", viewConfigTopics);
+            return configTopics;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -90,12 +90,12 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
 
     @Override
     public String toString() {
-        return "view configuration " + viewConfig;
+        return "view configuration " + configTopics;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private TopicModel getConfigTopic(String configTypeUri) {
-        return viewConfig.get(configTypeUri);
+        return configTopics.get(configTypeUri);
     }
 }

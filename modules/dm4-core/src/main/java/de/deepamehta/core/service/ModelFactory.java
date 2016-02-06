@@ -18,6 +18,8 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public interface ModelFactory {
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics);
 
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object);
+    DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException;
 
 
 
@@ -52,6 +54,11 @@ public interface ModelFactory {
     ChildTopicsModel newChildTopicsModel();
 
     ChildTopicsModel newChildTopicsModel(JSONObject values);
+
+    /**
+     * Utility.
+     */
+    String childTypeUri(String assocDefUri);
 
 
 
@@ -172,13 +179,15 @@ public interface ModelFactory {
 
     // === TypeModel ===
 
+    // ### TODO: make internal
+
     TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri,
                            List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                            List<String> labelConfig, ViewConfigurationModel viewConfig);
 
     TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri);
 
-    TypeModel newTypeModel(JSONObject typeModel);
+    TypeModel newTypeModel(JSONObject typeModel) throws JSONException;
 
 
 
@@ -236,5 +245,5 @@ public interface ModelFactory {
 
     ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics);
 
-    ViewConfigurationModel newViewConfigurationModel(JSONObject configurable);
+    ViewConfigurationModel newViewConfigurationModel(JSONArray configTopics);
 }

@@ -1,12 +1,10 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicReferenceModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -33,12 +31,15 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
     // ID equality (see DeepaMehtaObjectModel.equals()).
 
+    private ModelFactory mf;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsModelImpl(Map<String, Object> childTopics) {
+    ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
         this.childTopics = childTopics;
+        this.mf = mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -319,7 +320,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public ChildTopicsModel put(String assocDefUri, TopicModel value) {
-        return put(assocDefUri, new RelatedTopicModel(value));
+        return put(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
     // ---
@@ -335,7 +336,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     @Override
     public ChildTopicsModel put(String assocDefUri, Object value) {
         try {
-            return put(assocDefUri, new TopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
+            return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
         } catch (Exception e) {
             throw new RuntimeException("Putting a value in a ChildTopicsModel failed (assocDefUri=\"" +
                 assocDefUri + "\", value=" + value + ")", e);
@@ -350,7 +351,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
-        return put(assocDefUri, new TopicModel(childTypeUri(assocDefUri), value));
+        return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), value));
     }
 
     // ---
@@ -361,7 +362,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
-        put(assocDefUri, new TopicReferenceModel(refTopicId));
+        put(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
@@ -371,7 +372,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
-        put(assocDefUri, new TopicReferenceModel(refTopicUri));
+        put(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -383,7 +384,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
-        put(assocDefUri, new TopicDeletionModel(refTopicId));
+        put(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
@@ -393,7 +394,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
-        put(assocDefUri, new TopicDeletionModel(refTopicUri));
+        put(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
 
@@ -429,7 +430,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public ChildTopicsModel add(String assocDefUri, TopicModel value) {
-        return add(assocDefUri, new RelatedTopicModel(value));
+        return add(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
     /**
@@ -461,7 +462,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
-        add(assocDefUri, new TopicReferenceModel(refTopicId));
+        add(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
@@ -470,7 +471,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
-        add(assocDefUri, new TopicReferenceModel(refTopicUri));
+        add(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
 
@@ -481,7 +482,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
-        add(assocDefUri, new TopicDeletionModel(refTopicId));
+        add(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
@@ -490,7 +491,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
-        add(assocDefUri, new TopicDeletionModel(refTopicUri));
+        add(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
 
@@ -530,11 +531,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         }
     }
 
-    @Override
-    public String childTypeUri(String assocDefUri) {
-        return assocDefUri.split("#")[0];
-    }
-
 
 
     // ****************
@@ -545,7 +541,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public ChildTopicsModel clone() {
-        ChildTopicsModel clone = new ChildTopicsModel();
+        ChildTopicsModel clone = mf.newChildTopicsModel();
         for (String assocDefUri : this) {
             Object value = get(assocDefUri);
             if (value instanceof RelatedTopicModel) {

@@ -1,8 +1,6 @@
 package de.deepamehta.core.model;
 
-import de.deepamehta.core.JSONEnabled;
-
-import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.jettison.json.JSONArray;
 
 
 
@@ -35,5 +33,5 @@ public interface ViewConfigurationModel {
 
     // ---
 
-    void toJSON(JSONObject configurable);
+    JSONArray toJSONArray();
 }

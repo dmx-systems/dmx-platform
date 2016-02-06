@@ -68,18 +68,14 @@ class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) {
-        try {
-            return newDeepaMehtaObjectModel(
-                object.optLong("id", -1),
-                object.optString("uri", null),
-                object.optString("type_uri", null),
-                object.has("value") ? new SimpleValue(object.get("value")) : null,
-                object.has("childs") ? newChildTopicsModel(object.getJSONObject("childs")) : null
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + object + ")", e);
-        }
+    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
+        return newDeepaMehtaObjectModel(
+            object.optLong("id", -1),
+            object.optString("uri", null),
+            object.optString("type_uri", null),
+            object.has("value") ? new SimpleValue(object.get("value")) : null,
+            object.has("childs") ? newChildTopicsModel(object.getJSONObject("childs")) : null
+        );
     }
 
 
@@ -88,7 +84,7 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ChildTopicsModel newChildTopicsModel() {
-        return new ChildTopicsModelImpl(new HashMap());
+        return new ChildTopicsModelImpl(new HashMap(), this);
     }
 
     @Override
@@ -101,18 +97,25 @@ class ModelFactoryImpl implements ModelFactory {
                 String childTypeUri = childTypeUri(assocDefUri);
                 Object value = values.get(assocDefUri);
                 if (!(value instanceof JSONArray)) {
-                    put(assocDefUri, createTopicModel(childTypeUri, value));                    // ###
+                    childTopics.put(assocDefUri, createTopicModel(childTypeUri, value));
                 } else {
                     JSONArray valueArray = (JSONArray) value;
+                    List<RelatedTopicModel> topics = new ArrayList();
+                    childTopics.put(assocDefUri, topics);
                     for (int j = 0; j < valueArray.length(); j++) {
-                        add(assocDefUri, createTopicModel(childTypeUri, valueArray.get(j)));    // ###
+                        topics.add(createTopicModel(childTypeUri, valueArray.get(j)));
                     }
                 }
             }
-            return new ChildTopicsModelImpl(childTopics);
+            return new ChildTopicsModelImpl(childTopics, this);
         } catch (Exception e) {
             throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
         }
+    }
+
+    @Override
+    public String childTypeUri(String assocDefUri) {
+        return assocDefUri.split("#")[0];
     }
 
     // ---
@@ -281,7 +284,11 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicModel newTopicModel(JSONObject topic) {
-        return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
+        try {
+            return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing TopicModel failed (JSONObject=" + topic + ")", e);
+        }
     }
 
 
@@ -297,31 +304,31 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        return new AssociationModelImpl(typeUri, roleModel1, roleModel2, null);
+        return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
     public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
                                                                                       ChildTopicsModel childTopics) {
-        return new AssociationModelImpl(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
+        return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     @Override
     public AssociationModel newAssociationModel() {
-        return new AssociationModelImpl(-1, null, null, null, null);
+        return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     @Override
     public AssociationModel newAssociationModel(ChildTopicsModel childTopics) {
-        return new AssociationModelImpl(null, null, null, childTopics);
+        return newAssociationModel(-1, null, null, null, null, null, childTopics);
     }
 
     @Override
     public AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                                      RoleModel roleModel2) {
-        return new AssociationModelImpl(id, uri, typeUri, roleModel1, roleModel2, null, null);
+        return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
@@ -345,12 +352,12 @@ class ModelFactoryImpl implements ModelFactory {
 
     private RoleModel parseRole(JSONObject roleModel) {
         if (roleModel.has("topic_id") || roleModel.has("topic_uri")) {
-            return new TopicRoleModel(roleModel);
+            return newTopicRoleModel(roleModel);
         } else if (roleModel.has("assoc_id")) {
-            return new AssociationRoleModel(roleModel);
+            return newAssociationRoleModel(roleModel);
         } else {
-            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed " +
-                "(JSONObject=" + roleModel + ")");
+            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed (JSONObject=" +
+                roleModel + ")");
         }
     }
 
@@ -398,7 +405,7 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri) {
-        return new TopicRoleModelImpl(assocId, roleTypeUri);
+        return new AssociationRoleModelImpl(assocId, roleTypeUri);
     }    
 
     @Override
@@ -439,19 +446,21 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
-        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()
+        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(newTopicModel(topicId), relatingAssoc);
     }
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(String topicUri) {
-        return new RelatedTopicModelImpl(newTopicModel(topicUri, null), newAssociationModel()); // topicTypeUri=null
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), newAssociationModel());
+                                                          // topicTypeUri=null
     }
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()
-        return new RelatedTopicModelImpl(newTopicModel(topicUri, null), relatingAssoc);         // topicTypeUri=null
+        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()?
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), relatingAssoc);
+                                                          // topicTypeUri=null
     }
 
     @Override
@@ -466,13 +475,13 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(TopicModel topic) {
-        // ### FIXME: topic's childTopics might be null, call newDeepaMehtaObjectModel()
+        // ### FIXME: topic's childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(topic, newAssociationModel());
     }
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
-        // ### FIXME: childTopics might be null, call newDeepaMehtaObjectModel()
+        // ### FIXME: childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(topic, relatingAssoc);
     }
 
@@ -536,56 +545,60 @@ class ModelFactoryImpl implements ModelFactory {
     public TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                                   List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                                   ViewConfigurationModel viewConfig) {
-        SequencedHashMap<String, AssociationDefinitionModel> _assocDefs = new SequencedHashMap();
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            addAssocDef(assocDef);      // ###
-        }
-        return new TypeModelImpl(typeTopic, dataTypeUri, indexModes, _assocDefs, labelConfig, viewConfig);
+        return new TypeModelImpl(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
     }
 
     // ### internal?
     @Override
     public TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
-        return new TypeModelImpl(
-            newTopicModel(uri, typeUri, value), dataTypeUri,
-            new ArrayList(), new SequencedHashMap(), new ArrayList(), newViewConfigurationModel()
+        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri,
+            new ArrayList(), new ArrayList(), new ArrayList(), newViewConfigurationModel()
         );
     }
 
     @Override
-    public TypeModel newTypeModel(JSONObject typeModel) {
-        try {
-            return new TypeModelImpl(
-                newTopicModel(typeModel), typeModel.getString("data_type_uri"),
-                IndexMode.parse(typeModel), parseAssocDefs(typeModel), parseLabelConfig(typeModel),
-                newViewConfigurationModel(typeModel)
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing TypeModel failed (JSONObject=" + typeModel + ")", e);
-        }
+    public TypeModel newTypeModel(JSONObject typeModel) throws JSONException {
+        TopicModel typeTopic = newTopicModel(typeModel);
+        return new TypeModelImpl(typeTopic,
+            typeModel.getString("data_type_uri"),
+            parseIndexModes(typeModel.optJSONArray("index_mode_uris")),
+            parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),
+            parseLabelConfig(typeModel.optJSONArray("label_config")),
+            newViewConfigurationModel(typeModel.optJSONArray("view_config_topics"))
+        );
     }
 
     // ---
 
-    private List<String> parseLabelConfig(JSONObject typeModel) throws JSONException {
-        if (typeModel.has("label_config")) {
-            return DeepaMehtaUtils.toList(typeModel.getJSONArray("label_config"));
+    private List<IndexMode> parseIndexModes(JSONArray indexModeUris) {
+        try {
+            List<IndexMode> indexModes = new ArrayList();
+            if (indexModeUris != null) {
+                for (int i = 0; i < indexModeUris.length(); i++) {
+                    indexModes.add(IndexMode.fromUri(indexModeUris.getString(i)));
+                }
+            }
+            return indexModes;
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing index modes failed (JSONArray=" + indexModeUris + ")", e);
         }
-        return new ArrayList();
     }
 
-    private SequencedHashMap<String, AssociationDefinitionModel> parseAssocDefs(JSONObject typeModel)
-                                                                                                  throws JSONException {
-        SequencedHashMap<String, AssociationDefinitionModel> assocDefs = new SequencedHashMap();
-        JSONArray _assocDefs = typeModel.optJSONArray("assoc_defs");
-        if (_assocDefs != null) {
-            for (int i = 0; i < _assocDefs.length(); i++) {
-                JSONObject assocDef = _assocDefs.getJSONObject(i);
-                assocDef.put("parent_type_uri", this.uri);              // ###
-                addAssocDef(newAssociationDefinitionModel(assocDef));   // ###
+    private List<AssociationDefinitionModel> parseAssocDefs(JSONArray assocDefs, String parentTypeUri) throws
+                                                                                                       JSONException {
+        List<AssociationDefinitionModel> _assocDefs = new ArrayList();
+        if (assocDefs != null) {
+            for (int i = 0; i < assocDefs.length(); i++) {
+                JSONObject assocDef = assocDefs.getJSONObject(i)
+                    .put("parent_type_uri", parentTypeUri);
+                _assocDefs.add(newAssociationDefinitionModel(assocDef));
             }
         }
-        return assocDefs;
+        return _assocDefs;
+    }
+
+    private List<String> parseLabelConfig(JSONArray labelConfig) {
+        return labelConfig != null ? DeepaMehtaUtils.toList(labelConfig) : new ArrayList();
     }
 
 
@@ -607,7 +620,11 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModel newTopicTypeModel(JSONObject topicType) {
-        return new TopicTypeModelImpl(newTypeModel(topicType.put("type_uri", "dm4.core.topic_type")));
+        try {
+            return new TopicTypeModelImpl(newTypeModel(topicType.put("type_uri", "dm4.core.topic_type")));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicType + ")", e);
+        }
     }
 
 
@@ -630,7 +647,11 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationTypeModel newAssociationTypeModel(JSONObject assocType) {
-        return new AssociationTypeModelImpl(newTypeModel(assocType.put("type_uri", "dm4.core.assoc_type")));
+        try {
+            return new AssociationTypeModelImpl(newTypeModel(assocType.put("type_uri", "dm4.core.assoc_type")));
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing AssociationTypeModel failed (JSONObject=" + assocType + ")", e);
+        }
     }
 
 
@@ -646,7 +667,7 @@ class ModelFactoryImpl implements ModelFactory {
         AssociationModel assoc = newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri),
             childRole(childTypeUri), null, childTopics(customAssocTypeUri));
         if (viewConfigModel == null) {
-            viewConfigModel = new ViewConfigurationModel();
+            viewConfigModel = newViewConfigurationModel();
         }
         return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
     }
@@ -655,7 +676,7 @@ class ModelFactoryImpl implements ModelFactory {
     public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri) {
-        newAssociationDefinitionModel(-1, null, assocTypeUri, null, parentTypeUri, childTypeUri,
+        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, parentTypeUri, childTypeUri,
             parentCardinalityUri, childCardinalityUri, null);
     }
 
@@ -663,7 +684,7 @@ class ModelFactoryImpl implements ModelFactory {
     public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri) {
-        newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
+        return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
             parentCardinalityUri, childCardinalityUri, null);
     }
 
@@ -691,17 +712,22 @@ class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef) {
         try {
-            if (!assocDef.has("parent_cardinality_uri") && !typeUri.equals("dm4.core.composition_def")) {
+            AssociationModel assoc = newAssociationModel(assocDef.optLong("id", -1), null,
+                assocDef.getString("assoc_type_uri"),
+                parentRole(assocDef.getString("parent_type_uri")),
+                childRole(assocDef.getString("child_type_uri")),
+                null, childTopics(assocDef)
+            );
+            //
+            if (!assocDef.has("parent_cardinality_uri") && !assoc.getTypeUri().equals("dm4.core.composition_def")) {
                 throw new RuntimeException("\"parent_cardinality_uri\" is missing");
             }
-            AssociationModel assoc = newAssociationModel(assocDef.optLong("id", -1), null,
-                assocDef.getString("assoc_type_uri"), parentRole(assocDef), childRole(assocDef), null,
-                childTopics(assocDef));
-            String parentCardinalityUri = assocDef.optString("parent_cardinality_uri", "dm4.core.one");
-            String childCardinalityUri  = assocDef.getString("child_cardinality_uri");
             //
-            return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri,
-                new ViewConfigurationModel(assocDef));
+            return new AssociationDefinitionModelImpl(assoc,
+                assocDef.optString("parent_cardinality_uri", "dm4.core.one"),
+                assocDef.getString("child_cardinality_uri"),
+                newViewConfigurationModel(assocDef.optJSONArray("view_config_topics"))
+            );
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
@@ -709,39 +735,29 @@ class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private static TopicRoleModel parentRole(JSONObject assocDef) throws JSONException {
-        return parentRole(assocDef.getString("parent_type_uri"));
+    private TopicRoleModel parentRole(String parentTypeUri) {
+        return newTopicRoleModel(parentTypeUri, "dm4.core.parent_type");
     }
 
-    private static TopicRoleModel parentRole(String parentTypeUri) {
-        return new TopicRoleModel(parentTypeUri, "dm4.core.parent_type");
-    }
-
-    // ---
-
-    private static TopicRoleModel childRole(JSONObject assocDef) throws JSONException {
-        return childRole(assocDef.getString("child_type_uri"));
-    }
-
-    private static TopicRoleModel childRole(String childTypeUri) {
-        return new TopicRoleModel(childTypeUri, "dm4.core.child_type");
+    private TopicRoleModel childRole(String childTypeUri) {
+        return newTopicRoleModel(childTypeUri, "dm4.core.child_type");
     }
 
     // ---
 
-    private static ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
+    private ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
         // Note: getString() called on a key with JSON null value would return the string "null"
         return childTopics(assocDef.isNull("custom_assoc_type_uri") ? null :
             assocDef.getString("custom_assoc_type_uri"));
     }
 
-    private static ChildTopicsModel childTopics(String customAssocTypeUri) {
+    private ChildTopicsModel childTopics(String customAssocTypeUri) {
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                return new ChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                return newChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
-                return new ChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                return newChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     customAssocTypeUri);
             }
         } else {
@@ -760,29 +776,29 @@ class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
-        Map<String, TopicModel> viewConfig = new HashMap();
-        for (TopicModel topic : configTopics) {
-            addConfigTopic(topic);      // ###
+        Map<String, TopicModel> _configTopics = new HashMap();
+        for (TopicModel configTopic : configTopics) {
+            _configTopics.put(configTopic.getTypeUri(), configTopic);
         }
-        return new ViewConfigurationModelImpl(viewConfig);
+        return new ViewConfigurationModelImpl(_configTopics);
     }    
 
     /**
-     * @param   configurable    A topic type, an association type, or an association definition.
-     *                          ### TODO: pass sole JSONArray?
+     * @param   configurable    A topic type, an association type, or an association definition. ### FIXDOC
      */
     @Override
-    public ViewConfigurationModel newViewConfigurationModel(JSONObject configurable) {
+    public ViewConfigurationModel newViewConfigurationModel(JSONArray configTopics) {
         try {
-            JSONArray topics = configurable.optJSONArray("view_config_topics");
-            if (topics != null) {
-                for (int i = 0; i < topics.length(); i++) {
-                    addConfigTopic(new TopicModel(topics.getJSONObject(i)));    // ###
+            Map<String, TopicModel> _configTopics = new HashMap();
+            if (configTopics != null) {
+                for (int i = 0; i < configTopics.length(); i++) {
+                    TopicModel configTopic = newTopicModel(configTopics.getJSONObject(i));
+                    _configTopics.put(configTopic.getTypeUri(), configTopic);
                 }
             }
-            return new ViewConfigurationModelImpl();                            // ###
+            return new ViewConfigurationModelImpl(_configTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONObject=" + configurable + ")", e);
+            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONArray=" + configTopics + ")", e);
         }
     }    
 }

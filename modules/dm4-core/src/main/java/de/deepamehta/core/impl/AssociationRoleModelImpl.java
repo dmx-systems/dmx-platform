@@ -23,7 +23,7 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     public boolean refsSameObject(RoleModel model) {
         if (model instanceof AssociationRoleModel) {
             AssociationRoleModel assocRole = (AssociationRoleModel) model;
-            return assocRole.playerId == playerId;
+            return assocRole.getPlayerId() == playerId;
         }
         return false;
     }

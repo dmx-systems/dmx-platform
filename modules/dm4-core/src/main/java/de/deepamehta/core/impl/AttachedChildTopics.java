@@ -208,12 +208,12 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics set(String assocDefUri, Object value) {
-        return _updateOne(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
+        return _updateOne(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics set(String assocDefUri, ChildTopicsModel value) {
-        return _updateOne(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), value));
+        return _updateOne(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), value));
     }
 
     // ---
@@ -261,12 +261,12 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics add(String assocDefUri, Object value) {
-        return _updateMany(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), new SimpleValue(value)));
+        return _updateMany(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
     }
 
     @Override
     public ChildTopics add(String assocDefUri, ChildTopicsModel value) {
-        return _updateMany(assocDefUri, mf.newRelatedTopicModel(childTypeUri(assocDefUri), value));
+        return _updateMany(assocDefUri, mf.newRelatedTopicModel(mf.childTypeUri(assocDefUri), value));
     }
 
     // ---
@@ -459,12 +459,6 @@ class AttachedChildTopics implements ChildTopics {
     private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
         parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
-    }
-
-    // ---
-
-    private String childTypeUri(String assocDefUri) {
-        return model.childTypeUri(assocDefUri);
     }
 
 

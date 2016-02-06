@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 
 
-abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
+class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -32,14 +32,23 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TypeModelImpl(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                  SequencedHashMap<String, AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                   ViewConfigurationModel viewConfig) {
-        super(typeTopic);   // ### FIXME: may childTopics null?
+        super(typeTopic);
         this.dataTypeUri = dataTypeUri;
-        this.indexModes = indexModes;
-        this.assocDefs = assocDefs;
+        this.indexModes  = indexModes;
+        this.assocDefs   = toMap(assocDefs);
         this.labelConfig = labelConfig;
-        this.viewConfig = viewConfig;
+        this.viewConfig  = viewConfig;
+    }
+
+    TypeModelImpl(TypeModel type) {
+        super(type);
+        this.dataTypeUri = type.getDataTypeUri();
+        this.indexModes  = type.getIndexModes();
+        this.assocDefs   = toMap((List<AssociationDefinitionModel>) type.getAssocDefs());   // ###
+        this.labelConfig = type.getLabelConfig();
+        this.viewConfig  = type.getViewConfigModel();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -304,15 +313,12 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON();
-            //
-            o.put("data_type_uri", getDataTypeUri());
-            IndexMode.toJSON(indexModes, o);
-            AssociationDefinitionModel.toJSON(assocDefs.values(), o);
-            o.put("label_config", new JSONArray(getLabelConfig()));
-            getViewConfigModel().toJSON(o);
-            //
-            return o;
+            return super.toJSON()
+                .put("data_type_uri", getDataTypeUri())
+                .put("index_mode_uris", toJSONArray(indexModes))
+                .put("assoc_defs", toJSONArray(assocDefs.values()))
+                .put("label_config", new JSONArray(getLabelConfig()))
+                .put("view_config_topics", getViewConfigModel().toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -358,5 +364,33 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
             throw new RuntimeException("The assoc def ID is uninitialized (-1): " + assocDef);
         }
         return assocDefId;
+    }
+
+    // ---
+
+    private SequencedHashMap<String, AssociationDefinitionModel> toMap(List<AssociationDefinitionModel> assocDefs) {
+        SequencedHashMap<String, AssociationDefinitionModel> _assocDefs = new SequencedHashMap();
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            _assocDefs.put(assocDef.getAssocDefUri(), assocDef);
+        }
+        return _assocDefs;
+    }
+
+    // ---
+
+    private JSONArray toJSONArray(List<IndexMode> indexModes) {
+        JSONArray indexModeUris = new JSONArray();
+        for (IndexMode indexMode : indexModes) {
+            indexModeUris.put(indexMode.toUri());
+        }
+        return indexModeUris;
+    }
+
+    private JSONArray toJSONArray(Collection<AssociationDefinitionModel> assocDefs) {
+        JSONArray _assocDefs = new JSONArray();
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            _assocDefs.put(assocDef.toJSON());
+        }
+        return _assocDefs;
     }
 }

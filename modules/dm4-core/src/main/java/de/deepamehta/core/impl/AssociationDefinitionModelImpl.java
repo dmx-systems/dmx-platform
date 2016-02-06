@@ -162,11 +162,10 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON()
+            return super.toJSON()
                 .put("parent_cardinality_uri", parentCardinalityUri)
-                .put("child_cardinality_uri", childCardinalityUri);
-            viewConfigModel.toJSON(o);
-            return o;
+                .put("child_cardinality_uri", childCardinalityUri)
+                .put("view_config_topics", viewConfigModel.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -180,16 +179,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             ",\n        parent cardinality=\"" + parentCardinalityUri +
             "\",\n        child cardinality=\"" + childCardinalityUri +
             "\",\n        " + viewConfigModel + ")\n";
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    static void toJSON(Collection<AssociationDefinitionModel> assocDefs, JSONObject o) throws Exception {
-        List assocDefList = new ArrayList();
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            assocDefList.add(assocDef.toJSON());
-        }
-        o.put("assoc_defs", assocDefList);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
