@@ -8,6 +8,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
@@ -67,6 +68,7 @@ class AccessControlImpl implements AccessControl {
     };
 
     private EmbeddedService dms;
+    private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,6 +76,7 @@ class AccessControlImpl implements AccessControl {
 
     AccessControlImpl(EmbeddedService dms) {
         this.dms = dms;
+        this.mf = dms.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -193,9 +196,9 @@ class AccessControlImpl implements AccessControl {
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         try {
             // 1) create assignment association
-            dms.associationFactory(new AssociationModel("dm4.core.aggregation",
-                object.getModel().createRoleModel("dm4.core.parent"),
-                new TopicRoleModel(workspaceId, "dm4.core.child")
+            dms.associationFactory(mf.newAssociationModel("dm4.core.aggregation",
+                mf.createRoleModel(object.getModel(), "dm4.core.parent"),
+                mf.newTopicRoleModel(workspaceId, "dm4.core.child")
             ));
             // 2) store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true

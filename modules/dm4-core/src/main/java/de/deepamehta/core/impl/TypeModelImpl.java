@@ -34,7 +34,7 @@ abstract class TypeModelImpl extends TopicModelImpl implements TypeModel {
     TypeModelImpl(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                   SequencedHashMap<String, AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                   ViewConfigurationModel viewConfig) {
-        super(typeTopic);   // ### childTopics may null
+        super(typeTopic);   // ### FIXME: may childTopics null?
         this.dataTypeUri = dataTypeUri;
         this.indexModes = indexModes;
         this.assocDefs = assocDefs;

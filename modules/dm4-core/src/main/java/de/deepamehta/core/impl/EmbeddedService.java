@@ -623,6 +623,11 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
+    public ModelFactory getModelFactory() {
+        return mf;
+    }
+
+    @Override
     public TypeStorage getTypeStorage() {
         return typeStorage;
     }

@@ -10,8 +10,8 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long playerId;          // id of the player (a topic, or an association)
-    private String roleTypeUri;     // is never null
+    protected long playerId;        // id of the player (a topic, or an association)
+    protected String roleTypeUri;   // is never null
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

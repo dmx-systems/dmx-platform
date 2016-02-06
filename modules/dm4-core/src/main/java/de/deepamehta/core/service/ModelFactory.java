@@ -11,6 +11,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -29,9 +30,9 @@ public interface ModelFactory {
 
     // === DeepaMehtaObjectModel ===
 
+    // ### TODO: make internal
+
     /**
-     * Canonic.
-     *
      * @param   id          Optional (-1 is a valid value and represents "not set").
      * @param   uri         Optional (<code>null</code> is a valid value).
      * @param   typeUri     Mandatory in the context of a create operation.
@@ -41,37 +42,8 @@ public interface ModelFactory {
      */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics);
-    /**
-     * Copy.
-     */
-    // DeepaMehtaObjectModel newDeepaMehtaObjectModel(DeepaMehtaObjectModel object);
 
-    /**
-     * JSON.
-     */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object);
-
-    /* DeepaMehtaObjectModel newDeepaMehtaObjectModel(ChildTopicsModel childTopics);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri, SimpleValue value);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri, ChildTopicsModel childTopics);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri, SimpleValue value);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri, ChildTopicsModel childTopics);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, ChildTopicsModel childTopics);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String typeUri);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String typeUri, ChildTopicsModel childTopics); */
 
 
 
@@ -86,6 +58,10 @@ public interface ModelFactory {
     // === TopicModel ===
 
     TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics);
+
+    TopicModel newTopicModel(ChildTopicsModel childTopics);
+
+    TopicModel newTopicModel(String typeUri);
 
     TopicModel newTopicModel(String typeUri, SimpleValue value);
 
@@ -174,11 +150,23 @@ public interface ModelFactory {
 
     TopicReferenceModel newTopicReferenceModel(long topicId);
 
+    TopicReferenceModel newTopicReferenceModel(long topicId, AssociationModel relatingAssoc);
+
     TopicReferenceModel newTopicReferenceModel(String topicUri);
+
+    TopicReferenceModel newTopicReferenceModel(String topicUri, AssociationModel relatingAssoc);
 
     TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics);
 
     TopicReferenceModel newTopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics);
+
+
+
+    // === TopicDeletionModel ===
+
+    TopicDeletionModel newTopicDeletionModel(long topicId);
+
+    TopicDeletionModel newTopicDeletionModel(String topicUri);
 
 
 
@@ -220,14 +208,23 @@ public interface ModelFactory {
 
     // === AssociationDefinitionModel ===
 
-    AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
-                                                             String customAssocTypeUri,
-                                                             String parentTypeUri, String childTypeUri,
-                                                             String parentCardinalityUri, String childCardinalityUri,
-                                                             ViewConfigurationModel viewConfigModel);
+    AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri,
+                                                    String assocTypeUri, String customAssocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfigModel);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri,
-                                                    String childCardinalityUri, ViewConfigurationModel viewConfigModel);
+    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri);
+
+    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri);
+
+    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfigModel);
 
     AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
 

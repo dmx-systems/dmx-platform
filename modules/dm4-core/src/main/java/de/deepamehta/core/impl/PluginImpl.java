@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: refactoring? This class does to much.
+// ### TODO: refactoring? This class does too much.
 // ### It lies about its dependencies. It depends on dms but dms is not passed to constructor.
 public class PluginImpl implements Plugin, EventHandler {
 

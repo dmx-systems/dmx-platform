@@ -294,7 +294,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     @Override
     void updateChildTopics(ChildTopicsModel childTopics) {
-        update(new AssociationModel(childTopics));
+        update(mf.newAssociationModel(childTopics));
     }
 
     @Override

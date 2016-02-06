@@ -11,6 +11,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -34,6 +35,7 @@ class ValueStorage {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
+    private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -41,6 +43,7 @@ class ValueStorage {
 
     ValueStorage(EmbeddedService dms) {
         this.dms = dms;
+        this.mf = dms.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -272,8 +275,8 @@ class ValueStorage {
                                                            AssociationDefinitionModel assocDef) {
         AssociationModel assoc = childTopic.getRelatingAssociation();
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
-        assoc.setRoleModel1(dms.mf.createRoleModel(parent, "dm4.core.parent"));
-        assoc.setRoleModel2(dms.mf.createRoleModel(childTopic, "dm4.core.child"));
+        assoc.setRoleModel1(mf.createRoleModel(parent, "dm4.core.parent"));
+        assoc.setRoleModel2(mf.createRoleModel(childTopic, "dm4.core.child"));
         dms.createAssociation(assoc);
     }
 

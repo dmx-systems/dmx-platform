@@ -1,9 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -23,12 +21,19 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
         this.relatingAssoc = relatingAssoc;
     }
 
+    RelatedTopicModelImpl(RelatedTopicModel relatedTopic) {
+        super(relatedTopic);
+        this.relatingAssoc = relatedTopic.getRelatingAssociation();
+    }
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public AssociationModel getRelatingAssociation() {
         return relatingAssoc;
     }
+
+
 
     // === Serialization ===
 
@@ -48,6 +53,8 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
     }
+
+
 
     // === Java API ===
 

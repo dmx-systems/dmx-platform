@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 
 
@@ -8,12 +9,8 @@ class TopicDeletionModelImpl extends RelatedTopicModelImpl implements TopicDelet
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicDeletionModelImpl(long topicId) {
-        super(topicId);
-    }
-
-    TopicDeletionModelImpl(String topicUri) {
-        super(topicUri);
+    TopicDeletionModelImpl(RelatedTopicModel relatedTopic) {
+        super(relatedTopic);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

@@ -226,14 +226,14 @@ abstract class AttachedType extends AttachedTopic implements Type {
             return;
         }
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel newAssocModel = new AssociationModel(assoc.getModel());
+        AssociationModel newAssocModel = mf.newAssociationModel(assoc.getModel());
         AssociationModel oldAssocModel = oldAssocDef.getModel();
         // Note: an assoc def expects by-URI roles.
         newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
         newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
         //
         AssociationDefinition newAssocDef = new AttachedAssociationDefinition(
-            new AssociationDefinitionModel(newAssocModel,
+            mf.newAssociationDefinitionModel(newAssocModel,
                 oldAssocDef.getParentCardinalityUri(),
                 oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
             ),

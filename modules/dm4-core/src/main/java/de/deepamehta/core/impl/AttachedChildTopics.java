@@ -242,12 +242,12 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics setDeletionRef(String assocDefUri, long refTopicId) {
-        return _updateOne(assocDefUri, new TopicDeletionModel(refTopicId));
+        return _updateOne(assocDefUri, mf.newTopicDeletionModel(refTopicId));
     }
 
     @Override
     public ChildTopics setDeletionRef(String assocDefUri, String refTopicUri) {
-        return _updateOne(assocDefUri, new TopicDeletionModel(refTopicUri));
+        return _updateOne(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
     }
 
     // --- Multiple-valued Childs ---
@@ -295,12 +295,12 @@ class AttachedChildTopics implements ChildTopics {
 
     @Override
     public ChildTopics addDeletionRef(String assocDefUri, long refTopicId) {
-        return _updateMany(assocDefUri, new TopicDeletionModel(refTopicId));
+        return _updateMany(assocDefUri, mf.newTopicDeletionModel(refTopicId));
     }
 
     @Override
     public ChildTopics addDeletionRef(String assocDefUri, String refTopicUri) {
-        return _updateMany(assocDefUri, new TopicDeletionModel(refTopicUri));
+        return _updateMany(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
     }
 
 

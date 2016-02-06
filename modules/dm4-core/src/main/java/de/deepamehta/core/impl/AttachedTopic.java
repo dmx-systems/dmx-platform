@@ -199,7 +199,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     @Override
     void updateChildTopics(ChildTopicsModel childTopics) {
-        update(new TopicModel(childTopics));
+        update(mf.newTopicModel(childTopics));
     }
 
     @Override

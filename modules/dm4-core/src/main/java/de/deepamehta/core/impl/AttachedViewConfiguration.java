@@ -5,6 +5,7 @@ import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.ModelFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +21,11 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     private Map<String, Topic> configTopics = new HashMap();    // attached object cache
 
-    private final ViewConfigurationModel model;                 // underlying model
-    private final RoleModel configurable;
+    private ViewConfigurationModel model;                       // underlying model
+    private RoleModel configurable;
 
-    private final EmbeddedService dms;
+    private EmbeddedService dms;
+    private ModelFactory mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -31,6 +33,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
         this.configurable = configurable;
         this.model = model;
         this.dms = dms;
+        this.mf = dms.mf;
         initConfigTopics();
     }
 
@@ -48,7 +51,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
         Topic configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             // update DB
-            configTopic = dms.typeStorage.storeViewConfigTopic(configurable, new TopicModel(configTypeUri));
+            configTopic = dms.typeStorage.storeViewConfigTopic(configurable, mf.newTopicModel(configTypeUri));
             // update memory
             model.addConfigTopic(configTopic.getModel());
             // update attached object cache

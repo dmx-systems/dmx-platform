@@ -8,11 +8,11 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-abstract class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
+class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: make these private
+    // ### TODO: make these private?
     protected long id;                  // is -1 in models used for a create operation. ### FIXDOC
                                         // is never -1 in models used for an update operation.
     protected String uri;               // is never null in models used for a create operation, may be empty. ### FIXDOC
@@ -27,21 +27,19 @@ abstract class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics) {
-        this.id = id;
-        this.uri = uri;
-        this.typeUri = typeUri;
-        this.value = value;
+        this.id          = id;
+        this.uri         = uri;
+        this.typeUri     = typeUri;
+        this.value       = value;
         this.childTopics = childTopics;
     }
 
     DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {
-        this(
-            object.getId(),
-            object.getUri(),
-            object.getTypeUri(),
-            object.getSimpleValue(),
-            object.getChildTopicsModel()
-        );
+        this.id          = object.getId();
+        this.uri         = object.getUri();
+        this.typeUri     = object.getTypeUri();
+        this.value       = object.getSimpleValue();
+        this.childTopics = object.getChildTopicsModel();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

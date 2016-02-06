@@ -5,6 +5,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Migration;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -31,6 +32,7 @@ class MigrationManager {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EmbeddedService dms;
+    private ModelFactory mf;
 
     private enum MigrationRunMode {
         CLEAN_INSTALL, UPDATE, ALWAYS
@@ -42,6 +44,7 @@ class MigrationManager {
 
     MigrationManager(EmbeddedService dms) {
         this.dms = dms;
+        this.mf = dms.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -220,25 +223,25 @@ class MigrationManager {
 
     private void createTopicTypes(JSONArray topicTypes) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
-            dms.createTopicType(dms.mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
+            dms.createTopicType(mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
         }
     }
 
     private void createAssociationTypes(JSONArray assocTypes) throws JSONException {
         for (int i = 0; i < assocTypes.length(); i++) {
-            dms.createAssociationType(dms.mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
+            dms.createAssociationType(mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
         }
     }
 
     private void createTopics(JSONArray topics) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
-            dms.createTopic(dms.mf.newTopicModel(topics.getJSONObject(i)));
+            dms.createTopic(mf.newTopicModel(topics.getJSONObject(i)));
         }
     }
 
     private void createAssociations(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            dms.createAssociation(dms.mf.newAssociationModel(assocs.getJSONObject(i)));
+            dms.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
         }
     }
 

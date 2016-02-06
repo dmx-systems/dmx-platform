@@ -1,6 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.Type;
+import de.deepamehta.core.service.ModelFactory;
 
 
 
@@ -9,11 +10,14 @@ public abstract class Migration {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     protected DeepaMehtaService dms;
+    protected ModelFactory mf;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+    // ### TODO: make this internal. Define a public Migration interface?
     public void setCoreService(DeepaMehtaService dms) {
         this.dms = dms;
+        this.mf = dms.getModelFactory();
     }
 
     public abstract void run();

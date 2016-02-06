@@ -3,15 +3,15 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

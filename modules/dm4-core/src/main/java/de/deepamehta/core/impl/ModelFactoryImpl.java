@@ -11,6 +11,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -66,12 +67,6 @@ class ModelFactoryImpl implements ModelFactory {
         return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics);
     }
 
-    /* @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(DeepaMehtaObjectModel object) {
-        return newDeepaMehtaObjectModel(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel());
-    } */
-
     @Override
     public DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) {
         try {
@@ -80,67 +75,12 @@ class ModelFactoryImpl implements ModelFactory {
                 object.optString("uri", null),
                 object.optString("type_uri", null),
                 object.has("value") ? new SimpleValue(object.get("value")) : null,
-                object.has("childs") ? new ChildTopicsModel(object.getJSONObject("childs")) : null
+                object.has("childs") ? newChildTopicsModel(object.getJSONObject("childs")) : null
             );
         } catch (Exception e) {
             throw new RuntimeException("Parsing DeepaMehtaObjectModel failed (JSONObject=" + object + ")", e);
         }
     }
-
-    /* @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(ChildTopicsModel childTopics) {
-        return newDeepaMehtaObjectModel(null, childTopics);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri) {
-        return newDeepaMehtaObjectModel(-1, typeUri);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri, SimpleValue value) {
-        return newDeepaMehtaObjectModel(null, typeUri, value);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String typeUri, ChildTopicsModel childTopics) {
-        return newDeepaMehtaObjectModel(null, typeUri, childTopics);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri) {
-        return newDeepaMehtaObjectModel(-1, uri, typeUri, null, null);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri, SimpleValue value) {
-        return newDeepaMehtaObjectModel(-1, uri, typeUri, value, null);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(String uri, String typeUri, ChildTopicsModel childTopics) {
-        return newDeepaMehtaObjectModel(-1, uri, typeUri, null, childTopics);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id) {
-        return newDeepaMehtaObjectModel(id, null, null);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, ChildTopicsModel childTopics) {
-        return newDeepaMehtaObjectModel(id, null, childTopics);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String typeUri) {
-        return newDeepaMehtaObjectModel(id, typeUri, null);
-    }
-
-    @Override
-    public DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String typeUri, ChildTopicsModel childTopics) {
-        return newDeepaMehtaObjectModel(id, null, typeUri, null, childTopics);
-    } */
 
 
 
@@ -192,7 +132,7 @@ class ModelFactoryImpl implements ModelFactory {
                 // canonic format (topic or topic reference)
                 AssociationModel relatingAssoc = null;
                 if (val.has("assoc")) {
-                    relatingAssoc = new AssociationModel(val.getJSONObject("assoc"));
+                    relatingAssoc = newAssociationModel(val.getJSONObject("assoc"));
                 }
                 if (val.has("value")) {
                     RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
@@ -203,15 +143,15 @@ class ModelFactoryImpl implements ModelFactory {
                 //
                 initTypeUri(val, childTypeUri);
                 //
-                TopicModel topic = new TopicModel(val);
+                TopicModel topic = newTopicModel(val);
                 if (relatingAssoc != null) {
-                    return new RelatedTopicModel(topic, relatingAssoc);
+                    return newRelatedTopicModel(topic, relatingAssoc);
                 } else {
-                    return new RelatedTopicModel(topic);
+                    return newRelatedTopicModel(topic);
                 }
             } else {
                 // simplified format (composite topic)
-                return new RelatedTopicModel(new TopicModel(childTypeUri, new ChildTopicsModel(val)));
+                return newRelatedTopicModel(newTopicModel(childTypeUri, newChildTopicsModel(val)));
             }
         } else {
             // simplified format (simple topic or topic reference)
@@ -220,7 +160,7 @@ class ModelFactoryImpl implements ModelFactory {
                 return topicRef;
             }
             // simplified format (simple topic)
-            return new RelatedTopicModel(new TopicModel(childTypeUri, new SimpleValue(value)));
+            return newRelatedTopicModel(newTopicModel(childTypeUri, new SimpleValue(value)));
         }
     }
 
@@ -230,21 +170,21 @@ class ModelFactoryImpl implements ModelFactory {
             if (val.startsWith(REF_ID_PREFIX)) {
                 long topicId = refTopicId(val);
                 if (relatingAssoc != null) {
-                    return new TopicReferenceModel(topicId, relatingAssoc);
+                    return newTopicReferenceModel(topicId, relatingAssoc);
                 } else {
-                    return new TopicReferenceModel(topicId);
+                    return newTopicReferenceModel(topicId);
                 }
             } else if (val.startsWith(REF_URI_PREFIX)) {
                 String topicUri = refTopicUri(val);
                 if (relatingAssoc != null) {
-                    return new TopicReferenceModel(topicUri, relatingAssoc);
+                    return newTopicReferenceModel(topicUri, relatingAssoc);
                 } else {
-                    return new TopicReferenceModel(topicUri);
+                    return newTopicReferenceModel(topicUri);
                 }
             } else if (val.startsWith(DEL_ID_PREFIX)) {
-                return new TopicDeletionModel(delTopicId(val));
+                return newTopicDeletionModel(delTopicId(val));
             } else if (val.startsWith(DEL_URI_PREFIX)) {
-                return new TopicDeletionModel(delTopicUri(val));
+                return newTopicDeletionModel(delTopicUri(val));
             }
         }
         return null;
@@ -291,13 +231,15 @@ class ModelFactoryImpl implements ModelFactory {
         return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
     }
 
-    /* TopicModelImpl(ChildTopicsModel childTopics) {
-        super(childTopics);
+    @Override
+    public TopicModel newTopicModel(ChildTopicsModel childTopics) {
+        return newTopicModel(-1, null, null, null, childTopics);
     }
 
-    TopicModelImpl(String typeUri) {
-        super(typeUri);
-    } */
+    @Override
+    public TopicModel newTopicModel(String typeUri) {
+        return newTopicModel(-1, null, typeUri, null, null);
+    }
 
     @Override
     public TopicModel newTopicModel(String typeUri, SimpleValue value) {
@@ -543,18 +485,20 @@ class ModelFactoryImpl implements ModelFactory {
         return new TopicReferenceModelImpl(newRelatedTopicModel(topicId));
     }
 
-    /* TopicReferenceModelImpl(long topicId, AssociationModel relatingAssoc) {
-        super(topicId, relatingAssoc);
-    } */
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(long topicId, AssociationModel relatingAssoc) {
+        return new TopicReferenceModelImpl(newRelatedTopicModel(topicId, relatingAssoc));
+    }
 
     @Override
     public TopicReferenceModel newTopicReferenceModel(String topicUri) {
         return new TopicReferenceModelImpl(newRelatedTopicModel(topicUri));
     }
 
-    /* TopicReferenceModelImpl(String topicUri, AssociationModel relatingAssoc) {
-        super(topicUri, relatingAssoc);
-    } */
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(String topicUri, AssociationModel relatingAssoc) {
+        return new TopicReferenceModelImpl(newRelatedTopicModel(topicUri, relatingAssoc));
+    }
 
     @Override
     public TopicReferenceModel newTopicReferenceModel(long topicId, ChildTopicsModel relatingAssocChildTopics) {
@@ -568,6 +512,20 @@ class ModelFactoryImpl implements ModelFactory {
         return new TopicReferenceModelImpl(
             newRelatedTopicModel(topicUri, newAssociationModel(relatingAssocChildTopics))
         );
+    }
+
+
+
+    // === TopicDeletionModel ===
+
+    @Override
+    public TopicDeletionModel newTopicDeletionModel(long topicId) {
+        return new TopicDeletionModelImpl(newRelatedTopicModel(topicId));
+    }
+
+    @Override
+    public TopicDeletionModel newTopicDeletionModel(String topicUri) {
+        return new TopicDeletionModelImpl(newRelatedTopicModel(topicUri));
     }
 
 
@@ -680,11 +638,11 @@ class ModelFactoryImpl implements ModelFactory {
     // === AssociationDefinitionModel ===
 
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
-                                                                String customAssocTypeUri,
-                                                                String parentTypeUri, String childTypeUri,
-                                                                String parentCardinalityUri, String childCardinalityUri,
-                                                                ViewConfigurationModel viewConfigModel) {
+    public AssociationDefinitionModel newAssociationDefinitionModel(
+                                                    long id, String uri, String assocTypeUri, String customAssocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfigModel) {
         AssociationModel assoc = newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri),
             childRole(childTypeUri), null, childTopics(customAssocTypeUri));
         if (viewConfigModel == null) {
@@ -693,17 +651,21 @@ class ModelFactoryImpl implements ModelFactory {
         return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
     }
 
-    /* AssociationDefinitionModelImpl(String assocTypeUri, String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(assocTypeUri, null, parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri);
+    @Override
+    public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri) {
+        newAssociationDefinitionModel(-1, null, assocTypeUri, null, parentTypeUri, childTypeUri,
+            parentCardinalityUri, childCardinalityUri, null);
     }
 
-    AssociationDefinitionModelImpl(String assocTypeUri, String customAssocTypeUri,
-                                                        String parentTypeUri, String childTypeUri,
-                                                        String parentCardinalityUri, String childCardinalityUri) {
-        this(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri, parentCardinalityUri,
-            childCardinalityUri, null);
-    } */
+    @Override
+    public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri) {
+        newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
+            parentCardinalityUri, childCardinalityUri, null);
+    }
 
     /**
      * @param   assoc   the underlying association.

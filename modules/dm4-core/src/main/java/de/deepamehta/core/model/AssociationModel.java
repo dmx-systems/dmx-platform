@@ -32,4 +32,8 @@ public interface AssociationModel extends DeepaMehtaObjectModel {
     long getOtherPlayerId(long id);
 
     boolean hasSameRoleTypeUris();
+
+    // ---
+
+    AssociationModel clone();
 }

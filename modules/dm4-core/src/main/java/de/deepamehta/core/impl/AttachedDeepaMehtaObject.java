@@ -13,6 +13,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -42,7 +43,8 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     private AttachedChildTopics childTopics;    // attached object cache
 
-    protected final EmbeddedService dms;
+    protected EmbeddedService dms;
+    protected ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -51,6 +53,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
+        this.mf = dms.mf;
         this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), this, dms);
     }
 
