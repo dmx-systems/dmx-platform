@@ -21,6 +21,15 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
 
 
 
+    // === Implementation of the abstract methods ===
+
+    @Override
+    public RoleModel createRoleModel(String roleTypeUri) {
+        return mf.newTopicRoleModel(id, roleTypeUri);
+    }
+
+
+
     // === Java API ===
 
     @Override

@@ -197,7 +197,7 @@ class AccessControlImpl implements AccessControl {
         try {
             // 1) create assignment association
             dms.associationFactory(mf.newAssociationModel("dm4.core.aggregation",
-                mf.createRoleModel(object.getModel(), "dm4.core.parent"),
+                object.getModel().createRoleModel("dm4.core.parent"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.child")
             ));
             // 2) store assignment property

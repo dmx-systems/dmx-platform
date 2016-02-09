@@ -2,7 +2,9 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.service.ModelFactory;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -12,7 +14,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: make these private?
     protected long id;                  // is -1 in models used for a create operation. ### FIXDOC
                                         // is never -1 in models used for an update operation.
     protected String uri;               // is never null in models used for a create operation, may be empty. ### FIXDOC
@@ -24,14 +25,20 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                                         // may be null in models used for an update operation.
     protected ChildTopicsModel childTopics; // is never null, may be empty. ### FIXDOC
 
+    // ---
+
+    protected ModelFactory mf;
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics) {
+    DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics,
+                                                                                      ModelFactory mf) {
         this.id          = id;
         this.uri         = uri;
         this.typeUri     = typeUri;
         this.value       = value;
         this.childTopics = childTopics;
+        this.mf          = mf;
     }
 
     DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {
@@ -40,6 +47,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.typeUri     = object.getTypeUri();
         this.value       = object.getSimpleValue();
         this.childTopics = object.getChildTopicsModel();
+        this.mf = ((DeepaMehtaObjectModelImpl) object).mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -126,7 +134,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.childTopics = childTopics;
     }
 
-    // ---
+    // --- misc ---
 
     @Override
     public void set(DeepaMehtaObjectModel object) {
@@ -135,6 +143,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         setTypeUri(object.getTypeUri());
         setSimpleValue(object.getSimpleValue());
         setChildTopicsModel(object.getChildTopicsModel());
+    }
+
+    // ---
+
+    @Override
+    public RoleModel createRoleModel(String roleTypeUri) {
+        throw new RuntimeException("Not implemented");  // only implemented in subclasses
+        // Note: technically this class is not abstract. It is instantiated by the ModelFactory.
     }
 
 

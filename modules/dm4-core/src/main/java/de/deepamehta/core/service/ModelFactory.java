@@ -30,38 +30,6 @@ public interface ModelFactory {
 
 
 
-    // === DeepaMehtaObjectModel ===
-
-    // ### TODO: make internal
-
-    /**
-     * @param   id          Optional (-1 is a valid value and represents "not set").
-     * @param   uri         Optional (<code>null</code> is a valid value).
-     * @param   typeUri     Mandatory in the context of a create operation.
-     *                      Optional (<code>null</code> is a valid value) in the context of an update operation.
-     * @param   value       Optional (<code>null</code> is a valid value).
-     * @param   childTopics Optional (<code>null</code> is a valid value and is transformed into an empty composite).
-     */
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
-                                                                                        ChildTopicsModel childTopics);
-
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException;
-
-
-
-    // === ChildTopicsModel ===
-
-    ChildTopicsModel newChildTopicsModel();
-
-    ChildTopicsModel newChildTopicsModel(JSONObject values);
-
-    /**
-     * Utility.
-     */
-    String childTypeUri(String assocDefUri);
-
-
-
     // === TopicModel ===
 
     TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics);
@@ -109,6 +77,19 @@ public interface ModelFactory {
 
 
 
+    // === ChildTopicsModel ===
+
+    ChildTopicsModel newChildTopicsModel();
+
+    ChildTopicsModel newChildTopicsModel(JSONObject values);
+
+    /**
+     * Utility.
+     */
+    String childTypeUri(String assocDefUri);
+
+
+
     // === TopicRoleModel ===
     
     TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri);
@@ -124,12 +105,6 @@ public interface ModelFactory {
     AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri);
 
     AssociationRoleModel newAssociationRoleModel(JSONObject assocRoleModel);
-
-
-
-    // === RoleModel ===
-
-    RoleModel createRoleModel(DeepaMehtaObjectModel object, String roleTypeUri);
 
 
 
@@ -155,6 +130,8 @@ public interface ModelFactory {
 
     // === TopicReferenceModel ===
 
+    // TODO: make internal?
+
     TopicReferenceModel newTopicReferenceModel(long topicId);
 
     TopicReferenceModel newTopicReferenceModel(long topicId, AssociationModel relatingAssoc);
@@ -171,23 +148,11 @@ public interface ModelFactory {
 
     // === TopicDeletionModel ===
 
+    // TODO: make internal?
+
     TopicDeletionModel newTopicDeletionModel(long topicId);
 
     TopicDeletionModel newTopicDeletionModel(String topicUri);
-
-
-
-    // === TypeModel ===
-
-    // ### TODO: make internal
-
-    TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri,
-                           List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                           List<String> labelConfig, ViewConfigurationModel viewConfig);
-
-    TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri);
-
-    TypeModel newTypeModel(JSONObject typeModel) throws JSONException;
 
 
 

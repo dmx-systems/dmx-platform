@@ -49,11 +49,17 @@ public interface DeepaMehtaObjectModel extends Identifiable, JSONEnabled, Clonea
 
     void setChildTopicsModel(ChildTopicsModel childTopics);
 
-    // ---
+    // --- misc ---
 
     void set(DeepaMehtaObjectModel object);
 
     // ---
+
+    RoleModel createRoleModel(String roleTypeUri);
+
+
+
+    // === Java API ===
 
     DeepaMehtaObjectModel clone();
 }

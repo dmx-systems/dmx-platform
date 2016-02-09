@@ -46,7 +46,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         super(type);
         this.dataTypeUri = type.getDataTypeUri();
         this.indexModes  = type.getIndexModes();
-        this.assocDefs   = toMap((List<AssociationDefinitionModel>) type.getAssocDefs());   // ###
+        this.assocDefs   = toMap(type.getAssocDefs());
         this.labelConfig = type.getLabelConfig();
         this.viewConfig  = type.getViewConfigModel();
     }
@@ -368,7 +368,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private SequencedHashMap<String, AssociationDefinitionModel> toMap(List<AssociationDefinitionModel> assocDefs) {
+    private SequencedHashMap<String, AssociationDefinitionModel> toMap(Collection<AssociationDefinitionModel> assocDefs)
+    {
         SequencedHashMap<String, AssociationDefinitionModel> _assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : assocDefs) {
             _assocDefs.put(assocDef.getAssocDefUri(), assocDef);
