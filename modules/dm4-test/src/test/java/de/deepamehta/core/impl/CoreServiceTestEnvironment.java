@@ -52,7 +52,7 @@ public class CoreServiceTestEnvironment {
             logger.info("Instantiating the storage layer\n    databasePath=\"" + databasePath +
                 "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
             DeepaMehtaStorageFactory factory = (DeepaMehtaStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
-            return factory.createInstance(databasePath);
+            return factory.newDeepaMehtaStorage(databasePath);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating the storage layer failed (databasePath=\"" + databasePath +
                 "\", databaseFactory=\"" + DATABASE_FACTORY + "\"", e);

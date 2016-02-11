@@ -10,6 +10,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -74,11 +75,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private Index<Node> assocContentFulltext;   // assoc value (index modes FULLTEXT or FULLTEXT_KEY)
     private Index<Node> assocMetadata;
 
+    private ModelFactory mf;
+
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    Neo4jStorage(String databasePath) {
+    Neo4jStorage(String databasePath, ModelFactory mf) {
         try {
             this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
             this.relTypeCache = new RelationtypeCache(neo4j);
@@ -88,6 +91,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             this.assocContentExact    = createExactIndex("assoc-content-exact");
             this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
             this.assocMetadata = createExactIndex("assoc-metadata");
+            //
+            this.mf = mf;
         } catch (Exception e) {
             if (neo4j != null) {
                 shutdown();
@@ -559,7 +564,6 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     @Override
     public void shutdown() {
-        logger.info("Shutdown Neo4j");
         neo4j.shutdown();
     }
 
@@ -884,7 +888,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // --- Neo4j -> DeepaMehta Bridge ---
 
     TopicModel buildTopic(Node topicNode) {
-        return new TopicModel(
+        return mf.newTopicModel(
             topicNode.getId(),
             uri(topicNode),
             typeUri(topicNode),
@@ -905,7 +909,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     AssociationModel buildAssociation(Node assocNode) {
         List<RoleModel> roleModels = buildRoleModels(assocNode);
-        return new AssociationModel(
+        return mf.newAssociationModel(
             assocNode.getId(),
             uri(assocNode),
             typeUri(assocNode),
@@ -928,7 +932,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         for (Relationship rel : fetchRelationships(assocNode)) {
             Node node = rel.getEndNode();
             String roleTypeUri = rel.getType().name();
-            RoleModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri);
+            RoleModel roleModel = NodeType.of(node).createRoleModel(node, roleTypeUri, mf);
             roleModels.add(roleModel);
         }
         return roleModels;
@@ -1090,7 +1094,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private List<RelatedTopicModel> buildRelatedTopics(List<AssociationModel> assocs, long playerId) {
         List<RelatedTopicModel> relTopics = new ArrayList();
         for (AssociationModel assoc : assocs) {
-            relTopics.add(new RelatedTopicModel(
+            relTopics.add(mf.newRelatedTopicModel(
                 fetchTopic(
                     assoc.getOtherPlayerId(playerId)
                 ), assoc)
@@ -1103,7 +1107,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     private List<RelatedAssociationModel> buildRelatedAssociations(List<AssociationModel> assocs, long playerId) {
         List<RelatedAssociationModel> relAssocs = new ArrayList();
         for (AssociationModel assoc : assocs) {
-            relAssocs.add(new RelatedAssociationModel(
+            relAssocs.add(mf.newRelatedAssociationModel(
                 fetchAssociation(
                     assoc.getOtherPlayerId(playerId)
                 ), assoc)

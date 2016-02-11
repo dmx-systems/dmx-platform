@@ -1,8 +1,7 @@
 package de.deepamehta.storage.neo4j;
 
-import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ModelFactory;
 
 import org.neo4j.graphdb.Node;
 
@@ -12,8 +11,8 @@ enum NodeType {
 
     TOPIC {
         @Override
-        RoleModel createRoleModel(Node node, String roleTypeUri) {
-            return new TopicRoleModel(node.getId(), roleTypeUri);
+        RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+            return mf.newTopicRoleModel(node.getId(), roleTypeUri);
         }
 
         @Override
@@ -23,8 +22,8 @@ enum NodeType {
     },
     ASSOC {
         @Override
-        RoleModel createRoleModel(Node node, String roleTypeUri) {
-            return new AssociationRoleModel(node.getId(), roleTypeUri);
+        RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf) {
+            return mf.newAssociationRoleModel(node.getId(), roleTypeUri);
         }
 
         @Override
@@ -35,7 +34,7 @@ enum NodeType {
 
     // ---
 
-    abstract RoleModel createRoleModel(Node node, String roleTypeUri);
+    abstract RoleModel createRoleModel(Node node, String roleTypeUri, ModelFactory mf);
 
     abstract String error(Node node);
 

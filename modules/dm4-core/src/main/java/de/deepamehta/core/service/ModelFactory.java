@@ -7,6 +7,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -125,6 +126,12 @@ public interface ModelFactory {
     RelatedTopicModel newRelatedTopicModel(TopicModel topic);
 
     RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc);
+
+
+
+    // === RelatedAssociationModel ===
+
+    RelatedAssociationModel newRelatedAssociationModel(AssociationModel assoc, AssociationModel relatingAssoc);
 
 
 

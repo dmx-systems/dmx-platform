@@ -1,8 +1,10 @@
 package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.EmbeddedService;
+import de.deepamehta.core.impl.ModelFactoryImpl;
 import de.deepamehta.core.impl.StorageDecorator;
 import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import org.osgi.framework.BundleActivator;
@@ -46,6 +48,8 @@ public class CoreActivator implements BundleActivator {
         try {
             logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
             this.bundleContext = bundleContext;
+            //
+            registerModelFactory();
             //
             (storageServiceTracker = createServiceTracker(DeepaMehtaStorage.class)).open();
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
@@ -96,6 +100,13 @@ public class CoreActivator implements BundleActivator {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void registerModelFactory() {
+        logger.info("Registering ModelFactory service at OSGi framework");
+        bundleContext.registerService(ModelFactory.class.getName(), new ModelFactoryImpl(), null);
+    }
+
+    // ---
 
     private ServiceTracker createServiceTracker(final Class serviceInterface) {
         //
@@ -159,9 +170,10 @@ public class CoreActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
-            DeepaMehtaService dms = new EmbeddedService(new StorageDecorator(storageService), bundleContext);
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-            bundleContext.registerService(DeepaMehtaService.class.getName(), dms, null);
+            bundleContext.registerService(DeepaMehtaService.class.getName(), new EmbeddedService(
+                new StorageDecorator(storageService), getService(ModelFactory.class), bundleContext
+            ), null);
         }
     }
 }

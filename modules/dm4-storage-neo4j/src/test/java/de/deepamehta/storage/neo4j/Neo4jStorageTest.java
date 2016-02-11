@@ -1,5 +1,6 @@
 package de.deepamehta.storage.neo4j;
 
+import de.deepamehta.core.impl.ModelFactoryImpl;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
@@ -8,6 +9,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JavaUtils;
@@ -32,17 +34,18 @@ import java.util.logging.Logger;
 public class Neo4jStorageTest {
 
     private DeepaMehtaStorage storage;
+    private ModelFactory mf;
+
     private long assocId;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
-
-
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Before
     public void setup() {
-        storage = new Neo4jStorageFactory().createInstance(createTempDirectory("neo4j-test-"));
+        mf = new ModelFactoryImpl();
+        storage = new Neo4jStorageFactory().newDeepaMehtaStorage(createTempDirectory("neo4j-test-"), mf);
         setupContent();
     }
 
@@ -272,7 +275,7 @@ public class Neo4jStorageTest {
     }
 
     private long createTopic(String uri, String typeUri, String value, IndexMode indexMode, String indexValue) {
-        TopicModel topic = new TopicModel(uri, typeUri, new SimpleValue(value));
+        TopicModel topic = mf.newTopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
         storage.storeTopic(topic);
@@ -295,9 +298,9 @@ public class Neo4jStorageTest {
 
     private long createAssociation(String typeUri, String topicUri1, String roleTypeUri1,
                                                    String topicUri2, String roleTypeUri2) {
-        AssociationModel assoc = new AssociationModel(typeUri,
-            new TopicRoleModel(topicUri1, roleTypeUri1),
-            new TopicRoleModel(topicUri2, roleTypeUri2)
+        AssociationModel assoc = mf.newAssociationModel(typeUri,
+            mf.newTopicRoleModel(topicUri1, roleTypeUri1),
+            mf.newTopicRoleModel(topicUri2, roleTypeUri2)
         );
         assertEquals(-1, assoc.getId());
         //

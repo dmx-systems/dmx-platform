@@ -71,10 +71,10 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
      */
-    public EmbeddedService(StorageDecorator storageDecorator, BundleContext bundleContext) {
+    public EmbeddedService(StorageDecorator storageDecorator, ModelFactory modelFactory, BundleContext bundleContext) {
         this.storageDecorator = storageDecorator;
+        this.mf = modelFactory;
         this.bundleContext = bundleContext;
-        this.mf = new ModelFactoryImpl(storageDecorator);
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.eventManager = new EventManager(this);
@@ -1016,7 +1016,8 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     private void bootstrapTypeCache() {
-        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type", "dm4.core.text");
+        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
+            "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
         typeCache.putTopicType(new AttachedTopicType(metaMetaType, this));
     }

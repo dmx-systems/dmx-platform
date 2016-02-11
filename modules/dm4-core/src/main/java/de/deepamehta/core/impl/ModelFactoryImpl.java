@@ -7,6 +7,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -33,7 +34,7 @@ import java.util.Map;
 
 
 
-class ModelFactoryImpl implements ModelFactory {
+public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -44,13 +45,7 @@ class ModelFactoryImpl implements ModelFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private StorageDecorator storageDecorator;
-
-    // ---------------------------------------------------------------------------------------------------- Constructors
-
-    ModelFactoryImpl(StorageDecorator storageDecorator) {
-        this.storageDecorator = storageDecorator;
-    }
+    private StorageDecorator storageDecorator;  // ### TODO: not yet used
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -473,6 +468,15 @@ class ModelFactoryImpl implements ModelFactory {
     public RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
         // ### FIXME: childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(topic, relatingAssoc);
+    }
+
+
+
+    // === RelatedAssociationModel ===
+
+    @Override
+    public RelatedAssociationModel newRelatedAssociationModel(AssociationModel assoc, AssociationModel relatingAssoc) {
+        return new RelatedAssociationModelImpl(assoc, relatingAssoc);
     }
 
 

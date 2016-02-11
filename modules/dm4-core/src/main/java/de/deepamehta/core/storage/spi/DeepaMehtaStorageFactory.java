@@ -1,14 +1,16 @@
 package de.deepamehta.core.storage.spi;
 
+import de.deepamehta.core.service.ModelFactory;
+
 
 
 /**
  * Factory for obtaining a DeepaMehta storage.
  * <p>
- * Note: the factory in only needed by the test suites.
+ * Note: the factory is only needed by the test environment.
  * The DeepaMehta Core obtains the storage as an OSGi service.
  */
 public interface DeepaMehtaStorageFactory {
 
-    DeepaMehtaStorage createInstance(String databasePath);
+    DeepaMehtaStorage newDeepaMehtaStorage(String databasePath, ModelFactory mf);
 }
