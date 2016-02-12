@@ -230,14 +230,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    Topic searchTopic = dms.createTopic(new TopicModel("dm4.webclient.search", new ChildTopicsModel()
-                        .put("dm4.webclient.search_term", searchTerm)
+                    Topic searchTopic = dms.createTopic(mf.newTopicModel("dm4.webclient.search",
+                        mf.newChildTopicsModel().put("dm4.webclient.search_term", searchTerm)
                     ));
                     // associate result items
                     for (Topic resultItem : resultItems) {
-                        dms.createAssociation(new AssociationModel("dm4.webclient.search_result_item",
-                            new TopicRoleModel(searchTopic.getId(), "dm4.core.default"),
-                            new TopicRoleModel(resultItem.getId(), "dm4.core.default")
+                        dms.createAssociation(mf.newAssociationModel("dm4.webclient.search_result_item",
+                            mf.newTopicRoleModel(searchTopic.getId(), "dm4.core.default"),
+                            mf.newTopicRoleModel(resultItem.getId(), "dm4.core.default")
                         ));
                     }
                     //
@@ -355,8 +355,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         if (hasAssocDef(parentTopic, childTopic)) {
             // role types
             Association assoc = childTopic.getRelatingAssociation();
-            if (assoc.isPlayer(new TopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
-                assoc.isPlayer(new TopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
+            if (assoc.isPlayer(mf.newTopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
+                assoc.isPlayer(mf.newTopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
                 return true;
             }
         }

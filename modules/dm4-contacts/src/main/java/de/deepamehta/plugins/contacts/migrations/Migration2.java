@@ -39,27 +39,31 @@ public class Migration2 extends Migration {
         //
         // 2) change model
         //
-        dms.createAssociationType(new AssociationTypeModel("dm4.contacts.phone_entry", "Phone Entry",
+        dms.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.phone_entry", "Phone Entry",
             "dm4.core.composite")
-            .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
             "dm4.contacts.phone_entry", "dm4.contacts.phone_label", "dm4.core.many", "dm4.core.one")));
-        dms.createAssociationType(new AssociationTypeModel("dm4.contacts.address_entry", "Address Entry",
+        dms.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.address_entry", "Address Entry",
             "dm4.core.composite")
-            .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
             "dm4.contacts.address_entry", "dm4.contacts.address_label", "dm4.core.many", "dm4.core.one")));
         dms.getTopicType("dm4.contacts.person")
-            .addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
-            "dm4.contacts.person", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
+            .addAssocDefBefore(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
+                "dm4.contacts.person", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.email_address")
-            .addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
-            "dm4.contacts.person", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
+            .addAssocDefBefore(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
+                "dm4.contacts.person", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.notes");
         dms.getTopicType("dm4.contacts.institution")
-            .addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
-            "dm4.contacts.institution", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
+            .addAssocDefBefore(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
+                "dm4.contacts.institution", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.email_address")
-            .addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
-            "dm4.contacts.institution", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
+            .addAssocDefBefore(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
+                "dm4.contacts.institution", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.notes");
         //
         // 3) convert content
@@ -123,12 +127,12 @@ public class Migration2 extends Migration {
     // ---
 
     private void convertPhoneEntry(Entry entry) {
-        entry.parent.getChildTopics().addRef("dm4.contacts.phone_number", entry.objectId, new ChildTopicsModel()
+        entry.parent.getChildTopics().addRef("dm4.contacts.phone_number", entry.objectId, mf.newChildTopicsModel()
             .putRef("dm4.contacts.phone_label", entry.labelId));
     }
 
     private void convertAddressEntry(Entry entry) {
-        entry.parent.getChildTopics().addRef("dm4.contacts.address", entry.objectId, new ChildTopicsModel()
+        entry.parent.getChildTopics().addRef("dm4.contacts.address", entry.objectId, mf.newChildTopicsModel()
             .putRef("dm4.contacts.address_label", entry.labelId));
     }
 

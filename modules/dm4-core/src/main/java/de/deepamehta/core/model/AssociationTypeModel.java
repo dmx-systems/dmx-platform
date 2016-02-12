@@ -9,4 +9,6 @@ package de.deepamehta.core.model;
  */
 public interface AssociationTypeModel extends TypeModel {
 
+    @Override
+    AssociationTypeModel addAssocDef(AssociationDefinitionModel assocDef);
 }

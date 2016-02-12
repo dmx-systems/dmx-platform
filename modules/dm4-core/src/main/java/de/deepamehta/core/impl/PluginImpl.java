@@ -444,7 +444,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void setCoreService(EmbeddedService dms) {
         this.dms = dms;
-        this.mf = dms.mf;
+        this.mf = dms.getModelFactory();    // ### FIXME: NullPointerException
         pluginContext.setCoreService(dms);
     }
 
