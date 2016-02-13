@@ -1,11 +1,13 @@
 package de.deepamehta.plugins.facets;
 
-import de.deepamehta.plugins.facets.model.FacetValue;
+import de.deepamehta.plugins.facets.model.FacetValueModel;
 
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.ResultList;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
 
@@ -54,7 +56,7 @@ public interface FacetsService {
 
     // ---
 
-    void updateFacet(long topicId, String facetTypeUri, FacetValue value);
+    void updateFacet(long topicId, String facetTypeUri, FacetValueModel value);
 
     /**
      * Updates a facet.
@@ -63,7 +65,15 @@ public interface FacetsService {
      * @param   facetTypeUri    URI of the facet type.
      * @param   facetValue      The new facet value.
      */
-    void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value);
+    void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValueModel value);
+
+    // ---
+
+    // ### TODO: move to Core module
+    FacetValueModel newFacetValueModel(String childTypeUri);
+
+    // ### TODO: move to Core module
+    FacetValueModel newFacetValueModel(JSONObject facetValue);
 
     // ---
 

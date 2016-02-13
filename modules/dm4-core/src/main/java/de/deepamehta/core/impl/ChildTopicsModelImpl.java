@@ -17,7 +17,8 @@ import java.util.logging.Logger;
 
 
 
-class ChildTopicsModelImpl implements ChildTopicsModel {
+// ### TODO: make package private
+public class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -37,9 +38,16 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
+    // ### TODO: make package private
+    public ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
         this.childTopics = childTopics;
         this.mf = mf;
+    }
+
+    // ### TODO: make package private
+    public ChildTopicsModelImpl(ChildTopicsModel childTopics) {
+        this.childTopics = ((ChildTopicsModelImpl) childTopics).childTopics;
+        this.mf = ((ChildTopicsModelImpl) childTopics).mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

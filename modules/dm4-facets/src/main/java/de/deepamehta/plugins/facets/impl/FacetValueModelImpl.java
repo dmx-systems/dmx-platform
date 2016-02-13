@@ -1,10 +1,15 @@
-package de.deepamehta.plugins.facets.model;
+package de.deepamehta.plugins.facets.impl;
 
+import de.deepamehta.plugins.facets.model.FacetValueModel;
+
+import de.deepamehta.core.impl.ChildTopicsModelImpl;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.service.ModelFactory;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -12,28 +17,22 @@ import java.util.List;
 /**
  * A facet value as used in update facet calls.
  * Used for both, single-valued facets and multiple-valued facets.
+ * ### TODO: move to Core module
  */
-public class FacetValue extends ChildTopicsModel {
+public class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueModel {
 
     private String childTypeUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public FacetValue(String childTypeUri) {
+    public FacetValueModelImpl(String childTypeUri, ModelFactory mf) {
+        super(new HashMap(), mf);
         this.childTypeUri = childTypeUri;
     }
 
-    public FacetValue(JSONObject obj) {
-        super(obj);
-        try {
-            if (size() != 1) {
-                throw new RuntimeException("There are " + size() + " child type entries (expected is 1)");
-            }
-            //
-            this.childTypeUri = iterator().next();
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing FacetValue failed (JSONObject=" + obj + ")", e);
-        }
+    public FacetValueModelImpl(ChildTopicsModel childTopics) {
+        super(childTopics);
+        this.childTypeUri = iterator().next();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -59,8 +58,8 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Puts a value in a single-valued facet.
      */
-    public FacetValue put(RelatedTopicModel value) {
-        return (FacetValue) put(childTypeUri, value);
+    public FacetValueModel put(RelatedTopicModel value) {
+        return (FacetValueModel) put(childTypeUri, value);
     }
 
     // ---
@@ -68,15 +67,15 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Convenience method to put a *simple* value in a single-valued facet.
      */
-    public FacetValue put(Object value) {
-        return (FacetValue) put(childTypeUri, value);
+    public FacetValueModel put(Object value) {
+        return (FacetValueModel) put(childTypeUri, value);
     }
 
     /**
      * Convenience method to put a *composite* value in a single-valued facet.
      */
-    public FacetValue put(ChildTopicsModel value) {
-        return (FacetValue) put(childTypeUri, value);
+    public FacetValueModel put(ChildTopicsModel value) {
+        return (FacetValueModel) put(childTypeUri, value);
     }
 
     // ---
@@ -84,15 +83,15 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Puts a by-ID topic reference in a single-valued facet.
      */
-    public FacetValue putRef(long refTopicId) {
-        return (FacetValue) putRef(childTypeUri, refTopicId);
+    public FacetValueModel putRef(long refTopicId) {
+        return (FacetValueModel) putRef(childTypeUri, refTopicId);
     }
 
     /**
      * Puts a by-URI topic reference in a single-valued facet.
      */
-    public FacetValue putRef(String refTopicUri) {
-        return (FacetValue) putRef(childTypeUri, refTopicUri);
+    public FacetValueModel putRef(String refTopicUri) {
+        return (FacetValueModel) putRef(childTypeUri, refTopicUri);
     }
 
     // === Multiple-valued Facets ===
@@ -100,8 +99,8 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Sets the values of a multiple-valued facet.
      */
-    public FacetValue put(List<RelatedTopicModel> values) {
-        return (FacetValue) put(childTypeUri, values);
+    public FacetValueModel put(List<RelatedTopicModel> values) {
+        return (FacetValueModel) put(childTypeUri, values);
     }
 
     // ---
@@ -109,15 +108,15 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Adds a by-ID topic reference to a multiple-valued facet.
      */
-    public FacetValue addRef(long refTopicId) {
-        return (FacetValue) addRef(childTypeUri, refTopicId);
+    public FacetValueModel addRef(long refTopicId) {
+        return (FacetValueModel) addRef(childTypeUri, refTopicId);
     }
 
     /**
      * Adds a by-URI topic reference to a multiple-valued facet.
      */
-    public FacetValue addRef(String refTopicUri) {
-        return (FacetValue) addRef(childTypeUri, refTopicUri);
+    public FacetValueModel addRef(String refTopicUri) {
+        return (FacetValueModel) addRef(childTypeUri, refTopicUri);
     }
 
     // ---
@@ -125,7 +124,7 @@ public class FacetValue extends ChildTopicsModel {
     /**
      * Adds a by-ID topic deletion reference to a multiple-valued facet.
      */
-    public FacetValue addDeletionRef(long refTopicId) {
-        return (FacetValue) addDeletionRef(childTypeUri, refTopicId);
+    public FacetValueModel addDeletionRef(long refTopicId) {
+        return (FacetValueModel) addDeletionRef(childTypeUri, refTopicId);
     }
 }

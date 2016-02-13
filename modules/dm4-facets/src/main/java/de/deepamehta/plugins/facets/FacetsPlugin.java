@@ -1,20 +1,20 @@
 package de.deepamehta.plugins.facets;
 
-import de.deepamehta.plugins.facets.model.FacetValue;
+import de.deepamehta.plugins.facets.impl.FacetValueModelImpl;
+import de.deepamehta.plugins.facets.model.FacetValueModel;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -111,9 +111,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
-        dms.createAssociation(new AssociationModel("dm4.core.instantiation",
-            new TopicRoleModel(topicId,      "dm4.core.instance"),
-            new TopicRoleModel(facetTypeUri, "dm4.facets.facet")
+        dms.createAssociation(mf.newAssociationModel("dm4.core.instantiation",
+            mf.newTopicRoleModel(topicId,      "dm4.core.instance"),
+            mf.newTopicRoleModel(facetTypeUri, "dm4.facets.facet")
         ));
     }
 
@@ -124,7 +124,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Transactional
     @Override
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
-                                                                                        FacetValue value) {
+                                                                                        FacetValueModel value) {
         try {
             updateFacet(dms.getTopic(topicId), facetTypeUri, value);
         } catch (Exception e) {
@@ -134,12 +134,32 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValue value) {
+    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValueModel value) {
         AssociationDefinition assocDef = getAssocDef(facetTypeUri);
         if (!isMultiFacet(facetTypeUri)) {
             object.updateChildTopic(value.getTopic(), assocDef);
         } else {
             object.updateChildTopics(value.getTopics(), assocDef);
+        }
+    }
+
+    // ---
+
+    @Override
+    public FacetValueModel newFacetValueModel(String childTypeUri) {
+        return new FacetValueModelImpl(childTypeUri, mf);
+    }
+
+    @Override
+    public FacetValueModel newFacetValueModel(JSONObject facetValue) {
+        try {
+            ChildTopicsModel childTopics = mf.newChildTopicsModel(facetValue);
+            if (childTopics.size() != 1) {
+                throw new RuntimeException("There are " + childTopics.size() + " child topic entries (expected is 1)");
+            }
+            return new FacetValueModelImpl(childTopics);
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
         }
     }
 
