@@ -2,6 +2,8 @@ package de.deepamehta.plugins.topicmaps.model;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.topicmaps.AssociationViewModel;
+import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -24,15 +26,15 @@ public class TopicmapViewmodel implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicModel topicmapTopic;
-    private Map<Long, TopicViewmodel> topics;
-    private Map<Long, AssociationViewmodel> assocs;
+    private Map<Long, TopicViewModel> topics;
+    private Map<Long, AssociationViewModel> assocs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicmapViewmodel(TopicModel topicmapTopic, Map<Long, TopicViewmodel> topics,
-                                                       Map<Long, AssociationViewmodel> assocs) {
+    public TopicmapViewmodel(TopicModel topicmapTopic, Map<Long, TopicViewModel> topics,
+                                                       Map<Long, AssociationViewModel> assocs) {
         this.topicmapTopic = topicmapTopic;
         this.topics = topics;
         this.assocs = assocs;
@@ -46,21 +48,21 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     // ---
 
-    public Iterable<TopicViewmodel> getTopics() {
+    public Iterable<TopicViewModel> getTopics() {
         return topics.values();
     }
 
-    public Iterable<AssociationViewmodel> getAssociations() {
+    public Iterable<AssociationViewModel> getAssociations() {
         return assocs.values();
     }
 
     // ---
 
-    public TopicViewmodel getTopic(long id) {
+    public TopicViewModel getTopic(long id) {
         return topics.get(id);
     }
 
-    public AssociationViewmodel getAssociation(long id) {
+    public AssociationViewModel getAssociation(long id) {
         return assocs.get(id);
     }
 
@@ -125,7 +127,7 @@ public class TopicmapViewmodel implements JSONEnabled {
 
         private Point findStartPostition() {
             int maxY = MIN_Y;
-            for (TopicViewmodel topic : topics.values()) {
+            for (TopicViewModel topic : topics.values()) {
                 if (topic.getY() > maxY) {
                     maxY = topic.getY();
                 }

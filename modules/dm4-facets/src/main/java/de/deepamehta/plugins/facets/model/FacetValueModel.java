@@ -3,8 +3,6 @@ package de.deepamehta.plugins.facets.model;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.List;
 
 

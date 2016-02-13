@@ -1,7 +1,7 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 
 
 

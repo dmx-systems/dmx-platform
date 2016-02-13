@@ -1,9 +1,9 @@
 package de.deepamehta.plugins.topicmaps;
 
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
-import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 
 
 

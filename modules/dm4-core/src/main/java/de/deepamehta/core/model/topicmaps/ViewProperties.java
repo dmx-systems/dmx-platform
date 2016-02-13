@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.topicmaps.model;
+package de.deepamehta.core.model.topicmaps;
 
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.util.DeepaMehtaUtils;

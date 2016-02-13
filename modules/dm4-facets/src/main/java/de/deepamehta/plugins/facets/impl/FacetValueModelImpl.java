@@ -7,18 +7,12 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.service.ModelFactory;
 
-import org.codehaus.jettison.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.List;
 
 
 
-/**
- * A facet value as used in update facet calls.
- * Used for both, single-valued facets and multiple-valued facets.
- * ### TODO: move to Core module
- */
+// ### TODO: move to Core module
 public class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueModel {
 
     private String childTypeUri;

@@ -18,9 +18,11 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.model.topicmaps.AssociationViewModel;
+import de.deepamehta.core.model.topicmaps.TopicViewModel;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.util.DeepaMehtaUtils;
-import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -101,11 +103,12 @@ public class ModelFactoryImpl implements ModelFactory {
 
     /* TopicModelImpl(long id, String typeUri) {
         super(id, typeUri);
-    }
-
-    TopicModelImpl(long id, ChildTopicsModel childTopics) {
-        super(id, childTopics);
     } */
+
+    @Override
+    public TopicModel newTopicModel(long id, ChildTopicsModel childTopics) {
+        return newTopicModel(id, null, null, null, childTopics);
+    }
 
     @Override
     public TopicModel newTopicModel(JSONObject topic) {
@@ -791,4 +794,18 @@ public class ModelFactoryImpl implements ModelFactory {
             throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONArray=" + configTopics + ")", e);
         }
     }    
+
+
+
+    // === Topicmaps ===
+
+    @Override
+    public TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps) {
+        return new TopicViewModelImpl(topic, viewProps);
+    }
+
+    @Override
+    public AssociationViewModel newAssociationViewModel(AssociationModel assoc) {
+        return new AssociationViewModelImpl(assoc);
+    }
 }

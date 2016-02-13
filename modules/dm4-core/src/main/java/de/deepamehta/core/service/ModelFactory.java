@@ -18,6 +18,9 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.model.topicmaps.AssociationViewModel;
+import de.deepamehta.core.model.topicmaps.TopicViewModel;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -50,6 +53,8 @@ public interface ModelFactory {
     TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(long id);
+
+    TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(JSONObject topic);
 
@@ -218,4 +223,12 @@ public interface ModelFactory {
     ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics);
 
     ViewConfigurationModel newViewConfigurationModel(JSONArray configTopics);
+
+
+
+    // === Topicmaps ===
+
+    TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps);
+
+    AssociationViewModel newAssociationViewModel(AssociationModel assoc);
 }

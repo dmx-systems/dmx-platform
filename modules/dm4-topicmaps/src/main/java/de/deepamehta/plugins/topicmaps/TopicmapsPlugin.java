@@ -1,9 +1,6 @@
 package de.deepamehta.plugins.topicmaps;
 
-import de.deepamehta.plugins.topicmaps.model.AssociationViewmodel;
-import de.deepamehta.plugins.topicmaps.model.TopicViewmodel;
 import de.deepamehta.plugins.topicmaps.model.TopicmapViewmodel;
-import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
@@ -14,6 +11,9 @@ import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.topicmaps.AssociationViewModel;
+import de.deepamehta.core.model.topicmaps.TopicViewModel;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
@@ -88,11 +88,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                 @QueryParam("private") boolean isPrivate) {
         logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
             "\", isPrivate=" + isPrivate +")");
-        return dms.createTopic(new TopicModel("dm4.topicmaps.topicmap", new ChildTopicsModel()
+        return dms.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.private", isPrivate)
-            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState())
+            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))
         ));
     }
 
@@ -108,8 +108,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dms.getTopic(topicmapId).loadChildTopics();
-            Map<Long, TopicViewmodel> topics = fetchTopics(topicmapTopic, includeChilds);
-            Map<Long, AssociationViewmodel> assocs = fetchAssociations(topicmapTopic);
+            Map<Long, TopicViewModel> topics = fetchTopics(topicmapTopic, includeChilds);
+            Map<Long, AssociationViewModel> assocs = fetchAssociations(topicmapTopic);
             //
             return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
         } catch (Exception e) {
@@ -140,9 +140,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 throw new RuntimeException("The topic is already added");
             }
             //
-            Association assoc = dms.createAssociation(new AssociationModel(TOPIC_MAPCONTEXT,
-                new TopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-                new TopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
+            Association assoc = dms.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+                mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
+                mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
             ));
             storeViewProperties(assoc, viewProps);
         } catch (Exception e) {
@@ -166,9 +166,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 throw new RuntimeException("The association is already added");
             }
             //
-            dms.createAssociation(new AssociationModel(ASSOCIATION_MAPCONTEXT,
-                new TopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-                new AssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+            dms.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+                mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
+                mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
             ));
         } catch (Exception e) {
             throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed", e);
@@ -241,12 +241,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
         try {
-            ChildTopicsModel topicmapState = new ChildTopicsModel()
-                .put("dm4.topicmaps.state", new ChildTopicsModel()
-                    .put("dm4.topicmaps.translation", new ChildTopicsModel()
+            ChildTopicsModel topicmapState = mf.newChildTopicsModel()
+                .put("dm4.topicmaps.state", mf.newChildTopicsModel()
+                    .put("dm4.topicmaps.translation", mf.newChildTopicsModel()
                         .put("dm4.topicmaps.translation_x", transX)
                         .put("dm4.topicmaps.translation_y", transY)));
-            dms.updateTopic(new TopicModel(topicmapId, topicmapState));
+            dms.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
                 transX + ", transY=" + transY + ")", e);
@@ -303,36 +303,36 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch ---
 
-    private Map<Long, TopicViewmodel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
-        Map<Long, TopicViewmodel> topics = new HashMap();
+    private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
+        Map<Long, TopicViewModel> topics = new HashMap();
         ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
             "dm4.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
         if (includeChilds) {
             relTopics.loadChildTopics();
         }
         for (RelatedTopic topic : relTopics) {
-            topics.put(topic.getId(), createTopicViewmodel(topic));
+            topics.put(topic.getId(), createTopicViewModel(topic));
         }
         return topics;
     }
 
-    private Map<Long, AssociationViewmodel> fetchAssociations(Topic topicmapTopic) {
-        Map<Long, AssociationViewmodel> assocs = new HashMap();
+    private Map<Long, AssociationViewModel> fetchAssociations(Topic topicmapTopic) {
+        Map<Long, AssociationViewModel> assocs = new HashMap();
         ResultList<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
-            assocs.put(assoc.getId(), new AssociationViewmodel(assoc.getModel()));
+            assocs.put(assoc.getId(), mf.newAssociationViewModel(assoc.getModel()));
         }
         return assocs;
     }
 
     // ---
 
-    private TopicViewmodel createTopicViewmodel(RelatedTopic topic) {
+    private TopicViewModel createTopicViewModel(RelatedTopic topic) {
         try {
             ViewProperties viewProps = fetchViewProperties(topic.getRelatingAssociation());
             invokeViewmodelCustomizers(topic, viewProps);
-            return new TopicViewmodel(topic.getModel(), viewProps);
+            return mf.newTopicViewModel(topic.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Creating viewmodel for topic " + topic.getId() + " failed", e);
         }
