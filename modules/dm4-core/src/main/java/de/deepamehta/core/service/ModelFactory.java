@@ -18,6 +18,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
@@ -231,4 +232,12 @@ public interface ModelFactory {
     TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps);
 
     AssociationViewModel newAssociationViewModel(AssociationModel assoc);
+
+
+
+    // === Facets ===
+
+    FacetValueModel newFacetValueModel(String childTypeUri);
+
+    FacetValueModel newFacetValueModel(JSONObject facetValue);
 }

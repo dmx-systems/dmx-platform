@@ -1,14 +1,12 @@
 package de.deepamehta.plugins.facets;
 
-import de.deepamehta.plugins.facets.impl.FacetValueModelImpl;
-import de.deepamehta.plugins.facets.model.FacetValueModel;
-
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
@@ -140,26 +138,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
             object.updateChildTopic(value.getTopic(), assocDef);
         } else {
             object.updateChildTopics(value.getTopics(), assocDef);
-        }
-    }
-
-    // ---
-
-    @Override
-    public FacetValueModel newFacetValueModel(String childTypeUri) {
-        return new FacetValueModelImpl(childTypeUri, mf);
-    }
-
-    @Override
-    public FacetValueModel newFacetValueModel(JSONObject facetValue) {
-        try {
-            ChildTopicsModel childTopics = mf.newChildTopicsModel(facetValue);
-            if (childTopics.size() != 1) {
-                throw new RuntimeException("There are " + childTopics.size() + " child topic entries (expected is 1)");
-            }
-            return new FacetValueModelImpl(childTopics);
-        } catch (Exception e) {
-            throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
         }
     }
 

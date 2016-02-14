@@ -18,6 +18,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
@@ -807,5 +808,27 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationViewModel newAssociationViewModel(AssociationModel assoc) {
         return new AssociationViewModelImpl(assoc);
+    }
+
+
+
+    // === Facets ===
+
+    @Override
+    public FacetValueModel newFacetValueModel(String childTypeUri) {
+        return new FacetValueModelImpl(childTypeUri, this);
+    }
+
+    @Override
+    public FacetValueModel newFacetValueModel(JSONObject facetValue) {
+        try {
+            ChildTopicsModel childTopics = newChildTopicsModel(facetValue);
+            if (childTopics.size() != 1) {
+                throw new RuntimeException("There are " + childTopics.size() + " child topic entries (expected is 1)");
+            }
+            return new FacetValueModelImpl(childTopics);
+        } catch (Exception e) {
+            throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
+        }
     }
 }

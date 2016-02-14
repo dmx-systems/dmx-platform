@@ -1,10 +1,8 @@
-package de.deepamehta.plugins.facets.impl;
+package de.deepamehta.core.impl;
 
-import de.deepamehta.plugins.facets.model.FacetValueModel;
-
-import de.deepamehta.core.impl.ChildTopicsModelImpl;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.service.ModelFactory;
 
 import java.util.HashMap;
@@ -12,19 +10,18 @@ import java.util.List;
 
 
 
-// ### TODO: move to Core module
-public class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueModel {
+class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueModel {
 
     private String childTypeUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public FacetValueModelImpl(String childTypeUri, ModelFactory mf) {
+    FacetValueModelImpl(String childTypeUri, ModelFactory mf) {
         super(new HashMap(), mf);
         this.childTypeUri = childTypeUri;
     }
 
-    public FacetValueModelImpl(ChildTopicsModel childTopics) {
+    FacetValueModelImpl(ChildTopicsModel childTopics) {
         super(childTopics);
         this.childTypeUri = iterator().next();
     }

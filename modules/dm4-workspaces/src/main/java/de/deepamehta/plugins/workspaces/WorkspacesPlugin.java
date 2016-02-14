@@ -418,7 +418,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // 1) create assignment association
             facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
-                facetsService.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
+                mf.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
             // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
             //
             // 2) store assignment property

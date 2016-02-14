@@ -1,4 +1,4 @@
-package de.deepamehta.plugins.facets.model;
+package de.deepamehta.core.model.facets;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * A facet value as used in update facet calls.
  * Used for both, single-valued facets and multiple-valued facets.
- * ### TODO: move to Core module
  */
 public interface FacetValueModel extends ChildTopicsModel {
 

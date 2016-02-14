@@ -276,7 +276,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         try {
             logger.info("Storing geo coordinate (" + geoCoord + ") of address " + address);
             facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet",
-                facetsService.newFacetValueModel("dm4.geomaps.geo_coordinate")
+                mf.newFacetValueModel("dm4.geomaps.geo_coordinate")
                 .put(mf.newChildTopicsModel()
                     .put("dm4.geomaps.longitude", geoCoord.lon)
                     .put("dm4.geomaps.latitude",  geoCoord.lat)

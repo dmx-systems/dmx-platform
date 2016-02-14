@@ -54,6 +54,8 @@
                         <Export-Package>
                             de.deepamehta.core,
                             de.deepamehta.core.model,
+                            de.deepamehta.core.model.facets,
+                            de.deepamehta.core.model.topicmaps,
                             de.deepamehta.core.osgi,
                             de.deepamehta.core.service,
                             de.deepamehta.core.service.accesscontrol,
