@@ -16,7 +16,7 @@ public class Migration3 extends Migration {
     @Override
     public void run() {
         dms.getTopicType("dm4.workspaces.workspace").addAssocDef(
-            new AssociationDefinitionModel("dm4.core.aggregation_def",
+            mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                 "dm4.workspaces.workspace", "dm4.workspaces.sharing_mode", "dm4.core.many", "dm4.core.one")
         );
     }

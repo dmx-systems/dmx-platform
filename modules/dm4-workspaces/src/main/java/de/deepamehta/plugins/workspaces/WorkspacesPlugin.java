@@ -5,7 +5,6 @@ import de.deepamehta.plugins.config.ConfigModificationRole;
 import de.deepamehta.plugins.config.ConfigService;
 import de.deepamehta.plugins.config.ConfigTarget;
 import de.deepamehta.plugins.facets.FacetsService;
-import de.deepamehta.plugins.facets.model.FacetValue;
 import de.deepamehta.plugins.topicmaps.TopicmapsService;
 
 import de.deepamehta.core.Association;
@@ -17,9 +16,6 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DirectivesResponse;
@@ -117,7 +113,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     //
                     // 1) create workspace
                     Topic workspace = dms.createTopic(
-                        new TopicModel(uri, "dm4.workspaces.workspace", new ChildTopicsModel()
+                        mf.newTopicModel(uri, "dm4.workspaces.workspace", mf.newChildTopicsModel()
                             .put("dm4.workspaces.name", name)
                             .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
                     //
@@ -248,7 +244,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
-            new TopicModel("dm4.workspaces.enabled_sharing_modes", new ChildTopicsModel()
+            mf.newTopicModel("dm4.workspaces.enabled_sharing_modes", mf.newChildTopicsModel()
                 .put("dm4.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
                 .put("dm4.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
                 .put("dm4.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
@@ -422,7 +418,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // 1) create assignment association
             facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
-                new FacetValue("dm4.workspaces.workspace").putRef(workspaceId));
+                facetsService.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
             // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
             //
             // 2) store assignment property

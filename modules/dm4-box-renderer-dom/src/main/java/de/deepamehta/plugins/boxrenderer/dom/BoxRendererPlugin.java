@@ -2,10 +2,10 @@ package de.deepamehta.plugins.boxrenderer.dom;
 
 import de.deepamehta.plugins.topicmaps.TopicmapsService;
 import de.deepamehta.plugins.topicmaps.ViewmodelCustomizer;
-import de.deepamehta.plugins.topicmaps.model.ViewProperties;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 

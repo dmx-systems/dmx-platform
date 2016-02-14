@@ -239,7 +239,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dms.createTopic(new TopicModel("dm4.accesscontrol.user_account", new ChildTopicsModel()
+                    return dms.createTopic(mf.newTopicModel("dm4.accesscontrol.user_account", mf.newChildTopicsModel()
                         .put("dm4.accesscontrol.username", username)
                         .put("dm4.accesscontrol.password", cred.password)));
                 }
@@ -314,9 +314,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            dms.createAssociation(new AssociationModel(MEMBERSHIP_TYPE,
-                new TopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
-                new TopicRoleModel(workspaceId, "dm4.core.default")
+            dms.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+                mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
+                mf.newTopicRoleModel(workspaceId, "dm4.core.default")
             ));
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
@@ -411,7 +411,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
-            new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
+            mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
             ConfigModificationRole.ADMIN, this
         ));
     }
@@ -444,7 +444,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
         // the "admin" account must be enabled regardless of the "dm4.security.new_accounts_are_enabled" setting
         if (topic.getSimpleValue().toString().equals(ADMIN_USERNAME)) {
-            return new TopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
+            return mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
         }
         // don't customize
         return null;

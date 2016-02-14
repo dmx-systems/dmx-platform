@@ -61,13 +61,13 @@ public class Migration5 extends Migration {
         // 4) Sets the sharing mode of all workspaces to "Public".
         //
         for (Topic workspace : dms.getTopics("dm4.workspaces.workspace")) {
-            workspace.update(new TopicModel(null, new ChildTopicsModel()
+            workspace.update(mf.newTopicModel(mf.newChildTopicsModel()
                 .putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
             ));
             // Note: instead of calling update(...) on the entire topic object we could update the child selectively:
             //     workspace.getChildTopics().setRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
             // This would be much more concise. However in this case the topic will loose its label.
-            // ### TODO: fix that error in the labeling mechanism.
+            // ### TODO: fix that error in the labeling mechanism. ### TODO: check if already fixed
         }
     }
 

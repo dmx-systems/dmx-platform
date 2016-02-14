@@ -426,7 +426,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
             ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
-            new TopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
+            mf.newTopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN
         ));
     }
@@ -560,7 +560,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   path    A canonized absolute path.
      */
     private Topic createFileTopic(File path) throws Exception {
-        ChildTopicsModel childTopics = new ChildTopicsModel()
+        ChildTopicsModel childTopics = mf.newChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
             .put("dm4.files.path", repoPath(path))  // Note: repo path is already calculated by caller. Could be passed.
             .put("dm4.files.size", path.length());
@@ -570,7 +570,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             childTopics.put("dm4.files.media_type", mediaType);
         }
         //
-        return createFileOrFolderTopic(new TopicModel("dm4.files.file", childTopics));      // throws Exception
+        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics));      // throws Exception
     }
 
     /**
@@ -605,7 +605,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   repoPath    The folder repository path.
      */
     private Topic createFolderTopic(String folderName, String repoPath) throws Exception {
-        return createFileOrFolderTopic(new TopicModel("dm4.files.folder", new ChildTopicsModel()
+        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.folder", mf.newChildTopicsModel()
             .put("dm4.files.folder_name", folderName)
             .put("dm4.files.path", repoPath)
         ));    // throws Exception
@@ -637,9 +637,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 Association assoc = dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
                     @Override
                     public Association call() {
-                        return dms.createAssociation(new AssociationModel("dm4.core.aggregation",
-                            new TopicRoleModel(folderTopicId, "dm4.core.parent"),
-                            new TopicRoleModel(topicId,       "dm4.core.child")
+                        return dms.createAssociation(mf.newAssociationModel("dm4.core.aggregation",
+                            mf.newTopicRoleModel(folderTopicId, "dm4.core.parent"),
+                            mf.newTopicRoleModel(topicId,       "dm4.core.child")
                         ));
                     }
                 });

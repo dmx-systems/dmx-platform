@@ -45,6 +45,29 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     @Test
+    public void compositeModel() {
+        ChildTopicsModel person = mf.newChildTopicsModel()
+            .put("dm4.core.name", "Karl Blum")
+            .put("dm4.contacts.home_address", mf.newChildTopicsModel()
+                .put("dm4.contacts.postal_code", 13206)
+                .put("dm4.contacts.city", "Berlin"))
+            .put("dm4.contacts.office_address", mf.newChildTopicsModel()
+                .put("dm4.contacts.postal_code", 14345)
+                .put("dm4.contacts.city", "Berlin"));
+        //
+        assertEquals("Karl Blum", person.getString("dm4.core.name"));
+        //
+        ChildTopicsModel address = person.getChildTopicsModel("dm4.contacts.home_address");
+        assertEquals("Berlin", address.getString("dm4.contacts.city"));
+        //
+        Object code = address.getObject("dm4.contacts.postal_code");
+        assertSame(Integer.class, code.getClass());
+        assertEquals(13206, code);  // autoboxing
+    }
+
+    // ---
+
+    @Test
     public void typeDefinition() {
         TopicType topicType = dms.getTopicType("dm4.core.plugin");
         assertEquals("dm4.core.plugin",     topicType.getUri());
@@ -69,7 +92,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void createWithoutComposite() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
+            Topic topic = dms.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")));
             //
             topic.getChildTopics().set("dm4.core.plugin_migration_nr", 23);
@@ -92,8 +115,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void createWithComposite() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
+            Topic topic = dms.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
+                mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
             assertTrue(topic.getChildTopics().has("dm4.core.plugin_migration_nr"));
@@ -118,8 +141,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void onDemandChildTopicLoading() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
+            dms.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
+                mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
             Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
@@ -140,8 +163,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void onDemandChildTopicLoadingWithConvenienceAccessor() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            dms.createTopic(new TopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new ChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
+            dms.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
+                mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
             Topic topic = dms.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
@@ -163,10 +186,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithSetChildTopics() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic topic = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
-            topic.setChildTopics(new ChildTopicsModel().put("dm4.core.plugin_name", "My Plugin"));
+            topic.setChildTopics(mf.newChildTopicsModel().put("dm4.core.plugin_name", "My Plugin"));
             assertEquals("My Plugin", topic.getChildTopics().getString("dm4.core.plugin_name"));
             assertEquals("My Plugin", topic.getSimpleValue().toString());
             //
@@ -183,7 +206,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void changeLabelWithChildTopicsSet() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic topic = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
             topic.getChildTopics().set("dm4.core.plugin_name", "My Plugin");
@@ -205,7 +228,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setLabelChildWhileChildsAreNotLoaded() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin", new ChildTopicsModel()
+            Topic topic = dms.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
                 .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
                 .put("dm4.core.plugin_migration_nr", 1)
@@ -227,7 +250,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setNonlabelChildWhileChildsAreNotLoaded() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.core.plugin", new ChildTopicsModel()
+            Topic topic = dms.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
                 .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
                 .put("dm4.core.plugin_migration_nr", 1)
@@ -251,10 +274,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void uriUniquenessCreateTopic() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            Topic topic = dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic.getUri());
             //
-            dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             fail("\"URI not unique\" exception not thrown");
             //
             tx.success();
@@ -271,10 +294,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void uriUniquenessSetUri() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic1 = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            Topic topic1 = dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
-            Topic topic2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic topic2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic2.getUri());
             //
             topic2.setUri("dm4.my.uri");
@@ -292,13 +315,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void uriUniquenessUpdate() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic topic1 = dms.createTopic(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            Topic topic1 = dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
-            Topic topic2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic topic2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic2.getUri());
             //
-            topic2.update(new TopicModel("dm4.my.uri", "dm4.core.plugin"));
+            topic2.update(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             fail("\"URI not unique\" exception not thrown");
             //
             tx.success();
@@ -350,9 +373,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             Type type = dms.getTopicType("dm4.core.plugin");
             //
-            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 0
-            type.addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def",
+            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                 "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_name");
             //
             Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
@@ -374,9 +397,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             Type type = dms.getTopicType("dm4.core.plugin");
             //
-            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 1
-            type.addAssocDefBefore(new AssociationDefinitionModel("dm4.core.composition_def",
+            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                 "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_symbolic_name");
             //
             Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
@@ -615,22 +638,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define composite type
             // child types
-            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
             // parent type
-            dms.createTopicType(new TopicTypeModel("dm4.test.composite", "Composite", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.composition_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.composite", "Composite", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.composite", "dm4.test.name", "dm4.core.one", "dm4.core.one"
                 ))
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.composite", "dm4.test.item", "dm4.core.many", "dm4.core.one"
                 ))
             );
             // 2) create example child instances
-            item1 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 1")));
-            item2 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 2")));
+            item1 = dms.createTopic(mf.newTopicModel("dm4.test.item", new SimpleValue("Item 1")));
+            item2 = dms.createTopic(mf.newTopicModel("dm4.test.item", new SimpleValue("Item 2")));
             // 3) create composite instance
-            comp1 = dms.createTopic(new TopicModel("dm4.test.composite", new ChildTopicsModel()
+            comp1 = dms.createTopic(mf.newTopicModel("dm4.test.composite", mf.newChildTopicsModel()
                 .put("dm4.test.name", "Composite 1")
                 // ### .putRef("dm4.test.item", item1.getId())
             ));
@@ -648,7 +671,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update and check again
         tx = dms.beginTx();
         try {
-            comp1.update(new TopicModel(comp1.getId(), new ChildTopicsModel()
+            comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
                 .putRef("dm4.test.item", item2.getId())
             ));
             tx.success();
@@ -665,7 +688,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update and check again
         tx = dms.beginTx();
         try {
-            comp1.update(new TopicModel(comp1.getId(), new ChildTopicsModel()
+            comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
                 .putRef("dm4.test.item", item1.getId())
             ));
             tx.success();
@@ -686,18 +709,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic name, item1, item2;
         try {
             // 1) define facet
-            dms.createTopicType(new TopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.item_facet", "Item Facet", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.item_facet", "Item Facet", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.item_facet", "dm4.test.item", "dm4.core.many", "dm4.core.one"
                 ))
             );
             // 2) create example facet values
-            item1 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 1")));
-            item2 = dms.createTopic(new TopicModel("dm4.test.item", new SimpleValue("Item 2")));
+            item1 = dms.createTopic(mf.newTopicModel("dm4.test.item", new SimpleValue("Item 1")));
+            item2 = dms.createTopic(mf.newTopicModel("dm4.test.item", new SimpleValue("Item 2")));
             // 3) define simple type + instance
-            dms.createTopicType(new TopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
-            name = dms.createTopic(new TopicModel("dm4.test.name", new SimpleValue("Name 1")));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
+            name = dms.createTopic(mf.newTopicModel("dm4.test.name", new SimpleValue("Name 1")));
             //
             tx.success();
         } finally {
@@ -709,7 +732,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update facet
         tx = dms.beginTx();
         try {
-            name.updateChildTopic(new TopicReferenceModel(item1.getId()), assocDef);
+            name.updateChildTopic(mf.newTopicReferenceModel(item1.getId()), assocDef);
             tx.success();
         } finally {
             tx.finish();
@@ -724,7 +747,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update facet again
         tx = dms.beginTx();
         try {
-            name.updateChildTopic(new TopicReferenceModel(item2.getId()), assocDef);
+            name.updateChildTopic(mf.newTopicReferenceModel(item2.getId()), assocDef);
             tx.success();
         } finally {
             tx.finish();
@@ -746,18 +769,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define composite type
             // child type
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             // parent type
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
                 ))
             );
             // 2) create example child instance
-            child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            child1 = dms.createTopic(mf.newTopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create composite instance
             // Note: addRef() must be used (instead of putRef()) as child is defined as "many".
-            parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+            parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent", mf.newChildTopicsModel()
                 .addRef("dm4.test.child", child1.getId())
             ));
             tx.success();
@@ -776,16 +799,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic parent1, child1;
         try {
             // 1) define parent type (with Aggregation-Many child definition)
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
                 ))
             );
             // 2) create child instance
-            child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            child1 = dms.createTopic(mf.newTopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create composite instance
-            parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
+            parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent"));
             parent1.getChildTopics().addRef("dm4.test.child", child1.getId());
             tx.success();
         } finally {
@@ -804,15 +827,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             // 1) define composite type
             // child type
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             // parent type
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.many"
                 ))
             );
             // 2) create composite instance
-            parent1 = dms.createTopic(new TopicModel("dm4.test.parent"));
+            parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent"));
             parent1.getChildTopics().add("dm4.test.child", "Child 1");
             tx.success();
         } finally {
@@ -830,14 +853,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             // 1) define parent type (with Aggregation-One child definition)
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.many", "dm4.core.one"
                 ))
             );
             // 2) create parent instance
-            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+            Topic parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent", mf.newChildTopicsModel()
                 .put("dm4.test.child", "Child 1")
             ));
             //
@@ -860,16 +883,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             // 1) define composite type
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.composition_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.one", "dm4.core.one"
                 ))
             );
             // 2) create child instance
-            Topic child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            Topic child1 = dms.createTopic(mf.newTopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create parent instance
-            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+            Topic parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent", mf.newChildTopicsModel()
                 .putRef("dm4.test.child", child1.getId())
             ));
             //
@@ -886,16 +909,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             // 1) define composite type
-            dms.createTopicType(new TopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
-            dms.createTopicType(new TopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
-                .addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
+            dms.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
                     "dm4.test.parent", "dm4.test.child", "dm4.core.one", "dm4.core.one"
                 ))
             );
             // 2) create child instance
-            Topic child1 = dms.createTopic(new TopicModel("dm4.test.child", new SimpleValue("Child 1")));
+            Topic child1 = dms.createTopic(mf.newTopicModel("dm4.test.child", new SimpleValue("Child 1")));
             // 3) create parent instance
-            Topic parent1 = dms.createTopic(new TopicModel("dm4.test.parent", new ChildTopicsModel()
+            Topic parent1 = dms.createTopic(mf.newTopicModel("dm4.test.parent", mf.newChildTopicsModel()
                 .putRef("dm4.test.child", child1.getId())
             ));
             //
@@ -913,7 +936,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void deleteTopic() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
+            dms.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
             //
             Topic t0 = getTopicByUri("dm4.test.t0");
             assertNotNull(t0);
@@ -934,8 +957,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void coreACAssignTopicToWorkspace() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-            Topic ws = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic t1 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+            Topic ws = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             //
             dms.getAccessControl().assignToWorkspace(t1, ws.getId());
             //
@@ -952,9 +975,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void coreACAssignAssociationToWorkspace() {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-            Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-            Topic ws = dms.createTopic(new TopicModel("dm4.core.plugin"));
+            Topic t1 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+            Topic t2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+            Topic ws = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Association assoc = createAssociation(t1, t2);
             //
             dms.getAccessControl().assignToWorkspace(assoc, ws.getId());
@@ -996,21 +1019,21 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private void setupTestTopics() {
-        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
-        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t0 = dms.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
+        Topic t1 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+        Topic t2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+        Topic t3 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
         createAssociation(t0, t1);
         createAssociation(t0, t2);
         createAssociation(t0, t3);
     }
 
     private void setupTestAssociations() {
-        Topic t0 = dms.createTopic(new TopicModel("dm4.test.t0", "dm4.core.plugin"));
-        Topic t1 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-        Topic t2 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-        Topic t3 = dms.createTopic(new TopicModel("dm4.core.plugin"));
-        Topic t4 = dms.createTopic(new TopicModel("dm4.core.plugin"));
+        Topic t0 = dms.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
+        Topic t1 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+        Topic t2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+        Topic t3 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+        Topic t4 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
         Association a1 = createAssociation(t1, t2);
         Association a2 = createAssociation(t2, t3);
         Association a3 = createAssociation(t3, t4);
@@ -1022,16 +1045,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     private Association createAssociation(Topic topic1, Topic topic2) {
-        return dms.createAssociation(new AssociationModel("dm4.core.association",
-            new TopicRoleModel(topic1.getId(), "dm4.core.default"),
-            new TopicRoleModel(topic2.getId(), "dm4.core.default")
+        return dms.createAssociation(mf.newAssociationModel("dm4.core.association",
+            mf.newTopicRoleModel(topic1.getId(), "dm4.core.default"),
+            mf.newTopicRoleModel(topic2.getId(), "dm4.core.default")
         ));
     }
 
     private Association createAssociation(Topic topic, Association assoc) {
-        return dms.createAssociation(new AssociationModel("dm4.core.association",
-            new TopicRoleModel(topic.getId(), "dm4.core.default"),
-            new AssociationRoleModel(assoc.getId(), "dm4.core.default")
+        return dms.createAssociation(mf.newAssociationModel("dm4.core.association",
+            mf.newTopicRoleModel(topic.getId(), "dm4.core.default"),
+            mf.newAssociationRoleModel(assoc.getId(), "dm4.core.default")
         ));
     }
 

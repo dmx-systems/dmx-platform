@@ -4,7 +4,6 @@ import de.deepamehta.plugins.geomaps.model.GeoCoordinate;
 import de.deepamehta.plugins.geomaps.model.Geomap;
 import de.deepamehta.plugins.topicmaps.TopicmapsService;
 import de.deepamehta.plugins.facets.FacetsService;
-import de.deepamehta.plugins.facets.model.FacetValue;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
@@ -15,7 +14,6 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.Inject;
@@ -129,9 +127,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
-        AssociationModel model = new AssociationModel("dm4.geomaps.geotopic_mapcontext",
-            new TopicRoleModel(geomapId,   "dm4.core.default"),
-            new TopicRoleModel(geoCoordId, "dm4.topicmaps.topicmap_topic")
+        AssociationModel model = mf.newAssociationModel("dm4.geomaps.geotopic_mapcontext",
+            mf.newTopicRoleModel(geomapId,   "dm4.core.default"),
+            mf.newTopicRoleModel(geoCoordId, "dm4.topicmaps.topicmap_topic")
         );
         dms.createAssociation(model);
     }
@@ -142,14 +140,14 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
-        ChildTopicsModel geomapState = new ChildTopicsModel().put(
-            "dm4.topicmaps.state", new ChildTopicsModel().put(
-                "dm4.topicmaps.translation", new ChildTopicsModel().put(
+        ChildTopicsModel geomapState = mf.newChildTopicsModel().put(
+            "dm4.topicmaps.state", mf.newChildTopicsModel().put(
+                "dm4.topicmaps.translation", mf.newChildTopicsModel().put(
                     "dm4.topicmaps.translation_x", lon).put(
                     "dm4.topicmaps.translation_y", lat)).put(
                 "dm4.topicmaps.zoom_level", zoom)
         );
-        dms.updateTopic(new TopicModel(geomapId, geomapState));
+        dms.updateTopic(mf.newTopicModel(geomapId, geomapState));
     }
 
     @GET
@@ -277,11 +275,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord) {
         try {
             logger.info("Storing geo coordinate (" + geoCoord + ") of address " + address);
-            FacetValue value = new FacetValue("dm4.geomaps.geo_coordinate").put(new ChildTopicsModel()
-                .put("dm4.geomaps.longitude", geoCoord.lon)
-                .put("dm4.geomaps.latitude",  geoCoord.lat)
+            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet",
+                facetsService.newFacetValueModel("dm4.geomaps.geo_coordinate")
+                .put(mf.newChildTopicsModel()
+                    .put("dm4.geomaps.longitude", geoCoord.lon)
+                    .put("dm4.geomaps.latitude",  geoCoord.lat)
+                )
             );
-            facetsService.updateFacet(address, "dm4.geomaps.geo_coordinate_facet", value);
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }
