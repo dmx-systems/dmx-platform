@@ -122,7 +122,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public final void setCoreService(DeepaMehtaService dms) {
         this.dms = dms;
-        this.mf = dms.getModelFactory();
+        this.mf = dms != null ? dms.getModelFactory() : null;
     }
 
 
