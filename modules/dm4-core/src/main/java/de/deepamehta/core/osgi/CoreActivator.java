@@ -83,18 +83,22 @@ public class CoreActivator implements BundleActivator {
         return getService(DeepaMehtaService.class);
     }
 
+    public static ModelFactory getModelFactory() {
+        return getService(ModelFactory.class);
+    }
+
+    public static HttpService getHttpService() {
+        return httpService;
+    }
+
+    // ---
+
     public static <S> S getService(Class<S> clazz) {
         S serviceObject = bundleContext.getService(bundleContext.getServiceReference(clazz));
         if (serviceObject == null) {
             throw new RuntimeException("Service \"" + clazz.getName() + "\" is not available");
         }
         return serviceObject;
-    }
-
-    // ---
-
-    public static HttpService getHttpService() {
-        return httpService;
     }
 
 
