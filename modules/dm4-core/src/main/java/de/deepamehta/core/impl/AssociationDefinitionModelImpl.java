@@ -61,19 +61,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public RelatedTopicModel getCustomAssocType() {
-        RelatedTopicModel customAssocType = getChildTopicsModel().getTopic(
-            "dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
-        // Note: we can't do this sanity check because a type model would not even deserialize.
-        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI.
-        /* if (customAssocType instanceof TopicDeletionModel) {
-            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
-                "reference (" + this + ")");
-        } */
-        return customAssocType;
-    }
-
-    @Override
     public String getCustomAssocTypeUri() {
         TopicModel customAssocType = getCustomAssocType();
         return customAssocType != null ? customAssocType.getUri() : null;
@@ -132,33 +119,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---
 
-    // ### TODO: remove from public API
-    @Override
-    public boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
-        String _customAssocTypeUri = getCustomAssocTypeUri();
-        String customAssocTypeUri = assocDef.getCustomAssocTypeUriOrNull();
-        if (customAssocTypeUri == null) {
-            // compare our value to null if his value is a deletion ref or null
-            return _customAssocTypeUri == null;
-        } else {
-            // his value is neither a deletion ref nor null, compare it to our value (which may be null)
-            return customAssocTypeUri.equals(_customAssocTypeUri);
-        }
-    }
-
-    /**
-     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
-     *          Otherwise returns the custom assoc type URI.
-     *
-     *  ### TODO: remove from public API
-     */
-    @Override
-    public String getCustomAssocTypeUriOrNull() {
-        return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
-    }
-
-    // ---
-
     @Override
     public JSONObject toJSON() {
         try {
@@ -181,7 +141,41 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             "\",\n        " + viewConfigModel + ")\n";
     }
 
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
+        String _customAssocTypeUri = getCustomAssocTypeUri();
+        String customAssocTypeUri = ((AssociationDefinitionModelImpl) assocDef).getCustomAssocTypeUriOrNull();
+        if (customAssocTypeUri == null) {
+            // compare our value to null if his value is a deletion ref or null
+            return _customAssocTypeUri == null;
+        } else {
+            // his value is neither a deletion ref nor null, compare it to our value (which may be null)
+            return customAssocTypeUri.equals(_customAssocTypeUri);
+        }
+    }
+
+    /**
+     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
+     *          Otherwise returns the custom assoc type URI.
+     */
+    String getCustomAssocTypeUriOrNull() {
+        return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private RelatedTopicModel getCustomAssocType() {
+        RelatedTopicModel customAssocType = getChildTopicsModel().getTopic(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
+        // Note: we can't do this sanity check because a type model would not even deserialize.
+        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
+        /* if (customAssocType instanceof TopicDeletionModel) {
+            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
+                "reference (" + this + ")");
+        } */
+        return customAssocType;
+    }
 
     private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dm4.core.aggregation_def")) {

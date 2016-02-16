@@ -83,8 +83,8 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
     }
 
     @Override
-    public AssociationDefinitionModel getModel() {
-        return (AssociationDefinitionModel) super.getModel();
+    public AssociationDefinitionModelImpl getModel() {
+        return (AssociationDefinitionModelImpl) super.getModel();
     }
 
     // ---
@@ -115,7 +115,7 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
             boolean changeCustomAssocType = !getModel().hasSameCustomAssocType(newModel);
             if (changeCustomAssocType) {
                 logger.info("### Changing custom association type URI from \"" + getCustomAssocTypeUri() +
-                    "\" -> \"" + newModel.getCustomAssocTypeUriOrNull() + "\"");
+                    "\" -> \"" + ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
             }
             //
             super.update(newModel);

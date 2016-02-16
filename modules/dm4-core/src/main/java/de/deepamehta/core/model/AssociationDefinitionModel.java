@@ -13,8 +13,6 @@ public interface AssociationDefinitionModel extends AssociationModel {
 
     String getAssocDefUri();
 
-    RelatedTopicModel getCustomAssocType();
-
     String getCustomAssocTypeUri();
 
     /**
@@ -39,17 +37,4 @@ public interface AssociationDefinitionModel extends AssociationModel {
     void setChildCardinalityUri(String childCardinalityUri);
 
     void setViewConfigModel(ViewConfigurationModel viewConfigModel);
-
-    // ---
-
-    // ### TODO: remove from public API
-    boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef);
-
-    /**
-     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
-     *          Otherwise returns the custom assoc type URI.
-     *
-     *  ### TODO: remove from public API
-     */
-    String getCustomAssocTypeUriOrNull();
 }
