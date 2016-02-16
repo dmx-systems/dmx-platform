@@ -47,31 +47,6 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     AssociationDefinitionModel removeAssocDef(String assocDefUri);
 
-    // ---
-
-    /**
-     * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
-     * assoc def as well (at index 1), or null if the found assoc def is the last one.
-     *
-     * ### TODO: remove from public API
-     */
-    String[] findAssocDefUris(long assocDefId);
-
-    // ### TODO: remove from public API
-    boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs);
-
-    // ### TODO: remove from public API
-    void rehashAssocDef(String assocDefUri, String beforeAssocDefUri);
-
-    // ### TODO: remove from public API
-    void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs);
-
-    // ### TODO: remove from public API
-    void replaceAssocDef(AssociationDefinitionModel assocDef);
-
-    // ### TODO: remove from public API
-    void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri);
-
 
 
     // === Label Configuration ===
@@ -79,14 +54,6 @@ public interface TypeModel extends TopicModel, Iterable<String> {
     List<String> getLabelConfig();
 
     void setLabelConfig(List<String> labelConfig);
-
-    // ---
-
-    // ### TODO: remove from public API
-    void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri);
-
-    // ### TODO: remove from public API
-    void removeFromLabelConfig(String assocDefUri);
 
 
 

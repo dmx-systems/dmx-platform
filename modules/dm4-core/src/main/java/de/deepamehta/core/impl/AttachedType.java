@@ -294,8 +294,8 @@ abstract class AttachedType extends AttachedTopic implements Type {
     // ---
 
     @Override
-    public TypeModel getModel() {
-        return (TypeModel) super.getModel();
+    public TypeModelImpl getModel() {
+        return (TypeModelImpl) super.getModel();
     }
 
 

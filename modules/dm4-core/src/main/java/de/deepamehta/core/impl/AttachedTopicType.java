@@ -38,8 +38,8 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
     @Override
-    public TopicTypeModel getModel() {
-        return (TopicTypeModel) super.getModel();
+    public TopicTypeModelImpl getModel() {
+        return (TopicTypeModelImpl) super.getModel();
     }
 
     @Override

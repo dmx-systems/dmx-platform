@@ -144,92 +144,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    // ---
-
-    /**
-     * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
-     * assoc def as well (at index 1), or null if the found assoc def is the last one.
-     *
-     * ### TODO: remove from public API
-     */
-    @Override
-    public String[] findAssocDefUris(long assocDefId) {
-        if (assocDefId == -1) {
-            throw new IllegalArgumentException("findAssocDefUris() called with assocDefId=-1");
-        }
-        String[] assocDefUris = new String[2];
-        Iterator<String> i = iterator();
-        while (i.hasNext()) {
-            String assocDefUri = i.next();
-            long _assocDefId = checkAssocDefId(_getAssocDef(assocDefUri));
-            if (_assocDefId == assocDefId) {
-                assocDefUris[0] = assocDefUri;
-                if (i.hasNext()) {
-                    assocDefUris[1] = i.next();
-                }
-                break;
-            }
-        }
-        if (assocDefUris[0] == null) {
-            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" +
-                getUri() + "\" (" + assocDefs.keySet() + ")");
-        }
-        return assocDefUris;
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs) {
-        Collection<AssociationDefinitionModel> _assocDefs = getAssocDefs();
-        if (assocDefs.size() != _assocDefs.size()) {
-            return false;
-        }
-        //
-        Iterator<AssociationDefinitionModel> i = assocDefs.iterator();
-        for (AssociationDefinitionModel _assocDef : _assocDefs) {
-            AssociationDefinitionModel assocDef = i.next();
-            // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
-            // So we must identify the assoc defs to compare **by ID**.
-            long assocDefId  = checkAssocDefId(assocDef);
-            long _assocDefId = checkAssocDefId(_assocDef);
-            if (assocDefId != _assocDefId) {
-                return false;
-            }
-        }
-        //
-        return true;
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
-        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
-        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
-            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
-        addAssocDefBefore(assocDef, beforeAssocDefUri);
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            rehashAssocDef(assocDef.getAssocDefUri(), null);
-        }
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public void replaceAssocDef(AssociationDefinitionModel assocDef) {
-        replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
-        removeAssocDef(oldAssocDefUri);
-        addAssocDefBefore(assocDef, beforeAssocDefUri);
-    }
-
 
 
     // === Label Configuration ===
@@ -242,31 +156,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public void setLabelConfig(List<String> labelConfig) {
         this.labelConfig = labelConfig;
-    }
-
-    // ---
-
-    // ### TODO: remove from public API
-    @Override
-    public void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(oldAssocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
-                "\" (position " + i + ")");
-            labelConfig.set(i, newAssocDefUri);
-        }
-    }
-
-    // ### TODO: remove from public API
-    @Override
-    public void removeFromLabelConfig(String assocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(assocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
-            labelConfig.remove(i);
-        }
     }
 
 
@@ -337,6 +226,106 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
             getAssocDefs() + ", labelConfig=" + getLabelConfig() + ", " + getViewConfigModel();
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
+
+    // === Association Definitions ===
+
+    /**
+     * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
+     * assoc def as well (at index 1), or null if the found assoc def is the last one.
+     */
+    String[] findAssocDefUris(long assocDefId) {
+        if (assocDefId == -1) {
+            throw new IllegalArgumentException("findAssocDefUris() called with assocDefId=-1");
+        }
+        String[] assocDefUris = new String[2];
+        Iterator<String> i = iterator();
+        while (i.hasNext()) {
+            String assocDefUri = i.next();
+            long _assocDefId = checkAssocDefId(_getAssocDef(assocDefUri));
+            if (_assocDefId == assocDefId) {
+                assocDefUris[0] = assocDefUri;
+                if (i.hasNext()) {
+                    assocDefUris[1] = i.next();
+                }
+                break;
+            }
+        }
+        if (assocDefUris[0] == null) {
+            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" +
+                getUri() + "\" (" + assocDefs.keySet() + ")");
+        }
+        return assocDefUris;
+    }
+
+    boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs) {
+        Collection<AssociationDefinitionModel> _assocDefs = getAssocDefs();
+        if (assocDefs.size() != _assocDefs.size()) {
+            return false;
+        }
+        //
+        Iterator<AssociationDefinitionModel> i = assocDefs.iterator();
+        for (AssociationDefinitionModel _assocDef : _assocDefs) {
+            AssociationDefinitionModel assocDef = i.next();
+            // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
+            // So we must identify the assoc defs to compare **by ID**.
+            long assocDefId  = checkAssocDefId(assocDef);
+            long _assocDefId = checkAssocDefId(_assocDef);
+            if (assocDefId != _assocDefId) {
+                return false;
+            }
+        }
+        //
+        return true;
+    }
+
+    void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
+        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
+            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
+        addAssocDefBefore(assocDef, beforeAssocDefUri);
+    }
+
+    void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            rehashAssocDef(assocDef.getAssocDefUri(), null);
+        }
+    }
+
+    void replaceAssocDef(AssociationDefinitionModel assocDef) {
+        replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
+    }
+
+    void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
+        removeAssocDef(oldAssocDefUri);
+        addAssocDefBefore(assocDef, beforeAssocDefUri);
+    }
+
+
+
+    // === Label Configuration ===
+
+    void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
+        List<String> labelConfig = getLabelConfig();
+        int i = labelConfig.indexOf(oldAssocDefUri);
+        if (i != -1) {
+            logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
+                "\" (position " + i + ")");
+            labelConfig.set(i, newAssocDefUri);
+        }
+    }
+
+    void removeFromLabelConfig(String assocDefUri) {
+        List<String> labelConfig = getLabelConfig();
+        int i = labelConfig.indexOf(assocDefUri);
+        if (i != -1) {
+            logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
+            labelConfig.remove(i);
+        }
     }
 
 

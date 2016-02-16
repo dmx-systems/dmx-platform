@@ -38,8 +38,8 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
 
     @Override
-    public AssociationTypeModel getModel() {
-        return (AssociationTypeModel) super.getModel();
+    public AssociationTypeModelImpl getModel() {
+        return (AssociationTypeModelImpl) super.getModel();
     }
 
     @Override
