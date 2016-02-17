@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * An association type that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociationType extends AttachedType implements AssociationType {
+class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -23,7 +23,7 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationType(AssociationTypeModel model, EmbeddedService dms) {
+    AssociationTypeImpl(AssociationTypeModel model, EmbeddedService dms) {
         super(model, dms);
     }
 
@@ -57,7 +57,7 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
 
 
-    // === AttachedTopic Overrides ===
+    // === TopicImpl Overrides ===
 
     @Override
     final String className() {
@@ -66,7 +66,7 @@ class AttachedAssociationType extends AttachedType implements AssociationType {
 
 
 
-    // === Implementation of abstract AttachedType methods ===
+    // === Implementation of abstract TypeImpl methods ===
 
     @Override
     final void putInTypeCache() {

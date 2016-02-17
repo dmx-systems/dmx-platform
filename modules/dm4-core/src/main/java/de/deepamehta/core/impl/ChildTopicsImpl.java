@@ -25,13 +25,13 @@ import java.util.logging.Logger;
 /**
  * A child topics model that is attached to the DB.
  */
-class AttachedChildTopics implements ChildTopics {
+class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private ChildTopicsModel model;                             // underlying model
 
-    private AttachedDeepaMehtaObject parent;                    // attached object cache
+    private DeepaMehtaObjectImpl parent;                        // attached object cache
 
     /**
      * Attached object cache.
@@ -46,7 +46,7 @@ class AttachedChildTopics implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedChildTopics(ChildTopicsModel model, AttachedDeepaMehtaObject parent, EmbeddedService dms) {
+    ChildTopicsImpl(ChildTopicsModel model, DeepaMehtaObjectImpl parent, EmbeddedService dms) {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
@@ -351,7 +351,7 @@ class AttachedChildTopics implements ChildTopics {
 
     // Note: the given association definition must not necessarily originate from the parent object's type definition.
     // It may originate from a facet definition as well.
-    // Called from AttachedDeepaMehtaObject.updateChildTopic() and AttachedDeepaMehtaObject.updateChildTopics().
+    // Called from DeepaMehtaObjectImpl.updateChildTopic() and DeepaMehtaObjectImpl.updateChildTopics().
     void updateChildTopics(RelatedTopicModel newChildTopic, List<RelatedTopicModel> newChildTopics,
                                                             AssociationDefinition assocDef) {
         // Note: updating the child topics requires them to be loaded
@@ -447,7 +447,7 @@ class AttachedChildTopics implements ChildTopics {
     // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dm4-test).
 
     // Note 2: calling parent.update(..) would not work. The JVM would call the update() method of the base class
-    // (AttachedDeepaMehtaObject), not the subclass's update() method. This is related to Java's (missing) multiple
+    // (DeepaMehtaObjectImpl), not the subclass's update() method. This is related to Java's (missing) multiple
     // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
 
@@ -561,7 +561,7 @@ class AttachedChildTopics implements ChildTopics {
 
     private void updateRelatedTopic(RelatedTopic childTopic, RelatedTopicModel newChildTopic) {
         // update topic
-        ((AttachedTopic) childTopic)._update(newChildTopic);
+        ((TopicImpl) childTopic)._update(newChildTopic);
         // update association
         updateRelatingAssociation(childTopic, newChildTopic);
     }
@@ -871,7 +871,7 @@ class AttachedChildTopics implements ChildTopics {
             return;
         }
         // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
-        // implies creating further AttachedChildTopics objects, which in turn calls this method again but for the next
+        // implies creating further ChildTopicsImpl objects, which in turn calls this method again but for the next
         // child-level. Finally attached topics are created for all child-levels.
         if (value instanceof RelatedTopicModel) {
             RelatedTopicModel childTopic = (RelatedTopicModel) value;
@@ -892,7 +892,7 @@ class AttachedChildTopics implements ChildTopics {
      */
     private RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         try {
-            return new AttachedRelatedTopic(model, dms);
+            return new RelatedTopicImpl(model, dms);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
         }

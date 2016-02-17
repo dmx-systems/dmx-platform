@@ -697,7 +697,7 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     Topic instantiateTopic(TopicModel model) {
         checkAccess(model);
-        return new AttachedTopic(model, this);
+        return new TopicImpl(model, this);
     }
 
     private List<Topic> instantiateTopics(List<TopicModel> models) {
@@ -716,7 +716,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         checkAccess(model);
-        return new AttachedRelatedTopic(model, this);
+        return new RelatedTopicImpl(model, this);
     }
 
     ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
@@ -738,7 +738,7 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     Association instantiateAssociation(AssociationModel model) {
         checkAccess(model);
-        return new AttachedAssociation(model, this);
+        return new AssociationImpl(model, this);
     }
 
     List<Association> instantiateAssociations(List<AssociationModel> models) {
@@ -757,7 +757,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
         checkAccess(model);
-        return new AttachedRelatedAssociation(model, this);
+        return new RelatedAssociationImpl(model, this);
     }
 
     ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
@@ -811,7 +811,7 @@ public class EmbeddedService implements DeepaMehtaService {
         createTopicInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) instantiate
-        Topic topic = new AttachedTopic(model, this);
+        Topic topic = new TopicImpl(model, this);
         //
         // 3) set default URI
         // If no URI is given the topic gets a default URI based on its ID, if requested.
@@ -835,7 +835,7 @@ public class EmbeddedService implements DeepaMehtaService {
         createAssociationInstantiation(model.getId(), model.getTypeUri());
         //
         // 2) instantiate
-        return new AttachedAssociation(model, this);
+        return new AssociationImpl(model, this);
     }
 
     // ---
@@ -850,7 +850,7 @@ public class EmbeddedService implements DeepaMehtaService {
         typeStorage.storeType(model);                       // store type-specific parts
         //
         // 2) instantiate
-        TopicType topicType = new AttachedTopicType(model, this);
+        TopicType topicType = new TopicTypeImpl(model, this);
         typeCache.putTopicType(topicType);
         //
         return topicType;
@@ -866,7 +866,7 @@ public class EmbeddedService implements DeepaMehtaService {
         typeStorage.storeType(model);                       // store type-specific parts
         //
         // 2) instantiate
-        AssociationType assocType = new AttachedAssociationType(model, this);
+        AssociationType assocType = new AssociationTypeImpl(model, this);
         typeCache.putAssociationType(assocType);
         //
         return assocType;
@@ -965,8 +965,8 @@ public class EmbeddedService implements DeepaMehtaService {
             // Note: at time of the first associateDataType() call the required association type (dm4.core.aggregation)
             // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
             // the data type assigning association is created *before* the association type is fetched.
-            // (see AttachedAssociation.store(): storage.storeAssociation() is called before getType()
-            // in AttachedDeepaMehtaObject.store().)
+            // (see AssociationImpl.store(): storage.storeAssociation() is called before getType()
+            // in DeepaMehtaObjectImpl.store().)
             // ### FIXDOC: not true anymore
             //
             // Important is that associateDataType("dm4.core.aggregation") is the first call here.
@@ -1019,6 +1019,6 @@ public class EmbeddedService implements DeepaMehtaService {
         TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
-        typeCache.putTopicType(new AttachedTopicType(metaMetaType, this));
+        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));
     }
 }

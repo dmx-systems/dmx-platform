@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 
 
-abstract class AttachedType extends AttachedTopic implements Type {
+abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -37,7 +37,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedType(TypeModel model, EmbeddedService dms) {
+    TypeImpl(TypeModel model, EmbeddedService dms) {
         super(model, dms);
         // init attached object cache
         initAssocDefs();
@@ -48,9 +48,9 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
 
 
-    // ******************************************
-    // *** AttachedDeepaMehtaObject Overrides ***
-    // ******************************************
+    // **************************************
+    // *** DeepaMehtaObjectImpl Overrides ***
+    // **************************************
 
 
 
@@ -189,7 +189,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
             // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
             // def must be attached *after* the assoc def is stored.
             // ### TODO: attach before store. Refactoring needed. See comment in TypeCache#put methods.
-            _addAssocDefBefore(new AttachedAssociationDefinition(assocDef, this, dms), beforeAssocDefUri);
+            _addAssocDefBefore(new AssociationDefinitionImpl(assocDef, this, dms), beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
@@ -232,7 +232,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
         newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
         newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
         //
-        AssociationDefinition newAssocDef = new AttachedAssociationDefinition(
+        AssociationDefinition newAssocDef = new AssociationDefinitionImpl(
             mf.newAssociationDefinitionModel(newAssocModel,
                 oldAssocDef.getParentCardinalityUri(),
                 oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
@@ -453,7 +453,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
     private void initAssocDefs() {
         this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            _addAssocDef(new AttachedAssociationDefinition(assocDef, this, dms));
+            _addAssocDef(new AssociationDefinitionImpl(assocDef, this, dms));
         }
     }
 
@@ -521,7 +521,7 @@ abstract class AttachedType extends AttachedTopic implements Type {
 
     private void initViewConfig() {
         RoleModel configurable = dms.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
-        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
+        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
     }
 
 

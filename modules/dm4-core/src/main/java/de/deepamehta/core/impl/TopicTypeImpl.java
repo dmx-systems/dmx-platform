@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * A topic type that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedTopicType extends AttachedType implements TopicType {
+class TopicTypeImpl extends TypeImpl implements TopicType {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -23,7 +23,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopicType(TopicTypeModel model, EmbeddedService dms) {
+    TopicTypeImpl(TopicTypeModel model, EmbeddedService dms) {
         super(model, dms);
     }
 
@@ -57,7 +57,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
 
-    // === AttachedTopic Overrides ===
+    // === TopicImpl Overrides ===
 
     @Override
     final String className() {
@@ -66,7 +66,7 @@ class AttachedTopicType extends AttachedType implements TopicType {
 
 
 
-    // === Implementation of abstract AttachedType methods ===
+    // === Implementation of abstract TypeImpl methods ===
 
     @Override
     final void putInTypeCache() {

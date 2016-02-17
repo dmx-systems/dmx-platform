@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * A view configuration that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedViewConfiguration implements ViewConfiguration {
+class ViewConfigurationImpl implements ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -29,7 +29,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedViewConfiguration(RoleModel configurable, ViewConfigurationModel model, EmbeddedService dms) {
+    ViewConfigurationImpl(RoleModel configurable, ViewConfigurationModel model, EmbeddedService dms) {
         this.configurable = configurable;
         this.model = model;
         this.dms = dms;
@@ -76,7 +76,7 @@ class AttachedViewConfiguration implements ViewConfiguration {
 
     private void initConfigTopics() {
         for (TopicModel configTopic : model.getConfigTopics()) {
-            addConfigTopic(new AttachedTopic(configTopic, dms));
+            addConfigTopic(new TopicImpl(configTopic, dms));
         }
     }
 

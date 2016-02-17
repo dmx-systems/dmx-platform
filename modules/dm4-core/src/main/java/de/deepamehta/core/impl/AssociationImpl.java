@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 /**
  * An association model that is attached to the DB.
  */
-class AttachedAssociation extends AttachedDeepaMehtaObject implements Association {
+class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -39,7 +39,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociation(AssociationModel model, EmbeddedService dms) {
+    AssociationImpl(AssociationModel model, EmbeddedService dms) {
         super(model, dms);
         // init attached object cache
         this.role1 = createAttachedRole(model.getRoleModel1());
@@ -50,9 +50,9 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
 
 
-    // ******************************************
-    // *** AttachedDeepaMehtaObject Overrides ***
-    // ******************************************
+    // **************************************
+    // *** DeepaMehtaObjectImpl Overrides ***
+    // **************************************
 
 
 
@@ -67,7 +67,7 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
     @Override
     public void update(AssociationModel model) {
         // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
-        // AttachedTopic update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
+        // TopicImpl update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
         // Per request exactly one association is updated. Its childs are always topics (never associations).
         logger.info("Updating association " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
         //
@@ -364,9 +364,9 @@ class AttachedAssociation extends AttachedDeepaMehtaObject implements Associatio
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {
-            return new AttachedTopicRole((TopicRoleModel) model, this, dms);
+            return new TopicRoleImpl((TopicRoleModel) model, this, dms);
         } else if (model instanceof AssociationRoleModel) {
-            return new AttachedAssociationRole((AssociationRoleModel) model, this, dms);
+            return new AssociationRoleImpl((AssociationRoleModel) model, this, dms);
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }

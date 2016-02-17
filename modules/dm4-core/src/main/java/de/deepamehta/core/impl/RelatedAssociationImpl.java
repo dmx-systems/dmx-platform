@@ -9,7 +9,7 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 /**
  * An Association-Association pair that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedRelatedAssociation extends AttachedAssociation implements RelatedAssociation {
+class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociation {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,9 +17,9 @@ class AttachedRelatedAssociation extends AttachedAssociation implements RelatedA
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedRelatedAssociation(RelatedAssociationModel model, EmbeddedService dms) {
+    RelatedAssociationImpl(RelatedAssociationModel model, EmbeddedService dms) {
         super(model, dms);
-        this.relatingAssoc = new AttachedAssociation(model.getRelatingAssociation(), dms);
+        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

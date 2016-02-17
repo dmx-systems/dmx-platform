@@ -8,7 +8,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
-abstract class AttachedRole implements Role {
+abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -19,7 +19,7 @@ abstract class AttachedRole implements Role {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected AttachedRole(RoleModel model, Association assoc, EmbeddedService dms) {
+    protected RoleImpl(RoleModel model, Association assoc, EmbeddedService dms) {
         this.model = model;
         this.assoc = assoc;
         this.dms = dms;

@@ -14,19 +14,19 @@ import java.util.logging.Logger;
 /**
  * An association definition that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociationDefinition extends AttachedAssociation implements AssociationDefinition {
+class AssociationDefinitionImpl extends AssociationImpl implements AssociationDefinition {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AttachedType parentType;
+    private TypeImpl parentType;
 
-    private AttachedViewConfiguration viewConfig;   // attached object cache
+    private ViewConfigurationImpl viewConfig;   // attached object cache
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationDefinition(AssociationDefinitionModel model, AttachedType parentType, EmbeddedService dms) {
+    AssociationDefinitionImpl(AssociationDefinitionModel model, TypeImpl parentType, EmbeddedService dms) {
         super(model, dms);
         this.parentType = parentType;
         initViewConfig();
@@ -175,6 +175,6 @@ class AttachedAssociationDefinition extends AttachedAssociation implements Assoc
 
     private void initViewConfig() {
         RoleModel configurable = dms.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
-        this.viewConfig = new AttachedViewConfiguration(configurable, getModel().getViewConfigModel(), dms);
+        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
     }
 }

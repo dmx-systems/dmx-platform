@@ -309,7 +309,7 @@ class AccessControlImpl implements AccessControl {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
                     " is missing");
             }
-            return new AttachedRelatedTopic(configTopic, dms);
+            return new RelatedTopicImpl(configTopic, dms);
         } catch (Exception e) {
             throw new RuntimeException("Getting the \"" + configTypeUri + "\" configuration topic for topic " +
                 topicId + " failed", e);
@@ -570,7 +570,7 @@ class AccessControlImpl implements AccessControl {
      * Instantiates a topic without performing permission check.
      */
     private Topic instantiate(TopicModel model) {
-        return new AttachedTopic(model, dms);
+        return new TopicImpl(model, dms);
     }
 
 

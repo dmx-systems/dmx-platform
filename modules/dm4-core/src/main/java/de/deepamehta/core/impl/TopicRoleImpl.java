@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * A topic role that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedTopicRole extends AttachedRole implements TopicRole {
+class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -22,7 +22,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopicRole(TopicRoleModel model, Association assoc, EmbeddedService dms) {
+    TopicRoleImpl(TopicRoleModel model, Association assoc, EmbeddedService dms) {
         super(model, assoc, dms);
     }
 
@@ -64,7 +64,7 @@ class AttachedTopicRole extends AttachedRole implements TopicRole {
 
 
 
-    // === AttachedRole Overrides ===
+    // === RoleImpl Overrides ===
 
     @Override
     public TopicRoleModel getModel() {

@@ -143,7 +143,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---
 
-    // Note: there is a similar private method in AttachedDeepaMehtaObject:
+    // Note: there is a similar private method in DeepaMehtaObjectImpl:
     // fetchChildTopic(AssociationDefinition assocDef, long childTopicId)
     // ### TODO: Extend DeepaMehtaObject interface by hasChildTopic()?
     @Override
@@ -161,7 +161,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      * <p>
-     * Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
+     * Note: There is a principal copy in DeepaMehtaObjectImpl but here the precondition is different:
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
@@ -174,7 +174,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns child topics.
      * <p>
-     * Note: There is a principal copy in AttachedDeepaMehtaObject but here the precondition is different:
+     * Note: There is a principal copy in DeepaMehtaObjectImpl but here the precondition is different:
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */

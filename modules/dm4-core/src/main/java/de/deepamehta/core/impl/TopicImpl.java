@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 /**
  * A topic that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
+class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,7 +30,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedTopic(TopicModel model, EmbeddedService dms) {
+    TopicImpl(TopicModel model, EmbeddedService dms) {
         super(model, dms);
     }
 
@@ -38,9 +38,9 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
 
 
 
-    // ******************************************
-    // *** AttachedDeepaMehtaObject Overrides ***
-    // ******************************************
+    // **************************************
+    // *** DeepaMehtaObjectImpl Overrides ***
+    // **************************************
 
 
 
@@ -174,7 +174,7 @@ class AttachedTopic extends AttachedDeepaMehtaObject implements Topic {
     /**
      * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
      * <p>
-     * Called multiple times while updating the child topics (see AttachedChildTopics).
+     * Called multiple times while updating the child topics (see ChildTopicsImpl).
      * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
      */
     void _update(TopicModel model) {

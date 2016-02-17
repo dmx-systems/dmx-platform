@@ -10,11 +10,11 @@ import de.deepamehta.core.model.AssociationRoleModel;
 /**
  * An association role that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedAssociationRole extends AttachedRole implements AssociationRole {
+class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedAssociationRole(AssociationRoleModel model, Association assoc, EmbeddedService dms) {
+    AssociationRoleImpl(AssociationRoleModel model, Association assoc, EmbeddedService dms) {
         super(model, assoc, dms);
     }
 
@@ -40,7 +40,7 @@ class AttachedAssociationRole extends AttachedRole implements AssociationRole {
 
 
 
-    // === AttachedRole Overrides ===
+    // === RoleImpl Overrides ===
 
     @Override
     public AssociationRoleModel getModel() {

@@ -35,13 +35,13 @@ import java.util.logging.Logger;
  *  - fetchXX()         Fetches value from DB.              ### FIXDOC
  *  - storeXX()         Stores current value (model) to DB. ### FIXDOC
  */
-abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
+abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModel model;        // underlying model
+    private DeepaMehtaObjectModel model;    // underlying model
 
-    private AttachedChildTopics childTopics;    // attached object cache
+    private ChildTopicsImpl childTopics;    // attached object cache
 
     protected EmbeddedService dms;
     protected ModelFactory mf;
@@ -50,11 +50,11 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedDeepaMehtaObject(DeepaMehtaObjectModel model, EmbeddedService dms) {
+    DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
         this.mf = dms.mf;
-        this.childTopics = new AttachedChildTopics(model.getChildTopicsModel(), this, dms);
+        this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -143,7 +143,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
     // --- Child Topics ---
 
     @Override
-    public AttachedChildTopics getChildTopics() {
+    public ChildTopicsImpl getChildTopics() {
         return childTopics;
     }
 
@@ -327,7 +327,7 @@ abstract class AttachedDeepaMehtaObject implements DeepaMehtaObject {
 
     @Override
     public boolean equals(Object o) {
-        return ((AttachedDeepaMehtaObject) o).model.equals(model);
+        return ((DeepaMehtaObjectImpl) o).model.equals(model);
     }
 
     @Override

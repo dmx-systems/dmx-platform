@@ -9,7 +9,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 /**
  * A Topic-Association pair that is attached to the {@link DeepaMehtaService}.
  */
-class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
+class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -17,9 +17,9 @@ class AttachedRelatedTopic extends AttachedTopic implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AttachedRelatedTopic(RelatedTopicModel model, EmbeddedService dms) {
+    RelatedTopicImpl(RelatedTopicModel model, EmbeddedService dms) {
         super(model, dms);
-        this.relatingAssoc = new AttachedAssociation(model.getRelatingAssociation(), dms);
+        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), dms);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
