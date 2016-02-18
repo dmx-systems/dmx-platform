@@ -751,7 +751,8 @@ class TypeStorageImpl implements TypeStorage {
                 storeViewConfigTopic(configurable, configTopic);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Storing view configuration failed (configurable=" + configurable + ")", e);
+            throw new RuntimeException("Storing view configuration failed (configurable=" + configurable +
+                ", viewConfig=" + viewConfig + ")", e);
         }
     }
 

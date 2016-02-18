@@ -37,7 +37,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.uri         = uri;
         this.typeUri     = typeUri;
         this.value       = value;
-        this.childTopics = childTopics;
+        this.childTopics = childTopics != null ? childTopics : mf.newChildTopicsModel();
+        //
         this.mf          = mf;
     }
 
@@ -47,6 +48,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.typeUri     = object.getTypeUri();
         this.value       = object.getSimpleValue();
         this.childTopics = object.getChildTopicsModel();
+        //
         this.mf = ((DeepaMehtaObjectModelImpl) object).mf;
     }
 

@@ -49,7 +49,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         super(assoc);
         this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri  = childCardinalityUri;
-        this.viewConfigModel = viewConfigModel;
+        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : mf.newViewConfigurationModel();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

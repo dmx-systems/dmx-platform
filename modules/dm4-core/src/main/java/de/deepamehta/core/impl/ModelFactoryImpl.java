@@ -204,9 +204,6 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics) {
-        if (childTopics == null) {
-            childTopics = newChildTopicsModel();
-        }
         return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, this);
     }
 
@@ -435,7 +432,6 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
-        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(newTopicModel(topicId), relatingAssoc);
     }
 
@@ -447,7 +443,6 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        // ### FIXME: assoc's childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), relatingAssoc);
                                                           // topicTypeUri=null
     }
@@ -464,13 +459,11 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(TopicModel topic) {
-        // ### FIXME: topic's childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(topic, newAssociationModel());
     }
 
     @Override
     public RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
-        // ### FIXME: childTopics might be null, call newDeepaMehtaObjectModel()?
         return new RelatedTopicModelImpl(topic, relatingAssoc);
     }
 
@@ -658,12 +651,12 @@ public class ModelFactoryImpl implements ModelFactory {
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri,
                                                     ViewConfigurationModel viewConfigModel) {
-        AssociationModel assoc = newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri),
-            childRole(childTypeUri), null, childTopics(customAssocTypeUri));
-        if (viewConfigModel == null) {
-            viewConfigModel = newViewConfigurationModel();
-        }
-        return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
+        return new AssociationDefinitionModelImpl(
+            newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
+                null, childTopics(customAssocTypeUri)
+            ),
+            parentCardinalityUri, childCardinalityUri, viewConfigModel
+        );
     }
 
     @Override
@@ -689,8 +682,6 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri,
                                                    String childCardinalityUri, ViewConfigurationModel viewConfigModel) {
-        // ### FIXME: may assoc's childTopics uninitialized? may viewConfigModel null?
-        // ### Should we call the canonic newAssociationDefinitionModel()?
         return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
     }
 
