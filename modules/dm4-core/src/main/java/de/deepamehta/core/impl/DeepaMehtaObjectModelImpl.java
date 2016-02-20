@@ -7,6 +7,8 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 
@@ -216,6 +218,12 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    String className() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
     TypeModel getType() {
         throw new UnsupportedOperationException();
     }
@@ -226,6 +234,26 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
+        throw new UnsupportedOperationException();
+    }
+
+    void delete() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    DeepaMehtaEvent getPreDeleteEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPostDeleteEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    Directive getDeleteDirective() {
         throw new UnsupportedOperationException();
     }
 

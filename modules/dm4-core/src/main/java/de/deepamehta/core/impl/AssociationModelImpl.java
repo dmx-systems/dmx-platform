@@ -5,6 +5,8 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -154,6 +156,13 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
+    String className() {
+        return "association";
+    }
+
+    // ---
+
+    @Override
     AssociationTypeModel getType() {
         return pl.typeStorage.getAssociationType(typeUri);
     }
@@ -167,5 +176,29 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+    }
+
+    @Override
+    void delete() {
+        pl.deleteAssociation(id);
+    }
+
+    // ---
+
+    @Override
+    DeepaMehtaEvent getPreDeleteEvent() {
+        return CoreEvent.PRE_DELETE_ASSOCIATION;
+    }
+
+    @Override
+    DeepaMehtaEvent getPostDeleteEvent() {
+        return CoreEvent.POST_DELETE_ASSOCIATION;
+    }
+
+    // ---
+
+    @Override
+    Directive getDeleteDirective() {
+        return Directive.DELETE_ASSOCIATION;
     }
 }

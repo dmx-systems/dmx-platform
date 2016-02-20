@@ -169,7 +169,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void deleteTopic(long topicId) {
         try {
-            pl.deleteObject(pl.fetchTopic(topicId));
+            pl.deleteObject((DeepaMehtaObjectModelImpl) pl.fetchTopic(topicId));
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic " + topicId + " failed", e);
         }
@@ -305,7 +305,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public void deleteAssociation(long assocId) {
         try {
-            pl.deleteObject(pl.fetchAssociation(assocId));
+            pl.deleteObject((DeepaMehtaObjectModelImpl) pl.fetchAssociation(assocId));
         } catch (Exception e) {
             throw new RuntimeException("Deleting association " + assocId + " failed", e);
         }

@@ -6,6 +6,8 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -56,6 +58,13 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
+    String className() {
+        return "topic";
+    }
+
+    // ---
+
+    @Override
     TopicTypeModel getType() {
         return pl.typeStorage.getTopicType(typeUri);
     }
@@ -69,5 +78,29 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+    }
+
+    @Override
+    void delete() {
+        pl.deleteTopic(id);
+    }
+
+    // ---
+
+    @Override
+    DeepaMehtaEvent getPreDeleteEvent() {
+        return CoreEvent.PRE_DELETE_TOPIC;
+    }
+
+    @Override
+    DeepaMehtaEvent getPostDeleteEvent() {
+        return CoreEvent.POST_DELETE_TOPIC;
+    }
+
+    // ---
+
+    @Override
+    Directive getDeleteDirective() {
+        return Directive.DELETE_TOPIC;
     }
 }

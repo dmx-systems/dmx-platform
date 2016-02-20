@@ -45,33 +45,33 @@ public class PersistenceLayer extends StorageDecorator {
      * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
      * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
      * <p>
-     * Note: deletion of the object itself is up to the subclasses.
+     * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
      */
-    void deleteObject(DeepaMehtaObjectModel object) {
+    void deleteObject(DeepaMehtaObjectModelImpl object) {
         try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, object);      // ### FIXME
-            DeepaMehtaObjectModelImpl o = (DeepaMehtaObjectModelImpl) object;
+            dms.fireEvent(object.getPreDeleteEvent(), object);
+            //
             // 1) delete child topics (recursively)
-            for (AssociationDefinitionModel assocDef : o.getType().getAssocDefs()) {
+            for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
                 if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModel childTopic : o.getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
+                    for (TopicModel childTopic : object.getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
                             "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        deleteObject(childTopic);
+                        deleteObject((DeepaMehtaObjectModelImpl) childTopic);
                     }
                 }
             }
             // 2) delete direct associations
-            for (AssociationModel assoc : o.getAssociations()) {
-                deleteObject(assoc);
+            for (AssociationModel assoc : object.getAssociations()) {
+                deleteObject((DeepaMehtaObjectModelImpl) assoc);
             }
             // delete topic itself
             logger.info("Deleting " + object);
-            Directives.get().add(Directive.DELETE_TOPIC, object);   // ### FIXME
-            deleteTopic(object.getId());                            // ### FIXME
+            Directives.get().add(object.getDeleteDirective(), object);
+            object.delete();
             //
-            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, object);     // ### FIXME
+            dms.fireEvent(object.getPostDeleteEvent(), object);
         } catch (Exception e) {
-            throw new RuntimeException("Deleting topic failed (" + object + ")", e);    // ### FIXME
+            throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }
     }
 

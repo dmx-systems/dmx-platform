@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 
 
+// ### TODO: should methods return model *impl* objects?
 class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

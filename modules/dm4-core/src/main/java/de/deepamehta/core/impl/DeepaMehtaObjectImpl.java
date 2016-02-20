@@ -222,7 +222,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void delete() {
-        pl.deleteObject(getModel());
+        pl.deleteObject((DeepaMehtaObjectModelImpl) getModel());
     }
 
 
@@ -328,7 +328,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract String className();
+    abstract String className();    // ### TODO: rely on model class name
 
     abstract void updateChildTopics(ChildTopicsModel childTopics);
 
