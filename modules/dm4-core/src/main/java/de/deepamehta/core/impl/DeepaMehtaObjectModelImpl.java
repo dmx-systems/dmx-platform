@@ -237,6 +237,11 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    ResultList<RelatedTopicModel> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+        throw new UnsupportedOperationException();
+    }
+
     void delete() {
         throw new UnsupportedOperationException();
     }

@@ -11,7 +11,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -34,16 +33,14 @@ class ValueStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private EmbeddedService dms;
-    private ModelFactory mf;
+    private PersistenceLayer pl;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ValueStorage(EmbeddedService dms) {
-        this.dms = dms;
-        this.mf = dms.mf;
+    ValueStorage(PersistenceLayer pl) {
+        this.pl = pl;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -118,14 +115,14 @@ class ValueStorage {
      */
     void indexSimpleValue(DeepaMehtaObjectModel model, IndexMode indexMode) {
         if (model instanceof TopicModel) {
-            dms.pl.indexTopicValue(
+            pl.indexTopicValue(
                 model.getId(),
                 indexMode,
                 model.getTypeUri(),
                 getIndexValue(model)
             );
         } else if (model instanceof AssociationModel) {
-            dms.pl.indexAssociationValue(
+            pl.indexAssociationValue(
                 model.getId(),
                 indexMode,
                 model.getTypeUri(),
@@ -174,7 +171,7 @@ class ValueStorage {
     private void storeSimpleValue(DeepaMehtaObjectModel model) {
         TypeModel type = getType(model);
         if (model instanceof TopicModel) {
-            dms.pl.storeTopicValue(
+            pl.storeTopicValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -182,7 +179,7 @@ class ValueStorage {
                 getIndexValue(model)
             );
         } else if (model instanceof AssociationModel) {
-            dms.pl.storeAssociationValue(
+            pl.storeAssociationValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -354,7 +351,7 @@ class ValueStorage {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModel fetchChildTopic(long parentId, AssociationDefinitionModel assocDef) {
-        return dms.pl.fetchRelatedTopic(
+        return pl.fetchRelatedTopic(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
@@ -363,7 +360,7 @@ class ValueStorage {
     }
 
     private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
-        return dms.pl.fetchRelatedTopics(
+        return pl.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
@@ -393,9 +390,9 @@ class ValueStorage {
      */
     private TypeModel getType(DeepaMehtaObjectModel model) {
         if (model instanceof TopicModel) {
-            return dms.pl.typeStorage.getTopicType(model.getTypeUri());
+            return pl.typeStorage.getTopicType(model.getTypeUri());
         } else if (model instanceof AssociationModel) {
-            return dms.pl.typeStorage.getAssociationType(model.getTypeUri());
+            return pl.typeStorage.getAssociationType(model.getTypeUri());
         }
         throw new RuntimeException("Unexpected model: " + model);
     }

@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: should methods return model *impl* objects?
+// ### TODO: should methods return model *impl* objects? -> Yes!
 class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -59,8 +59,8 @@ class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
      */
-    TopicModel fetchTopic(String key, SimpleValue value) {
-        return storage.fetchTopic(key, value.value());
+    TopicModelImpl fetchTopic(String key, SimpleValue value) {
+        return (TopicModelImpl) storage.fetchTopic(key, value.value());
     }
 
     List<TopicModel> fetchTopics(String key, SimpleValue value) {

@@ -10,7 +10,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -73,11 +72,5 @@ public class PersistenceLayer extends StorageDecorator {
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }
-    }
-
-    // ---
-
-    ModelFactory getModelFactory() {
-        return super.getModelFactory();
     }
 }

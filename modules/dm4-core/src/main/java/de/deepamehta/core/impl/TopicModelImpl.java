@@ -81,6 +81,12 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
+    ResultList<RelatedTopicModel> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+        return pl.fetchTopicRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
+    }
+
+    @Override
     void delete() {
         pl.deleteTopic(id);
     }

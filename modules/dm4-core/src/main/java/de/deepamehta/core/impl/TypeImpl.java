@@ -261,7 +261,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         getModel().removeFromLabelConfig(assocDefUri);      // update model
         _removeAssocDef(assocDefUri);                       // update attached object cache
         // update DB
-        pl.typeStorage.rebuildSequence(this);
+        pl.typeStorage.rebuildSequence(getModel());
     }
 
     // --- Label Configuration ---
@@ -395,7 +395,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
             getModel().rehashAssocDefs(newAssocDefs);   // update model
             _rehashAssocDefs(newAssocDefs);             // update attached object cache
             // update DB
-            pl.typeStorage.rebuildSequence(this);
+            pl.typeStorage.rebuildSequence(getModel());
         } catch (Exception e) {
             throw new RuntimeException("Updating the assoc def sequence failed", e);
         }
