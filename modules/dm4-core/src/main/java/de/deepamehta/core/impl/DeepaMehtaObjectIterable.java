@@ -59,7 +59,7 @@ class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
     @Override
     Iterator<TopicModel> fetchObjects() {
-        return dms.storageDecorator.fetchAllTopics();
+        return dms.pl.fetchAllTopics();
     }
 
     @Override
@@ -78,7 +78,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModel> 
 
     @Override
     Iterator<AssociationModel> fetchObjects() {
-        return dms.storageDecorator.fetchAllAssociations();
+        return dms.pl.fetchAllAssociations();
     }
 
     @Override

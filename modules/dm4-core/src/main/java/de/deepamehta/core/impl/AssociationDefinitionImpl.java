@@ -94,7 +94,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         // update memory
         getModel().setParentCardinalityUri(parentCardinalityUri);
         // update DB
-        dms.typeStorage.storeParentCardinalityUri(getId(), parentCardinalityUri);
+        pl.typeStorage.storeParentCardinalityUri(getId(), parentCardinalityUri);
     }
 
     @Override
@@ -102,7 +102,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         // update memory
         getModel().setChildCardinalityUri(childCardinalityUri);
         // update DB
-        dms.typeStorage.storeChildCardinalityUri(getId(), childCardinalityUri);
+        pl.typeStorage.storeChildCardinalityUri(getId(), childCardinalityUri);
     }
 
 
@@ -174,7 +174,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     // === Attached Object Cache ===
 
     private void initViewConfig() {
-        RoleModel configurable = dms.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
+        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
         this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
     }
 }

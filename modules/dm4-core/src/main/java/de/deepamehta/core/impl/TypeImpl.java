@@ -67,7 +67,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         //
         if (uriChanged) {
             putInTypeCache();   // abstract
-            dms.typeStorage.putInTypeCache(getModel());  // ### TODO: refactoring. See comment in TypeCache#put methods.
+            pl.typeStorage.putInTypeCache(getModel());  // ### TODO: refactoring. See comment in TypeCache#put methods.
         }
         //
         updateDataTypeUri(model.getDataTypeUri());
@@ -136,7 +136,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         // update memory
         getModel().addIndexMode(indexMode);
         // update DB
-        dms.typeStorage.storeIndexMode(getUri(), indexMode);
+        pl.typeStorage.storeIndexMode(getUri(), indexMode);
         indexAllInstances(indexMode);
     }
 
@@ -177,10 +177,10 @@ abstract class TypeImpl extends TopicImpl implements Type {
             getModel().addAssocDefBefore(assocDef, beforeAssocDefUri);
             //
             // 2) update DB
-            dms.typeStorage.storeAssociationDefinition(assocDef);
+            pl.typeStorage.storeAssociationDefinition(assocDef);
             long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
             long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
-            dms.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
+            pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
                                                                                                lastAssocDefId);
             // 3) update memory (attached object cache)
             // Note: attaching an assoc def involves attaching the 2 roles of the association that assigns the assoc
@@ -212,7 +212,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public void _addAssocDef(Association assoc) {
-        addAssocDef(dms.typeStorage.createAssociationDefinition(assoc));
+        addAssocDef(pl.typeStorage.createAssociationDefinition(assoc));
     }
 
     @Override
@@ -261,7 +261,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         getModel().removeFromLabelConfig(assocDefUri);      // update model
         _removeAssocDef(assocDefUri);                       // update attached object cache
         // update DB
-        dms.typeStorage.rebuildSequence(this);
+        pl.typeStorage.rebuildSequence(this);
     }
 
     // --- Label Configuration ---
@@ -276,7 +276,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         // update memory
         getModel().setLabelConfig(labelConfig);
         // update DB
-        dms.typeStorage.updateLabelConfig(labelConfig, getModel().getAssocDefs());
+        pl.typeStorage.updateLabelConfig(labelConfig, getModel().getAssocDefs());
     }
 
     // --- View Configuration ---
@@ -346,7 +346,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type")
             .getRelatingAssociation().delete();
         // create new assignment
-        dms.typeStorage.storeDataType(getUri(), dataTypeUri);
+        pl.typeStorage.storeDataType(getUri(), dataTypeUri);
     }
 
     // ---
@@ -366,7 +366,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         }
         //
         for (DeepaMehtaObject obj : objects) {
-            dms.valueStorage.indexSimpleValue(obj.getModel(), indexMode);
+            pl.valueStorage.indexSimpleValue(obj.getModel(), indexMode);
         }
     }
 
@@ -395,7 +395,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
             getModel().rehashAssocDefs(newAssocDefs);   // update model
             _rehashAssocDefs(newAssocDefs);             // update attached object cache
             // update DB
-            dms.typeStorage.rebuildSequence(this);
+            pl.typeStorage.rebuildSequence(this);
         } catch (Exception e) {
             throw new RuntimeException("Updating the assoc def sequence failed", e);
         }
@@ -520,7 +520,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
     // ---
 
     private void initViewConfig() {
-        RoleModel configurable = dms.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
+        RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
         this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
     }
 

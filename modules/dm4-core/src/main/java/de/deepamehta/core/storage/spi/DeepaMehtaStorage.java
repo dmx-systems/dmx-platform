@@ -7,6 +7,7 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ModelFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -245,4 +246,8 @@ public interface DeepaMehtaStorage {
     Object getDatabaseVendorObject();
 
     Object getDatabaseVendorObject(long objectId);
+
+    // ---
+
+    ModelFactory getModelFactory();
 }

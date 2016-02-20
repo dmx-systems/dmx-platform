@@ -2,7 +2,7 @@ package de.deepamehta.core.osgi;
 
 import de.deepamehta.core.impl.EmbeddedService;
 import de.deepamehta.core.impl.ModelFactoryImpl;
-import de.deepamehta.core.impl.StorageDecorator;
+import de.deepamehta.core.impl.PersistenceLayer;
 import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -175,9 +175,10 @@ public class CoreActivator implements BundleActivator {
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-            bundleContext.registerService(DeepaMehtaService.class.getName(), new EmbeddedService(
-                new StorageDecorator(storageService), getService(ModelFactory.class), bundleContext
-            ), null);
+            PersistenceLayer pl = new PersistenceLayer(storageService);
+            ((ModelFactoryImpl) getService(ModelFactory.class)).setPersistenceLayer(pl);
+            bundleContext.registerService(DeepaMehtaService.class.getName(), new EmbeddedService(pl, bundleContext),
+                null);
         }
     }
 }

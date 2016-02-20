@@ -92,7 +92,7 @@ class TypeCache {
         if (topicTypes.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
         }
-        dms.typeStorage.removeFromTypeCache(topicTypeUri);
+        dms.pl.typeStorage.removeFromTypeCache(topicTypeUri);
     }
 
     void removeAssociationType(String assocTypeUri) {
@@ -100,7 +100,7 @@ class TypeCache {
         if (assocTypes.remove(assocTypeUri) == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in type cache");
         }
-        dms.typeStorage.removeFromTypeCache(assocTypeUri);
+        dms.pl.typeStorage.removeFromTypeCache(assocTypeUri);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -110,7 +110,7 @@ class TypeCache {
             logger.info("Loading topic type \"" + topicTypeUri + "\"");
             endlessRecursionDetection.check(topicTypeUri);
             //
-            TopicTypeModel model = dms.typeStorage.getTopicType(topicTypeUri);
+            TopicTypeModel model = dms.pl.typeStorage.getTopicType(topicTypeUri);
             return new TopicTypeImpl(model, dms);
         } finally {
             endlessRecursionDetection.reset(topicTypeUri);
@@ -122,7 +122,7 @@ class TypeCache {
             logger.info("Loading association type \"" + assocTypeUri + "\"");
             endlessRecursionDetection.check(assocTypeUri);
             //
-            AssociationTypeModel model = dms.typeStorage.getAssociationType(assocTypeUri);
+            AssociationTypeModel model = dms.pl.typeStorage.getAssociationType(assocTypeUri);
             return new AssociationTypeImpl(model, dms);
         } finally {
             endlessRecursionDetection.reset(assocTypeUri);

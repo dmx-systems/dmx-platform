@@ -40,6 +40,7 @@ class ChildTopicsImpl implements ChildTopics {
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
     private EmbeddedService dms;
+    private PersistenceLayer pl;
     private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -50,6 +51,7 @@ class ChildTopicsImpl implements ChildTopics {
         this.model = model;
         this.parent = parent;
         this.dms = dms;
+        this.pl = dms.pl;
         this.mf = dms.mf;
         initChildTopics();
     }
@@ -416,7 +418,7 @@ class ChildTopicsImpl implements ChildTopics {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!has(assocDefUri)) {
             logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + parentInfo());
-            dms.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
+            pl.valueStorage.fetchChildTopics(parent.getModel(), assocDef.getModel());
             initChildTopics(assocDefUri);
         }
     }
@@ -427,12 +429,12 @@ class ChildTopicsImpl implements ChildTopics {
             DeepaMehtaObjectModel parent = this.parent.getModel();
             //
             // load required childs
-            labelAssocDefUris = dms.valueStorage.getLabelAssocDefUris(parent);
+            labelAssocDefUris = pl.valueStorage.getLabelAssocDefUris(parent);
             for (String assocDefUri : labelAssocDefUris) {
                 loadChildTopics(assocDefUri);
             }
             //
-            dms.valueStorage.recalculateLabel(parent);
+            pl.valueStorage.recalculateLabel(parent);
         } catch (Exception e) {
             throw new RuntimeException("Recalculating the label of " + parentInfo() +
                 " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
@@ -639,12 +641,12 @@ class ChildTopicsImpl implements ChildTopics {
      * @return  the resolved child topic.
      */
     RelatedTopic resolveRefAndAssociateChildTopic(TopicReferenceModel childTopicRef, AssociationDefinition assocDef) {
-        dms.valueStorage.resolveReference(childTopicRef);
+        pl.valueStorage.resolveReference(childTopicRef);
         return associateChildTopic(childTopicRef, assocDef);
     }
 
     private RelatedTopic associateChildTopic(RelatedTopicModel childTopic, AssociationDefinition assocDef) {
-        dms.valueStorage.associateChildTopic(parent.getModel(), childTopic, assocDef.getModel());
+        pl.valueStorage.associateChildTopic(parent.getModel(), childTopic, assocDef.getModel());
         return instantiateRelatedTopic(childTopic);
     }
 

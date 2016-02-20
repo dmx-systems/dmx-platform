@@ -83,49 +83,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
 
 
-    // === Deletion ===
-
-    @Override
-    public void delete() {
-        try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_ASSOCIATION, this);
-            //
-            // delete sub-topics and associations
-            super.delete();
-            // delete association itself
-            logger.info("Deleting " + this);
-            Directives.get().add(Directive.DELETE_ASSOCIATION, this);
-            dms.storageDecorator.deleteAssociation(getId());
-            //
-            dms.fireEvent(CoreEvent.POST_DELETE_ASSOCIATION, this);
-        } catch (IllegalStateException e) {
-            // Note: getAssociations() might throw IllegalStateException and is no problem.
-            // This can happen when this object is an association which is already deleted.
-            //
-            // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.
-            // If A1 gets deleted first (the association set order is non-deterministic), A2 is implicitely deleted
-            // with it (because it is a direct association of A1 as well). Then when the loop comes to A2
-            // "IllegalStateException: Node[1327] has been deleted in this tx" is thrown because A2 has been deleted
-            // already. (The Node appearing in the exception is the middle node of A2.) If, on the other hand, A2
-            // gets deleted first no error would occur.
-            //
-            // This particular situation exists when e.g. a topicmap is deleted while one of its mapcontext
-            // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
-            // a topicmap's mapcontext association and then deletes the topicmap.
-            //
-            if (e.getMessage().equals("Node[" + getId() + "] has been deleted in this tx")) {
-                logger.info("### Association " + getId() + " has already been deleted in this transaction. This can " +
-                    "happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" + this + ")");
-            } else {
-                throw e;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting association failed (" + this + ")", e);
-        }
-    }
-
-
-
     // **********************************
     // *** Association Implementation ***
     // **********************************
@@ -229,7 +186,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                      String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchAssociationRelatedTopics(getId(),
+        ResultList<RelatedTopicModel> topics = pl.fetchAssociationRelatedTopics(getId(),
             assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         return dms.instantiateRelatedTopics(topics);
     }
@@ -239,7 +196,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModel assoc = dms.storageDecorator.fetchAssociationRelatedAssociation(getId(),
+        RelatedAssociationModel assoc = pl.fetchAssociationRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
     }
@@ -247,7 +204,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModel> assocs = dms.storageDecorator.fetchAssociationRelatedAssociations(getId(),
+        ResultList<RelatedAssociationModel> assocs = pl.fetchAssociationRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return dms.instantiateRelatedAssociations(assocs);
     }
@@ -257,14 +214,14 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = dms.storageDecorator.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
+        AssociationModel assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
             othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
         return assoc != null ? dms.instantiateAssociation(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return dms.instantiateAssociations(dms.storageDecorator.fetchAssociationAssociations(getId()));
+        return dms.instantiateAssociations(pl.fetchAssociationAssociations(getId()));
     }
 
 
@@ -273,12 +230,12 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        dms.storageDecorator.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
+        pl.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
     }
 
     @Override
     public void removeProperty(String propUri) {
-        dms.storageDecorator.removeAssociationProperty(getId(), propUri);
+        pl.removeAssociationProperty(getId(), propUri);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -304,13 +261,13 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     final void storeUri() {
-        dms.storageDecorator.storeAssociationUri(getId(), getUri());
+        pl.storeAssociationUri(getId(), getUri());
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        dms.storageDecorator.storeAssociationTypeUri(getId(), getTypeUri());
+        pl.storeAssociationTypeUri(getId(), getTypeUri());
     }
 
     // ---
@@ -318,14 +275,14 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storageDecorator.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
+        return pl.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storageDecorator.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
+        return pl.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
     }
 

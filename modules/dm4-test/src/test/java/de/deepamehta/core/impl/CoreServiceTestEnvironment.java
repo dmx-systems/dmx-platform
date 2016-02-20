@@ -39,7 +39,7 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dm4-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        dms = new EmbeddedService(new StorageDecorator(storage), mf, null);
+        dms = new EmbeddedService(new PersistenceLayer(storage), mf, null);
     }
 
     @After

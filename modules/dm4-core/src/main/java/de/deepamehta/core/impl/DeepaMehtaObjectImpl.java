@@ -44,6 +44,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     private ChildTopicsImpl childTopics;    // attached object cache
 
     protected EmbeddedService dms;
+    protected PersistenceLayer pl;
     protected ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -53,6 +54,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, EmbeddedService dms) {
         this.model = model;
         this.dms = dms;
+        this.pl = dms.pl;
         this.mf = dms.mf;
         this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, dms);
     }
@@ -137,7 +139,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setSimpleValue(SimpleValue value) {
-        dms.valueStorage.setSimpleValue(getModel(), value);
+        pl.valueStorage.setSimpleValue(getModel(), value);
     }
 
     // --- Child Topics ---
@@ -218,27 +220,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // === Deletion ===
 
-    /**
-     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
-     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
-     * <p>
-     * Note: deletion of the object itself is up to the subclasses.
-     */
     @Override
     public void delete() {
-        // 1) delete child topics (recursively)
-        for (AssociationDefinition assocDef : getType().getAssocDefs()) {
-            if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                for (Topic childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
-                        "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                    childTopic.delete();
-                }
-            }
-        }
-        // 2) delete direct associations
-        for (Association assoc : getAssociations()) {       // getAssociations() is abstract
-            assoc.delete();
-        }
+        pl.deleteObject(getModel());
     }
 
 
@@ -301,7 +285,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public Object getDatabaseVendorObject() {
-        return dms.storageDecorator.getDatabaseVendorObject(getId());
+        return pl.getDatabaseVendorObject(getId());
     }
 
 

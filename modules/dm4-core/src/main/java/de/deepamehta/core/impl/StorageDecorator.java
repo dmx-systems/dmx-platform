@@ -7,6 +7,7 @@ import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 
 
 
-public class StorageDecorator {
+class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -28,11 +29,11 @@ public class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public StorageDecorator(DeepaMehtaStorage storage) {
+    StorageDecorator(DeepaMehtaStorage storage) {
         this.storage = storage;
     }
 
-    // -------------------------------------------------------------------------------------------------- Public Methods
+    // ----------------------------------------------------------------------------------------- Package Private Methods
 
 
 
@@ -673,5 +674,11 @@ public class StorageDecorator {
 
     Object getDatabaseVendorObject(long objectId) {
         return storage.getDatabaseVendorObject(objectId);
+    }
+
+    // ---
+
+    ModelFactory getModelFactory() {
+        return storage.getModelFactory();
     }
 }

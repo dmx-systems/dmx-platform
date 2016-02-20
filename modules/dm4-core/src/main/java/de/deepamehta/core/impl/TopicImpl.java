@@ -55,28 +55,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
 
-    // === Deletion ===
-
-    @Override
-    public void delete() {
-        try {
-            dms.fireEvent(CoreEvent.PRE_DELETE_TOPIC, this);
-            //
-            // delete sub-topics and associations
-            super.delete();
-            // delete topic itself
-            logger.info("Deleting " + this);
-            Directives.get().add(Directive.DELETE_TOPIC, this);
-            dms.storageDecorator.deleteTopic(getId());
-            //
-            dms.fireEvent(CoreEvent.POST_DELETE_TOPIC, this);
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting topic failed (" + this + ")", e);
-        }
-    }
-
-
-
     // ****************************
     // *** Topic Implementation ***
     // ****************************
@@ -115,7 +93,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                             String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUris,
+        ResultList<RelatedTopicModel> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         return dms.instantiateRelatedTopics(topics);
     }
@@ -125,7 +103,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                             String othersAssocTypeUri) {
-        RelatedAssociationModel assoc = dms.storageDecorator.fetchTopicRelatedAssociation(getId(),
+        RelatedAssociationModel assoc = pl.fetchTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
     }
@@ -133,7 +111,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModel> assocs = dms.storageDecorator.fetchTopicRelatedAssociations(getId(),
+        ResultList<RelatedAssociationModel> assocs = pl.fetchTopicRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         return dms.instantiateRelatedAssociations(assocs);
     }
@@ -143,14 +121,14 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = dms.storageDecorator.fetchAssociation(assocTypeUri, getId(), othersTopicId,
+        AssociationModel assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId,
             myRoleTypeUri, othersRoleTypeUri);
         return assoc != null ? dms.instantiateAssociation(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return dms.instantiateAssociations(dms.storageDecorator.fetchTopicAssociations(getId()));
+        return dms.instantiateAssociations(pl.fetchTopicAssociations(getId()));
     }
 
 
@@ -159,12 +137,12 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        dms.storageDecorator.storeTopicProperty(getId(), propUri, propValue, addToIndex);
+        pl.storeTopicProperty(getId(), propUri, propValue, addToIndex);
     }
 
     @Override
     public void removeProperty(String propUri) {
-        dms.storageDecorator.removeTopicProperty(getId(), propUri);
+        pl.removeTopicProperty(getId(), propUri);
     }
 
 
@@ -209,13 +187,13 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     final void storeUri() {
-        dms.storageDecorator.storeTopicUri(getId(), getUri());
+        pl.storeTopicUri(getId(), getUri());
     }
 
     @Override
     final void storeTypeUri() {
         reassignInstantiation();
-        dms.storageDecorator.storeTopicTypeUri(getId(), getTypeUri());
+        pl.storeTopicTypeUri(getId(), getTypeUri());
     }
 
     // ---
@@ -223,14 +201,14 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storageDecorator.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return pl.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
     final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
-        return dms.storageDecorator.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        return pl.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 

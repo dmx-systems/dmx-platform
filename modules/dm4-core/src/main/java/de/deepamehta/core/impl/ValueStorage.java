@@ -118,14 +118,14 @@ class ValueStorage {
      */
     void indexSimpleValue(DeepaMehtaObjectModel model, IndexMode indexMode) {
         if (model instanceof TopicModel) {
-            dms.storageDecorator.indexTopicValue(
+            dms.pl.indexTopicValue(
                 model.getId(),
                 indexMode,
                 model.getTypeUri(),
                 getIndexValue(model)
             );
         } else if (model instanceof AssociationModel) {
-            dms.storageDecorator.indexAssociationValue(
+            dms.pl.indexAssociationValue(
                 model.getId(),
                 indexMode,
                 model.getTypeUri(),
@@ -174,7 +174,7 @@ class ValueStorage {
     private void storeSimpleValue(DeepaMehtaObjectModel model) {
         TypeModel type = getType(model);
         if (model instanceof TopicModel) {
-            dms.storageDecorator.storeTopicValue(
+            dms.pl.storeTopicValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -182,7 +182,7 @@ class ValueStorage {
                 getIndexValue(model)
             );
         } else if (model instanceof AssociationModel) {
-            dms.storageDecorator.storeAssociationValue(
+            dms.pl.storeAssociationValue(
                 model.getId(),
                 model.getSimpleValue(),
                 type.getIndexModes(),
@@ -354,7 +354,7 @@ class ValueStorage {
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      */
     private RelatedTopicModel fetchChildTopic(long parentId, AssociationDefinitionModel assocDef) {
-        return dms.storageDecorator.fetchRelatedTopic(
+        return dms.pl.fetchRelatedTopic(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
@@ -363,7 +363,7 @@ class ValueStorage {
     }
 
     private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
-        return dms.storageDecorator.fetchRelatedTopics(
+        return dms.pl.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
@@ -393,9 +393,9 @@ class ValueStorage {
      */
     private TypeModel getType(DeepaMehtaObjectModel model) {
         if (model instanceof TopicModel) {
-            return dms.typeStorage.getTopicType(model.getTypeUri());
+            return dms.pl.typeStorage.getTopicType(model.getTypeUri());
         } else if (model instanceof AssociationModel) {
-            return dms.typeStorage.getAssociationType(model.getTypeUri());
+            return dms.pl.typeStorage.getAssociationType(model.getTypeUri());
         }
         throw new RuntimeException("Unexpected model: " + model);
     }

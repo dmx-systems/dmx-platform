@@ -198,7 +198,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = dms.storageDecorator.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
+            RelatedTopicModel dataType = dms.pl.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation",
                 "dm4.core.type", "dm4.core.default", "dm4.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
@@ -232,7 +232,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        ResultList<RelatedTopicModel> indexModes = dms.storageDecorator.fetchTopicRelatedTopics(typeId,
+        ResultList<RelatedTopicModel> indexModes = dms.pl.fetchTopicRelatedTopics(typeId,
             "dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
         return IndexMode.fromTopics(indexModes.getItems());
     }
@@ -364,13 +364,13 @@ class TypeStorageImpl implements TypeStorage {
 
     private RelatedTopicModel fetchCustomAssocType(long assocDefId) {
         // ### TODO: can we use type-driven retrieval?
-        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.custom_assoc_type",
+        return dms.pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.custom_assoc_type",
             "dm4.core.parent", "dm4.core.child", "dm4.core.assoc_type");
     }
 
     private RelatedTopicModel fetchIncludeInLabel(long assocDefId) {
         // ### TODO: can we use type-driven retrieval?
-        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
+        return dms.pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition",
             "dm4.core.parent", "dm4.core.child", "dm4.core.include_in_label");
     }
 
@@ -463,7 +463,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     private RelatedTopicModel fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
-        return dms.storageDecorator.fetchAssociationRelatedTopic(assocDefId,
+        return dms.pl.fetchAssociationRelatedTopic(assocDefId,
             "dm4.core.aggregation", "dm4.core.assoc_def", cardinalityRoleTypeUri, "dm4.core.cardinality");
     }
 
@@ -548,17 +548,17 @@ class TypeStorageImpl implements TypeStorage {
     // ---
 
     private RelatedAssociationModel fetchSequenceStart(long typeId) {
-        return dms.storageDecorator.fetchTopicRelatedAssociation(typeId, "dm4.core.aggregation",
+        return dms.pl.fetchTopicRelatedAssociation(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.sequence_start", null);      // othersAssocTypeUri=null
     }
 
     private RelatedAssociationModel fetchSuccessor(long assocDefId) {
-        return dms.storageDecorator.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence",
+        return dms.pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence",
             "dm4.core.predecessor", "dm4.core.successor", null);    // othersAssocTypeUri=null
     }
 
     private RelatedAssociationModel fetchPredecessor(long assocDefId) {
-        return dms.storageDecorator.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence",
+        return dms.pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence",
             "dm4.core.successor", "dm4.core.predecessor", null);    // othersAssocTypeUri=null
     }
 
@@ -704,7 +704,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: the Type Editor plugin must not react
             TopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());
             boolean value = labelConfig.contains(assocDef.getAssocDefUri());
-            dms.storageDecorator.storeTopicValue(includeInLabel.getId(), new SimpleValue(value));
+            dms.pl.storeTopicValue(includeInLabel.getId(), new SimpleValue(value));
         }
     }
 
@@ -717,7 +717,7 @@ class TypeStorageImpl implements TypeStorage {
     private ViewConfigurationModel fetchTypeViewConfig(TopicModel typeTopic) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(dms.storageDecorator.fetchTopicRelatedTopics(typeTopic.getId(),
+            return viewConfigModel(dms.pl.fetchTopicRelatedTopics(typeTopic.getId(),
                 "dm4.core.aggregation", "dm4.core.type", "dm4.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
@@ -728,7 +728,7 @@ class TypeStorageImpl implements TypeStorage {
     private ViewConfigurationModel fetchAssocDefViewConfig(AssociationModel assocDef) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(dms.storageDecorator.fetchAssociationRelatedTopics(assocDef.getId(),
+            return viewConfigModel(dms.pl.fetchAssociationRelatedTopics(assocDef.getId(),
                 "dm4.core.aggregation", "dm4.core.assoc_def", "dm4.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +
@@ -767,7 +767,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private void fetchChildTopics(Iterable<? extends DeepaMehtaObjectModel> objects) {
         for (DeepaMehtaObjectModel object : objects) {
-            dms.valueStorage.fetchChildTopics(object);
+            dms.pl.valueStorage.fetchChildTopics(object);
         }
     }
 

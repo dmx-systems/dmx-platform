@@ -1,12 +1,18 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.ModelFactory;
+import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.List;
 
 
 
@@ -27,29 +33,26 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
+    protected PersistenceLayer pl;
     protected ModelFactory mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics,
-                                                                                      ModelFactory mf) {
+                                                                                      PersistenceLayer pl) {
         this.id          = id;
         this.uri         = uri;
         this.typeUri     = typeUri;
         this.value       = value;
         this.childTopics = childTopics != null ? childTopics : mf.newChildTopicsModel();
         //
-        this.mf          = mf;
+        this.pl          = pl;
+        this.mf          = pl.getModelFactory();
     }
 
     DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {
-        this.id          = object.getId();
-        this.uri         = object.getUri();
-        this.typeUri     = object.getTypeUri();
-        this.value       = object.getSimpleValue();
-        this.childTopics = object.getChildTopicsModel();
-        //
-        this.mf = ((DeepaMehtaObjectModelImpl) object).mf;
+        this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
+            object.getChildTopicsModel(), ((DeepaMehtaObjectModelImpl) object).pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -210,6 +213,21 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
 
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    TypeModel getType() {
+        throw new UnsupportedOperationException();
+    }
+
+    List<AssociationModel> getAssociations() {
+        throw new UnsupportedOperationException();
+    }
+
+    ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+        throw new UnsupportedOperationException();
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

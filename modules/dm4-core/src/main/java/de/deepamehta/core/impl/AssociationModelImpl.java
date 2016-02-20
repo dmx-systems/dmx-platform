@@ -1,14 +1,15 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
+
+import java.util.List;
 
 
 
@@ -119,10 +120,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = super.toJSON();
-            o.put("role_1", roleModel1.toJSON());
-            o.put("role_2", roleModel2.toJSON());
-            return o;
+            return super.toJSON()
+                .put("role_1", roleModel1.toJSON())
+                .put("role_2", roleModel2.toJSON());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -147,5 +147,25 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     @Override
     public String toString() {
         return "association (" + super.toString() + ", " + roleModel1 + ", " + roleModel2 + ")";
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    AssociationTypeModel getType() {
+        return pl.typeStorage.getAssociationType(typeUri);
+    }
+
+    @Override
+    List<AssociationModel> getAssociations() {
+        return pl.fetchAssociationAssociations(id);
+    }
+
+    @Override
+    ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+        return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 }

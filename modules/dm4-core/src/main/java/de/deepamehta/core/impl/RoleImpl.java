@@ -70,6 +70,6 @@ abstract class RoleImpl implements Role {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void storeRoleTypeUri() {
-        dms.storageDecorator.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
+        dms.pl.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
     }
 }

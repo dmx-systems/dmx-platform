@@ -48,7 +48,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private StorageDecorator storageDecorator;  // ### TODO: not yet used
+    private PersistenceLayer pl;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -204,7 +204,7 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics) {
-        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, this);
+        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, pl);
     }
 
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
@@ -821,5 +821,13 @@ public class ModelFactoryImpl implements ModelFactory {
         } catch (Exception e) {
             throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
         }
+    }
+
+
+
+    // ===
+
+    public void setPersistenceLayer(PersistenceLayer pl) {
+        this.pl = pl;
     }
 }

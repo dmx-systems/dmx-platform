@@ -51,7 +51,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
         Topic configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             // update DB
-            configTopic = dms.typeStorage.storeViewConfigTopic(configurable, mf.newTopicModel(configTypeUri));
+            configTopic = dms.pl.typeStorage.storeViewConfigTopic(configurable, mf.newTopicModel(configTypeUri));
             // update memory
             model.addConfigTopic(configTopic.getModel());
             // update attached object cache

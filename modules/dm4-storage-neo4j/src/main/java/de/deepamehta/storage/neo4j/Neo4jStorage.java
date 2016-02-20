@@ -579,6 +579,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return fetchNode(objectId);
     }
 
+    // ---
+
+    @Override
+    public ModelFactory getModelFactory() {
+        return mf;
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
