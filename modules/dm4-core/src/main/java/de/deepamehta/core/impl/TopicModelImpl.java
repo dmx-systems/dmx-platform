@@ -87,6 +87,11 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
+    void storeUri() {
+        pl.storeTopicUri(id, uri);
+    }
+
+    @Override
     void delete() {
         pl.deleteTopic(id);
     }

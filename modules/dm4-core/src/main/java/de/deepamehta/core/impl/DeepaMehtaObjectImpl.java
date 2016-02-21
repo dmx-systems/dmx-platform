@@ -39,9 +39,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModel model;    // underlying model
+    private DeepaMehtaObjectModelImpl model;    // underlying model
 
-    private ChildTopicsImpl childTopics;    // attached object cache
+    private ChildTopicsImpl childTopics;        // attached object cache
 
     protected EmbeddedService dms;
     protected PersistenceLayer pl;
@@ -52,7 +52,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, EmbeddedService dms) {
-        this.model = model;
+        this.model = (DeepaMehtaObjectModelImpl) model;
         this.dms = dms;
         this.pl = dms.pl;
         this.mf = dms.mf;
@@ -87,10 +87,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setUri(String uri) {
-        // update memory
-        model.setUri(uri);
-        // update DB
-        storeUri();         // abstract
+        model.updateUri(uri);
     }
 
     // --- Type URI ---
@@ -333,8 +330,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     abstract void updateChildTopics(ChildTopicsModel childTopics);
 
     abstract Directive getUpdateDirective();
-
-    abstract void storeUri();
 
     abstract void storeTypeUri();
 

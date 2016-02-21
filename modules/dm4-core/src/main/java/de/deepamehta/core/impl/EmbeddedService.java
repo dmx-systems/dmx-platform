@@ -54,10 +54,10 @@ public class EmbeddedService implements DeepaMehtaService {
 
     BundleContext bundleContext;
     PersistenceLayer pl;
+    EventManager em;
     ModelFactory mf;
     MigrationManager migrationManager;
     PluginManager pluginManager;
-    EventManager eventManager;
     TypeCache typeCache;
     AccessControl accessControl;
     WebPublishingService wpService;
@@ -72,10 +72,10 @@ public class EmbeddedService implements DeepaMehtaService {
     public EmbeddedService(PersistenceLayer pl, BundleContext bundleContext) {
         this.bundleContext = bundleContext;
         this.pl = pl;
+        this.em = pl.em;
         this.mf = pl.mf;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.eventManager = new EventManager(this);
         this.typeCache = new TypeCache(this);
         this.accessControl = new AccessControlImpl(this);
         this.wpService = new WebPublishingService(this);
@@ -504,7 +504,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // === Plugins ===
 
     @Override
-    public Plugin getPlugin(String pluginUri) {
+    public PluginImpl getPlugin(String pluginUri) {
         return pluginManager.getPlugin(pluginUri);
     }
 
@@ -519,12 +519,12 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public void fireEvent(DeepaMehtaEvent event, Object... params) {
-        eventManager.fireEvent(event, params);
+        em.fireEvent(event, params);
     }
 
     @Override
     public void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
-        eventManager.deliverEvent(pluginUri, event, params);
+        em.deliverEvent(getPlugin(pluginUri), event, params);
     }
 
 

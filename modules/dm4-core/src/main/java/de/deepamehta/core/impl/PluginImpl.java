@@ -632,7 +632,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("Registering " + events.size() + " event listeners of " + this);
             for (DeepaMehtaEvent event : events) {
-                dms.eventManager.addListener(event, (EventListener) pluginContext);
+                dms.em.addListener(event, (EventListener) pluginContext);
             }
         } catch (Exception e) {
             throw new RuntimeException("Registering event listeners of " + this + " failed", e);
@@ -647,7 +647,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering event listeners of " + this);
         for (DeepaMehtaEvent event : events) {
-            dms.eventManager.removeListener(event, (EventListener) pluginContext);
+            dms.em.removeListener(event, (EventListener) pluginContext);
         }
     }
 
@@ -675,7 +675,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Called internally to deliver the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
     private void deliverEvent(DeepaMehtaEvent event, Object... params) {
-        dms.eventManager.deliverEvent(this, event, params);
+        dms.em.deliverEvent(this, event, params);
     }
 
     /**

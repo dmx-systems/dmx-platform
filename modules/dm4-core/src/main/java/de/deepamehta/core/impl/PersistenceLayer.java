@@ -29,6 +29,7 @@ public class PersistenceLayer extends StorageDecorator {
     TypeStorageImpl typeStorage;
     ValueStorage valueStorage;
 
+    EventManager em;
     ModelFactory mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -40,6 +41,7 @@ public class PersistenceLayer extends StorageDecorator {
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
         //
+        this.em = new EventManager();
         this.mf = storage.getModelFactory();
     }
 
@@ -47,9 +49,9 @@ public class PersistenceLayer extends StorageDecorator {
 
     TopicModel createTopic(TopicModel model, String uriPrefix) {
         try {
-            dms.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             _createTopic(model, uriPrefix);
-            dms.fireEvent(CoreEvent.POST_CREATE_TOPIC, model);
+            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model);
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
@@ -59,9 +61,9 @@ public class PersistenceLayer extends StorageDecorator {
 
     AssociationModel createAssociation(AssociationModel model) {
         try {
-            dms.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
+            em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             _createAssociation(model);
-            dms.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, model);
+            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, model);
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating association failed (" + model + ")", e);
@@ -158,7 +160,7 @@ public class PersistenceLayer extends StorageDecorator {
      */
     void deleteObject(DeepaMehtaObjectModelImpl object) {
         try {
-            dms.fireEvent(object.getPreDeleteEvent(), object);
+            em.fireEvent(object.getPreDeleteEvent(), object);
             //
             // 1) delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
@@ -178,7 +180,7 @@ public class PersistenceLayer extends StorageDecorator {
             Directives.get().add(object.getDeleteDirective(), object);
             object.delete();
             //
-            dms.fireEvent(object.getPostDeleteEvent(), object);
+            em.fireEvent(object.getPostDeleteEvent(), object);
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }

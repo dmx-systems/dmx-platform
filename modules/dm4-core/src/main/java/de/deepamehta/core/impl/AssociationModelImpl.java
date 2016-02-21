@@ -187,6 +187,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
+    void storeUri() {
+        pl.storeAssociationUri(id, uri);
+    }
+
+    @Override
     void delete() {
         pl.deleteAssociation(id);
     }

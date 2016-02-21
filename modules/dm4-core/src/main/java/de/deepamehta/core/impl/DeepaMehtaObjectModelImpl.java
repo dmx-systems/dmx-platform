@@ -242,6 +242,15 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    void updateUri(String uri) {
+        setUri(uri);    // update memory
+        storeUri();     // update DB, "abstract"
+    }
+
+    void storeUri() {
+        throw new UnsupportedOperationException();
+    }
+
     void delete() {
         throw new UnsupportedOperationException();
     }

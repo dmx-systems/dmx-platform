@@ -2,7 +2,6 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 
@@ -24,12 +23,9 @@ class EventManager {
      */
     private Map<String, List<EventListener>> listenerRegistry = new HashMap();
 
-    private DeepaMehtaService dms;
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    EventManager(DeepaMehtaService dms) {
-        this.dms = dms;
+    EventManager() {
         // Note: actually the class CoreEvent does not need to be instantiated as it contains only statics.
         // But if not instantiated OSGi apparently does not load the class at all.
         new CoreEvent();
@@ -78,16 +74,6 @@ class EventManager {
         }
         //
         deliverEvent((EventListener) pluginContext, event, params);
-    }
-
-    /**
-     * Delivers an event to a particular plugin.
-     * If the plugin is not a listener for that event nothing is performed.
-     * <p>
-     * Convenience method that takes a plugin URI.
-     */
-    void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
-        deliverEvent((PluginImpl) dms.getPlugin(pluginUri), event, params);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

@@ -260,11 +260,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     }
 
     @Override
-    final void storeUri() {
-        pl.storeAssociationUri(getId(), getUri());
-    }
-
-    @Override
     final void storeTypeUri() {
         reassignInstantiation();
         pl.storeAssociationTypeUri(getId(), getTypeUri());

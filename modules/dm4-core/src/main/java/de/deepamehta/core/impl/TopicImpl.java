@@ -186,11 +186,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     }
 
     @Override
-    final void storeUri() {
-        pl.storeTopicUri(getId(), getUri());
-    }
-
-    @Override
     final void storeTypeUri() {
         reassignInstantiation();
         pl.storeTopicTypeUri(getId(), getTypeUri());
