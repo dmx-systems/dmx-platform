@@ -353,7 +353,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
         // remove current assignment
         fetchInstantiation().delete();
         // create new assignment
-        dms.createAssociationInstantiation(getId(), getTypeUri());
+        pl.createAssociationInstantiation(getId(), getTypeUri());
     }
 
     private Association fetchInstantiation() {

@@ -676,10 +676,4 @@ class StorageDecorator {
     Object getDatabaseVendorObject(long objectId) {
         return storage.getDatabaseVendorObject(objectId);
     }
-
-    // ---
-
-    ModelFactory getModelFactory() {
-        return storage.getModelFactory();
-    }
 }

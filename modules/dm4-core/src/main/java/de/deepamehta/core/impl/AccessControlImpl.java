@@ -195,7 +195,7 @@ class AccessControlImpl implements AccessControl {
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         try {
-            // 1) create assignment association
+            // 1) create assignment association ### FIXME. Note: must not fire events.
             dms.associationFactory(mf.newAssociationModel("dm4.core.aggregation",
                 object.getModel().createRoleModel("dm4.core.parent"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.child")

@@ -49,7 +49,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.childTopics = childTopics != null ? childTopics : mf.newChildTopicsModel();
         //
         this.pl          = pl;
-        this.mf          = pl.getModelFactory();
+        this.mf          = pl.mf;
     }
 
     DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {

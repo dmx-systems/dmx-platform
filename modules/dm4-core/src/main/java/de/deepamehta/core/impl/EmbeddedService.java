@@ -69,10 +69,10 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
      */
-    public EmbeddedService(PersistenceLayer persistenceLayer, BundleContext bundleContext) {
+    public EmbeddedService(PersistenceLayer pl, BundleContext bundleContext) {
         this.bundleContext = bundleContext;
-        this.pl = persistenceLayer;
-        this.mf = persistenceLayer.getModelFactory();
+        this.pl = pl;
+        this.mf = pl.mf;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.eventManager = new EventManager(this);
@@ -153,7 +153,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic createTopic(TopicModel model) {
-        return createTopic(model, null);    // uriPrefix=null
+        return topicFactory(model, null);   // uriPrefix=null
     }
 
     @Override
@@ -282,14 +282,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association createAssociation(AssociationModel model) {
-        try {
-            fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
-            Association assoc = associationFactory(model);
-            fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
-            return assoc;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating association failed (" + model + ")", e);
-        }
+        return associationFactory(model);
     }
 
     @Override
@@ -487,7 +480,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
         }
         //
-        return createTopic(model, URI_PREFIX_ROLE_TYPE);
+        return topicFactory(model, URI_PREFIX_ROLE_TYPE);
     }
 
 
@@ -643,37 +636,8 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Helper ===
 
-    void createTopicInstantiation(long topicId, String topicTypeUri) {
-        try {
-            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
-                mf.newTopicRoleModel(topicTypeUri, "dm4.core.type"),
-                mf.newTopicRoleModel(topicId, "dm4.core.instance"));
-            pl.storeAssociation(assoc);   // direct storage calls used here ### explain
-            pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-            createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
-        } catch (Exception e) {
-            throw new RuntimeException("Associating topic " + topicId +
-                " with topic type \"" + topicTypeUri + "\" failed", e);
-        }
-    }
-
-    void createAssociationInstantiation(long assocId, String assocTypeUri) {
-        try {
-            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
-                mf.newTopicRoleModel(assocTypeUri, "dm4.core.type"),
-                mf.newAssociationRoleModel(assocId, "dm4.core.instance"));
-            pl.storeAssociation(assoc);   // direct storage calls used here ### explain
-            pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-        } catch (Exception e) {
-            throw new RuntimeException("Associating association " + assocId +
-                " with association type \"" + assocTypeUri + "\" failed", e);
-        }
-    }
-
-    // ---
-
     /**
-     * Convenience method. ### to be dropped?
+     * Convenience method.
      */
     Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
@@ -769,20 +733,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
     // === Factory ===
 
-    private Topic createTopic(TopicModel model, String uriPrefix) {
-        try {
-            fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            Topic topic = topicFactory(model, uriPrefix);
-            fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
-            return topic;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
-                "\")", e);
-        }
-    }
-
-    // ---
-
     private void checkAccess(TopicModel model) {
         fireEvent(CoreEvent.PRE_GET_TOPIC, model.getId());          // throws AccessControlException
     }
@@ -795,39 +745,19 @@ public class EmbeddedService implements DeepaMehtaService {
 
     /**
      * Factory method: creates a new topic in the DB according to the given model
-     * and returns a topic instance.
+     * and returns a topic instance. ### FIXDOC
      */
     private Topic topicFactory(TopicModel model, String uriPrefix) {
-        // 1) store in DB
-        pl.storeTopic(model);
-        pl.valueStorage.storeValue(model);
-        createTopicInstantiation(model.getId(), model.getTypeUri());
-        //
-        // 2) instantiate
-        Topic topic = new TopicImpl(model, this);
-        //
-        // 3) set default URI
-        // If no URI is given the topic gets a default URI based on its ID, if requested.
-        // Note: this must be done *after* the topic is stored. The ID is not known before.
-        // Note: in case no URI was given: once stored a topic's URI is empty (not null).
-        if (uriPrefix != null && topic.getUri().equals("")) {
-            topic.setUri(uriPrefix + topic.getId());
-        }
-        //
-        return topic;
+        pl.createTopic(model, uriPrefix);
+        return new TopicImpl(model, this);
     }
 
     /**
      * Factory method: creates a new association in the DB according to the given model
      * and returns an association instance.
      */
-    Association associationFactory(AssociationModel model) {
-        // 1) store in DB
-        pl.storeAssociation(model);
-        pl.valueStorage.storeValue(model);
-        createAssociationInstantiation(model.getId(), model.getTypeUri());
-        //
-        // 2) instantiate
+    private Association associationFactory(AssociationModel model) {
+        pl.createAssociation(model);
         return new AssociationImpl(model, this);
     }
 
@@ -839,8 +769,8 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private TopicType topicTypeFactory(TopicTypeModel model) {
         // 1) store in DB
-        createTopic(model, URI_PREFIX_TOPIC_TYPE);          // store generic topic
-        pl.typeStorage.storeType(model);                    // store type-specific parts
+        pl.createTopic(model, URI_PREFIX_TOPIC_TYPE);           // store generic topic
+        pl.typeStorage.storeType(model);                        // store type-specific parts
         //
         // 2) instantiate
         TopicType topicType = new TopicTypeImpl(model, this);
@@ -855,8 +785,8 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     private AssociationType associationTypeFactory(AssociationTypeModel model) {
         // 1) store in DB
-        createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // store generic topic
-        pl.typeStorage.storeType(model);                    // store type-specific parts
+        pl.createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);     // store generic topic
+        pl.typeStorage.storeType(model);                        // store type-specific parts
         //
         // 2) instantiate
         AssociationType assocType = new AssociationTypeImpl(model, this);
@@ -937,16 +867,16 @@ public class EmbeddedService implements DeepaMehtaService {
             // Note: createTopicInstantiation() creates the associations by *low-level* (storage) calls.
             // That's why the associations can be created *before* their type (here: "dm4.core.instantiation")
             // is fully constructed (the type's data type is not yet associated => step 2).
-            createTopicInstantiation(t.getId(), t.getTypeUri());
-            createTopicInstantiation(a.getId(), a.getTypeUri());
-            createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
-            createTopicInstantiation(roleType.getId(), roleType.getTypeUri());
-            createTopicInstantiation(text.getId(), text.getTypeUri());
-            createTopicInstantiation(deflt.getId(), deflt.getTypeUri());
-            createTopicInstantiation(type.getId(), type.getTypeUri());
-            createTopicInstantiation(inst.getId(), inst.getTypeUri());
-            createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
-            createTopicInstantiation(instn.getId(), instn.getTypeUri());
+            pl.createTopicInstantiation(t.getId(), t.getTypeUri());
+            pl.createTopicInstantiation(a.getId(), a.getTypeUri());
+            pl.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
+            pl.createTopicInstantiation(roleType.getId(), roleType.getTypeUri());
+            pl.createTopicInstantiation(text.getId(), text.getTypeUri());
+            pl.createTopicInstantiation(deflt.getId(), deflt.getTypeUri());
+            pl.createTopicInstantiation(type.getId(), type.getTypeUri());
+            pl.createTopicInstantiation(inst.getId(), inst.getTypeUri());
+            pl.createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
+            pl.createTopicInstantiation(instn.getId(), instn.getTypeUri());
             //
             // 2) Postponed data type association
             //

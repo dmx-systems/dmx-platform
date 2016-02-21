@@ -232,7 +232,7 @@ class ValueStorage {
         if (childTopic instanceof TopicReferenceModel) {
             resolveReference((TopicReferenceModel) childTopic);
         } else {
-            dms.createTopic(childTopic);
+            pl.createTopic(childTopic);
         }
         associateChildTopic(parent, childTopic, assocDef);
     }
@@ -243,17 +243,17 @@ class ValueStorage {
      * Replaces a reference with the real thing.
      */
     void resolveReference(TopicReferenceModel topicRef) {
-        topicRef.set(fetchReferencedTopic(topicRef).getModel());
+        topicRef.set(fetchReferencedTopic(topicRef));
     }
 
-    private Topic fetchReferencedTopic(TopicReferenceModel topicRef) {
+    private TopicModel fetchReferencedTopic(TopicReferenceModel topicRef) {
         // Note: the resolved topic must be fetched including its composite value.
         // It might be required at client-side. ### TODO
         if (topicRef.isReferenceById()) {
-            return dms.getTopic(topicRef.getId());                                 // ### FIXME: had fetchComposite=true
+            return pl.fetchTopic(topicRef.getId());                                // ### FIXME: had fetchComposite=true
         } else if (topicRef.isReferenceByUri()) {
-            Topic topic = dms.getTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had fetchComposite=true
-            if (topic == null) {
+            TopicModel topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had
+            if (topic == null) {                                                         //          fetchComposite=true
                 throw new RuntimeException("Topic with URI \"" + topicRef.getUri() + "\" not found");
             }
             return topic;
@@ -274,7 +274,7 @@ class ValueStorage {
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
         assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
         assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
-        dms.createAssociation(assoc);
+        pl.createAssociation(assoc);
     }
 
 

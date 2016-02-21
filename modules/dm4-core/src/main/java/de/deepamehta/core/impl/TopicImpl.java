@@ -227,7 +227,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
         // remove current assignment
         fetchInstantiation().delete();
         // create new assignment
-        dms.createTopicInstantiation(getId(), getTypeUri());
+        pl.createTopicInstantiation(getId(), getTypeUri());
     }
 
     // Note: this method works only for instances, not for types.
