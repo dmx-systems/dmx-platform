@@ -745,7 +745,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     /**
      * Factory method: creates a new topic in the DB according to the given model
-     * and returns a topic instance. ### FIXDOC
+     * and returns a topic instance.
      */
     private Topic topicFactory(TopicModel model, String uriPrefix) {
         pl.createTopic(model, uriPrefix);

@@ -4,12 +4,8 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
-import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONArray;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 

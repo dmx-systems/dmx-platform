@@ -204,6 +204,9 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics) {
+        if (pl == null) {
+            throw new RuntimeException("before using the ModelFactory a PersistenceLayer must be set");
+        }
         return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, pl);
     }
 

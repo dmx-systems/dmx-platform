@@ -1,6 +1,7 @@
 package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.impl.ModelFactoryImpl;
+import de.deepamehta.core.impl.PersistenceLayer;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
 public class Neo4jStorageTest {
 
     private DeepaMehtaStorage storage;
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private long assocId;
 
@@ -46,6 +47,7 @@ public class Neo4jStorageTest {
     public void setup() {
         mf = new ModelFactoryImpl();
         storage = new Neo4jStorageFactory().newDeepaMehtaStorage(createTempDirectory("neo4j-test-"), mf);
+        mf.setPersistenceLayer(new PersistenceLayer(storage));
         setupContent();
     }
 

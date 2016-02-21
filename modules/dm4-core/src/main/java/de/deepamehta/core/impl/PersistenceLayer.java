@@ -26,11 +26,11 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    TypeStorageImpl typeStorage;
-    ValueStorage valueStorage;
-
     EventManager em;
     ModelFactory mf;
+
+    TypeStorageImpl typeStorage;
+    ValueStorage valueStorage;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -38,25 +38,42 @@ public class PersistenceLayer extends StorageDecorator {
 
     public PersistenceLayer(DeepaMehtaStorage storage) {
         super(storage);
-        this.typeStorage = new TypeStorageImpl(this);
-        this.valueStorage = new ValueStorage(this);
-        //
+        // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = storage.getModelFactory();
+        //
+        this.typeStorage = new TypeStorageImpl(this);
+        this.valueStorage = new ValueStorage(this);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Convenience.
+     */
+    TopicModel createTopic(TopicModel model) {
+        return createTopic(model, null);    // uriPrefix=null
+    }
+
     TopicModel createTopic(TopicModel model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            _createTopic(model, uriPrefix);
+            _createTopic((TopicModelImpl) model, uriPrefix);
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model);
             return model;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
                 "\")", e);
         }
+    }
+
+    // ---
+
+    /**
+     * Convenience.
+     */
+    AssociationModel createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+        return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
     AssociationModel createAssociation(AssociationModel model) {
@@ -73,26 +90,9 @@ public class PersistenceLayer extends StorageDecorator {
     // ---
 
     /**
-     * Convenience method.
+     * Creates a new topic in the DB.
      */
-    TopicModel createTopic(TopicModel model) {
-        return createTopic(model, null);    // uriPrefix=null
-    }
-
-    /**
-     * Convenience method.
-     */
-    AssociationModel createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
-        return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
-    }
-
-    // ---
-
-    /**
-     * Factory method: creates a new topic in the DB according to the given model
-     * and returns a topic instance. ### FIXDOC
-     */
-    private void _createTopic(TopicModel model, String uriPrefix) {
+    private void _createTopic(TopicModelImpl model, String uriPrefix) {
         // 1) store in DB
         storeTopic(model);
         valueStorage.storeValue(model);
@@ -103,18 +103,15 @@ public class PersistenceLayer extends StorageDecorator {
         // Note: this must be done *after* the topic is stored. The ID is not known before.
         // Note: in case no URI was given: once stored a topic's URI is empty (not null).
         if (uriPrefix != null && model.getUri().equals("")) {
-            long topicId = model.getId();
-            String uri = uriPrefix + topicId;
-            model.setUri(uri);              // update memory
-            storeTopicUri(topicId, uri);    // update DB
+            model.updateUri(uriPrefix + model.getId());
         }
     }
 
     /**
-     * Factory method: creates a new association in the DB according to the given model
-     * and returns an association instance. ### FIXDOC
+     * Creates a new association in the DB.
+     * ### TODO: should be private. Currently called from AccessControlImpl.assignToWorkspace().
      */
-    private void _createAssociation(AssociationModel model) {
+    void _createAssociation(AssociationModel model) {
         // 1) store in DB
         storeAssociation(model);
         valueStorage.storeValue(model);

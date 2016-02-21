@@ -25,7 +25,7 @@ public class CoreServiceTestEnvironment {
 
     // providing the test subclasses access to the core service and logger
     protected DeepaMehtaService dms;
-    protected ModelFactory mf;
+    protected ModelFactoryImpl mf;
 
     protected Logger logger = Logger.getLogger(getClass().getName());
 
@@ -39,7 +39,9 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dm4-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        dms = new EmbeddedService(new PersistenceLayer(storage), mf, null);
+        PersistenceLayer pl = new PersistenceLayer(storage);
+        mf.setPersistenceLayer(pl);
+        dms = new EmbeddedService(pl, null);     // bundleContext=null
     }
 
     @After

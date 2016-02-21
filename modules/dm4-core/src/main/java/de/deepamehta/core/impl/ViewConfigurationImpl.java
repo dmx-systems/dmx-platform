@@ -51,11 +51,12 @@ class ViewConfigurationImpl implements ViewConfiguration {
         Topic configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             // update DB
-            configTopic = dms.pl.typeStorage.storeViewConfigTopic(configurable, mf.newTopicModel(configTypeUri));
+            TopicModel _configTopic = dms.pl.typeStorage.storeViewConfigTopic(configurable,
+                mf.newTopicModel(configTypeUri));
             // update memory
-            model.addConfigTopic(configTopic.getModel());
+            model.addConfigTopic(_configTopic);
             // update attached object cache
-            addConfigTopic(configTopic);
+            configTopic = addConfigTopic(_configTopic);
         }
         configTopic.getChildTopics().set(settingUri, value);
     }
@@ -76,7 +77,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     private void initConfigTopics() {
         for (TopicModel configTopic : model.getConfigTopics()) {
-            addConfigTopic(new TopicImpl(configTopic, dms));
+            addConfigTopic(configTopic);
         }
     }
 
@@ -86,7 +87,9 @@ class ViewConfigurationImpl implements ViewConfiguration {
         return configTopics.get(configTypeUri);
     }
 
-    private void addConfigTopic(Topic configTopic) {
-        configTopics.put(configTopic.getTypeUri(), configTopic);
+    private Topic addConfigTopic(TopicModel configTopic) {
+        Topic _configTopic = new TopicImpl(configTopic, dms);
+        configTopics.put(configTopic.getTypeUri(), _configTopic);
+        return _configTopic;
     }
 }

@@ -46,7 +46,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.uri         = uri;
         this.typeUri     = typeUri;
         this.value       = value;
-        this.childTopics = childTopics != null ? childTopics : mf.newChildTopicsModel();
+        this.childTopics = childTopics != null ? childTopics : pl.mf.newChildTopicsModel();
         //
         this.pl          = pl;
         this.mf          = pl.mf;
