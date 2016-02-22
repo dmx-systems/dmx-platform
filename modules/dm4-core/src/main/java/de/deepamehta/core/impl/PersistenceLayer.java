@@ -1,15 +1,19 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
@@ -23,6 +27,12 @@ import java.util.logging.Logger;
 
 public class PersistenceLayer extends StorageDecorator {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String URI_PREFIX_TOPIC_TYPE       = "domain.project.topic_type_";
+    private static final String URI_PREFIX_ASSOCIATION_TYPE = "domain.project.assoc_type_";
+    private static final String URI_PREFIX_ROLE_TYPE        = "domain.project.role_type_";
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     TypeStorageImpl typeStorage;
@@ -30,6 +40,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     EventManager em;
     ModelFactoryImpl mf;
+    TypeCache typeCache;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -40,6 +51,7 @@ public class PersistenceLayer extends StorageDecorator {
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
+        this.typeCache = new TypeCache(this);
         //
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
@@ -47,6 +59,8 @@ public class PersistenceLayer extends StorageDecorator {
         // Note: this is a constructor side effect. This is a cyclic dependency. This is very nasty.
         // ### TODO: explain why we do it.
         mf.pl = this;
+        //
+        bootstrapTypeCache();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -152,7 +166,83 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
+
+
+    // === Types ===
+
+    TopicType getTopicType(String uri) {
+        try {
+            return typeCache.getTopicType(uri);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
+        }
+    }
+
+    AssociationType getAssociationType(String uri) {
+        try {
+            return typeCache.getAssociationType(uri);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
+        }
+    }
+
     // ---
+
+    TopicType createTopicType(TopicTypeModel model) {
+        try {
+            // store in DB
+            createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
+            typeStorage.storeType(model);                       // store type-specific parts
+            //
+            // instantiate
+            TopicType topicType = new TopicTypeImpl(model, this);
+            typeCache.putTopicType(topicType);
+            //
+            em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
+            return topicType;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
+        }
+    }
+
+    AssociationType createAssociationType(AssociationTypeModel model) {
+        try {
+            // store in DB
+            createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
+            typeStorage.storeType(model);                       // store type-specific parts
+            //
+            // instantiate
+            AssociationType assocType = new AssociationTypeImpl(model, this);
+            typeCache.putAssociationType(assocType);
+            //
+            em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+            return assocType;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
+                e);
+        }
+    }
+
+    // ---
+
+    Topic createRoleType(TopicModel model) {
+        // check type URI argument
+        String typeUri = model.getTypeUri();
+        if (typeUri == null) {
+            model.setTypeUri("dm4.core.role_type");
+        } else {
+            if (!typeUri.equals("dm4.core.role_type")) {
+                throw new IllegalArgumentException("A role type is supposed to be of type \"dm4.core.role_type\" " +
+                    "(found: \"" + typeUri + "\")");
+            }
+        }
+        //
+        return createTopic(model, URI_PREFIX_ROLE_TYPE);
+    }
+
+
+
+    // ===
 
     /**
      * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
@@ -280,5 +370,16 @@ public class PersistenceLayer extends StorageDecorator {
 
     private void checkReadAccess(AssociationModel model) {
         em.fireEvent(CoreEvent.PRE_GET_ASSOCIATION, model.getId());    // throws AccessControlException
+    }
+
+
+
+    // ===
+
+    private void bootstrapTypeCache() {
+        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
+            "dm4.core.text");
+        metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
+        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));
     }
 }

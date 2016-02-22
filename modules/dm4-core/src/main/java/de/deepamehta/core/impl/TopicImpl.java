@@ -211,7 +211,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     TopicType getType() {
-        return dms.getTopicType(getTypeUri());
+        return pl.getTopicType(getTypeUri());
     }
 
 

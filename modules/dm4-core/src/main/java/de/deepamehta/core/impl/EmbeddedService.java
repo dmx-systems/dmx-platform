@@ -44,12 +44,6 @@ import java.util.logging.Logger;
  */
 public class EmbeddedService implements DeepaMehtaService {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String URI_PREFIX_TOPIC_TYPE       = "domain.project.topic_type_";
-    private static final String URI_PREFIX_ASSOCIATION_TYPE = "domain.project.assoc_type_";
-    private static final String URI_PREFIX_ROLE_TYPE        = "domain.project.role_type_";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     BundleContext bundleContext;
@@ -58,7 +52,6 @@ public class EmbeddedService implements DeepaMehtaService {
     ModelFactory mf;
     MigrationManager migrationManager;
     PluginManager pluginManager;
-    TypeCache typeCache;
     AccessControl accessControl;
     WebPublishingService wpService;
 
@@ -76,11 +69,9 @@ public class EmbeddedService implements DeepaMehtaService {
         this.mf = pl.mf;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.typeCache = new TypeCache(pl);
         this.accessControl = new AccessControlImpl(this);
         this.wpService = new WebPublishingService(this);
         //
-        bootstrapTypeCache();
         setupDB();
     }
 
@@ -332,11 +323,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType getTopicType(String uri) {
-        try {
-            return typeCache.getTopicType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
-        }
+        return pl.getTopicType(uri);
     }
 
     @Override
@@ -357,13 +344,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType createTopicType(TopicTypeModel model) {
-        try {
-            TopicType topicType = topicTypeFactory(model);
-            fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
-            return topicType;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
-        }
+        return pl.createTopicType(model);
     }
 
     @Override
@@ -408,11 +389,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType getAssociationType(String uri) {
-        try {
-            return typeCache.getAssociationType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
-        }
+        return pl.getAssociationType(uri);
     }
 
     @Override
@@ -433,14 +410,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        try {
-            AssociationType assocType = associationTypeFactory(model);
-            fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
-            return assocType;
-        } catch (Exception e) {
-            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
-                e);
-        }
+        return pl.createAssociationType(model);
     }
 
     @Override
@@ -469,18 +439,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic createRoleType(TopicModel model) {
-        // check type URI argument
-        String typeUri = model.getTypeUri();
-        if (typeUri == null) {
-            model.setTypeUri("dm4.core.role_type");
-        } else {
-            if (!typeUri.equals("dm4.core.role_type")) {
-                throw new IllegalArgumentException("A role type is supposed to be of type \"dm4.core.role_type\" " +
-                    "(found: \"" + typeUri + "\")");
-            }
-        }
-        //
-        return pl.createTopic(model, URI_PREFIX_ROLE_TYPE);
+        return pl.createRoleType(model);
     }
 
 
@@ -647,42 +606,6 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Factory ===
-
-    /**
-     * Factory method: creates a new topic type in the DB according to the given model
-     * and returns a topic type instance.
-     */
-    private TopicType topicTypeFactory(TopicTypeModel model) {
-        // 1) store in DB
-        pl.createTopic(model, URI_PREFIX_TOPIC_TYPE);           // store generic topic
-        pl.typeStorage.storeType(model);                        // store type-specific parts
-        //
-        // 2) instantiate
-        TopicType topicType = new TopicTypeImpl(model, pl);
-        typeCache.putTopicType(topicType);
-        //
-        return topicType;
-    }
-
-    /**
-     * Factory method: creates a new association type in the DB according to the given model
-     * and returns an association type instance.
-     */
-    private AssociationType associationTypeFactory(AssociationTypeModel model) {
-        // 1) store in DB
-        pl.createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);     // store generic topic
-        pl.typeStorage.storeType(model);                        // store type-specific parts
-        //
-        // 2) instantiate
-        AssociationType assocType = new AssociationTypeImpl(model, pl);
-        typeCache.putAssociationType(assocType);
-        //
-        return assocType;
-    }
-
-
-
     // === Bootstrap ===
 
     /**
@@ -820,14 +743,5 @@ public class EmbeddedService implements DeepaMehtaService {
             mf.newTopicRoleModel(dataTypeUri, "dm4.core.default"));
         pl.storeAssociation(assoc);
         pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
-    }
-
-    // ---
-
-    private void bootstrapTypeCache() {
-        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
-            "dm4.core.text");
-        metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
-        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, pl));
     }
 }

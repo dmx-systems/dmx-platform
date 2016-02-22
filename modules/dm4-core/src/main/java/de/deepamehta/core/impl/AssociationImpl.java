@@ -285,7 +285,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     AssociationType getType() {
-        return dms.getAssociationType(getTypeUri());
+        return pl.getAssociationType(getTypeUri());
     }
 
 
