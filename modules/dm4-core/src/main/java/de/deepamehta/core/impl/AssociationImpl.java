@@ -39,8 +39,8 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationImpl(AssociationModel model, EmbeddedService dms) {
-        super(model, dms);
+    AssociationImpl(AssociationModel model, PersistenceLayer pl) {
+        super(model, pl);
         // init attached object cache
         this.role1 = createAttachedRole(model.getRoleModel1());
         this.role2 = createAttachedRole(model.getRoleModel2());
@@ -71,14 +71,14 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
         // Per request exactly one association is updated. Its childs are always topics (never associations).
         logger.info("Updating association " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
+        pl.em.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
         //
         AssociationModel oldModel = getModel().clone();
         super.update(model);
         updateRole(model.getRoleModel1(), 1);
         updateRole(model.getRoleModel2(), 2);
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel);
+        pl.em.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel);
     }
 
 
@@ -316,9 +316,9 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {
-            return new TopicRoleImpl((TopicRoleModel) model, this, dms);
+            return new TopicRoleImpl((TopicRoleModel) model, this, pl);
         } else if (model instanceof AssociationRoleModel) {
-            return new AssociationRoleImpl((AssociationRoleModel) model, this, dms);
+            return new AssociationRoleImpl((AssociationRoleModel) model, this, pl);
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }

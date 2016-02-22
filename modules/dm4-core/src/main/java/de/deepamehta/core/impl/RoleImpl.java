@@ -15,14 +15,14 @@ abstract class RoleImpl implements Role {
     private RoleModel model;
     private Association assoc;  // the association this role is involved in
 
-    protected final EmbeddedService dms;
+    protected final PersistenceLayer pl;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected RoleImpl(RoleModel model, Association assoc, EmbeddedService dms) {
+    protected RoleImpl(RoleModel model, Association assoc, PersistenceLayer pl) {
         this.model = model;
         this.assoc = assoc;
-        this.dms = dms;
+        this.pl = pl;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -70,6 +70,6 @@ abstract class RoleImpl implements Role {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void storeRoleTypeUri() {
-        dms.pl.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
+        pl.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
     }
 }

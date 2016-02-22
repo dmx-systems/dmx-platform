@@ -17,9 +17,9 @@ class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicImpl(RelatedTopicModel model, EmbeddedService dms) {
-        super(model, dms);
-        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), dms);
+    RelatedTopicImpl(RelatedTopicModel model, PersistenceLayer pl) {
+        super(model, pl);
+        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

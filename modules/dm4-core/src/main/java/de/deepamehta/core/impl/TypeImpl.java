@@ -37,8 +37,8 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeImpl(TypeModel model, EmbeddedService dms) {
-        super(model, dms);
+    TypeImpl(TypeModel model, PersistenceLayer pl) {
+        super(model, pl);
         // init attached object cache
         initAssocDefs();
         initViewConfig();
@@ -189,7 +189,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
             // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
             // def must be attached *after* the assoc def is stored.
             // ### TODO: attach before store. Refactoring needed. See comment in TypeCache#put methods.
-            _addAssocDefBefore(new AssociationDefinitionImpl(assocDef, this, dms), beforeAssocDefUri);
+            _addAssocDefBefore(new AssociationDefinitionImpl(assocDef, this, pl), beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
@@ -237,7 +237,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
                 oldAssocDef.getParentCardinalityUri(),
                 oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
             ),
-            this, dms
+            this, pl
         );
         String oldAssocDefUri = oldAssocDef.getAssocDefUri();
         String newAssocDefUri = newAssocDef.getAssocDefUri();
@@ -453,7 +453,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
     private void initAssocDefs() {
         this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            _addAssocDef(new AssociationDefinitionImpl(assocDef, this, dms));
+            _addAssocDef(new AssociationDefinitionImpl(assocDef, this, pl));
         }
     }
 
@@ -521,7 +521,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     private void initViewConfig() {
         RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
-        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
+        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
 

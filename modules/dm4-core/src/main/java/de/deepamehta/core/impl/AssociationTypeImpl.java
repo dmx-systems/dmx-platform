@@ -23,8 +23,8 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationTypeImpl(AssociationTypeModel model, EmbeddedService dms) {
-        super(model, dms);
+    AssociationTypeImpl(AssociationTypeModel model, PersistenceLayer pl) {
+        super(model, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

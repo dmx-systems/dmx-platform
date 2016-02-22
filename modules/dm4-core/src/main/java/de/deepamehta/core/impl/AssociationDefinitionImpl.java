@@ -26,8 +26,8 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionImpl(AssociationDefinitionModel model, TypeImpl parentType, EmbeddedService dms) {
-        super(model, dms);
+    AssociationDefinitionImpl(AssociationDefinitionModel model, TypeImpl parentType, PersistenceLayer pl) {
+        super(model, pl);
         this.parentType = parentType;
         initViewConfig();
     }
@@ -175,6 +175,6 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     private void initViewConfig() {
         RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
-        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), dms);
+        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 }

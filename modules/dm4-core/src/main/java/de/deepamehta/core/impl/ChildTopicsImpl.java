@@ -39,7 +39,6 @@ class ChildTopicsImpl implements ChildTopics {
      */
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
 
-    private EmbeddedService dms;
     private PersistenceLayer pl;
     private ModelFactory mf;
 
@@ -47,12 +46,11 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsImpl(ChildTopicsModel model, DeepaMehtaObjectImpl parent, EmbeddedService dms) {
+    ChildTopicsImpl(ChildTopicsModel model, DeepaMehtaObjectImpl parent, PersistenceLayer pl) {
         this.model = model;
         this.parent = parent;
-        this.dms = dms;
-        this.pl = dms.pl;
-        this.mf = dms.mf;
+        this.pl = pl;
+        this.mf = pl.mf;
         initChildTopics();
     }
 
@@ -591,7 +589,7 @@ class ChildTopicsImpl implements ChildTopics {
     // ---
 
     private RelatedTopic createAndAssociateChildTopic(RelatedTopicModel childTopic, AssociationDefinition assocDef) {
-        dms.createTopic(childTopic);
+        pl.createTopic(childTopic);
         return associateChildTopic(childTopic, assocDef);
     }
 
@@ -894,7 +892,7 @@ class ChildTopicsImpl implements ChildTopics {
      */
     private RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         try {
-            return new RelatedTopicImpl(model, dms);
+            return new RelatedTopicImpl(model, pl);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
         }

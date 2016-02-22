@@ -30,8 +30,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicImpl(TopicModel model, EmbeddedService dms) {
-        super(model, dms);
+    TopicImpl(TopicModel model, PersistenceLayer pl) {
+        super(model, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -50,7 +50,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     public void update(TopicModel model) {
         _update(model);
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
+        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
     }
 
 
@@ -158,12 +158,12 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     void _update(TopicModel model) {
         logger.info("Updating topic " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
         //
-        dms.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
+        pl.em.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
         //
         TopicModel oldModel = getModel().clone();
         super.update(model);
         //
-        dms.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
+        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
     }
 
 

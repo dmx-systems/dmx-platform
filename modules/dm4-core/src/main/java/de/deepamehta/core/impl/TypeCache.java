@@ -27,7 +27,7 @@ class TypeCache {
     private Map<String, TopicType>       topicTypes = new HashMap();   // key: topic type URI
     private Map<String, AssociationType> assocTypes = new HashMap();   // key: assoc type URI
 
-    private EmbeddedService dms;
+    private PersistenceLayer pl;
 
     private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
@@ -35,8 +35,8 @@ class TypeCache {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeCache(EmbeddedService dms) {
-        this.dms = dms;
+    TypeCache(PersistenceLayer pl) {
+        this.pl = pl;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -92,7 +92,7 @@ class TypeCache {
         if (topicTypes.remove(topicTypeUri) == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in type cache");
         }
-        dms.pl.typeStorage.removeFromTypeCache(topicTypeUri);
+        pl.typeStorage.removeFromTypeCache(topicTypeUri);
     }
 
     void removeAssociationType(String assocTypeUri) {
@@ -100,7 +100,7 @@ class TypeCache {
         if (assocTypes.remove(assocTypeUri) == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in type cache");
         }
-        dms.pl.typeStorage.removeFromTypeCache(assocTypeUri);
+        pl.typeStorage.removeFromTypeCache(assocTypeUri);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -110,8 +110,8 @@ class TypeCache {
             logger.info("Loading topic type \"" + topicTypeUri + "\"");
             endlessRecursionDetection.check(topicTypeUri);
             //
-            TopicTypeModel model = dms.pl.typeStorage.getTopicType(topicTypeUri);
-            return new TopicTypeImpl(model, dms);
+            TopicTypeModel model = pl.typeStorage.getTopicType(topicTypeUri);
+            return new TopicTypeImpl(model, pl);
         } finally {
             endlessRecursionDetection.reset(topicTypeUri);
         }
@@ -122,8 +122,8 @@ class TypeCache {
             logger.info("Loading association type \"" + assocTypeUri + "\"");
             endlessRecursionDetection.check(assocTypeUri);
             //
-            AssociationTypeModel model = dms.pl.typeStorage.getAssociationType(assocTypeUri);
-            return new AssociationTypeImpl(model, dms);
+            AssociationTypeModel model = pl.typeStorage.getAssociationType(assocTypeUri);
+            return new AssociationTypeImpl(model, pl);
         } finally {
             endlessRecursionDetection.reset(assocTypeUri);
         }

@@ -23,8 +23,8 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicTypeImpl(TopicTypeModel model, EmbeddedService dms) {
-        super(model, dms);
+    TopicTypeImpl(TopicTypeModel model, PersistenceLayer pl) {
+        super(model, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

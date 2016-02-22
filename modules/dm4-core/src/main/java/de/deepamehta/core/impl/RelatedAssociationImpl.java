@@ -17,9 +17,9 @@ class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociati
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationImpl(RelatedAssociationModel model, EmbeddedService dms) {
-        super(model, dms);
-        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), dms);
+    RelatedAssociationImpl(RelatedAssociationModel model, PersistenceLayer pl) {
+        super(model, pl);
+        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

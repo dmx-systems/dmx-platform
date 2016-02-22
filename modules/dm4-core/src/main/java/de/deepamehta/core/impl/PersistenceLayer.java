@@ -1,23 +1,14 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
-import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
-import static java.util.Arrays.asList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -55,16 +46,17 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    TopicModel createTopic(TopicModel model) {
+    Topic createTopic(TopicModel model) {
         return createTopic(model, null);    // uriPrefix=null
     }
 
-    TopicModel createTopic(TopicModel model, String uriPrefix) {
+    Topic createTopic(TopicModel model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             _createTopic((TopicModelImpl) model, uriPrefix);
-            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, model);
-            return model;
+            Topic topic = new TopicImpl(model, this);
+            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+            return topic;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
                 "\")", e);
@@ -76,16 +68,17 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    AssociationModel createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
-    AssociationModel createAssociation(AssociationModel model) {
+    Association createAssociation(AssociationModel model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             _createAssociation(model);
-            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, model);
-            return model;
+            Association assoc = new AssociationImpl(model, this);
+            em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
+            return assoc;
         } catch (Exception e) {
             throw new RuntimeException("Creating association failed (" + model + ")", e);
         }
@@ -181,7 +174,7 @@ public class PersistenceLayer extends StorageDecorator {
             Directives.get().add(object.getDeleteDirective(), object);
             object.delete();
             //
-            em.fireEvent(object.getPostDeleteEvent(), object);
+            em.fireEvent(object.getPostDeleteEvent(), object);  // ### FIXME: adapt listener
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }

@@ -683,7 +683,7 @@ class TypeStorageImpl implements TypeStorage {
             // assoc def and the Type Editor plugin would react and try to access the assoc def's parent type.
             // This means retrieving a type that is in-mid its storage process. Strange errors would occur.
             // As a workaround we create the child topic manually.
-            TopicModel topic = pl.createTopic(mf.newTopicModel("dm4.core.include_in_label",
+            Topic topic = pl.createTopic(mf.newTopicModel("dm4.core.include_in_label",
                 new SimpleValue(includeInLabel)));
             pl.createAssociation("dm4.core.composition",
                 mf.newAssociationRoleModel(assocDef.getId(), "dm4.core.parent"),
@@ -752,10 +752,10 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    TopicModel storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
-        TopicModel topic = pl.createTopic(configTopic);
-        pl.createAssociation("dm4.core.aggregation", configurable,
-            mf.newTopicRoleModel(topic.getId(), "dm4.core.view_config"));
+    Topic storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
+        Topic topic = pl.createTopic(configTopic);
+        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(topic.getId(),
+            "dm4.core.view_config"));
         return topic;
     }
 

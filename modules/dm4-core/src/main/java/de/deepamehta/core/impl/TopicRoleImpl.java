@@ -22,8 +22,8 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModel model, Association assoc, EmbeddedService dms) {
-        super(model, assoc, dms);
+    TopicRoleImpl(TopicRoleModel model, Association assoc, PersistenceLayer pl) {
+        super(model, assoc, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

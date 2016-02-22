@@ -24,16 +24,16 @@ class ViewConfigurationImpl implements ViewConfiguration {
     private ViewConfigurationModel model;                       // underlying model
     private RoleModel configurable;
 
-    private EmbeddedService dms;
+    private PersistenceLayer pl;
     private ModelFactory mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationImpl(RoleModel configurable, ViewConfigurationModel model, EmbeddedService dms) {
+    ViewConfigurationImpl(RoleModel configurable, ViewConfigurationModel model, PersistenceLayer pl) {
         this.configurable = configurable;
         this.model = model;
-        this.dms = dms;
-        this.mf = dms.mf;
+        this.pl = pl;
+        this.mf = pl.mf;
         initConfigTopics();
     }
 
@@ -51,12 +51,11 @@ class ViewConfigurationImpl implements ViewConfiguration {
         Topic configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             // update DB
-            TopicModel _configTopic = dms.pl.typeStorage.storeViewConfigTopic(configurable,
-                mf.newTopicModel(configTypeUri));
+            configTopic = pl.typeStorage.storeViewConfigTopic(configurable, mf.newTopicModel(configTypeUri));
             // update memory
-            model.addConfigTopic(_configTopic);
+            model.addConfigTopic(configTopic.getModel());
             // update attached object cache
-            configTopic = addConfigTopic(_configTopic);
+            addConfigTopic(configTopic);
         }
         configTopic.getChildTopics().set(settingUri, value);
     }
@@ -77,7 +76,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     private void initConfigTopics() {
         for (TopicModel configTopic : model.getConfigTopics()) {
-            addConfigTopic(configTopic);
+            addConfigTopic(new TopicImpl(configTopic, pl));
         }
     }
 
@@ -87,9 +86,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
         return configTopics.get(configTypeUri);
     }
 
-    private Topic addConfigTopic(TopicModel configTopic) {
-        Topic _configTopic = new TopicImpl(configTopic, dms);
-        configTopics.put(configTopic.getTypeUri(), _configTopic);
-        return _configTopic;
+    private void addConfigTopic(Topic configTopic) {
+        configTopics.put(configTopic.getTypeUri(), configTopic);
     }
 }

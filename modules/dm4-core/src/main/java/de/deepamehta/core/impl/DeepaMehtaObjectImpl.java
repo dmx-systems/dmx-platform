@@ -43,7 +43,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     private ChildTopicsImpl childTopics;        // attached object cache
 
-    protected EmbeddedService dms;
     protected PersistenceLayer pl;
     protected ModelFactory mf;
 
@@ -51,12 +50,11 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, EmbeddedService dms) {
+    DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, PersistenceLayer pl) {
         this.model = (DeepaMehtaObjectModelImpl) model;
-        this.dms = dms;
-        this.pl = dms.pl;
-        this.mf = dms.mf;
-        this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, dms);
+        this.pl = pl;
+        this.mf = pl.mf;
+        this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

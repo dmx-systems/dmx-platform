@@ -76,7 +76,7 @@ public class EmbeddedService implements DeepaMehtaService {
         this.mf = pl.mf;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.typeCache = new TypeCache(this);
+        this.typeCache = new TypeCache(pl);
         this.accessControl = new AccessControlImpl(this);
         this.wpService = new WebPublishingService(this);
         //
@@ -153,7 +153,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic createTopic(TopicModel model) {
-        return topicFactory(model, null);   // uriPrefix=null
+        return pl.createTopic(model);
     }
 
     @Override
@@ -282,7 +282,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association createAssociation(AssociationModel model) {
-        return associationFactory(model);
+        return pl.createAssociation(model);
     }
 
     @Override
@@ -480,7 +480,7 @@ public class EmbeddedService implements DeepaMehtaService {
             }
         }
         //
-        return topicFactory(model, URI_PREFIX_ROLE_TYPE);
+        return pl.createTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
 
@@ -654,7 +654,7 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     Topic instantiateTopic(TopicModel model) {
         checkAccess(model);
-        return new TopicImpl(model, this);
+        return new TopicImpl(model, pl);
     }
 
     private List<Topic> instantiateTopics(List<TopicModel> models) {
@@ -673,7 +673,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         checkAccess(model);
-        return new RelatedTopicImpl(model, this);
+        return new RelatedTopicImpl(model, pl);
     }
 
     ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
@@ -695,7 +695,7 @@ public class EmbeddedService implements DeepaMehtaService {
      */
     Association instantiateAssociation(AssociationModel model) {
         checkAccess(model);
-        return new AssociationImpl(model, this);
+        return new AssociationImpl(model, pl);
     }
 
     List<Association> instantiateAssociations(List<AssociationModel> models) {
@@ -714,7 +714,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
         checkAccess(model);
-        return new RelatedAssociationImpl(model, this);
+        return new RelatedAssociationImpl(model, pl);
     }
 
     ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
@@ -744,26 +744,6 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     /**
-     * Factory method: creates a new topic in the DB according to the given model
-     * and returns a topic instance.
-     */
-    private Topic topicFactory(TopicModel model, String uriPrefix) {
-        pl.createTopic(model, uriPrefix);
-        return new TopicImpl(model, this);
-    }
-
-    /**
-     * Factory method: creates a new association in the DB according to the given model
-     * and returns an association instance.
-     */
-    private Association associationFactory(AssociationModel model) {
-        pl.createAssociation(model);
-        return new AssociationImpl(model, this);
-    }
-
-    // ---
-
-    /**
      * Factory method: creates a new topic type in the DB according to the given model
      * and returns a topic type instance.
      */
@@ -773,7 +753,7 @@ public class EmbeddedService implements DeepaMehtaService {
         pl.typeStorage.storeType(model);                        // store type-specific parts
         //
         // 2) instantiate
-        TopicType topicType = new TopicTypeImpl(model, this);
+        TopicType topicType = new TopicTypeImpl(model, pl);
         typeCache.putTopicType(topicType);
         //
         return topicType;
@@ -789,7 +769,7 @@ public class EmbeddedService implements DeepaMehtaService {
         pl.typeStorage.storeType(model);                        // store type-specific parts
         //
         // 2) instantiate
-        AssociationType assocType = new AssociationTypeImpl(model, this);
+        AssociationType assocType = new AssociationTypeImpl(model, pl);
         typeCache.putAssociationType(assocType);
         //
         return assocType;
@@ -942,6 +922,6 @@ public class EmbeddedService implements DeepaMehtaService {
         TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
-        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));
+        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, pl));
     }
 }
