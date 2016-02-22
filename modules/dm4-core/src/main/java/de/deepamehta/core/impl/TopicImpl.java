@@ -95,7 +95,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
                                                                                             String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return dms.instantiateRelatedTopics(topics);
+        return pl.instantiateRelatedTopics(topics);
     }
 
     // --- Association Retrieval ---
@@ -105,7 +105,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
                                                                                             String othersAssocTypeUri) {
         RelatedAssociationModel assoc = pl.fetchTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? dms.instantiateRelatedAssociation(assoc) : null;
+        return assoc != null ? pl.instantiateRelatedAssociation(assoc) : null;
     }
 
     @Override
@@ -113,7 +113,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         ResultList<RelatedAssociationModel> assocs = pl.fetchTopicRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return dms.instantiateRelatedAssociations(assocs);
+        return pl.instantiateRelatedAssociations(assocs);
     }
 
     // ---
@@ -123,12 +123,12 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
                                                                                    long othersTopicId) {
         AssociationModel assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId,
             myRoleTypeUri, othersRoleTypeUri);
-        return assoc != null ? dms.instantiateAssociation(assoc) : null;
+        return assoc != null ? pl.instantiateAssociation(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return dms.instantiateAssociations(pl.fetchTopicAssociations(getId()));
+        return pl.instantiateAssociations(pl.fetchTopicAssociations(getId()));
     }
 
 

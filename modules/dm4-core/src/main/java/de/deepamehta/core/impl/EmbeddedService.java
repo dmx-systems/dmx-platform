@@ -99,7 +99,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Topic getTopic(long topicId) {
         try {
-            return instantiateTopic(pl.fetchTopic(topicId));
+            return pl.instantiateTopic(pl.fetchTopic(topicId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -109,7 +109,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Topic getTopic(String key, SimpleValue value) {
         try {
             TopicModel topic = pl.fetchTopic(key, value);
-            return topic != null ? instantiateTopic(topic) : null;
+            return topic != null ? pl.instantiateTopic(topic) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -118,7 +118,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<Topic> getTopics(String key, SimpleValue value) {
         try {
-            return instantiateTopics(pl.fetchTopics(key, value));
+            return pl.instantiateTopics(pl.fetchTopics(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -137,7 +137,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return instantiateTopics(pl.queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return pl.instantiateTopics(pl.queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\")", e);
@@ -182,7 +182,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public Association getAssociation(long assocId) {
         try {
-            return instantiateAssociation(pl.fetchAssociation(assocId));
+            return pl.instantiateAssociation(pl.fetchAssociation(assocId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
         }
@@ -192,7 +192,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public Association getAssociation(String key, SimpleValue value) {
         try {
             AssociationModel assoc = pl.fetchAssociation(key, value);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? pl.instantiateAssociation(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -201,7 +201,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<Association> getAssociations(String key, SimpleValue value) {
         try {
-            return instantiateAssociations(pl.fetchAssociations(key, value));
+            return pl.instantiateAssociations(pl.fetchAssociations(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
                 e);
@@ -215,7 +215,7 @@ public class EmbeddedService implements DeepaMehtaService {
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssociationModel assoc = pl.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? pl.instantiateAssociation(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -230,7 +230,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             AssociationModel assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? pl.instantiateAssociation(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -258,7 +258,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            return instantiateAssociations(pl.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
+            return pl.instantiateAssociations(pl.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
                                                                         // roleTypeUri1=null, roleTypeUri2=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
@@ -311,7 +311,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getTopicTypeUris() {
         try {
-            Topic metaType = instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")));
+            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")));
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type");
             List<String> topicTypeUris = new ArrayList();
@@ -393,7 +393,7 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getAssociationTypeUris() {
         try {
-            Topic metaType = instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")));
+            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")));
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type");
             List<String> assocTypeUris = new ArrayList();
@@ -491,9 +491,9 @@ public class EmbeddedService implements DeepaMehtaService {
     public DeepaMehtaObject getObject(long id) {
         DeepaMehtaObjectModel model = pl.fetchObject(id);
         if (model instanceof TopicModel) {
-            return instantiateTopic((TopicModel) model);
+            return pl.instantiateTopic((TopicModel) model);
         } else if (model instanceof AssociationModel) {
-            return instantiateAssociation((AssociationModel) model);
+            return pl.instantiateAssociation((AssociationModel) model);
         } else {
             throw new RuntimeException("Unexpected model: " + model);
         }
@@ -545,22 +545,22 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return instantiateTopics(pl.fetchTopicsByProperty(propUri, propValue));
+        return pl.instantiateTopics(pl.fetchTopicsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateTopics(pl.fetchTopicsByPropertyRange(propUri, from, to));
+        return pl.instantiateTopics(pl.fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     @Override
     public List<Association> getAssociationsByProperty(String propUri, Object propValue) {
-        return instantiateAssociations(pl.fetchAssociationsByProperty(propUri, propValue));
+        return pl.instantiateAssociations(pl.fetchAssociationsByProperty(propUri, propValue));
     }
 
     @Override
     public List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateAssociations(pl.fetchAssociationsByPropertyRange(propUri, from, to));
+        return pl.instantiateAssociations(pl.fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
     // ---
@@ -647,101 +647,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // === Instantiation ===
-
-    /**
-     * Attaches this core service to a topic model fetched from storage layer.
-     */
-    Topic instantiateTopic(TopicModel model) {
-        checkAccess(model);
-        return new TopicImpl(model, pl);
-    }
-
-    private List<Topic> instantiateTopics(List<TopicModel> models) {
-        List<Topic> topics = new ArrayList();
-        for (TopicModel model : models) {
-            try {
-                topics.add(instantiateTopic(model));
-            } catch (AccessControlException e) {
-                // don't add topic to result and continue
-            }
-        }
-        return topics;
-    }
-
-    // ---
-
-    RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
-        checkAccess(model);
-        return new RelatedTopicImpl(model, pl);
-    }
-
-    ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
-        List<RelatedTopic> relTopics = new ArrayList();
-        for (RelatedTopicModel model : models) {
-            try {
-                relTopics.add(instantiateRelatedTopic(model));
-            } catch (AccessControlException e) {
-                // don't add topic to result and continue
-            }
-        }
-        return new ResultList<RelatedTopic>(relTopics);
-    }
-
-    // ===
-
-    /**
-     * Attaches this core service to an association model fetched from storage layer.
-     */
-    Association instantiateAssociation(AssociationModel model) {
-        checkAccess(model);
-        return new AssociationImpl(model, pl);
-    }
-
-    List<Association> instantiateAssociations(List<AssociationModel> models) {
-        List<Association> assocs = new ArrayList();
-        for (AssociationModel model : models) {
-            try {
-                assocs.add(instantiateAssociation(model));
-            } catch (AccessControlException e) {
-                // don't add association to result and continue
-            }
-        }
-        return assocs;
-    }
-
-    // ---
-
-    RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
-        checkAccess(model);
-        return new RelatedAssociationImpl(model, pl);
-    }
-
-    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
-        ResultList<RelatedAssociation> relAssocs = new ResultList();
-        for (RelatedAssociationModel model : models) {
-            try {
-                relAssocs.add(instantiateRelatedAssociation(model));
-            } catch (AccessControlException e) {
-                // don't add association to result and continue
-            }
-        }
-        return relAssocs;
-    }
-
-
-
     // === Factory ===
-
-    private void checkAccess(TopicModel model) {
-        fireEvent(CoreEvent.PRE_GET_TOPIC, model.getId());          // throws AccessControlException
-    }
-
-    private void checkAccess(AssociationModel model) {
-        fireEvent(CoreEvent.PRE_GET_ASSOCIATION, model.getId());    // throws AccessControlException
-    }
-
-    // ---
 
     /**
      * Factory method: creates a new topic type in the DB according to the given model

@@ -1,14 +1,22 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.RelatedAssociationModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Directives;
+import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -178,5 +186,99 @@ public class PersistenceLayer extends StorageDecorator {
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }
+    }
+
+
+
+    // === Instantiation ===
+
+    // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
+    // Call these methods when passing objects fetched from the DB to the user.
+    // ### TODO: make these private?
+
+    Topic instantiateTopic(TopicModel model) {
+        checkReadAccess(model);
+        return new TopicImpl(model, this);
+    }
+
+    List<Topic> instantiateTopics(List<TopicModel> models) {
+        List<Topic> topics = new ArrayList();
+        for (TopicModel model : models) {
+            try {
+                topics.add(instantiateTopic(model));
+            } catch (AccessControlException e) {
+                // don't add to result and continue
+            }
+        }
+        return topics;
+    }
+
+    // ---
+
+    RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
+        checkReadAccess(model);
+        return new RelatedTopicImpl(model, this);
+    }
+
+    ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
+        List<RelatedTopic> relTopics = new ArrayList();
+        for (RelatedTopicModel model : models) {
+            try {
+                relTopics.add(instantiateRelatedTopic(model));
+            } catch (AccessControlException e) {
+                // don't add to result and continue
+            }
+        }
+        return new ResultList<RelatedTopic>(relTopics);
+    }
+
+    // ---
+
+    Association instantiateAssociation(AssociationModel model) {
+        checkReadAccess(model);
+        return new AssociationImpl(model, this);
+    }
+
+    List<Association> instantiateAssociations(List<AssociationModel> models) {
+        List<Association> assocs = new ArrayList();
+        for (AssociationModel model : models) {
+            try {
+                assocs.add(instantiateAssociation(model));
+            } catch (AccessControlException e) {
+                // don't add to result and continue
+            }
+        }
+        return assocs;
+    }
+
+    // ---
+
+    RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
+        checkReadAccess(model);
+        return new RelatedAssociationImpl(model, this);
+    }
+
+    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
+        ResultList<RelatedAssociation> relAssocs = new ResultList();
+        for (RelatedAssociationModel model : models) {
+            try {
+                relAssocs.add(instantiateRelatedAssociation(model));
+            } catch (AccessControlException e) {
+                // don't add to result and continue
+            }
+        }
+        return relAssocs;
+    }
+
+
+
+    // === Access Control ===
+
+    private void checkReadAccess(TopicModel model) {
+        em.fireEvent(CoreEvent.PRE_GET_TOPIC, model.getId());          // throws AccessControlException
+    }
+
+    private void checkReadAccess(AssociationModel model) {
+        em.fireEvent(CoreEvent.PRE_GET_ASSOCIATION, model.getId());    // throws AccessControlException
     }
 }

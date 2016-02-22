@@ -231,7 +231,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
                                                                                    String othersTopicTypeUri) {
         RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         // fetchRelatedTopic() is abstract
-        return topic != null ? dms.instantiateRelatedTopic(topic) : null;
+        return topic != null ? pl.instantiateRelatedTopic(topic) : null;
     }
 
     @Override
@@ -244,7 +244,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);    // fetchRelatedTopics() is abstract
-        return dms.instantiateRelatedTopics(topics);
+        return pl.instantiateRelatedTopics(topics);
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):
@@ -262,12 +262,12 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public Object getProperty(String propUri) {
-        return dms.getProperty(getId(), propUri);
+        return pl.fetchProperty(getId(), propUri);
     }
 
     @Override
     public boolean hasProperty(String propUri) {
-        return dms.hasProperty(getId(), propUri);
+        return pl.hasProperty(getId(), propUri);
     }
 
     // Note: these methods are implemented in the subclasses:
