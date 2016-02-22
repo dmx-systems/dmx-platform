@@ -175,10 +175,10 @@ public class CoreActivator implements BundleActivator {
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-            PersistenceLayer pl = new PersistenceLayer(storageService);
-            ((ModelFactoryImpl) getService(ModelFactory.class)).setPersistenceLayer(pl);
-            bundleContext.registerService(DeepaMehtaService.class.getName(), new EmbeddedService(pl, bundleContext),
-                null);
+            bundleContext.registerService(DeepaMehtaService.class.getName(),
+                new EmbeddedService(new PersistenceLayer(storageService), bundleContext),
+                null
+            );
         }
     }
 }

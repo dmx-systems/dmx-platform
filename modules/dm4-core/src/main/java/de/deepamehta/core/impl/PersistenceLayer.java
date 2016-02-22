@@ -26,11 +26,11 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    EventManager em;
-    ModelFactory mf;
-
     TypeStorageImpl typeStorage;
     ValueStorage valueStorage;
+
+    EventManager em;
+    ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -40,10 +40,14 @@ public class PersistenceLayer extends StorageDecorator {
         super(storage);
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
-        this.mf = storage.getModelFactory();
+        this.mf = (ModelFactoryImpl) storage.getModelFactory();
         //
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
+        //
+        // Note: this is a constructor side effect. This is a cyclic dependency. This is very nasty.
+        // ### TODO: explain why we do it.
+        mf.pl = this;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

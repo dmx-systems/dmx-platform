@@ -47,7 +47,7 @@ public class Neo4jStorageTest {
     public void setup() {
         mf = new ModelFactoryImpl();
         storage = new Neo4jStorageFactory().newDeepaMehtaStorage(createTempDirectory("neo4j-test-"), mf);
-        mf.setPersistenceLayer(new PersistenceLayer(storage));
+        new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
         setupContent();
     }
 

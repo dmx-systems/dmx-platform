@@ -48,7 +48,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private PersistenceLayer pl;
+    PersistenceLayer pl;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -824,13 +824,5 @@ public class ModelFactoryImpl implements ModelFactory {
         } catch (Exception e) {
             throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
         }
-    }
-
-
-
-    // ===
-
-    public void setPersistenceLayer(PersistenceLayer pl) {
-        this.pl = pl;
     }
 }

@@ -39,9 +39,7 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dm4-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        PersistenceLayer pl = new PersistenceLayer(storage);
-        mf.setPersistenceLayer(pl);
-        dms = new EmbeddedService(pl, null);     // bundleContext=null
+        dms = new EmbeddedService(new PersistenceLayer(storage), null);     // bundleContext=null
     }
 
     @After
