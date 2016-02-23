@@ -89,55 +89,32 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Topic getTopic(long topicId) {
-        try {
-            return pl.instantiateTopic(pl.fetchTopic(topicId));
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic " + topicId + " failed", e);
-        }
+        return pl.getTopic(topicId);
     }
 
     @Override
     public Topic getTopic(String key, SimpleValue value) {
-        try {
-            TopicModel topic = pl.fetchTopic(key, value);
-            return topic != null ? pl.instantiateTopic(topic) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
-        }
+        return pl.getTopic(key, value);
     }
 
     @Override
     public List<Topic> getTopics(String key, SimpleValue value) {
-        try {
-            return pl.instantiateTopics(pl.fetchTopics(key, value));
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
-        }
+        return pl.getTopics(key, value);
     }
 
     @Override
     public ResultList<RelatedTopic> getTopics(String topicTypeUri) {
-        try {
-            return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", topicTypeUri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
-        }
+        return pl.getTopics(topicTypeUri);
     }
 
     @Override
     public List<Topic> searchTopics(String searchTerm, String fieldUri) {
-        try {
-            return pl.instantiateTopics(pl.queryTopics(fieldUri, new SimpleValue(searchTerm)));
-        } catch (Exception e) {
-            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
-                fieldUri + "\")", e);
-        }
+        return pl.searchTopics(searchTerm, fieldUri);
     }
 
     @Override
     public Iterable<Topic> getAllTopics() {
-        return new TopicIterable(this);
+        return pl.getAllTopics();
     }
 
     // ---
@@ -172,101 +149,59 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association getAssociation(long assocId) {
-        try {
-            return pl.instantiateAssociation(pl.fetchAssociation(assocId));
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association " + assocId + " failed", e);
-        }
+        return pl.getAssociation(assocId);
     }
 
     @Override
     public Association getAssociation(String key, SimpleValue value) {
-        try {
-            AssociationModel assoc = pl.fetchAssociation(key, value);
-            return assoc != null ? pl.instantiateAssociation(assoc) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
-        }
+        return pl.getAssociation(key, value);
     }
 
     @Override
     public List<Association> getAssociations(String key, SimpleValue value) {
-        try {
-            return pl.instantiateAssociations(pl.fetchAssociations(key, value));
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
-                e);
-        }
+        return pl.getAssociations(key, value);
     }
 
     @Override
     public Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
                                                            String roleTypeUri1, String roleTypeUri2) {
-        String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
-            ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
-        try {
-            AssociationModel assoc = pl.fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? pl.instantiateAssociation(assoc) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (" + info + ")", e);
-        }
+        return pl.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     @Override
     public Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                 String topicRoleTypeUri, String assocRoleTypeUri) {
-        String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
-            ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
-        logger.info(info);
-        try {
-            AssociationModel assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
-                topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? pl.instantiateAssociation(assoc) : null;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association failed (" + info + ")", e);
-        }
+        return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId, topicRoleTypeUri,
+            assocRoleTypeUri);
     }
 
     // ---
 
     @Override
     public ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
-        try {
-            return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
-                "dm4.core.type", "dm4.core.instance", assocTypeUri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
-                e);
-        }
+        return pl.getAssociations(assocTypeUri);
     }
 
     @Override
     public List<Association> getAssociations(long topic1Id, long topic2Id) {
-        return getAssociations(topic1Id, topic2Id, null);
+        return pl.getAssociations(topic1Id, topic2Id);
     }
 
     @Override
     public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
-        try {
-            return pl.instantiateAssociations(pl.fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
-                                                                        // roleTypeUri1=null, roleTypeUri2=null
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
-        }
+        return pl.getAssociations(topic1Id, topic2Id, assocTypeUri);
     }
 
     // ---
 
     @Override
     public Iterable<Association> getAllAssociations() {
-        return new AssociationIterable(this);
+        return pl.getAllAssociations();
     }
 
     @Override
     public long[] getPlayerIds(long assocId) {
-        return pl.fetchPlayerIds(assocId);
+        return pl.getPlayerIds(assocId);
     }
 
     // ---

@@ -2,7 +2,6 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -70,12 +69,12 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     @Override
     final void putInTypeCache() {
-        dms.typeCache.putAssociationType(this);
+        pl.typeCache.putAssociationType(this);
     }
 
     @Override
     final void removeFromTypeCache() {
-        dms.typeCache.removeAssociationType(getUri());
+        pl.typeCache.removeAssociationType(getUri());
     }
 
     // ---
@@ -87,6 +86,6 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
-        return dms.getAssociations(getUri()).getItems();
+        return pl.getAssociations(getUri()).getItems();
     }
 }

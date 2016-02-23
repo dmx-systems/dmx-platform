@@ -18,8 +18,8 @@ class TopicIterable implements Iterable<Topic> {
 
     private Iterator<Topic> topics;
 
-    TopicIterable(EmbeddedService dms) {
-        this.topics = new TopicIterator(dms);
+    TopicIterable(PersistenceLayer pl) {
+        this.topics = new TopicIterator(pl);
     }
 
     @Override
@@ -35,8 +35,8 @@ class AssociationIterable implements Iterable<Association> {
 
     private Iterator<Association> assocs;
 
-    AssociationIterable(EmbeddedService dms) {
-        this.assocs = new AssociationIterator(dms);
+    AssociationIterable(PersistenceLayer pl) {
+        this.assocs = new AssociationIterator(pl);
     }
 
     @Override
@@ -53,18 +53,18 @@ class AssociationIterable implements Iterable<Association> {
 
 class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
-    TopicIterator(EmbeddedService dms) {
-        super(dms);
+    TopicIterator(PersistenceLayer pl) {
+        super(pl);
     }
 
     @Override
     Iterator<TopicModel> fetchObjects() {
-        return dms.pl.fetchAllTopics();
+        return pl.fetchAllTopics();
     }
 
     @Override
     Topic instantiateObject(TopicModel model) {
-        return dms.pl.instantiateTopic(model);
+        return pl.instantiateTopic(model);
     }
 }
 
@@ -72,18 +72,18 @@ class TopicIterator extends ObjectIterator<Topic, TopicModel> {
 
 class AssociationIterator extends ObjectIterator<Association, AssociationModel> {
 
-    AssociationIterator(EmbeddedService dms) {
-        super(dms);
+    AssociationIterator(PersistenceLayer pl) {
+        super(pl);
     }
 
     @Override
     Iterator<AssociationModel> fetchObjects() {
-        return dms.pl.fetchAllAssociations();
+        return pl.fetchAllAssociations();
     }
 
     @Override
     Association instantiateObject(AssociationModel model) {
-        return dms.pl.instantiateAssociation(model);
+        return pl.instantiateAssociation(model);
     }
 }
 
@@ -93,13 +93,13 @@ abstract class ObjectIterator<O extends DeepaMehtaObject, M extends DeepaMehtaOb
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected EmbeddedService dms;
+    protected PersistenceLayer pl;
     private Iterator<M> objects;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ObjectIterator(EmbeddedService dms) {
-        this.dms = dms;
+    ObjectIterator(PersistenceLayer pl) {
+        this.pl = pl;
         this.objects = fetchObjects();
     }
 

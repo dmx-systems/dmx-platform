@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Directive;
@@ -70,12 +69,12 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
 
     @Override
     final void putInTypeCache() {
-        dms.typeCache.putTopicType(this);
+        pl.typeCache.putTopicType(this);
     }
 
     @Override
     final void removeFromTypeCache() {
-        dms.typeCache.removeTopicType(getUri());
+        pl.typeCache.removeTopicType(getUri());
     }
 
     // ---
@@ -87,6 +86,6 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
 
     @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
-        return dms.getTopics(getUri()).getItems();
+        return pl.getTopics(getUri()).getItems();
     }
 }

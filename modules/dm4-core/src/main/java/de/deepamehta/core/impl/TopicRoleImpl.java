@@ -35,9 +35,9 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
     @Override
     public DeepaMehtaObject getPlayer() {
         if (topicIdentifiedByUri()) {
-            return dms.getTopic("uri", new SimpleValue(getTopicUri()));
+            return pl.getTopic("uri", new SimpleValue(getTopicUri()));
         } else {
-            return dms.getTopic(getPlayerId());
+            return pl.getTopic(getPlayerId());
         }
     }
 

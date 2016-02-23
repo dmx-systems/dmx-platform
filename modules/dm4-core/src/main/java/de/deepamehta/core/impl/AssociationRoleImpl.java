@@ -26,7 +26,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        return dms.getAssociation(getPlayerId());
+        return pl.getAssociation(getPlayerId());
     }
 
 

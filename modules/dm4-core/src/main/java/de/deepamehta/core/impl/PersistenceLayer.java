@@ -12,6 +12,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Directives;
@@ -65,6 +66,59 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+
+
+    // === Topics ===
+
+    Topic getTopic(long topicId) {
+        try {
+            return instantiateTopic(fetchTopic(topicId));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic " + topicId + " failed", e);
+        }
+    }
+
+    Topic getTopic(String key, SimpleValue value) {
+        try {
+            TopicModel topic = fetchTopic(key, value);
+            return topic != null ? instantiateTopic(topic) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+        }
+    }
+
+    List<Topic> getTopics(String key, SimpleValue value) {
+        try {
+            return instantiateTopics(fetchTopics(key, value));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+        }
+    }
+
+    ResultList<RelatedTopic> getTopics(String topicTypeUri) {
+        try {
+            return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+                "dm4.core.instance", topicTypeUri);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
+        }
+    }
+
+    List<Topic> searchTopics(String searchTerm, String fieldUri) {
+        try {
+            return instantiateTopics(queryTopics(fieldUri, new SimpleValue(searchTerm)));
+        } catch (Exception e) {
+            throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
+                fieldUri + "\")", e);
+        }
+    }
+
+    Iterable<Topic> getAllTopics() {
+        return new TopicIterable(this);
+    }
+
+    // ---
+
     /**
      * Convenience.
      */
@@ -83,6 +137,99 @@ public class PersistenceLayer extends StorageDecorator {
             throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
                 "\")", e);
         }
+    }
+
+
+
+    // === Associations ===
+
+    Association getAssociation(long assocId) {
+        try {
+            return instantiateAssociation(fetchAssociation(assocId));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association " + assocId + " failed", e);
+        }
+    }
+
+    Association getAssociation(String key, SimpleValue value) {
+        try {
+            AssociationModel assoc = fetchAssociation(key, value);
+            return assoc != null ? instantiateAssociation(assoc) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
+        }
+    }
+
+    List<Association> getAssociations(String key, SimpleValue value) {
+        try {
+            return instantiateAssociations(fetchAssociations(key, value));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
+                e);
+        }
+    }
+
+    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
+                                                           String roleTypeUri1, String roleTypeUri2) {
+        String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
+            ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
+        try {
+            AssociationModel assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            return assoc != null ? instantiateAssociation(assoc) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association failed (" + info + ")", e);
+        }
+    }
+
+    Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
+                                                                String topicRoleTypeUri, String assocRoleTypeUri) {
+        String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
+            ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
+        logger.info(info);
+        try {
+            AssociationModel assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+                topicRoleTypeUri, assocRoleTypeUri);
+            return assoc != null ? instantiateAssociation(assoc) : null;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association failed (" + info + ")", e);
+        }
+    }
+
+    // ---
+
+    ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
+        try {
+            return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
+                "dm4.core.type", "dm4.core.instance", assocTypeUri);
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
+                e);
+        }
+    }
+
+    List<Association> getAssociations(long topic1Id, long topic2Id) {
+        return getAssociations(topic1Id, topic2Id, null);
+    }
+
+    List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
+        logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
+        try {
+            return instantiateAssociations(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
+                                                                    // roleTypeUri1=null, roleTypeUri2=null
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
+                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+        }
+    }
+
+    // ---
+
+    Iterable<Association> getAllAssociations() {
+        return new AssociationIterable(this);
+    }
+
+    long[] getPlayerIds(long assocId) {
+        return fetchPlayerIds(assocId);
     }
 
     // ---
