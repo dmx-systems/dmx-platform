@@ -126,21 +126,12 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public void updateTopic(TopicModel model) {
-        try {
-            getTopic(model.getId()).update(model);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
-                "\")", e);
-        }
+        pl.updateTopic(model);
     }
 
     @Override
     public void deleteTopic(long topicId) {
-        try {
-            pl.deleteObject((DeepaMehtaObjectModelImpl) pl.fetchTopic(topicId));
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
-        }
+        pl.deleteTopic(topicId);
     }
 
 
@@ -213,21 +204,12 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public void updateAssociation(AssociationModel model) {
-        try {
-            getAssociation(model.getId()).update(model);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
-                model.getTypeUri() + "\")", e);
-        }
+        pl.updateAssociation(model);
     }
 
     @Override
     public void deleteAssociation(long assocId) {
-        try {
-            pl.deleteObject((DeepaMehtaObjectModelImpl) pl.fetchAssociation(assocId));
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting association " + assocId + " failed", e);
-        }
+        pl.deleteAssociation(assocId);
     }
 
 

@@ -44,8 +44,8 @@ class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
      */
-    final TopicModel fetchTopic(long topicId) {
-        return storage.fetchTopic(topicId);
+    final TopicModelImpl fetchTopic(long topicId) {
+        return (TopicModelImpl) storage.fetchTopic(topicId);
     }
 
     /**
@@ -139,7 +139,7 @@ class StorageDecorator {
      * <p>
      * Prerequisite: the topic has no relations.
      */
-    final void deleteTopic(long topicId) {
+    final void _deleteTopic(long topicId) {
         storage.deleteTopic(topicId);
     }
 
@@ -147,8 +147,8 @@ class StorageDecorator {
 
     // === Associations ===
 
-    final AssociationModel fetchAssociation(long assocId) {
-        return storage.fetchAssociation(assocId);
+    final AssociationModelImpl fetchAssociation(long assocId) {
+        return (AssociationModelImpl) storage.fetchAssociation(assocId);
     }
 
     /**
@@ -288,7 +288,7 @@ class StorageDecorator {
         storage.storeAssociation(model);
     }
 
-    final void deleteAssociation(long assocId) {
+    final void _deleteAssociation(long assocId) {
         storage.deleteAssociation(assocId);
     }
 

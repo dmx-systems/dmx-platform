@@ -199,7 +199,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     void delete() {
-        pl.deleteAssociation(id);
+        pl._deleteAssociation(id);
     }
 
     // ---

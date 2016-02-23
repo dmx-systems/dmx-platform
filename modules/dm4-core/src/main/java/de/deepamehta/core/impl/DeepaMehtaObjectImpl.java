@@ -180,6 +180,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // === Updating ===
 
+    // ### TODO: refactoring. Move update logic to PersistenceLayer (or ValueStorage?).
     @Override
     public void update(DeepaMehtaObjectModel newModel) {
         updateUri(newModel.getUri());

@@ -99,7 +99,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
 
     @Override
     void delete() {
-        pl.deleteTopic(id);
+        pl._deleteTopic(id);
     }
 
     // ---
