@@ -399,7 +399,7 @@ public class PersistenceLayer extends StorageDecorator {
      */
     void deleteObject(DeepaMehtaObjectModelImpl object) {
         try {
-            em.fireEvent(object.getPreDeleteEvent(), object);
+            em.fireEvent(object.getPreDeleteEvent(), object.instantiate());
             //
             // 1) delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
@@ -419,7 +419,7 @@ public class PersistenceLayer extends StorageDecorator {
             Directives.get().add(object.getDeleteDirective(), object);
             object.delete();
             //
-            em.fireEvent(object.getPostDeleteEvent(), object);  // ### FIXME: adapt listener
+            em.fireEvent(object.getPostDeleteEvent(), object);
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + object.className() + " failed (" + object + ")", e);
         }

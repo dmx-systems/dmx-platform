@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -219,6 +220,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     String className() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaObject instantiate() {
         throw new UnsupportedOperationException();
     }
 

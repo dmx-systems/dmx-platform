@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -158,6 +159,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     @Override
     String className() {
         return "association";
+    }
+
+    @Override
+    DeepaMehtaObject instantiate() {
+        return new AssociationImpl(this, pl);
     }
 
     // ---

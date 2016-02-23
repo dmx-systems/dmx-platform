@@ -165,7 +165,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostDeleteTopicListener) listener).postDeleteTopic(
-                (Topic) params[0]
+                (TopicModel) params[0]
             );
         }
     };
@@ -174,7 +174,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostDeleteAssociationListener) listener).postDeleteAssociation(
-                (Association) params[0]
+                (AssociationModel) params[0]
             );
         }
     };
