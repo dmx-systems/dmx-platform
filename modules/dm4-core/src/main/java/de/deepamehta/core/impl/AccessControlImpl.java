@@ -67,16 +67,16 @@ class AccessControlImpl implements AccessControl {
         }
     };
 
-    private EmbeddedService dms;
+    private PersistenceLayer pl;
     private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AccessControlImpl(EmbeddedService dms) {
-        this.dms = dms;
-        this.mf = dms.mf;
+    AccessControlImpl(PersistenceLayer pl) {
+        this.pl = pl;
+        this.mf = pl.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -131,7 +131,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public String getCreator(long objectId) {
-        return dms.hasProperty(objectId, PROP_CREATOR) ? (String) dms.getProperty(objectId, PROP_CREATOR) : null;
+        return pl.hasProperty(objectId, PROP_CREATOR) ? (String) pl.fetchProperty(objectId, PROP_CREATOR) : null;
     }
 
 
@@ -140,7 +140,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getWorkspace(String uri) {
-        Topic workspace = dms.getTopic("uri", new SimpleValue(uri));
+        Topic workspace = pl.getTopic("uri", new SimpleValue(uri));
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }
@@ -182,8 +182,8 @@ class AccessControlImpl implements AccessControl {
     public long getAssignedWorkspaceId(long objectId) {
         long workspaceId = -1;
         try {
-            if (dms.hasProperty(objectId, PROP_WORKSPACE_ID)) {
-                workspaceId = (Long) dms.getProperty(objectId, PROP_WORKSPACE_ID);
+            if (pl.hasProperty(objectId, PROP_WORKSPACE_ID)) {
+                workspaceId = (Long) pl.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
@@ -195,13 +195,12 @@ class AccessControlImpl implements AccessControl {
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
         try {
-            // 1) create assignment association
-            // ### TODO: we pass event firing here. Is this still necessary?
-            dms.pl._createAssociation(mf.newAssociationModel("dm4.core.aggregation",
+            // create assignment association
+            pl.createAssociation("dm4.core.aggregation",
                 object.getModel().createRoleModel("dm4.core.parent"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.child")
-            ));
-            // 2) store assignment property
+            );
+            // store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
@@ -278,7 +277,7 @@ class AccessControlImpl implements AccessControl {
         if (workspaceId == -1) {
             throw new RuntimeException("User \"" + username + "\" has no private workspace");
         }
-        return instantiate(dms.pl.fetchTopic(workspaceId));
+        return instantiate(pl.fetchTopic(workspaceId));
     }
 
     @Override
@@ -288,7 +287,7 @@ class AccessControlImpl implements AccessControl {
                 return false;
             }
             // Note: direct storage access is required here
-            AssociationModel membership = dms.pl.fetchAssociation(TYPE_MEMBERSHIP,
+            AssociationModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP,
                 _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
             return membership != null;
         } catch (Exception e) {
@@ -304,13 +303,13 @@ class AccessControlImpl implements AccessControl {
     @Override
     public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
         try {
-            RelatedTopicModel configTopic = dms.pl.fetchTopicRelatedTopic(topicId,
-                ASSOC_TYPE_CONFIGURATION, ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
+            RelatedTopicModel configTopic = pl.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
+                ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
             if (configTopic == null) {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
                     " is missing");
             }
-            return new RelatedTopicImpl(configTopic, dms.pl);
+            return new RelatedTopicImpl(configTopic, pl);
         } catch (Exception e) {
             throw new RuntimeException("Getting the \"" + configTypeUri + "\" configuration topic for topic " +
                 topicId + " failed", e);
@@ -353,8 +352,8 @@ class AccessControlImpl implements AccessControl {
     private TopicModel _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModel userAccount = dms.pl.fetchTopicRelatedTopic(usernameTopic.getId(),
-            "dm4.core.composition", "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
+        RelatedTopicModel userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dm4.core.composition",
+            "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
                 usernameTopic.getSimpleValue() + "\" (usernameTopic=" + usernameTopic + ")");
@@ -368,8 +367,8 @@ class AccessControlImpl implements AccessControl {
     private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = dms.pl.fetchTopicRelatedTopic(userAccount.getId(),
-            "dm4.core.composition", "dm4.core.parent", "dm4.core.child", "dm4.accesscontrol.password");
+        RelatedTopicModel password = pl.fetchTopicRelatedTopic(userAccount.getId(), "dm4.core.composition",
+            "dm4.core.parent", "dm4.core.child", "dm4.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
                 userAccount.getSimpleValue() + "\" (userAccount=" + userAccount + ")");
@@ -477,8 +476,8 @@ class AccessControlImpl implements AccessControl {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = dms.pl.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.sharing_mode");
+        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation", "dm4.core.parent",
+            "dm4.core.child", "dm4.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
@@ -496,8 +495,8 @@ class AccessControlImpl implements AccessControl {
     // ---
 
     private boolean isTopicmapPrivate(long topicmapId) {
-        TopicModel privateFlag = dms.pl.fetchTopicRelatedTopic(topicmapId, "dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", "dm4.topicmaps.private");
+        TopicModel privateFlag = pl.fetchTopicRelatedTopic(topicmapId, "dm4.core.composition", "dm4.core.parent",
+            "dm4.core.child", "dm4.topicmaps.private");
         if (privateFlag == null) {
             // Note: migrated topicmaps might not have a Private child topic ### TODO: throw exception?
             return false;   // treat as non-private
@@ -513,15 +512,15 @@ class AccessControlImpl implements AccessControl {
 
     private String getOwner(long workspaceId) {
         // Note: direct storage access is required here
-        if (!dms.pl.hasProperty(workspaceId, PROP_OWNER)) {
+        if (!pl.hasProperty(workspaceId, PROP_OWNER)) {
             throw new RuntimeException("No owner is assigned to workspace " + workspaceId);
         }
-        return (String) dms.pl.fetchProperty(workspaceId, PROP_OWNER);
+        return (String) pl.fetchProperty(workspaceId, PROP_OWNER);
     }
 
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
-        return (String) dms.pl.fetchProperty(objectId, "type_uri");
+        return (String) pl.fetchProperty(objectId, "type_uri");
     }
 
     // ---
@@ -550,7 +549,7 @@ class AccessControlImpl implements AccessControl {
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
     private TopicModel fetchTopic(String key, Object value) {
-        return dms.pl.fetchTopic(key, new SimpleValue(value));
+        return pl.fetchTopic(key, new SimpleValue(value));
     }
 
     /**
@@ -562,7 +561,7 @@ class AccessControlImpl implements AccessControl {
      * @return  a list, possibly empty.
      */
     private List<TopicModel> queryTopics(String key, Object value) {
-        return dms.pl.queryTopics(key, new SimpleValue(value));
+        return pl.queryTopics(key, new SimpleValue(value));
     }
 
     // ---
@@ -571,7 +570,7 @@ class AccessControlImpl implements AccessControl {
      * Instantiates a topic without performing permission check.
      */
     private Topic instantiate(TopicModel model) {
-        return new TopicImpl(model, dms.pl);
+        return new TopicImpl(model, pl);
     }
 
 

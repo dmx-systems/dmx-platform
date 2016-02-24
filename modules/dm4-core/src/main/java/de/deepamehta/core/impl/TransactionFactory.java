@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -23,7 +22,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaService dms;
+    private PersistenceLayer pl;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -33,8 +32,8 @@ class TransactionFactory implements ResourceFilterFactory {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TransactionFactory(DeepaMehtaService dms) {
-        this.dms = dms;
+    TransactionFactory(PersistenceLayer pl) {
+        this.pl = pl;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -75,7 +74,7 @@ class TransactionFactory implements ResourceFilterFactory {
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
                     logger.fine("### Begining transaction of " + info(method));
-                    DeepaMehtaTransaction tx = dms.beginTx();
+                    DeepaMehtaTransaction tx = pl.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
                 }
@@ -88,8 +87,8 @@ class TransactionFactory implements ResourceFilterFactory {
 
                 @Override
                 public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-                    boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
                     DeepaMehtaTransaction tx = threadLocalTransaction.get();
+                    boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
                     if (success) {
                         logger.fine("### Comitting transaction of " + info(method));
                         tx.success();

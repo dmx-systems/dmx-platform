@@ -7,7 +7,6 @@ import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.DirectivesResponse;
 
@@ -26,14 +25,14 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaService dms;
+    private EventManager em;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(DeepaMehtaService dms) {
-        this.dms = dms;
+    JerseyResponseFilter(EventManager em) {
+        this.em = em;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -41,7 +40,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     @Override
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
         try {
-            dms.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
+            em.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
             boolean includeChilds = getIncludeChilds(request);
@@ -136,13 +135,13 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     private void firePreSend(DeepaMehtaObject object) {
         if (object instanceof TopicType) {                  // Note: must take precedence over topic
-            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, object);
+            em.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, object);
         } else if (object instanceof AssociationType) {     // Note: must take precedence over topic
-            dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, object);
+            em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION_TYPE, object);
         } else if (object instanceof Topic) {
-            dms.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);
+            em.fireEvent(CoreEvent.PRE_SEND_TOPIC, object);
         } else if (object instanceof Association) {
-            dms.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, object);
+            em.fireEvent(CoreEvent.PRE_SEND_ASSOCIATION, object);
         }
     }
 

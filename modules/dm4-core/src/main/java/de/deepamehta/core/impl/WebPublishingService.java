@@ -51,25 +51,25 @@ class WebPublishingService {
     private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
-    private DeepaMehtaService dms;
+    private PersistenceLayer pl;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(DeepaMehtaService dms) {
+    WebPublishingService(PersistenceLayer pl) {
         try {
             logger.info("Setting up the WebPublishingService");
-            this.dms = dms;
+            this.pl = pl;
             //
             // create Jersey application
             this.jerseyApplication = new DefaultResourceConfig();
             //
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(dms));
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(dms));
-            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(dms));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(pl.em));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(pl.em));
+            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(pl));
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);
@@ -272,7 +272,7 @@ class WebPublishingService {
 
     private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            dms.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
+            pl.em.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
             return true;
         } catch (Throwable e) {
             // Note: resourceRequestFilter() is called from an OSGi HTTP service static resource HttpContext.

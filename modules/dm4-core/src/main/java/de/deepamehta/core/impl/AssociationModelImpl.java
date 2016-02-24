@@ -205,6 +205,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
+    DeepaMehtaEvent getPreGetEvent() {
+        return CoreEvent.PRE_GET_ASSOCIATION;
+    }
+
+    @Override
     DeepaMehtaEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_ASSOCIATION;
     }

@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -9,6 +10,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -126,11 +128,27 @@ public class PersistenceLayer extends StorageDecorator {
         return createTopic(model, null);    // uriPrefix=null
     }
 
+    /**
+     * Creates a new topic in the DB.
+     */
     Topic createTopic(TopicModel model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            _createTopic((TopicModelImpl) model, uriPrefix);
+            //
+            // 1) store in DB
+            storeTopic(model);
+            valueStorage.storeValue(model);
+            createTopicInstantiation(model.getId(), model.getTypeUri());
+            // 2) set default URI
+            // If no URI is given the topic gets a default URI based on its ID, if requested.
+            // Note: this must be done *after* the topic is stored. The ID is not known before.
+            // Note: in case no URI was given: once stored a topic's URI is empty (not null).
+            if (uriPrefix != null && model.getUri().equals("")) {
+                ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
+            }
+            // 3) instantiate
             Topic topic = new TopicImpl(model, this);
+            //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
         } catch (Exception e) {
@@ -256,11 +274,20 @@ public class PersistenceLayer extends StorageDecorator {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
+    /**
+     * Creates a new association in the DB.
+     */
     Association createAssociation(AssociationModel model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
-            _createAssociation(model);
+            //
+            // 1) store in DB
+            storeAssociation(model);
+            valueStorage.storeValue(model);
+            createAssociationInstantiation(model.getId(), model.getTypeUri());
+            // 2) instantiate
             Association assoc = new AssociationImpl(model, this);
+            //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;
         } catch (Exception e) {
@@ -286,37 +313,6 @@ public class PersistenceLayer extends StorageDecorator {
 
 
     // ===
-
-    /**
-     * Creates a new topic in the DB.
-     */
-    private void _createTopic(TopicModelImpl model, String uriPrefix) {
-        // 1) store in DB
-        storeTopic(model);
-        valueStorage.storeValue(model);
-        createTopicInstantiation(model.getId(), model.getTypeUri());
-        //
-        // 2) set default URI
-        // If no URI is given the topic gets a default URI based on its ID, if requested.
-        // Note: this must be done *after* the topic is stored. The ID is not known before.
-        // Note: in case no URI was given: once stored a topic's URI is empty (not null).
-        if (uriPrefix != null && model.getUri().equals("")) {
-            model.updateUri(uriPrefix + model.getId());
-        }
-    }
-
-    /**
-     * Creates a new association in the DB.
-     * ### TODO: should be private. Currently called from AccessControlImpl.assignToWorkspace().
-     */
-    void _createAssociation(AssociationModel model) {
-        // 1) store in DB
-        storeAssociation(model);
-        valueStorage.storeValue(model);
-        createAssociationInstantiation(model.getId(), model.getTypeUri());
-    }
-
-    // ---
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
@@ -423,6 +419,12 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ===
 
+    DeepaMehtaObject getObject(long id) {
+        DeepaMehtaObjectModelImpl model = fetchObject(id);
+        checkReadAccess(model);
+        return model.instantiate();
+    }
+
     /**
      * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
      * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
@@ -478,6 +480,26 @@ public class PersistenceLayer extends StorageDecorator {
             throw new RuntimeException("Deleting " + object.className() + " " + object.getId() + " failed (" +
                 object + ")", e);
         }
+    }
+
+
+
+    // === Properties ===
+
+    List<Topic> getTopicsByProperty(String propUri, Object propValue) {
+        return instantiateTopics(fetchTopicsByProperty(propUri, propValue));
+    }
+
+    List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return instantiateTopics(fetchTopicsByPropertyRange(propUri, from, to));
+    }
+
+    List<Association> getAssociationsByProperty(String propUri, Object propValue) {
+        return instantiateAssociations(fetchAssociationsByProperty(propUri, propValue));
+    }
+
+    List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
+        return instantiateAssociations(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
 
@@ -566,12 +588,11 @@ public class PersistenceLayer extends StorageDecorator {
 
     // === Access Control ===
 
-    private void checkReadAccess(TopicModel model) {
-        em.fireEvent(CoreEvent.PRE_GET_TOPIC, model.getId());          // throws AccessControlException
-    }
-
-    private void checkReadAccess(AssociationModel model) {
-        em.fireEvent(CoreEvent.PRE_GET_ASSOCIATION, model.getId());    // throws AccessControlException
+    /**
+     * @throws  AccessControlException
+     */
+    private void checkReadAccess(DeepaMehtaObjectModel model) {
+        em.fireEvent(((DeepaMehtaObjectModelImpl) model).getPreGetEvent(), model.getId());
     }
 
 

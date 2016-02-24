@@ -296,8 +296,8 @@ class StorageDecorator {
 
     // === Generic Object ===
 
-    final DeepaMehtaObjectModel fetchObject(long id) {
-        return storage.fetchObject(id);
+    final DeepaMehtaObjectModelImpl fetchObject(long id) {
+        return (DeepaMehtaObjectModelImpl) storage.fetchObject(id);
     }
 
 

@@ -69,8 +69,8 @@ public class EmbeddedService implements DeepaMehtaService {
         this.mf = pl.mf;
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
-        this.accessControl = new AccessControlImpl(this);
-        this.wpService = new WebPublishingService(this);
+        this.accessControl = new AccessControlImpl(pl);
+        this.wpService = new WebPublishingService(pl);
         //
         setupDB();
     }
@@ -365,14 +365,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public DeepaMehtaObject getObject(long id) {
-        DeepaMehtaObjectModel model = pl.fetchObject(id);
-        if (model instanceof TopicModel) {
-            return pl.instantiateTopic((TopicModel) model);
-        } else if (model instanceof AssociationModel) {
-            return pl.instantiateAssociation((AssociationModel) model);
-        } else {
-            throw new RuntimeException("Unexpected model: " + model);
-        }
+        return pl.getObject(id);
     }
 
 
@@ -421,22 +414,22 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return pl.instantiateTopics(pl.fetchTopicsByProperty(propUri, propValue));
+        return pl.getTopicsByProperty(propUri, propValue);
     }
 
     @Override
     public List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.instantiateTopics(pl.fetchTopicsByPropertyRange(propUri, from, to));
+        return pl.getTopicsByPropertyRange(propUri, from, to);
     }
 
     @Override
     public List<Association> getAssociationsByProperty(String propUri, Object propValue) {
-        return pl.instantiateAssociations(pl.fetchAssociationsByProperty(propUri, propValue));
+        return pl.getAssociationsByProperty(propUri, propValue);
     }
 
     @Override
     public List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return pl.instantiateAssociations(pl.fetchAssociationsByPropertyRange(propUri, from, to));
+        return pl.getAssociationsByPropertyRange(propUri, from, to);
     }
 
     // ---
@@ -503,8 +496,6 @@ public class EmbeddedService implements DeepaMehtaService {
     public Object getDatabaseVendorObject() {
         return pl.getDatabaseVendorObject();
     }
-
-
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
