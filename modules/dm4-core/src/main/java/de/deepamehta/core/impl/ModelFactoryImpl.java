@@ -204,10 +204,7 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                         ChildTopicsModel childTopics) {
-        if (pl == null) {
-            throw new RuntimeException("before using the ModelFactory a PersistenceLayer must be set");
-        }
-        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, pl);
+        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, pl());
     }
 
     DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
@@ -372,12 +369,12 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri) {
-        return new TopicRoleModelImpl(topicId, roleTypeUri);
+        return new TopicRoleModelImpl(topicId, roleTypeUri, pl());
     }
 
     @Override
     public TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri) {
-        return new TopicRoleModelImpl(topicUri, roleTypeUri);
+        return new TopicRoleModelImpl(topicUri, roleTypeUri, pl());
     }
 
     @Override
@@ -410,7 +407,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri) {
-        return new AssociationRoleModelImpl(assocId, roleTypeUri);
+        return new AssociationRoleModelImpl(assocId, roleTypeUri, pl());
     }    
 
     @Override
@@ -824,5 +821,14 @@ public class ModelFactoryImpl implements ModelFactory {
         } catch (Exception e) {
             throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
         }
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private PersistenceLayer pl() {
+        if (pl == null) {
+            throw new RuntimeException("before using the ModelFactory a PersistenceLayer must be set");
+        }
+        return pl;
     }
 }

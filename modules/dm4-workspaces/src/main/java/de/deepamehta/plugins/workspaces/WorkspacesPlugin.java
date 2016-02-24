@@ -455,13 +455,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
-        if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
-            Topic topic = assoc.getTopic("dm4.core.child");
-            if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
-                return true;
-            }
-        }
-        return false;
+        // Note: the current user might have no READ permission for the potential workspace.
+        // This is the case e.g. when a newly created User Account is assigned to the new user's private workspace.
+        return dms.getAccessControl().isWorkspaceAssignment(assoc);
     }
 
     // ---

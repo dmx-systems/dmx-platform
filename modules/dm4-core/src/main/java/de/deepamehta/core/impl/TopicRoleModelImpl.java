@@ -1,6 +1,8 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -16,14 +18,14 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleModelImpl(long topicId, String roleTypeUri) {
-        super(topicId, roleTypeUri);
+    TopicRoleModelImpl(long topicId, String roleTypeUri, PersistenceLayer pl) {
+        super(topicId, roleTypeUri, pl);
         this.topicUri = null;
         this.topicIdentifiedByUri = false;
     }
 
-    TopicRoleModelImpl(String topicUri, String roleTypeUri) {
-        super(-1, roleTypeUri);
+    TopicRoleModelImpl(String topicUri, String roleTypeUri, PersistenceLayer pl) {
+        super(-1, roleTypeUri, pl);
         this.topicUri = topicUri;
         this.topicIdentifiedByUri = true;
     }
@@ -50,6 +52,8 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     public boolean topicIdentifiedByUri() {
         return topicIdentifiedByUri;
     }
+
+
 
     // === Implementation of abstract RoleModel methods ===
 
@@ -84,11 +88,24 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
         }
     }
 
+
+
     // === Java API ===
 
     @Override
     public String toString() {
         String player = topicIdentifiedByUri ? "topicUri=\"" + topicUri + "\"" : "playerId=" + playerId;
         return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", " + player + ")";
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    TopicModel getPlayer() {
+        if (topicIdentifiedByUri) {
+            return pl.fetchTopic("uri", new SimpleValue(topicUri));
+        } else {
+            return pl.fetchTopic(playerId);
+        }
     }
 }

@@ -6,6 +6,8 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ResultList;
@@ -155,6 +157,21 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * @teturn  this association's topic which plays the given role.
+     *          If there is no such topic, null is returned.
+     *          <p>
+     *          If there are 2 such topics an exception is thrown.
+     */
+    TopicModel getTopic(String roleTypeUri) {
+        RoleModel role = getRoleModel(roleTypeUri);
+        return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
+    }
+
+
+
+    // ===
 
     @Override
     String className() {

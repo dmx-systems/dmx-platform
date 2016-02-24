@@ -1,5 +1,6 @@
 package de.deepamehta.core.service.accesscontrol;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -85,6 +86,13 @@ public interface AccessControl {
      * created in a migration or objects created while workspace assignment is deliberately suppressed.
      */
     void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+
+    /**
+     * Checks if an association represents a workspace assignment.
+     * This is a privileged method: it works also if the current user has no READ permission for the potential
+     * workspace.
+     */
+    boolean isWorkspaceAssignment(Association assoc);
 
     // ---
 

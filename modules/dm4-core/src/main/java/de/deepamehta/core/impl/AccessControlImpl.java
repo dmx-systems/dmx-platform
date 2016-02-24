@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -7,7 +8,6 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Credentials;
@@ -205,6 +205,17 @@ class AccessControlImpl implements AccessControl {
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
         }
+    }
+
+    @Override
+    public boolean isWorkspaceAssignment(Association assoc) {
+        if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
+            TopicModel topic = ((AssociationModelImpl) assoc.getModel()).getTopic("dm4.core.child");
+            if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ---

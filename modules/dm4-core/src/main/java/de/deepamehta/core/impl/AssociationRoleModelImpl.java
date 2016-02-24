@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.RoleModel;
 
@@ -11,11 +12,13 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleModelImpl(long assocId, String roleTypeUri) {
-        super(assocId, roleTypeUri);
+    AssociationRoleModelImpl(long assocId, String roleTypeUri, PersistenceLayer pl) {
+        super(assocId, roleTypeUri,  pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
 
     // === Implementation of abstract RoleModel methods ===
 
@@ -40,10 +43,19 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
         }
     }
 
+
+
     // === Java API ===
 
     @Override
     public String toString() {
         return "\n        association role (roleTypeUri=\"" + roleTypeUri + "\", playerId=" + playerId + ")";
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    AssociationModel getPlayer() {
+        return pl.fetchAssociation(playerId);
     }
 }
