@@ -74,8 +74,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     // ---
 
     @Override
-    public TopicModel getModel() {
-        return (TopicModel) super.getModel();
+    public TopicModelImpl getModel() {
+        return (TopicModelImpl) super.getModel();
     }
 
 

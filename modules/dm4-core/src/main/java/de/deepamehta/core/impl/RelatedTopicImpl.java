@@ -30,7 +30,7 @@ class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
     }
 
     @Override
-    public RelatedTopicModel getModel() {
-        return (RelatedTopicModel) super.getModel();
+    public RelatedTopicModelImpl getModel() {
+        return (RelatedTopicModelImpl) super.getModel();
     }
 }

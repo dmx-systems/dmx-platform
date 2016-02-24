@@ -167,8 +167,8 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
-    public AssociationModel getModel() {
-        return (AssociationModel) super.getModel();
+    public AssociationModelImpl getModel() {
+        return (AssociationModelImpl) super.getModel();
     }
 
 

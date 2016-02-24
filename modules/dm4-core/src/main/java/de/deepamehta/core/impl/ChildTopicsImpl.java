@@ -4,6 +4,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -38,6 +39,10 @@ class ChildTopicsImpl implements ChildTopics {
      * Key: assoc def URI (String), value: RelatedTopic or List<RelatedTopic>
      */
     private Map<String, Object> childTopics = new HashMap();    // attached object cache
+
+    // ### TODO: completely drop all attached object caches. Internal Core operations (e.g. update/delete) must
+    // not rely on attached objects. Attached objects embody userland semantics, e.g. access restrictions.
+    // Construct attached objects on demand only, that is when passed to the userland.
 
     private PersistenceLayer pl;
     private ModelFactory mf;
@@ -855,8 +860,15 @@ class ChildTopicsImpl implements ChildTopics {
      * to the underlying model.
      */
     private void initChildTopics() {
-        for (String assocDefUri : model) {
-            initChildTopics(assocDefUri);
+        // ### TODO: explain
+        if (parent.getUri().equals("dm4.core.meta_meta_type") || parent.getUri().equals("dm4.core.meta_type")) {
+            return;
+        }
+        // Note: we can't just iterate the assoc def URIs contained in the ChildTopicsModel as it may contain
+        // syntetic childs like "dm4.time.created". The Relating Association of these is uninitialized and can not
+        // be instantiated. That's why we do type-driven iteration here.
+        for (AssociationDefinitionModel assocDef : parent.getModel().getType().getAssocDefs()) {
+            initChildTopics(assocDef.getAssocDefUri());
         }
     }
 

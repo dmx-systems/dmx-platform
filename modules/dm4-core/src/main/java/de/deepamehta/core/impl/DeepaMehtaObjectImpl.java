@@ -172,7 +172,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // ---
 
     @Override
-    public DeepaMehtaObjectModel getModel() {
+    public DeepaMehtaObjectModelImpl getModel() {
         return model;
     }
 
@@ -218,7 +218,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void delete() {
-        pl.deleteObject((DeepaMehtaObjectModelImpl) getModel());
+        pl.deleteObject(getModel());
     }
 
 

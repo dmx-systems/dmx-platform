@@ -30,7 +30,7 @@ class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociati
     }
 
     @Override
-    public RelatedAssociationModel getModel() {
-        return (RelatedAssociationModel) super.getModel();
+    public RelatedAssociationModelImpl getModel() {
+        return (RelatedAssociationModelImpl) super.getModel();
     }
 }
