@@ -12,24 +12,24 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel relatingAssoc;
+    private AssociationModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     RelatedTopicModelImpl(TopicModel topic, AssociationModel relatingAssoc) {
         super(topic);
-        this.relatingAssoc = relatingAssoc;
+        this.relatingAssoc = (AssociationModelImpl) relatingAssoc;
     }
 
     RelatedTopicModelImpl(RelatedTopicModel relatedTopic) {
         super(relatedTopic);
-        this.relatingAssoc = relatedTopic.getRelatingAssociation();
+        this.relatingAssoc = (AssociationModelImpl) relatedTopic.getRelatingAssociation();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModel getRelatingAssociation() {
+    public AssociationModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 

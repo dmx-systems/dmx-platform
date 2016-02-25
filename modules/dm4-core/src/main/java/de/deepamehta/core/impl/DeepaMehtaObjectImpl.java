@@ -97,10 +97,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setTypeUri(String typeUri) {
-        // update memory
-        model.setTypeUri(typeUri);
-        // update DB
-        storeTypeUri();     // abstract
+        model.updateTypeUri(typeUri);
     }
 
     // --- Simple Value ---
@@ -134,7 +131,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setSimpleValue(SimpleValue value) {
-        pl.valueStorage.setSimpleValue(getModel(), value);
+        model.updateSimpleValue(value);
     }
 
     // --- Child Topics ---
@@ -180,18 +177,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // === Updating ===
 
-    // ### TODO: refactoring. Move update logic to PersistenceLayer (or ValueStorage?).
     @Override
     public void update(DeepaMehtaObjectModel newModel) {
-        updateUri(newModel.getUri());
-        updateTypeUri(newModel.getTypeUri());
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getChildTopics().update(newModel.getChildTopicsModel());
-        } else {
-            updateSimpleValue(newModel.getSimpleValue());
-        }
-        //
-        Directives.get().add(getUpdateDirective(), this);
+        pl.valueStorage.updateObject(getModel(), newModel);
     }
 
     // ---
@@ -328,10 +316,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     abstract void updateChildTopics(ChildTopicsModel childTopics);
 
-    abstract Directive getUpdateDirective();
-
-    abstract void storeTypeUri();
-
     // ---
 
     abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
@@ -344,52 +328,4 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ### TODO: add to public interface?
     abstract Type getType();
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Update ===
-
-    private void updateUri(String newUri) {
-        // abort if no update is requested
-        if (newUri == null) {
-            return;
-        }
-        //
-        String uri = getUri();
-        if (!uri.equals(newUri)) {
-            logger.info("### Changing URI of " + className() + " " + getId() +
-                " from \"" + uri + "\" -> \"" + newUri + "\"");
-            setUri(newUri);
-        }
-    }
-
-    private void updateTypeUri(String newTypeUri) {
-        // abort if no update is requested
-        if (newTypeUri == null) {
-            return;
-        }
-        //
-        String typeUri = getTypeUri();
-        if (!typeUri.equals(newTypeUri)) {
-            logger.info("### Changing type URI of " + className() + " " + getId() +
-                " from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-            setTypeUri(newTypeUri);
-        }
-    }
-
-    private void updateSimpleValue(SimpleValue newValue) {
-        // abort if no update is requested
-        if (newValue == null) {
-            return;
-        }
-        //
-        SimpleValue value = getSimpleValue();
-        if (!value.equals(newValue)) {
-            logger.info("### Changing simple value of " + className() + " " + getId() +
-                " from \"" + value + "\" -> \"" + newValue + "\"");
-            setSimpleValue(newValue);
-        }
-    }
 }

@@ -137,7 +137,7 @@ public class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue(model);
+            valueStorage.storeValue((DeepaMehtaObjectModelImpl) model);
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
@@ -161,7 +161,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void updateTopic(TopicModel model) {
         try {
-            getTopic(model.getId()).update(model);
+            valueStorage.updateObject(fetchTopic(model.getId()), model);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
                 "\")", e);
@@ -283,7 +283,7 @@ public class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeAssociation(model);
-            valueStorage.storeValue(model);
+            valueStorage.storeValue((DeepaMehtaObjectModelImpl) model);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
             Association assoc = new AssociationImpl(model, this);
@@ -299,7 +299,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void updateAssociation(AssociationModel model) {
         try {
-            getAssociation(model.getId()).update(model);
+            valueStorage.updateObject(fetchAssociation(model.getId()), model);
         } catch (Exception e) {
             throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
                 model.getTypeUri() + "\")", e);
@@ -417,7 +417,7 @@ public class PersistenceLayer extends StorageDecorator {
 
 
 
-    // ===
+    // === Generic Object ===
 
     DeepaMehtaObject getObject(long id) {
         DeepaMehtaObjectModelImpl model = fetchObject(id);
@@ -451,7 +451,7 @@ public class PersistenceLayer extends StorageDecorator {
             // delete object itself
             logger.info("Deleting " + object);
             Directives.get().add(object.getDeleteDirective(), object);
-            object.delete();
+            object._delete();
             //
             em.fireEvent(object.getPostDeleteEvent(), object);
         } catch (IllegalStateException e) {

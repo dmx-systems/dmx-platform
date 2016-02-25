@@ -58,6 +58,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // === Updating ===
 
+    // ### TODO: refactoring. Move update logic to ValueStorage.
     /**
      * @param   model   The data to update.
      *                  If the type URI is <code>null</code> it is not updated.
@@ -254,17 +255,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
         update(mf.newAssociationModel(childTopics));
     }
 
-    @Override
-    Directive getUpdateDirective() {
-        return Directive.UPDATE_ASSOCIATION;
-    }
-
-    @Override
-    final void storeTypeUri() {
-        reassignInstantiation();
-        pl.storeAssociationTypeUri(getId(), getTypeUri());
-    }
-
     // ---
 
     @Override
@@ -340,25 +330,5 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     private TopicRole filterRole(Role role, TopicRoleModel roleModel) {
         return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
             role.getPlayerId() == roleModel.getPlayerId() ? (TopicRole) role : null;
-    }
-
-    // ---
-
-    private void reassignInstantiation() {
-        // remove current assignment
-        fetchInstantiation().delete();
-        // create new assignment
-        pl.createAssociationInstantiation(getId(), getTypeUri());
-    }
-
-    private Association fetchInstantiation() {
-        RelatedTopic assocType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
-            "dm4.core.assoc_type");
-        //
-        if (assocType == null) {
-            throw new RuntimeException("Association " + getId() + " is not associated to an association type");
-        }
-        //
-        return assocType.getRelatingAssociation();
     }
 }

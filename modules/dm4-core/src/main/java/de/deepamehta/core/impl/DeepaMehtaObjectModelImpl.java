@@ -4,6 +4,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -12,6 +13,7 @@ import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -237,6 +239,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    // ---
+
+    RelatedTopicModel getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+                                      String othersRoleTypeUri, String othersTopicTypeUri) {
+        throw new UnsupportedOperationException();
+    }
+
     ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
@@ -247,16 +256,76 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    // ---
+
     void updateUri(String uri) {
-        setUri(uri);    // update memory
-        storeUri();     // update DB, "abstract"
+        setUri(uri);            // update memory
+        storeUri();             // update DB, "abstract"
     }
+
+    void updateTypeUri(String typeUri) {
+        setTypeUri(typeUri);    // update memory
+        storeTypeUri();         // update DB, "abstract"
+    }
+
+    void updateSimpleValue(SimpleValue value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
+        }
+        setSimpleValue(value);  // update memory
+        storeSimpleValue();     // update DB, "abstract"
+    }
+
+    // ---
+
+    /**
+     * Calculates the simple value that is to be indexed for this object.
+     *
+     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
+     */
+    SimpleValue getIndexValue() {
+        SimpleValue value = getSimpleValue();
+        if (getType().getDataTypeUri().equals("dm4.core.html")) {
+            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
+        } else {
+            return value;
+        }
+    }
+
+    // ---
 
     void storeUri() {
         throw new UnsupportedOperationException();
     }
 
+    void storeTypeUri() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Stores and indexes the simple value of the specified topic or association model.
+     * Determines the index key and index modes.
+     */
+    void storeSimpleValue() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Indexes the simple value of the given object model according to the given index mode.
+     * <p>
+     * Called to index existing topics/associations once an index mode has been added to a type definition.
+     */
+    void indexSimpleValue(IndexMode indexMode) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
     void delete() {
+        pl.deleteObject(this);
+    }
+
+    void _delete() {
         throw new UnsupportedOperationException();
     }
 
@@ -275,6 +344,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     // ---
+
+    Directive getUpdateDirective() {
+        throw new UnsupportedOperationException();
+    }
 
     Directive getDeleteDirective() {
         throw new UnsupportedOperationException();

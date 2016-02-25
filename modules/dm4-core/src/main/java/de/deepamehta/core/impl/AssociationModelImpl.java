@@ -4,10 +4,12 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.ResultList;
@@ -195,6 +197,15 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return pl.fetchAssociationAssociations(id);
     }
 
+    // ---
+
+    @Override
+    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+        return pl.fetchAssociationRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
+    }
+
     @Override
     ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                    String othersRoleTypeUri, String othersTopicTypeUri) {
@@ -209,13 +220,34 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             othersTopicTypeUri);
     }
 
+    // ---
+
     @Override
     void storeUri() {
         pl.storeAssociationUri(id, uri);
     }
 
     @Override
-    void delete() {
+    void storeTypeUri() {
+        reassignInstantiation();
+        pl.storeAssociationTypeUri(id, typeUri);
+    }
+
+    @Override
+    void storeSimpleValue() {
+        TypeModel type = getType();
+        pl.storeAssociationValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
+    }
+
+    @Override
+    void indexSimpleValue(IndexMode indexMode) {
+        pl.indexAssociationValue(id, indexMode, typeUri, getIndexValue());
+    }
+
+    // ---
+
+    @Override
+    void _delete() {
         pl._deleteAssociation(id);
     }
 
@@ -239,7 +271,32 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
+    Directive getUpdateDirective() {
+        return Directive.UPDATE_ASSOCIATION;
+    }
+
+    @Override
     Directive getDeleteDirective() {
         return Directive.DELETE_ASSOCIATION;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void reassignInstantiation() {
+        // remove current assignment
+        fetchInstantiation().delete();
+        // create new assignment
+        pl.createAssociationInstantiation(id, typeUri);
+    }
+
+    private AssociationModelImpl fetchInstantiation() {
+        RelatedTopicModelImpl assocType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance",
+            "dm4.core.type", "dm4.core.assoc_type");
+        //
+        if (assocType == null) {
+            throw new RuntimeException("Association " + id + " is not associated to an association type");
+        }
+        //
+        return assocType.getRelatingAssociation();
     }
 }

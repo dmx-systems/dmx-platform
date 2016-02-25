@@ -46,6 +46,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // === Updating ===
 
+    // ### TODO: refactoring. Move update logic to ValueStorage.
     @Override
     public void update(TopicModel model) {
         _update(model);
@@ -149,6 +150,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    // ### TODO: refactoring. Move update logic to ValueStorage.
     /**
      * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
      * <p>
@@ -180,17 +182,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
         update(mf.newTopicModel(childTopics));
     }
 
-    @Override
-    Directive getUpdateDirective() {
-        return Directive.UPDATE_TOPIC;
-    }
-
-    @Override
-    final void storeTypeUri() {
-        reassignInstantiation();
-        pl.storeTopicTypeUri(getId(), getTypeUri());
-    }
-
     // ---
 
     @Override
@@ -212,29 +203,5 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     TopicType getType() {
         return pl.getTopicType(getTypeUri());
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void reassignInstantiation() {
-        // remove current assignment
-        fetchInstantiation().delete();
-        // create new assignment
-        pl.createTopicInstantiation(getId(), getTypeUri());
-    }
-
-    // Note: this method works only for instances, not for types.
-    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
-    private Association fetchInstantiation() {
-        RelatedTopic topicType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
-            "dm4.core.topic_type");
-        //
-        if (topicType == null) {
-            throw new RuntimeException("Topic " + getId() + " is not associated to a topic type");
-        }
-        //
-        return topicType.getRelatingAssociation();
     }
 }

@@ -429,7 +429,7 @@ class ChildTopicsImpl implements ChildTopics {
     private void recalculateParentLabel() {
         List<String> labelAssocDefUris = null;
         try {
-            DeepaMehtaObjectModel parent = this.parent.getModel();
+            DeepaMehtaObjectModelImpl parent = this.parent.getModel();
             //
             // load required childs
             labelAssocDefUris = pl.valueStorage.getLabelAssocDefUris(parent);

@@ -329,15 +329,15 @@ class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
      */
-    final RelatedTopicModel fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+    final RelatedTopicModelImpl fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         switch (topics.getSize()) {
         case 0:
             return null;
         case 1:
-            return topics.iterator().next();
+            return (RelatedTopicModelImpl) topics.iterator().next();
         default:
             throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
@@ -431,15 +431,15 @@ class StorageDecorator {
      * @return  The fetched topic.
      *          Note: its child topics are not fetched.
      */
-    final RelatedTopicModel fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
-                                                         String othersRoleTypeUri, String othersTopicTypeUri) {
+    final RelatedTopicModelImpl fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
+                                                             String othersRoleTypeUri, String othersTopicTypeUri) {
         ResultList<RelatedTopicModel> topics = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         switch (topics.getSize()) {
         case 0:
             return null;
         case 1:
-            return topics.iterator().next();
+            return (RelatedTopicModelImpl) topics.iterator().next();
         default:
             throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +

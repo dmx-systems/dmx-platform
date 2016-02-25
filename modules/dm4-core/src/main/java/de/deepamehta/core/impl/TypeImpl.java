@@ -56,6 +56,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // === Updating ===
 
+    // ### TODO: refactoring. Move update logic to ValueStorage.
     @Override
     public void update(TypeModel model) {
         boolean uriChanged = hasUriChanged(model.getUri());
@@ -366,7 +367,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         }
         //
         for (DeepaMehtaObject obj : objects) {
-            pl.valueStorage.indexSimpleValue(obj.getModel(), indexMode);
+            ((DeepaMehtaObjectModelImpl) obj.getModel()).indexSimpleValue(indexMode);
         }
     }
 
