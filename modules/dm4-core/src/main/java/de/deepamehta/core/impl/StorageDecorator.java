@@ -391,15 +391,15 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final RelatedAssociationModel fetchTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                               String othersRoleTypeUri, String othersAssocTypeUri) {
+    final RelatedAssociationModelImpl fetchTopicRelatedAssociation(long topicId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         ResultList<RelatedAssociationModel> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         switch (assocs.getSize()) {
         case 0:
             return null;
         case 1:
-            return assocs.iterator().next();
+            return (RelatedAssociationModelImpl) assocs.iterator().next();
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
@@ -488,7 +488,7 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final RelatedAssociationModel fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
+    final RelatedAssociationModelImpl fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         ResultList<RelatedAssociationModel> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
@@ -496,7 +496,7 @@ class StorageDecorator {
         case 0:
             return null;
         case 1:
-            return assocs.iterator().next();
+            return (RelatedAssociationModelImpl) assocs.iterator().next();
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +

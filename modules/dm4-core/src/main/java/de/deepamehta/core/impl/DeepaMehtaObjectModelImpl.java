@@ -1,6 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -8,9 +9,11 @@ import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
@@ -18,6 +21,7 @@ import de.deepamehta.core.util.JavaUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 
 
@@ -25,21 +29,24 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long id;                  // is -1 in models used for a create operation. ### FIXDOC
-                                        // is never -1 in models used for an update operation.
-    protected String uri;               // is never null in models used for a create operation, may be empty. ### FIXDOC
-                                        // may be null in models used for an update operation.
-    protected String typeUri;           // is never null in models used for a create operation. ### FIXDOC
-                                        // may be null in models used for an update operation.
-    protected SimpleValue value;        // is never null in models used for a create operation, may be constructed
-                                        //                                                   on empty string. ### FIXDOC
-                                        // may be null in models used for an update operation.
-    protected ChildTopicsModel childTopics; // is never null, may be empty. ### FIXDOC
+    long id;                        // is -1 in models used for a create operation. ### FIXDOC
+                                    // is never -1 in models used for an update operation.
+    String uri;                     // is never null in models used for a create operation, may be empty. ### FIXDOC
+                                    // may be null in models used for an update operation.
+    String typeUri;                 // is never null in models used for a create operation. ### FIXDOC
+                                    // may be null in models used for an update operation.
+    SimpleValue value;              // is never null in models used for a create operation, may be constructed
+                                    //                                                   on empty string. ### FIXDOC
+                                    // may be null in models used for an update operation.
+    ChildTopicsModel childTopics;   // is never null, may be empty. ### FIXDOC
 
     // ---
 
-    protected PersistenceLayer pl;
-    protected ModelFactory mf;
+    PersistenceLayer pl;
+    EventManager em;
+    ModelFactory mf;
+
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -52,6 +59,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.childTopics = childTopics != null ? childTopics : pl.mf.newChildTopicsModel();
         //
         this.pl          = pl;
+        this.em          = pl.em;
         this.mf          = pl.mf;
     }
 
@@ -319,10 +327,98 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    // ---
 
+
+    // === Update ===
+
+    void update(DeepaMehtaObjectModel newModel) {
+        // URI
+        String newUri = newModel.getUri();
+        if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
+            logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri + "\" -> \"" +
+                newUri + "\"");
+            updateUri(newUri);
+        }
+        // type URI
+        String newTypeUri = newModel.getTypeUri();
+        if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
+            logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri + "\" -> \"" +
+                newTypeUri + "\"");
+            updateTypeUri(newTypeUri);
+        }
+        //
+        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+            getChildTopics().update(newModel.getChildTopicsModel());    // ### FIXME
+        } else {
+            // simple value
+            SimpleValue newValue = newModel.getSimpleValue();
+            if (newValue != null && !newValue.equals(value)) {      // abort if no update is requested
+                logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value + "\" -> \"" +
+                    newValue + "\"");
+                updateSimpleValue(newValue);
+            }
+        }
+        //
+        Directives.get().add(getUpdateDirective(), this);
+    }
+
+
+
+    // === Delete ===
+
+    /**
+     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
+     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
+     * <p>
+     * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
+     */
     void delete() {
-        pl.deleteObject(this);
+        try {
+            em.fireEvent(getPreDeleteEvent(), instantiate());
+            //
+            // delete child topics (recursively)
+            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+                if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
+                    for (TopicModel childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
+                            "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
+                        ((DeepaMehtaObjectModelImpl) childTopic).delete();
+                    }
+                }
+            }
+            // delete direct associations
+            for (AssociationModel assoc : getAssociations()) {
+                ((DeepaMehtaObjectModelImpl) assoc).delete();
+            }
+            // delete object itself
+            logger.info("Deleting " + this);
+            Directives.get().add(getDeleteDirective(), this);
+            _delete();
+            //
+            em.fireEvent(getPostDeleteEvent(), this);
+        } catch (IllegalStateException e) {
+            // Note: getAssociations() might throw IllegalStateException and is no problem.
+            // This can happen when this object is an association which is already deleted.
+            //
+            // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.
+            // If A1 gets deleted first (the association set order is non-deterministic), A2 is implicitely deleted
+            // with it (because it is a direct association of A1 as well). Then when the loop comes to A2
+            // "IllegalStateException: Node[1327] has been deleted in this tx" is thrown because A2 has been deleted
+            // already. (The Node appearing in the exception is the middle node of A2.) If, on the other hand, A2
+            // gets deleted first no error would occur.
+            //
+            // This particular situation exists when e.g. a topicmap is deleted while one of its mapcontext
+            // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
+            // a topicmap's mapcontext association and then deletes the topicmap.
+            //
+            if (e.getMessage().equals("Node[" + id + "] has been deleted in this tx")) {
+                logger.info("### Association " + id + " has already been deleted in this transaction. This can " +
+                    "happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" + this + ")");
+            } else {
+                throw e;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting " + className() + " " + id + " failed (" + this + ")", e);
+        }
     }
 
     void _delete() {

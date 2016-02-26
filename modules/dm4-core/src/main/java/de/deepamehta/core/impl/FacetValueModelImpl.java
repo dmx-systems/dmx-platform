@@ -21,7 +21,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         this.childTypeUri = childTypeUri;
     }
 
-    FacetValueModelImpl(ChildTopicsModel childTopics) {
+    FacetValueModelImpl(ChildTopicsModelImpl childTopics) {
         super(childTopics);
         this.childTypeUri = iterator().next();
     }

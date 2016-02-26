@@ -37,6 +37,7 @@ import java.util.Map;
 
 
 
+// ### TODO: should methods return model *impl* objects? -> Yes!
 public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -222,12 +223,12 @@ public class ModelFactoryImpl implements ModelFactory {
     // === ChildTopicsModel ===
 
     @Override
-    public ChildTopicsModel newChildTopicsModel() {
+    public ChildTopicsModelImpl newChildTopicsModel() {
         return new ChildTopicsModelImpl(new HashMap(), this);
     }
 
     @Override
-    public ChildTopicsModel newChildTopicsModel(JSONObject values) {
+    public ChildTopicsModelImpl newChildTopicsModel(JSONObject values) {
         try {
             Map<String, Object> childTopics = new HashMap();
             Iterator<String> i = values.keys();
@@ -813,7 +814,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public FacetValueModel newFacetValueModel(JSONObject facetValue) {
         try {
-            ChildTopicsModel childTopics = newChildTopicsModel(facetValue);
+            ChildTopicsModelImpl childTopics = newChildTopicsModel(facetValue);
             if (childTopics.size() != 1) {
                 throw new RuntimeException("There are " + childTopics.size() + " child topic entries (expected is 1)");
             }

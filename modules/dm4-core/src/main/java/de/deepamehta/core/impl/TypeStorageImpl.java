@@ -270,7 +270,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
         Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
-        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
+        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (assocDefs.size() != sequence.size()) {
             throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " +
@@ -460,13 +460,13 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    private RelatedTopicModel fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
+    private RelatedTopicModelImpl fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation", "dm4.core.assoc_def",
             cardinalityRoleTypeUri, "dm4.core.cardinality");
     }
 
-    private RelatedTopicModel fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+    private RelatedTopicModelImpl fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
+        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         // error check
         if (cardinality == null) {
             throw new RuntimeException("Invalid association definition: cardinality is missing (assocDefId=" +
@@ -490,21 +490,21 @@ class TypeStorageImpl implements TypeStorage {
 
     private void storeCardinalityUri(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
         // remove current assignment
-        RelatedTopicModel cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
+        RelatedTopicModelImpl cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
         removeCardinalityAssignment(cardinality);
         // create new assignment
         associateCardinality(assocDefId, cardinalityRoleTypeUri, cardinalityUri);
     }
 
     private void removeCardinalityAssignmentIfExists(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         if (cardinality != null) {
             removeCardinalityAssignment(cardinality);
         }
     }
 
-    private void removeCardinalityAssignment(RelatedTopicModel cardinalityAssignment) {
-        pl.deleteObject((DeepaMehtaObjectModelImpl) cardinalityAssignment.getRelatingAssociation());
+    private void removeCardinalityAssignment(RelatedTopicModelImpl cardinalityAssignment) {
+        cardinalityAssignment.getRelatingAssociation().delete();
     }
 
     private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
@@ -524,11 +524,11 @@ class TypeStorageImpl implements TypeStorage {
     // 1) When fetching a type's association definitions.
     //    In this situation we don't have a Type object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
-    private List<RelatedAssociationModel> fetchSequence(TopicModel typeTopic) {
+    private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {
         try {
-            List<RelatedAssociationModel> sequence = new ArrayList();
+            List<RelatedAssociationModelImpl> sequence = new ArrayList();
             //
-            RelatedAssociationModel assocDef = fetchSequenceStart(typeTopic.getId());
+            RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeTopic.getId());
             if (assocDef != null) {
                 sequence.add(assocDef);
                 while ((assocDef = fetchSuccessor(assocDef.getId())) != null) {
@@ -544,17 +544,17 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    private RelatedAssociationModel fetchSequenceStart(long typeId) {
+    private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
         return pl.fetchTopicRelatedAssociation(typeId, "dm4.core.aggregation", "dm4.core.type",
             "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
     }
 
-    private RelatedAssociationModel fetchSuccessor(long assocDefId) {
+    private RelatedAssociationModelImpl fetchSuccessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.predecessor",
             "dm4.core.successor", null);        // othersAssocTypeUri=null
     }
 
-    private RelatedAssociationModel fetchPredecessor(long assocDefId) {
+    private RelatedAssociationModelImpl fetchPredecessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.successor",
             "dm4.core.predecessor", null);      // othersAssocTypeUri=null
     }
@@ -605,8 +605,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private void insertAtSequenceStart(long typeId, long assocDefId) {
         // delete sequence start
-        RelatedAssociationModel assocDef = fetchSequenceStart(typeId);
-        pl.deleteObject((DeepaMehtaObjectModelImpl) assocDef.getRelatingAssociation());
+        RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeId);
+        assocDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceStart(typeId, assocDefId);
         storeSequenceSegment(assocDefId, assocDef.getId());
@@ -614,8 +614,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private void insertIntoSequence(long assocDefId, long beforeAssocDefId) {
         // delete sequence segment
-        RelatedAssociationModel assocDef = fetchPredecessor(beforeAssocDefId);
-        pl.deleteObject((DeepaMehtaObjectModelImpl) assocDef.getRelatingAssociation());
+        RelatedAssociationModelImpl assocDef = fetchPredecessor(beforeAssocDefId);
+        assocDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceSegment(assocDef.getId(), assocDefId);
         storeSequenceSegment(assocDefId, beforeAssocDefId);
@@ -645,10 +645,10 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     private void deleteSequence(TopicModel typeTopic) {
-        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
+        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
-        for (RelatedAssociationModel assoc : sequence) {
-            pl.deleteObject((DeepaMehtaObjectModelImpl) assoc.getRelatingAssociation());
+        for (RelatedAssociationModelImpl assoc : sequence) {
+            assoc.getRelatingAssociation().delete();
         }
     }
 

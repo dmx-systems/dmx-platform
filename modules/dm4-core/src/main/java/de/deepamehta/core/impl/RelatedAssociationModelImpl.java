@@ -9,19 +9,19 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel relatingAssoc;
+    private AssociationModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     RelatedAssociationModelImpl(AssociationModel assoc, AssociationModel relatingAssoc) {
         super(assoc);
-        this.relatingAssoc = relatingAssoc;
+        this.relatingAssoc = (AssociationModelImpl) relatingAssoc;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModel getRelatingAssociation() {
+    public AssociationModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 

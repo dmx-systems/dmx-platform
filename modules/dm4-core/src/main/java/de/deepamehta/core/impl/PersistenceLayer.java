@@ -7,7 +7,6 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -17,7 +16,6 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
@@ -161,7 +159,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void updateTopic(TopicModel model) {
         try {
-            valueStorage.updateObject(fetchTopic(model.getId()), model);
+            fetchTopic(model.getId()).update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
                 "\")", e);
@@ -169,7 +167,7 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     void deleteTopic(long topicId) {
-        deleteObject(fetchTopic(topicId));
+        fetchTopic(topicId).delete();
     }
 
 
@@ -299,7 +297,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void updateAssociation(AssociationModel model) {
         try {
-            valueStorage.updateObject(fetchAssociation(model.getId()), model);
+            fetchAssociation(model.getId()).update(model);
         } catch (Exception e) {
             throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
                 model.getTypeUri() + "\")", e);
@@ -307,7 +305,7 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     void deleteAssociation(long assocId) {
-        deleteObject(fetchAssociation(assocId));
+        fetchAssociation(assocId).delete();
     }
 
 
@@ -423,63 +421,6 @@ public class PersistenceLayer extends StorageDecorator {
         DeepaMehtaObjectModelImpl model = fetchObject(id);
         checkReadAccess(model);
         return model.instantiate();
-    }
-
-    /**
-     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
-     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
-     * <p>
-     * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
-     */
-    void deleteObject(DeepaMehtaObjectModelImpl object) {
-        try {
-            em.fireEvent(object.getPreDeleteEvent(), object.instantiate());
-            //
-            // delete child topics (recursively)
-            for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
-                if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModel childTopic : object.getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
-                            "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        deleteObject((DeepaMehtaObjectModelImpl) childTopic);
-                    }
-                }
-            }
-            // delete direct associations
-            for (AssociationModel assoc : object.getAssociations()) {
-                deleteObject((DeepaMehtaObjectModelImpl) assoc);
-            }
-            // delete object itself
-            logger.info("Deleting " + object);
-            Directives.get().add(object.getDeleteDirective(), object);
-            object._delete();
-            //
-            em.fireEvent(object.getPostDeleteEvent(), object);
-        } catch (IllegalStateException e) {
-            // Note: getAssociations() might throw IllegalStateException and is no problem.
-            // This can happen when this object is an association which is already deleted.
-            //
-            // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.
-            // If A1 gets deleted first (the association set order is non-deterministic), A2 is implicitely deleted
-            // with it (because it is a direct association of A1 as well). Then when the loop comes to A2
-            // "IllegalStateException: Node[1327] has been deleted in this tx" is thrown because A2 has been deleted
-            // already. (The Node appearing in the exception is the middle node of A2.) If, on the other hand, A2
-            // gets deleted first no error would occur.
-            //
-            // This particular situation exists when e.g. a topicmap is deleted while one of its mapcontext
-            // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
-            // a topicmap's mapcontext association and then deletes the topicmap.
-            //
-            if (e.getMessage().equals("Node[" + object.getId() + "] has been deleted in this tx")) {
-                logger.info("### Association " + object.getId() + " has already been deleted in this transaction. " +
-                    "This can happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" +
-                    object + ")");
-            } else {
-                throw e;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting " + object.className() + " " + object.getId() + " failed (" +
-                object + ")", e);
-        }
     }
 
 
