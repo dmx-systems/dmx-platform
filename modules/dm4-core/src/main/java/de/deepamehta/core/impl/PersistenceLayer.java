@@ -157,12 +157,17 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopic(TopicModel model) {
+    void updateTopic(TopicModel newModel) {
         try {
-            fetchTopic(model.getId()).update(model);
+            TopicModelImpl model = fetchTopic(newModel.getId());
+            model.update(newModel);
+            //
+            // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
+            // On the other hand TopicModel's update() method is called multiple times while updating the child topics
+            // (see ChildTopicsModelImpl).
+            em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
-                "\")", e);
+            throw new RuntimeException("Updating topic " + newModel.getId() + " failed", e);
         }
     }
 
@@ -295,12 +300,16 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModel model) {
+    void updateAssociation(AssociationModel newModel) {
         try {
-            fetchAssociation(model.getId()).update(model);
+            AssociationModelImpl model = fetchAssociation(newModel.getId());
+            model.update(newModel);
+            //
+            // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
+            // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
+            // Its childs are always topics (never associations).
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
-                model.getTypeUri() + "\")", e);
+            throw new RuntimeException("Updating association " + newModel.getId() + " failed", e);
         }
     }
 

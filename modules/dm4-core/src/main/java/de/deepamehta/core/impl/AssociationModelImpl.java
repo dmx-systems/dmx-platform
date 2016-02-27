@@ -171,6 +171,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
     }
 
+    void updateRoles(AssociationModel newModel) {
+        updateRole(newModel.getRoleModel1(), 1);
+        updateRole(newModel.getRoleModel2(), 2);
+    }
+
 
 
     // ===
@@ -256,6 +261,16 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     @Override
     DeepaMehtaEvent getPreGetEvent() {
         return CoreEvent.PRE_GET_ASSOCIATION;
+    }
+
+    @Override
+    DeepaMehtaEvent getPreUpdateEvent() {
+        return CoreEvent.PRE_UPDATE_ASSOCIATION;
+    }
+
+    @Override
+    DeepaMehtaEvent getPostUpdateEvent() {
+        return CoreEvent.POST_UPDATE_ASSOCIATION;
     }
 
     @Override

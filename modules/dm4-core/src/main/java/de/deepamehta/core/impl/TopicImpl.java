@@ -44,14 +44,9 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
 
-    // === Updating ===
-
-    // ### TODO: refactoring. Move update logic to ValueStorage.
     @Override
-    public void update(TopicModel model) {
-        _update(model);
-        //
-        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
+    public void update(TopicModel newModel) {
+        super.update(newModel);
     }
 
 
@@ -146,27 +141,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
         pl.removeTopicProperty(getId(), propUri);
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    // ### TODO: refactoring. Move update logic to ValueStorage.
-    /**
-     * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
-     * <p>
-     * Called multiple times while updating the child topics (see ChildTopicsImpl).
-     * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
-     */
-    void _update(TopicModel model) {
-        logger.info("Updating topic " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
-        //
-        pl.em.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
-        //
-        TopicModel oldModel = getModel().clone();
-        super.update(model);
-        //
-        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
-    }
 
 
 

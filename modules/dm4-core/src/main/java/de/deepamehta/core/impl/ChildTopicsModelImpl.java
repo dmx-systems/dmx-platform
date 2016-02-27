@@ -820,7 +820,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModel newChildTopic) {
         // update topic
-        childTopic._update(newChildTopic);      // ### FIXME
+        childTopic.update(newChildTopic);
         // update association
         updateRelatingAssociation(childTopic, newChildTopic);
     }

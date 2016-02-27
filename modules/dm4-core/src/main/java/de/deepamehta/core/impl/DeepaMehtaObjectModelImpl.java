@@ -331,35 +331,59 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Update ===
 
+    /**
+     * @param   newModel    The data to update.
+     *              If the URI is <code>null</code> it is not updated.
+     *              If the type URI is <code>null</code> it is not updated.
+     *              If the simple value is <code>null</code> it is not updated.
+     *              In case of an association:
+     *                  If role 1 is <code>null</code> it is not updated.
+     *                  If role 2 is <code>null</code> it is not updated.
+     */
     void update(DeepaMehtaObjectModel newModel) {
-        // URI
-        String newUri = newModel.getUri();
-        if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
-            logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri + "\" -> \"" +
-                newUri + "\"");
-            updateUri(newUri);
-        }
-        // type URI
-        String newTypeUri = newModel.getTypeUri();
-        if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
-            logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri + "\" -> \"" +
-                newTypeUri + "\"");
-            updateTypeUri(newTypeUri);
-        }
-        //
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getChildTopicsModel().update(newModel.getChildTopicsModel());    // ### FIXME: inject parent
-        } else {
-            // simple value
-            SimpleValue newValue = newModel.getSimpleValue();
-            if (newValue != null && !newValue.equals(value)) {      // abort if no update is requested
-                logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value + "\" -> \"" +
-                    newValue + "\"");
-                updateSimpleValue(newValue);
+        try {
+            logger.info("Updating " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
+            em.fireEvent(getPreUpdateEvent(), instantiate(), newModel);
+            DeepaMehtaObjectModel oldModel = clone();
+            //
+            // URI
+            String newUri = newModel.getUri();
+            if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
+                logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
+                    "\" -> \"" + newUri + "\"");
+                updateUri(newUri);
             }
+            // type URI
+            String newTypeUri = newModel.getTypeUri();
+            if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
+                logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri +
+                    "\" -> \"" + newTypeUri + "\"");
+                updateTypeUri(newTypeUri);
+            }
+            //
+            if (getType().getDataTypeUri().equals("dm4.core.composite")) {
+                getChildTopicsModel().update(newModel.getChildTopicsModel());    // ### FIXME: inject parent
+            } else {
+                // simple value
+                SimpleValue newValue = newModel.getSimpleValue();
+                if (newValue != null && !newValue.equals(value)) {      // abort if no update is requested
+                    logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value +
+                        "\" -> \"" + newValue + "\"");
+                    updateSimpleValue(newValue);
+                }
+            }
+            //
+            if (this instanceof AssociationModel) {
+                ((AssociationModelImpl) this).updateRoles((AssociationModel) newModel);
+            }
+            //
+            Directives.get().add(getUpdateDirective(), this);
+            em.fireEvent(getPostUpdateEvent(), instantiate(), newModel, oldModel);
+            // ### FIXME: extends post-update-assoc listener: newModel
+        } catch (Exception e) {
+            throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",
+                e);
         }
-        //
-        Directives.get().add(getUpdateDirective(), this);
     }
 
 
@@ -428,6 +452,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // ---
 
     DeepaMehtaEvent getPreGetEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPreUpdateEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPostUpdateEvent() {
         throw new UnsupportedOperationException();
     }
 

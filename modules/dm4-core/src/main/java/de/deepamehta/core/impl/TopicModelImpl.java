@@ -141,6 +141,16 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
+    DeepaMehtaEvent getPreUpdateEvent() {
+        return CoreEvent.PRE_UPDATE_TOPIC;
+    }
+
+    @Override
+    DeepaMehtaEvent getPostUpdateEvent() {
+        return CoreEvent.POST_UPDATE_TOPIC;
+    }
+
+    @Override
     DeepaMehtaEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_TOPIC;
     }
