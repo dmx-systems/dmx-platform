@@ -406,7 +406,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: if the association definition has been created interactively the underlying association
             // exists already. We must not create it again. We detect this case by inspecting the ID.
             if (assocDefId == -1) {
-                assocDefId = pl.createAssociation(assocDef).getId();
+                assocDefId = pl.createAssociation((AssociationDefinitionModelImpl) assocDef).getId();
             }
             //
             // 2) cardinality

@@ -39,7 +39,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationImpl(AssociationModel model, PersistenceLayer pl) {
+    AssociationImpl(AssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
         // init attached object cache
         this.role1 = createAttachedRole(model.getRoleModel1());
@@ -215,7 +215,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    long othersTopicId) {
-        AssociationModel assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
+        AssociationModelImpl assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
             othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
         return assoc != null ? pl.instantiateAssociation(assoc) : null;
     }

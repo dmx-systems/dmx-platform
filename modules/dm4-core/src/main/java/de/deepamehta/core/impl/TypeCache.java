@@ -111,7 +111,7 @@ class TypeCache {
             endlessRecursionDetection.check(topicTypeUri);
             //
             TopicTypeModel model = pl.typeStorage.getTopicType(topicTypeUri);
-            return new TopicTypeImpl(model, pl);
+            return new TopicTypeImpl((TopicTypeModelImpl) model, pl);
         } finally {
             endlessRecursionDetection.reset(topicTypeUri);
         }
@@ -123,7 +123,7 @@ class TypeCache {
             endlessRecursionDetection.check(assocTypeUri);
             //
             AssociationTypeModel model = pl.typeStorage.getAssociationType(assocTypeUri);
-            return new AssociationTypeImpl(model, pl);
+            return new AssociationTypeImpl((AssociationTypeModelImpl) model, pl);
         } finally {
             endlessRecursionDetection.reset(assocTypeUri);
         }

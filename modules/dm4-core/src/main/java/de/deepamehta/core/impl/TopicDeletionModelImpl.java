@@ -9,7 +9,7 @@ class TopicDeletionModelImpl extends RelatedTopicModelImpl implements TopicDelet
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicDeletionModelImpl(RelatedTopicModel relatedTopic) {
+    TopicDeletionModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
     }
 

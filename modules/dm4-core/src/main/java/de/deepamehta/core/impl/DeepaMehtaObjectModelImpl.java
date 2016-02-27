@@ -29,16 +29,16 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    long id;                        // is -1 in models used for a create operation. ### FIXDOC
-                                    // is never -1 in models used for an update operation.
-    String uri;                     // is never null in models used for a create operation, may be empty. ### FIXDOC
-                                    // may be null in models used for an update operation.
-    String typeUri;                 // is never null in models used for a create operation. ### FIXDOC
-                                    // may be null in models used for an update operation.
-    SimpleValue value;              // is never null in models used for a create operation, may be constructed
-                                    //                                                   on empty string. ### FIXDOC
-                                    // may be null in models used for an update operation.
-    ChildTopicsModel childTopics;   // is never null, may be empty. ### FIXDOC
+    long id;                            // is -1 in models used for a create operation. ### FIXDOC
+                                        // is never -1 in models used for an update operation.
+    String uri;                         // is never null in models used for a create operation, may be empty. ### FIXDOC
+                                        // may be null in models used for an update operation.
+    String typeUri;                     // is never null in models used for a create operation. ### FIXDOC
+                                        // may be null in models used for an update operation.
+    SimpleValue value;                  // is never null in models used for a create operation, may be constructed
+                                        //                                                   on empty string. ### FIXDOC
+                                        // may be null in models used for an update operation.
+    ChildTopicsModelImpl childTopics;   // is never null, may be empty. ### FIXDOC
 
     // ---
 
@@ -50,7 +50,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics,
+    DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
                                                                                       PersistenceLayer pl) {
         this.id          = id;
         this.uri         = uri;
@@ -63,9 +63,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.mf          = pl.mf;
     }
 
-    DeepaMehtaObjectModelImpl(DeepaMehtaObjectModel object) {
+    DeepaMehtaObjectModelImpl(DeepaMehtaObjectModelImpl object) {
         this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel(), ((DeepaMehtaObjectModelImpl) object).pl);
+            object.getChildTopicsModel(), object.pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -143,13 +143,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // --- Child Topics ---
 
     @Override
-    public ChildTopicsModel getChildTopicsModel() {
+    public ChildTopicsModelImpl getChildTopicsModel() {
         return childTopics;
     }
 
     @Override
     public void setChildTopicsModel(ChildTopicsModel childTopics) {
-        this.childTopics = childTopics;
+        this.childTopics = (ChildTopicsModelImpl) childTopics;
     }
 
     // --- misc ---
@@ -348,7 +348,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
         //
         if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getChildTopics().update(newModel.getChildTopicsModel());    // ### FIXME
+            getChildTopicsModel().update(newModel.getChildTopicsModel());    // ### FIXME: inject parent
         } else {
             // simple value
             SimpleValue newValue = newModel.getSimpleValue();

@@ -30,7 +30,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicImpl(TopicModel model, PersistenceLayer pl) {
+    TopicImpl(TopicModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -121,9 +121,9 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   long othersTopicId) {
-        AssociationModel assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId,
-            myRoleTypeUri, othersRoleTypeUri);
+                                                                                 long othersTopicId) {
+        AssociationModelImpl assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
+            othersRoleTypeUri);
         return assoc != null ? pl.instantiateAssociation(assoc) : null;
     }
 

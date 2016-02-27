@@ -135,7 +135,7 @@ public class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue((DeepaMehtaObjectModelImpl) model);
+            valueStorage.storeValue((TopicModelImpl) model);
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
@@ -145,7 +145,7 @@ public class PersistenceLayer extends StorageDecorator {
                 ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
             }
             // 3) instantiate
-            Topic topic = new TopicImpl(model, this);
+            Topic topic = new TopicImpl((TopicModelImpl) model, this);
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -184,7 +184,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Association getAssociation(String key, SimpleValue value) {
         try {
-            AssociationModel assoc = fetchAssociation(key, value);
+            AssociationModelImpl assoc = fetchAssociation(key, value);
             return assoc != null ? instantiateAssociation(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
@@ -200,12 +200,12 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                           String roleTypeUri1, String roleTypeUri2) {
+    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                  String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
-            AssociationModel assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
             return assoc != null ? instantiateAssociation(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
@@ -213,12 +213,12 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                String topicRoleTypeUri, String assocRoleTypeUri) {
+                                                         String topicRoleTypeUri, String assocRoleTypeUri) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         logger.info(info);
         try {
-            AssociationModel assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
             return assoc != null ? instantiateAssociation(assoc) : null;
         } catch (Exception e) {
@@ -275,13 +275,13 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Creates a new association in the DB.
      */
-    Association createAssociation(AssociationModel model) {
+    Association createAssociation(AssociationModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
             // 1) store in DB
             storeAssociation(model);
-            valueStorage.storeValue((DeepaMehtaObjectModelImpl) model);
+            valueStorage.storeValue(model);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
             Association assoc = new AssociationImpl(model, this);
@@ -368,7 +368,7 @@ public class PersistenceLayer extends StorageDecorator {
             typeStorage.storeType(model);                       // store type-specific parts
             //
             // instantiate
-            TopicType topicType = new TopicTypeImpl(model, this);
+            TopicType topicType = new TopicTypeImpl((TopicTypeModelImpl) model, this);
             typeCache.putTopicType(topicType);
             //
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
@@ -385,7 +385,7 @@ public class PersistenceLayer extends StorageDecorator {
             typeStorage.storeType(model);                       // store type-specific parts
             //
             // instantiate
-            AssociationType assocType = new AssociationTypeImpl(model, this);
+            AssociationType assocType = new AssociationTypeImpl((AssociationTypeModelImpl) model, this);
             typeCache.putAssociationType(assocType);
             //
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
@@ -453,7 +453,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Topic instantiateTopic(TopicModel model) {
         checkReadAccess(model);
-        return new TopicImpl(model, this);
+        return new TopicImpl((TopicModelImpl) model, this);
     }
 
     List<Topic> instantiateTopics(List<TopicModel> models) {
@@ -472,7 +472,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         checkReadAccess(model);
-        return new RelatedTopicImpl(model, this);
+        return new RelatedTopicImpl((RelatedTopicModelImpl) model, this);
     }
 
     ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
@@ -489,7 +489,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Association instantiateAssociation(AssociationModel model) {
+    Association instantiateAssociation(AssociationModelImpl model) {
         checkReadAccess(model);
         return new AssociationImpl(model, this);
     }
@@ -498,7 +498,7 @@ public class PersistenceLayer extends StorageDecorator {
         List<Association> assocs = new ArrayList();
         for (AssociationModel model : models) {
             try {
-                assocs.add(instantiateAssociation(model));
+                assocs.add(instantiateAssociation((AssociationModelImpl) model));
             } catch (AccessControlException e) {
                 // don't add to result and continue
             }
@@ -510,7 +510,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
         checkReadAccess(model);
-        return new RelatedAssociationImpl(model, this);
+        return new RelatedAssociationImpl((RelatedAssociationModelImpl) model, this);
     }
 
     ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
@@ -541,7 +541,7 @@ public class PersistenceLayer extends StorageDecorator {
     // ===
 
     private void bootstrapTypeCache() {
-        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
+        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
         typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));

@@ -83,7 +83,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModel> 
 
     @Override
     Association instantiateObject(AssociationModel model) {
-        return pl.instantiateAssociation(model);
+        return pl.instantiateAssociation((AssociationModelImpl) model);
     }
 }
 

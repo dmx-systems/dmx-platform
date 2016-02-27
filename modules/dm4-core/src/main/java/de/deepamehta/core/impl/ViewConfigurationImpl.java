@@ -76,7 +76,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     private void initConfigTopics() {
         for (TopicModel configTopic : model.getConfigTopics()) {
-            addConfigTopic(new TopicImpl(configTopic, pl));
+            addConfigTopic(new TopicImpl((TopicModelImpl) configTopic, pl));
         }
     }
 

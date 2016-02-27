@@ -15,7 +15,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationTypeModelImpl(TypeModel type) {
+    AssociationTypeModelImpl(TypeModelImpl type) {
         super(type);
     }
 

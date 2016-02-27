@@ -23,7 +23,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicModelImpl(DeepaMehtaObjectModel object) {
+    TopicModelImpl(DeepaMehtaObjectModelImpl object) {
         super(object);
     }
 

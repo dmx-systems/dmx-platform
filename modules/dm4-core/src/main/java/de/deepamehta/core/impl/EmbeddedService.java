@@ -199,7 +199,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association createAssociation(AssociationModel model) {
-        return pl.createAssociation(model);
+        return pl.createAssociation((AssociationModelImpl) model);
     }
 
     @Override

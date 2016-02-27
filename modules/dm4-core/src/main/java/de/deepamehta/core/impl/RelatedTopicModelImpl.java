@@ -16,14 +16,14 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicModelImpl(TopicModel topic, AssociationModel relatingAssoc) {
+    RelatedTopicModelImpl(TopicModelImpl topic, AssociationModelImpl relatingAssoc) {
         super(topic);
-        this.relatingAssoc = (AssociationModelImpl) relatingAssoc;
+        this.relatingAssoc = relatingAssoc;
     }
 
-    RelatedTopicModelImpl(RelatedTopicModel relatedTopic) {
+    RelatedTopicModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
-        this.relatingAssoc = (AssociationModelImpl) relatedTopic.getRelatingAssociation();
+        this.relatingAssoc = relatedTopic.getRelatingAssociation();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

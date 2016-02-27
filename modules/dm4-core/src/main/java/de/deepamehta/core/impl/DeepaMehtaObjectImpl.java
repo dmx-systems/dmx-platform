@@ -44,14 +44,14 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     private ChildTopicsImpl childTopics;        // attached object cache
 
     protected PersistenceLayer pl;
-    protected ModelFactory mf;
+    protected ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, PersistenceLayer pl) {
-        this.model = (DeepaMehtaObjectModelImpl) model;
+    DeepaMehtaObjectImpl(DeepaMehtaObjectModelImpl model, PersistenceLayer pl) {
+        this.model = model;
         this.pl = pl;
         this.mf = pl.mf;
         this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, pl);
@@ -146,7 +146,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
-            getChildTopics().update(childTopics);
+            model.getChildTopicsModel().update(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
         }
@@ -189,7 +189,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(newChildTopic, null, assocDef);      // newChildTopics=null
+        model.getChildTopicsModel().updateChildTopics(newChildTopic, null, assocDef.getModel());  // newChildTopics=null
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -197,7 +197,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(null, newChildTopics, assocDef);     // newChildTopic=null
+        model.getChildTopicsModel().updateChildTopics(null, newChildTopics, assocDef.getModel());  // newChildTopic=null
     }
 
 

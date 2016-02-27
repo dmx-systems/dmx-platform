@@ -58,48 +58,48 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TopicModel ===
 
     @Override
-    public TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value,
+    public TopicModelImpl newTopicModel(long id, String uri, String typeUri, SimpleValue value,
                                                                          ChildTopicsModel childTopics) {
         return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
     }
 
     @Override
-    public TopicModel newTopicModel(ChildTopicsModel childTopics) {
+    public TopicModelImpl newTopicModel(ChildTopicsModel childTopics) {
         return newTopicModel(-1, null, null, null, childTopics);
     }
 
     @Override
-    public TopicModel newTopicModel(String typeUri) {
+    public TopicModelImpl newTopicModel(String typeUri) {
         return newTopicModel(-1, null, typeUri, null, null);
     }
 
     @Override
-    public TopicModel newTopicModel(String typeUri, SimpleValue value) {
+    public TopicModelImpl newTopicModel(String typeUri, SimpleValue value) {
         return newTopicModel(-1, null, typeUri, value, null);
     }
 
     @Override
-    public TopicModel newTopicModel(String typeUri, ChildTopicsModel childTopics) {
+    public TopicModelImpl newTopicModel(String typeUri, ChildTopicsModel childTopics) {
         return newTopicModel(-1, null, typeUri, null, childTopics);
     }
 
     @Override
-    public TopicModel newTopicModel(String uri, String typeUri) {
+    public TopicModelImpl newTopicModel(String uri, String typeUri) {
         return newTopicModel(-1, uri, typeUri, null, null);
     }
 
     @Override
-    public TopicModel newTopicModel(String uri, String typeUri, SimpleValue value) {
+    public TopicModelImpl newTopicModel(String uri, String typeUri, SimpleValue value) {
         return newTopicModel(-1, uri, typeUri, value, null);
     }
 
     @Override
-    public TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics) {
+    public TopicModelImpl newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics) {
         return newTopicModel(-1, uri, typeUri, null, childTopics);
     }
 
     @Override
-    public TopicModel newTopicModel(long id) {
+    public TopicModelImpl newTopicModel(long id) {
         return newTopicModel(id, null, null, null, null);
     }
 
@@ -108,12 +108,12 @@ public class ModelFactoryImpl implements ModelFactory {
     } */
 
     @Override
-    public TopicModel newTopicModel(long id, ChildTopicsModel childTopics) {
+    public TopicModelImpl newTopicModel(long id, ChildTopicsModel childTopics) {
         return newTopicModel(id, null, null, null, childTopics);
     }
 
     @Override
-    public TopicModel newTopicModel(JSONObject topic) {
+    public TopicModelImpl newTopicModel(JSONObject topic) {
         try {
             return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
         } catch (Exception e) {
@@ -126,48 +126,48 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationModel ===
 
     @Override
-    public AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
+    public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                 RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
         return new AssociationModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics), roleModel1,
             roleModel2);
     }
 
     @Override
-    public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    public AssociationModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
+    public AssociationModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
                                                                                       ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     @Override
-    public AssociationModel newAssociationModel() {
+    public AssociationModelImpl newAssociationModel() {
         return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
     @Override
-    public AssociationModel newAssociationModel(ChildTopicsModel childTopics) {
+    public AssociationModelImpl newAssociationModel(ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, null, null, null, null, childTopics);
     }
 
     @Override
-    public AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
+    public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                                      RoleModel roleModel2) {
         return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 
     @Override
-    public AssociationModel newAssociationModel(AssociationModel assoc) {
-        return new AssociationModelImpl(assoc);
+    public AssociationModelImpl newAssociationModel(AssociationModel assoc) {
+        return new AssociationModelImpl((AssociationModelImpl) assoc);
     }
 
     @Override
-    public AssociationModel newAssociationModel(JSONObject assoc) {
+    public AssociationModelImpl newAssociationModel(JSONObject assoc) {
         try {
             return new AssociationModelImpl(newDeepaMehtaObjectModel(assoc),
                 assoc.has("role_1") ? parseRole(assoc.getJSONObject("role_1")) : null,
@@ -203,12 +203,12 @@ public class ModelFactoryImpl implements ModelFactory {
      * @param   value       Optional (<code>null</code> is a valid value).
      * @param   childTopics Optional (<code>null</code> is a valid value and is transformed into an empty composite).
      */
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
-                                                                                        ChildTopicsModel childTopics) {
-        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, childTopics, pl());
+    DeepaMehtaObjectModelImpl newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
+                                                                                         ChildTopicsModel childTopics) {
+        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, (ChildTopicsModelImpl) childTopics, pl());
     }
 
-    DeepaMehtaObjectModel newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
+    DeepaMehtaObjectModelImpl newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
         return newDeepaMehtaObjectModel(
             object.optLong("id", -1),
             object.optString("uri", null),
@@ -224,7 +224,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ChildTopicsModelImpl newChildTopicsModel() {
-        return new ChildTopicsModelImpl(new HashMap(), this);
+        return new ChildTopicsModelImpl(new HashMap(), pl);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class ModelFactoryImpl implements ModelFactory {
                     }
                 }
             }
-            return new ChildTopicsModelImpl(childTopics, this);
+            return new ChildTopicsModelImpl(childTopics, pl);
         } catch (Exception e) {
             throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
         }
@@ -427,45 +427,45 @@ public class ModelFactoryImpl implements ModelFactory {
     // === RelatedTopicModel ===
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(long topicId) {
+    public RelatedTopicModelImpl newRelatedTopicModel(long topicId) {
         return new RelatedTopicModelImpl(newTopicModel(topicId), newAssociationModel());
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl(newTopicModel(topicId), relatingAssoc);
+    public RelatedTopicModelImpl newRelatedTopicModel(long topicId, AssociationModel relatingAssoc) {
+        return new RelatedTopicModelImpl(newTopicModel(topicId), (AssociationModelImpl) relatingAssoc);
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(String topicUri) {
+    public RelatedTopicModelImpl newRelatedTopicModel(String topicUri) {
         return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), newAssociationModel());
                                                           // topicTypeUri=null
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), relatingAssoc);
+    public RelatedTopicModelImpl newRelatedTopicModel(String topicUri, AssociationModel relatingAssoc) {
+        return new RelatedTopicModelImpl(newTopicModel(topicUri, (String) null), (AssociationModelImpl) relatingAssoc);
                                                           // topicTypeUri=null
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(String topicTypeUri, SimpleValue value) {
+    public RelatedTopicModelImpl newRelatedTopicModel(String topicTypeUri, SimpleValue value) {
         return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, value), newAssociationModel());
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics) {
+    public RelatedTopicModelImpl newRelatedTopicModel(String topicTypeUri, ChildTopicsModel childTopics) {
         return new RelatedTopicModelImpl(newTopicModel(topicTypeUri, childTopics), newAssociationModel());
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(TopicModel topic) {
-        return new RelatedTopicModelImpl(topic, newAssociationModel());
+    public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic) {
+        return new RelatedTopicModelImpl((TopicModelImpl) topic, newAssociationModel());
     }
 
     @Override
-    public RelatedTopicModel newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
-        return new RelatedTopicModelImpl(topic, relatingAssoc);
+    public RelatedTopicModelImpl newRelatedTopicModel(TopicModel topic, AssociationModel relatingAssoc) {
+        return new RelatedTopicModelImpl((TopicModelImpl) topic, (AssociationModelImpl) relatingAssoc);
     }
 
 
@@ -474,7 +474,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public RelatedAssociationModel newRelatedAssociationModel(AssociationModel assoc, AssociationModel relatingAssoc) {
-        return new RelatedAssociationModelImpl(assoc, relatingAssoc);
+        return new RelatedAssociationModelImpl((AssociationModelImpl) assoc, (AssociationModelImpl) relatingAssoc);
     }
 
 
@@ -534,7 +534,7 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TopicTypeModel ===
 
     @Override
-    public TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
+    public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
                                             List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                             List<String> labelConfig, ViewConfigurationModel viewConfig) {
         return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
@@ -542,12 +542,12 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri) {
+    public TopicTypeModelImpl newTopicTypeModel(String uri, String value, String dataTypeUri) {
         return new TopicTypeModelImpl(newTypeModel(uri, "dm4.core.topic_type", new SimpleValue(value), dataTypeUri));
     }
 
     @Override
-    public TopicTypeModel newTopicTypeModel(JSONObject topicType) {
+    public TopicTypeModelImpl newTopicTypeModel(JSONObject topicType) {
         try {
             return new TopicTypeModelImpl(newTypeModel(topicType.put("type_uri", "dm4.core.topic_type")));
         } catch (Exception e) {
@@ -586,20 +586,21 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // === TypeModel ===
 
-    TypeModel newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
+    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                                   List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                                   ViewConfigurationModel viewConfig) {
-        return new TypeModelImpl(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+            viewConfig);
     }
 
-    TypeModel newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
+    TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
         return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri,
             new ArrayList(), new ArrayList(), new ArrayList(), newViewConfigurationModel()
         );
     }
 
-    TypeModel newTypeModel(JSONObject typeModel) throws JSONException {
-        TopicModel typeTopic = newTopicModel(typeModel);
+    TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
+        TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.getString("data_type_uri"),
             parseIndexModes(typeModel.optJSONArray("index_mode_uris")),
@@ -647,7 +648,7 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationDefinitionModel ===
 
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(
                                                     long id, String uri, String assocTypeUri, String customAssocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri,
@@ -661,7 +662,7 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri) {
         return newAssociationDefinitionModel(-1, null, assocTypeUri, null, parentTypeUri, childTypeUri,
@@ -669,7 +670,7 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri) {
         return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
@@ -681,9 +682,11 @@ public class ModelFactoryImpl implements ModelFactory {
      *                  IMPORTANT: the association must identify its players <i>by URI</i> (not by ID). ### still true?
      */
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, String parentCardinalityUri,
-                                                   String childCardinalityUri, ViewConfigurationModel viewConfigModel) {
-        return new AssociationDefinitionModelImpl(assoc, parentCardinalityUri, childCardinalityUri, viewConfigModel);
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModel assoc,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfigModel) {
+        return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, parentCardinalityUri,
+            childCardinalityUri, viewConfigModel);
     }
 
     /**
@@ -696,9 +699,9 @@ public class ModelFactoryImpl implements ModelFactory {
     } */
 
     @Override
-    public AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef) {
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(JSONObject assocDef) {
         try {
-            AssociationModel assoc = newAssociationModel(assocDef.optLong("id", -1), null,
+            AssociationModelImpl assoc = newAssociationModel(assocDef.optLong("id", -1), null,
                 assocDef.getString("assoc_type_uri"),
                 parentRole(assocDef.getString("parent_type_uri")),
                 childRole(assocDef.getString("child_type_uri")),
@@ -794,12 +797,12 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps) {
-        return new TopicViewModelImpl(topic, viewProps);
+        return new TopicViewModelImpl((TopicModelImpl) topic, viewProps);
     }
 
     @Override
     public AssociationViewModel newAssociationViewModel(AssociationModel assoc) {
-        return new AssociationViewModelImpl(assoc);
+        return new AssociationViewModelImpl((AssociationModelImpl) assoc);
     }
 
 
@@ -808,7 +811,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public FacetValueModel newFacetValueModel(String childTypeUri) {
-        return new FacetValueModelImpl(childTypeUri, this);
+        return new FacetValueModelImpl(childTypeUri, pl);
     }
 
     @Override

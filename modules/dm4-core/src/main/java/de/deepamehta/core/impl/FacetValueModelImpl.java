@@ -16,8 +16,8 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    FacetValueModelImpl(String childTypeUri, ModelFactory mf) {
-        super(new HashMap(), mf);
+    FacetValueModelImpl(String childTypeUri, PersistenceLayer pl) {
+        super(new HashMap(), pl);
         this.childTypeUri = childTypeUri;
     }
 

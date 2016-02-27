@@ -15,7 +15,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicTypeModelImpl(TypeModel type) {
+    TopicTypeModelImpl(TypeModelImpl type) {
         super(type);
     }
 

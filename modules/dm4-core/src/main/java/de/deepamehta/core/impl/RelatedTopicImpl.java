@@ -17,7 +17,7 @@ class RelatedTopicImpl extends TopicImpl implements RelatedTopic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicImpl(RelatedTopicModel model, PersistenceLayer pl) {
+    RelatedTopicImpl(RelatedTopicModelImpl model, PersistenceLayer pl) {
         super(model, pl);
         this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), pl);
     }

@@ -31,7 +31,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
                   ViewConfigurationModel viewConfig) {
         super(typeTopic);
@@ -42,7 +42,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         this.viewConfig  = viewConfig;
     }
 
-    TypeModelImpl(TypeModel type) {
+    TypeModelImpl(TypeModelImpl type) {
         super(type);
         this.dataTypeUri = type.getDataTypeUri();
         this.indexModes  = type.getIndexModes();

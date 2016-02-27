@@ -13,9 +13,9 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationModelImpl(AssociationModel assoc, AssociationModel relatingAssoc) {
+    RelatedAssociationModelImpl(AssociationModelImpl assoc, AssociationModelImpl relatingAssoc) {
         super(assoc);
-        this.relatingAssoc = (AssociationModelImpl) relatingAssoc;
+        this.relatingAssoc = relatingAssoc;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

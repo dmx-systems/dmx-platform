@@ -22,7 +22,7 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationTypeImpl(AssociationTypeModel model, PersistenceLayer pl) {
+    AssociationTypeImpl(AssociationTypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 

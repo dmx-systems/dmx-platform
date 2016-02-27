@@ -22,7 +22,7 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicTypeImpl(TopicTypeModel model, PersistenceLayer pl) {
+    TopicTypeImpl(TopicTypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 

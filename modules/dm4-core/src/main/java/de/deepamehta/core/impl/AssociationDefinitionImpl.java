@@ -26,7 +26,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionImpl(AssociationDefinitionModel model, TypeImpl parentType, PersistenceLayer pl) {
+    AssociationDefinitionImpl(AssociationDefinitionModelImpl model, TypeImpl parentType, PersistenceLayer pl) {
         super(model, pl);
         this.parentType = parentType;
         initViewConfig();

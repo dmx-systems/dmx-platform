@@ -37,7 +37,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeImpl(TypeModel model, PersistenceLayer pl) {
+    TypeImpl(TypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
         // init attached object cache
         initAssocDefs();
@@ -190,7 +190,8 @@ abstract class TypeImpl extends TopicImpl implements Type {
             // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
             // def must be attached *after* the assoc def is stored.
             // ### TODO: attach before store. Refactoring needed. See comment in TypeCache#put methods.
-            _addAssocDefBefore(new AssociationDefinitionImpl(assocDef, this, pl), beforeAssocDefUri);
+            _addAssocDefBefore(new AssociationDefinitionImpl((AssociationDefinitionModelImpl) assocDef, this, pl),
+                beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
@@ -454,7 +455,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
     private void initAssocDefs() {
         this.assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            _addAssocDef(new AssociationDefinitionImpl(assocDef, this, pl));
+            _addAssocDef(new AssociationDefinitionImpl((AssociationDefinitionModelImpl) assocDef, this, pl));
         }
     }
 

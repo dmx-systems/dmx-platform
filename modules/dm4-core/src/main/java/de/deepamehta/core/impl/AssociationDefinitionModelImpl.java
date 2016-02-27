@@ -44,7 +44,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      *
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
-    AssociationDefinitionModelImpl(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
+    AssociationDefinitionModelImpl(AssociationModelImpl assoc, String parentCardinalityUri, String childCardinalityUri,
                                                                                ViewConfigurationModel viewConfigModel) {
         super(assoc);
         this.parentCardinalityUri = parentCardinalityUri;

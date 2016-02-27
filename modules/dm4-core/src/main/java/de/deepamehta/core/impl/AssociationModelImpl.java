@@ -34,13 +34,13 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationModelImpl(DeepaMehtaObjectModel object, RoleModel roleModel1, RoleModel roleModel2) {
+    AssociationModelImpl(DeepaMehtaObjectModelImpl object, RoleModel roleModel1, RoleModel roleModel2) {
         super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
     }
 
-    AssociationModelImpl(AssociationModel assoc) {
+    AssociationModelImpl(AssociationModelImpl assoc) {
         super(assoc);
         this.roleModel1 = assoc.getRoleModel1();
         this.roleModel2 = assoc.getRoleModel2();

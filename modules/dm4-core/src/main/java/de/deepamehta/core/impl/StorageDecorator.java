@@ -162,8 +162,8 @@ class StorageDecorator {
      * @return  The fetched association.
      *          Note: its child topics are not fetched.
      */
-    final AssociationModel fetchAssociation(String key, SimpleValue value) {
-        return storage.fetchAssociation(key, value.value());
+    final AssociationModelImpl fetchAssociation(String key, SimpleValue value) {
+        return (AssociationModelImpl) storage.fetchAssociation(key, value.value());
     }
 
     final List<AssociationModel> fetchAssociations(String key, SimpleValue value) {
@@ -182,14 +182,14 @@ class StorageDecorator {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    final AssociationModel fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                               String roleTypeUri2) {
+    final AssociationModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
+                                                                                                  String roleTypeUri2) {
         List<AssociationModel> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
         switch (assocs.size()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return (AssociationModelImpl) assocs.get(0);
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.size() + " \"" + assocTypeUri +
                 "\" associations (topicId1=" + topicId1 + ", topicId2=" + topicId2 + ", " +
@@ -212,15 +212,15 @@ class StorageDecorator {
     /**
      * Convenience method (checks singularity).
      */
-    final AssociationModel fetchAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                     String topicRoleTypeUri, String assocRoleTypeUri) {
+    final AssociationModelImpl fetchAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+                                                       long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
         List<AssociationModel> assocs = fetchAssociationsBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
             topicRoleTypeUri, assocRoleTypeUri);
         switch (assocs.size()) {
         case 0:
             return null;
         case 1:
-            return assocs.get(0);
+            return (AssociationModelImpl) assocs.get(0);
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.size() + " \"" + assocTypeUri +
                 "\" associations (topicId=" + topicId + ", assocId=" + assocId + ", " +

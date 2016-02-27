@@ -1,8 +1,7 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 
 import java.util.List;
@@ -13,7 +12,7 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicReferenceModelImpl(RelatedTopicModel relatedTopic) {
+    TopicReferenceModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
     }
 
@@ -31,11 +30,8 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
 
     // ---
 
-    /**
-     * Checks weather this reference refers to the given topic.
-     */
     @Override
-    public boolean isReferingTo(Topic topic) {
+    public boolean isReferingTo(TopicModel topic) {
         if (isReferenceById()) {
             return getId() == topic.getId();
         } else if (isReferenceByUri()) {
@@ -45,14 +41,11 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
         }
     }
 
-    /**
-     * From the given topics finds the one this reference refers to.
-     */
     @Override
-    public RelatedTopic findReferencedTopic(List<RelatedTopic> topics) {
-        for (RelatedTopic topic : topics) {
+    public RelatedTopicModelImpl findReferencedTopic(List<? extends RelatedTopicModel> topics) {
+        for (RelatedTopicModel topic : topics) {
             if (isReferingTo(topic)) {
-                return topic;
+                return (RelatedTopicModelImpl) topic;
             }
         }
         return null;
