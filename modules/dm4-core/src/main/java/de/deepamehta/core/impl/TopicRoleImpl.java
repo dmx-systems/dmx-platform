@@ -22,7 +22,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModel model, Association assoc, PersistenceLayer pl) {
+    TopicRoleImpl(TopicRoleModelImpl model, Association assoc, PersistenceLayer pl) {
         super(model, assoc, pl);
     }
 

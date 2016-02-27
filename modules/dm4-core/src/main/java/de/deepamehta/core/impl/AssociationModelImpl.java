@@ -29,12 +29,12 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModel roleModel1;   // may be null in models used for an update operation
-    private RoleModel roleModel2;   // may be null in models used for an update operation
+    private RoleModelImpl roleModel1;   // may be null in models used for an update operation
+    private RoleModelImpl roleModel2;   // may be null in models used for an update operation
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationModelImpl(DeepaMehtaObjectModelImpl object, RoleModel roleModel1, RoleModel roleModel2) {
+    AssociationModelImpl(DeepaMehtaObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
         super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
@@ -42,8 +42,8 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     AssociationModelImpl(AssociationModelImpl assoc) {
         super(assoc);
-        this.roleModel1 = assoc.getRoleModel1();
-        this.roleModel2 = assoc.getRoleModel2();
+        this.roleModel1 = assoc.roleModel1;
+        this.roleModel2 = assoc.roleModel2;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -62,12 +62,12 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     public void setRoleModel1(RoleModel roleModel1) {
-        this.roleModel1 = roleModel1;
+        this.roleModel1 = (RoleModelImpl) roleModel1;
     }
 
     @Override
     public void setRoleModel2(RoleModel roleModel2) {
-        this.roleModel2 = roleModel2;
+        this.roleModel2 = (RoleModelImpl) roleModel2;
     }
 
     // --- Convenience Methods ---
@@ -296,6 +296,42 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    /**
+     * @param   nr      used only for logging
+     */
+    private void updateRole(RoleModel newModel, int nr) {
+        if (newModel != null) {     // abort if no update is requested
+            // Note: We must lookup the roles individually.
+            // The role order (getRole1(), getRole2()) is undeterministic and not fix.
+            RoleModelImpl role = getRole(newModel);
+            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
+            String roleTypeUri = role.getRoleTypeUri();         // current value
+            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
+                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
+                    "\"");
+                role.updateRoleTypeUri(newRoleTypeUri);
+            }
+        }
+    }
+
+    /**
+     * Returns this association's role which refers to the same object as the given role model.
+     * The role returned is found by comparing topic IDs, topic URIs, or association IDs.
+     * The role types are <i>not</i> compared.
+     * <p>
+     * If the object refered by the given role model is not a player in this association an exception is thrown.
+     */
+    private RoleModelImpl getRole(RoleModel roleModel) {
+        if (roleModel1.refsSameObject(roleModel)) {
+            return roleModel1;
+        } else if (roleModel2.refsSameObject(roleModel)) {
+            return roleModel2;
+        }
+        throw new RuntimeException("Role is not part of association (role=" + roleModel + ", association=" + this);
+    }
+
+    // ---
 
     private void reassignInstantiation() {
         // remove current assignment

@@ -117,6 +117,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---
 
+    // ### TODO: make use of model's getRole()
     @Override
     public Role getRole(RoleModel roleModel) {
         if (getRole1().getModel().refsSameObject(roleModel)) {
@@ -285,9 +286,9 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     private Role createAttachedRole(RoleModel model) {
         if (model instanceof TopicRoleModel) {
-            return new TopicRoleImpl((TopicRoleModel) model, this, pl);
+            return new TopicRoleImpl((TopicRoleModelImpl) model, this, pl);
         } else if (model instanceof AssociationRoleModel) {
-            return new AssociationRoleImpl((AssociationRoleModel) model, this, pl);
+            return new AssociationRoleImpl((AssociationRoleModelImpl) model, this, pl);
         } else {
             throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
         }

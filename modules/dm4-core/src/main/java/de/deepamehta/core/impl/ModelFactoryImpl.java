@@ -128,8 +128,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                 RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
-        return new AssociationModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics), roleModel1,
-            roleModel2);
+        return new AssociationModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics),
+            (RoleModelImpl) roleModel1, (RoleModelImpl) roleModel2);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private RoleModel parseRole(JSONObject roleModel) {
+    private RoleModelImpl parseRole(JSONObject roleModel) {
         if (roleModel.has("topic_id") || roleModel.has("topic_uri")) {
             return newTopicRoleModel(roleModel);
         } else if (roleModel.has("assoc_id")) {
@@ -369,17 +369,17 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TopicRoleModel ===
 
     @Override
-    public TopicRoleModel newTopicRoleModel(long topicId, String roleTypeUri) {
+    public TopicRoleModelImpl newTopicRoleModel(long topicId, String roleTypeUri) {
         return new TopicRoleModelImpl(topicId, roleTypeUri, pl());
     }
 
     @Override
-    public TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri) {
+    public TopicRoleModelImpl newTopicRoleModel(String topicUri, String roleTypeUri) {
         return new TopicRoleModelImpl(topicUri, roleTypeUri, pl());
     }
 
     @Override
-    public TopicRoleModel newTopicRoleModel(JSONObject topicRoleModel) {
+    public TopicRoleModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
         try {
             long topicId       = topicRoleModel.optLong("topic_id", -1);
             String topicUri    = topicRoleModel.optString("topic_uri", null);
@@ -407,12 +407,12 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationRoleModel ===
 
     @Override
-    public AssociationRoleModel newAssociationRoleModel(long assocId, String roleTypeUri) {
+    public AssociationRoleModelImpl newAssociationRoleModel(long assocId, String roleTypeUri) {
         return new AssociationRoleModelImpl(assocId, roleTypeUri, pl());
     }    
 
     @Override
-    public AssociationRoleModel newAssociationRoleModel(JSONObject assocRoleModel) {
+    public AssociationRoleModelImpl newAssociationRoleModel(JSONObject assocRoleModel) {
         try {
             long assocId       = assocRoleModel.getLong("assoc_id");
             String roleTypeUri = assocRoleModel.getString("role_type_uri");

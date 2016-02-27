@@ -12,14 +12,14 @@ abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModel model;
+    private RoleModelImpl model;
     private Association assoc;  // the association this role is involved in
 
-    protected final PersistenceLayer pl;
+    PersistenceLayer pl;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    protected RoleImpl(RoleModel model, Association assoc, PersistenceLayer pl) {
+    RoleImpl(RoleModelImpl model, Association assoc, PersistenceLayer pl) {
         this.model = model;
         this.assoc = assoc;
         this.pl = pl;
@@ -47,10 +47,7 @@ abstract class RoleImpl implements Role {
 
     @Override
     public void setRoleTypeUri(String roleTypeUri) {
-        // update memory
-        model.setRoleTypeUri(roleTypeUri);
-        // update DB
-        storeRoleTypeUri();
+        model.updateRoleTypeUri(roleTypeUri);
     }
 
     // ---
@@ -64,12 +61,6 @@ abstract class RoleImpl implements Role {
 
     @Override
     public JSONObject toJSON() {
-        return getModel().toJSON();
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void storeRoleTypeUri() {
-        pl.storeRoleTypeUri(assoc.getId(), getPlayerId(), getRoleTypeUri());
+        return model.toJSON();
     }
 }

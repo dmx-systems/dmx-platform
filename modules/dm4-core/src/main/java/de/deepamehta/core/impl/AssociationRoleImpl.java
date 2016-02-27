@@ -14,7 +14,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleImpl(AssociationRoleModel model, Association assoc, PersistenceLayer pl) {
+    AssociationRoleImpl(AssociationRoleModelImpl model, Association assoc, PersistenceLayer pl) {
         super(model, assoc, pl);
     }
 

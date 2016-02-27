@@ -46,7 +46,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     EventManager em;
     ModelFactory mf;
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -379,7 +379,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             Directives.get().add(getUpdateDirective(), this);
             em.fireEvent(getPostUpdateEvent(), instantiate(), newModel, oldModel);
-            // ### FIXME: extends post-update-assoc listener: newModel
+            // ### FIXME: extend post-update-assoc listener: newModel
         } catch (Exception e) {
             throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",
                 e);
