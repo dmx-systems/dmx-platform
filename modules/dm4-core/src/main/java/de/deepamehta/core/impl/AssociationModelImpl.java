@@ -171,9 +171,16 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
     }
 
+    // ---
+
     void updateRoles(AssociationModel newModel) {
         updateRole(newModel.getRoleModel1(), 1);
         updateRole(newModel.getRoleModel2(), 2);
+    }
+
+    void updateRoleTypeUri(RoleModelImpl role, String roleTypeUri) {
+        role.setRoleTypeUri(roleTypeUri);                           // update memory
+        pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
     }
 
 
@@ -310,7 +317,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
                 logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
                     "\"");
-                role.updateRoleTypeUri(newRoleTypeUri);
+                updateRoleTypeUri(role, newRoleTypeUri);
             }
         }
     }
