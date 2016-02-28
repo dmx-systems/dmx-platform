@@ -317,33 +317,17 @@ class ChildTopicsImpl implements ChildTopics {
         return childTopics.keySet().iterator();
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    /**
-     * Loads the child topics which are not loaded already.
-     */
-    void loadChildTopics() {
-        model.loadChildTopics();
-    }
-
-    /**
-     * Loads the child topics for the given assoc def, provided they are not loaded already.
-     */
-    void loadChildTopics(String assocDefUri) {
-        model.loadChildTopics(assocDefUri);
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // Note 1: we need to explicitly declare the arg as RelatedTopicModel. When declared as TopicModel instead the
     // JVM would invoke the ChildTopicsModel's put()/add() which takes a TopicModel object even if at runtime a
     // RelatedTopicModel or even a TopicReferenceModel is passed. This is because Java method overloading involves
-    // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dm4-test).
+    // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dm4-test). ### still true?
 
     // Note 2: calling parent.update(..) would not work. The JVM would call the update() method of the base class
     // (DeepaMehtaObjectImpl), not the subclass's update() method. This is related to Java's (missing) multiple
     // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
-    // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test).
+    // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test). ### still true?
 
     private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
         parent.updateChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
@@ -353,6 +337,15 @@ class ChildTopicsImpl implements ChildTopics {
     private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
         parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
+    }
+
+    // ---
+
+    /**
+     * Loads the child topics for the given assoc def, provided they are not loaded already.
+     */
+    private void loadChildTopics(String assocDefUri) {
+        parent.loadChildTopics(assocDefUri);
     }
 
 

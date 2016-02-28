@@ -146,7 +146,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
-            model.getChildTopicsModel().update(childTopics);
+            model.updateChildTopics(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
         }
@@ -156,13 +156,13 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public DeepaMehtaObject loadChildTopics() {
-        getChildTopics().loadChildTopics();
+        model.loadChildTopics();
         return this;
     }
 
     @Override
     public DeepaMehtaObject loadChildTopics(String assocDefUri) {
-        getChildTopics().loadChildTopics(assocDefUri);
+        model.loadChildTopics(assocDefUri);
         return this;
     }
 
@@ -189,7 +189,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        model.getChildTopicsModel().updateChildTopics(newChildTopic, null, assocDef.getModel());  // newChildTopics=null
+        model.updateChildTopics(newChildTopic, null, assocDef.getModel());      // newChildTopics=null
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -197,7 +197,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
-        model.getChildTopicsModel().updateChildTopics(null, newChildTopics, assocDef.getModel());  // newChildTopic=null
+        model.updateChildTopics(null, newChildTopics, assocDef.getModel());     // newChildTopic=null
     }
 
 
