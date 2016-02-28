@@ -166,8 +166,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private RelatedTopicModel getCustomAssocType() {
-        RelatedTopicModel customAssocType = getChildTopicsModel().getTopic(
-            "dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
+        RelatedTopicModel customAssocType = getChildTopicsModel().getTopicOrNull(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
         // Note: we can't do this sanity check because a type model would not even deserialize.
         // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
         /* if (customAssocType instanceof TopicDeletionModel) {

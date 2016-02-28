@@ -140,12 +140,12 @@ class ValueStorage {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    RelatedTopicModel childTopic = model.getTopic(assocDefUri, null);          // defaultValue=null
+                    RelatedTopicModel childTopic = model.getTopicOrNull(assocDefUri);
                     if (childTopic != null) {   // skip if not contained in create request
                         storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<RelatedTopicModel> childTopics = model.getTopics(assocDefUri, null);  // defaultValue=null
+                    List<? extends RelatedTopicModel> childTopics = model.getTopicsOrNull(assocDefUri);
                     if (childTopics != null) {  // skip if not contained in create request
                         for (RelatedTopicModel childTopic : childTopics) {
                             storeChildTopic(childTopic, parent, assocDef);

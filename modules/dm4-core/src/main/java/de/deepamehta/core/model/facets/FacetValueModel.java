@@ -25,7 +25,7 @@ public interface FacetValueModel extends ChildTopicsModel {
     /**
      * Accesses a multiple-valued facet.
      */
-    List<RelatedTopicModel> getTopics();
+    List<? extends RelatedTopicModel> getTopics();
 
     // ---
 

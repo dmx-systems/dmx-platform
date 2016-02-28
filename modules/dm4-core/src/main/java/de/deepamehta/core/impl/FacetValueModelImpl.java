@@ -40,7 +40,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     /**
      * Accesses a multiple-valued facet.
      */
-    public List<RelatedTopicModel> getTopics() {
+    public List<? extends RelatedTopicModel> getTopics() {
         return getTopics(childTypeUri);
     }
 

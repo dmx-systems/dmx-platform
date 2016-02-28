@@ -354,6 +354,8 @@ class ChildTopicsImpl implements ChildTopics {
 
     // --- Access ---
 
+    // ### TODO: make use of model's getTopic methods
+
     private RelatedTopic _getTopic(String assocDefUri) {
         RelatedTopic topic = _getTopicOrNull(assocDefUri);
         // error check

@@ -26,9 +26,9 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a single-valued child.
-     * Returns a default value if there is no such child. ### TODO: make it getTopicOrNull(), catch ClassCastException
+     * Returns <code>null</code> if there is no such child.
      */
-    RelatedTopicModel getTopic(String assocDefUri, RelatedTopicModel defaultValue);
+    RelatedTopicModel getTopicOrNull(String assocDefUri);
 
     // ---
 
@@ -36,13 +36,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      * Accesses a multiple-valued child.
      * Throws if there is no such child.
      */
-    List<RelatedTopicModel> getTopics(String assocDefUri);
+    List<? extends RelatedTopicModel> getTopics(String assocDefUri);
 
     /**
      * Accesses a multiple-valued child.
-     * Returns a default value if there is no such child. ### TODO: make it getTopicsOrNull()
+     * Returns <code>null</code> if there is no such child.
      */
-    List<RelatedTopicModel> getTopics(String assocDefUri, List<RelatedTopicModel> defaultValue);
+    List<? extends RelatedTopicModel> getTopicsOrNull(String assocDefUri);
 
     // ---
 
