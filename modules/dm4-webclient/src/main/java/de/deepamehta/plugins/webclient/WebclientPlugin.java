@@ -299,7 +299,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             viewConfig + ")");
         TopicType topicType = dms.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
-        Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);
+        Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);           // ### TODO: should be implicit
     }
 
     private void updateAssociationType(Topic type, Topic viewConfig) {
@@ -307,7 +307,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             viewConfig + ")");
         AssociationType assocType = dms.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
-        Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);
+        Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);     // ### TODO: should be implicit
     }
 
     // ---

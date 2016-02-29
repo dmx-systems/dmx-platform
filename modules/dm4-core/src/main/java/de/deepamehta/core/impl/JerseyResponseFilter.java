@@ -78,7 +78,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             //
             return response;
         } catch (Exception e) {
-            throw new RuntimeException("Jersey response filtering failed", e);
+            throw new RuntimeException("Response filtering failed", e);
         }
     }
 
@@ -98,15 +98,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds,
                                                                      boolean includeAssocChilds) {
-        if (includeChilds) {
-            for (DeepaMehtaObject object : objects) {
-                object.loadChildTopics();
-            }
-            if (includeAssocChilds) {
-                for (DeepaMehtaObject object : objects) {
-                    loadRelatingAssociationChildTopics(object);
-                }
-            }
+        for (DeepaMehtaObject object : objects) {
+            loadChildTopics(object, includeChilds, includeChilds);
         }
     }
 

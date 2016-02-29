@@ -176,7 +176,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
+    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
         storeTimestamp(assoc);
     }
 
@@ -205,8 +205,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     public void serviceResponseFilter(ContainerResponse response) {
         DeepaMehtaObject object = responseObject(response);
         if (object != null) {
-            long modified = enrichWithTimestamp(object);
-            setLastModifiedHeader(response, modified);
+            setLastModifiedHeader(response, getModificationTime(object.getId()));
         }
     }
 
@@ -257,14 +256,11 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
         return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
     }
 
-    private long enrichWithTimestamp(DeepaMehtaObject object) {
+    private void enrichWithTimestamp(DeepaMehtaObject object) {
         long objectId = object.getId();
-        long created = getCreationTime(objectId);
-        long modified = getModificationTime(objectId);
-        ChildTopicsModel childTopics = object.getChildTopics().getModel();
-        childTopics.put(PROP_CREATED, created);
-        childTopics.put(PROP_MODIFIED, modified);
-        return modified;
+        ChildTopicsModel childTopics = object.getChildTopics().getModel()
+            .put(PROP_CREATED, getCreationTime(objectId))
+            .put(PROP_MODIFIED, getModificationTime(objectId));
     }
 
     // ---

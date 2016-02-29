@@ -387,6 +387,10 @@ class ChildTopicsImpl implements ChildTopics {
     }
 
     private RelatedTopic instantiate(RelatedTopicModel model) {
-        return new RelatedTopicImpl((RelatedTopicModelImpl) model, pl);
+        try {
+            return new RelatedTopicImpl((RelatedTopicModelImpl) model, pl);
+        } catch (Exception e) {
+            throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
+        }
     }
 }

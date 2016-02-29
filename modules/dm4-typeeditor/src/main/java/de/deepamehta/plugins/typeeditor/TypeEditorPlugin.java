@@ -35,9 +35,9 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
-        AssociationModel newModel = assoc.getModel();
-        if (isAssocDef(newModel)) {
+    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
+        AssociationModel _newModel = assoc.getModel();  // ### TODO: can we rely on newModel instead? I don't think so.
+        if (isAssocDef(_newModel)) {
             if (isAssocDef(oldModel)) {
                 updateAssocDef(assoc);
             } else {

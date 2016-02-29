@@ -345,8 +345,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     void update(DeepaMehtaObjectModel newModel) {
         try {
             logger.info("Updating " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
-            em.fireEvent(getPreUpdateEvent(), instantiate(), newModel);
+            DeepaMehtaObject object = instantiate();
             DeepaMehtaObjectModel oldModel = clone();
+            em.fireEvent(getPreUpdateEvent(), object, newModel);
             //
             // URI
             String newUri = newModel.getUri();
@@ -379,8 +380,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 ((AssociationModelImpl) this).updateRoles((AssociationModel) newModel);
             }
             //
-            Directives.get().add(getUpdateDirective(), this);
-            em.fireEvent(getPostUpdateEvent(), instantiate(), newModel, oldModel);
+            Directives.get().add(getUpdateDirective(), object);
+            em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
             // ### FIXME: extend post-update-assoc listener: newModel
         } catch (Exception e) {
             throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",

@@ -119,7 +119,7 @@ class CoreEvent {
         @Override
         public void deliver(EventListener listener, Object... params) {
             ((PostUpdateAssociationListener) listener).postUpdateAssociation(
-                (Association) params[0], (AssociationModel) params[1]
+                (Association) params[0], (AssociationModel) params[1], (AssociationModel) params[2]
             );
         }
     };
