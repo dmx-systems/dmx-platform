@@ -32,12 +32,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
     // ID equality (see DeepaMehtaObjectModel.equals()).
 
-    /**
-     * The parent object this child topics belong to.
-     * Only initialized while update operation. ### FIXME: inject
-     */
-    private DeepaMehtaObjectModelImpl parent;
-
     private PersistenceLayer pl;
     private ModelFactory mf;
 

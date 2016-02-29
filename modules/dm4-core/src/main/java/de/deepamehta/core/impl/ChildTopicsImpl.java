@@ -30,19 +30,10 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ChildTopicsModelImpl model;                         // underlying model
+    private ChildTopicsModel model;             // underlying model
 
-    private DeepaMehtaObjectImpl parent;                        // attached object cache
-
-    /**
-     * Attached object cache.
-     * Key: assoc def URI (String), value: RelatedTopic or List<RelatedTopic>
-     */
-    private Map<String, Object> childTopics = new HashMap();    // attached object cache
-
-    // ### TODO: completely drop all attached object caches. Internal Core operations (e.g. update/delete) must
-    // not rely on attached objects. Attached objects embody userland semantics, e.g. access restrictions.
-    // Construct attached objects on demand only, that is when passed to the userland.
+    private DeepaMehtaObjectImpl parent;        // the parent object this ChildTopics belongs to
+                                                // ### TODO: should be model object?
 
     private PersistenceLayer pl;
     private ModelFactory mf;
@@ -56,7 +47,6 @@ class ChildTopicsImpl implements ChildTopics {
         this.parent = parent;
         this.pl = pl;
         this.mf = pl.mf;
-        initChildTopics();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -99,23 +89,37 @@ class ChildTopicsImpl implements ChildTopics {
 
     @Override
     public Object get(String assocDefUri) {
-        return childTopics.get(assocDefUri);
+        Object value = model.get(assocDefUri);
+        // Note: topics just created have no child topics yet
+        if (value == null) {
+            return null;
+        }
+        // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
+        // implies creating further ChildTopicsImpl objects, which in turn calls this method again but for the next
+        // child-level. Finally attached topics are created for all child-levels. ### FIXME
+        if (value instanceof RelatedTopicModel) {
+            return instantiate((RelatedTopicModel) value);
+        } else if (value instanceof List) {
+            return instantiate((List<RelatedTopicModel>) value);
+        } else {
+            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
+        }
     }
 
     @Override
     public boolean has(String assocDefUri) {
-        return childTopics.containsKey(assocDefUri);
+        return model.has(assocDefUri);
     }
 
     @Override
     public int size() {
-        return childTopics.size();
+        return model.size();
     }
 
     // ---
 
     @Override
-    public ChildTopicsModelImpl getModel() {
+    public ChildTopicsModel getModel() {
         return model;
     }
 
@@ -314,7 +318,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     @Override
     public Iterator<String> iterator() {
-        return childTopics.keySet().iterator();
+        return model.iterator();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -350,114 +354,39 @@ class ChildTopicsImpl implements ChildTopics {
 
 
 
-    // === Attached Object Cache ===
-
-    // --- Access ---
-
-    // ### TODO: make use of model's getTopic methods
+    // === Instantiation ===
 
     private RelatedTopic _getTopic(String assocDefUri) {
-        RelatedTopic topic = _getTopicOrNull(assocDefUri);
-        // error check
-        if (topic == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet() +
-                " (" + parentInfo() + ")");
-        }
-        //
-        return topic;
+        return instantiate(model.getTopic(assocDefUri));
     }
 
     private RelatedTopic _getTopicOrNull(String assocDefUri) {
-        try {
-            return (RelatedTopic) childTopics.get(assocDefUri);
-        } catch (ClassCastException e) {
-            model.throwInvalidSingleAccess(assocDefUri, e);
-            return null;    // never reached
-        }
+        RelatedTopicModel topic = model.getTopicOrNull(assocDefUri);
+        return topic != null ? instantiate(topic) : null;
     }
 
     // ---
 
     private List<RelatedTopic> _getTopics(String assocDefUri) {
-        List<RelatedTopic> topics = _getTopicsOrNull(assocDefUri);
-        // error check
-        if (topics == null) {
-            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet() +
-                " (" + parentInfo() + ")");
-        }
-        //
-        return topics;
+        return instantiate(model.getTopics(assocDefUri));
     }
 
     private List<RelatedTopic> _getTopicsOrNull(String assocDefUri) {
-        try {
-            return (List<RelatedTopic>) childTopics.get(assocDefUri);
-        } catch (ClassCastException e) {
-            model.throwInvalidMultiAccess(assocDefUri, e);
-            return null;    // never reached
-        }
-    }
-
-    // --- Initialization ---
-
-    /**
-     * Initializes this attached object cache. Creates a hierarchy of attached topics (recursively) that is isomorph
-     * to the underlying model.
-     */
-    private void initChildTopics() {
-        // ### TODO: explain
-        if (parent.getUri().equals("dm4.core.meta_meta_type") || parent.getUri().equals("dm4.core.meta_type")) {
-            return;
-        }
-        // Note: we can't just iterate the assoc def URIs contained in the ChildTopicsModel as it may contain
-        // syntetic childs like "dm4.time.created". The Relating Association of these is uninitialized and can not
-        // be instantiated. That's why we do type-driven iteration here.
-        for (AssociationDefinitionModel assocDef : parent.getModel().getType().getAssocDefs()) {
-            initChildTopics(assocDef.getAssocDefUri());
-        }
-    }
-
-    /**
-     * Initializes this attached object cache selectively. Creates a hierarchy of attached topics (recursively) that is
-     * isomorph to the underlying model, starting at the given child sub-tree.
-     */
-    private void initChildTopics(String assocDefUri) {
-        Object value = model.get(assocDefUri);
-        // Note: topics just created have no child topics yet
-        if (value == null) {
-            return;
-        }
-        // Note: no direct recursion takes place here. Recursion is indirect: attached topics are created here, this
-        // implies creating further ChildTopicsImpl objects, which in turn calls this method again but for the next
-        // child-level. Finally attached topics are created for all child-levels.
-        if (value instanceof RelatedTopicModel) {
-            RelatedTopicModel childTopic = (RelatedTopicModel) value;
-            childTopics.put(assocDefUri, instantiateRelatedTopic(childTopic));
-        } else if (value instanceof List) {
-            List<RelatedTopic> topics = new ArrayList();
-            childTopics.put(assocDefUri, topics);
-            for (RelatedTopicModel childTopic : (List<RelatedTopicModel>) value) {
-                topics.add(instantiateRelatedTopic(childTopic));
-            }
-        } else {
-            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
-        }
-    }
-
-    /**
-     * Creates an attached topic to be put in this attached object cache.
-     */
-    private RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
-        try {
-            return new RelatedTopicImpl((RelatedTopicModelImpl) model, pl);
-        } catch (Exception e) {
-            throw new RuntimeException("Instantiating a RelatedTopic failed (" + model + ")", e);
-        }
+        List<? extends RelatedTopicModel> topics = model.getTopicsOrNull(assocDefUri);
+        return topics != null ? instantiate(topics) : null;
     }
 
     // ---
 
-    private String parentInfo() {
-        return parent.className() + " " + parent.getId();
+    private List<RelatedTopic> instantiate(List<? extends RelatedTopicModel> models) {
+        List<RelatedTopic> topics = new ArrayList();
+        for (RelatedTopicModel model : models) {
+            topics.add(instantiate(model));
+        }
+        return topics;
+    }
+
+    private RelatedTopic instantiate(RelatedTopicModel model) {
+        return new RelatedTopicImpl((RelatedTopicModelImpl) model, pl);
     }
 }

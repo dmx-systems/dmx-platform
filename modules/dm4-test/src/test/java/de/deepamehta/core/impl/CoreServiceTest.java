@@ -314,11 +314,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void uriUniquenessUpdate() {
         DeepaMehtaTransaction tx = dms.beginTx();
+        long topic2Id = -1;
         try {
             Topic topic1 = dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
             Topic topic2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+            topic2Id = topic2.getId();
             assertEquals("", topic2.getUri());
             //
             topic2.update(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
@@ -326,7 +328,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             tx.success();
         } catch (Exception e) {
-            assertEquals("URI \"dm4.my.uri\" is not unique", e.getMessage());
+            logger.log(Level.WARNING, "Exception thrown:", e);
+            assertEquals("Updating topic " + topic2Id + " failed (typeUri=\"dm4.core.plugin\")", e.getMessage());
+            assertEquals("URI \"dm4.my.uri\" is not unique", e.getCause().getMessage());
         } finally {
             tx.finish();
         }

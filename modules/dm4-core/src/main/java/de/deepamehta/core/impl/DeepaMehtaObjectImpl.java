@@ -41,8 +41,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     private DeepaMehtaObjectModelImpl model;    // underlying model
 
-    private ChildTopicsImpl childTopics;        // attached object cache
-
     protected PersistenceLayer pl;
     protected ModelFactoryImpl mf;
 
@@ -54,7 +52,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
         this.model = model;
         this.pl = pl;
         this.mf = pl.mf;
-        this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -138,7 +135,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public ChildTopicsImpl getChildTopics() {
-        return childTopics;
+        return new ChildTopicsImpl(model.childTopics, this, pl);
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -196,7 +193,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Directives/events is handled only in the high-level update() method.
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
-    public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
+    public void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
         model.updateChildTopics(null, newChildTopics, assocDef.getModel());     // newChildTopic=null
     }
 
