@@ -22,7 +22,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModelImpl model, AssociationImpl assoc, PersistenceLayer pl) {
+    TopicRoleImpl(TopicRoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
         super(model, assoc, pl);
     }
 
@@ -34,11 +34,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        if (topicIdentifiedByUri()) {
-            return pl.getTopic("uri", new SimpleValue(getTopicUri()));
-        } else {
-            return pl.getTopic(getPlayerId());
-        }
+        return new TopicImpl(getModel().getPlayer(), pl);   // ### TODO: permission check?
     }
 
 
@@ -67,7 +63,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
     // === RoleImpl Overrides ===
 
     @Override
-    public TopicRoleModel getModel() {
-        return (TopicRoleModel) super.getModel();
+    public TopicRoleModelImpl getModel() {
+        return (TopicRoleModelImpl) super.getModel();
     }
 }

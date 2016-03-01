@@ -41,8 +41,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     private DeepaMehtaObjectModelImpl model;    // underlying model
 
-    protected PersistenceLayer pl;
-    protected ModelFactoryImpl mf;
+    PersistenceLayer pl;
+    ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

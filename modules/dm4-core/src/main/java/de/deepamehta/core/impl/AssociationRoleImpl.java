@@ -14,7 +14,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleImpl(AssociationRoleModelImpl model, AssociationImpl assoc, PersistenceLayer pl) {
+    AssociationRoleImpl(AssociationRoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
         super(model, assoc, pl);
     }
 
@@ -26,7 +26,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        return pl.getAssociation(getPlayerId());
+        return new AssociationImpl(getModel().getPlayer(), pl);     // ### TODO: permission check?
     }
 
 
@@ -43,7 +43,7 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
     // === RoleImpl Overrides ===
 
     @Override
-    public AssociationRoleModel getModel() {
-        return (AssociationRoleModel) super.getModel();
+    public AssociationRoleModelImpl getModel() {
+        return (AssociationRoleModelImpl) super.getModel();
     }
 }

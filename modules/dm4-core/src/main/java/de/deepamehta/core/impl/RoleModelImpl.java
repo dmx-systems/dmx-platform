@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Role;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RoleModel;
@@ -76,6 +77,10 @@ abstract class RoleModelImpl implements RoleModel {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    Role instantiate(AssociationModelImpl assoc) {
+        throw new UnsupportedOperationException();
+    }
 
     DeepaMehtaObjectModel getPlayer() {
         throw new UnsupportedOperationException();

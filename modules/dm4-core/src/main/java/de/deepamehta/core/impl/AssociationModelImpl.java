@@ -49,12 +49,12 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public RoleModel getRoleModel1() {
+    public RoleModelImpl getRoleModel1() {
         return roleModel1;
     }
 
     @Override
-    public RoleModel getRoleModel2() {
+    public RoleModelImpl getRoleModel2() {
         return roleModel2;
     }
 
@@ -72,25 +72,15 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // --- Convenience Methods ---
 
-    /**
-     * @teturn  this association's role that matches the given role type.
-     *          If no role matches, null is returned.
-     *          <p>
-     *          If both roles are matching an exception is thrown.
-     */
     @Override
     public RoleModel getRoleModel(String roleTypeUri) {
         boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);
         if (rm1 && rm2) {
-            throw new RuntimeException("Ambiguous getRoleModel() call: both players occupy role \"" +
-                roleTypeUri + "\" in association (" + this + ")");
-        } else if (rm1) {
-            return roleModel1;
-        } else if (rm2) {
-            return roleModel2;
+            throw new RuntimeException("Ambiguity in association: both players occupy role \"" + roleTypeUri +
+                "\" (" + this + ")");
         }
-        return null;
+        return rm1 ? roleModel1 : rm2 ? roleModel2 : null;
     }
 
     @Override
@@ -166,9 +156,19 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
      *          <p>
      *          If there are 2 such topics an exception is thrown.
      */
-    TopicModel getTopic(String roleTypeUri) {
+    TopicModelImpl getTopic(String roleTypeUri) {
         RoleModel role = getRoleModel(roleTypeUri);
         return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
+    }
+
+    TopicModelImpl getTopicByType(String topicTypeUri) {
+        TopicModelImpl topic1 = filterTopic(roleModel1, topicTypeUri);
+        TopicModelImpl topic2 = filterTopic(roleModel2, topicTypeUri);
+        if (topic1 != null && topic2 != null) {
+            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri +
+                "\" (" + this + ")");
+        }
+        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
     }
 
     // ---
@@ -336,6 +336,18 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             return roleModel2;
         }
         throw new RuntimeException("Role is not part of association (role=" + roleModel + ", association=" + this);
+    }
+
+    // ---
+
+    private TopicModelImpl filterTopic(RoleModelImpl role, String topicTypeUri) {
+        if (role instanceof TopicRoleModel) {
+            TopicModelImpl topic = ((TopicRoleModelImpl) role).getPlayer();
+            if (topic.getTypeUri().equals(topicTypeUri)) {
+                return topic;
+            }
+        }
+        return null;
     }
 
     // ---

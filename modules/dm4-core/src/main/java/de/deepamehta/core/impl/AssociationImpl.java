@@ -14,6 +14,7 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -32,18 +33,12 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Role role1;     // attached object cache
-    private Role role2;     // attached object cache
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     AssociationImpl(AssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        // init attached object cache
-        this.role1 = createAttachedRole(model.getRoleModel1());
-        this.role2 = createAttachedRole(model.getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -71,12 +66,12 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public Role getRole1() {
-        return role1;
+        return getModel().getRoleModel1().instantiate(getModel());
     }
 
     @Override
     public Role getRole2() {
-        return role2;
+        return getModel().getRoleModel2().instantiate(getModel());
     }
 
     // ---
@@ -95,24 +90,14 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public Topic getTopic(String roleTypeUri) {
-        Topic topic1 = filterTopic(getRole1(), roleTypeUri);
-        Topic topic2 = filterTopic(getRole2(), roleTypeUri);
-        if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguity in association: both topics have role type \"" + roleTypeUri +
-                "\" (" + this + ")");
-        }
-        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
+        TopicModelImpl topic = getModel().getTopic(roleTypeUri);
+        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
     }
 
     @Override
     public Topic getTopicByType(String topicTypeUri) {
-        Topic topic1 = filterTopic(getPlayer1(), topicTypeUri);
-        Topic topic2 = filterTopic(getPlayer2(), topicTypeUri);
-        if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri +
-                "\" (" + this + ")");
-        }
-        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
+        TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
+        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
     }
 
     // ---
@@ -262,50 +247,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // --- Update ---
-
-    /**
-     * @param   nr      used only for logging
-     */
-    private void updateRole(RoleModel newModel, int nr) {
-        if (newModel != null) {
-            // Note: We must lookup the roles individually.
-            // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            Role role = getRole(newModel);
-            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
-            String roleTypeUri = role.getRoleTypeUri();         // current value
-            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
-                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
-                    "\"");
-                role.setRoleTypeUri(newRoleTypeUri);
-            }
-        }
-    }
-
     // --- Helper ---
-
-    private Role createAttachedRole(RoleModel model) {
-        if (model instanceof TopicRoleModel) {
-            return new TopicRoleImpl((TopicRoleModelImpl) model, this, pl);
-        } else if (model instanceof AssociationRoleModel) {
-            return new AssociationRoleImpl((AssociationRoleModelImpl) model, this, pl);
-        } else {
-            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
-        }
-    }
-
-    // ---
-
-    private Topic filterTopic(Role role, String roleTypeUri) {
-        return role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri) ? ((TopicRole) role).getTopic()
-            : null;
-    }
-
-    private Topic filterTopic(DeepaMehtaObject object, String topicTypeUri) {
-        return object instanceof Topic && object.getTypeUri().equals(topicTypeUri) ? (Topic) object : null;
-    }
-
-    // ---
 
     private TopicRole filterRole(Role role, TopicRoleModel roleModel) {
         return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&

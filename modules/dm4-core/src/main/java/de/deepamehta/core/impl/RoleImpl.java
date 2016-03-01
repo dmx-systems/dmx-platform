@@ -12,14 +12,15 @@ abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModelImpl model;
-    private AssociationImpl assoc;      // the association this role is involved in
+    private RoleModelImpl model;            // underlying model
+
+    private AssociationModelImpl assoc;     // the association this role is involved in
 
     PersistenceLayer pl;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RoleImpl(RoleModelImpl model, AssociationImpl assoc, PersistenceLayer pl) {
+    RoleImpl(RoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
         this.model = model;
         this.assoc = assoc;
         this.pl = pl;
@@ -47,7 +48,7 @@ abstract class RoleImpl implements Role {
 
     @Override
     public void setRoleTypeUri(String roleTypeUri) {
-        assoc.getModel().updateRoleTypeUri(model, roleTypeUri);
+        assoc.updateRoleTypeUri(model, roleTypeUri);
     }
 
     // ---

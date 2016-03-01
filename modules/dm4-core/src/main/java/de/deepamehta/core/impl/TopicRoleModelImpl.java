@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Role;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -101,7 +102,12 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    TopicModel getPlayer() {
+    Role instantiate(AssociationModelImpl assoc) {
+        return new TopicRoleImpl(this, assoc, pl);
+    }
+
+    @Override
+    TopicModelImpl getPlayer() {
         if (topicIdentifiedByUri) {
             return pl.fetchTopic("uri", new SimpleValue(topicUri));
         } else {
