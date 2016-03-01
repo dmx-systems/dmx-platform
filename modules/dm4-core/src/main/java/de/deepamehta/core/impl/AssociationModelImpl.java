@@ -77,7 +77,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);
         if (rm1 && rm2) {
-            throw new RuntimeException("Ambiguity in association: both players occupy role \"" + roleTypeUri +
+            throw new RuntimeException("Ambiguous getRoleModel() call: both players occupy role \"" + roleTypeUri +
                 "\" (" + this + ")");
         }
         return rm1 ? roleModel1 : rm2 ? roleModel2 : null;
@@ -165,7 +165,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         TopicModelImpl topic1 = filterTopic(roleModel1, topicTypeUri);
         TopicModelImpl topic2 = filterTopic(roleModel2, topicTypeUri);
         if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri +
+            throw new RuntimeException("Ambiguous getTopicByType() call: both topics are of type \"" + topicTypeUri +
                 "\" (" + this + ")");
         }
         return topic1 != null ? topic1 : topic2 != null ? topic2 : null;

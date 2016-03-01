@@ -38,9 +38,9 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
 
-    // **************************************
-    // *** DeepaMehtaObjectImpl Overrides ***
-    // **************************************
+    // ****************************
+    // *** Topic Implementation ***
+    // ****************************
 
 
 
@@ -49,13 +49,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
         super.update(newModel);
     }
 
-
-
-    // ****************************
-    // *** Topic Implementation ***
-    // ****************************
-
-
+    // ---
 
     @Override
     public Topic loadChildTopics() {
@@ -63,8 +57,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     }
 
     @Override
-    public Topic loadChildTopics(String childTypeUri) {
-        return (Topic) super.loadChildTopics(childTypeUri);
+    public Topic loadChildTopics(String assocDefUri) {
+        return (Topic) super.loadChildTopics(assocDefUri);
     }
 
     // ---

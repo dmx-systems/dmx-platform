@@ -13,20 +13,14 @@ import java.util.List;
  */
 public interface Topic extends DeepaMehtaObject {
 
+    void update(TopicModel model);
 
-
-    // === Model ===
+    // ---
 
     Topic loadChildTopics();
-    Topic loadChildTopics(String childTypeUri);
+    Topic loadChildTopics(String assocDefUri);
 
     // ---
 
     TopicModel getModel();
-
-
-
-    // === Updating ===
-
-    void update(TopicModel model);
 }

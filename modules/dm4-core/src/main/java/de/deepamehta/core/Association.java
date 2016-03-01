@@ -15,10 +15,6 @@ import java.util.List;
  */
 public interface Association extends DeepaMehtaObject {
 
-
-
-    // === Model ===
-
     Role getRole1();
 
     Role getRole2();
@@ -62,16 +58,14 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
+    void update(AssociationModel model);
+
+    // ---
+
     Association loadChildTopics();
-    Association loadChildTopics(String childTypeUri);
+    Association loadChildTopics(String assocDefUri);
 
     // ---
 
     AssociationModel getModel();
-
-
-
-    // === Updating ===
-
-    void update(AssociationModel model);
 }

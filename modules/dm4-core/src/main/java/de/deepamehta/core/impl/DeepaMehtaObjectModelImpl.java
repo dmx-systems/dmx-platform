@@ -239,6 +239,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    boolean isSimple() {
+        return !getType().getDataTypeUri().equals("dm4.core.composite");
+    }        
+
     // ---
 
     TypeModel getType() {
@@ -342,38 +346,19 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *                  If role 1 is <code>null</code> it is not updated.
      *                  If role 2 is <code>null</code> it is not updated.
      */
-    void update(DeepaMehtaObjectModel newModel) {
+    final void update(DeepaMehtaObjectModel newModel) {
         try {
             logger.info("Updating " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
             DeepaMehtaObject object = instantiate();
             DeepaMehtaObjectModel oldModel = clone();
             em.fireEvent(getPreUpdateEvent(), object, newModel);
             //
-            // URI
-            String newUri = newModel.getUri();
-            if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
-                logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
-                    "\" -> \"" + newUri + "\"");
-                updateUri(newUri);
-            }
-            // type URI
-            String newTypeUri = newModel.getTypeUri();
-            if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
-                logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri +
-                    "\" -> \"" + newTypeUri + "\"");
-                updateTypeUri(newTypeUri);
-            }
-            //
-            if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-                updateChildTopics(newModel.getChildTopicsModel());
+            _updateUri(newModel.getUri());
+            _updateTypeUri(newModel.getTypeUri());
+            if (isSimple()) {
+                _updateSimpleValue(newModel.getSimpleValue());
             } else {
-                // simple value
-                SimpleValue newValue = newModel.getSimpleValue();
-                if (newValue != null && !newValue.equals(value)) {      // abort if no update is requested
-                    logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value +
-                        "\" -> \"" + newValue + "\"");
-                    updateSimpleValue(newValue);
-                }
+                updateChildTopics(newModel.getChildTopicsModel());
             }
             //
             if (this instanceof AssociationModel) {
@@ -382,7 +367,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
-            // ### FIXME: extend post-update-assoc listener: newModel
         } catch (Exception e) {
             throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",
                 e);
@@ -488,6 +472,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Update Child Topics ===
 
+    // ### TODO: make this private? See comment in DeepaMehtaObjectImpl.setChildTopics()
     void updateChildTopics(ChildTopicsModel newModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
@@ -615,6 +600,34 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         } catch (Exception e) {
             throw new RuntimeException("Recalculating the label of " + objectInfo() +
                 " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
+        }
+    }
+
+
+
+    // === Update ===
+
+    private void _updateUri(String newUri) {
+        if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
+            logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
+                "\" -> \"" + newUri + "\"");
+            updateUri(newUri);
+        }
+    }
+
+    private void _updateTypeUri(String newTypeUri) {
+        if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
+            logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri +
+                "\" -> \"" + newTypeUri + "\"");
+            updateTypeUri(newTypeUri);
+        }
+    }
+
+    private void _updateSimpleValue(SimpleValue newValue) {
+        if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
+            logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value +
+                "\" -> \"" + newValue + "\"");
+            updateSimpleValue(newValue);
         }
     }
 

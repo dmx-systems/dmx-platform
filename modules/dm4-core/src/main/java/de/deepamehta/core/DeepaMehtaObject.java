@@ -51,7 +51,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     // ---
 
     DeepaMehtaObject loadChildTopics();
-    DeepaMehtaObject loadChildTopics(String childTypeUri);
+    DeepaMehtaObject loadChildTopics(String assocDefUri);
 
     // ---
 
