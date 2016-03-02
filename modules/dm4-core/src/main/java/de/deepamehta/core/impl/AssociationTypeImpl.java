@@ -68,23 +68,6 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
     // === Implementation of abstract TypeImpl methods ===
 
     @Override
-    final void putInTypeCache() {
-        pl.typeCache.putAssociationType(this);
-    }
-
-    @Override
-    final void removeFromTypeCache() {
-        pl.typeCache.removeAssociationType(getUri());
-    }
-
-    // ---
-
-    @Override
-    final Directive getDeleteTypeDirective() {
-        return Directive.DELETE_ASSOCIATION_TYPE;
-    }
-
-    @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
         return pl.getAssociations(getUri()).getItems();
     }

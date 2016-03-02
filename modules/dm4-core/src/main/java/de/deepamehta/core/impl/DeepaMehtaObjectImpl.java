@@ -39,7 +39,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModelImpl model;    // underlying model
+    DeepaMehtaObjectModelImpl model;    // underlying model
 
     PersistenceLayer pl;
     ModelFactoryImpl mf;
@@ -143,7 +143,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
-            model.updateChildTopics(childTopics);
+            model._updateChildTopics(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
         }

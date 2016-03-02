@@ -353,16 +353,35 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             DeepaMehtaObjectModel oldModel = clone();
             em.fireEvent(getPreUpdateEvent(), object, newModel);
             //
+            // --- Type (preambel) ---
+            TypeModelImpl type = null;
+            boolean uriChanged = false;
+            if (this instanceof TypeModel) {
+                type = (TypeModelImpl) this;
+                uriChanged = hasUriChanged(newModel.getUri());
+                if (uriChanged) {
+                    type._removeFromTypeCache();
+                }
+            }
+            // --- Generic Object ---
             _updateUri(newModel.getUri());
             _updateTypeUri(newModel.getTypeUri());
             if (isSimple()) {
                 _updateSimpleValue(newModel.getSimpleValue());
             } else {
-                updateChildTopics(newModel.getChildTopicsModel());
+                _updateChildTopics(newModel.getChildTopicsModel());
             }
-            //
+            // --- Association ---
             if (this instanceof AssociationModel) {
                 ((AssociationModelImpl) this).updateRoles((AssociationModel) newModel);
+            }
+            // --- Type ---
+            if (this instanceof TypeModel) {
+                if (uriChanged) {
+                    type.putInTypeCache();
+                    pl.typeStorage.putInTypeCache(type);    // ### TODO: refactoring. See comment in TypeCache#put..
+                }
+                type.updateType((TypeModel) newModel);
             }
             //
             Directives.get().add(getUpdateDirective(), object);
@@ -472,8 +491,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Update Child Topics ===
 
-    // ### TODO: make this private? See comment in DeepaMehtaObjectImpl.setChildTopics()
-    void updateChildTopics(ChildTopicsModel newModel) {
+    // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
+    void _updateChildTopics(ChildTopicsModel newModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
@@ -608,7 +627,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Update ===
 
     private void _updateUri(String newUri) {
-        if (newUri != null && !newUri.equals(uri)) {                // abort if no update is requested
+        if (hasUriChanged(newUri)) {                                // abort if no update is requested
             logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
                 "\" -> \"" + newUri + "\"");
             updateUri(newUri);
@@ -629,6 +648,12 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 "\" -> \"" + newValue + "\"");
             updateSimpleValue(newValue);
         }
+    }
+
+    // ---
+
+    private boolean hasUriChanged(String newUri) {
+        return newUri != null && !newUri.equals(uri);
     }
 
 

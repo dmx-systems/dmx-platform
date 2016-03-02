@@ -30,8 +30,8 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private SequencedHashMap<String, AssociationDefinition> assocDefs;  // Attached object cache
-    private ViewConfiguration viewConfig;                               // Attached object cache
+    private SequencedHashMap<String, AssociationDefinition> assocDefs;  // Attached object cache ### TODO: drop this
+    private ViewConfiguration viewConfig;                               // Attached object cache ### TODO: drop this
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -54,33 +54,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
 
-    // === Updating ===
-
-    // ### TODO: refactoring. Move update logic to ValueStorage.
-    @Override
-    public void update(TypeModel model) {
-        boolean uriChanged = hasUriChanged(model.getUri());
-        if (uriChanged) {
-            _removeFromTypeCache();
-        }
-        //
-        super.update(model);
-        //
-        if (uriChanged) {
-            putInTypeCache();   // abstract
-            pl.typeStorage.putInTypeCache(getModel());  // ### TODO: refactoring. See comment in TypeCache#put methods.
-        }
-        //
-        updateDataTypeUri(model.getDataTypeUri());
-        updateAssocDefs(model.getAssocDefs());
-        updateSequence(model.getAssocDefs());
-        updateLabelConfig(model.getLabelConfig());
-    }
-
-
-
-    // === Deletion ===
-
+    // ### TODO: refactoring. Move update logic to TypeModel.
     @Override
     public void delete() {
         String operation = "Deleting " + className() + " \"" + getUri() + "\" (named \"" + getSimpleValue() + "\")";
@@ -94,7 +68,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
             //
             super.delete();   // delete type topic
             //
-            _removeFromTypeCache();
+            getModel()._removeFromTypeCache();
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed", e);
         }
@@ -107,8 +81,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
     // ***************************
 
 
-
-    // === Model ===
 
     // --- Data Type ---
 
@@ -296,6 +268,13 @@ abstract class TypeImpl extends TopicImpl implements Type {
     // ---
 
     @Override
+    public void update(TypeModel newModel) {
+        model.update(newModel);
+    }
+
+    // ---
+
+    @Override
     public TypeModelImpl getModel() {
         return (TypeModelImpl) super.getModel();
     }
@@ -303,14 +282,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    abstract void putInTypeCache();
-
-    abstract void removeFromTypeCache();
-
-    // ---
-
-    abstract Directive getDeleteTypeDirective();
 
     abstract List<? extends DeepaMehtaObject> getAllInstances();
 
@@ -326,22 +297,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
     // === Update ===
-
-    private boolean hasUriChanged(String newUri) {
-        return newUri != null && !getUri().equals(newUri);
-    }
-
-    // ---
-
-    private void updateDataTypeUri(String newDataTypeUri) {
-        if (newDataTypeUri != null) {
-            String dataTypeUri = getDataTypeUri();
-            if (!dataTypeUri.equals(newDataTypeUri)) {
-                logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
-                setDataTypeUri(newDataTypeUri);
-            }
-        }
-    }
 
     private void storeDataTypeUri(String dataTypeUri) {
         // remove current assignment
@@ -369,50 +324,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
         //
         for (DeepaMehtaObject obj : objects) {
             ((DeepaMehtaObjectModelImpl) obj.getModel()).indexSimpleValue(indexMode);
-        }
-    }
-
-    // ---
-
-    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
-            // So we must identify the assoc def to update **by ID**.
-            // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
-            String[] assocDefUris = getModel().findAssocDefUris(assocDef.getId());
-            getAssocDef(assocDefUris[0]).update(assocDef);
-        }
-    }
-
-    private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
-        try {
-            if (getAssocDefs().size() != newAssocDefs.size()) {
-                throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
-            }
-            if (getModel().hasSameAssocDefSequence(newAssocDefs)) {
-                return;
-            }
-            // update memory
-            logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
-            getModel().rehashAssocDefs(newAssocDefs);   // update model
-            _rehashAssocDefs(newAssocDefs);             // update attached object cache
-            // update DB
-            pl.typeStorage.rebuildSequence(getModel());
-        } catch (Exception e) {
-            throw new RuntimeException("Updating the assoc def sequence failed", e);
-        }
-    }
-
-    // ---
-
-    private void updateLabelConfig(List<String> newLabelConfig) {
-        try {
-            if (!getLabelConfig().equals(newLabelConfig)) {
-                logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
-                setLabelConfig(newLabelConfig);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
         }
     }
 
@@ -524,43 +435,5 @@ abstract class TypeImpl extends TopicImpl implements Type {
     private void initViewConfig() {
         RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
         this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
-    }
-
-
-
-    // ===
-
-    /**
-     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
-     */
-    private void _removeFromTypeCache() {
-        removeFromTypeCache();                      // abstract
-        addDeleteTypeDirective();
-    }
-
-    private void addDeleteTypeDirective() {
-        Directive dir = getDeleteTypeDirective();   // abstract
-        Directives.get().add(dir, new JSONWrapper("uri", getUri()));
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private class JSONWrapper implements JSONEnabled {
-
-        private JSONObject wrapped;
-
-        private JSONWrapper(String key, Object value) {
-            try {
-                wrapped = new JSONObject();
-                wrapped.put(key, value);
-            } catch (Exception e) {
-                throw new RuntimeException("Constructing a JSONWrapper failed", e);
-            }
-        }
-
-        @Override
-        public JSONObject toJSON() {
-            return wrapped;
-        }
     }
 }

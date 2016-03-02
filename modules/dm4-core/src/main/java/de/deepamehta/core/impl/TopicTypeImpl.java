@@ -68,23 +68,6 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
     // === Implementation of abstract TypeImpl methods ===
 
     @Override
-    final void putInTypeCache() {
-        pl.typeCache.putTopicType(this);
-    }
-
-    @Override
-    final void removeFromTypeCache() {
-        pl.typeCache.removeTopicType(getUri());
-    }
-
-    // ---
-
-    @Override
-    final Directive getDeleteTypeDirective() {
-        return Directive.DELETE_TOPIC_TYPE;
-    }
-
-    @Override
     final List<? extends DeepaMehtaObject> getAllInstances() {
         return pl.getTopics(getUri()).getItems();
     }

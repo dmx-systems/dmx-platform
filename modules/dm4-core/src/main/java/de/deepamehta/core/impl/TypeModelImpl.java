@@ -1,10 +1,13 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
+import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -230,6 +233,41 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    void putInTypeCache() {
+        throw new UnsupportedOperationException();
+    }
+
+    void removeFromTypeCache() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    Directive getDeleteTypeDirective() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    /**
+     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
+     */
+    void _removeFromTypeCache() {
+        removeFromTypeCache();                      // abstract
+        addDeleteTypeDirective();
+    }
+
+
+
+    // === Update ===
+
+    void updateType(TypeModel newModel) {
+        updateDataTypeUri(newModel.getDataTypeUri());
+        updateAssocDefs(newModel.getAssocDefs());
+        updateSequence(newModel.getAssocDefs());
+        updateLabelConfig(newModel.getLabelConfig());
+    }
+
 
 
     // === Association Definitions ===
@@ -237,6 +275,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     /**
      * Finds an assoc def by ID and returns its URI (at index 0). Returns the URI of the next-in-sequence
      * assoc def as well (at index 1), or null if the found assoc def is the last one.
+     * ### TODO: make private?
      */
     String[] findAssocDefUris(long assocDefId) {
         if (assocDefId == -1) {
@@ -262,6 +301,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return assocDefUris;
     }
 
+    // ### TODO: make private?
     boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs) {
         Collection<AssociationDefinitionModel> _assocDefs = getAssocDefs();
         if (assocDefs.size() != _assocDefs.size()) {
@@ -283,6 +323,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return true;
     }
 
+    // ### TODO: make private?
     void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
         AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
         logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
@@ -290,16 +331,19 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 
+    // ### TODO: make private?
     void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
     }
 
+    // ### TODO: make private?
     void replaceAssocDef(AssociationDefinitionModel assocDef) {
         replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
     }
 
+    // ### TODO: make private?
     void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
         removeAssocDef(oldAssocDefUri);
         addAssocDefBefore(assocDef, beforeAssocDefUri);
@@ -309,6 +353,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Label Configuration ===
 
+    // ### TODO: make private?
     void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
         List<String> labelConfig = getLabelConfig();
         int i = labelConfig.indexOf(oldAssocDefUri);
@@ -319,6 +364,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
+    // ### TODO: make private?
     void removeFromLabelConfig(String assocDefUri) {
         List<String> labelConfig = getLabelConfig();
         int i = labelConfig.indexOf(assocDefUri);
@@ -328,9 +374,76 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Update ===
+
+    private void updateDataTypeUri(String newDataTypeUri) {
+        if (newDataTypeUri != null) {
+            String dataTypeUri = getDataTypeUri();
+            if (!dataTypeUri.equals(newDataTypeUri)) {
+                logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
+                setDataTypeUri(newDataTypeUri);
+            }
+        }
+    }
+
+    // ---
+
+    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+            // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
+            // So we must identify the assoc def to update **by ID**.
+            // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
+            String[] assocDefUris = findAssocDefUris(assocDef.getId());
+            getAssocDef(assocDefUris[0]).update(assocDef);
+        }
+    }
+
+    private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
+        try {
+            if (getAssocDefs().size() != newAssocDefs.size()) {
+                throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
+            }
+            if (hasSameAssocDefSequence(newAssocDefs)) {
+                return;
+            }
+            // update memory
+            logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
+            rehashAssocDefs(newAssocDefs);
+            // update DB
+            pl.typeStorage.rebuildSequence(this);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating the assoc def sequence failed", e);
+        }
+    }
+
+    // ---
+
+    private void updateLabelConfig(List<String> newLabelConfig) {
+        try {
+            if (!getLabelConfig().equals(newLabelConfig)) {
+                logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
+                setLabelConfig(newLabelConfig);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
+        }
+    }
+
+    // ---
+
+    // ### TODO: inline
+    private void addDeleteTypeDirective() {
+        Directive dir = getDeleteTypeDirective();   // abstract
+        Directives.get().add(dir, new JSONWrapper("uri", uri));
+    }
+
+
+
+    // ===
 
     private AssociationDefinitionModel getAssocDefOrThrow(String assocDefUri) {
         AssociationDefinitionModel assocDef = _getAssocDef(assocDefUri);
@@ -382,5 +495,26 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             _assocDefs.put(assocDef.toJSON());
         }
         return _assocDefs;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class JSONWrapper implements JSONEnabled {
+
+        private JSONObject wrapped;
+
+        private JSONWrapper(String key, Object value) {
+            try {
+                wrapped = new JSONObject();
+                wrapped.put(key, value);
+            } catch (Exception e) {
+                throw new RuntimeException("Constructing a JSONWrapper failed", e);
+            }
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            return wrapped;
+        }
     }
 }

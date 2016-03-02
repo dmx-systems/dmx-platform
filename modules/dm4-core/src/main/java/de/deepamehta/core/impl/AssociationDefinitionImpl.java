@@ -109,6 +109,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // === Updating ===
 
+    // ### TODO: move update logic to model
     @Override
     public void update(AssociationDefinitionModel newModel) {
         try {

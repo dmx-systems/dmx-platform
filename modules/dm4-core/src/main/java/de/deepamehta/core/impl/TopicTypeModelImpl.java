@@ -1,8 +1,10 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.Directive;
 
 
 
@@ -31,5 +33,38 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     @Override
     public String toString() {
         return "topic type (" + super.toString() + ")";
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    String className() {
+        return "topic type";
+    }
+
+    @Override
+    TopicType instantiate() {
+        return new TopicTypeImpl(this, pl);
+    }
+
+
+
+    // === Implementation of abstract TypeModelImpl methods ===
+
+    @Override
+    void putInTypeCache() {
+        pl.typeCache.putTopicType(instantiate());
+    }
+
+    @Override
+    void removeFromTypeCache() {
+        pl.typeCache.removeTopicType(uri);
+    }
+
+    // ---
+
+    @Override
+    Directive getDeleteTypeDirective() {
+        return Directive.DELETE_TOPIC_TYPE;
     }
 }

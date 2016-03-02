@@ -12,10 +12,6 @@ import java.util.List;
 
 public interface Type extends Topic {
 
-
-
-    // === Model ===
-
     // --- Data Type ---
 
     String getDataTypeUri();
@@ -85,11 +81,9 @@ public interface Type extends Topic {
 
     // ---
 
-    TypeModel getModel();
-
-
-
-    // === Updating ===
-
     void update(TypeModel model);
+
+    // ---
+
+    TypeModel getModel();
 }
