@@ -251,6 +251,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
+     * ### TODO: make private
      */
     void _removeFromTypeCache() {
         removeFromTypeCache();                      // abstract
@@ -322,6 +323,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         //
         return true;
     }
+
+    void rehashAssocDef(long assocDefId) {
+        String[] assocDefUris = findAssocDefUris(assocDefId);
+        rehashAssocDef(assocDefUris[0], assocDefUris[1]);
+    }
+
 
     // ### TODO: make private?
     void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
@@ -398,7 +405,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // So we must identify the assoc def to update **by ID**.
             // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
             String[] assocDefUris = findAssocDefUris(assocDef.getId());
-            getAssocDef(assocDefUris[0]).update(assocDef);
+            ((AssociationDefinitionModelImpl) getAssocDef(assocDefUris[0])).update(assocDef);
         }
     }
 

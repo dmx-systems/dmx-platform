@@ -370,14 +370,14 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicType createTopicType(TopicTypeModel model) {
+    TopicType createTopicType(TopicTypeModelImpl model) {
         try {
             // store in DB
             createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
             // instantiate
-            TopicType topicType = new TopicTypeImpl((TopicTypeModelImpl) model, this);
+            TopicType topicType = new TopicTypeImpl(model, this);
             typeCache.putTopicType(topicType);
             //
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
@@ -387,14 +387,14 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssociationType createAssociationType(AssociationTypeModel model) {
+    AssociationType createAssociationType(AssociationTypeModelImpl model) {
         try {
             // store in DB
             createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
             // instantiate
-            AssociationType assocType = new AssociationTypeImpl((AssociationTypeModelImpl) model, this);
+            AssociationType assocType = new AssociationTypeImpl(model, this);
             typeCache.putAssociationType(assocType);
             //
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);

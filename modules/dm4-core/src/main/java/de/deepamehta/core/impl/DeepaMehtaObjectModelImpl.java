@@ -363,6 +363,17 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                     type._removeFromTypeCache();
                 }
             }
+            // --- Association Definition (preambel) ---
+            AssociationDefinitionModelImpl assocDef = null;
+            boolean changeCustomAssocType = false;
+            if (this instanceof AssociationDefinitionModel) {
+                assocDef = (AssociationDefinitionModelImpl) this;
+                changeCustomAssocType = !assocDef.hasSameCustomAssocType((AssociationDefinitionModel) newModel);
+                if (changeCustomAssocType) {
+                    logger.info("### Changing custom association type URI from \"" + assocDef.getCustomAssocTypeUri() +
+                        "\" -> \"" + ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
+                }
+            }
             // --- Generic Object ---
             _updateUri(newModel.getUri());
             _updateTypeUri(newModel.getTypeUri());
@@ -374,6 +385,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             // --- Association ---
             if (this instanceof AssociationModel) {
                 ((AssociationModelImpl) this).updateRoles((AssociationModel) newModel);
+            }
+            // --- Association Definition ---
+            if (this instanceof AssociationDefinitionModel) {
+                assocDef.updateCardinality((AssociationDefinitionModel) newModel);
+                // rehash
+                if (changeCustomAssocType) {
+                    assocDef.getParentType().rehashAssocDef(newModel.getId());
+                }
             }
             // --- Type ---
             if (this instanceof TypeModel) {

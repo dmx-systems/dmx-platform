@@ -560,7 +560,7 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationTypeModel ===
 
     @Override
-    public AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
+    public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                                  List<String> labelConfig, ViewConfigurationModel viewConfig) {
         return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
@@ -568,13 +568,13 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri) {
+    public AssociationTypeModelImpl newAssociationTypeModel(String uri, String value, String dataTypeUri) {
         return new AssociationTypeModelImpl(newTypeModel(uri, "dm4.core.assoc_type", new SimpleValue(value),
             dataTypeUri));
     }
 
     @Override
-    public AssociationTypeModel newAssociationTypeModel(JSONObject assocType) {
+    public AssociationTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
         try {
             return new AssociationTypeModelImpl(newTypeModel(assocType.put("type_uri", "dm4.core.assoc_type")));
         } catch (Exception e) {

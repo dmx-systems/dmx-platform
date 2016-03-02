@@ -261,7 +261,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType createTopicType(TopicTypeModel model) {
-        return pl.createTopicType(model);
+        return pl.createTopicType((TopicTypeModelImpl) model);
     }
 
     @Override
@@ -327,7 +327,7 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        return pl.createAssociationType(model);
+        return pl.createAssociationType((AssociationTypeModelImpl) model);
     }
 
     @Override

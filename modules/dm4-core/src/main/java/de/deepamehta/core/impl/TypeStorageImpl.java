@@ -52,11 +52,12 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: check if we can drop the type model cache if we attach *before* storing a type
-    private Map<String, TypeModel> typeCache = new HashMap();   // type model cache
+    // ### TODO: check if we can drop the type model cache if we attach *before* storing a type. --> No!
+    // ### Keep the type model cache, and drop the attached type cache instead!
+    private Map<String, TypeModelImpl> typeCache = new HashMap();   // type model cache
 
     private PersistenceLayer pl;
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -74,7 +75,7 @@ class TypeStorageImpl implements TypeStorage {
     // === Type Model Cache ===
 
     TopicTypeModel getTopicType(String topicTypeUri) {
-        TopicTypeModel topicType = (TopicTypeModel) getType(topicTypeUri);
+        TopicTypeModelImpl topicType = (TopicTypeModelImpl) getType(topicTypeUri);
         if (topicType == null) {
             // logger.info("##################### Loading topic type \"" + topicTypeUri + "\"");
             topicType = fetchTopicType(topicTypeUri);
@@ -84,7 +85,7 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     AssociationTypeModel getAssociationType(String assocTypeUri) {
-        AssociationTypeModel assocType = (AssociationTypeModel) getType(assocTypeUri);
+        AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getType(assocTypeUri);
         if (assocType == null) {
             // logger.info("##################### Loading association type \"" + assocTypeUri + "\"");
             assocType = fetchAssociationType(assocTypeUri);
@@ -95,7 +96,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    void putInTypeCache(TypeModel type) {
+    void putInTypeCache(TypeModelImpl type) {
         typeCache.put(type.getUri(), type);
     }
 
@@ -105,7 +106,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    private TypeModel getType(String typeUri) {
+    TypeModelImpl getType(String typeUri) {
         return typeCache.get(typeUri);
     }
 
@@ -116,7 +117,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     // ### TODO: unify with next method
-    private TopicTypeModel fetchTopicType(String topicTypeUri) {
+    private TopicTypeModelImpl fetchTopicType(String topicTypeUri) {
         TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
         checkTopicType(topicTypeUri, typeTopic);
         //
@@ -131,7 +132,7 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     // ### TODO: unify with previous method
-    private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
+    private AssociationTypeModelImpl fetchAssociationType(String assocTypeUri) {
         TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
         checkAssociationType(assocTypeUri, typeTopic);
         //
@@ -175,7 +176,7 @@ class TypeStorageImpl implements TypeStorage {
      * <p>
      * Called to store a newly created topic type or association type.
      */
-    void storeType(TypeModel type) {
+    void storeType(TypeModelImpl type) {
         // 1) put in type model cache
         // Note: an association type must be put in type model cache *before* storing its association definitions.
         // Consider creation of association type "Composition Definition": it has a composition definition itself.

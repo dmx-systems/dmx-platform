@@ -7,6 +7,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONException;
@@ -143,6 +144,24 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    @Override
+    String className() {
+        return "association definition";
+    }
+
+
+
+    // === Update ===
+
+    void updateCardinality(AssociationDefinitionModel newModel) {
+        updateParentCardinality(newModel.getParentCardinalityUri());
+        updateChildCardinality(newModel.getChildCardinalityUri());
+    }
+
+
+
+    // ===
+
     boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
         String _customAssocTypeUri = getCustomAssocTypeUri();
         String customAssocTypeUri = ((AssociationDefinitionModelImpl) assocDef).getCustomAssocTypeUriOrNull();
@@ -156,6 +175,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     /**
+     * ### TODO: make private
+     *
      * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
      *          Otherwise returns the custom assoc type URI.
      */
@@ -163,7 +184,49 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
     }
 
+    // ---
+
+    TypeModelImpl getParentType() {
+        return pl.typeStorage.getType(getParentTypeUri());
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    // === Update ===
+
+    private void updateParentCardinality(String newParentCardinalityUri) {
+        // abort if no update is requested
+        if (newParentCardinalityUri == null) {
+            return;
+        }
+        //
+        String parentCardinalityUri = getParentCardinalityUri();
+        if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
+            logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
+                newParentCardinalityUri + "\"");
+            setParentCardinalityUri(newParentCardinalityUri);
+        }
+    }
+
+    private void updateChildCardinality(String newChildCardinalityUri) {
+        // abort if no update is requested
+        if (newChildCardinalityUri == null) {
+            return;
+        }
+        //
+        String childCardinalityUri = getChildCardinalityUri();
+        if (!childCardinalityUri.equals(newChildCardinalityUri)) {
+            logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
+                newChildCardinalityUri + "\"");
+            setChildCardinalityUri(newChildCardinalityUri);
+        }
+    }
+
+
+
+    // ====
 
     private RelatedTopicModel getCustomAssocType() {
         RelatedTopicModel customAssocType = getChildTopicsModel().getTopicOrNull(

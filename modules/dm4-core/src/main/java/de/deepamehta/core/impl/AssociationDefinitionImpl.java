@@ -18,9 +18,9 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private TypeImpl parentType;
+    private TypeImpl parentType;                // ### TODO: drop this
 
-    private ViewConfigurationImpl viewConfig;   // attached object cache
+    private ViewConfigurationImpl viewConfig;   // attached object cache ### TODO: drop this
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -109,66 +109,12 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // === Updating ===
 
-    // ### TODO: move update logic to model
     @Override
     public void update(AssociationDefinitionModel newModel) {
-        try {
-            boolean changeCustomAssocType = !getModel().hasSameCustomAssocType(newModel);
-            if (changeCustomAssocType) {
-                logger.info("### Changing custom association type URI from \"" + getCustomAssocTypeUri() +
-                    "\" -> \"" + ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
-            }
-            //
-            super.update(newModel);
-            //
-            // cardinality
-            updateParentCardinality(newModel.getParentCardinalityUri());
-            updateChildCardinality(newModel.getChildCardinalityUri());
-            //
-            // rehash
-            if (changeCustomAssocType) {
-                String[] assocDefUris = parentType.getModel().findAssocDefUris(newModel.getId());
-                parentType.rehashAssocDef(assocDefUris[0], assocDefUris[1]);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Updating association definition \"" + getAssocDefUri() +
-                "\" failed (" + newModel + ")", e);
-        }
+        model.update(newModel);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Update ===
-
-    private void updateParentCardinality(String newParentCardinalityUri) {
-        // abort if no update is requested
-        if (newParentCardinalityUri == null) {
-            return;
-        }
-        //
-        String parentCardinalityUri = getParentCardinalityUri();
-        if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
-            logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
-                newParentCardinalityUri + "\"");
-            setParentCardinalityUri(newParentCardinalityUri);
-        }
-    }
-
-    private void updateChildCardinality(String newChildCardinalityUri) {
-        // abort if no update is requested
-        if (newChildCardinalityUri == null) {
-            return;
-        }
-        //
-        String childCardinalityUri = getChildCardinalityUri();
-        if (!childCardinalityUri.equals(newChildCardinalityUri)) {
-            logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
-                newChildCardinalityUri + "\"");
-            setChildCardinalityUri(newChildCardinalityUri);
-        }
-    }
 
 
 
