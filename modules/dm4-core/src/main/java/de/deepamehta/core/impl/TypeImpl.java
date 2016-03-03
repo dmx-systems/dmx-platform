@@ -184,9 +184,12 @@ abstract class TypeImpl extends TopicImpl implements Type {
         // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
         String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
         AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc == oldAssocDef) {     // ### FIXME: compare models
+        if (assoc.getModel() == oldAssocDef.getModel()) {
             // edited via type topic -- abort
+            logger.info("################################## edited via TYPE TOPIC");
             return;
+        } else {
+            logger.info("################################## edited via ASSOCIATION");
         }
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel newAssocModel = mf.newAssociationModel(assoc.getModel());
