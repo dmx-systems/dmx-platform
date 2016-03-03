@@ -39,12 +39,12 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         AssociationModel _newModel = assoc.getModel();  // ### TODO: can we rely on newModel instead? I don't think so.
         if (isAssocDef(_newModel)) {
             if (isAssocDef(oldModel)) {
-                updateAssocDef(assoc);
+                updateAssocDef(_newModel);
             } else {
-                createAssocDef(assoc);
+                createAssocDef(_newModel);
             }
         } else if (isAssocDef(oldModel)) {
-            removeAssocDef(assoc);
+            removeAssocDef(_newModel);
         }
     }
 
@@ -53,8 +53,9 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
     // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
     @Override
     public void preDeleteAssociation(Association assoc) {
-        if (isAssocDef(assoc.getModel())) {
-            removeAssocDef(assoc);
+        AssociationModel assocModel = assoc.getModel();
+        if (isAssocDef(assocModel)) {
+            removeAssocDef(assocModel);
         }
     }
 
@@ -62,7 +63,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void createAssocDef(Association assoc) {
+    private void createAssocDef(AssociationModel assoc) {
         Type parentType = fetchParentType(assoc);
         logger.info("##### Adding association definition " + assoc.getId() + " to type \"" + parentType.getUri() +
             "\"");
@@ -72,7 +73,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef(Association assoc) {
+    private void updateAssocDef(AssociationModel assoc) {
         Type parentType = fetchParentType(assoc);
         logger.info("##### Updating association definition " + assoc.getId() + " of type \"" + parentType.getUri() +
             "\"");
@@ -82,7 +83,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
         addUpdateTypeDirective(parentType);
     }
 
-    private void removeAssocDef(Association assoc) {
+    private void removeAssocDef(AssociationModel assoc) {
         Type parentType = fetchParentType(assoc);
         logger.info("##### Removing association definition " + assoc.getId() + " from type \"" + parentType.getUri() +
             "\"");
@@ -127,7 +128,7 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     // ---
 
-    private Type fetchParentType(Association assoc) {
+    private Type fetchParentType(AssociationModel assoc) {
         TopicModel type = dms.getTypeStorage().fetchParentType(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {

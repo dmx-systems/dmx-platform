@@ -44,7 +44,7 @@ public interface Type extends Topic {
 
     // ---
 
-    void _addAssocDef(Association assoc);
+    void _addAssocDef(AssociationModel assoc);
 
     /**
      * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
@@ -59,13 +59,13 @@ public interface Type extends Topic {
      *                      Note: in contrast to the other "update" methods this one does not support partial updates.
      *                      That is all association definition fields must be initialized. ### FIXDOC
      */
-    void _updateAssocDef(Association assoc);
+    void _updateAssocDef(AssociationModel assoc);
 
     // Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
     // association is *not* removed from DB.
     // This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
     // deletion of an association that represents an association definition is imminent.
-    void _removeAssocDefFromMemoryAndRebuildSequence(Association assoc);
+    void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc);
 
     // --- Label Configuration ---
 

@@ -258,7 +258,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // Note: if the underlying association was an association definition before it has cardinality
     // assignments already. These assignments are restored. Otherwise "One" is used as default.
-    private String defaultCardinalityUri(Association assoc, String cardinalityRoleTypeUri) {
+    private String defaultCardinalityUri(AssociationModel assoc, String cardinalityRoleTypeUri) {
         RelatedTopicModel cardinality = fetchCardinality(assoc.getId(), cardinalityRoleTypeUri);
         if (cardinality != null) {
             return cardinality.getUri();
@@ -314,9 +314,9 @@ class TypeStorageImpl implements TypeStorage {
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
-    AssociationDefinitionModel createAssociationDefinition(Association assoc) {
+    AssociationDefinitionModel createAssociationDefinition(AssociationModel assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel model = mf.newAssociationModel(assoc.getModel());
+        AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentType(assoc).getUri();
         String childTypeUri = fetchChildType(assoc).getUri();
         prepareAssocModel(model, parentTypeUri, childTypeUri);
@@ -433,26 +433,26 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     @Override
-    public TopicModel fetchParentType(Association assoc) {
-        Topic parentType = assoc.getTopic("dm4.core.parent_type");
+    public TopicModel fetchParentType(AssociationModel assoc) {
+        TopicModel parentType = ((AssociationModelImpl) assoc).getTopic("dm4.core.parent_type");
         // error check
         if (parentType == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
                 "is missing in " + assoc);
         }
         //
-        return parentType.getModel();
+        return parentType;
     }
 
-    private TopicModel fetchChildType(Association assoc) {
-        Topic childType = assoc.getTopic("dm4.core.child_type");
+    private TopicModel fetchChildType(AssociationModel assoc) {
+        TopicModel childType = ((AssociationModelImpl) assoc).getTopic("dm4.core.child_type");
         // error check
         if (childType == null) {
             throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
                 "is missing in " + assoc);
         }
         //
-        return childType.getModel();
+        return childType;
     }
 
 

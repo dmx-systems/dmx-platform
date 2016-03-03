@@ -171,62 +171,19 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---
 
-    // ### TODO: move logic to model
     @Override
-    public void _addAssocDef(Association assoc) {
-        addAssocDef(pl.typeStorage.createAssociationDefinition(assoc));
+    public void _addAssocDef(AssociationModel assoc) {
+        getModel()._addAssocDef(assoc);
     }
 
-    // ### TODO: move logic to model
     @Override
-    public void _updateAssocDef(Association assoc) {
-        // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
-        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
-        String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
-        AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc.getModel() == oldAssocDef.getModel()) {
-            // edited via type topic -- abort
-            logger.info("################################## edited via TYPE TOPIC");
-            return;
-        } else {
-            logger.info("################################## edited via ASSOCIATION");
-        }
-        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel newAssocModel = mf.newAssociationModel(assoc.getModel());
-        AssociationModel oldAssocModel = oldAssocDef.getModel();
-        // Note: an assoc def expects by-URI roles.
-        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
-        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
-        //
-        AssociationDefinition newAssocDef = new AssociationDefinitionImpl(     // ### TODO: creating model is sufficient
-            mf.newAssociationDefinitionModel(newAssocModel,
-                oldAssocDef.getParentCardinalityUri(),
-                oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
-            ), pl
-        );
-        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
-        String newAssocDefUri = newAssocDef.getAssocDefUri();
-        if (oldAssocDefUri.equals(newAssocDefUri)) {
-            getModel().replaceAssocDef(newAssocDef.getModel());
-        } else {
-            getModel().replaceAssocDef(newAssocDef.getModel(), oldAssocDefUri, assocDefUris[1]);
-            //
-            // Note: if the custom association type has changed and the assoc def is part the label config
-            // we must replace the assoc def URI in the label config
-            getModel().replaceInLabelConfig(newAssocDefUri, oldAssocDefUri);
-        }
+    public void _updateAssocDef(AssociationModel assoc) {
+        getModel()._updateAssocDef(assoc);
     }
 
-    // ### TODO: move logic to model
     @Override
-    public void _removeAssocDefFromMemoryAndRebuildSequence(Association assoc) {
-        String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
-        String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();
-        // update memory
-        getModel().removeAssocDef(assocDefUri);
-        getModel().removeFromLabelConfig(assocDefUri);
-        // update DB
-        pl.typeStorage.rebuildSequence(getModel());
+    public void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
+        getModel()._removeAssocDefFromMemoryAndRebuildSequence(assoc);
     }
 
     // --- Label Configuration ---
