@@ -227,9 +227,11 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             "\", childTopics=" + childTopics;
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
+
+    // === Abstract Methods ===
 
     String className() {
         throw new UnsupportedOperationException();
@@ -238,10 +240,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     DeepaMehtaObject instantiate() {
         throw new UnsupportedOperationException();
     }
-
-    boolean isSimple() {
-        return !getType().getDataTypeUri().equals("dm4.core.composite");
-    }        
 
     // ---
 
@@ -272,42 +270,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    void updateUri(String uri) {
-        setUri(uri);            // update memory
-        storeUri();             // update DB, "abstract"
-    }
-
-    void updateTypeUri(String typeUri) {
-        setTypeUri(typeUri);    // update memory
-        storeTypeUri();         // update DB, "abstract"
-    }
-
-    void updateSimpleValue(SimpleValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
-        }
-        setSimpleValue(value);  // update memory
-        storeSimpleValue();     // update DB, "abstract"
-    }
-
-    // ---
-
-    /**
-     * Calculates the simple value that is to be indexed for this object.
-     *
-     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
-     */
-    SimpleValue getIndexValue() {
-        SimpleValue value = getSimpleValue();
-        if (getType().getDataTypeUri().equals("dm4.core.html")) {
-            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
-        } else {
-            return value;
-        }
-    }
-
-    // ---
-
     void storeUri() {
         throw new UnsupportedOperationException();
     }
@@ -330,6 +292,44 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      * Called to index existing topics/associations once an index mode has been added to a type definition.
      */
     void indexSimpleValue(IndexMode indexMode) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    void _delete() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    DeepaMehtaEvent getPreGetEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPreUpdateEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPostUpdateEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPreDeleteEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    DeepaMehtaEvent getPostDeleteEvent() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
+
+    Directive getUpdateDirective() {
+        throw new UnsupportedOperationException();
+    }
+
+    Directive getDeleteDirective() {
         throw new UnsupportedOperationException();
     }
 
@@ -411,6 +411,26 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
+    // ---
+
+    void updateUri(String uri) {
+        setUri(uri);            // update memory
+        storeUri();             // update DB, "abstract"
+    }
+
+    void updateTypeUri(String typeUri) {
+        setTypeUri(typeUri);    // update memory
+        storeTypeUri();         // update DB, "abstract"
+    }
+
+    void updateSimpleValue(SimpleValue value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
+        }
+        setSimpleValue(value);  // update memory
+        storeSimpleValue();     // update DB, "abstract"
+    }
+
 
 
     // === Delete ===
@@ -468,42 +488,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         } catch (Exception e) {
             throw new RuntimeException("Deleting " + className() + " " + id + " failed (" + this + ")", e);
         }
-    }
-
-    void _delete() {
-        throw new UnsupportedOperationException();
-    }
-
-    // ---
-
-    DeepaMehtaEvent getPreGetEvent() {
-        throw new UnsupportedOperationException();
-    }
-
-    DeepaMehtaEvent getPreUpdateEvent() {
-        throw new UnsupportedOperationException();
-    }
-
-    DeepaMehtaEvent getPostUpdateEvent() {
-        throw new UnsupportedOperationException();
-    }
-
-    DeepaMehtaEvent getPreDeleteEvent() {
-        throw new UnsupportedOperationException();
-    }
-
-    DeepaMehtaEvent getPostDeleteEvent() {
-        throw new UnsupportedOperationException();
-    }
-
-    // ---
-
-    Directive getUpdateDirective() {
-        throw new UnsupportedOperationException();
-    }
-
-    Directive getDeleteDirective() {
-        throw new UnsupportedOperationException();
     }
 
 
@@ -595,6 +579,28 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
+    // ---
+
+    /**
+     * Calculates the simple value that is to be indexed for this object.
+     *
+     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
+     */
+    SimpleValue getIndexValue() {
+        SimpleValue value = getSimpleValue();
+        if (getType().getDataTypeUri().equals("dm4.core.html")) {
+            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
+        } else {
+            return value;
+        }
+    }
+
+    boolean isSimple() {
+        return !getType().getDataTypeUri().equals("dm4.core.composite");
+    }        
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // ### TODO: a principal copy exists in Neo4jStorage.
@@ -643,7 +649,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
-    // === Update ===
+    // === Update (memory + DB) ===
 
     private void _updateUri(String newUri) {
         if (hasUriChanged(newUri)) {                                // abort if no update is requested

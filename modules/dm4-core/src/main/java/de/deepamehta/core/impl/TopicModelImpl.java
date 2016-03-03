@@ -56,9 +56,9 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         return "topic (" + super.toString() + ")";
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+
 
     @Override
     String className() {
@@ -171,6 +171,8 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     Directive getDeleteDirective() {
         return Directive.DELETE_TOPIC;
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

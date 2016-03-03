@@ -86,10 +86,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public void setDataTypeUri(String dataTypeUri) {
-        // update memory
-        getModel().setDataTypeUri(dataTypeUri);
-        // update DB
-        storeDataTypeUri(dataTypeUri);
+        getModel().updateDataTypeUri(dataTypeUri);
     }
 
     // --- Index Modes ---
@@ -237,16 +234,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
     // === Update ===
-
-    private void storeDataTypeUri(String dataTypeUri) {
-        // remove current assignment
-        getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type")
-            .getRelatingAssociation().delete();
-        // create new assignment
-        pl.typeStorage.storeDataType(getUri(), dataTypeUri);
-    }
-
-    // ---
 
     private void indexAllInstances(IndexMode indexMode) {
         List<? extends DeepaMehtaObject> objects = getAllInstances();

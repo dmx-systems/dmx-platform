@@ -273,10 +273,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Update ===
 
     void updateType(TypeModel newModel) {
-        updateDataTypeUri(newModel.getDataTypeUri());
-        updateAssocDefs(newModel.getAssocDefs());
-        updateSequence(newModel.getAssocDefs());
-        updateLabelConfig(newModel.getLabelConfig());
+        _updateDataTypeUri(newModel.getDataTypeUri());
+        _updateAssocDefs(newModel.getAssocDefs());
+        _updateSequence(newModel.getAssocDefs());
+        _updateLabelConfig(newModel.getLabelConfig());
+    }
+
+    // ---
+
+    void updateDataTypeUri(String dataTypeUri) {
+        setDataTypeUri(dataTypeUri);    // update memory
+        storeDataTypeUri();             // update DB
     }
 
 
@@ -356,17 +363,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Update (memory + DB) ===
 
-    private void updateDataTypeUri(String newDataTypeUri) {
+    private void _updateDataTypeUri(String newDataTypeUri) {
         if (newDataTypeUri != null) {
             String dataTypeUri = getDataTypeUri();
             if (!dataTypeUri.equals(newDataTypeUri)) {
                 logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
-                setDataTypeUri(newDataTypeUri);
+                updateDataTypeUri(newDataTypeUri);
             }
         }
     }
 
-    private void updateAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
+    private void _updateAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
             // So we must identify the assoc def to update **by ID**.
@@ -376,7 +383,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void updateSequence(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
+    private void _updateSequence(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
         try {
             if (getAssocDefs().size() != newAssocDefs.size()) {
                 throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
@@ -394,7 +401,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void updateLabelConfig(List<String> newLabelConfig) {
+    private void _updateLabelConfig(List<String> newLabelConfig) {
         try {
             if (!getLabelConfig().equals(newLabelConfig)) {
                 logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
@@ -403,6 +410,18 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         } catch (Exception e) {
             throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
         }
+    }
+
+
+
+    // === Store (DB only) ===
+
+    private void storeDataTypeUri() {
+        // remove current assignment
+        getRelatedTopic("dm4.core.aggregation", "dm4.core.type", "dm4.core.default", "dm4.core.data_type")
+            .getRelatingAssociation().delete();
+        // create new assignment
+        pl.typeStorage.storeDataType(uri, dataTypeUri);
     }
 
 

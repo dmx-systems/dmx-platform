@@ -146,46 +146,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return "association (" + super.toString() + ", " + roleModel1 + ", " + roleModel2 + ")";
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    /**
-     * @teturn  this association's topic which plays the given role.
-     *          If there is no such topic, null is returned.
-     *          <p>
-     *          If there are 2 such topics an exception is thrown.
-     */
-    TopicModelImpl getTopic(String roleTypeUri) {
-        RoleModel role = getRoleModel(roleTypeUri);
-        return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
-    }
 
-    TopicModelImpl getTopicByType(String topicTypeUri) {
-        TopicModelImpl topic1 = filterTopic(roleModel1, topicTypeUri);
-        TopicModelImpl topic2 = filterTopic(roleModel2, topicTypeUri);
-        if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguous getTopicByType() call: both topics are of type \"" + topicTypeUri +
-                "\" (" + this + ")");
-        }
-        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
-    }
-
-    // ---
-
-    void updateRoles(AssociationModel newModel) {
-        updateRole(newModel.getRoleModel1(), 1);
-        updateRole(newModel.getRoleModel2(), 2);
-    }
-
-    void updateRoleTypeUri(RoleModelImpl role, String roleTypeUri) {
-        role.setRoleTypeUri(roleTypeUri);                           // update memory
-        pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
-    }
-
-
-
-    // ===
 
     @Override
     String className() {
@@ -302,7 +265,46 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return Directive.DELETE_ASSOCIATION;
     }
 
+
+
+    // ===
+
+    /**
+     * @teturn  this association's topic which plays the given role.
+     *          If there is no such topic, null is returned.
+     *          <p>
+     *          If there are 2 such topics an exception is thrown.
+     */
+    TopicModelImpl getTopic(String roleTypeUri) {
+        RoleModel role = getRoleModel(roleTypeUri);
+        return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
+    }
+
+    TopicModelImpl getTopicByType(String topicTypeUri) {
+        TopicModelImpl topic1 = filterTopic(roleModel1, topicTypeUri);
+        TopicModelImpl topic2 = filterTopic(roleModel2, topicTypeUri);
+        if (topic1 != null && topic2 != null) {
+            throw new RuntimeException("Ambiguous getTopicByType() call: both topics are of type \"" + topicTypeUri +
+                "\" (" + this + ")");
+        }
+        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
+    }
+
+    // ---
+
+    void updateRoles(AssociationModel newModel) {
+        updateRole(newModel.getRoleModel1(), 1);
+        updateRole(newModel.getRoleModel2(), 2);
+    }
+
+    void updateRoleTypeUri(RoleModelImpl role, String roleTypeUri) {
+        role.setRoleTypeUri(roleTypeUri);                           // update memory
+        pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     /**
      * @param   nr      used only for logging
