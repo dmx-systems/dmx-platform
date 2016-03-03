@@ -27,9 +27,11 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     // === Association Definitions ===
 
-    Collection<AssociationDefinitionModel> getAssocDefs();
+    Collection<? extends AssociationDefinitionModel> getAssocDefs();
 
     AssociationDefinitionModel getAssocDef(String assocDefUri);
+
+    boolean hasAssocDef(String assocDefUri);
 
     /**
      * @param   assocDef    the assoc def to add.

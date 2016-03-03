@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
@@ -13,6 +14,7 @@ import de.deepamehta.core.util.SequencedHashMap;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -26,9 +28,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private String dataTypeUri;
     private List<IndexMode> indexModes;
-    private SequencedHashMap<String, AssociationDefinitionModel> assocDefs; // is never null, may be empty
-    private List<String> labelConfig;                                       // is never null, may be empty
-    private ViewConfigurationModel viewConfig;                              // is never null
+    private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
+    private List<String> labelConfig;                                           // is never null, may be empty
+    private ViewConfigurationModel viewConfig;                                  // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -89,13 +91,18 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Association Definitions ===
 
     @Override
-    public Collection<AssociationDefinitionModel> getAssocDefs() {
+    public Collection<? extends AssociationDefinitionModel> getAssocDefs() {
         return assocDefs.values();
     }
 
     @Override
-    public AssociationDefinitionModel getAssocDef(String assocDefUri) {
+    public AssociationDefinitionModelImpl getAssocDef(String assocDefUri) {
         return getAssocDefOrThrow(assocDefUri);
+    }
+
+    @Override
+    public boolean hasAssocDef(String assocDefUri) {
+        return _getAssocDef(assocDefUri) != null;
     }
 
     /**
@@ -124,7 +131,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                     "\" association definitions");
             }
             //
-            assocDefs.putBefore(assocDefUri, assocDef, beforeAssocDefUri);
+            assocDefs.putBefore(assocDefUri, (AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
@@ -303,13 +310,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     // ### TODO: make private?
-    boolean hasSameAssocDefSequence(Collection<AssociationDefinitionModel> assocDefs) {
-        Collection<AssociationDefinitionModel> _assocDefs = getAssocDefs();
+    boolean hasSameAssocDefSequence(Collection<? extends AssociationDefinitionModel> assocDefs) {
+        Collection<? extends AssociationDefinitionModel> _assocDefs = getAssocDefs();
         if (assocDefs.size() != _assocDefs.size()) {
             return false;
         }
         //
-        Iterator<AssociationDefinitionModel> i = assocDefs.iterator();
+        Iterator<? extends AssociationDefinitionModel> i = assocDefs.iterator();
         for (AssociationDefinitionModel _assocDef : _assocDefs) {
             AssociationDefinitionModel assocDef = i.next();
             // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
@@ -339,7 +346,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     // ### TODO: make private?
-    void rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+    void rehashAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
@@ -354,6 +361,16 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
         removeAssocDef(oldAssocDefUri);
         addAssocDefBefore(assocDef, beforeAssocDefUri);
+    }
+
+    // ---
+
+    Collection<AssociationDefinition> instantiateAssocDefs() {
+        Collection<AssociationDefinition> assocDefs = new ArrayList();
+        for (AssociationDefinitionModel assocDef : getAssocDefs()) {
+            assocDefs.add(((AssociationDefinitionModelImpl) assocDef).instantiate());
+        }
+        return assocDefs;
     }
 
 
@@ -399,17 +416,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private void updateAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
+    private void updateAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
             // So we must identify the assoc def to update **by ID**.
             // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
             String[] assocDefUris = findAssocDefUris(assocDef.getId());
-            ((AssociationDefinitionModelImpl) getAssocDef(assocDefUris[0])).update(assocDef);
+            getAssocDef(assocDefUris[0]).update(assocDef);
         }
     }
 
-    private void updateSequence(Collection<AssociationDefinitionModel> newAssocDefs) {
+    private void updateSequence(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
         try {
             if (getAssocDefs().size() != newAssocDefs.size()) {
                 throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
@@ -452,8 +469,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ===
 
-    private AssociationDefinitionModel getAssocDefOrThrow(String assocDefUri) {
-        AssociationDefinitionModel assocDef = _getAssocDef(assocDefUri);
+    private AssociationDefinitionModelImpl getAssocDefOrThrow(String assocDefUri) {
+        AssociationDefinitionModelImpl assocDef = _getAssocDef(assocDefUri);
         if (assocDef == null) {
             throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
                 assocDefs.keySet());
@@ -461,7 +478,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return assocDef;
     }
 
-    private AssociationDefinitionModel _getAssocDef(String assocDefUri) {
+    private AssociationDefinitionModelImpl _getAssocDef(String assocDefUri) {
         return assocDefs.get(assocDefUri);
     }
 
@@ -477,11 +494,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private SequencedHashMap<String, AssociationDefinitionModel> toMap(Collection<AssociationDefinitionModel> assocDefs)
-    {
-        SequencedHashMap<String, AssociationDefinitionModel> _assocDefs = new SequencedHashMap();
+    private SequencedHashMap<String, AssociationDefinitionModelImpl> toMap(
+                                                           Collection<? extends AssociationDefinitionModel> assocDefs) {
+        SequencedHashMap<String, AssociationDefinitionModelImpl> _assocDefs = new SequencedHashMap();
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            _assocDefs.put(assocDef.getAssocDefUri(), assocDef);
+            _assocDefs.put(assocDef.getAssocDefUri(), (AssociationDefinitionModelImpl) assocDef);
         }
         return _assocDefs;
     }
@@ -496,7 +513,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return indexModeUris;
     }
 
-    private JSONArray toJSONArray(Collection<AssociationDefinitionModel> assocDefs) {
+    private JSONArray toJSONArray(Collection<? extends AssociationDefinitionModel> assocDefs) {
         JSONArray _assocDefs = new JSONArray();
         for (AssociationDefinitionModel assocDef : assocDefs) {
             _assocDefs.put(assocDef.toJSON());

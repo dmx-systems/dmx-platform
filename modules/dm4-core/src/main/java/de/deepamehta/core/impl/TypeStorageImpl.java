@@ -392,7 +392,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    private void storeAssocDefs(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeAssocDefs(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             storeAssociationDefinition(assocDef);
         }
@@ -562,7 +562,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    private void storeSequence(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeSequence(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
         long predAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : assocDefs) {
@@ -676,7 +676,8 @@ class TypeStorageImpl implements TypeStorage {
     /**
      * Stores the label configuration of a <i>newly created</i> type.
      */
-    private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeLabelConfig(List<String> labelConfig,
+                                  Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
             // Note: we don't do the storage in a type-driven fashion here (as in new AssociationDefinitionImpl(
@@ -696,7 +697,7 @@ class TypeStorageImpl implements TypeStorage {
     /**
      * Updates the label configuration of an <i>existing</i> type.
      */
-    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    void updateLabelConfig(List<String> labelConfig, Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             // Note: the Type Editor plugin must not react
             TopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());

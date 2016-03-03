@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -147,6 +148,11 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     @Override
     String className() {
         return "association definition";
+    }
+
+    @Override
+    AssociationDefinition instantiate() {
+        return new AssociationDefinitionImpl(this, pl);
     }
 
 

@@ -238,7 +238,7 @@ class ValueStorage {
             return labelConfig;
         } else {
             List<String> assocDefUris = new ArrayList();
-            Iterator<AssociationDefinitionModel> i = type.getAssocDefs().iterator();
+            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
             // Note: types just created might have no child types yet
             if (i.hasNext()) {
                 assocDefUris.add(i.next().getAssocDefUri());

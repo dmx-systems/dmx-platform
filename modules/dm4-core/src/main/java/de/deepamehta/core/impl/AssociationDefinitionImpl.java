@@ -18,18 +18,12 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private TypeImpl parentType;                // ### TODO: drop this
-
-    private ViewConfigurationImpl viewConfig;   // attached object cache ### TODO: drop this
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionImpl(AssociationDefinitionModelImpl model, TypeImpl parentType, PersistenceLayer pl) {
+    AssociationDefinitionImpl(AssociationDefinitionModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        this.parentType = parentType;
-        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -79,7 +73,8 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     @Override
     public ViewConfiguration getViewConfig() {
-        return viewConfig;
+        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
     @Override
@@ -112,16 +107,5 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     @Override
     public void update(AssociationDefinitionModel newModel) {
         model.update(newModel);
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Attached Object Cache ===
-
-    private void initViewConfig() {
-        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
-        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 }

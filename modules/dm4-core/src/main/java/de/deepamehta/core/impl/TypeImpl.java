@@ -19,6 +19,7 @@ import de.deepamehta.core.util.SequencedHashMap;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -30,18 +31,12 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private SequencedHashMap<String, AssociationDefinition> assocDefs;  // Attached object cache ### TODO: drop this
-    private ViewConfiguration viewConfig;                               // Attached object cache ### TODO: drop this
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TypeImpl(TypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        // init attached object cache
-        initAssocDefs();
-        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -54,7 +49,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
 
-    // ### TODO: refactoring. Move update logic to TypeModel.
+    // ### TODO: refactoring. Move logic to model.
     @Override
     public void delete() {
         String operation = "Deleting " + className() + " \"" + getUri() + "\" (named \"" + getSimpleValue() + "\")";
@@ -117,17 +112,17 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public Collection<AssociationDefinition> getAssocDefs() {
-        return assocDefs.values();
+        return getModel().instantiateAssocDefs();
     }
 
     @Override
     public AssociationDefinition getAssocDef(String assocDefUri) {
-        return getAssocDefOrThrow(assocDefUri);
+        return getModel().getAssocDef(assocDefUri).instantiate();
     }
 
     @Override
     public boolean hasAssocDef(String assocDefUri) {
-        return _getAssocDef(assocDefUri) != null;
+        return getModel().hasAssocDef(assocDefUri);
     }
 
     @Override
@@ -135,6 +130,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
+    // ### TODO: move logic to model
     @Override
     public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         try {
@@ -155,15 +151,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
             long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
             pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
                                                                                                lastAssocDefId);
-            // 3) update memory (attached object cache)
-            // Note: attaching an assoc def involves attaching the 2 roles of the association that assigns the assoc
-            // def's custom association type (the "relating association"). These roles are only initialized while
-            // storing (see ValueStorage#associateChildTopic()). (The AssociationDefinitionModel constructors leave
-            // the relating association uninitialized, see AssociationDefinitionModel#childTopics()). So, the assoc
-            // def must be attached *after* the assoc def is stored.
-            // ### TODO: attach before store. Refactoring needed. See comment in TypeCache#put methods.
-            _addAssocDefBefore(new AssociationDefinitionImpl((AssociationDefinitionModelImpl) assocDef, this, pl),
-                beforeAssocDefUri);
             return this;
         } catch (Exception e) {
             throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
@@ -184,18 +171,20 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     // ---
 
+    // ### TODO: move logic to model
     @Override
     public void _addAssocDef(Association assoc) {
         addAssocDef(pl.typeStorage.createAssociationDefinition(assoc));
     }
 
+    // ### TODO: move logic to model
     @Override
     public void _updateAssocDef(Association assoc) {
         // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
         // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
         String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
         AssociationDefinition oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc == oldAssocDef) {
+        if (assoc == oldAssocDef) {     // ### FIXME: compare models
             // edited via type topic -- abort
             return;
         }
@@ -206,19 +195,18 @@ abstract class TypeImpl extends TopicImpl implements Type {
         newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
         newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
         //
-        AssociationDefinition newAssocDef = new AssociationDefinitionImpl(
+        AssociationDefinition newAssocDef = new AssociationDefinitionImpl(     // ### TODO: creating model is sufficient
             mf.newAssociationDefinitionModel(newAssocModel,
                 oldAssocDef.getParentCardinalityUri(),
                 oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfig().getModel()
-            ),
-            this, pl
+            ), pl
         );
         String oldAssocDefUri = oldAssocDef.getAssocDefUri();
         String newAssocDefUri = newAssocDef.getAssocDefUri();
         if (oldAssocDefUri.equals(newAssocDefUri)) {
-            replaceAssocDef(newAssocDef);
+            getModel().replaceAssocDef(newAssocDef.getModel());
         } else {
-            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
+            getModel().replaceAssocDef(newAssocDef.getModel(), oldAssocDefUri, assocDefUris[1]);
             //
             // Note: if the custom association type has changed and the assoc def is part the label config
             // we must replace the assoc def URI in the label config
@@ -226,14 +214,14 @@ abstract class TypeImpl extends TopicImpl implements Type {
         }
     }
 
+    // ### TODO: move logic to model
     @Override
     public void _removeAssocDefFromMemoryAndRebuildSequence(Association assoc) {
         String[] assocDefUris = getModel().findAssocDefUris(assoc.getId());
         String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();
         // update memory
-        getModel().removeAssocDef(assocDefUri);             // update model
-        getModel().removeFromLabelConfig(assocDefUri);      // update model
-        _removeAssocDef(assocDefUri);                       // update attached object cache
+        getModel().removeAssocDef(assocDefUri);
+        getModel().removeFromLabelConfig(assocDefUri);
         // update DB
         pl.typeStorage.rebuildSequence(getModel());
     }
@@ -257,7 +245,8 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        return viewConfig;
+        RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
     @Override
@@ -279,18 +268,9 @@ abstract class TypeImpl extends TopicImpl implements Type {
         return (TypeModelImpl) super.getModel();
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     abstract List<? extends DeepaMehtaObject> getAllInstances();
-
-    // ---
-
-    void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
-        getModel().rehashAssocDef(assocDefUri, beforeAssocDefUri);      // update model
-        _rehashAssocDef(assocDefUri, beforeAssocDefUri);                // update attached object cache
-    }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -347,93 +327,5 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     private AssociationDefinitionModel firstAssocDef() {
         return getModel().getAssocDefs().iterator().next();
-    }
-
-    // ---
-
-    private void replaceAssocDef(AssociationDefinition assocDef) {
-        getModel().replaceAssocDef(assocDef.getModel());    // update model
-        _replaceAssocDef(assocDef);         // update attached object cache
-    }
-
-    private void replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
-        getModel().replaceAssocDef(assocDef.getModel(), oldAssocDefUri, beforeAssocDefUri);     // update model
-        _replaceAssocDef(assocDef, oldAssocDefUri, beforeAssocDefUri);          // update attached object cache
-    }
-
-    // --- Attached Object Cache ---
-
-    private void initAssocDefs() {
-        this.assocDefs = new SequencedHashMap();
-        for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            _addAssocDef(new AssociationDefinitionImpl((AssociationDefinitionModelImpl) assocDef, this, pl));
-        }
-    }
-
-    private AssociationDefinition getAssocDefOrThrow(String assocDefUri) {
-        AssociationDefinition assocDef = _getAssocDef(assocDefUri);
-        if (assocDef == null) {
-            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
-                assocDefs.keySet());
-        }
-        return assocDef;
-    }
-
-    private AssociationDefinition _getAssocDef(String assocDefUri) {
-        return assocDefs.get(assocDefUri);
-    }
-
-    private void _addAssocDef(AssociationDefinition assocDef) {
-        _addAssocDefBefore(assocDef, null);     // beforeAssocDefUri=null
-    }
-
-    /**
-     * @param   beforeAssocDefUri   the assoc def <i>before</i> the assoc def is inserted into the sequence.
-     *                              If <code>null</code> the assoc def is appended at the end.
-     */
-    private void _addAssocDefBefore(AssociationDefinition assocDef, String beforeAssocDefUri) {
-        assocDefs.putBefore(assocDef.getAssocDefUri(), assocDef, beforeAssocDefUri);
-    }
-
-    private AssociationDefinition _removeAssocDef(String assocDefUri) {
-        try {
-            AssociationDefinition assocDef = assocDefs.remove(assocDefUri);
-            if (assocDef == null) {
-                throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
-                    assocDefs.keySet());
-            }
-            return assocDef;
-        } catch (Exception e) {
-            throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
-                getUri() + "\" failed", e);
-        }
-    }
-
-    private void _rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
-        _addAssocDefBefore(_removeAssocDef(assocDefUri), beforeAssocDefUri);
-    }
-
-    private void _rehashAssocDefs(Collection<AssociationDefinitionModel> newAssocDefs) {
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
-            _rehashAssocDef(assocDef.getAssocDefUri(), null);
-        }
-    }
-
-    // ---
-
-    private void _replaceAssocDef(AssociationDefinition assocDef) {
-        _replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
-    }
-
-    private void _replaceAssocDef(AssociationDefinition assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
-        _removeAssocDef(oldAssocDefUri);
-        _addAssocDefBefore(assocDef, beforeAssocDefUri);
-    }
-
-    // ---
-
-    private void initViewConfig() {
-        RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
-        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 }

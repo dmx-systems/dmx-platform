@@ -64,8 +64,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     private void createAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
-        logger.info("##### Adding association definition \"" + assoc.getId() + "\" to type \"" +
-            parentType.getUri() + "\"");
+        logger.info("##### Adding association definition " + assoc.getId() + " to type \"" + parentType.getUri() +
+            "\"");
         //
         parentType._addAssocDef(assoc);
         //
@@ -74,8 +74,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     private void updateAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
-        logger.info("##### Updating association definition " + assoc.getId() + " of type \"" +
-            parentType.getUri() + "\"");
+        logger.info("##### Updating association definition " + assoc.getId() + " of type \"" + parentType.getUri() +
+            "\"");
         //
         parentType._updateAssocDef(assoc);
         //
@@ -84,8 +84,8 @@ public class TypeEditorPlugin extends PluginActivator implements PostUpdateAssoc
 
     private void removeAssocDef(Association assoc) {
         Type parentType = fetchParentType(assoc);
-        logger.info("##### Removing association definition \"" + assoc.getId() + "\" from type \"" +
-            parentType.getUri() + "\"");
+        logger.info("##### Removing association definition " + assoc.getId() + " from type \"" + parentType.getUri() +
+            "\"");
         //
         parentType._removeAssocDefFromMemoryAndRebuildSequence(assoc);
         //
