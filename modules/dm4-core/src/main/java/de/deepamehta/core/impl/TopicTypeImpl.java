@@ -38,7 +38,7 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
 
     @Override
     public TopicTypeModelImpl getModel() {
-        return (TopicTypeModelImpl) super.getModel();
+        return (TopicTypeModelImpl) model;
     }
 
     @Override
@@ -61,14 +61,5 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
     @Override
     final String className() {
         return "topic type";
-    }
-
-
-
-    // === Implementation of abstract TypeImpl methods ===
-
-    @Override
-    final List<? extends DeepaMehtaObject> getAllInstances() {
-        return pl.getTopics(getUri()).getItems();
     }
 }

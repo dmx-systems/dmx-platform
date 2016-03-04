@@ -242,6 +242,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+
+
+    // === Abstract Methods ===
+
     List<? extends DeepaMehtaObjectModel> getAllInstances() {
         throw new UnsupportedOperationException();
     }
@@ -260,19 +264,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     Directive getDeleteTypeDirective() {
         throw new UnsupportedOperationException();
-    }
-
-    // ---
-
-    /**
-     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
-     * ### TODO: make private?
-     */
-    void _removeFromTypeCache() {
-        removeFromTypeCache();                      // abstract
-        //
-        Directive dir = getDeleteTypeDirective();   // abstract
-        Directives.get().add(dir, new JSONWrapper("uri", uri));
     }
 
 
@@ -296,6 +287,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void updateLabelConfig(List<String> labelConfig) {
         setLabelConfig(labelConfig);                                    // update memory
         pl.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());  // update DB
+    }
+
+    void _addIndexMode(IndexMode indexMode) {
+        // update memory
+        addIndexMode(indexMode);
+        // update DB
+        pl.typeStorage.storeIndexMode(uri, indexMode);
+        indexAllInstances(indexMode);
     }
 
     // ---
@@ -394,14 +393,25 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         rehashAssocDef(assocDefUris[0], assocDefUris[1]);
     }
 
-    // ---
-
     Collection<AssociationDefinition> instantiateAssocDefs() {
         Collection<AssociationDefinition> assocDefs = new ArrayList();
         for (AssociationDefinitionModel assocDef : getAssocDefs()) {
             assocDefs.add(((AssociationDefinitionModelImpl) assocDef).instantiate());
         }
         return assocDefs;
+    }
+
+    // ---
+
+    /**
+     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
+     * ### TODO: make private?
+     */
+    void _removeFromTypeCache() {
+        removeFromTypeCache();                      // abstract
+        //
+        Directive dir = getDeleteTypeDirective();   // abstract
+        Directives.get().add(dir, new JSONWrapper("uri", uri));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -469,6 +479,25 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             .getRelatingAssociation().delete();
         // create new assignment
         pl.typeStorage.storeDataType(uri, dataTypeUri);
+    }
+
+    private void indexAllInstances(IndexMode indexMode) {
+        List<? extends DeepaMehtaObjectModel> objects = getAllInstances();
+        //
+        String str = "\"" + value + "\" (" + uri + ") instances";
+        if (indexModes.size() > 0) {
+            if (objects.size() > 0) {
+                logger.info("### Indexing " + objects.size() + " " + str + " (indexMode=" + indexMode + ")");
+            } else {
+                logger.info("### Indexing " + str + " ABORTED -- no instances in DB");
+            }
+        } else {
+            logger.info("### Indexing " + str + " ABORTED -- no index mode set");
+        }
+        //
+        for (DeepaMehtaObjectModel obj : objects) {
+            ((DeepaMehtaObjectModelImpl) obj).indexSimpleValue(indexMode);
+        }
     }
 
 

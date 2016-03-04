@@ -69,11 +69,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public void addIndexMode(IndexMode indexMode) {
-        // update memory
-        getModel().addIndexMode(indexMode);
-        // update DB
-        pl.typeStorage.storeIndexMode(getUri(), indexMode);
-        indexAllInstances(indexMode);
+        getModel()._addIndexMode(indexMode);
     }
 
     // --- Association Definitions ---
@@ -164,34 +160,5 @@ abstract class TypeImpl extends TopicImpl implements Type {
     @Override
     public TypeModelImpl getModel() {
         return (TypeModelImpl) model;
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    abstract List<? extends DeepaMehtaObject> getAllInstances();
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Update ===
-
-    private void indexAllInstances(IndexMode indexMode) {
-        List<? extends DeepaMehtaObject> objects = getAllInstances();
-        //
-        String str = "\"" + getSimpleValue() + "\" (" + getUri() + ") instances";
-        if (getIndexModes().size() > 0) {
-            if (objects.size() > 0) {
-                logger.info("### Indexing " + objects.size() + " " + str + " (indexMode=" + indexMode + ")");
-            } else {
-                logger.info("### Indexing " + str + " ABORTED -- no instances in DB");
-            }
-        } else {
-            logger.info("### Indexing " + str + " ABORTED -- no index mode set");
-        }
-        //
-        for (DeepaMehtaObject obj : objects) {
-            ((DeepaMehtaObjectModelImpl) obj.getModel()).indexSimpleValue(indexMode);
-        }
     }
 }

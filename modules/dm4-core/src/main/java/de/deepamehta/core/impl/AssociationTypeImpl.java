@@ -38,7 +38,7 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
 
     @Override
     public AssociationTypeModelImpl getModel() {
-        return (AssociationTypeModelImpl) super.getModel();
+        return (AssociationTypeModelImpl) model;
     }
 
     @Override
@@ -61,14 +61,5 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
     @Override
     final String className() {
         return "association type";
-    }
-
-
-
-    // === Implementation of abstract TypeImpl methods ===
-
-    @Override
-    final List<? extends DeepaMehtaObject> getAllInstances() {
-        return pl.getAssociations(getUri()).getItems();
     }
 }
