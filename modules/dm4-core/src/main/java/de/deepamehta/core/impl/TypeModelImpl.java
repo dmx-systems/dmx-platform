@@ -318,6 +318,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
+    void _removeAssocDef(String assocDefUri) {
+        // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
+        // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
+        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
+        // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
+        // deletes an association), and 2) programmatical deletion (e.g. from a migration).
+        getAssocDef(assocDefUri).delete();
+    }
+
 
 
     // === 3 Type Editor helpers ===

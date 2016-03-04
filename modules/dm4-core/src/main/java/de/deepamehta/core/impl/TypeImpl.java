@@ -49,7 +49,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
 
-    // ### TODO: refactoring. Move logic to model.
+    // ### TODO: move logic to model
     @Override
     public void delete() {
         String operation = "Deleting " + className() + " \"" + getUri() + "\" (named \"" + getSimpleValue() + "\")";
@@ -135,12 +135,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public Type removeAssocDef(String assocDefUri) {
-        // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
-        // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
-        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
-        // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
-        // deletes an association), and 2) programmatical deletion (e.g. from a migration).
-        getAssocDef(assocDefUri).delete();
+        getModel()._removeAssocDef(assocDefUri);
         return this;
     }
 
