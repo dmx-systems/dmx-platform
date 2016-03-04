@@ -2,9 +2,13 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.Directive;
+
+import java.util.List;
 
 
 
@@ -50,6 +54,13 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
 
     // === Implementation of abstract TypeModelImpl methods ===
+
+    @Override
+    List<AssociationModel> getAllInstances() {
+        return pl.fetchAssociations("type_uri", new SimpleValue(uri));
+    }
+
+    // ---
 
     @Override
     void putInTypeCache() {

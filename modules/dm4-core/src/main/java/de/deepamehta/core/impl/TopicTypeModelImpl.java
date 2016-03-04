@@ -2,9 +2,13 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.Directive;
+
+import java.util.List;
 
 
 
@@ -50,6 +54,13 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
 
     // === Implementation of abstract TypeModelImpl methods ===
+
+    @Override
+    List<TopicModel> getAllInstances() {
+        return pl.fetchTopics("type_uri", new SimpleValue(uri));
+    }
+
+    // ---
 
     @Override
     void putInTypeCache() {

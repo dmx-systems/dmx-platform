@@ -4,6 +4,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
@@ -240,6 +241,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    List<? extends DeepaMehtaObjectModel> getAllInstances() {
+        throw new UnsupportedOperationException();
+    }
+
+    // ---
 
     void putInTypeCache() {
         throw new UnsupportedOperationException();

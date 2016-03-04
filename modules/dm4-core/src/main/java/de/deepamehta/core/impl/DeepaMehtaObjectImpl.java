@@ -202,7 +202,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Deletion ===
 
     @Override
-    public void delete() {
+    public final void delete() {
         model.delete();
     }
 

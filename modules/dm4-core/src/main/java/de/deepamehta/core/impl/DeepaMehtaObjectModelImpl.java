@@ -441,9 +441,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      * <p>
      * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
      */
-    void delete() {
+    final void delete() {
         try {
             em.fireEvent(getPreDeleteEvent(), instantiate());
+            //
+            TypeModelImpl type = null;
+            if (this instanceof TypeModel) {
+                type = (TypeModelImpl) this;
+                int size = type.getAllInstances().size();
+                if (size > 0) {
+                    throw new RuntimeException(size + " \"" + value + "\" instances still exist");
+                }
+            }
             //
             // delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
@@ -459,9 +468,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 ((DeepaMehtaObjectModelImpl) assoc).delete();
             }
             // delete object itself
-            logger.info("Deleting " + this);
+            logger.info("Deleting " + className() + " " + id);
             Directives.get().add(getDeleteDirective(), this);
             _delete();
+            //
+            if (type != null) {
+                type._removeFromTypeCache();
+            }
             //
             em.fireEvent(getPostDeleteEvent(), this);
         } catch (IllegalStateException e) {

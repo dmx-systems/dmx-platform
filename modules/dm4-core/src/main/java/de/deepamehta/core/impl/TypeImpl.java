@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.JSONEnabled;
@@ -40,34 +39,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // **************************************
-    // *** DeepaMehtaObjectImpl Overrides ***
-    // **************************************
-
-
-
-    // ### TODO: move logic to model
-    @Override
-    public void delete() {
-        String operation = "Deleting " + className() + " \"" + getUri() + "\" (named \"" + getSimpleValue() + "\")";
-        try {
-            logger.info(operation);
-            //
-            int size = getAllInstances().size();
-            if (size > 0) {
-                throw new RuntimeException(size + " \"" + getSimpleValue() + "\" instances still exist");
-            }
-            //
-            super.delete();   // delete type topic
-            //
-            getModel()._removeFromTypeCache();
-        } catch (Exception e) {
-            throw new RuntimeException(operation + " failed", e);
-        }
-    }
 
 
 
