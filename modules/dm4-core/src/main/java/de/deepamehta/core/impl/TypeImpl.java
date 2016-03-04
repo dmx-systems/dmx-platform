@@ -127,32 +127,10 @@ abstract class TypeImpl extends TopicImpl implements Type {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
-    // ### TODO: move logic to model
     @Override
     public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        try {
-            long lastAssocDefId = lastAssocDefId();             // must be determined *before* the memory is updated
-            //
-            // 1) update memory (model)
-            // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
-            // adds "Association Type" as a child to the "Composition Definition" and "Aggregation Definition"
-            // association types has itself a custom association type (named "Custom Association Type"), see migration
-            // 5. It would not be stored as storage is model driven and the (meta) model doesn't know about custom
-            // associations as this very concept is introduced only by the assoc def being added here. So, the model
-            // must be updated (in-memory) *before* the assoc def is stored.
-            getModel().addAssocDefBefore(assocDef, beforeAssocDefUri);
-            //
-            // 2) update DB
-            pl.typeStorage.storeAssociationDefinition(assocDef);
-            long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
-            long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
-            pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
-                                                                                               lastAssocDefId);
-            return this;
-        } catch (Exception e) {
-            throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
-                beforeAssocDefUri + "\" failed" + assocDef, e);
-        }
+        getModel()._addAssocDefBefore(assocDef, beforeAssocDefUri);
+        return this;
     }
 
     @Override
@@ -166,7 +144,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
         return this;
     }
 
-    // ---
+    // --- 3 Type Editor helpers ---
 
     @Override
     public void _addAssocDef(AssociationModel assoc) {
@@ -215,14 +193,14 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public void update(TypeModel newModel) {
-        model.update(newModel);
+        getModel().update(newModel);
     }
 
     // ---
 
     @Override
     public TypeModelImpl getModel() {
-        return (TypeModelImpl) super.getModel();
+        return (TypeModelImpl) model;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -252,27 +230,5 @@ abstract class TypeImpl extends TopicImpl implements Type {
         for (DeepaMehtaObject obj : objects) {
             ((DeepaMehtaObjectModelImpl) obj.getModel()).indexSimpleValue(indexMode);
         }
-    }
-
-
-
-    // === Association Definitions ===
-
-    /**
-     * Returns the ID of the last association definition of this type or
-     * <code>-1</code> if there are no association definitions.
-     *
-     * ### TODO: move to class TypeModel?
-     */
-    private long lastAssocDefId() {
-        long lastAssocDefId = -1;
-        for (AssociationDefinitionModel assocDef : getModel().getAssocDefs()) {
-            lastAssocDefId = assocDef.getId();
-        }
-        return lastAssocDefId;
-    }
-
-    private AssociationDefinitionModel firstAssocDef() {
-        return getModel().getAssocDefs().iterator().next();
     }
 }

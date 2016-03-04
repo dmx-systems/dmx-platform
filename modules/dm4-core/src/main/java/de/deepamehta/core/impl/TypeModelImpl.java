@@ -270,7 +270,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Update ===
+    // === Update (memory + DB) ===
 
     void updateType(TypeModel newModel) {
         _updateDataTypeUri(newModel.getDataTypeUri());
@@ -286,12 +286,39 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         storeDataTypeUri();             // update DB
     }
 
+    // ---
+
+    void _addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+        try {
+            long lastAssocDefId = lastAssocDefId();             // must be determined *before* the memory is updated
+            //
+            // 1) update memory (model)
+            // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
+            // adds "Association Type" as a child to the "Composition Definition" and "Aggregation Definition"
+            // association types has itself a custom association type (named "Custom Association Type"), see migration
+            // 5. It would not be stored as storage is model driven and the (meta) model doesn't know about custom
+            // associations as this very concept is introduced only by the assoc def being added here. So, the model
+            // must be updated (in-memory) *before* the assoc def is stored.
+            addAssocDefBefore(assocDef, beforeAssocDefUri);
+            //
+            // 2) update DB
+            pl.typeStorage.storeAssociationDefinition(assocDef);
+            long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
+            long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
+            pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
+                lastAssocDefId);
+        } catch (Exception e) {
+            throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
+                beforeAssocDefUri + "\" failed" + assocDef, e);
+        }
+    }
 
 
-    // === Association Definitions ===
+
+    // === 3 Type Editor helpers ===
 
     void _addAssocDef(AssociationModel assoc) {
-        addAssocDef(pl.typeStorage.createAssociationDefinition(assoc));
+        _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
     }
 
     void _updateAssocDef(AssociationModel assoc) {
@@ -340,7 +367,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         pl.typeStorage.rebuildSequence(this);
     }
 
-    // ---
+
+
+    // ===
 
     void rehashAssocDef(long assocDefId) {
         String[] assocDefUris = findAssocDefUris(assocDefId);
@@ -514,6 +543,24 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private AssociationDefinitionModelImpl _getAssocDef(String assocDefUri) {
         return assocDefs.get(assocDefUri);
+    }
+
+    // ---
+
+    /**
+     * Returns the ID of the last association definition of this type or
+     * <code>-1</code> if there are no association definitions.
+     */
+    private long lastAssocDefId() {
+        long lastAssocDefId = -1;
+        for (AssociationDefinitionModel assocDef : getAssocDefs()) {
+            lastAssocDefId = assocDef.getId();
+        }
+        return lastAssocDefId;
+    }
+
+    private AssociationDefinitionModel firstAssocDef() {
+        return getAssocDefs().iterator().next();
     }
 
     // ---

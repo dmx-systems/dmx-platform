@@ -314,7 +314,7 @@ class TypeStorageImpl implements TypeStorage {
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
-    AssociationDefinitionModel createAssociationDefinition(AssociationModel assoc) {
+    AssociationDefinitionModel newAssociationDefinition(AssociationModel assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentType(assoc).getUri();
@@ -437,8 +437,7 @@ class TypeStorageImpl implements TypeStorage {
         TopicModel parentType = ((AssociationModelImpl) assoc).getTopic("dm4.core.parent_type");
         // error check
         if (parentType == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
-                "is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.parent_type\" is missing in " + assoc);
         }
         //
         return parentType;
@@ -448,8 +447,7 @@ class TypeStorageImpl implements TypeStorage {
         TopicModel childType = ((AssociationModelImpl) assoc).getTopic("dm4.core.child_type");
         // error check
         if (childType == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
-                "is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.child_type\" is missing in " + assoc);
         }
         //
         return childType;
@@ -470,8 +468,8 @@ class TypeStorageImpl implements TypeStorage {
         RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         // error check
         if (cardinality == null) {
-            throw new RuntimeException("Invalid association definition: cardinality is missing (assocDefId=" +
-                assocDefId + ", cardinalityRoleTypeUri=\"" + cardinalityRoleTypeUri + "\")");
+            throw new RuntimeException("DB inconsistency: association definition " + assocDefId +
+                " is missing a cardinality (\"" + cardinalityRoleTypeUri + "\")");
         }
         //
         return cardinality;
