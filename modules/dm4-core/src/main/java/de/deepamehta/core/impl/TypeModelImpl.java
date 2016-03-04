@@ -286,13 +286,18 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         storeDataTypeUri();             // update DB
     }
 
+    void updateLabelConfig(List<String> labelConfig) {
+        setLabelConfig(labelConfig);                                    // update memory
+        pl.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());  // update DB
+    }
+
     // ---
 
     void _addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         try {
-            long lastAssocDefId = lastAssocDefId();             // must be determined *before* the memory is updated
+            long lastAssocDefId = lastAssocDefId();     // must be determined *before* memory is updated
             //
-            // 1) update memory (model)
+            // 1) update memory
             // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
             // adds "Association Type" as a child to the "Composition Definition" and "Aggregation Definition"
             // association types has itself a custom association type (named "Custom Association Type"), see migration
@@ -304,7 +309,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // 2) update DB
             pl.typeStorage.storeAssociationDefinition(assocDef);
             long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
-            long firstAssocDefId = firstAssocDef().getId();     // must be determined *after* the memory is updated
+            long firstAssocDefId = firstAssocDefId();   // must be determined *after* memory is updated
             pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
                 lastAssocDefId);
         } catch (Exception e) {
@@ -328,10 +333,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
         if (assoc == oldAssocDef) {
             // edited via type topic -- abort
-            logger.info("################################## edited via TYPE TOPIC");
             return;
-        } else {
-            logger.info("################################## edited via ASSOCIATION");
         }
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel newAssocModel = mf.newAssociationModel(assoc);
@@ -434,7 +436,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             if (!getLabelConfig().equals(newLabelConfig)) {
                 logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
-                setLabelConfig(newLabelConfig);
+                updateLabelConfig(newLabelConfig);
             }
         } catch (Exception e) {
             throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
@@ -559,8 +561,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return lastAssocDefId;
     }
 
-    private AssociationDefinitionModel firstAssocDef() {
-        return getAssocDefs().iterator().next();
+    private long firstAssocDefId() {
+        return getAssocDefs().iterator().next().getId();
     }
 
     // ---

@@ -170,10 +170,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public void setLabelConfig(List<String> labelConfig) {
-        // update memory
-        getModel().setLabelConfig(labelConfig);
-        // update DB
-        pl.typeStorage.updateLabelConfig(labelConfig, getModel().getAssocDefs());
+        getModel().updateLabelConfig(labelConfig);
     }
 
     // --- View Configuration ---
