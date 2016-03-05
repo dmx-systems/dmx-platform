@@ -75,6 +75,11 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // ---
 
     @Override
+    Directive getUpdateTypeDirective() {
+        return Directive.UPDATE_ASSOCIATION_TYPE;
+    }
+
+    @Override
     Directive getDeleteTypeDirective() {
         return Directive.DELETE_ASSOCIATION_TYPE;
     }

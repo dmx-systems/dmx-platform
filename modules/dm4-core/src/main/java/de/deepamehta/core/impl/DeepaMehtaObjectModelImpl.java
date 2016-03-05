@@ -401,6 +401,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                     pl.typeStorage.putInTypeCache(type);    // ### TODO: refactoring. See comment in TypeCache#put..
                 }
                 type.updateType((TypeModel) newModel);
+                // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible
+                // UPDATE_TOPIC directive (added by super.update()). In case of a changed type URI the webclient's type
+                // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
+                Directives.get().add(type.getUpdateTypeDirective(), object);
             }
             //
             Directives.get().add(getUpdateDirective(), object);

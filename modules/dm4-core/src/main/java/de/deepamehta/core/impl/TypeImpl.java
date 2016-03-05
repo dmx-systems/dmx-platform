@@ -1,26 +1,15 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.util.SequencedHashMap;
 
-import org.codehaus.jettison.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 

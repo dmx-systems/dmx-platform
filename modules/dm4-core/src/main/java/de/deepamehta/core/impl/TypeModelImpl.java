@@ -262,6 +262,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
+    Directive getUpdateTypeDirective() {
+        throw new UnsupportedOperationException();
+    }
+
     Directive getDeleteTypeDirective() {
         throw new UnsupportedOperationException();
     }

@@ -175,7 +175,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public void update(DeepaMehtaObjectModel newModel) {
+    public final void update(DeepaMehtaObjectModel newModel) {
         model.update(newModel);
     }
 

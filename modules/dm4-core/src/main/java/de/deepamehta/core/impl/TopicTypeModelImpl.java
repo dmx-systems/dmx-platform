@@ -75,6 +75,11 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // ---
 
     @Override
+    Directive getUpdateTypeDirective() {
+        return Directive.UPDATE_TOPIC_TYPE;
+    }
+
+    @Override
     Directive getDeleteTypeDirective() {
         return Directive.DELETE_TOPIC_TYPE;
     }
