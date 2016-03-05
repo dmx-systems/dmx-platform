@@ -142,11 +142,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     // === Implementation of the abstract methods ===
 
     @Override
-    String className() {
-        return "topic";
-    }
-
-    @Override
     void updateChildTopics(ChildTopicsModel childTopics) {
         update(mf.newTopicModel(childTopics));
     }

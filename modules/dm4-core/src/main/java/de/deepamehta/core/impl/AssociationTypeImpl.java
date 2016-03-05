@@ -35,15 +35,4 @@ class AssociationTypeImpl extends TypeImpl implements AssociationType {
     public void update(AssociationTypeModel newModel) {
         model.update(newModel);
     }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === TopicImpl Overrides ===
-
-    @Override
-    final String className() {
-        return "association type";
-    }
 }

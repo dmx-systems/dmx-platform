@@ -205,11 +205,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // === Implementation of the abstract methods ===
 
     @Override
-    final String className() {
-        return "association";
-    }
-
-    @Override
     void updateChildTopics(ChildTopicsModel childTopics) {
         update(mf.newAssociationModel(childTopics));
     }
@@ -243,6 +238,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // --- Helper ---
 
+    // ### TODO: move to model
     private TopicRole filterRole(Role role, TopicRoleModel roleModel) {
         return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
             role.getPlayerId() == roleModel.getPlayerId() ? (TopicRole) role : null;

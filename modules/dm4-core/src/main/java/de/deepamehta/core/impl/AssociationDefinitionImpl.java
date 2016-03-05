@@ -1,13 +1,9 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicModel;
-
-import java.util.logging.Logger;
 
 
 
@@ -15,10 +11,6 @@ import java.util.logging.Logger;
  * An association definition that is attached to the {@link DeepaMehtaService}.
  */
 class AssociationDefinitionImpl extends AssociationImpl implements AssociationDefinition {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -41,15 +33,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         return getModel().getAssocDefUri();
     }
 
-    @Override
-    public String getCustomAssocTypeUri() {
-        return getModel().getCustomAssocTypeUri();
-    }
-
-    @Override
-    public String getInstanceLevelAssocTypeUri() {
-        return getModel().getInstanceLevelAssocTypeUri();
-    }
+    // ---
 
     @Override
     public String getParentTypeUri() {
@@ -61,10 +45,31 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         return getModel().getChildTypeUri();
     }
 
+    // ---
+
+    @Override
+    public String getCustomAssocTypeUri() {
+        return getModel().getCustomAssocTypeUri();
+    }
+
+    @Override
+    public String getInstanceLevelAssocTypeUri() {
+        return getModel().getInstanceLevelAssocTypeUri();
+    }
+
+    // --- Parent Cardinality ---
+
     @Override
     public String getParentCardinalityUri() {
         return getModel().getParentCardinalityUri();
     }
+
+    @Override
+    public void setParentCardinalityUri(String parentCardinalityUri) {
+        getModel().updateParentCardinalityUri(parentCardinalityUri);
+    }
+
+    // --- Child Cardinality ---
 
     @Override
     public String getChildCardinalityUri() {
@@ -72,40 +77,29 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     }
 
     @Override
-    public ViewConfiguration getViewConfig() {
-        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
-    }
-
-    @Override
-    public AssociationDefinitionModelImpl getModel() {
-        return (AssociationDefinitionModelImpl) super.getModel();
+    public void setChildCardinalityUri(String childCardinalityUri) {
+        getModel().updateChildCardinalityUri(childCardinalityUri);
     }
 
     // ---
 
     @Override
-    public void setParentCardinalityUri(String parentCardinalityUri) {
-        // update memory
-        getModel().setParentCardinalityUri(parentCardinalityUri);
-        // update DB
-        pl.typeStorage.storeParentCardinalityUri(getId(), parentCardinalityUri);
+    public ViewConfiguration getViewConfig() {
+        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
-    @Override
-    public void setChildCardinalityUri(String childCardinalityUri) {
-        // update memory
-        getModel().setChildCardinalityUri(childCardinalityUri);
-        // update DB
-        pl.typeStorage.storeChildCardinalityUri(getId(), childCardinalityUri);
-    }
-
-
-
-    // === Updating ===
+    // ---
 
     @Override
     public void update(AssociationDefinitionModel newModel) {
         model.update(newModel);
+    }
+
+    // ---
+
+    @Override
+    public AssociationDefinitionModelImpl getModel() {
+        return (AssociationDefinitionModelImpl) model;
     }
 }

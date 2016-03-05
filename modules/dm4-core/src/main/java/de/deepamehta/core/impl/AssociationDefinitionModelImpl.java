@@ -182,7 +182,21 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
-    // === Update ===
+    // === Update (memory + DB) ===
+
+    void updateParentCardinalityUri(String parentCardinalityUri) {
+        setParentCardinalityUri(parentCardinalityUri);                      // update memory
+        pl.typeStorage.storeParentCardinalityUri(id, parentCardinalityUri); // update DB
+    }
+
+    void updateChildCardinalityUri(String childCardinalityUri) {
+        setChildCardinalityUri(childCardinalityUri);                        // update memory
+        pl.typeStorage.storeChildCardinalityUri(id, childCardinalityUri);   // update DB
+    }
+
+
+
+    // ===
 
     /**
      * ### TODO: make private
@@ -223,7 +237,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
             logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
                 newParentCardinalityUri + "\"");
-            setParentCardinalityUri(newParentCardinalityUri);
+            updateParentCardinalityUri(newParentCardinalityUri);
         }
     }
 
@@ -237,7 +251,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         if (!childCardinalityUri.equals(newChildCardinalityUri)) {
             logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
                 newChildCardinalityUri + "\"");
-            setChildCardinalityUri(newChildCardinalityUri);
+            updateChildCardinalityUri(newChildCardinalityUri);
         }
     }
 

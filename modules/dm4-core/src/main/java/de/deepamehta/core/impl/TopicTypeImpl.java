@@ -35,15 +35,4 @@ class TopicTypeImpl extends TypeImpl implements TopicType {
     public void update(TopicTypeModel newModel) {
         model.update(newModel);
     }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === TopicImpl Overrides ===
-
-    @Override
-    final String className() {
-        return "topic type";
-    }
 }

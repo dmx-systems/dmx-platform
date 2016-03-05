@@ -14,6 +14,14 @@ public interface AssociationDefinition extends Association {
 
     String getAssocDefUri();
 
+    // ---
+
+    String getParentTypeUri();
+
+    String getChildTypeUri();
+
+    // ---
+
     /**
      * @return  The custom association type, or <code>null</code> if not set.
      */
@@ -27,25 +35,27 @@ public interface AssociationDefinition extends Association {
      */
     String getInstanceLevelAssocTypeUri();
 
-    String getParentTypeUri();
-
-    String getChildTypeUri();
+    // --- Parent Cardinality ---
 
     String getParentCardinalityUri();
 
-    String getChildCardinalityUri();
-
-    ViewConfiguration getViewConfig();
-
-    AssociationDefinitionModel getModel();
-
-    // ---
-
     void setParentCardinalityUri(String parentCardinalityUri);
+
+    // --- Child Cardinality ---
+
+    String getChildCardinalityUri();
 
     void setChildCardinalityUri(String childCardinalityUri);
 
-    // === Updating ===
+    // ---
+
+    ViewConfiguration getViewConfig();
+
+    // ---
 
     void update(AssociationDefinitionModel model);
+
+    // ---
+
+    AssociationDefinitionModel getModel();
 }

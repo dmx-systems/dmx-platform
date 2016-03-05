@@ -309,8 +309,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract String className();    // ### TODO: rely on model class name
-
     abstract void updateChildTopics(ChildTopicsModel childTopics);
 
     // ---
@@ -325,4 +323,12 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ### TODO: add to public interface?
     abstract Type getType();
+
+
+
+    // ===
+
+    final String className() {
+        return model.className();
+    }
 }
