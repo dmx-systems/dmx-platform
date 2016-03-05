@@ -272,16 +272,37 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Update (memory + DB) ===
+    // === Core Internal Hooks ===
 
-    void updateType(TypeModel newModel) {
-        _updateDataTypeUri(newModel.getDataTypeUri());
-        _updateAssocDefs(newModel.getAssocDefs());
-        _updateSequence(newModel.getAssocDefs());
-        _updateLabelConfig(newModel.getLabelConfig());
+    @Override
+    void preUpdate(DeepaMehtaObjectModel newModel) {
+        super.preUpdate(newModel);
+        //
+        if (uriChange(newModel.getUri(), uri)) {
+            _removeFromTypeCache();
+        }
     }
 
-    // ---
+    @Override
+    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+        super.postUpdate(newModel, oldModel);
+        //
+        if (uriChange(newModel.getUri(), oldModel.getUri())) {
+            putInTypeCache();
+            pl.typeStorage.putInTypeCache(this);    // ### TODO: refactoring. See comment in TypeCache#put..
+        }
+        //
+        updateType((TypeModel) newModel);
+        //
+        Directives.get().add(getUpdateTypeDirective(), instantiate());
+        // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
+        // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
+        // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
+    }
+
+
+
+    // === Update (memory + DB) ===
 
     void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
@@ -352,7 +373,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
         if (assoc == oldAssocDef) {
             // edited via type topic -- abort
+            logger.info("################################## assoc def " + assoc.getId() + " edited via TYPE TOPIC");
             return;
+        } else {
+            logger.info("################################## assoc def " + assoc.getId() + " edited via ASSOCIATION");
         }
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel newAssocModel = mf.newAssociationModel(assoc);
@@ -409,7 +433,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
-     * ### TODO: make private?
+     * ### TODO: make private
      */
     void _removeFromTypeCache() {
         removeFromTypeCache();                      // abstract
@@ -423,6 +447,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     // === Update (memory + DB) ===
+
+    private void updateType(TypeModel newModel) {
+        _updateDataTypeUri(newModel.getDataTypeUri());
+        _updateAssocDefs(newModel.getAssocDefs());
+        _updateSequence(newModel.getAssocDefs());
+        _updateLabelConfig(newModel.getLabelConfig());
+    }
+
+    // ---
 
     private void _updateDataTypeUri(String newDataTypeUri) {
         if (newDataTypeUri != null) {
@@ -682,7 +715,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    private class JSONWrapper implements JSONEnabled {
+    private static final class JSONWrapper implements JSONEnabled {
 
         private JSONObject wrapped;
 

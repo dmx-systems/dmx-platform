@@ -335,6 +335,16 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
+    // === Core Internal Hooks ===
+
+    void preUpdate(DeepaMehtaObjectModel newModel) {
+    }
+
+    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+    }
+
+
+
     // === Update ===
 
     /**
@@ -353,28 +363,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             DeepaMehtaObjectModel oldModel = clone();
             em.fireEvent(getPreUpdateEvent(), object, newModel);
             //
-            // --- Type (preambel) ---
-            TypeModelImpl type = null;
-            boolean uriChanged = false;
-            if (this instanceof TypeModel) {
-                type = (TypeModelImpl) this;
-                uriChanged = hasUriChanged(newModel.getUri());
-                if (uriChanged) {
-                    type._removeFromTypeCache();
-                }
-            }
-            // --- Association Definition (preambel) ---
-            AssociationDefinitionModelImpl assocDef = null;
-            boolean changeCustomAssocType = false;
-            if (this instanceof AssociationDefinitionModel) {
-                assocDef = (AssociationDefinitionModelImpl) this;
-                changeCustomAssocType = !assocDef.hasSameCustomAssocType((AssociationDefinitionModel) newModel);
-                if (changeCustomAssocType) {
-                    logger.info("### Changing custom association type URI from \"" + assocDef.getCustomAssocTypeUri() +
-                        "\" -> \"" + ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
-                }
-            }
-            // --- Generic Object ---
+            preUpdate(newModel);
+            //
             _updateUri(newModel.getUri());
             _updateTypeUri(newModel.getTypeUri());
             if (isSimple()) {
@@ -382,30 +372,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             } else {
                 _updateChildTopics(newModel.getChildTopicsModel());
             }
-            // --- Association ---
-            if (this instanceof AssociationModel) {
-                ((AssociationModelImpl) this).updateRoles((AssociationModel) newModel);
-            }
-            // --- Association Definition ---
-            if (this instanceof AssociationDefinitionModel) {
-                assocDef.updateCardinality((AssociationDefinitionModel) newModel);
-                // rehash
-                if (changeCustomAssocType) {
-                    assocDef.getParentType().rehashAssocDef(newModel.getId());
-                }
-            }
-            // --- Type ---
-            if (this instanceof TypeModel) {
-                if (uriChanged) {
-                    type.putInTypeCache();
-                    pl.typeStorage.putInTypeCache(type);    // ### TODO: refactoring. See comment in TypeCache#put..
-                }
-                type.updateType((TypeModel) newModel);
-                // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible
-                // UPDATE_TOPIC directive (added by super.update()). In case of a changed type URI the webclient's type
-                // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
-                Directives.get().add(type.getUpdateTypeDirective(), object);
-            }
+            //
+            postUpdate(newModel, oldModel);
             //
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
@@ -612,9 +580,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
+    boolean uriChange(String newUri, String compareUri) {
+        return newUri != null && !newUri.equals(compareUri);
+    }
+
     boolean isSimple() {
         return !getType().getDataTypeUri().equals("dm4.core.composite");
-    }        
+    }
 
 
 
@@ -669,7 +641,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Update (memory + DB) ===
 
     private void _updateUri(String newUri) {
-        if (hasUriChanged(newUri)) {                                // abort if no update is requested
+        if (uriChange(newUri, uri)) {                               // abort if no update is requested
             logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
                 "\" -> \"" + newUri + "\"");
             updateUri(newUri);
@@ -690,12 +662,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 "\" -> \"" + newValue + "\"");
             updateSimpleValue(newValue);
         }
-    }
-
-    // ---
-
-    private boolean hasUriChanged(String newUri) {
-        return newUri != null && !newUri.equals(uri);
     }
 
 

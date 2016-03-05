@@ -267,6 +267,17 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
 
+    // === Core Internal Hooks ===
+
+    @Override
+    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+        super.postUpdate(newModel, oldModel);
+        //
+        updateRoles((AssociationModel) newModel);
+    }
+
+
+
     // ===
 
     /**
@@ -292,11 +303,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // ---
 
-    void updateRoles(AssociationModel newModel) {
-        updateRole(newModel.getRoleModel1(), 1);
-        updateRole(newModel.getRoleModel2(), 2);
-    }
-
     void updateRoleTypeUri(RoleModelImpl role, String roleTypeUri) {
         role.setRoleTypeUri(roleTypeUri);                           // update memory
         pl.storeRoleTypeUri(id, role.playerId, role.roleTypeUri);   // update DB
@@ -305,6 +311,13 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
+
+    // === Update (memory + DB) ===
+
+    private void updateRoles(AssociationModel newModel) {
+        updateRole(newModel.getRoleModel1(), 1);
+        updateRole(newModel.getRoleModel2(), 2);
+    }
 
     /**
      * @param   nr      used only for logging
@@ -323,6 +336,10 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             }
         }
     }
+
+
+
+    // === Roles (memory access) ===
 
     /**
      * Returns this association's role which refers to the same object as the given role model.
@@ -352,7 +369,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return null;
     }
 
-    // ---
+
+
+    // === Store (DB only) ===
 
     private void reassignInstantiation() {
         // remove current assignment

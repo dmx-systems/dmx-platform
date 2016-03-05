@@ -4,6 +4,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
@@ -145,6 +146,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+
+
     @Override
     String className() {
         return "association definition";
@@ -157,28 +160,29 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
-    // === Update ===
+    // === Core Internal Hooks ===
 
-    void updateCardinality(AssociationDefinitionModel newModel) {
-        updateParentCardinality(newModel.getParentCardinalityUri());
-        updateChildCardinality(newModel.getChildCardinalityUri());
-    }
-
-
-
-    // ===
-
-    boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
-        String _customAssocTypeUri = getCustomAssocTypeUri();
-        String customAssocTypeUri = ((AssociationDefinitionModelImpl) assocDef).getCustomAssocTypeUriOrNull();
-        if (customAssocTypeUri == null) {
-            // compare our value to null if his value is a deletion ref or null
-            return _customAssocTypeUri == null;
-        } else {
-            // his value is neither a deletion ref nor null, compare it to our value (which may be null)
-            return customAssocTypeUri.equals(_customAssocTypeUri);
+    @Override
+    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+        logger.info("################################ assoc def postUpdate()!!!");
+        super.postUpdate(newModel, oldModel);
+        //
+        updateCardinality((AssociationDefinitionModel) newModel);
+        //
+        // rehash
+        boolean changeCustomAssocType = customAssocTypeChange((AssociationDefinitionModel) newModel,
+            (AssociationDefinitionModel) oldModel);
+        if (changeCustomAssocType) {
+            logger.info("### Changed custom association type URI from \"" +
+                ((AssociationDefinitionModelImpl) oldModel).getCustomAssocTypeUri() + "\" -> \"" +
+                ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
+            getParentType().rehashAssocDef(newModel.getId());
         }
     }
+
+
+
+    // === Update ===
 
     /**
      * ### TODO: make private
@@ -201,6 +205,13 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
     // === Update ===
+
+    private void updateCardinality(AssociationDefinitionModel newModel) {
+        updateParentCardinality(newModel.getParentCardinalityUri());
+        updateChildCardinality(newModel.getChildCardinalityUri());
+    }
+
+    // ---
 
     private void updateParentCardinality(String newParentCardinalityUri) {
         // abort if no update is requested
@@ -233,6 +244,19 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
     // ====
+
+    private boolean customAssocTypeChange(AssociationDefinitionModel newModel, AssociationDefinitionModel oldModel) {
+        String oldUri = oldModel.getCustomAssocTypeUri();   // null if no assoc type is set
+        String newUri = ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull();  // null if del ref
+        if (newUri != null) {
+            // new value is neither a deletion ref nor null, compare it to old value (which may be null)
+            return !newUri.equals(oldUri);
+        } else {
+            // compare old value to null if new value is a deletion ref or null
+            // ### FIXME: must differentiate "no change requested" (= null) and "remove current assignment" (= del ref)?
+            return oldUri != null;
+        }
+    }
 
     private RelatedTopicModel getCustomAssocType() {
         RelatedTopicModel customAssocType = getChildTopicsModel().getTopicOrNull(
