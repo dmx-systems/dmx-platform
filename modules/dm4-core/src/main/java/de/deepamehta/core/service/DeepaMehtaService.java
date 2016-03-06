@@ -12,7 +12,6 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -74,7 +73,7 @@ public interface DeepaMehtaService {
      */
     List<Topic> getTopics(String key, SimpleValue value);
 
-    ResultList<RelatedTopic> getTopics(String topicTypeUri);
+    List<Topic> getTopics(String topicTypeUri);
 
     /**
      * Performs a fulltext search.
@@ -141,7 +140,7 @@ public interface DeepaMehtaService {
 
     // ---
 
-    ResultList<RelatedAssociation> getAssociations(String assocTypeUri);
+    List<Association> getAssociations(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.

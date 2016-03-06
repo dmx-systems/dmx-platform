@@ -93,10 +93,9 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    ResultList<RelatedTopic> getTopics(String topicTypeUri) {
+    List<Topic> getTopics(String topicTypeUri) {
         try {
-            return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", topicTypeUri);
+            return instantiateTopics(typeStorage.getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
@@ -231,10 +230,9 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
+    List<Association> getAssociations(String assocTypeUri) {
         try {
-            return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
-                "dm4.core.type", "dm4.core.instance", assocTypeUri);
+            return instantiateAssociations(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);

@@ -6,7 +6,6 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.List;
@@ -78,10 +77,10 @@ public interface WorkspacesService {
     /**
      * Returns all topics of the given type that are assigned to the given workspace.
      */
-    ResultList<RelatedTopic> getAssignedTopics(long workspaceId, String topicTypeUri);
+    List<Topic> getAssignedTopics(long workspaceId, String topicTypeUri);
 
     /**
      * Returns all associations of the given type that are assigned to the given workspace.
      */
-    ResultList<RelatedAssociation> getAssignedAssociations(long workspaceId, String assocTypeUri);
+    List<Association> getAssignedAssociations(long workspaceId, String assocTypeUri);
 }

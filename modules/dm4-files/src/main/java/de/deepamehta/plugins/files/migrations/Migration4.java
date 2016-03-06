@@ -1,11 +1,10 @@
 package de.deepamehta.plugins.files.migrations;
 
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.ResultList;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -35,8 +34,8 @@ public class Migration4 extends Migration {
     public void run() {
         // 1) Rename root Folder topics
         if (FILE_REPOSITORY_PER_WORKSPACE) {
-            ResultList<RelatedTopic> workspaces = dms.getTopics("dm4.workspaces.workspace");
-            logger.info("########## Renaming root Folder topics of " + workspaces.getSize() + " possible workspaces");
+            List<Topic> workspaces = dms.getTopics("dm4.workspaces.workspace");
+            logger.info("########## Renaming root Folder topics of " + workspaces.size() + " possible workspaces");
             int renamed = 0;
             for (Topic workspace : workspaces) {
                 Topic folderTopic = fetchFolderTopic("/workspace-" + workspace.getId());

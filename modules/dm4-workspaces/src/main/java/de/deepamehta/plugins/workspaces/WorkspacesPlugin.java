@@ -20,7 +20,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
@@ -214,9 +213,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/topics/{topic_type_uri}")
     @Override
-    public ResultList<RelatedTopic> getAssignedTopics(@PathParam("id") long workspaceId,
-                                                      @PathParam("topic_type_uri") String topicTypeUri) {
-        ResultList<RelatedTopic> topics = dms.getTopics(topicTypeUri);
+    public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId,
+                                         @PathParam("topic_type_uri") String topicTypeUri) {
+        List<Topic> topics = dms.getTopics(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
         return topics;
     }
@@ -225,9 +224,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @GET
     @Path("/{id}/assocs/{assoc_type_uri}")
     @Override
-    public ResultList<RelatedAssociation> getAssignedAssociations(@PathParam("id") long workspaceId,
-                                                                  @PathParam("assoc_type_uri") String assocTypeUri) {
-        ResultList<RelatedAssociation> assocs = dms.getAssociations(assocTypeUri);
+    public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId,
+                                                     @PathParam("assoc_type_uri") String assocTypeUri) {
+        List<Association> assocs = dms.getAssociations(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
     }

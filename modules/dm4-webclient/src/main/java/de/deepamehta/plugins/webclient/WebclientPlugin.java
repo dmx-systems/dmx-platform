@@ -106,7 +106,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\"");
             String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<RelatedTopic> topics = dms.getTopics(typeUri).getItems();
+            List<Topic> topics = dms.getTopics(typeUri);
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
@@ -223,7 +223,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     /**
      * Creates a "Search" topic.
      */
-    private Topic createSearchTopic(final String searchTerm, final Collection<? extends Topic> resultItems) {
+    private Topic createSearchTopic(final String searchTerm, final Collection<Topic> resultItems) {
         try {
             // We suppress standard workspace assignment here as a Search topic requires a special assignment.
             // That is done by the Access Control module. ### TODO: refactoring. Do the assignment here.

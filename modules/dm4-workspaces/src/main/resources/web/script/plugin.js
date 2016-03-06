@@ -50,7 +50,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})
         return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri +
-            params.to_query_string()).items
+            params.to_query_string())
     }
     dm4c.restc.get_assigned_workspace = function(object_id, include_childs) {
         var params = this.createRequestParameter({include_childs: include_childs})
@@ -291,8 +291,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     // ---
 
     function fetch_workspaces() {
-        workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true).items   // include_childs=false
-                                                                                            // sort=true
+        workspaces = dm4c.restc.get_topics("dm4.workspaces.workspace", false, true)   // include_childs=false, sort=true
         // suppress System workspace from appearing in menu
         js.delete(workspaces, function(workspace) {
             return workspace.uri == "dm4.workspaces.system"

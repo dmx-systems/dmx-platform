@@ -103,7 +103,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultList<RelatedTopic> getTopics(String topicTypeUri) {
+    public List<Topic> getTopics(String topicTypeUri) {
         return pl.getTopics(topicTypeUri);
     }
 
@@ -169,7 +169,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
+    public List<Association> getAssociations(String assocTypeUri) {
         return pl.getAssociations(assocTypeUri);
     }
 
@@ -335,6 +335,7 @@ public class EmbeddedService implements DeepaMehtaService {
     public void updateAssociationType(AssociationTypeModel newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            // ### FIXME: access control
             String assocTypeUri = pl.fetchTopic(newModel.getId()).getUri();
             pl.typeStorage.getAssociationType(assocTypeUri).update(newModel);
         } catch (Exception e) {

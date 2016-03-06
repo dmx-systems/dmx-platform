@@ -366,7 +366,7 @@ function RenderHelper() {
             throw "RendererHelperError: illegal \"selected_id_or_uri\" argument in topic_menu() call"
         }
         // fetch all instances
-        var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // include_childs=false, sort=true
+        var topics = dm4c.restc.get_topics(topic_type_uri, false, true)     // include_childs=false, sort=true
         // build menu
         var menu = dm4c.ui.menu(handler)
         for (var i = 0, topic; topic = topics[i]; i++) {
@@ -397,7 +397,7 @@ function RenderHelper() {
      */
     this.topic_combobox = function(topic_type_uri, item_value_prop, selected_id_or_uri) {
         // fetch all instances
-        var topics = dm4c.restc.get_topics(topic_type_uri, false, true).items   // include_childs=false, sort=true
+        var topics = dm4c.restc.get_topics(topic_type_uri, false, true)     // include_childs=false, sort=true
         // build combobox
         var combobox = dm4c.ui.combobox()
         for (var i = 0, topic; topic = topics[i]; i++) {
@@ -419,7 +419,7 @@ function RenderHelper() {
         switch (result.length) {
         case 0:
             // fetch all instances
-            return dm4c.restc.get_topics(topic_type_uri, false, true).items     // include_childs=false, sort=true
+            return dm4c.restc.get_topics(topic_type_uri, false, true)       // include_childs=false, sort=true
         case 1:
             return result[0]
         default:

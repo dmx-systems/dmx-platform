@@ -64,13 +64,13 @@ function RESTClient(config) {
      *                              If evaluates to true the returned topics are sorted.
      *
      * @return  An object with 1 property:
-     *              "items"       - array of topics, possibly empty.
+     *              "items"       - array of topics, possibly empty. ### FIXDOC
      */
     this.get_topics = function(type_uri, include_childs, sort) {
         var params = new RequestParameter({include_childs: include_childs})
         var result = request("GET", "/core/topic/by_type/" + type_uri + params.to_query_string())
         if (sort) {
-            this.sort_topics(result.items)
+            this.sort_topics(result)
         }
         return result
     }
