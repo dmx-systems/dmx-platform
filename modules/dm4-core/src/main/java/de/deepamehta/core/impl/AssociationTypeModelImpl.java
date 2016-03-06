@@ -63,18 +63,6 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // ---
 
     @Override
-    void putInTypeCache() {
-        pl.typeCache.putAssociationType(instantiate());
-    }
-
-    @Override
-    void removeFromTypeCache() {
-        pl.typeCache.removeAssociationType(uri);
-    }
-
-    // ---
-
-    @Override
     Directive getUpdateTypeDirective() {
         return Directive.UPDATE_ASSOCIATION_TYPE;
     }

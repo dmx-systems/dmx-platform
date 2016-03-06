@@ -41,7 +41,6 @@ public class PersistenceLayer extends StorageDecorator {
 
     EventManager em;
     ModelFactoryImpl mf;
-    TypeCache typeCache;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -52,7 +51,6 @@ public class PersistenceLayer extends StorageDecorator {
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
-        this.typeCache = new TypeCache(this);
         //
         this.typeStorage = new TypeStorageImpl(this);
         this.valueStorage = new ValueStorage(this);
@@ -353,19 +351,11 @@ public class PersistenceLayer extends StorageDecorator {
     // === Types ===
 
     TopicType getTopicType(String uri) {
-        try {
-            return typeCache.getTopicType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
-        }
+        return typeStorage.getTopicType(uri).instantiate();
     }
 
     AssociationType getAssociationType(String uri) {
-        try {
-            return typeCache.getAssociationType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
-        }
+        return typeStorage.getAssociationType(uri).instantiate();
     }
 
     // ---
@@ -376,11 +366,9 @@ public class PersistenceLayer extends StorageDecorator {
             createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
-            // instantiate
-            TopicType topicType = new TopicTypeImpl(model, this);
-            typeCache.putTopicType(topicType);
-            //
+            TopicType topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
+            //
             return topicType;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
@@ -393,11 +381,9 @@ public class PersistenceLayer extends StorageDecorator {
             createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
-            // instantiate
-            AssociationType assocType = new AssociationTypeImpl(model, this);
-            typeCache.putAssociationType(assocType);
-            //
+            AssociationType assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+            //
             return assocType;
         } catch (Exception e) {
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
@@ -553,6 +539,6 @@ public class PersistenceLayer extends StorageDecorator {
         TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
-        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));
+        typeStorage.putInTypeCache(metaMetaType);
     }
 }

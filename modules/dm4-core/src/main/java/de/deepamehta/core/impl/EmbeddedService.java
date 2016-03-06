@@ -125,8 +125,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void updateTopic(TopicModel model) {
-        pl.updateTopic(model);
+    public void updateTopic(TopicModel newModel) {
+        pl.updateTopic(newModel);
     }
 
     @Override
@@ -203,8 +203,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void updateAssociation(AssociationModel model) {
-        pl.updateAssociation(model);
+    public void updateAssociation(AssociationModel newModel) {
+        pl.updateAssociation(newModel);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")));
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.topic_type");
+                "dm4.core.instance", "dm4.core.topic_type");        // ### TODO: perform by-value search instead
             List<String> topicTypeUris = new ArrayList();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
@@ -265,20 +265,21 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void updateTopicType(TopicTypeModel model) {
+    public void updateTopicType(TopicTypeModel newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String topicTypeUri = getTopic(model.getId()).getUri();
-            getTopicType(topicTypeUri).update(model);
+            // ### FIXME: access control
+            String topicTypeUri = pl.fetchTopic(newModel.getId()).getUri();
+            pl.typeStorage.getTopicType(topicTypeUri).update(newModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + model + ")", e);
+            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
         }
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
         try {
-            getTopicType(topicTypeUri).delete();    // ### TODO: delete view config topics
+            pl.typeStorage.getTopicType(topicTypeUri).delete();     // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         }
@@ -293,7 +294,7 @@ public class EmbeddedService implements DeepaMehtaService {
         try {
             Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")));
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.assoc_type");
+                "dm4.core.instance", "dm4.core.assoc_type");        // ### TODO: perform by-value search instead
             List<String> assocTypeUris = new ArrayList();
             for (Topic assocType : assocTypes) {
                 assocTypeUris.add(assocType.getUri());
@@ -331,20 +332,20 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void updateAssociationType(AssociationTypeModel model) {
+    public void updateAssociationType(AssociationTypeModel newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String assocTypeUri = getTopic(model.getId()).getUri();
-            getAssociationType(assocTypeUri).update(model);
+            String assocTypeUri = pl.fetchTopic(newModel.getId()).getUri();
+            pl.typeStorage.getAssociationType(assocTypeUri).update(newModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + model + ")", e);
+            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
         }
     }
 
     @Override
     public void deleteAssociationType(String assocTypeUri) {
         try {
-            getAssociationType(assocTypeUri).delete();
+            pl.typeStorage.getAssociationType(assocTypeUri).delete();
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }

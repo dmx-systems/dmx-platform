@@ -252,16 +252,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    void putInTypeCache() {
-        throw new UnsupportedOperationException();
-    }
-
-    void removeFromTypeCache() {
-        throw new UnsupportedOperationException();
-    }
-
-    // ---
-
     Directive getUpdateTypeDirective() {
         throw new UnsupportedOperationException();
     }
@@ -278,8 +268,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void preUpdate(DeepaMehtaObjectModel newModel) {
         super.preUpdate(newModel);
         //
+        // ### TODO: is it sufficient if we rehash (remove + add) at post-time?
         if (uriChange(newModel.getUri(), uri)) {
-            _removeFromTypeCache();
+            removeFromTypeCache();
         }
     }
 
@@ -288,8 +279,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         super.postUpdate(newModel, oldModel);
         //
         if (uriChange(newModel.getUri(), oldModel.getUri())) {
-            putInTypeCache();
-            pl.typeStorage.putInTypeCache(this);    // ### TODO: refactoring. See comment in TypeCache#put..
+            pl.typeStorage.putInTypeCache(this);
         }
         //
         updateType((TypeModel) newModel);
@@ -316,7 +306,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void postDelete() {
         super.postDelete();
         //
-        _removeFromTypeCache();
+        removeFromTypeCache();
     }
 
 
@@ -703,10 +693,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
-     * ### TODO: make private
      */
-    private void _removeFromTypeCache() {
-        removeFromTypeCache();                      // abstract
+    private void removeFromTypeCache() {
+        pl.typeStorage.removeFromTypeCache(uri);
         //
         Directive dir = getDeleteTypeDirective();   // abstract
         Directives.get().add(dir, new JSONWrapper("uri", uri));

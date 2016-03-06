@@ -52,9 +52,9 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: check if we can drop the type model cache if we attach *before* storing a type. --> No!
-    // ### Keep the type model cache, and drop the attached type cache instead!
     private Map<String, TypeModelImpl> typeCache = new HashMap();   // type model cache
+
+    private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
     private PersistenceLayer pl;
     private ModelFactoryImpl mf;
@@ -74,38 +74,32 @@ class TypeStorageImpl implements TypeStorage {
 
     // === Type Model Cache ===
 
-    TopicTypeModel getTopicType(String topicTypeUri) {
+    TopicTypeModelImpl getTopicType(String topicTypeUri) {
         TopicTypeModelImpl topicType = (TopicTypeModelImpl) getType(topicTypeUri);
-        if (topicType == null) {
-            // logger.info("##################### Loading topic type \"" + topicTypeUri + "\"");
-            topicType = fetchTopicType(topicTypeUri);
-            putInTypeCache(topicType);
-        }
-        return topicType;
+        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
     }
 
-    AssociationTypeModel getAssociationType(String assocTypeUri) {
+    AssociationTypeModelImpl getAssociationType(String assocTypeUri) {
         AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getType(assocTypeUri);
-        if (assocType == null) {
-            // logger.info("##################### Loading association type \"" + assocTypeUri + "\"");
-            assocType = fetchAssociationType(assocTypeUri);
-            putInTypeCache(assocType);
-        }
-        return assocType;
+        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
     }
 
     // ---
 
     void putInTypeCache(TypeModelImpl type) {
-        typeCache.put(type.getUri(), type);
+        typeCache.put(type.uri, type);
     }
 
     void removeFromTypeCache(String typeUri) {
-        typeCache.remove(typeUri);
+        logger.info("### Removing type \"" + typeUri + "\" from type cache");
+        if (typeCache.remove(typeUri) == null) {
+            throw new RuntimeException("Type \"" + typeUri + "\" not found in type cache");
+        }
     }
 
     // ---
 
+    // ### FIXME: make private
     TypeModelImpl getType(String typeUri) {
         return typeCache.get(typeUri);
     }
@@ -116,34 +110,60 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    // ### TODO: unify with next method
     private TopicTypeModelImpl fetchTopicType(String topicTypeUri) {
-        TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
-        checkTopicType(topicTypeUri, typeTopic);
-        //
-        // fetch type components
-        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
-        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-        List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
-        //
-        return mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        try {
+            logger.info("Fetching topic type \"" + topicTypeUri + "\"");
+            endlessRecursionDetection.check(topicTypeUri);
+            //
+            // fetch generic topic
+            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
+            checkTopicType(topicTypeUri, typeTopic);
+            //
+            // fetch type-specific parts
+            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
+            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<String> labelConfig = fetchLabelConfig(assocDefs);
+            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
+            //
+            // create and cache type model
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, labelConfig, viewConfig);
+            putInTypeCache(topicType);
+            return topicType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic type \"" + topicTypeUri + "\" failed", e);
+        } finally {
+            endlessRecursionDetection.reset(topicTypeUri);
+        }
     }
 
-    // ### TODO: unify with previous method
     private AssociationTypeModelImpl fetchAssociationType(String assocTypeUri) {
-        TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
-        checkAssociationType(assocTypeUri, typeTopic);
-        //
-        // fetch type components
-        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
-        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-        List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
-        //
-        return mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+        try {
+            logger.info("Fetching association type \"" + assocTypeUri + "\"");
+            endlessRecursionDetection.check(assocTypeUri);
+            //
+            // fetch generic topic
+            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
+            checkAssociationType(assocTypeUri, typeTopic);
+            //
+            // fetch type-specific parts
+            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
+            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<String> labelConfig = fetchLabelConfig(assocDefs);
+            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
+            //
+            // create and cache type model
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, labelConfig, viewConfig);
+            putInTypeCache(assocType);
+            return assocType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association type \"" + assocTypeUri + "\" failed", e);
+        } finally {
+            endlessRecursionDetection.reset(assocTypeUri);
+        }
     }
 
     // ---
@@ -775,5 +795,25 @@ class TypeStorageImpl implements TypeStorage {
 
     RoleModel createConfigurableAssocDef(long assocDefId) {
         return mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def");
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private static final class EndlessRecursionDetection {
+
+        private Map<String, Boolean> loadInProgress = new HashMap();
+
+        private void check(String typeUri) {
+            if (loadInProgress.get(typeUri) != null) {
+                throw new RuntimeException("Endless recursion detected while loading type \"" + typeUri + "\"");
+            }
+            loadInProgress.put(typeUri, true);
+        }
+
+        private void reset(String typeUri) {
+            loadInProgress.remove(typeUri);
+        }
     }
 }

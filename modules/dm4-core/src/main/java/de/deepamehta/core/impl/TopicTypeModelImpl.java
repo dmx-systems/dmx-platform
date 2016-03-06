@@ -63,18 +63,6 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // ---
 
     @Override
-    void putInTypeCache() {
-        pl.typeCache.putTopicType(instantiate());
-    }
-
-    @Override
-    void removeFromTypeCache() {
-        pl.typeCache.removeTopicType(uri);
-    }
-
-    // ---
-
-    @Override
     Directive getUpdateTypeDirective() {
         return Directive.UPDATE_TOPIC_TYPE;
     }
