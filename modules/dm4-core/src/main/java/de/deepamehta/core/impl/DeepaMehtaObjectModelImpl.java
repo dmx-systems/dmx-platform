@@ -343,6 +343,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
     }
 
+    // ---
+
+    void preDelete() {
+    }
+
+    void postDelete() {
+    }
+
 
 
     // === Update ===
@@ -416,15 +424,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     final void delete() {
         try {
             em.fireEvent(getPreDeleteEvent(), instantiate());
-            //
-            TypeModelImpl type = null;
-            if (this instanceof TypeModel) {
-                type = (TypeModelImpl) this;
-                int size = type.getAllInstances().size();
-                if (size > 0) {
-                    throw new RuntimeException(size + " \"" + value + "\" instances still exist");
-                }
-            }
+            preDelete();
             //
             // delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
@@ -440,14 +440,12 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 ((DeepaMehtaObjectModelImpl) assoc).delete();
             }
             // delete object itself
-            logger.info("Deleting " + className() + " " + id);
-            Directives.get().add(getDeleteDirective(), this);
+            logger.info("Deleting " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
             _delete();
             //
-            if (type != null) {
-                type._removeFromTypeCache();
-            }
+            postDelete();
             //
+            Directives.get().add(getDeleteDirective(), this);
             em.fireEvent(getPostDeleteEvent(), this);
         } catch (IllegalStateException e) {
             // Note: getAssociations() might throw IllegalStateException and is no problem.

@@ -294,10 +294,29 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         //
         updateType((TypeModel) newModel);
         //
-        Directives.get().add(getUpdateTypeDirective(), instantiate());
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
         // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
         // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
+        Directives.get().add(getUpdateTypeDirective(), instantiate());
+    }
+
+    // ---
+
+    @Override
+    void preDelete() {
+        super.preDelete();
+        //
+        int size = getAllInstances().size();
+        if (size > 0) {
+            throw new RuntimeException(size + " \"" + value + "\" instances still exist");
+        }
+    }
+
+    @Override
+    void postDelete() {
+        super.postDelete();
+        //
+        _removeFromTypeCache();
     }
 
 
@@ -427,19 +446,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             assocDefs.add(((AssociationDefinitionModelImpl) assocDef).instantiate());
         }
         return assocDefs;
-    }
-
-    // ---
-
-    /**
-     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
-     * ### TODO: make private
-     */
-    void _removeFromTypeCache() {
-        removeFromTypeCache();                      // abstract
-        //
-        Directive dir = getDeleteTypeDirective();   // abstract
-        Directives.get().add(dir, new JSONWrapper("uri", uri));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -689,6 +695,21 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
             labelConfig.remove(i);
         }
+    }
+
+
+
+    // === Type Cache (memory access) ===
+
+    /**
+     * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.
+     * ### TODO: make private
+     */
+    private void _removeFromTypeCache() {
+        removeFromTypeCache();                      // abstract
+        //
+        Directive dir = getDeleteTypeDirective();   // abstract
+        Directives.get().add(dir, new JSONWrapper("uri", uri));
     }
 
 
