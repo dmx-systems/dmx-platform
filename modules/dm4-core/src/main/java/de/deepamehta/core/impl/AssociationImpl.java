@@ -109,26 +109,28 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public void update(AssociationModel newModel) {
-        super.update(newModel);
+        model.update(newModel);
     }
 
     // ---
 
     @Override
     public Association loadChildTopics() {
-        return (Association) super.loadChildTopics();
+        model.loadChildTopics();
+        return this;
     }
 
     @Override
     public Association loadChildTopics(String assocDefUri) {
-        return (Association) super.loadChildTopics(assocDefUri);
+        model.loadChildTopics(assocDefUri);
+        return this;
     }
 
     // ---
 
     @Override
     public AssociationModelImpl getModel() {
-        return (AssociationModelImpl) super.getModel();
+        return (AssociationModelImpl) model;
     }
 
 
@@ -203,13 +205,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
 
     // === Implementation of the abstract methods ===
-
-    @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newAssociationModel(childTopics));
-    }
-
-    // ---
 
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,

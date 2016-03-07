@@ -36,7 +36,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     private String parentCardinalityUri;
     private String childCardinalityUri;
 
-    private ViewConfigurationModel viewConfigModel; // is never null
+    private ViewConfigurationModelImpl viewConfig;     // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -48,11 +48,12 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
     AssociationDefinitionModelImpl(AssociationModelImpl assoc, String parentCardinalityUri, String childCardinalityUri,
-                                                                               ViewConfigurationModel viewConfigModel) {
+                                                                                ViewConfigurationModelImpl viewConfig) {
         super(assoc);
         this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri  = childCardinalityUri;
-        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : mf.newViewConfigurationModel();
+        this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
+        // ### TODO: why null check? Compare to TypeModelImpl constructor
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -99,8 +100,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public ViewConfigurationModel getViewConfigModel() {
-        return viewConfigModel;
+    public ViewConfigurationModelImpl getViewConfigModel() {
+        return viewConfig;
     }
 
     // ---
@@ -116,8 +117,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public void setViewConfigModel(ViewConfigurationModel viewConfigModel) {
-        this.viewConfigModel = viewConfigModel;
+    public void setViewConfigModel(ViewConfigurationModel viewConfig) {
+        this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
     }
 
     // ---
@@ -128,7 +129,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             return super.toJSON()
                 .put("parent_cardinality_uri", parentCardinalityUri)
                 .put("child_cardinality_uri", childCardinalityUri)
-                .put("view_config_topics", viewConfigModel.toJSONArray());
+                .put("view_config_topics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -141,7 +142,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         return "\n    association definition (" + super.toString() +
             ",\n        parent cardinality=\"" + parentCardinalityUri +
             "\",\n        child cardinality=\"" + childCardinalityUri +
-            "\",\n        " + viewConfigModel + ")\n";
+            "\",\n        " + viewConfig + ")\n";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

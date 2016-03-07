@@ -111,7 +111,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public ViewConfiguration getViewConfig() {
-        RoleModel configurable = pl.typeStorage.createConfigurableType(getId());   // ### type ID is uninitialized
+        RoleModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 

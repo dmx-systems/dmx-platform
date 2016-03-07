@@ -9,7 +9,9 @@ import org.codehaus.jettison.json.JSONArray;
  */
 public interface ViewConfigurationModel {
 
-    Iterable<TopicModel> getConfigTopics();
+    Iterable<? extends TopicModel> getConfigTopics();
+
+    TopicModel getConfigTopic(String configTypeUri);
 
     void addConfigTopic(TopicModel configTopic);
 

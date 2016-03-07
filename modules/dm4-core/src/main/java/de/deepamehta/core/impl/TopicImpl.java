@@ -46,26 +46,28 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     public void update(TopicModel newModel) {
-        super.update(newModel);
+        model.update(newModel);
     }
 
     // ---
 
     @Override
     public Topic loadChildTopics() {
-        return (Topic) super.loadChildTopics();
+        model.loadChildTopics();
+        return this;
     }
 
     @Override
     public Topic loadChildTopics(String assocDefUri) {
-        return (Topic) super.loadChildTopics(assocDefUri);
+        model.loadChildTopics(assocDefUri);
+        return this;
     }
 
     // ---
 
     @Override
     public TopicModelImpl getModel() {
-        return (TopicModelImpl) super.getModel();
+        return (TopicModelImpl) model;
     }
 
 
@@ -140,13 +142,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
     // === Implementation of the abstract methods ===
-
-    @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newTopicModel(childTopics));
-    }
-
-    // ---
 
     @Override
     final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,

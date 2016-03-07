@@ -206,7 +206,7 @@ class TypeStorage {
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
-        storeViewConfig(createConfigurableType(type.getId()), type.getViewConfigModel());
+        storeViewConfig(newTypeRole(type.getId()), type.getViewConfigModel());
     }
 
 
@@ -438,7 +438,7 @@ class TypeStorage {
             associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
-            storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
+            storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + assocDef.getAssocDefUri() +
                 "\" of type \"" + assocDef.getParentTypeUri() + "\" failed", e);
@@ -797,11 +797,10 @@ class TypeStorage {
         }
     }
 
-    Topic storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
-        Topic topic = pl.createTopic(configTopic);
-        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(topic.getId(),
+    void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
+        pl.createTopic(configTopic);
+        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(configTopic.getId(),
             "dm4.core.view_config"));
-        return topic;
     }
 
     // --- Helper ---
@@ -814,11 +813,11 @@ class TypeStorage {
 
     // ---
 
-    RoleModel createConfigurableType(long typeId) {
+    RoleModel newTypeRole(long typeId) {
         return mf.newTopicRoleModel(typeId, "dm4.core.type");
     }
 
-    RoleModel createConfigurableAssocDef(long assocDefId) {
+    RoleModel newAssocDefRole(long assocDefId) {
         return mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def");
     }
 

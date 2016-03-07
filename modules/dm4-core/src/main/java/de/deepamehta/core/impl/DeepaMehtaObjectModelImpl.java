@@ -16,7 +16,6 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -46,7 +45,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     PersistenceLayer pl;
     EventManager em;
-    ModelFactory mf;
+    ModelFactoryImpl mf;
 
     Logger logger = Logger.getLogger(getClass().getName());
 
@@ -296,6 +295,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     // ---
+
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        throw new UnsupportedOperationException();
+    }
 
     void _delete() {
         throw new UnsupportedOperationException();

@@ -32,21 +32,19 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
     // ID equality (see DeepaMehtaObjectModel.equals()).
 
-    private PersistenceLayer pl;
     private ModelFactory mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsModelImpl(Map<String, Object> childTopics, PersistenceLayer pl) {
+    ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
         this.childTopics = childTopics;
-        this.pl = pl;
-        this.mf = pl.mf;
+        this.mf = mf;
     }
 
     ChildTopicsModelImpl(ChildTopicsModelImpl childTopics) {
-        this(childTopics.childTopics, childTopics.pl);
+        this(childTopics.childTopics, childTopics.mf);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -553,29 +551,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    // ### TODO: make private
-    void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
-        if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but is defined as multi", e);
-        } else {
-            throw new RuntimeException("Accessing \"" + assocDefUri + "\" failed", e);
-        }
-    }
-
-    // ### TODO: make private
-    void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
-        if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
-            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but is defined as single", e);
-        } else {
-            throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
-        }
-    }
 
 
+    // === Mmemory Access ===
 
-    // === ChildTopics Model ===
-
-    // --- Access ---
+    // --- Read ---
 
     /**
      * For multiple-valued childs: looks in the attached object cache for a child topic by ID. ### FIXDOC
@@ -606,37 +586,53 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return null;
     }
 
-    // --- Update ---
+    // --- Write Helper ---
 
     /**
      * For single-valued childs
      */
     void putInChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getAssocDefUri();
-        put(assocDefUri, childTopic);
+        put(assocDef.getAssocDefUri(), childTopic);
     }
 
     /**
      * For single-valued childs
      */
     void removeChildTopic(AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getAssocDefUri();
-        remove(assocDefUri);
+        remove(assocDef.getAssocDefUri());
     }
 
     /**
      * For multiple-valued childs
      */
     void addToChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getAssocDefUri();
-        add(assocDefUri, childTopic);
+        add(assocDef.getAssocDefUri(), childTopic);
     }
 
     /**
      * For multiple-valued childs
      */
     void removeFromChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getAssocDefUri();
-        remove(assocDefUri, childTopic);
+        remove(assocDef.getAssocDefUri(), childTopic);
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
+        if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but is defined as multi", e);
+        } else {
+            throw new RuntimeException("Accessing \"" + assocDefUri + "\" failed", e);
+        }
+    }
+
+    private void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
+        if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
+            throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but is defined as single", e);
+        } else {
+            throw new RuntimeException("Accessing \"" + assocDefUri + " failed", e);
+        }
     }
 }

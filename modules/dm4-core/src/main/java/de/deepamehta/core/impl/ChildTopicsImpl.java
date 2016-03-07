@@ -32,8 +32,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     private ChildTopicsModel model;             // underlying model
 
-    private DeepaMehtaObjectImpl parent;        // the parent object this ChildTopics belongs to
-                                                // ### TODO: should be model object?
+    private DeepaMehtaObjectModelImpl parent;   // the parent object this ChildTopics belongs to
 
     private PersistenceLayer pl;
     private ModelFactory mf;
@@ -42,7 +41,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ChildTopicsImpl(ChildTopicsModelImpl model, DeepaMehtaObjectImpl parent, PersistenceLayer pl) {
+    ChildTopicsImpl(ChildTopicsModelImpl model, DeepaMehtaObjectModelImpl parent, PersistenceLayer pl) {
         this.model = model;
         this.parent = parent;
         this.pl = pl;

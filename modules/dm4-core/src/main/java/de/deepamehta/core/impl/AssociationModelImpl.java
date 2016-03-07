@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -221,6 +222,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     // ---
+
+    @Override
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        update(mf.newAssociationModel(childTopics));
+    }
 
     @Override
     void _delete() {

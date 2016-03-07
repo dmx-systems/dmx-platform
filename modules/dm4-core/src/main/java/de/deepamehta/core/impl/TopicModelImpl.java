@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -126,6 +127,11 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     // ---
+
+    @Override
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        update(mf.newTopicModel(childTopics));
+    }
 
     @Override
     void _delete() {

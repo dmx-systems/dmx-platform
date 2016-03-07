@@ -32,7 +32,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private List<String> labelConfig;                                           // is never null, may be empty
-    private ViewConfigurationModel viewConfig;                                  // is never null
+    private ViewConfigurationModelImpl viewConfig;                              // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -40,7 +40,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                  ViewConfigurationModel viewConfig) {
+                  ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes  = indexModes;
@@ -175,7 +175,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === View Configuration ===
 
     @Override
-    public ViewConfigurationModel getViewConfigModel() {
+    public ViewConfigurationModelImpl getViewConfigModel() {
         return viewConfig;
     }
 
@@ -188,7 +188,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     public void setViewConfig(ViewConfigurationModel viewConfig) {
-        this.viewConfig = viewConfig;
+        this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
     }
 
 
@@ -449,6 +449,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         rehashAssocDef(assocDefUris[0], assocDefUris[1]);
     }
 
+    // ### TODO: make generic (config topics, see ViewConfigurationModelImpl)
     Collection<AssociationDefinition> instantiateAssocDefs() {
         Collection<AssociationDefinition> assocDefs = new ArrayList();
         for (AssociationDefinitionModel assocDef : getAssocDefs()) {

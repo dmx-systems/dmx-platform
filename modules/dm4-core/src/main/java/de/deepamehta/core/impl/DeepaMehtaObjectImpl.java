@@ -135,7 +135,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public ChildTopicsImpl getChildTopics() {
-        return new ChildTopicsImpl(model.childTopics, this, pl);
+        return new ChildTopicsImpl(model.childTopics, model, pl);
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -309,13 +309,11 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract void updateChildTopics(ChildTopicsModel childTopics);
-
-    // ---
-
+    // ### TODO: drop this
     abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
                                                  String othersRoleTypeUri, String othersTopicTypeUri);
 
+    // ### TODO: drop this
     abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                               String othersRoleTypeUri, String othersTopicTypeUri);
 

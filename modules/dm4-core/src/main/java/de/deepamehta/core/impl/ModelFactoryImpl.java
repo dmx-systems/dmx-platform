@@ -224,7 +224,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ChildTopicsModelImpl newChildTopicsModel() {
-        return new ChildTopicsModelImpl(new HashMap(), pl);
+        return new ChildTopicsModelImpl(new HashMap(), this);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class ModelFactoryImpl implements ModelFactory {
                     }
                 }
             }
-            return new ChildTopicsModelImpl(childTopics, pl);
+            return new ChildTopicsModelImpl(childTopics, this);
         } catch (Exception e) {
             throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
         }
@@ -538,7 +538,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                             List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                             List<String> labelConfig, ViewConfigurationModel viewConfig) {
         return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
-            viewConfig));
+            (ViewConfigurationModelImpl) viewConfig));
     }
 
     @Override
@@ -564,7 +564,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                                  List<String> labelConfig, ViewConfigurationModel viewConfig) {
         return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
-            viewConfig));
+            (ViewConfigurationModelImpl) viewConfig));
     }
 
     @Override
@@ -588,7 +588,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                                   List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                                  ViewConfigurationModel viewConfig) {
+                                  ViewConfigurationModelImpl viewConfig) {
         return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
             viewConfig);
     }
@@ -657,7 +657,7 @@ public class ModelFactoryImpl implements ModelFactory {
             newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(customAssocTypeUri)
             ),
-            parentCardinalityUri, childCardinalityUri, viewConfigModel
+            parentCardinalityUri, childCardinalityUri, (ViewConfigurationModelImpl) viewConfigModel
         );
     }
 
@@ -686,7 +686,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                                     String parentCardinalityUri, String childCardinalityUri,
                                                     ViewConfigurationModel viewConfigModel) {
         return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, parentCardinalityUri,
-            childCardinalityUri, viewConfigModel);
+            childCardinalityUri, (ViewConfigurationModelImpl) viewConfigModel);
     }
 
     /**
@@ -759,15 +759,15 @@ public class ModelFactoryImpl implements ModelFactory {
     // === ViewConfigurationModel ===
 
     @Override
-    public ViewConfigurationModel newViewConfigurationModel() {
+    public ViewConfigurationModelImpl newViewConfigurationModel() {
         return new ViewConfigurationModelImpl(new HashMap());
     }    
 
     @Override
-    public ViewConfigurationModel newViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
-        Map<String, TopicModel> _configTopics = new HashMap();
+    public ViewConfigurationModelImpl newViewConfigurationModel(Iterable<? extends TopicModel> configTopics) {
+        Map<String, TopicModelImpl> _configTopics = new HashMap();
         for (TopicModel configTopic : configTopics) {
-            _configTopics.put(configTopic.getTypeUri(), configTopic);
+            _configTopics.put(configTopic.getTypeUri(), (TopicModelImpl) configTopic);
         }
         return new ViewConfigurationModelImpl(_configTopics);
     }    
@@ -776,12 +776,12 @@ public class ModelFactoryImpl implements ModelFactory {
      * @param   configurable    A topic type, an association type, or an association definition. ### FIXDOC
      */
     @Override
-    public ViewConfigurationModel newViewConfigurationModel(JSONArray configTopics) {
+    public ViewConfigurationModelImpl newViewConfigurationModel(JSONArray configTopics) {
         try {
-            Map<String, TopicModel> _configTopics = new HashMap();
+            Map<String, TopicModelImpl> _configTopics = new HashMap();
             if (configTopics != null) {
                 for (int i = 0; i < configTopics.length(); i++) {
-                    TopicModel configTopic = newTopicModel(configTopics.getJSONObject(i));
+                    TopicModelImpl configTopic = newTopicModel(configTopics.getJSONObject(i));
                     _configTopics.put(configTopic.getTypeUri(), configTopic);
                 }
             }
@@ -811,7 +811,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public FacetValueModel newFacetValueModel(String childTypeUri) {
-        return new FacetValueModelImpl(childTypeUri, pl);
+        return new FacetValueModelImpl(childTypeUri, this);
     }
 
     @Override
