@@ -1,8 +1,7 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -66,7 +65,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
-    DeepaMehtaObject instantiate() {
+    Topic instantiate() {
         return new TopicImpl(this, pl);
     }
 

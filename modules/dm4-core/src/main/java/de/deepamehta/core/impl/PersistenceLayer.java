@@ -36,7 +36,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    TypeStorageImpl typeStorage;
+    TypeStorage typeStorage;
     ValueStorage valueStorage;
 
     EventManager em;
@@ -52,10 +52,10 @@ public class PersistenceLayer extends StorageDecorator {
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
         //
-        this.typeStorage = new TypeStorageImpl(this);
+        this.typeStorage = new TypeStorage(this);
         this.valueStorage = new ValueStorage(this);
         //
-        // Note: this is a constructor side effect. This is a cyclic dependency. This is very nasty.
+        // Note: this is a constructor side effect. This is a cyclic dependency. This is nasty.
         // ### TODO: explain why we do it.
         mf.pl = this;
         //

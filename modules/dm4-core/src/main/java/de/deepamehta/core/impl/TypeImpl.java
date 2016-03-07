@@ -95,23 +95,6 @@ abstract class TypeImpl extends TopicImpl implements Type {
         return this;
     }
 
-    // --- 3 Type Editor helpers ---
-
-    @Override
-    public void _addAssocDef(AssociationModel assoc) {
-        getModel()._addAssocDef(assoc);
-    }
-
-    @Override
-    public void _updateAssocDef(AssociationModel assoc) {
-        getModel()._updateAssocDef(assoc);
-    }
-
-    @Override
-    public void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
-        getModel()._removeAssocDefFromMemoryAndRebuildSequence(assoc);
-    }
-
     // --- Label Configuration ---
 
     @Override

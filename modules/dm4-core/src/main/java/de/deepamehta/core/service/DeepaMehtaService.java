@@ -276,8 +276,10 @@ public interface DeepaMehtaService {
 
     DeepaMehtaTransaction beginTx();
 
+    // ---
+
     ModelFactory getModelFactory();
-    TypeStorage getTypeStorage();       // ### TODO: drop this
+
     AccessControl getAccessControl();   // ### TODO: drop this
 
     Object getDatabaseVendorObject();

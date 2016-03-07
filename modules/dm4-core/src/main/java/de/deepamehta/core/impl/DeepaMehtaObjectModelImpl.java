@@ -360,9 +360,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *              If the URI is <code>null</code> it is not updated.
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
-     *              In case of an association:
-     *                  If role 1 is <code>null</code> it is not updated.
-     *                  If role 2 is <code>null</code> it is not updated.
      */
     final void update(DeepaMehtaObjectModel newModel) {
         try {

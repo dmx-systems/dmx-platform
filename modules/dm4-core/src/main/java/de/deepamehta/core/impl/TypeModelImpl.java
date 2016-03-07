@@ -369,12 +369,25 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === 3 Type Editor helpers ===
+    // === Type Editor Support ===
 
     void _addAssocDef(AssociationModel assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
     }
 
+    /**
+     * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
+     * If you want to update memory and DB use {@link AssociationDefinition#update}.
+     * <p>
+     * This method is here to support a special case: the user retypes an association which results in
+     * a changed type definition. In this case the DB is already up-to-date and only the type's memory
+     * representation must be updated. So, here the DB update is the *cause* for a necessary memory-update.
+     * Normally the situation is vice-versa: the DB update is the necessary *effect* of a memory-update.
+     *
+     * @param   assocDef    the new association definition.
+     *                      Note: in contrast to the other "update" methods this one does not support partial updates.
+     *                      That is all association definition fields must be initialized. ### FIXDOC
+     */
     void _updateAssocDef(AssociationModel assoc) {
         // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
         // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
@@ -411,6 +424,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
+    /**
+     * Removes an association from memory and rebuilds the sequence in DB. Note: the underlying
+     * association is *not* removed from DB.
+     * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
+     * deletion of an association that represents an association definition is imminent. ### FIXDOC
+     */
     void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
         String[] assocDefUris = findAssocDefUris(assoc.getId());
         String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();

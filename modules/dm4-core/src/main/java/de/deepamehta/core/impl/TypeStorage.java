@@ -26,7 +26,6 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
@@ -42,7 +41,7 @@ import java.util.logging.Logger;
 /**
  * Storage-impl agnostic support for fetching/storing type models.
  */
-class TypeStorageImpl implements TypeStorage {
+class TypeStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -63,7 +62,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeStorageImpl(PersistenceLayer pl) {
+    TypeStorage(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
     }
@@ -337,8 +336,8 @@ class TypeStorageImpl implements TypeStorage {
     AssociationDefinitionModel newAssociationDefinition(AssociationModel assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel model = mf.newAssociationModel(assoc);
-        String parentTypeUri = fetchParentType(assoc).getUri();
-        String childTypeUri = fetchChildType(assoc).getUri();
+        String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
+        String childTypeUri = fetchChildTypeTopic(assoc).getUri();
         prepareAssocModel(model, parentTypeUri, childTypeUri);
         return mf.newAssociationDefinitionModel(model,
             defaultCardinalityUri(assoc, PARENT_CARDINALITY),
@@ -452,8 +451,13 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    @Override
-    public TopicModel fetchParentType(AssociationModel assoc) {
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the parent type topic.
+     *          A topic representing either a topic type or an association type.
+     */
+    private TopicModel fetchParentTypeTopic(AssociationModel assoc) {
         TopicModel parentType = ((AssociationModelImpl) assoc).getTopic("dm4.core.parent_type");
         // error check
         if (parentType == null) {
@@ -463,7 +467,13 @@ class TypeStorageImpl implements TypeStorage {
         return parentType;
     }
 
-    private TopicModel fetchChildType(AssociationModel assoc) {
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the child type topic.
+     *          A topic representing a topic type.
+     */
+    private TopicModel fetchChildTypeTopic(AssociationModel assoc) {
         TopicModel childType = ((AssociationModelImpl) assoc).getTopic("dm4.core.child_type");
         // error check
         if (childType == null) {
@@ -471,6 +481,21 @@ class TypeStorageImpl implements TypeStorage {
         }
         //
         return childType;
+    }
+
+    // ---
+
+    TypeModelImpl fetchParentType(AssociationModel assoc) {
+        TopicModel type = fetchParentTypeTopic(assoc);
+        String typeUri = type.getTypeUri();
+        if (typeUri.equals("dm4.core.topic_type")) {
+            return getTopicType(type.getUri());
+        } else if (typeUri.equals("dm4.core.assoc_type")) {
+            return getAssociationType(type.getUri());
+        } else {
+            throw new RuntimeException("DB inconsistency: the \"dm4.core.parent_type\" player is not a type " +
+                "but of type \"" + typeUri + "\" in " + assoc);
+        }
     }
 
 

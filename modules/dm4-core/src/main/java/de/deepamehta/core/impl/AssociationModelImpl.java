@@ -1,6 +1,6 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Association;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -12,6 +12,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -156,7 +157,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    DeepaMehtaObject instantiate() {
+    Association instantiate() {
         return new AssociationImpl(this, pl);
     }
 
@@ -274,6 +275,30 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         super.postUpdate(newModel, oldModel);
         //
         updateRoles((AssociationModel) newModel);
+        //
+        // Type Editor Support
+        if (isAssocDef(this)) {
+            if (isAssocDef((AssociationModel) oldModel)) {
+                updateAssocDef();
+            } else {
+                createAssocDef();
+            }
+        } else if (isAssocDef((AssociationModel) oldModel)) {
+            removeAssocDef();
+        }
+    }
+
+    void preDelete() {
+        super.preDelete();
+        //
+        // Type Editor Support
+        if (isAssocDef(this)) {
+            // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
+            // interrupted, which would result in a corrupted sequence once rebuild. (Due to the interruption, while
+            // rebuilding not all segments would be catched for deletion and recreated redundantly -> ambiguity.)
+            // ### FIXDOC
+            removeAssocDef();
+        }
     }
 
 
@@ -314,6 +339,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // === Update (memory + DB) ===
 
+    /**
+     * @param   newModel    The data to update.
+     *                      If role 1 is <code>null</code> it is not updated.
+     *                      If role 2 is <code>null</code> it is not updated.
+     */
     private void updateRoles(AssociationModel newModel) {
         updateRole(newModel.getRoleModel1(), 1);
         updateRole(newModel.getRoleModel2(), 2);
@@ -389,5 +419,73 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         }
         //
         return assocType.getRelatingAssociation();
+    }
+
+
+
+    // === Type Editor Support ===
+
+    // ### TODO: explain
+
+    private void createAssocDef() {
+        TypeModelImpl parentType = fetchParentType();
+        logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");
+        //
+        parentType._addAssocDef(this);
+        //
+        addUpdateTypeDirective(parentType);
+    }
+
+    private void updateAssocDef() {
+        TypeModelImpl parentType = fetchParentType();
+        logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
+        //
+        parentType._updateAssocDef(this);
+        //
+        addUpdateTypeDirective(parentType);
+    }
+
+    private void removeAssocDef() {
+        TypeModelImpl parentType = fetchParentType();
+        logger.info("##### Removing association definition " + id + " from type \"" + parentType.getUri() + "\"");
+        //
+        parentType._removeAssocDefFromMemoryAndRebuildSequence(this);
+        //
+        addUpdateTypeDirective(parentType);
+    }
+
+    // ---
+
+    private boolean isAssocDef(AssociationModel assoc) {
+        String typeUri = assoc.getTypeUri();
+        if (!typeUri.equals("dm4.core.aggregation_def") &&
+            !typeUri.equals("dm4.core.composition_def")) {
+            return false;
+        }
+        //
+        if (assoc.hasSameRoleTypeUris()) {
+            return false;
+        }
+        if (assoc.getRoleModel("dm4.core.parent_type") == null ||
+            assoc.getRoleModel("dm4.core.child_type") == null)  {
+            return false;
+        }
+        //
+        return true;
+    }
+
+    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The Type interface's
+    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter ### FIXDOC
+    private void addUpdateTypeDirective(TypeModelImpl type) {
+        if (type.getTypeUri().equals("dm4.core.topic_type")) {
+            Directives.get().add(Directive.UPDATE_TOPIC_TYPE, type.instantiate());
+        } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
+            Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, type.instantiate());
+        }
+        // Note: no else here as error check already performed in fetchParentType()
+    }
+
+    private TypeModelImpl fetchParentType() {
+        return pl.typeStorage.fetchParentType(this);
     }
 }
