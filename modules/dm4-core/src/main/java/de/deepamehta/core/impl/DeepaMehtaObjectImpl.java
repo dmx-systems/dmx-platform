@@ -1,25 +1,18 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
@@ -43,8 +36,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     PersistenceLayer pl;
     ModelFactoryImpl mf;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -165,6 +156,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---
 
+    // Note: getType() remains abstract
+
     @Override
     public DeepaMehtaObjectModelImpl getModel() {
         return model;
@@ -215,8 +208,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    String othersTopicTypeUri) {
-        RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        // fetchRelatedTopic() is abstract
+        RelatedTopicModel topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
         return topic != null ? pl.instantiateRelatedTopic(topic) : null;
     }
 
@@ -228,8 +221,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);    // fetchRelatedTopics() is abstract
+        ResultList<RelatedTopicModel> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
         return pl.instantiateRelatedTopics(topics);
     }
 
@@ -308,23 +301,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    // ### TODO: drop this
-    abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                                 String othersRoleTypeUri, String othersTopicTypeUri);
-
-    // ### TODO: drop this
-    abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri);
-
-    // ---
-
-    // ### TODO: add to public interface?
-    abstract Type getType();
-
-
-
-    // ===
 
     final String className() {
         return model.className();

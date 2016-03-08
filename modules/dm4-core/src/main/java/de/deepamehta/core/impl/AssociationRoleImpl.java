@@ -3,12 +3,11 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationRole;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.model.AssociationRoleModel;
 
 
 
 /**
- * An association role that is attached to the {@link DeepaMehtaService}.
+ * An association role that is attached to the {@link PersistenceLayer}.
  */
 class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
@@ -44,6 +43,6 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     @Override
     public AssociationRoleModelImpl getModel() {
-        return (AssociationRoleModelImpl) super.getModel();
+        return (AssociationRoleModelImpl) model;
     }
 }

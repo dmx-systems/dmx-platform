@@ -66,6 +66,11 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     // ---
 
     @Override
+    public TopicType getType() {
+        return pl.getTopicType(getTypeUri());
+    }
+
+    @Override
     public TopicModelImpl getModel() {
         return (TopicModelImpl) model;
     }
@@ -135,32 +140,5 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public void removeProperty(String propUri) {
         pl.removeTopicProperty(getId(), propUri);
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === Implementation of the abstract methods ===
-
-    @Override
-    final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                              String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-    }
-
-    @Override
-    final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-    }
-
-    // ---
-
-    @Override
-    TopicType getType() {
-        return pl.getTopicType(getTypeUri());
     }
 }

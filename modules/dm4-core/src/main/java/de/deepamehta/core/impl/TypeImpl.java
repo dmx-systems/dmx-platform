@@ -4,22 +4,16 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TypeModel;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
 abstract class TypeImpl extends TopicImpl implements Type {
-
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -65,7 +59,7 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
     @Override
     public Collection<AssociationDefinition> getAssocDefs() {
-        return getModel().instantiateAssocDefs();
+        return pl.instantiate(getModel().getAssocDefs());
     }
 
     @Override

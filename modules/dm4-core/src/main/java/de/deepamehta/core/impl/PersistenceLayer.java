@@ -21,6 +21,7 @@ import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -516,6 +517,18 @@ public class PersistenceLayer extends StorageDecorator {
             }
         }
         return relAssocs;
+    }
+
+
+
+    // === Instantiation (w/o access check) ===
+
+    <O> Collection<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        Collection<O> objects = new ArrayList();
+        for (DeepaMehtaObjectModelImpl model : models) {
+            objects.add((O) model.instantiate());
+        }
+        return objects;
     }
 
 

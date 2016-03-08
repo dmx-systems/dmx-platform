@@ -652,12 +652,12 @@ public class ModelFactoryImpl implements ModelFactory {
                                                     long id, String uri, String assocTypeUri, String customAssocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfigModel) {
+                                                    ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
             newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(customAssocTypeUri)
             ),
-            parentCardinalityUri, childCardinalityUri, (ViewConfigurationModelImpl) viewConfigModel
+            parentCardinalityUri, childCardinalityUri, (ViewConfigurationModelImpl) viewConfig
         );
     }
 
@@ -684,9 +684,9 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModel assoc,
                                                     String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfigModel) {
+                                                    ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, parentCardinalityUri,
-            childCardinalityUri, (ViewConfigurationModelImpl) viewConfigModel);
+            childCardinalityUri, (ViewConfigurationModelImpl) viewConfig);
     }
 
     /**

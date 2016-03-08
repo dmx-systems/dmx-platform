@@ -47,7 +47,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     @Override
     public Iterable<Topic> getConfigTopics() {
-        return model.instantiateConfigTopics();
+        return pl.instantiate(model.getConfigTopics());
     }
 
     @Override

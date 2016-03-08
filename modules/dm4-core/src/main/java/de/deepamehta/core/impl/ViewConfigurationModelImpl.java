@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
@@ -32,7 +33,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Iterable<? extends TopicModel> getConfigTopics() {
+    public Iterable<TopicModelImpl> getConfigTopics() {
         return configTopics.values();
     }
 
@@ -94,18 +95,5 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     @Override
     public String toString() {
         return "view configuration " + configTopics;
-    }
-
-
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    // ### TODO: make generic (assoc defs, see TypeModelImpl)
-    Collection<Topic> instantiateConfigTopics() {
-        Collection<Topic> configTopics = new ArrayList();
-        for (TopicModel configTopic : getConfigTopics()) {
-            configTopics.add(((TopicModelImpl) configTopic).instantiate());
-        }
-        return configTopics;
     }
 }

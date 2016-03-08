@@ -93,7 +93,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Association Definitions ===
 
     @Override
-    public Collection<? extends AssociationDefinitionModel> getAssocDefs() {
+    public Collection<AssociationDefinitionModelImpl> getAssocDefs() {
         return assocDefs.values();
     }
 
@@ -447,15 +447,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void rehashAssocDef(long assocDefId) {
         String[] assocDefUris = findAssocDefUris(assocDefId);
         rehashAssocDef(assocDefUris[0], assocDefUris[1]);
-    }
-
-    // ### TODO: make generic (config topics, see ViewConfigurationModelImpl)
-    Collection<AssociationDefinition> instantiateAssocDefs() {
-        Collection<AssociationDefinition> assocDefs = new ArrayList();
-        for (AssociationDefinitionModel assocDef : getAssocDefs()) {
-            assocDefs.add(((AssociationDefinitionModelImpl) assocDef).instantiate());
-        }
-        return assocDefs;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

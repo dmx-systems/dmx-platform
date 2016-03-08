@@ -602,7 +602,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     /**
-     * Recursively loads child topics (model) and updates this attached object cache accordingly.
+     * Recursively loads child topics (model) and updates this attached object cache accordingly. ### FIXDOC
      * If the child topics are loaded already nothing is performed.
      *
      * @param   assocDef    the child topics according to this association definition are loaded.

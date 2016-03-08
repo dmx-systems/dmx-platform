@@ -12,9 +12,9 @@ abstract class RoleImpl implements Role {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModelImpl model;            // underlying model
+    RoleModelImpl model;            // underlying model
 
-    private AssociationModelImpl assoc;     // the association this role is involved in
+    AssociationModelImpl assoc;     // the association this role is involved in
 
     PersistenceLayer pl;
 

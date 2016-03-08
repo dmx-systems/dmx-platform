@@ -129,6 +129,11 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
+    public AssociationType getType() {
+        return pl.getAssociationType(getTypeUri());
+    }
+
+    @Override
     public AssociationModelImpl getModel() {
         return (AssociationModelImpl) model;
     }
@@ -198,33 +203,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public void removeProperty(String propUri) {
         pl.removeAssociationProperty(getId(), propUri);
-    }
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === Implementation of the abstract methods ===
-
-    @Override
-    final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                              String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-    }
-
-    @Override
-    final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-    }
-
-    // ---
-
-    @Override
-    AssociationType getType() {
-        return pl.getAssociationType(getTypeUri());
     }
 
 
