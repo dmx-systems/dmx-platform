@@ -22,6 +22,7 @@ import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -71,7 +72,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Topic getTopic(long topicId) {
         try {
-            return instantiateTopic(fetchTopic(topicId));
+            return checkReadAccessAndInstantiate(fetchTopic(topicId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -79,8 +80,8 @@ public class PersistenceLayer extends StorageDecorator {
 
     Topic getTopic(String key, SimpleValue value) {
         try {
-            TopicModel topic = fetchTopic(key, value);
-            return topic != null ? instantiateTopic(topic) : null;
+            TopicModelImpl topic = fetchTopic(key, value);
+            return topic != null ? this.<Topic>checkReadAccessAndInstantiate(topic) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -88,7 +89,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> getTopics(String key, SimpleValue value) {
         try {
-            return instantiateTopics(fetchTopics(key, value));
+            return checkReadAccessAndInstantiate(fetchTopics(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -96,7 +97,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> getTopics(String topicTypeUri) {
         try {
-            return instantiateTopics(typeStorage.getTopicType(topicTypeUri).getAllInstances());
+            return checkReadAccessAndInstantiate(typeStorage.getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
@@ -104,7 +105,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return instantiateTopics(queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return checkReadAccessAndInstantiate(queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\")", e);
@@ -179,7 +180,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Association getAssociation(long assocId) {
         try {
-            return instantiateAssociation(fetchAssociation(assocId));
+            return checkReadAccessAndInstantiate(fetchAssociation(assocId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
         }
@@ -188,7 +189,7 @@ public class PersistenceLayer extends StorageDecorator {
     Association getAssociation(String key, SimpleValue value) {
         try {
             AssociationModelImpl assoc = fetchAssociation(key, value);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -196,7 +197,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Association> getAssociations(String key, SimpleValue value) {
         try {
-            return instantiateAssociations(fetchAssociations(key, value));
+            return checkReadAccessAndInstantiate(fetchAssociations(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
                 e);
@@ -209,7 +210,7 @@ public class PersistenceLayer extends StorageDecorator {
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
             AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -223,7 +224,7 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -233,7 +234,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Association> getAssociations(String assocTypeUri) {
         try {
-            return instantiateAssociations(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
+            return checkReadAccessAndInstantiate(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
@@ -247,8 +248,8 @@ public class PersistenceLayer extends StorageDecorator {
     List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            return instantiateAssociations(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
-                                                                    // roleTypeUri1=null, roleTypeUri2=null
+            return checkReadAccessAndInstantiate(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
+                                                                                 // roleTypeUri1=null, roleTypeUri2=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
@@ -422,19 +423,19 @@ public class PersistenceLayer extends StorageDecorator {
     // === Properties ===
 
     List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return instantiateTopics(fetchTopicsByProperty(propUri, propValue));
+        return checkReadAccessAndInstantiate(fetchTopicsByProperty(propUri, propValue));
     }
 
     List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateTopics(fetchTopicsByPropertyRange(propUri, from, to));
+        return checkReadAccessAndInstantiate(fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     List<Association> getAssociationsByProperty(String propUri, Object propValue) {
-        return instantiateAssociations(fetchAssociationsByProperty(propUri, propValue));
+        return checkReadAccessAndInstantiate(fetchAssociationsByProperty(propUri, propValue));
     }
 
     List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateAssociations(fetchAssociationsByPropertyRange(propUri, from, to));
+        return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
 
@@ -444,25 +445,6 @@ public class PersistenceLayer extends StorageDecorator {
     // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
     // Call these methods when passing objects fetched from the DB to the user.
     // ### TODO: make these private?
-
-    Topic instantiateTopic(TopicModel model) {
-        checkReadAccess(model);
-        return new TopicImpl((TopicModelImpl) model, this);
-    }
-
-    List<Topic> instantiateTopics(List<TopicModel> models) {
-        List<Topic> topics = new ArrayList();
-        for (TopicModel model : models) {
-            try {
-                topics.add(instantiateTopic(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return topics;
-    }
-
-    // ---
 
     RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
         checkReadAccess(model);
@@ -479,25 +461,6 @@ public class PersistenceLayer extends StorageDecorator {
             }
         }
         return new ResultList<RelatedTopic>(relTopics);
-    }
-
-    // ---
-
-    Association instantiateAssociation(AssociationModelImpl model) {
-        checkReadAccess(model);
-        return new AssociationImpl(model, this);
-    }
-
-    List<Association> instantiateAssociations(List<AssociationModel> models) {
-        List<Association> assocs = new ArrayList();
-        for (AssociationModel model : models) {
-            try {
-                assocs.add(instantiateAssociation((AssociationModelImpl) model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return assocs;
     }
 
     // ---
@@ -521,19 +484,39 @@ public class PersistenceLayer extends StorageDecorator {
 
 
 
-    // === Instantiation (w/o access check) ===
+    // === Access Control / Instantiation ===
 
-    <O> Collection<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
-        Collection<O> objects = new ArrayList();
+    <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
+        checkReadAccess(model);
+        return (O) model.instantiate();
+    }
+
+    <O> List<O> checkReadAccessAndInstantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        filterReadables(models);
+        return instantiate(models);
+    }
+
+    // ---
+
+    <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        List<O> objects = new ArrayList();
         for (DeepaMehtaObjectModelImpl model : models) {
             objects.add((O) model.instantiate());
         }
         return objects;
     }
 
-
-
-    // === Access Control ===
+    private void filterReadables(Iterable<? extends DeepaMehtaObjectModel> models) {
+        Iterator<? extends DeepaMehtaObjectModel> i = models.iterator();
+        while (i.hasNext()) {
+            DeepaMehtaObjectModel model = i.next();
+            try {
+                checkReadAccess(model);
+            } catch (AccessControlException e) {
+                i.remove();
+            }
+        }
+    }
 
     /**
      * @throws  AccessControlException

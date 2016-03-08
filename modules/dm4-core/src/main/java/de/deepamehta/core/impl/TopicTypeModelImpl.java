@@ -56,7 +56,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // === Implementation of abstract TypeModelImpl methods ===
 
     @Override
-    List<TopicModel> getAllInstances() {
+    List<TopicModelImpl> getAllInstances() {
         return pl.fetchTopics("type_uri", new SimpleValue(uri));
     }
 

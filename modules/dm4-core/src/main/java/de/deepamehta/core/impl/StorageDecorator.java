@@ -63,8 +63,8 @@ class StorageDecorator {
         return (TopicModelImpl) storage.fetchTopic(key, value.value());
     }
 
-    final List<TopicModel> fetchTopics(String key, SimpleValue value) {
-        return storage.fetchTopics(key, value.value());
+    final List<TopicModelImpl> fetchTopics(String key, SimpleValue value) {
+        return (List<TopicModelImpl>) storage.fetchTopics(key, value.value());
     }
 
     // ---
@@ -73,14 +73,14 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final List<TopicModel> queryTopics(String key, SimpleValue value) {
-        return storage.queryTopics(key, value.value());
+    final List<TopicModelImpl> queryTopics(String key, SimpleValue value) {
+        return (List<TopicModelImpl>) storage.queryTopics(key, value.value());
     }
 
     // ---
 
-    final Iterator<TopicModel> fetchAllTopics() {
-        return storage.fetchAllTopics();
+    final Iterator<TopicModelImpl> fetchAllTopics() {
+        return (Iterator<TopicModelImpl>) storage.fetchAllTopics();
     }
 
     // ---
@@ -166,8 +166,8 @@ class StorageDecorator {
         return (AssociationModelImpl) storage.fetchAssociation(key, value.value());
     }
 
-    final List<AssociationModel> fetchAssociations(String key, SimpleValue value) {
-        return storage.fetchAssociations(key, value.value());
+    final List<AssociationModelImpl> fetchAssociations(String key, SimpleValue value) {
+        return (List<AssociationModelImpl>) storage.fetchAssociations(key, value.value());
     }
 
     // ---
@@ -184,12 +184,13 @@ class StorageDecorator {
      */
     final AssociationModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
                                                                                                   String roleTypeUri2) {
-        List<AssociationModel> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+        List<AssociationModelImpl> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1,
+            roleTypeUri2);
         switch (assocs.size()) {
         case 0:
             return null;
         case 1:
-            return (AssociationModelImpl) assocs.get(0);
+            return assocs.get(0);
         default:
             throw new RuntimeException("Ambiguity: there are " + assocs.size() + " \"" + assocTypeUri +
                 "\" associations (topicId1=" + topicId1 + ", topicId2=" + topicId2 + ", " +
@@ -202,9 +203,10 @@ class StorageDecorator {
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */
-    final List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
-                                                                        String roleTypeUri1, String roleTypeUri2) {
-        return storage.fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1, roleTypeUri2);
+    final List<AssociationModelImpl> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                                            String roleTypeUri1, String roleTypeUri2) {
+        return (List<AssociationModelImpl>) storage.fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1,
+            roleTypeUri2);
     }
 
     // ---
@@ -236,8 +238,8 @@ class StorageDecorator {
 
     // ---
 
-    final Iterator<AssociationModel> fetchAllAssociations() {
-        return storage.fetchAllAssociations();
+    final Iterator<AssociationModelImpl> fetchAllAssociations() {
+        return (Iterator<AssociationModelImpl>) storage.fetchAllAssociations();
     }
 
     final long[] fetchPlayerIds(long assocId) {
@@ -308,12 +310,12 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final List<AssociationModel> fetchTopicAssociations(long topicId) {
-        return storage.fetchTopicAssociations(topicId);
+    final List<AssociationModelImpl> fetchTopicAssociations(long topicId) {
+        return (List<AssociationModelImpl>) storage.fetchTopicAssociations(topicId);
     }
 
-    final List<AssociationModel> fetchAssociationAssociations(long assocId) {
-        return storage.fetchAssociationAssociations(assocId);
+    final List<AssociationModelImpl> fetchAssociationAssociations(long assocId) {
+        return (List<AssociationModelImpl>) storage.fetchAssociationAssociations(assocId);
     }
 
     // ---
@@ -584,20 +586,20 @@ class StorageDecorator {
 
     // ---
 
-    final List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
-        return storage.fetchTopicsByProperty(propUri, propValue);
+    final List<TopicModelImpl> fetchTopicsByProperty(String propUri, Object propValue) {
+        return (List<TopicModelImpl>) storage.fetchTopicsByProperty(propUri, propValue);
     }
 
-    final List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return storage.fetchTopicsByPropertyRange(propUri, from, to);
+    final List<TopicModelImpl> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
+        return (List<TopicModelImpl>) storage.fetchTopicsByPropertyRange(propUri, from, to);
     }
 
-    final List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
-        return storage.fetchAssociationsByProperty(propUri, propValue);
+    final List<AssociationModelImpl> fetchAssociationsByProperty(String propUri, Object propValue) {
+        return (List<AssociationModelImpl>) storage.fetchAssociationsByProperty(propUri, propValue);
     }
 
-    final List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return storage.fetchAssociationsByPropertyRange(propUri, from, to);
+    final List<AssociationModelImpl> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
+        return (List<AssociationModelImpl>) storage.fetchAssociationsByPropertyRange(propUri, from, to);
     }
 
     // ---

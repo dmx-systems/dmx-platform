@@ -209,9 +209,10 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getTopicTypeUris() {
         try {
-            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")));
+            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
+                new SimpleValue("dm4.core.topic_type")));       // ### TODO: rethink access control    
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.topic_type");        // ### TODO: perform by-value search instead
+                "dm4.core.instance", "dm4.core.topic_type");    // ### TODO: perform by-value search instead
             List<String> topicTypeUris = new ArrayList();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
@@ -282,7 +283,8 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getAssociationTypeUris() {
         try {
-            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")));
+            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
+                new SimpleValue("dm4.core.assoc_type")));           // ### TODO: rethink access control
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type");        // ### TODO: perform by-value search instead
             List<String> assocTypeUris = new ArrayList();

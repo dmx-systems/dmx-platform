@@ -571,7 +571,7 @@ class AccessControlImpl implements AccessControl {
      *
      * @return  a list, possibly empty.
      */
-    private List<TopicModel> queryTopics(String key, Object value) {
+    private List<TopicModelImpl> queryTopics(String key, Object value) {
         return pl.queryTopics(key, new SimpleValue(value));
     }
 

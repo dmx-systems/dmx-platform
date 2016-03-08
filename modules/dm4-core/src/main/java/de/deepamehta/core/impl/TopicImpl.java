@@ -85,6 +85,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // === Traversal ===
 
+    // ### TODO: move logic to model
+
     // --- Topic Retrieval ---
 
     @Override
@@ -120,12 +122,12 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
                                                                                  long othersTopicId) {
         AssociationModelImpl assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
             othersRoleTypeUri);
-        return assoc != null ? pl.instantiateAssociation(assoc) : null;
+        return assoc != null ? pl.<Association>checkReadAccessAndInstantiate(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return pl.instantiateAssociations(pl.fetchTopicAssociations(getId()));
+        return pl.checkReadAccessAndInstantiate(pl.fetchTopicAssociations(getId()));
     }
 
 

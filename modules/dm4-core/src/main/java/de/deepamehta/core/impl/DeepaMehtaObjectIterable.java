@@ -51,45 +51,45 @@ class AssociationIterable implements Iterable<Association> {
 
 
 
-class TopicIterator extends ObjectIterator<Topic, TopicModel> {
+class TopicIterator extends ObjectIterator<Topic, TopicModelImpl> {
 
     TopicIterator(PersistenceLayer pl) {
         super(pl);
     }
 
     @Override
-    Iterator<TopicModel> fetchObjects() {
+    Iterator<TopicModelImpl> fetchObjects() {
         return pl.fetchAllTopics();
     }
 
     @Override
-    Topic instantiateObject(TopicModel model) {
-        return pl.instantiateTopic(model);
+    Topic instantiateObject(TopicModelImpl model) {
+        return pl.checkReadAccessAndInstantiate(model);
     }
 }
 
 
 
-class AssociationIterator extends ObjectIterator<Association, AssociationModel> {
+class AssociationIterator extends ObjectIterator<Association, AssociationModelImpl> {
 
     AssociationIterator(PersistenceLayer pl) {
         super(pl);
     }
 
     @Override
-    Iterator<AssociationModel> fetchObjects() {
+    Iterator<AssociationModelImpl> fetchObjects() {
         return pl.fetchAllAssociations();
     }
 
     @Override
-    Association instantiateObject(AssociationModel model) {
-        return pl.instantiateAssociation((AssociationModelImpl) model);
+    Association instantiateObject(AssociationModelImpl model) {
+        return pl.checkReadAccessAndInstantiate(model);
     }
 }
 
 
 
-abstract class ObjectIterator<O extends DeepaMehtaObject, M extends DeepaMehtaObjectModel> implements Iterator<O> {
+abstract class ObjectIterator<O extends DeepaMehtaObject, M extends DeepaMehtaObjectModelImpl> implements Iterator<O> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

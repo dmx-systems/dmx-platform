@@ -188,7 +188,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void testExactIndexWithQuery() {
-        List<TopicModel> topics;
+        List<? extends TopicModel> topics;
         topics = storage.fetchTopics("uri", "dm?.core.topic_type"); assertEquals(1, topics.size());
         topics = storage.fetchTopics("uri", "*.core.topic_type");   assertEquals(1, topics.size());
         // => in contrast to Lucene docs a wildcard can be used as the first character of a search
@@ -213,7 +213,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndex() {
-        List<TopicModel> topics;
+        List<? extends TopicModel> topics;
         // Note: The same type must be used for indexing and querying.
         // That is, you can't index a value as a Long and then query the index using an Integer.
         topics = storage.fetchTopicsByProperty("score", 12L);  assertEquals(0, topics.size());
@@ -223,7 +223,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void propertyIndexRange() {
-        List<TopicModel> topics;
+        List<? extends TopicModel> topics;
         topics = storage.fetchTopicsByPropertyRange("score", 1L, 1000L);  assertEquals(3, topics.size());
         topics = storage.fetchTopicsByPropertyRange("score", 23L, 23L);   assertEquals(2, topics.size());
         topics = storage.fetchTopicsByPropertyRange("score", 23L, 1234L); assertEquals(4, topics.size());

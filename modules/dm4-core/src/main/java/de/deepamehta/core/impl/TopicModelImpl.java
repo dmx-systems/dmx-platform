@@ -78,7 +78,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
-    List<AssociationModel> getAssociations() {
+    List<AssociationModelImpl> getAssociations() {
         return pl.fetchTopicAssociations(id);
     }
 

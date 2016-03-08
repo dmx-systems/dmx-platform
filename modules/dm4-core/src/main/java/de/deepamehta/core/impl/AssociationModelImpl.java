@@ -170,7 +170,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    List<AssociationModel> getAssociations() {
+    List<AssociationModelImpl> getAssociations() {
         return pl.fetchAssociationAssociations(id);
     }
 

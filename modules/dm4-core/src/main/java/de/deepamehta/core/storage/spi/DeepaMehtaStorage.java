@@ -24,13 +24,13 @@ public interface DeepaMehtaStorage {
 
     TopicModel fetchTopic(String key, Object value);
 
-    List<TopicModel> fetchTopics(String key, Object value);
+    List<? extends TopicModel> fetchTopics(String key, Object value);
 
     List<TopicModel> queryTopics(Object value);
 
-    List<TopicModel> queryTopics(String key, Object value);
+    List<? extends TopicModel> queryTopics(String key, Object value);
 
-    Iterator<TopicModel> fetchAllTopics();
+    Iterator<? extends TopicModel> fetchAllTopics();
 
     // ---
 
@@ -77,15 +77,15 @@ public interface DeepaMehtaStorage {
 
     AssociationModel fetchAssociation(String key, Object value);
 
-    List<AssociationModel> fetchAssociations(String key, Object value);
+    List<? extends AssociationModel> fetchAssociations(String key, Object value);
 
-    List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                                String roleTypeUri2);
+    List<? extends AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
+                                                                            String roleTypeUri1, String roleTypeUri2);
 
     List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
                                                                       String topicRoleTypeUri, String assocRoleTypeUri);
 
-    Iterator<AssociationModel> fetchAllAssociations();
+    Iterator<? extends AssociationModel> fetchAllAssociations();
 
     long[] fetchPlayerIds(long assocId);
 
@@ -123,9 +123,9 @@ public interface DeepaMehtaStorage {
 
     // === Traversal ===
 
-    List<AssociationModel> fetchTopicAssociations(long topicId);
+    List<? extends AssociationModel> fetchTopicAssociations(long topicId);
 
-    List<AssociationModel> fetchAssociationAssociations(long assocId);
+    List<? extends AssociationModel> fetchAssociationAssociations(long assocId);
 
     // ---
 
@@ -205,13 +205,13 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
+    List<? extends TopicModel> fetchTopicsByProperty(String propUri, Object propValue);
 
-    List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
+    List<? extends TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to);
 
-    List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
+    List<? extends AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue);
 
-    List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
+    List<? extends AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to);
 
     // ---
 

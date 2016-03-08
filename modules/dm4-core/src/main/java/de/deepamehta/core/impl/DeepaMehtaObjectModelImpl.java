@@ -246,7 +246,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    List<AssociationModel> getAssociations() {
+    List<AssociationModelImpl> getAssociations() {
         throw new UnsupportedOperationException();
     }
 
