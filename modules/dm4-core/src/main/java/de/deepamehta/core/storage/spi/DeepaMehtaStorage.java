@@ -82,8 +82,8 @@ public interface DeepaMehtaStorage {
     List<? extends AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                             String roleTypeUri1, String roleTypeUri2);
 
-    List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                      String topicRoleTypeUri, String assocRoleTypeUri);
+    List<? extends AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
+                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri);
 
     Iterator<? extends AssociationModel> fetchAllAssociations();
 
@@ -135,7 +135,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
+    List<? extends RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -144,7 +144,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    List<? extends RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -155,7 +155,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
+    List<? extends RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -164,7 +164,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    List<? extends RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
@@ -176,7 +176,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri,
+    List<? extends RelatedTopicModel> fetchRelatedTopics(long objectId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri);
 
     /**
@@ -186,7 +186,7 @@ public interface DeepaMehtaStorage {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    List<RelatedAssociationModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
+    List<? extends RelatedAssociationModel> fetchRelatedAssociations(long objectId, String assocTypeUri,
                                              String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri);
 
 

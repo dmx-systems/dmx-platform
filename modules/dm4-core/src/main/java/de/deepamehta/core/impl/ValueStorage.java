@@ -293,7 +293,7 @@ class ValueStorage {
         );
     }
 
-    private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
+    private ResultList<RelatedTopicModelImpl> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
         return pl.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),

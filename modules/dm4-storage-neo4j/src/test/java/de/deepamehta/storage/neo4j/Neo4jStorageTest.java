@@ -77,8 +77,8 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //
-        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
-            "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+        List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
+            "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
         assertEquals(1, topics.size());
         //
         TopicModel type = topics.get(0);
@@ -91,8 +91,8 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.topic_type");
         assertNotNull(topic);
         //
-        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
-            "dm4.core.type", "dm4.core.instance", "dm4.core.topic_type");
+        List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
+            "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", "dm4.core.topic_type");
         assertEquals(1, topics.size());
         //
         TopicModel type = topics.get(0);
@@ -105,7 +105,8 @@ public class Neo4jStorageTest {
         TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
         assertNotNull(topic);
         //
-        List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null, null);
+        List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null,
+            null);
         assertEquals(1, topics.size());
     }
 
@@ -116,8 +117,8 @@ public class Neo4jStorageTest {
             TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
             assertNotNull(topic);
             //
-            List<RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
-                "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+            List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
+                "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
             assertEquals(1, topics.size());
             //
             AssociationModel assoc = topics.get(0).getRelatingAssociation();

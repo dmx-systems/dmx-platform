@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
@@ -70,5 +71,19 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
     @Override
     public String toString() {
         return super.toString() + ", relating " + relatingAssoc;
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    String className() {
+        return "related topic";
+    }
+
+    @Override
+    RelatedTopic instantiate() {
+        return new RelatedTopicImpl(this, pl);
     }
 }

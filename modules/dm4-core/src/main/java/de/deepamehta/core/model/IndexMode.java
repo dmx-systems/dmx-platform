@@ -15,7 +15,7 @@ public enum IndexMode {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    public static List<IndexMode> fromTopics(List<RelatedTopicModel> topics) {
+    public static List<IndexMode> fromTopics(List<? extends RelatedTopicModel> topics) {
         List<IndexMode> indexModes = new ArrayList();
         for (TopicModel topic : topics) {
             indexModes.add(fromUri(topic.getUri()));

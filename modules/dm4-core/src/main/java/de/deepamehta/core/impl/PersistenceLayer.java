@@ -440,51 +440,11 @@ public class PersistenceLayer extends StorageDecorator {
 
 
 
-    // === Instantiation ===
+    // === Access Control / Instantiation ===
 
     // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
     // Call these methods when passing objects fetched from the DB to the user.
     // ### TODO: make these private?
-
-    RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
-        checkReadAccess(model);
-        return new RelatedTopicImpl((RelatedTopicModelImpl) model, this);
-    }
-
-    ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
-        List<RelatedTopic> relTopics = new ArrayList();
-        for (RelatedTopicModel model : models) {
-            try {
-                relTopics.add(instantiateRelatedTopic(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return new ResultList<RelatedTopic>(relTopics);
-    }
-
-    // ---
-
-    RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
-        checkReadAccess(model);
-        return new RelatedAssociationImpl((RelatedAssociationModelImpl) model, this);
-    }
-
-    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
-        ResultList<RelatedAssociation> relAssocs = new ResultList();
-        for (RelatedAssociationModel model : models) {
-            try {
-                relAssocs.add(instantiateRelatedAssociation(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return relAssocs;
-    }
-
-
-
-    // === Access Control / Instantiation ===
 
     <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
         checkReadAccess(model);
@@ -498,18 +458,10 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
-        List<O> objects = new ArrayList();
-        for (DeepaMehtaObjectModelImpl model : models) {
-            objects.add((O) model.instantiate());
-        }
-        return objects;
-    }
-
-    private void filterReadables(Iterable<? extends DeepaMehtaObjectModel> models) {
-        Iterator<? extends DeepaMehtaObjectModel> i = models.iterator();
+    private void filterReadables(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
-            DeepaMehtaObjectModel model = i.next();
+            DeepaMehtaObjectModelImpl model = i.next();
             try {
                 checkReadAccess(model);
             } catch (AccessControlException e) {
@@ -521,8 +473,20 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * @throws  AccessControlException
      */
-    private void checkReadAccess(DeepaMehtaObjectModel model) {
-        em.fireEvent(((DeepaMehtaObjectModelImpl) model).getPreGetEvent(), model.getId());
+    private void checkReadAccess(DeepaMehtaObjectModelImpl model) {
+        em.fireEvent(model.getPreGetEvent(), model.getId());
+    }
+
+
+
+    // === Instantiation ===
+
+    <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        List<O> objects = new ArrayList();
+        for (DeepaMehtaObjectModelImpl model : models) {
+            objects.add((O) model.instantiate());
+        }
+        return objects;
     }
 
 

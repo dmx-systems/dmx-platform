@@ -252,18 +252,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    RelatedTopicModel getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                      String othersRoleTypeUri, String othersTopicTypeUri) {
+    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+                                          String othersRoleTypeUri, String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 
-    ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+    ResultList<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 
-    ResultList<RelatedTopicModel> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+    ResultList<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 

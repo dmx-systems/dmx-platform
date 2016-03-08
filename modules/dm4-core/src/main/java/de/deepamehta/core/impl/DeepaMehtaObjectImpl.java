@@ -208,9 +208,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    String othersTopicTypeUri) {
-        RelatedTopicModel topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+        RelatedTopicModelImpl topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
-        return topic != null ? pl.instantiateRelatedTopic(topic) : null;
+        return topic != null ? pl.<RelatedTopic>checkReadAccessAndInstantiate(topic) : null;
     }
 
     @Override
@@ -221,9 +221,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-        return pl.instantiateRelatedTopics(topics);
+        ResultList<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):

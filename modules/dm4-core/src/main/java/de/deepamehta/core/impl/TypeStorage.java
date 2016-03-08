@@ -251,7 +251,7 @@ class TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        ResultList<RelatedTopicModel> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
+        ResultList<? extends RelatedTopicModel> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
         return IndexMode.fromTopics(indexModes.getItems());
     }
@@ -310,7 +310,7 @@ class TypeStorage {
         // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dm4.core.topic_type"
         // and "dm4.core.meta_type" (the latter is required e.g. by dm4-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        ResultList<RelatedTopicModel> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+        ResultList<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null);
             // othersTopicTypeUri=null
         //

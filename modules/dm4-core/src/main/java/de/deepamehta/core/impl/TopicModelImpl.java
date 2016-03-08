@@ -56,9 +56,9 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         return "topic (" + super.toString() + ")";
     }
 
+
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
 
     @Override
     String className() {
@@ -91,14 +91,14 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
-    ResultList<RelatedTopicModel> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+    ResultList<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    ResultList<RelatedTopicModel> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
+    ResultList<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
