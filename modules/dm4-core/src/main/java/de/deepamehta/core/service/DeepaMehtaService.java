@@ -12,7 +12,6 @@ import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -74,7 +73,7 @@ public interface DeepaMehtaService {
      */
     List<Topic> getTopics(String key, SimpleValue value);
 
-    ResultList<RelatedTopic> getTopics(String topicTypeUri);
+    List<Topic> getTopics(String topicTypeUri);
 
     /**
      * Performs a fulltext search.
@@ -93,7 +92,7 @@ public interface DeepaMehtaService {
 
     Topic createTopic(TopicModel model);
 
-    void updateTopic(TopicModel model);
+    void updateTopic(TopicModel newModel);
 
     void deleteTopic(long topicId);
 
@@ -141,7 +140,7 @@ public interface DeepaMehtaService {
 
     // ---
 
-    ResultList<RelatedAssociation> getAssociations(String assocTypeUri);
+    List<Association> getAssociations(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.
@@ -165,7 +164,7 @@ public interface DeepaMehtaService {
 
     Association createAssociation(AssociationModel model);
 
-    void updateAssociation(AssociationModel model);
+    void updateAssociation(AssociationModel newModel);
 
     void deleteAssociation(long assocId);
 
@@ -183,7 +182,7 @@ public interface DeepaMehtaService {
 
     TopicType createTopicType(TopicTypeModel model);
 
-    void updateTopicType(TopicTypeModel model);
+    void updateTopicType(TopicTypeModel newModel);
 
     void deleteTopicType(String topicTypeUri);
 
@@ -201,7 +200,7 @@ public interface DeepaMehtaService {
 
     AssociationType createAssociationType(AssociationTypeModel model);
 
-    void updateAssociationType(AssociationTypeModel model);
+    void updateAssociationType(AssociationTypeModel newModel);
 
     void deleteAssociationType(String assocTypeUri);
 
@@ -277,8 +276,10 @@ public interface DeepaMehtaService {
 
     DeepaMehtaTransaction beginTx();
 
+    // ---
+
     ModelFactory getModelFactory();
-    TypeStorage getTypeStorage();       // ### TODO: drop this
+
     AccessControl getAccessControl();   // ### TODO: drop this
 
     Object getDatabaseVendorObject();

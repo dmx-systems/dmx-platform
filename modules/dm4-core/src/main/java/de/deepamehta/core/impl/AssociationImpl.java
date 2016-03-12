@@ -14,6 +14,7 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -32,54 +33,15 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Role role1;     // attached object cache
-    private Role role2;     // attached object cache
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationImpl(AssociationModel model, PersistenceLayer pl) {
+    AssociationImpl(AssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        // init attached object cache
-        this.role1 = createAttachedRole(model.getRoleModel1());
-        this.role2 = createAttachedRole(model.getRoleModel2());
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // **************************************
-    // *** DeepaMehtaObjectImpl Overrides ***
-    // **************************************
-
-
-
-    // === Updating ===
-
-    /**
-     * @param   model   The data to update.
-     *                  If the type URI is <code>null</code> it is not updated.
-     *                  If role 1 is <code>null</code> it is not updated.
-     *                  If role 2 is <code>null</code> it is not updated.
-     */
-    @Override
-    public void update(AssociationModel model) {
-        // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to
-        // TopicImpl update()). It would be equivalent to POST_UPDATE_ASSOCIATION.
-        // Per request exactly one association is updated. Its childs are always topics (never associations).
-        logger.info("Updating association " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
-        //
-        pl.em.fireEvent(CoreEvent.PRE_UPDATE_ASSOCIATION, this, model);
-        //
-        AssociationModel oldModel = getModel().clone();
-        super.update(model);
-        updateRole(model.getRoleModel1(), 1);
-        updateRole(model.getRoleModel2(), 2);
-        //
-        pl.em.fireEvent(CoreEvent.POST_UPDATE_ASSOCIATION, this, oldModel);
-    }
 
 
 
@@ -91,12 +53,12 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public Role getRole1() {
-        return role1;
+        return getModel().getRoleModel1().instantiate(getModel());
     }
 
     @Override
     public Role getRole2() {
-        return role2;
+        return getModel().getRoleModel2().instantiate(getModel());
     }
 
     // ---
@@ -115,28 +77,19 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public Topic getTopic(String roleTypeUri) {
-        Topic topic1 = filterTopic(getRole1(), roleTypeUri);
-        Topic topic2 = filterTopic(getRole2(), roleTypeUri);
-        if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguity in association: both topics have role type \"" + roleTypeUri +
-                "\" (" + this + ")");
-        }
-        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
+        TopicModelImpl topic = getModel().getTopic(roleTypeUri);
+        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
     }
 
     @Override
     public Topic getTopicByType(String topicTypeUri) {
-        Topic topic1 = filterTopic(getPlayer1(), topicTypeUri);
-        Topic topic2 = filterTopic(getPlayer2(), topicTypeUri);
-        if (topic1 != null && topic2 != null) {
-            throw new RuntimeException("Ambiguity in association: both topics are of type \"" + topicTypeUri +
-                "\" (" + this + ")");
-        }
-        return topic1 != null ? topic1 : topic2 != null ? topic2 : null;
+        TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
+        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
     }
 
     // ---
 
+    // ### TODO: make use of model's getRole()
     @Override
     public Role getRole(RoleModel roleModel) {
         if (getRole1().getModel().refsSameObject(roleModel)) {
@@ -155,20 +108,34 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
-    public Association loadChildTopics() {
-        return (Association) super.loadChildTopics();
-    }
-
-    @Override
-    public Association loadChildTopics(String childTypeUri) {
-        return (Association) super.loadChildTopics(childTypeUri);
+    public void update(AssociationModel newModel) {
+        model.update(newModel);
     }
 
     // ---
 
     @Override
+    public Association loadChildTopics() {
+        model.loadChildTopics();
+        return this;
+    }
+
+    @Override
+    public Association loadChildTopics(String assocDefUri) {
+        model.loadChildTopics(assocDefUri);
+        return this;
+    }
+
+    // ---
+
+    @Override
+    public AssociationType getType() {
+        return pl.getAssociationType(getTypeUri());
+    }
+
+    @Override
     public AssociationModelImpl getModel() {
-        return (AssociationModelImpl) super.getModel();
+        return (AssociationModelImpl) model;
     }
 
 
@@ -181,14 +148,16 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     // === Traversal ===
 
+    // ### TODO: move logic to model
+
     // --- Topic Retrieval ---
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                      String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = pl.fetchAssociationRelatedTopics(getId(),
+        ResultList<RelatedTopicModelImpl> topics = pl.fetchAssociationRelatedTopics(getId(),
             assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return pl.instantiateRelatedTopics(topics);
+        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
     }
 
     // --- Association Retrieval ---
@@ -196,32 +165,32 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                     String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModel assoc = pl.fetchAssociationRelatedAssociation(getId(),
+        RelatedAssociationModelImpl assoc = pl.fetchAssociationRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? pl.instantiateRelatedAssociation(assoc) : null;
+        return assoc != null ? pl.<RelatedAssociation>checkReadAccessAndInstantiate(assoc) : null;
     }
 
     @Override
     public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModel> assocs = pl.fetchAssociationRelatedAssociations(getId(),
+        ResultList<RelatedAssociationModelImpl> assocs = pl.fetchAssociationRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return pl.instantiateRelatedAssociations(assocs);
+        return new ResultList(pl.checkReadAccessAndInstantiate(assocs));
     }
 
     // ---
 
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   long othersTopicId) {
-        AssociationModel assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
+                                                                                 long othersTopicId) {
+        AssociationModelImpl assoc = pl.fetchAssociationBetweenTopicAndAssociation(assocTypeUri,
             othersTopicId, getId(), othersRoleTypeUri, myRoleTypeUri);
-        return assoc != null ? pl.instantiateAssociation(assoc) : null;
+        return assoc != null ? pl.<Association>checkReadAccessAndInstantiate(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return pl.instantiateAssociations(pl.fetchAssociationAssociations(getId()));
+        return pl.checkReadAccessAndInstantiate(pl.fetchAssociationAssociations(getId()));
     }
 
 
@@ -238,127 +207,15 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
         pl.removeAssociationProperty(getId(), propUri);
     }
 
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-
-
-    // === Implementation of the abstract methods ===
-
-    @Override
-    final String className() {
-        return "association";
-    }
-
-    @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newAssociationModel(childTopics));
-    }
-
-    @Override
-    Directive getUpdateDirective() {
-        return Directive.UPDATE_ASSOCIATION;
-    }
-
-    @Override
-    final void storeTypeUri() {
-        reassignInstantiation();
-        pl.storeAssociationTypeUri(getId(), getTypeUri());
-    }
-
-    // ---
-
-    @Override
-    final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                              String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopic(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-    }
-
-    @Override
-    final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopics(getId(), assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-    }
-
-    // ---
-
-    @Override
-    AssociationType getType() {
-        return pl.getAssociationType(getTypeUri());
-    }
-
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // --- Update ---
-
-    /**
-     * @param   nr      used only for logging
-     */
-    private void updateRole(RoleModel newModel, int nr) {
-        if (newModel != null) {
-            // Note: We must lookup the roles individually.
-            // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            Role role = getRole(newModel);
-            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
-            String roleTypeUri = role.getRoleTypeUri();         // current value
-            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
-                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
-                    "\"");
-                role.setRoleTypeUri(newRoleTypeUri);
-            }
-        }
-    }
-
     // --- Helper ---
 
-    private Role createAttachedRole(RoleModel model) {
-        if (model instanceof TopicRoleModel) {
-            return new TopicRoleImpl((TopicRoleModel) model, this, pl);
-        } else if (model instanceof AssociationRoleModel) {
-            return new AssociationRoleImpl((AssociationRoleModel) model, this, pl);
-        } else {
-            throw new RuntimeException("Unexpected RoleModel object (" + model + ")");
-        }
-    }
-
-    // ---
-
-    private Topic filterTopic(Role role, String roleTypeUri) {
-        return role instanceof TopicRole && role.getRoleTypeUri().equals(roleTypeUri) ? ((TopicRole) role).getTopic()
-            : null;
-    }
-
-    private Topic filterTopic(DeepaMehtaObject object, String topicTypeUri) {
-        return object instanceof Topic && object.getTypeUri().equals(topicTypeUri) ? (Topic) object : null;
-    }
-
-    // ---
-
+    // ### TODO: move to model
     private TopicRole filterRole(Role role, TopicRoleModel roleModel) {
         return role instanceof TopicRole && role.getRoleTypeUri().equals(roleModel.getRoleTypeUri()) &&
             role.getPlayerId() == roleModel.getPlayerId() ? (TopicRole) role : null;
-    }
-
-    // ---
-
-    private void reassignInstantiation() {
-        // remove current assignment
-        fetchInstantiation().delete();
-        // create new assignment
-        pl.createAssociationInstantiation(getId(), getTypeUri());
-    }
-
-    private Association fetchInstantiation() {
-        RelatedTopic assocType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
-            "dm4.core.assoc_type");
-        //
-        if (assocType == null) {
-            throw new RuntimeException("Association " + getId() + " is not associated to an association type");
-        }
-        //
-        return assocType.getRelatingAssociation();
     }
 }

@@ -7,7 +7,6 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -17,12 +16,13 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -38,12 +38,11 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    TypeStorageImpl typeStorage;
+    TypeStorage typeStorage;
     ValueStorage valueStorage;
 
     EventManager em;
     ModelFactoryImpl mf;
-    TypeCache typeCache;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -54,12 +53,11 @@ public class PersistenceLayer extends StorageDecorator {
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
-        this.typeCache = new TypeCache(this);
         //
-        this.typeStorage = new TypeStorageImpl(this);
+        this.typeStorage = new TypeStorage(this);
         this.valueStorage = new ValueStorage(this);
         //
-        // Note: this is a constructor side effect. This is a cyclic dependency. This is very nasty.
+        // Note: this is a constructor side effect. This is a cyclic dependency. This is nasty.
         // ### TODO: explain why we do it.
         mf.pl = this;
         //
@@ -74,7 +72,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Topic getTopic(long topicId) {
         try {
-            return instantiateTopic(fetchTopic(topicId));
+            return checkReadAccessAndInstantiate(fetchTopic(topicId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic " + topicId + " failed", e);
         }
@@ -82,8 +80,8 @@ public class PersistenceLayer extends StorageDecorator {
 
     Topic getTopic(String key, SimpleValue value) {
         try {
-            TopicModel topic = fetchTopic(key, value);
-            return topic != null ? instantiateTopic(topic) : null;
+            TopicModelImpl topic = fetchTopic(key, value);
+            return topic != null ? this.<Topic>checkReadAccessAndInstantiate(topic) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -91,16 +89,15 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> getTopics(String key, SimpleValue value) {
         try {
-            return instantiateTopics(fetchTopics(key, value));
+            return checkReadAccessAndInstantiate(fetchTopics(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
     }
 
-    ResultList<RelatedTopic> getTopics(String topicTypeUri) {
+    List<Topic> getTopics(String topicTypeUri) {
         try {
-            return getTopicType(topicTypeUri).getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", topicTypeUri);
+            return checkReadAccessAndInstantiate(typeStorage.getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
@@ -108,7 +105,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> searchTopics(String searchTerm, String fieldUri) {
         try {
-            return instantiateTopics(queryTopics(fieldUri, new SimpleValue(searchTerm)));
+            return checkReadAccessAndInstantiate(queryTopics(fieldUri, new SimpleValue(searchTerm)));
         } catch (Exception e) {
             throw new RuntimeException("Searching topics failed (searchTerm=\"" + searchTerm + "\", fieldUri=\"" +
                 fieldUri + "\")", e);
@@ -137,7 +134,7 @@ public class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue(model);
+            valueStorage.storeValue((TopicModelImpl) model);
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
@@ -147,7 +144,7 @@ public class PersistenceLayer extends StorageDecorator {
                 ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
             }
             // 3) instantiate
-            Topic topic = new TopicImpl(model, this);
+            Topic topic = new TopicImpl((TopicModelImpl) model, this);
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -159,17 +156,22 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopic(TopicModel model) {
+    void updateTopic(TopicModel newModel) {
         try {
-            getTopic(model.getId()).update(model);
+            TopicModelImpl model = fetchTopic(newModel.getId());
+            model.update(newModel);
+            //
+            // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
+            // On the other hand TopicModel's update() method is called multiple times while updating the child topics
+            // (see ChildTopicsModelImpl).
+            em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
-                "\")", e);
+            throw new RuntimeException("Updating topic " + newModel.getId() + " failed", e);
         }
     }
 
     void deleteTopic(long topicId) {
-        deleteObject(fetchTopic(topicId));
+        fetchTopic(topicId).delete();
     }
 
 
@@ -178,7 +180,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     Association getAssociation(long assocId) {
         try {
-            return instantiateAssociation(fetchAssociation(assocId));
+            return checkReadAccessAndInstantiate(fetchAssociation(assocId));
         } catch (Exception e) {
             throw new RuntimeException("Fetching association " + assocId + " failed", e);
         }
@@ -186,8 +188,8 @@ public class PersistenceLayer extends StorageDecorator {
 
     Association getAssociation(String key, SimpleValue value) {
         try {
-            AssociationModel assoc = fetchAssociation(key, value);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            AssociationModelImpl assoc = fetchAssociation(key, value);
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -195,34 +197,34 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Association> getAssociations(String key, SimpleValue value) {
         try {
-            return instantiateAssociations(fetchAssociations(key, value));
+            return checkReadAccessAndInstantiate(fetchAssociations(key, value));
         } catch (Exception e) {
             throw new RuntimeException("Fetching associationss failed (key=\"" + key + "\", value=\"" + value + "\")",
                 e);
         }
     }
 
-    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id,
-                                                           String roleTypeUri1, String roleTypeUri2) {
+    Association getAssociation(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                  String roleTypeUri2) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
             ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"";
         try {
-            AssociationModel assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
     }
 
     Association getAssociationBetweenTopicAndAssociation(String assocTypeUri, long topicId, long assocId,
-                                                                String topicRoleTypeUri, String assocRoleTypeUri) {
+                                                         String topicRoleTypeUri, String assocRoleTypeUri) {
         String info = "assocTypeUri=\"" + assocTypeUri + "\", topicId=" + topicId + ", assocId=" + assocId +
             ", topicRoleTypeUri=\"" + topicRoleTypeUri + "\", assocRoleTypeUri=\"" + assocRoleTypeUri + "\"";
         logger.info(info);
         try {
-            AssociationModel assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
+            AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
-            return assoc != null ? instantiateAssociation(assoc) : null;
+            return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -230,10 +232,9 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
+    List<Association> getAssociations(String assocTypeUri) {
         try {
-            return getAssociationType(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
-                "dm4.core.type", "dm4.core.instance", assocTypeUri);
+            return checkReadAccessAndInstantiate(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
@@ -247,8 +248,8 @@ public class PersistenceLayer extends StorageDecorator {
     List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
         logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
         try {
-            return instantiateAssociations(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
-                                                                    // roleTypeUri1=null, roleTypeUri2=null
+            return checkReadAccessAndInstantiate(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
+                                                                                 // roleTypeUri1=null, roleTypeUri2=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
                 " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
@@ -277,7 +278,7 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Creates a new association in the DB.
      */
-    Association createAssociation(AssociationModel model) {
+    Association createAssociation(AssociationModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -297,17 +298,21 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModel model) {
+    void updateAssociation(AssociationModel newModel) {
         try {
-            getAssociation(model.getId()).update(model);
+            AssociationModelImpl model = fetchAssociation(newModel.getId());
+            model.update(newModel);
+            //
+            // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
+            // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
+            // Its childs are always topics (never associations).
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + model.getId() + " failed (typeUri=\"" +
-                model.getTypeUri() + "\")", e);
+            throw new RuntimeException("Updating association " + newModel.getId() + " failed", e);
         }
     }
 
     void deleteAssociation(long assocId) {
-        deleteObject(fetchAssociation(assocId));
+        fetchAssociation(assocId).delete();
     }
 
 
@@ -346,51 +351,39 @@ public class PersistenceLayer extends StorageDecorator {
     // === Types ===
 
     TopicType getTopicType(String uri) {
-        try {
-            return typeCache.getTopicType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching topic type \"" + uri + "\" failed", e);
-        }
+        return typeStorage.getTopicType(uri).instantiate();
     }
 
     AssociationType getAssociationType(String uri) {
-        try {
-            return typeCache.getAssociationType(uri);
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching association type \"" + uri + "\" failed", e);
-        }
+        return typeStorage.getAssociationType(uri).instantiate();
     }
 
     // ---
 
-    TopicType createTopicType(TopicTypeModel model) {
+    TopicType createTopicType(TopicTypeModelImpl model) {
         try {
             // store in DB
             createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
-            // instantiate
-            TopicType topicType = new TopicTypeImpl(model, this);
-            typeCache.putTopicType(topicType);
-            //
+            TopicType topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
+            //
             return topicType;
         } catch (Exception e) {
             throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
         }
     }
 
-    AssociationType createAssociationType(AssociationTypeModel model) {
+    AssociationType createAssociationType(AssociationTypeModelImpl model) {
         try {
             // store in DB
             createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
             typeStorage.storeType(model);                       // store type-specific parts
             //
-            // instantiate
-            AssociationType assocType = new AssociationTypeImpl(model, this);
-            typeCache.putAssociationType(assocType);
-            //
+            AssociationType assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+            //
             return assocType;
         } catch (Exception e) {
             throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
@@ -417,7 +410,7 @@ public class PersistenceLayer extends StorageDecorator {
 
 
 
-    // ===
+    // === Generic Object ===
 
     DeepaMehtaObject getObject(long id) {
         DeepaMehtaObjectModelImpl model = fetchObject(id);
@@ -425,174 +418,75 @@ public class PersistenceLayer extends StorageDecorator {
         return model.instantiate();
     }
 
-    /**
-     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
-     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
-     * <p>
-     * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
-     */
-    void deleteObject(DeepaMehtaObjectModelImpl object) {
-        try {
-            em.fireEvent(object.getPreDeleteEvent(), object.instantiate());
-            //
-            // delete child topics (recursively)
-            for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
-                if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModel childTopic : object.getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
-                            "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        deleteObject((DeepaMehtaObjectModelImpl) childTopic);
-                    }
-                }
-            }
-            // delete direct associations
-            for (AssociationModel assoc : object.getAssociations()) {
-                deleteObject((DeepaMehtaObjectModelImpl) assoc);
-            }
-            // delete object itself
-            logger.info("Deleting " + object);
-            Directives.get().add(object.getDeleteDirective(), object);
-            object.delete();
-            //
-            em.fireEvent(object.getPostDeleteEvent(), object);
-        } catch (IllegalStateException e) {
-            // Note: getAssociations() might throw IllegalStateException and is no problem.
-            // This can happen when this object is an association which is already deleted.
-            //
-            // Consider this particular situation: let A1 and A2 be associations of this object and let A2 point to A1.
-            // If A1 gets deleted first (the association set order is non-deterministic), A2 is implicitely deleted
-            // with it (because it is a direct association of A1 as well). Then when the loop comes to A2
-            // "IllegalStateException: Node[1327] has been deleted in this tx" is thrown because A2 has been deleted
-            // already. (The Node appearing in the exception is the middle node of A2.) If, on the other hand, A2
-            // gets deleted first no error would occur.
-            //
-            // This particular situation exists when e.g. a topicmap is deleted while one of its mapcontext
-            // associations is also a part of the topicmap itself. This originates e.g. when the user reveals
-            // a topicmap's mapcontext association and then deletes the topicmap.
-            //
-            if (e.getMessage().equals("Node[" + object.getId() + "] has been deleted in this tx")) {
-                logger.info("### Association " + object.getId() + " has already been deleted in this transaction. " +
-                    "This can happen while deleting a topic with associations A1 and A2 while A2 points to A1 (" +
-                    object + ")");
-            } else {
-                throw e;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting " + object.className() + " " + object.getId() + " failed (" +
-                object + ")", e);
-        }
-    }
-
 
 
     // === Properties ===
 
     List<Topic> getTopicsByProperty(String propUri, Object propValue) {
-        return instantiateTopics(fetchTopicsByProperty(propUri, propValue));
+        return checkReadAccessAndInstantiate(fetchTopicsByProperty(propUri, propValue));
     }
 
     List<Topic> getTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateTopics(fetchTopicsByPropertyRange(propUri, from, to));
+        return checkReadAccessAndInstantiate(fetchTopicsByPropertyRange(propUri, from, to));
     }
 
     List<Association> getAssociationsByProperty(String propUri, Object propValue) {
-        return instantiateAssociations(fetchAssociationsByProperty(propUri, propValue));
+        return checkReadAccessAndInstantiate(fetchAssociationsByProperty(propUri, propValue));
     }
 
     List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return instantiateAssociations(fetchAssociationsByPropertyRange(propUri, from, to));
+        return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
+    }
+
+
+
+    // === Access Control / Instantiation ===
+
+    // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
+    // Call these methods when passing objects fetched from the DB to the user.
+    // ### TODO: make these private?
+
+    <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
+        checkReadAccess(model);
+        return (O) model.instantiate();
+    }
+
+    <O> List<O> checkReadAccessAndInstantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        filterReadables(models);
+        return instantiate(models);
+    }
+
+    // ---
+
+    private void filterReadables(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
+        while (i.hasNext()) {
+            DeepaMehtaObjectModelImpl model = i.next();
+            try {
+                checkReadAccess(model);
+            } catch (AccessControlException e) {
+                i.remove();
+            }
+        }
+    }
+
+    /**
+     * @throws  AccessControlException
+     */
+    private void checkReadAccess(DeepaMehtaObjectModelImpl model) {
+        em.fireEvent(model.getPreGetEvent(), model.getId());
     }
 
 
 
     // === Instantiation ===
 
-    // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
-    // Call these methods when passing objects fetched from the DB to the user.
-    // ### TODO: make these private?
-
-    Topic instantiateTopic(TopicModel model) {
-        checkReadAccess(model);
-        return new TopicImpl(model, this);
-    }
-
-    List<Topic> instantiateTopics(List<TopicModel> models) {
-        List<Topic> topics = new ArrayList();
-        for (TopicModel model : models) {
-            try {
-                topics.add(instantiateTopic(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
+    <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+        List<O> objects = new ArrayList();
+        for (DeepaMehtaObjectModelImpl model : models) {
+            objects.add((O) model.instantiate());
         }
-        return topics;
-    }
-
-    // ---
-
-    RelatedTopic instantiateRelatedTopic(RelatedTopicModel model) {
-        checkReadAccess(model);
-        return new RelatedTopicImpl(model, this);
-    }
-
-    ResultList<RelatedTopic> instantiateRelatedTopics(ResultList<RelatedTopicModel> models) {
-        List<RelatedTopic> relTopics = new ArrayList();
-        for (RelatedTopicModel model : models) {
-            try {
-                relTopics.add(instantiateRelatedTopic(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return new ResultList<RelatedTopic>(relTopics);
-    }
-
-    // ---
-
-    Association instantiateAssociation(AssociationModel model) {
-        checkReadAccess(model);
-        return new AssociationImpl(model, this);
-    }
-
-    List<Association> instantiateAssociations(List<AssociationModel> models) {
-        List<Association> assocs = new ArrayList();
-        for (AssociationModel model : models) {
-            try {
-                assocs.add(instantiateAssociation(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return assocs;
-    }
-
-    // ---
-
-    RelatedAssociation instantiateRelatedAssociation(RelatedAssociationModel model) {
-        checkReadAccess(model);
-        return new RelatedAssociationImpl(model, this);
-    }
-
-    ResultList<RelatedAssociation> instantiateRelatedAssociations(Iterable<RelatedAssociationModel> models) {
-        ResultList<RelatedAssociation> relAssocs = new ResultList();
-        for (RelatedAssociationModel model : models) {
-            try {
-                relAssocs.add(instantiateRelatedAssociation(model));
-            } catch (AccessControlException e) {
-                // don't add to result and continue
-            }
-        }
-        return relAssocs;
-    }
-
-
-
-    // === Access Control ===
-
-    /**
-     * @throws  AccessControlException
-     */
-    private void checkReadAccess(DeepaMehtaObjectModel model) {
-        em.fireEvent(((DeepaMehtaObjectModelImpl) model).getPreGetEvent(), model.getId());
+        return objects;
     }
 
 
@@ -600,9 +494,9 @@ public class PersistenceLayer extends StorageDecorator {
     // ===
 
     private void bootstrapTypeCache() {
-        TopicTypeModel metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
+        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
-        typeCache.putTopicType(new TopicTypeImpl(metaMetaType, this));
+        typeStorage.putInTypeCache(metaMetaType);
     }
 }

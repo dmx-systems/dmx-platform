@@ -1,12 +1,15 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONException;
@@ -33,7 +36,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     private String parentCardinalityUri;
     private String childCardinalityUri;
 
-    private ViewConfigurationModel viewConfigModel; // is never null
+    private ViewConfigurationModelImpl viewConfig;     // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -44,12 +47,13 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      *
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
-    AssociationDefinitionModelImpl(AssociationModel assoc, String parentCardinalityUri, String childCardinalityUri,
-                                                                               ViewConfigurationModel viewConfigModel) {
+    AssociationDefinitionModelImpl(AssociationModelImpl assoc, String parentCardinalityUri, String childCardinalityUri,
+                                                                                ViewConfigurationModelImpl viewConfig) {
         super(assoc);
         this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri  = childCardinalityUri;
-        this.viewConfigModel = viewConfigModel != null ? viewConfigModel : mf.newViewConfigurationModel();
+        this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
+        // ### TODO: why null check? Compare to TypeModelImpl constructor
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -96,8 +100,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public ViewConfigurationModel getViewConfigModel() {
-        return viewConfigModel;
+    public ViewConfigurationModelImpl getViewConfigModel() {
+        return viewConfig;
     }
 
     // ---
@@ -113,8 +117,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public void setViewConfigModel(ViewConfigurationModel viewConfigModel) {
-        this.viewConfigModel = viewConfigModel;
+    public void setViewConfigModel(ViewConfigurationModel viewConfig) {
+        this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
     }
 
     // ---
@@ -125,7 +129,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             return super.toJSON()
                 .put("parent_cardinality_uri", parentCardinalityUri)
                 .put("child_cardinality_uri", childCardinalityUri)
-                .put("view_config_topics", viewConfigModel.toJSONArray());
+                .put("view_config_topics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -138,24 +142,66 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         return "\n    association definition (" + super.toString() +
             ",\n        parent cardinality=\"" + parentCardinalityUri +
             "\",\n        child cardinality=\"" + childCardinalityUri +
-            "\",\n        " + viewConfigModel + ")\n";
+            "\",\n        " + viewConfig + ")\n";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    boolean hasSameCustomAssocType(AssociationDefinitionModel assocDef) {
-        String _customAssocTypeUri = getCustomAssocTypeUri();
-        String customAssocTypeUri = ((AssociationDefinitionModelImpl) assocDef).getCustomAssocTypeUriOrNull();
-        if (customAssocTypeUri == null) {
-            // compare our value to null if his value is a deletion ref or null
-            return _customAssocTypeUri == null;
-        } else {
-            // his value is neither a deletion ref nor null, compare it to our value (which may be null)
-            return customAssocTypeUri.equals(_customAssocTypeUri);
+
+
+    @Override
+    String className() {
+        return "association definition";
+    }
+
+    @Override
+    AssociationDefinition instantiate() {
+        return new AssociationDefinitionImpl(this, pl);
+    }
+
+
+
+    // === Core Internal Hooks ===
+
+    @Override
+    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+        logger.info("################################ assoc def postUpdate()!!!");
+        super.postUpdate(newModel, oldModel);
+        //
+        updateCardinality((AssociationDefinitionModel) newModel);
+        //
+        // rehash
+        boolean changeCustomAssocType = customAssocTypeChange((AssociationDefinitionModel) newModel,
+            (AssociationDefinitionModel) oldModel);
+        if (changeCustomAssocType) {
+            logger.info("### Changed custom association type URI from \"" +
+                ((AssociationDefinitionModelImpl) oldModel).getCustomAssocTypeUri() + "\" -> \"" +
+                ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
+            getParentType().rehashAssocDef(newModel.getId());
         }
     }
 
+
+
+    // === Update (memory + DB) ===
+
+    void updateParentCardinalityUri(String parentCardinalityUri) {
+        setParentCardinalityUri(parentCardinalityUri);                      // update memory
+        pl.typeStorage.storeParentCardinalityUri(id, parentCardinalityUri); // update DB
+    }
+
+    void updateChildCardinalityUri(String childCardinalityUri) {
+        setChildCardinalityUri(childCardinalityUri);                        // update memory
+        pl.typeStorage.storeChildCardinalityUri(id, childCardinalityUri);   // update DB
+    }
+
+
+
+    // ===
+
     /**
+     * ### TODO: make private
+     *
      * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
      *          Otherwise returns the custom assoc type URI.
      */
@@ -163,11 +209,73 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
     }
 
+    // ---
+
+    TypeModelImpl getParentType() {
+        return pl.typeStorage.getType(getParentTypeUri());
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+
+
+    // === Update ===
+
+    private void updateCardinality(AssociationDefinitionModel newModel) {
+        updateParentCardinality(newModel.getParentCardinalityUri());
+        updateChildCardinality(newModel.getChildCardinalityUri());
+    }
+
+    // ---
+
+    private void updateParentCardinality(String newParentCardinalityUri) {
+        // abort if no update is requested
+        if (newParentCardinalityUri == null) {
+            return;
+        }
+        //
+        String parentCardinalityUri = getParentCardinalityUri();
+        if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
+            logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
+                newParentCardinalityUri + "\"");
+            updateParentCardinalityUri(newParentCardinalityUri);
+        }
+    }
+
+    private void updateChildCardinality(String newChildCardinalityUri) {
+        // abort if no update is requested
+        if (newChildCardinalityUri == null) {
+            return;
+        }
+        //
+        String childCardinalityUri = getChildCardinalityUri();
+        if (!childCardinalityUri.equals(newChildCardinalityUri)) {
+            logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
+                newChildCardinalityUri + "\"");
+            updateChildCardinalityUri(newChildCardinalityUri);
+        }
+    }
+
+
+
+    // ====
+
+    private boolean customAssocTypeChange(AssociationDefinitionModel newModel, AssociationDefinitionModel oldModel) {
+        String oldUri = oldModel.getCustomAssocTypeUri();   // null if no assoc type is set
+        String newUri = ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull();  // null if del ref
+        if (newUri != null) {
+            // new value is neither a deletion ref nor null, compare it to old value (which may be null)
+            return !newUri.equals(oldUri);
+        } else {
+            // compare old value to null if new value is a deletion ref or null
+            // ### FIXME: must differentiate "no change requested" (= null) and "remove current assignment" (= del ref)?
+            return oldUri != null;
+        }
+    }
+
     private RelatedTopicModel getCustomAssocType() {
-        RelatedTopicModel customAssocType = getChildTopicsModel().getTopic(
-            "dm4.core.assoc_type#dm4.core.custom_assoc_type", null);
+        RelatedTopicModel customAssocType = getChildTopicsModel().getTopicOrNull(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
         // Note: we can't do this sanity check because a type model would not even deserialize.
         // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
         /* if (customAssocType instanceof TopicDeletionModel) {

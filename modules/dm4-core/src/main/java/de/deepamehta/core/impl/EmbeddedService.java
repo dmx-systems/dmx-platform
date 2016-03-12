@@ -1,24 +1,16 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -26,9 +18,7 @@ import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
-import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import org.osgi.framework.BundleContext;
@@ -103,7 +93,7 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public ResultList<RelatedTopic> getTopics(String topicTypeUri) {
+    public List<Topic> getTopics(String topicTypeUri) {
         return pl.getTopics(topicTypeUri);
     }
 
@@ -125,8 +115,8 @@ public class EmbeddedService implements DeepaMehtaService {
     }
 
     @Override
-    public void updateTopic(TopicModel model) {
-        pl.updateTopic(model);
+    public void updateTopic(TopicModel newModel) {
+        pl.updateTopic(newModel);
     }
 
     @Override
@@ -169,7 +159,7 @@ public class EmbeddedService implements DeepaMehtaService {
     // ---
 
     @Override
-    public ResultList<RelatedAssociation> getAssociations(String assocTypeUri) {
+    public List<Association> getAssociations(String assocTypeUri) {
         return pl.getAssociations(assocTypeUri);
     }
 
@@ -199,12 +189,12 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public Association createAssociation(AssociationModel model) {
-        return pl.createAssociation(model);
+        return pl.createAssociation((AssociationModelImpl) model);
     }
 
     @Override
-    public void updateAssociation(AssociationModel model) {
-        pl.updateAssociation(model);
+    public void updateAssociation(AssociationModel newModel) {
+        pl.updateAssociation(newModel);
     }
 
     @Override
@@ -219,9 +209,10 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getTopicTypeUris() {
         try {
-            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.topic_type")));
+            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
+                new SimpleValue("dm4.core.topic_type")));       // ### TODO: rethink access control    
             ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.topic_type");
+                "dm4.core.instance", "dm4.core.topic_type");    // ### TODO: perform by-value search instead
             List<String> topicTypeUris = new ArrayList();
             // add meta types
             topicTypeUris.add("dm4.core.topic_type");
@@ -261,24 +252,25 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public TopicType createTopicType(TopicTypeModel model) {
-        return pl.createTopicType(model);
+        return pl.createTopicType((TopicTypeModelImpl) model);
     }
 
     @Override
-    public void updateTopicType(TopicTypeModel model) {
+    public void updateTopicType(TopicTypeModel newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String topicTypeUri = getTopic(model.getId()).getUri();
-            getTopicType(topicTypeUri).update(model);
+            // ### FIXME: access control
+            String topicTypeUri = pl.fetchTopic(newModel.getId()).getUri();
+            pl.typeStorage.getTopicType(topicTypeUri).update(newModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + model + ")", e);
+            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
         }
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
         try {
-            getTopicType(topicTypeUri).delete();    // ### TODO: delete view config topics
+            pl.typeStorage.getTopicType(topicTypeUri).delete();     // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         }
@@ -291,9 +283,10 @@ public class EmbeddedService implements DeepaMehtaService {
     @Override
     public List<String> getAssociationTypeUris() {
         try {
-            Topic metaType = pl.instantiateTopic(pl.fetchTopic("uri", new SimpleValue("dm4.core.assoc_type")));
+            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
+                new SimpleValue("dm4.core.assoc_type")));           // ### TODO: rethink access control
             ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.assoc_type");
+                "dm4.core.instance", "dm4.core.assoc_type");        // ### TODO: perform by-value search instead
             List<String> assocTypeUris = new ArrayList();
             for (Topic assocType : assocTypes) {
                 assocTypeUris.add(assocType.getUri());
@@ -327,24 +320,25 @@ public class EmbeddedService implements DeepaMehtaService {
 
     @Override
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        return pl.createAssociationType(model);
+        return pl.createAssociationType((AssociationTypeModelImpl) model);
     }
 
     @Override
-    public void updateAssociationType(AssociationTypeModel model) {
+    public void updateAssociationType(AssociationTypeModel newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            String assocTypeUri = getTopic(model.getId()).getUri();
-            getAssociationType(assocTypeUri).update(model);
+            // ### FIXME: access control
+            String assocTypeUri = pl.fetchTopic(newModel.getId()).getUri();
+            pl.typeStorage.getAssociationType(assocTypeUri).update(newModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + model + ")", e);
+            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
         }
     }
 
     @Override
     public void deleteAssociationType(String assocTypeUri) {
         try {
-            getAssociationType(assocTypeUri).delete();
+            pl.typeStorage.getAssociationType(assocTypeUri).delete();
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }
@@ -477,14 +471,11 @@ public class EmbeddedService implements DeepaMehtaService {
         return pl.beginTx();
     }
 
+    // ---
+
     @Override
     public ModelFactory getModelFactory() {
         return mf;
-    }
-
-    @Override
-    public TypeStorage getTypeStorage() {
-        return pl.typeStorage;
     }
 
     @Override

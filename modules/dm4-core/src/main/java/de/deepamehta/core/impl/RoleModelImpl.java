@@ -1,5 +1,7 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Role;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RoleModel;
 
@@ -11,10 +13,10 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected long playerId;        // id of the player (a topic, or an association)
-    protected String roleTypeUri;   // is never null
+    long playerId;                  // id of the player (a topic, or an association)
+    String roleTypeUri;             // is never null
 
-    protected PersistenceLayer pl;
+    PersistenceLayer pl;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -75,6 +77,10 @@ abstract class RoleModelImpl implements RoleModel {
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    Role instantiate(AssociationModelImpl assoc) {
+        throw new UnsupportedOperationException();
+    }
 
     DeepaMehtaObjectModel getPlayer() {
         throw new UnsupportedOperationException();

@@ -11,6 +11,7 @@ import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -39,8 +40,8 @@ public class Migration8 extends Migration {
     public void run() {
         // Note: at migration running time our plugin listeners are not yet registered. That means
         // access control is not yet in effect. We have full READ/WRITE access to the database.
-        ResultList<RelatedTopic> userAccounts = dms.getTopics("dm4.accesscontrol.user_account");
-        logger.info("########## Converting " + userAccounts.getSize() + " user accounts");
+        List<Topic> userAccounts = dms.getTopics("dm4.accesscontrol.user_account");
+        logger.info("########## Converting " + userAccounts.size() + " user accounts");
         for (Topic userAccount : userAccounts) {
             // compare to AccessControlPlugin.createUserAccount()
             ChildTopics childTopics = userAccount.getChildTopics();

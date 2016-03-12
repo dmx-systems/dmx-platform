@@ -12,32 +12,8 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-module</artifactId>
+        <artifactId>deepamehta-plugin</artifactId>
         <version>4.8-SNAPSHOT</version>
-        <relativePath>../dm4-module/pom.xml</relativePath>
+        <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
-
-    <dependencies>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
-            <version>4.8-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-Activator>
-                            de.deepamehta.plugins.typeeditor.TypeEditorPlugin
-                        </Bundle-Activator>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

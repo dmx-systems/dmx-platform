@@ -4,12 +4,11 @@ import de.deepamehta.plugins.accesscontrol.AccessControlService;
 import de.deepamehta.plugins.config.ConfigService;
 import de.deepamehta.plugins.workspaces.WorkspacesService;
 
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.ResultList;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -68,9 +67,9 @@ public class Migration12 extends Migration {
         // (as the Access Control plugin depends indirectly on the Files plugin).
         //
         // 3) create "Enabled Sharing Modes" config topics
-        ResultList<RelatedTopic> usernames = dms.getTopics("dm4.accesscontrol.username");
+        List<Topic> usernames = dms.getTopics("dm4.accesscontrol.username");
         logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" for " +
-            usernames.getSize() + " usernames");
+            usernames.size() + " usernames");
         for (Topic username : usernames) {
             configService.createConfigTopic("dm4.workspaces.enabled_sharing_modes", username);
         }
@@ -83,8 +82,8 @@ public class Migration12 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void assignConfigTopics(String configTypeUri) {
-        ResultList<RelatedTopic> configTopics = dms.getTopics(configTypeUri);
-        logger.info("########## Reassigning " + configTopics.getSize() + " config topics of type \"" + configTypeUri +
+        List<Topic> configTopics = dms.getTopics(configTypeUri);
+        logger.info("########## Reassigning " + configTopics.size() + " config topics of type \"" + configTypeUri +
             "\" to workspace \"Administration\"");
         for (Topic configTopic : configTopics) {
             wsService.assignToWorkspace(configTopic, administrationWorkspaceId);

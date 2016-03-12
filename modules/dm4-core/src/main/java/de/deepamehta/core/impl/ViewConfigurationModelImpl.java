@@ -1,11 +1,15 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONArray;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -18,19 +22,24 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     /**
      * Key: config topic type URI
      */
-    private Map<String, TopicModel> configTopics;
+    private Map<String, TopicModelImpl> configTopics;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ViewConfigurationModelImpl(Map<String, TopicModel> configTopics) {
+    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics) {
         this.configTopics = configTopics;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public Iterable<TopicModel> getConfigTopics() {
+    public Iterable<TopicModelImpl> getConfigTopics() {
         return configTopics.values();
+    }
+
+    @Override
+    public TopicModelImpl getConfigTopic(String configTypeUri) {
+        return configTopics.get(configTypeUri);
     }
 
     @Override
@@ -41,7 +50,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
             throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
-        configTopics.put(configTypeUri, configTopic);
+        configTopics.put(configTypeUri, (TopicModelImpl) configTopic);
     }
 
     @Override
@@ -70,7 +79,6 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
 
     // ---
 
-    // ### FIXME: drop parameter, implement JSONEnabled
     @Override
     public JSONArray toJSONArray() {
         try {
@@ -87,11 +95,5 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     @Override
     public String toString() {
         return "view configuration " + configTopics;
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private TopicModel getConfigTopic(String configTypeUri) {
-        return configTopics.get(configTypeUri);
     }
 }

@@ -2,12 +2,11 @@ package de.deepamehta.plugins.files.migrations;
 
 import de.deepamehta.plugins.config.ConfigService;
 
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.ResultList;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -34,9 +33,8 @@ public class Migration3 extends Migration {
 
     @Override
     public void run() {
-        ResultList<RelatedTopic> usernames = dms.getTopics("dm4.accesscontrol.username");
-        logger.info("########## Adding \"dm4.files.disk_quota\" config topic to " + usernames.getSize() +
-            " usernames");
+        List<Topic> usernames = dms.getTopics("dm4.accesscontrol.username");
+        logger.info("########## Adding \"dm4.files.disk_quota\" config topic to " + usernames.size() + " usernames");
         for (Topic username : usernames) {
             configService.createConfigTopic("dm4.files.disk_quota", username);
         }

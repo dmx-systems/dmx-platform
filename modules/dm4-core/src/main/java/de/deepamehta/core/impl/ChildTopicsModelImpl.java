@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -17,8 +18,7 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: make package private
-public class ChildTopicsModelImpl implements ChildTopicsModel {
+class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,16 +38,13 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    // ### TODO: make package private
-    public ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
+    ChildTopicsModelImpl(Map<String, Object> childTopics, ModelFactory mf) {
         this.childTopics = childTopics;
         this.mf = mf;
     }
 
-    // ### TODO: make package private
-    public ChildTopicsModelImpl(ChildTopicsModel childTopics) {
-        this.childTopics = ((ChildTopicsModelImpl) childTopics).childTopics;
-        this.mf = ((ChildTopicsModelImpl) childTopics).mf;
+    ChildTopicsModelImpl(ChildTopicsModelImpl childTopics) {
+        this(childTopics.childTopics, childTopics.mf);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -56,13 +53,9 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // === Accessors ===
 
-    /**
-     * Accesses a single-valued child.
-     * Throws if there is no such child.
-     */
     @Override
-    public RelatedTopicModel getTopic(String assocDefUri) {
-        RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
+    public RelatedTopicModelImpl getTopic(String assocDefUri) {
+        RelatedTopicModelImpl topic = getTopicOrNull(assocDefUri);
         // error check
         if (topic == null) {
             throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
@@ -71,48 +64,33 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
         return topic;
     }
 
-    /**
-     * Accesses a single-valued child.
-     * Returns a default value if there is no such child. ### TODO: make it getTopicOrNull(), catch ClassCastException
-     */
     @Override
-    public RelatedTopicModel getTopic(String assocDefUri, RelatedTopicModel defaultValue) {
-        RelatedTopicModel topic = (RelatedTopicModel) get(assocDefUri);
-        return topic != null ? topic : defaultValue;
-    }
-
-    // ---
-
-    /**
-     * Accesses a multiple-valued child.
-     * Throws if there is no such child.
-     */
-    @Override
-    public List<RelatedTopicModel> getTopics(String assocDefUri) {
+    public RelatedTopicModelImpl getTopicOrNull(String assocDefUri) {
         try {
-            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
-            // error check
-            if (topics == null) {
-                throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " +
-                    childTopics.keySet());
-            }
-            //
-            return topics;
+            return (RelatedTopicModelImpl) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
-            throwInvalidMultiAccess(assocDefUri, e);
+            throwInvalidSingleAccess(assocDefUri, e);
             return null;    // never reached
         }
     }
 
-    /**
-     * Accesses a multiple-valued child.
-     * Returns a default value if there is no such child. ### TODO: make it getTopicsOrNull()
-     */
+    // ---
+
     @Override
-    public List<RelatedTopicModel> getTopics(String assocDefUri, List<RelatedTopicModel> defaultValue) {
+    public List<RelatedTopicModelImpl> getTopics(String assocDefUri) {
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
+        // error check
+        if (topics == null) {
+            throw new RuntimeException("Assoc Def URI \"" + assocDefUri + "\" not found in " + childTopics.keySet());
+        }
+        //
+        return topics;
+    }
+
+    @Override
+    public List<RelatedTopicModelImpl> getTopicsOrNull(String assocDefUri) {
         try {
-            List<RelatedTopicModel> topics = (List<RelatedTopicModel>) get(assocDefUri);
-            return topics != null ? topics : defaultValue;
+            return (List<RelatedTopicModelImpl>) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
             throwInvalidMultiAccess(assocDefUri, e);
             return null;    // never reached
@@ -168,7 +146,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public String getString(String assocDefUri, String defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
 
@@ -189,7 +167,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public int getInt(String assocDefUri, int defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
 
@@ -210,7 +188,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public long getLong(String assocDefUri, long defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
 
@@ -231,7 +209,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public double getDouble(String assocDefUri, double defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
 
@@ -252,7 +230,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public boolean getBoolean(String assocDefUri, boolean defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
 
@@ -273,7 +251,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public Object getObject(String assocDefUri, Object defaultValue) {
-        TopicModel topic = getTopic(assocDefUri, null);
+        TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
 
@@ -294,7 +272,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
-        RelatedTopicModel topic = getTopic(assocDefUri, null);
+        RelatedTopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }
 
@@ -424,14 +402,14 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
-        List<RelatedTopicModel> topics = getTopics(assocDefUri, null);      // defaultValue=null
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
         // Note: topics just created have no child topics yet
         if (topics == null) {
             topics = new ArrayList();
             childTopics.put(assocDefUri, topics);
         }
         //
-        topics.add(value);
+        topics.add((RelatedTopicModelImpl) value);
         //
         return this;
     }
@@ -456,7 +434,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
      */
     @Override
     public ChildTopicsModel remove(String assocDefUri, TopicModel value) {
-        List<RelatedTopicModel> topics = getTopics(assocDefUri, null);      // defaultValue=null
+        List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
         if (topics != null) {
             topics.remove(value);
         }
@@ -571,11 +549,78 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
         return childTopics.toString();
     }
 
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
+
+
+    // === Mmemory Access ===
+
+    // --- Read ---
+
+    /**
+     * For multiple-valued childs: looks in the attached object cache for a child topic by ID. ### FIXDOC
+     */
+    RelatedTopicModelImpl findChildTopicById(long childTopicId, AssociationDefinitionModel assocDef) {
+        List<RelatedTopicModelImpl> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
+        if (childTopics != null) {
+            for (RelatedTopicModelImpl childTopic : childTopics) {
+                if (childTopic.getId() == childTopicId) {
+                    return childTopic;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * For multiple-valued childs: looks in the attached object cache for the child topic the given reference refers to.
+     * ### FIXDOC
+     *
+     * @param   assocDef    the child topics according to this association definition are considered.
+     */
+    RelatedTopicModelImpl findChildTopicByRef(TopicReferenceModelImpl topicRef, AssociationDefinitionModel assocDef) {
+        List<? extends RelatedTopicModel> childTopics = getTopicsOrNull(assocDef.getAssocDefUri());
+        if (childTopics != null) {
+            return topicRef.findReferencedTopic(childTopics);
+        }
+        return null;
+    }
+
+    // --- Write Helper ---
+
+    /**
+     * For single-valued childs
+     */
+    void putInChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+        put(assocDef.getAssocDefUri(), childTopic);
+    }
+
+    /**
+     * For single-valued childs
+     */
+    void removeChildTopic(AssociationDefinitionModel assocDef) {
+        remove(assocDef.getAssocDefUri());
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    void addToChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+        add(assocDef.getAssocDefUri(), childTopic);
+    }
+
+    /**
+     * For multiple-valued childs
+     */
+    void removeFromChildTopics(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+        remove(assocDef.getAssocDefUri(), childTopic);
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void throwInvalidSingleAccess(String assocDefUri, ClassCastException e) {
         if (e.getMessage().startsWith("java.util.ArrayList cannot be cast to")) {
             throw new RuntimeException("\"" + assocDefUri + "\" is accessed as single but is defined as multi", e);
         } else {
@@ -583,7 +628,7 @@ public class ChildTopicsModelImpl implements ChildTopicsModel {
         }
     }
 
-    void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
+    private void throwInvalidMultiAccess(String assocDefUri, ClassCastException e) {
         if (e.getMessage().endsWith("cannot be cast to java.util.List")) {
             throw new RuntimeException("\"" + assocDefUri + "\" is accessed as multi but is defined as single", e);
         } else {

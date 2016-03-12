@@ -12,6 +12,8 @@ import java.util.List;
 
 class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueModel {
 
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
     private String childTypeUri;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
@@ -21,12 +23,14 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
         this.childTypeUri = childTypeUri;
     }
 
-    FacetValueModelImpl(ChildTopicsModel childTopics) {
+    FacetValueModelImpl(ChildTopicsModelImpl childTopics) {
         super(childTopics);
         this.childTypeUri = iterator().next();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
+
+
 
     // === Single-valued Facets ===
 
@@ -40,7 +44,7 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     /**
      * Accesses a multiple-valued facet.
      */
-    public List<RelatedTopicModel> getTopics() {
+    public List<? extends RelatedTopicModel> getTopics() {
         return getTopics(childTypeUri);
     }
 
@@ -84,6 +88,8 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     public FacetValueModel putRef(String refTopicUri) {
         return (FacetValueModel) putRef(childTypeUri, refTopicUri);
     }
+
+
 
     // === Multiple-valued Facets ===
 

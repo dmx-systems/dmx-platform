@@ -524,7 +524,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel oldModel) {
+    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
         if (isMembership(assoc.getModel())) {
             if (isMembership(oldModel)) {
                 // ### TODO?

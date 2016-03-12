@@ -1,28 +1,19 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
-import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicRoleModel;
-
-import java.util.logging.Logger;
 
 
 
 /**
- * A topic role that is attached to the {@link DeepaMehtaService}.
+ * A topic role that is attached to the {@link PersistenceLayer}.
  */
 class TopicRoleImpl extends RoleImpl implements TopicRole {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModel model, Association assoc, PersistenceLayer pl) {
+    TopicRoleImpl(TopicRoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
         super(model, assoc, pl);
     }
 
@@ -34,11 +25,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        if (topicIdentifiedByUri()) {
-            return pl.getTopic("uri", new SimpleValue(getTopicUri()));
-        } else {
-            return pl.getTopic(getPlayerId());
-        }
+        return new TopicImpl(getModel().getPlayer(), pl);   // ### TODO: permission check?
     }
 
 
@@ -67,7 +54,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
     // === RoleImpl Overrides ===
 
     @Override
-    public TopicRoleModel getModel() {
-        return (TopicRoleModel) super.getModel();
+    public TopicRoleModelImpl getModel() {
+        return (TopicRoleModelImpl) model;
     }
 }

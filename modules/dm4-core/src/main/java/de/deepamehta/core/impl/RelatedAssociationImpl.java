@@ -2,35 +2,29 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.model.RelatedAssociationModel;
 
 
 
 /**
- * An Association-Association pair that is attached to the {@link DeepaMehtaService}.
+ * An Association-Association pair that is attached to the {@link PersistenceLayer}.
  */
 class RelatedAssociationImpl extends AssociationImpl implements RelatedAssociation {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private Association relatingAssoc;      // Attached object cache
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationImpl(RelatedAssociationModel model, PersistenceLayer pl) {
+    RelatedAssociationImpl(RelatedAssociationModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        this.relatingAssoc = new AssociationImpl(model.getRelatingAssociation(), pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public Association getRelatingAssociation() {
-        return relatingAssoc;
+        return getModel().getRelatingAssociation().instantiate();
     }
 
     @Override
     public RelatedAssociationModelImpl getModel() {
-        return (RelatedAssociationModelImpl) super.getModel();
+        return (RelatedAssociationModelImpl) model;
     }
 }

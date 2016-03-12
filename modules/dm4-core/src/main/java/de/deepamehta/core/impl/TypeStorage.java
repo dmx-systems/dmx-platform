@@ -26,7 +26,6 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.service.TypeStorage;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
@@ -42,7 +41,7 @@ import java.util.logging.Logger;
 /**
  * Storage-impl agnostic support for fetching/storing type models.
  */
-class TypeStorageImpl implements TypeStorage {
+class TypeStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -52,17 +51,18 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // ### TODO: check if we can drop the type model cache if we attach *before* storing a type
-    private Map<String, TypeModel> typeCache = new HashMap();   // type model cache
+    private Map<String, TypeModelImpl> typeCache = new HashMap();   // type model cache
+
+    private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
     private PersistenceLayer pl;
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeStorageImpl(PersistenceLayer pl) {
+    TypeStorage(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
     }
@@ -73,39 +73,33 @@ class TypeStorageImpl implements TypeStorage {
 
     // === Type Model Cache ===
 
-    TopicTypeModel getTopicType(String topicTypeUri) {
-        TopicTypeModel topicType = (TopicTypeModel) getType(topicTypeUri);
-        if (topicType == null) {
-            // logger.info("##################### Loading topic type \"" + topicTypeUri + "\"");
-            topicType = fetchTopicType(topicTypeUri);
-            putInTypeCache(topicType);
-        }
-        return topicType;
+    TopicTypeModelImpl getTopicType(String topicTypeUri) {
+        TopicTypeModelImpl topicType = (TopicTypeModelImpl) getType(topicTypeUri);
+        return topicType != null ? topicType : fetchTopicType(topicTypeUri);
     }
 
-    AssociationTypeModel getAssociationType(String assocTypeUri) {
-        AssociationTypeModel assocType = (AssociationTypeModel) getType(assocTypeUri);
-        if (assocType == null) {
-            // logger.info("##################### Loading association type \"" + assocTypeUri + "\"");
-            assocType = fetchAssociationType(assocTypeUri);
-            putInTypeCache(assocType);
-        }
-        return assocType;
+    AssociationTypeModelImpl getAssociationType(String assocTypeUri) {
+        AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getType(assocTypeUri);
+        return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
     }
 
     // ---
 
-    void putInTypeCache(TypeModel type) {
-        typeCache.put(type.getUri(), type);
+    void putInTypeCache(TypeModelImpl type) {
+        typeCache.put(type.uri, type);
     }
 
     void removeFromTypeCache(String typeUri) {
-        typeCache.remove(typeUri);
+        logger.info("### Removing type \"" + typeUri + "\" from type cache");
+        if (typeCache.remove(typeUri) == null) {
+            throw new RuntimeException("Type \"" + typeUri + "\" not found in type cache");
+        }
     }
 
     // ---
 
-    private TypeModel getType(String typeUri) {
+    // ### FIXME: make private
+    TypeModelImpl getType(String typeUri) {
         return typeCache.get(typeUri);
     }
 
@@ -115,34 +109,60 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    // ### TODO: unify with next method
-    private TopicTypeModel fetchTopicType(String topicTypeUri) {
-        TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
-        checkTopicType(topicTypeUri, typeTopic);
-        //
-        // fetch type components
-        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
-        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-        List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
-        //
-        return mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+    private TopicTypeModelImpl fetchTopicType(String topicTypeUri) {
+        try {
+            logger.info("Fetching topic type \"" + topicTypeUri + "\"");
+            endlessRecursionDetection.check(topicTypeUri);
+            //
+            // fetch generic topic
+            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
+            checkTopicType(topicTypeUri, typeTopic);
+            //
+            // fetch type-specific parts
+            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
+            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<String> labelConfig = fetchLabelConfig(assocDefs);
+            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
+            //
+            // create and cache type model
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, labelConfig, viewConfig);
+            putInTypeCache(topicType);
+            return topicType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic type \"" + topicTypeUri + "\" failed", e);
+        } finally {
+            endlessRecursionDetection.reset(topicTypeUri);
+        }
     }
 
-    // ### TODO: unify with previous method
-    private AssociationTypeModel fetchAssociationType(String assocTypeUri) {
-        TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
-        checkAssociationType(assocTypeUri, typeTopic);
-        //
-        // fetch type components
-        String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
-        List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
-        List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-        List<String> labelConfig = fetchLabelConfig(assocDefs);
-        ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
-        //
-        return mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig, viewConfig);
+    private AssociationTypeModelImpl fetchAssociationType(String assocTypeUri) {
+        try {
+            logger.info("Fetching association type \"" + assocTypeUri + "\"");
+            endlessRecursionDetection.check(assocTypeUri);
+            //
+            // fetch generic topic
+            TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
+            checkAssociationType(assocTypeUri, typeTopic);
+            //
+            // fetch type-specific parts
+            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
+            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
+            List<String> labelConfig = fetchLabelConfig(assocDefs);
+            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
+            //
+            // create and cache type model
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, labelConfig, viewConfig);
+            putInTypeCache(assocType);
+            return assocType;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching association type \"" + assocTypeUri + "\" failed", e);
+        } finally {
+            endlessRecursionDetection.reset(assocTypeUri);
+        }
     }
 
     // ---
@@ -175,7 +195,7 @@ class TypeStorageImpl implements TypeStorage {
      * <p>
      * Called to store a newly created topic type or association type.
      */
-    void storeType(TypeModel type) {
+    void storeType(TypeModelImpl type) {
         // 1) put in type model cache
         // Note: an association type must be put in type model cache *before* storing its association definitions.
         // Consider creation of association type "Composition Definition": it has a composition definition itself.
@@ -186,7 +206,7 @@ class TypeStorageImpl implements TypeStorage {
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
-        storeViewConfig(createConfigurableType(type.getId()), type.getViewConfigModel());
+        storeViewConfig(newTypeRole(type.getId()), type.getViewConfigModel());
     }
 
 
@@ -231,7 +251,7 @@ class TypeStorageImpl implements TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        ResultList<RelatedTopicModel> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
+        ResultList<? extends RelatedTopicModel> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
         return IndexMode.fromTopics(indexModes.getItems());
     }
@@ -257,7 +277,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // Note: if the underlying association was an association definition before it has cardinality
     // assignments already. These assignments are restored. Otherwise "One" is used as default.
-    private String defaultCardinalityUri(Association assoc, String cardinalityRoleTypeUri) {
+    private String defaultCardinalityUri(AssociationModel assoc, String cardinalityRoleTypeUri) {
         RelatedTopicModel cardinality = fetchCardinality(assoc.getId(), cardinalityRoleTypeUri);
         if (cardinality != null) {
             return cardinality.getUri();
@@ -270,7 +290,7 @@ class TypeStorageImpl implements TypeStorage {
 
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
         Map<Long, AssociationDefinitionModel> assocDefs = fetchAssociationDefinitionsUnsorted(typeTopic);
-        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
+        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         // error check
         if (assocDefs.size() != sequence.size()) {
             throw new RuntimeException("DB inconsistency: type \"" + typeTopic.getUri() + "\" has " +
@@ -290,7 +310,7 @@ class TypeStorageImpl implements TypeStorage {
         // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dm4.core.topic_type"
         // and "dm4.core.meta_type" (the latter is required e.g. by dm4-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        ResultList<RelatedTopicModel> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
+        ResultList<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
             "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null);
             // othersTopicTypeUri=null
         //
@@ -313,11 +333,11 @@ class TypeStorageImpl implements TypeStorage {
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
-    AssociationDefinitionModel createAssociationDefinition(Association assoc) {
+    AssociationDefinitionModel newAssociationDefinition(AssociationModel assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel model = mf.newAssociationModel(assoc.getModel());
-        String parentTypeUri = fetchParentType(assoc).getUri();
-        String childTypeUri = fetchChildType(assoc).getUri();
+        AssociationModel model = mf.newAssociationModel(assoc);
+        String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
+        String childTypeUri = fetchChildTypeTopic(assoc).getUri();
         prepareAssocModel(model, parentTypeUri, childTypeUri);
         return mf.newAssociationDefinitionModel(model,
             defaultCardinalityUri(assoc, PARENT_CARDINALITY),
@@ -391,7 +411,7 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Store ---
 
-    private void storeAssocDefs(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeAssocDefs(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             storeAssociationDefinition(assocDef);
         }
@@ -406,7 +426,7 @@ class TypeStorageImpl implements TypeStorage {
             // Note: if the association definition has been created interactively the underlying association
             // exists already. We must not create it again. We detect this case by inspecting the ID.
             if (assocDefId == -1) {
-                assocDefId = pl.createAssociation(assocDef).getId();
+                assocDefId = pl.createAssociation((AssociationDefinitionModelImpl) assocDef).getId();
             }
             //
             // 2) cardinality
@@ -418,7 +438,7 @@ class TypeStorageImpl implements TypeStorage {
             associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
-            storeViewConfig(createConfigurableAssocDef(assocDefId), assocDef.getViewConfigModel());
+            storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
             throw new RuntimeException("Storing association definition \"" + assocDef.getAssocDefUri() +
                 "\" of type \"" + assocDef.getParentTypeUri() + "\" failed", e);
@@ -431,27 +451,51 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    @Override
-    public TopicModel fetchParentType(Association assoc) {
-        Topic parentType = assoc.getTopic("dm4.core.parent_type");
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the parent type topic.
+     *          A topic representing either a topic type or an association type.
+     */
+    private TopicModel fetchParentTypeTopic(AssociationModel assoc) {
+        TopicModel parentType = ((AssociationModelImpl) assoc).getTopic("dm4.core.parent_type");
         // error check
         if (parentType == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.parent_type " +
-                "is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.parent_type\" is missing in " + assoc);
         }
         //
-        return parentType.getModel();
+        return parentType;
     }
 
-    private TopicModel fetchChildType(Association assoc) {
-        Topic childType = assoc.getTopic("dm4.core.child_type");
+    /**
+     * @param   assoc   an association representing an association definition
+     *
+     * @return  the child type topic.
+     *          A topic representing a topic type.
+     */
+    private TopicModel fetchChildTypeTopic(AssociationModel assoc) {
+        TopicModel childType = ((AssociationModelImpl) assoc).getTopic("dm4.core.child_type");
         // error check
         if (childType == null) {
-            throw new RuntimeException("Invalid association definition: topic role dm4.core.child_type " +
-                "is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.child_type\" is missing in " + assoc);
         }
         //
-        return childType.getModel();
+        return childType;
+    }
+
+    // ---
+
+    TypeModelImpl fetchParentType(AssociationModel assoc) {
+        TopicModel type = fetchParentTypeTopic(assoc);
+        String typeUri = type.getTypeUri();
+        if (typeUri.equals("dm4.core.topic_type")) {
+            return getTopicType(type.getUri());
+        } else if (typeUri.equals("dm4.core.assoc_type")) {
+            return getAssociationType(type.getUri());
+        } else {
+            throw new RuntimeException("DB inconsistency: the \"dm4.core.parent_type\" player is not a type " +
+                "but of type \"" + typeUri + "\" in " + assoc);
+        }
     }
 
 
@@ -460,17 +504,17 @@ class TypeStorageImpl implements TypeStorage {
 
     // --- Fetch ---
 
-    private RelatedTopicModel fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
+    private RelatedTopicModelImpl fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation", "dm4.core.assoc_def",
             cardinalityRoleTypeUri, "dm4.core.cardinality");
     }
 
-    private RelatedTopicModel fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+    private RelatedTopicModelImpl fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
+        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         // error check
         if (cardinality == null) {
-            throw new RuntimeException("Invalid association definition: cardinality is missing (assocDefId=" +
-                assocDefId + ", cardinalityRoleTypeUri=\"" + cardinalityRoleTypeUri + "\")");
+            throw new RuntimeException("DB inconsistency: association definition " + assocDefId +
+                " is missing a cardinality (\"" + cardinalityRoleTypeUri + "\")");
         }
         //
         return cardinality;
@@ -490,21 +534,21 @@ class TypeStorageImpl implements TypeStorage {
 
     private void storeCardinalityUri(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
         // remove current assignment
-        RelatedTopicModel cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
+        RelatedTopicModelImpl cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
         removeCardinalityAssignment(cardinality);
         // create new assignment
         associateCardinality(assocDefId, cardinalityRoleTypeUri, cardinalityUri);
     }
 
     private void removeCardinalityAssignmentIfExists(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModel cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         if (cardinality != null) {
             removeCardinalityAssignment(cardinality);
         }
     }
 
-    private void removeCardinalityAssignment(RelatedTopicModel cardinalityAssignment) {
-        pl.deleteObject((DeepaMehtaObjectModelImpl) cardinalityAssignment.getRelatingAssociation());
+    private void removeCardinalityAssignment(RelatedTopicModelImpl cardinalityAssignment) {
+        cardinalityAssignment.getRelatingAssociation().delete();
     }
 
     private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
@@ -524,11 +568,11 @@ class TypeStorageImpl implements TypeStorage {
     // 1) When fetching a type's association definitions.
     //    In this situation we don't have a Type object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
-    private List<RelatedAssociationModel> fetchSequence(TopicModel typeTopic) {
+    private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {
         try {
-            List<RelatedAssociationModel> sequence = new ArrayList();
+            List<RelatedAssociationModelImpl> sequence = new ArrayList();
             //
-            RelatedAssociationModel assocDef = fetchSequenceStart(typeTopic.getId());
+            RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeTopic.getId());
             if (assocDef != null) {
                 sequence.add(assocDef);
                 while ((assocDef = fetchSuccessor(assocDef.getId())) != null) {
@@ -544,24 +588,24 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    private RelatedAssociationModel fetchSequenceStart(long typeId) {
+    private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
         return pl.fetchTopicRelatedAssociation(typeId, "dm4.core.aggregation", "dm4.core.type",
             "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
     }
 
-    private RelatedAssociationModel fetchSuccessor(long assocDefId) {
+    private RelatedAssociationModelImpl fetchSuccessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.predecessor",
             "dm4.core.successor", null);        // othersAssocTypeUri=null
     }
 
-    private RelatedAssociationModel fetchPredecessor(long assocDefId) {
+    private RelatedAssociationModelImpl fetchPredecessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.successor",
             "dm4.core.predecessor", null);      // othersAssocTypeUri=null
     }
 
     // --- Store ---
 
-    private void storeSequence(long typeId, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeSequence(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
         long predAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : assocDefs) {
@@ -605,8 +649,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private void insertAtSequenceStart(long typeId, long assocDefId) {
         // delete sequence start
-        RelatedAssociationModel assocDef = fetchSequenceStart(typeId);
-        pl.deleteObject((DeepaMehtaObjectModelImpl) assocDef.getRelatingAssociation());
+        RelatedAssociationModelImpl assocDef = fetchSequenceStart(typeId);
+        assocDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceStart(typeId, assocDefId);
         storeSequenceSegment(assocDefId, assocDef.getId());
@@ -614,8 +658,8 @@ class TypeStorageImpl implements TypeStorage {
 
     private void insertIntoSequence(long assocDefId, long beforeAssocDefId) {
         // delete sequence segment
-        RelatedAssociationModel assocDef = fetchPredecessor(beforeAssocDefId);
-        pl.deleteObject((DeepaMehtaObjectModelImpl) assocDef.getRelatingAssociation());
+        RelatedAssociationModelImpl assocDef = fetchPredecessor(beforeAssocDefId);
+        assocDef.getRelatingAssociation().delete();
         // reconnect
         storeSequenceSegment(assocDef.getId(), assocDefId);
         storeSequenceSegment(assocDefId, beforeAssocDefId);
@@ -645,10 +689,10 @@ class TypeStorageImpl implements TypeStorage {
     }
 
     private void deleteSequence(TopicModel typeTopic) {
-        List<RelatedAssociationModel> sequence = fetchSequence(typeTopic);
+        List<RelatedAssociationModelImpl> sequence = fetchSequence(typeTopic);
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
-        for (RelatedAssociationModel assoc : sequence) {
-            pl.deleteObject((DeepaMehtaObjectModelImpl) assoc.getRelatingAssociation());
+        for (RelatedAssociationModelImpl assoc : sequence) {
+            assoc.getRelatingAssociation().delete();
         }
     }
 
@@ -675,7 +719,8 @@ class TypeStorageImpl implements TypeStorage {
     /**
      * Stores the label configuration of a <i>newly created</i> type.
      */
-    private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    private void storeLabelConfig(List<String> labelConfig,
+                                  Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
             // Note: we don't do the storage in a type-driven fashion here (as in new AssociationDefinitionImpl(
@@ -695,7 +740,7 @@ class TypeStorageImpl implements TypeStorage {
     /**
      * Updates the label configuration of an <i>existing</i> type.
      */
-    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModel> assocDefs) {
+    void updateLabelConfig(List<String> labelConfig, Collection<? extends AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             // Note: the Type Editor plugin must not react
             TopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());
@@ -752,11 +797,10 @@ class TypeStorageImpl implements TypeStorage {
         }
     }
 
-    Topic storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
-        Topic topic = pl.createTopic(configTopic);
-        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(topic.getId(),
+    void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
+        pl.createTopic(configTopic);
+        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(configTopic.getId(),
             "dm4.core.view_config"));
-        return topic;
     }
 
     // --- Helper ---
@@ -769,11 +813,31 @@ class TypeStorageImpl implements TypeStorage {
 
     // ---
 
-    RoleModel createConfigurableType(long typeId) {
+    RoleModel newTypeRole(long typeId) {
         return mf.newTopicRoleModel(typeId, "dm4.core.type");
     }
 
-    RoleModel createConfigurableAssocDef(long assocDefId) {
+    RoleModel newAssocDefRole(long assocDefId) {
         return mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def");
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private static final class EndlessRecursionDetection {
+
+        private Map<String, Boolean> loadInProgress = new HashMap();
+
+        private void check(String typeUri) {
+            if (loadInProgress.get(typeUri) != null) {
+                throw new RuntimeException("Endless recursion detected while loading type \"" + typeUri + "\"");
+            }
+            loadInProgress.put(typeUri, true);
+        }
+
+        private void reset(String typeUri) {
+            loadInProgress.remove(typeUri);
+        }
     }
 }

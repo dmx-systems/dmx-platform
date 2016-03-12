@@ -51,9 +51,11 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     // ---
 
     DeepaMehtaObject loadChildTopics();
-    DeepaMehtaObject loadChildTopics(String childTypeUri);
+    DeepaMehtaObject loadChildTopics(String assocDefUri);
 
     // ---
+
+    Type getType();
 
     DeepaMehtaObjectModel getModel();
 
@@ -66,7 +68,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     // ---
 
     void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef);
-    void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef);
+    void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef);
 
 
 

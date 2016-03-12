@@ -33,8 +33,8 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
 
         function open_choose_icon_dialog() {
             // retrieve icon topics
-            var icon_topics = dm4c.restc.get_topics("dm4.webclient.icon", false, true).items    // include_childs=false
-            //                                                                                  // sort=true
+            var icon_topics = dm4c.restc.get_topics("dm4.webclient.icon", false, true)  // include_childs=false,
+            //                                                                          // sort=true
             var content = $()
             for (var i = 0, icon_topic; icon_topic = icon_topics[i]; i++) {
                 content = content.add(dm4c.render.icon(icon_topic.value, icon_topic.value)

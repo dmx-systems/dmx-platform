@@ -16,7 +16,7 @@ class TopicViewModelImpl extends TopicModelImpl implements TopicViewModel {
 
     // --- Constructors ---
 
-    TopicViewModelImpl(TopicModel topic, ViewProperties viewProps) {
+    TopicViewModelImpl(TopicModelImpl topic, ViewProperties viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }

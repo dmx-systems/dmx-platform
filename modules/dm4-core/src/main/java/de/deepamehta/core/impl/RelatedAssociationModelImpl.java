@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 
@@ -9,11 +10,11 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel relatingAssoc;
+    private AssociationModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedAssociationModelImpl(AssociationModel assoc, AssociationModel relatingAssoc) {
+    RelatedAssociationModelImpl(AssociationModelImpl assoc, AssociationModelImpl relatingAssoc) {
         super(assoc);
         this.relatingAssoc = relatingAssoc;
     }
@@ -21,7 +22,7 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModel getRelatingAssociation() {
+    public AssociationModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 
@@ -30,5 +31,19 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
     @Override
     public String toString() {
         return super.toString() + ", relating " + relatingAssoc;
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    String className() {
+        return "related association";
+    }
+
+    @Override
+    RelatedAssociation instantiate() {
+        return new RelatedAssociationImpl(this, pl);
     }
 }

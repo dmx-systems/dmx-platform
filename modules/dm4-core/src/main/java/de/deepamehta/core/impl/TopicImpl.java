@@ -30,28 +30,11 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicImpl(TopicModel model, PersistenceLayer pl) {
+    TopicImpl(TopicModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // **************************************
-    // *** DeepaMehtaObjectImpl Overrides ***
-    // **************************************
-
-
-
-    // === Updating ===
-
-    @Override
-    public void update(TopicModel model) {
-        _update(model);
-        //
-        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, this);
-    }
 
 
 
@@ -62,20 +45,34 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
     @Override
-    public Topic loadChildTopics() {
-        return (Topic) super.loadChildTopics();
-    }
-
-    @Override
-    public Topic loadChildTopics(String childTypeUri) {
-        return (Topic) super.loadChildTopics(childTypeUri);
+    public void update(TopicModel newModel) {
+        model.update(newModel);
     }
 
     // ---
 
     @Override
+    public Topic loadChildTopics() {
+        model.loadChildTopics();
+        return this;
+    }
+
+    @Override
+    public Topic loadChildTopics(String assocDefUri) {
+        model.loadChildTopics(assocDefUri);
+        return this;
+    }
+
+    // ---
+
+    @Override
+    public TopicType getType() {
+        return pl.getTopicType(getTypeUri());
+    }
+
+    @Override
     public TopicModelImpl getModel() {
-        return (TopicModelImpl) super.getModel();
+        return (TopicModelImpl) model;
     }
 
 
@@ -88,14 +85,16 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // === Traversal ===
 
+    // ### TODO: move logic to model
+
     // --- Topic Retrieval ---
 
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                             String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris,
+        ResultList<RelatedTopicModelImpl> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris,
             myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return pl.instantiateRelatedTopics(topics);
+        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
     }
 
     // --- Association Retrieval ---
@@ -103,32 +102,32 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                             String othersAssocTypeUri) {
-        RelatedAssociationModel assoc = pl.fetchTopicRelatedAssociation(getId(),
+        RelatedAssociationModelImpl assoc = pl.fetchTopicRelatedAssociation(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? pl.instantiateRelatedAssociation(assoc) : null;
+        return assoc != null ? pl.<RelatedAssociation>checkReadAccessAndInstantiate(assoc) : null;
     }
 
     @Override
     public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModel> assocs = pl.fetchTopicRelatedAssociations(getId(),
+        ResultList<RelatedAssociationModelImpl> assocs = pl.fetchTopicRelatedAssociations(getId(),
             assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return pl.instantiateRelatedAssociations(assocs);
+        return new ResultList(pl.checkReadAccessAndInstantiate(assocs));
     }
 
     // ---
 
     @Override
     public Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   long othersTopicId) {
-        AssociationModel assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId,
-            myRoleTypeUri, othersRoleTypeUri);
-        return assoc != null ? pl.instantiateAssociation(assoc) : null;
+                                                                                 long othersTopicId) {
+        AssociationModelImpl assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
+            othersRoleTypeUri);
+        return assoc != null ? pl.<Association>checkReadAccessAndInstantiate(assoc) : null;
     }
 
     @Override
     public List<Association> getAssociations() {
-        return pl.instantiateAssociations(pl.fetchTopicAssociations(getId()));
+        return pl.checkReadAccessAndInstantiate(pl.fetchTopicAssociations(getId()));
     }
 
 
@@ -143,98 +142,5 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public void removeProperty(String propUri) {
         pl.removeTopicProperty(getId(), propUri);
-    }
-
-
-
-    // ----------------------------------------------------------------------------------------- Package Private Methods
-
-    /**
-     * Low-level update method which does not fire the POST_UPDATE_TOPIC_REQUEST event.
-     * <p>
-     * Called multiple times while updating the child topics (see ChildTopicsImpl).
-     * POST_UPDATE_TOPIC_REQUEST on the other hand must be fired only once (per update request).
-     */
-    void _update(TopicModel model) {
-        logger.info("Updating topic " + getId() + " (typeUri=\"" + getTypeUri() + "\")");
-        //
-        pl.em.fireEvent(CoreEvent.PRE_UPDATE_TOPIC, this, model);
-        //
-        TopicModel oldModel = getModel().clone();
-        super.update(model);
-        //
-        pl.em.fireEvent(CoreEvent.POST_UPDATE_TOPIC, this, model, oldModel);
-    }
-
-
-
-    // === Implementation of the abstract methods ===
-
-    @Override
-    String className() {
-        return "topic";
-    }
-
-    @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newTopicModel(childTopics));
-    }
-
-    @Override
-    Directive getUpdateDirective() {
-        return Directive.UPDATE_TOPIC;
-    }
-
-    @Override
-    final void storeTypeUri() {
-        reassignInstantiation();
-        pl.storeTopicTypeUri(getId(), getTypeUri());
-    }
-
-    // ---
-
-    @Override
-    final RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                              String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopic(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-    }
-
-    @Override
-    final ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopics(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-    }
-
-    // ---
-
-    @Override
-    TopicType getType() {
-        return pl.getTopicType(getTypeUri());
-    }
-
-
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void reassignInstantiation() {
-        // remove current assignment
-        fetchInstantiation().delete();
-        // create new assignment
-        pl.createTopicInstantiation(getId(), getTypeUri());
-    }
-
-    // Note: this method works only for instances, not for types.
-    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
-    private Association fetchInstantiation() {
-        RelatedTopic topicType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance", "dm4.core.type",
-            "dm4.core.topic_type");
-        //
-        if (topicType == null) {
-            throw new RuntimeException("Topic " + getId() + " is not associated to a topic type");
-        }
-        //
-        return topicType.getRelatingAssociation();
     }
 }

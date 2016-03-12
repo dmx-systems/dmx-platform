@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Role;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.RoleModel;
@@ -34,10 +35,9 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject o = new JSONObject();
-            o.put("assoc_id", playerId);
-            o.put("role_type_uri", roleTypeUri);
-            return o;
+            return new JSONObject()
+                .put("assoc_id", playerId)
+                .put("role_type_uri", roleTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -55,7 +55,12 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override
-    AssociationModel getPlayer() {
+    Role instantiate(AssociationModelImpl assoc) {
+        return new AssociationRoleImpl(this, assoc, pl);
+    }
+
+    @Override
+    AssociationModelImpl getPlayer() {
         return pl.fetchAssociation(playerId);
     }
 }

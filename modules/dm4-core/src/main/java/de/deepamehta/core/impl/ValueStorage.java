@@ -1,18 +1,16 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
-import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.ResultList;
-import de.deepamehta.core.util.JavaUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -51,7 +49,7 @@ class ValueStorage {
      * overhead in others (e.g. when updating composite structures).
      */
     void fetchChildTopics(DeepaMehtaObjectModel parent) {
-        for (AssociationDefinitionModel assocDef : getType(parent).getAssocDefs()) {
+        for (AssociationDefinitionModel assocDef : ((DeepaMehtaObjectModelImpl) parent).getType().getAssocDefs()) {
             fetchChildTopics(parent, assocDef);
         }
     }
@@ -99,39 +97,14 @@ class ValueStorage {
      * <p>
      * Called to store the initial value of a newly created topic/association.
      */
-    void storeValue(DeepaMehtaObjectModel model) {
-        if (getType(model).getDataTypeUri().equals("dm4.core.composite")) {
+    void storeValue(DeepaMehtaObjectModelImpl model) {
+        if (model.getType().getDataTypeUri().equals("dm4.core.composite")) {
             storeChildTopics(model);
             recalculateLabel(model);
         } else {
-            storeSimpleValue(model);
+            model.storeSimpleValue();
         }
     }
-
-    /**
-     * Indexes the simple value of the given object model according to the given index mode.
-     * <p>
-     * Called to index existing topics/associations once an index mode has been added to a type definition.
-     */
-    void indexSimpleValue(DeepaMehtaObjectModel model, IndexMode indexMode) {
-        if (model instanceof TopicModel) {
-            pl.indexTopicValue(
-                model.getId(),
-                indexMode,
-                model.getTypeUri(),
-                getIndexValue(model)
-            );
-        } else if (model instanceof AssociationModel) {
-            pl.indexAssociationValue(
-                model.getId(),
-                indexMode,
-                model.getTypeUri(),
-                getIndexValue(model)
-            );
-        }
-    }
-
-    // ---
 
     /**
      * Recalculates the label of the given parent object model and updates it in-place.
@@ -140,56 +113,17 @@ class ValueStorage {
      *
      * @param   parent  The object model the label is calculated for. This is expected to be a composite model.
      */
-    void recalculateLabel(DeepaMehtaObjectModel parent) {
+    void recalculateLabel(DeepaMehtaObjectModelImpl parent) {
         try {
             String label = calculateLabel(parent);
-            setSimpleValue(parent, new SimpleValue(label));
+            parent.updateSimpleValue(new SimpleValue(label));
         } catch (Exception e) {
             throw new RuntimeException("Recalculating label of object " + parent.getId() + " failed (" + parent + ")",
                 e);
         }
     }
 
-    void setSimpleValue(DeepaMehtaObjectModel model, SimpleValue value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
-        }
-        // update memory
-        model.setSimpleValue(value);
-        // update DB
-        storeSimpleValue(model);
-    }
-
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    /**
-     * Stores and indexes the simple value of the specified topic or association model.
-     * Determines the index key and index modes.
-     */
-    private void storeSimpleValue(DeepaMehtaObjectModel model) {
-        TypeModel type = getType(model);
-        if (model instanceof TopicModel) {
-            pl.storeTopicValue(
-                model.getId(),
-                model.getSimpleValue(),
-                type.getIndexModes(),
-                type.getUri(),
-                getIndexValue(model)
-            );
-        } else if (model instanceof AssociationModel) {
-            pl.storeAssociationValue(
-                model.getId(),
-                model.getSimpleValue(),
-                type.getIndexModes(),
-                type.getUri(),
-                getIndexValue(model)
-            );
-        }
-    }
-
-    // ---
 
     /**
      * Stores the composite value (child topics) of the specified topic or association model.
@@ -198,20 +132,20 @@ class ValueStorage {
      * Note: the given model can contain childs not defined in the type definition.
      * Only the childs defined in the type definition are stored.
      */
-    private void storeChildTopics(DeepaMehtaObjectModel parent) {
+    private void storeChildTopics(DeepaMehtaObjectModelImpl parent) {
         ChildTopicsModel model = null;
         try {
             model = parent.getChildTopicsModel();
-            for (AssociationDefinitionModel assocDef : getType(parent).getAssocDefs()) {
+            for (AssociationDefinitionModel assocDef : parent.getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    RelatedTopicModel childTopic = model.getTopic(assocDefUri, null);          // defaultValue=null
+                    RelatedTopicModel childTopic = model.getTopicOrNull(assocDefUri);
                     if (childTopic != null) {   // skip if not contained in create request
                         storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<RelatedTopicModel> childTopics = model.getTopics(assocDefUri, null);  // defaultValue=null
+                    List<? extends RelatedTopicModel> childTopics = model.getTopicsOrNull(assocDefUri);
                     if (childTopics != null) {  // skip if not contained in create request
                         for (RelatedTopicModel childTopic : childTopics) {
                             storeChildTopic(childTopic, parent, assocDef);
@@ -274,15 +208,15 @@ class ValueStorage {
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());
         assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
         assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
-        pl.createAssociation(assoc);
+        pl.createAssociation((AssociationModelImpl) assoc);
     }
 
 
 
     // === Label ===
 
-    private String calculateLabel(DeepaMehtaObjectModel model) {
-        TypeModel type = getType(model);
+    private String calculateLabel(DeepaMehtaObjectModelImpl model) {
+        TypeModel type = model.getType();
         if (type.getDataTypeUri().equals("dm4.core.composite")) {
             StringBuilder label = new StringBuilder();
             for (String assocDefUri : getLabelAssocDefUris(model)) {
@@ -298,13 +232,13 @@ class ValueStorage {
      * Prerequisite: parent is a composite model.
      */
     List<String> getLabelAssocDefUris(DeepaMehtaObjectModel parent) {
-        TypeModel type = getType(parent);
+        TypeModel type = ((DeepaMehtaObjectModelImpl) parent).getType();
         List<String> labelConfig = type.getLabelConfig();
         if (labelConfig.size() > 0) {
             return labelConfig;
         } else {
             List<String> assocDefUris = new ArrayList();
-            Iterator<AssociationDefinitionModel> i = type.getAssocDefs().iterator();
+            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
             // Note: types just created might have no child types yet
             if (i.hasNext()) {
                 assocDefUris.add(i.next().getAssocDefUri());
@@ -321,12 +255,12 @@ class ValueStorage {
         }
         //
         if (value instanceof TopicModel) {
-            TopicModel childTopic = (TopicModel) value;
-            return calculateLabel(childTopic);                                          // recursion
+            TopicModelImpl childTopic = (TopicModelImpl) value;
+            return calculateLabel(childTopic);                                                          // recursion
         } else if (value instanceof List) {
             StringBuilder label = new StringBuilder();
             for (TopicModel childTopic : (List<TopicModel>) value) {
-                appendLabel(calculateLabel(childTopic), label, LABEL_TOPIC_SEPARATOR);  // recursion
+                appendLabel(calculateLabel((TopicModelImpl) childTopic), label, LABEL_TOPIC_SEPARATOR); // recursion
             }
             return label.toString();
         } else {
@@ -359,41 +293,12 @@ class ValueStorage {
         );
     }
 
-    private ResultList<RelatedTopicModel> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
+    private ResultList<RelatedTopicModelImpl> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
         return pl.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),
             "dm4.core.parent", "dm4.core.child",
             assocDef.getChildTypeUri()
         );
-    }
-
-    // ---
-
-    /**
-     * Calculates the simple value that is to be indexed for this object.
-     *
-     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
-     */
-    private SimpleValue getIndexValue(DeepaMehtaObjectModel model) {
-        SimpleValue value = model.getSimpleValue();
-        if (getType(model).getDataTypeUri().equals("dm4.core.html")) {
-            return new SimpleValue(JavaUtils.stripHTML(value.toString()));
-        } else {
-            return value;
-        }
-    }
-
-    /**
-     * Returns the type model of a DeepaMehta object model.
-     * The type is obtained from the type storage.
-     */
-    private TypeModel getType(DeepaMehtaObjectModel model) {
-        if (model instanceof TopicModel) {
-            return pl.typeStorage.getTopicType(model.getTypeUri());
-        } else if (model instanceof AssociationModel) {
-            return pl.typeStorage.getAssociationType(model.getTypeUri());
-        }
-        throw new RuntimeException("Unexpected model: " + model);
     }
 }

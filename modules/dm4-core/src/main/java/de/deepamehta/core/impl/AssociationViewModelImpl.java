@@ -9,7 +9,7 @@ class AssociationViewModelImpl extends AssociationModelImpl implements Associati
 
     // --- Constructors ---
 
-    AssociationViewModelImpl(AssociationModel assoc) {
+    AssociationViewModelImpl(AssociationModelImpl assoc) {
         super(assoc);
     }
 }

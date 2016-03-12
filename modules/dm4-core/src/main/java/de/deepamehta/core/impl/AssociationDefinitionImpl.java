@@ -1,13 +1,9 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicModel;
-
-import java.util.logging.Logger;
 
 
 
@@ -16,20 +12,10 @@ import java.util.logging.Logger;
  */
 class AssociationDefinitionImpl extends AssociationImpl implements AssociationDefinition {
 
-    // ---------------------------------------------------------------------------------------------- Instance Variables
-
-    private TypeImpl parentType;
-
-    private ViewConfigurationImpl viewConfig;   // attached object cache
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationDefinitionImpl(AssociationDefinitionModel model, TypeImpl parentType, PersistenceLayer pl) {
+    AssociationDefinitionImpl(AssociationDefinitionModelImpl model, PersistenceLayer pl) {
         super(model, pl);
-        this.parentType = parentType;
-        initViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -47,15 +33,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         return getModel().getAssocDefUri();
     }
 
-    @Override
-    public String getCustomAssocTypeUri() {
-        return getModel().getCustomAssocTypeUri();
-    }
-
-    @Override
-    public String getInstanceLevelAssocTypeUri() {
-        return getModel().getInstanceLevelAssocTypeUri();
-    }
+    // ---
 
     @Override
     public String getParentTypeUri() {
@@ -67,10 +45,31 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         return getModel().getChildTypeUri();
     }
 
+    // ---
+
+    @Override
+    public String getCustomAssocTypeUri() {
+        return getModel().getCustomAssocTypeUri();
+    }
+
+    @Override
+    public String getInstanceLevelAssocTypeUri() {
+        return getModel().getInstanceLevelAssocTypeUri();
+    }
+
+    // --- Parent Cardinality ---
+
     @Override
     public String getParentCardinalityUri() {
         return getModel().getParentCardinalityUri();
     }
+
+    @Override
+    public void setParentCardinalityUri(String parentCardinalityUri) {
+        getModel().updateParentCardinalityUri(parentCardinalityUri);
+    }
+
+    // --- Child Cardinality ---
 
     @Override
     public String getChildCardinalityUri() {
@@ -78,103 +77,29 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     }
 
     @Override
-    public ViewConfiguration getViewConfig() {
-        return viewConfig;
-    }
-
-    @Override
-    public AssociationDefinitionModelImpl getModel() {
-        return (AssociationDefinitionModelImpl) super.getModel();
+    public void setChildCardinalityUri(String childCardinalityUri) {
+        getModel().updateChildCardinalityUri(childCardinalityUri);
     }
 
     // ---
 
     @Override
-    public void setParentCardinalityUri(String parentCardinalityUri) {
-        // update memory
-        getModel().setParentCardinalityUri(parentCardinalityUri);
-        // update DB
-        pl.typeStorage.storeParentCardinalityUri(getId(), parentCardinalityUri);
+    public ViewConfiguration getViewConfig() {
+        RoleModel configurable = pl.typeStorage.newAssocDefRole(getId());   // ### ID is uninitialized
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
-    @Override
-    public void setChildCardinalityUri(String childCardinalityUri) {
-        // update memory
-        getModel().setChildCardinalityUri(childCardinalityUri);
-        // update DB
-        pl.typeStorage.storeChildCardinalityUri(getId(), childCardinalityUri);
-    }
-
-
-
-    // === Updating ===
+    // ---
 
     @Override
     public void update(AssociationDefinitionModel newModel) {
-        try {
-            boolean changeCustomAssocType = !getModel().hasSameCustomAssocType(newModel);
-            if (changeCustomAssocType) {
-                logger.info("### Changing custom association type URI from \"" + getCustomAssocTypeUri() +
-                    "\" -> \"" + ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
-            }
-            //
-            super.update(newModel);
-            //
-            // cardinality
-            updateParentCardinality(newModel.getParentCardinalityUri());
-            updateChildCardinality(newModel.getChildCardinalityUri());
-            //
-            // rehash
-            if (changeCustomAssocType) {
-                String[] assocDefUris = parentType.getModel().findAssocDefUris(newModel.getId());
-                parentType.rehashAssocDef(assocDefUris[0], assocDefUris[1]);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Updating association definition \"" + getAssocDefUri() +
-                "\" failed (" + newModel + ")", e);
-        }
+        model.update(newModel);
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
-
-
-    // === Update ===
-
-    private void updateParentCardinality(String newParentCardinalityUri) {
-        // abort if no update is requested
-        if (newParentCardinalityUri == null) {
-            return;
-        }
-        //
-        String parentCardinalityUri = getParentCardinalityUri();
-        if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
-            logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
-                newParentCardinalityUri + "\"");
-            setParentCardinalityUri(newParentCardinalityUri);
-        }
-    }
-
-    private void updateChildCardinality(String newChildCardinalityUri) {
-        // abort if no update is requested
-        if (newChildCardinalityUri == null) {
-            return;
-        }
-        //
-        String childCardinalityUri = getChildCardinalityUri();
-        if (!childCardinalityUri.equals(newChildCardinalityUri)) {
-            logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
-                newChildCardinalityUri + "\"");
-            setChildCardinalityUri(newChildCardinalityUri);
-        }
-    }
-
-
-
-    // === Attached Object Cache ===
-
-    private void initViewConfig() {
-        RoleModel configurable = pl.typeStorage.createConfigurableAssocDef(getId());   // ### ID is uninitialized
-        this.viewConfig = new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
+    @Override
+    public AssociationDefinitionModelImpl getModel() {
+        return (AssociationDefinitionModelImpl) model;
     }
 }

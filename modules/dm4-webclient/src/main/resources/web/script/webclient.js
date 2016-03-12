@@ -581,7 +581,7 @@ dm4c = new function() {
         // In this case the canvas must be refreshed in order to reflect changed association colors.
         dm4c.topicmap_renderer.update_association_type(assoc_type)
         // 3) fire event
-        // ### dm4c.fire_event("post_update_topic", topic_type)
+        // dm4c.fire_event("post_update_topic", assoc_type)     // ### FIXME: why commented?
     }
 
     // ---

@@ -314,11 +314,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void uriUniquenessUpdate() {
         DeepaMehtaTransaction tx = dms.beginTx();
+        long topic2Id = -1;
         try {
             Topic topic1 = dms.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
             Topic topic2 = dms.createTopic(mf.newTopicModel("dm4.core.plugin"));
+            topic2Id = topic2.getId();
             assertEquals("", topic2.getUri());
             //
             topic2.update(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
@@ -326,7 +328,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             tx.success();
         } catch (Exception e) {
-            assertEquals("URI \"dm4.my.uri\" is not unique", e.getMessage());
+            // logger.log(Level.WARNING, "Exception thrown:", e);
+            assertEquals("Updating topic " + topic2Id + " failed (typeUri=\"dm4.core.plugin\")", e.getMessage());
+            assertEquals("URI \"dm4.my.uri\" is not unique", e.getCause().getMessage());
         } finally {
             tx.finish();
         }
@@ -666,7 +670,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
         comp1.loadChildTopics();
         assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
-        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").size());
         //
         // update and check again
         tx = dms.beginTx();
@@ -683,7 +687,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
         assertEquals("Item 2",      comp1.getChildTopics().getString("dm4.test.item"));
         assertEquals(item2.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").size());
         //
         // update and check again
         tx = dms.beginTx();
@@ -700,7 +704,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
         assertEquals("Item 1",      comp1.getChildTopics().getString("dm4.test.item"));
         assertEquals(item1.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").size());
     }
 
     @Test
@@ -742,7 +746,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic facetValue = (Topic)  name.getChildTopics().get("dm4.test.item");
         assertEquals("Item 1",      facetValue.getSimpleValue().toString());
         assertEquals(item1.getId(), facetValue.getId());
-        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").size());
         //
         // update facet again
         tx = dms.beginTx();
@@ -757,7 +761,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
         assertEquals("Item 2",      facetValue.getSimpleValue().toString());
         assertEquals(item2.getId(), facetValue.getId());
-        assertEquals(2, dms.getTopics("dm4.test.item").getSize());
+        assertEquals(2, dms.getTopics("dm4.test.item").size());
     }
 
     // ---

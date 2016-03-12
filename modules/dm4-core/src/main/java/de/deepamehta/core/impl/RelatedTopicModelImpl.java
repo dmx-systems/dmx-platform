@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
@@ -12,16 +13,16 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private AssociationModel relatingAssoc;
+    private AssociationModelImpl relatingAssoc;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RelatedTopicModelImpl(TopicModel topic, AssociationModel relatingAssoc) {
+    RelatedTopicModelImpl(TopicModelImpl topic, AssociationModelImpl relatingAssoc) {
         super(topic);
         this.relatingAssoc = relatingAssoc;
     }
 
-    RelatedTopicModelImpl(RelatedTopicModel relatedTopic) {
+    RelatedTopicModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
         this.relatingAssoc = relatedTopic.getRelatingAssociation();
     }
@@ -29,7 +30,7 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public AssociationModel getRelatingAssociation() {
+    public AssociationModelImpl getRelatingAssociation() {
         return relatingAssoc;
     }
 
@@ -70,5 +71,19 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
     @Override
     public String toString() {
         return super.toString() + ", relating " + relatingAssoc;
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    String className() {
+        return "related topic";
+    }
+
+    @Override
+    RelatedTopic instantiate() {
+        return new RelatedTopicImpl(this, pl);
     }
 }

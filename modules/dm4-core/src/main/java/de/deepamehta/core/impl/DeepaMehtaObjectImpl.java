@@ -1,25 +1,18 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.Topic;
 import de.deepamehta.core.Type;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 
 
@@ -39,22 +32,17 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModelImpl model;    // underlying model
+    DeepaMehtaObjectModelImpl model;    // underlying model
 
-    private ChildTopicsImpl childTopics;        // attached object cache
-
-    protected PersistenceLayer pl;
-    protected ModelFactory mf;
-
-    private Logger logger = Logger.getLogger(getClass().getName());
+    PersistenceLayer pl;
+    ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectImpl(DeepaMehtaObjectModel model, PersistenceLayer pl) {
-        this.model = (DeepaMehtaObjectModelImpl) model;
+    DeepaMehtaObjectImpl(DeepaMehtaObjectModelImpl model, PersistenceLayer pl) {
+        this.model = model;
         this.pl = pl;
         this.mf = pl.mf;
-        this.childTopics = new ChildTopicsImpl(model.getChildTopicsModel(), this, pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -97,10 +85,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setTypeUri(String typeUri) {
-        // update memory
-        model.setTypeUri(typeUri);
-        // update DB
-        storeTypeUri();     // abstract
+        model.updateTypeUri(typeUri);
     }
 
     // --- Simple Value ---
@@ -134,14 +119,14 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public void setSimpleValue(SimpleValue value) {
-        pl.valueStorage.setSimpleValue(getModel(), value);
+        model.updateSimpleValue(value);
     }
 
     // --- Child Topics ---
 
     @Override
     public ChildTopicsImpl getChildTopics() {
-        return childTopics;
+        return new ChildTopicsImpl(model.childTopics, model, pl);
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -149,7 +134,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {
-            getChildTopics().update(childTopics);
+            model._updateChildTopics(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
         }
@@ -159,17 +144,19 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public DeepaMehtaObject loadChildTopics() {
-        getChildTopics().loadChildTopics();
+        model.loadChildTopics();
         return this;
     }
 
     @Override
     public DeepaMehtaObject loadChildTopics(String assocDefUri) {
-        getChildTopics().loadChildTopics(assocDefUri);
+        model.loadChildTopics(assocDefUri);
         return this;
     }
 
     // ---
+
+    // Note: getType() remains abstract
 
     @Override
     public DeepaMehtaObjectModelImpl getModel() {
@@ -180,18 +167,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // === Updating ===
 
-    // ### TODO: refactoring. Move update logic to PersistenceLayer (or ValueStorage?).
     @Override
-    public void update(DeepaMehtaObjectModel newModel) {
-        updateUri(newModel.getUri());
-        updateTypeUri(newModel.getTypeUri());
-        if (getType().getDataTypeUri().equals("dm4.core.composite")) {
-            getChildTopics().update(newModel.getChildTopicsModel());
-        } else {
-            updateSimpleValue(newModel.getSimpleValue());
-        }
-        //
-        Directives.get().add(getUpdateDirective(), this);
+    public final void update(DeepaMehtaObjectModel newModel) {
+        model.update(newModel);
     }
 
     // ---
@@ -201,15 +179,15 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(newChildTopic, null, assocDef);      // newChildTopics=null
+        model.updateChildTopics(newChildTopic, null, assocDef.getModel());      // newChildTopics=null
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
     // Directives/events is handled only in the high-level update() method.
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
-    public void updateChildTopics(List<RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
-        getChildTopics().updateChildTopics(null, newChildTopics, assocDef);     // newChildTopic=null
+    public void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
+        model.updateChildTopics(null, newChildTopics, assocDef.getModel());     // newChildTopic=null
     }
 
 
@@ -217,8 +195,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Deletion ===
 
     @Override
-    public void delete() {
-        pl.deleteObject(getModel());
+    public final void delete() {
+        model.delete();
     }
 
 
@@ -230,9 +208,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                    String othersTopicTypeUri) {
-        RelatedTopicModel topic = fetchRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        // fetchRelatedTopic() is abstract
-        return topic != null ? pl.instantiateRelatedTopic(topic) : null;
+        RelatedTopicModelImpl topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
+        return topic != null ? pl.<RelatedTopic>checkReadAccessAndInstantiate(topic) : null;
     }
 
     @Override
@@ -243,9 +221,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     @Override
     public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModel> topics = fetchRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);    // fetchRelatedTopics() is abstract
-        return pl.instantiateRelatedTopics(topics);
+        ResultList<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):
@@ -324,72 +302,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    abstract String className();    // ### TODO: rely on model class name
-
-    abstract void updateChildTopics(ChildTopicsModel childTopics);
-
-    abstract Directive getUpdateDirective();
-
-    abstract void storeTypeUri();
-
-    // ---
-
-    abstract RelatedTopicModel fetchRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                                 String othersRoleTypeUri, String othersTopicTypeUri);
-
-    abstract ResultList<RelatedTopicModel> fetchRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                              String othersRoleTypeUri, String othersTopicTypeUri);
-
-    // ---
-
-    // ### TODO: add to public interface?
-    abstract Type getType();
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Update ===
-
-    private void updateUri(String newUri) {
-        // abort if no update is requested
-        if (newUri == null) {
-            return;
-        }
-        //
-        String uri = getUri();
-        if (!uri.equals(newUri)) {
-            logger.info("### Changing URI of " + className() + " " + getId() +
-                " from \"" + uri + "\" -> \"" + newUri + "\"");
-            setUri(newUri);
-        }
-    }
-
-    private void updateTypeUri(String newTypeUri) {
-        // abort if no update is requested
-        if (newTypeUri == null) {
-            return;
-        }
-        //
-        String typeUri = getTypeUri();
-        if (!typeUri.equals(newTypeUri)) {
-            logger.info("### Changing type URI of " + className() + " " + getId() +
-                " from \"" + typeUri + "\" -> \"" + newTypeUri + "\"");
-            setTypeUri(newTypeUri);
-        }
-    }
-
-    private void updateSimpleValue(SimpleValue newValue) {
-        // abort if no update is requested
-        if (newValue == null) {
-            return;
-        }
-        //
-        SimpleValue value = getSimpleValue();
-        if (!value.equals(newValue)) {
-            logger.info("### Changing simple value of " + className() + " " + getId() +
-                " from \"" + value + "\" -> \"" + newValue + "\"");
-            setSimpleValue(newValue);
-        }
+    final String className() {
+        return model.className();
     }
 }
