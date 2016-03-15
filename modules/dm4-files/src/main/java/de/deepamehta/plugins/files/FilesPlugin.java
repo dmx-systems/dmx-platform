@@ -462,7 +462,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         try {
             String repoPath = repoPath(request);    // Note: the path is not canonized
             if (repoPath != null) {
-                logger.info("### Checking access to repository path \"" + repoPath + "\"");
+                logger.fine("### Checking access to repository path \"" + repoPath + "\"");
                 File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
                 checkExistence(path);                           // throws FileRepositoryException 404 Not Found
                 checkAuthorization(repoPath(path), request);    // throws FileRepositoryException 401 Unauthorized
@@ -721,7 +721,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         path = path.getCanonicalFile();     // throws IOException
         boolean pointsToRepository = path.getPath().startsWith(FILE_REPOSITORY_PATH);
         //
-        logger.info("Checking path \"" + path + "\"\n  dm4.filerepo.path=" +
+        logger.fine("Checking path \"" + path + "\"\n  dm4.filerepo.path=" +
             "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
@@ -734,7 +734,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     private void checkExistence(File path) throws FileRepositoryException {
         boolean exists = path.exists();
         //
-        logger.info("Checking existence of \"" + path + "\" => " + (exists ? "EXISTS" : "NOT FOUND"));
+        logger.fine("Checking existence of \"" + path + "\" => " + (exists ? "EXISTS" : "NOT FOUND"));
         //
         if (!exists) {
             throw new FileRepositoryException("File or directory \"" + path + "\" does not exist", Status.NOT_FOUND);

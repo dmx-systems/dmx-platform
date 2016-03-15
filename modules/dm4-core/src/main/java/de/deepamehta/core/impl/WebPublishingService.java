@@ -342,7 +342,7 @@ class WebPublishingService {
         public URL getResource(String name) {
             try {
                 URL url = new URL("file:" + path + "/" + name);     // throws java.net.MalformedURLException
-                logger.info("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
+                logger.fine("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
                 return url;
             } catch (Exception e) {
                 throw new RuntimeException("Mapping resource name \"" + name + "\" to URL failed", e);
