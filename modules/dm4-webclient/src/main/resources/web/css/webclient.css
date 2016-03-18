@@ -132,19 +132,24 @@ body {
     padding-right: 0.8em;
 }
 
-/* Note: styles must match /css/ckeditor-contents.css */
+/* Note: style must match ckeditor-contents.css */
 #page-content p, ul, ol {
     margin-top: 0;
     margin-bottom: 0.7em;
     line-height: 1.6em;
 }
 
-/* Note: styles must match /css/ckeditor-contents.css */
+/* Note: style must match ckeditor-contents.css */
 #page-content pre {
-    /* Relative or no font-size results in different sizes in Safari and Firefox */
-    font-size: 16px;
+    font-size: 16px;    /* relative or no font-size results in different sizes in Safari and Firefox */
     line-height: 1.3em;
     white-space: pre-wrap;
+}
+
+/* Note: style must match ckeditor-contents.css */
+#page-content img {
+    max-width: 100%;
+    height: auto;       /* overrides img height attribute, avoids distortion */
 }
 
 .field-label {

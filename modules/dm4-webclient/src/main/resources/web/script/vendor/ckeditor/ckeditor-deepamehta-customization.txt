@@ -12,11 +12,11 @@ This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/b
     - Remove plugins:
         - About CKEditor (about)
     - Add plugins:
-        - AutoGrow            *) Useful with framed editing
+        - AutoGrow                  *) Useful with framed editing
         - Enhanced Image
-        - Media (oEmbed) Plugin
+        - Media (oEmbed) Plugin     *) Author: ingo, http://ckeditor.com/addon/oembed
         - Table
-        - Table Tools         *) required to e.g. add a row to existing table
+        - Table Tools               *) required to e.g. add a row to existing table
     - Skin: "Flat"
     - Languages: English
     - Source: optimized
