@@ -18,3 +18,7 @@ img {
     max-width: 100%;
     height: auto;
 }
+
+.embeddedContent > iframe {
+    max-width: 100%;
+}

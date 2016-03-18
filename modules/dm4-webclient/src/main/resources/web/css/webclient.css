@@ -152,6 +152,11 @@ body {
     height: auto;       /* overrides img height attribute, avoids distortion */
 }
 
+/* Note: style must match ckeditor-contents.css */
+#page-content .embeddedContent > iframe {
+    max-width: 100%;
+}
+
 .field-label {
     font-size: 0.75em;
     color: gray;
