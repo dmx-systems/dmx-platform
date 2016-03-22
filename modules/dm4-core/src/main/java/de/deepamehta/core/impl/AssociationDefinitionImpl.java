@@ -8,7 +8,7 @@ import de.deepamehta.core.model.RoleModel;
 
 
 /**
- * An association definition that is attached to the {@link DeepaMehtaService}.
+ * An association definition that is attached to the {@link CoreService}.
  */
 class AssociationDefinitionImpl extends AssociationImpl implements AssociationDefinition {
 

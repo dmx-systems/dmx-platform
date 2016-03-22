@@ -10,7 +10,7 @@
     ],
 
     # Note: Both association types relies on association type "Composition Definition".
-    # It must be defined first. See also EmbeddedService.createAssociationType().
+    # It must be defined first. See also CoreServiceImpl.createAssociationType().
     "assoc_types": [
         {
             "value":         "Composition Definition",

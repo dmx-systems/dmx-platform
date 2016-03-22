@@ -40,7 +40,7 @@ public class Migration8 extends Migration {
     public void run() {
         // Note: at migration running time our plugin listeners are not yet registered. That means
         // access control is not yet in effect. We have full READ/WRITE access to the database.
-        List<Topic> userAccounts = dms.getTopics("dm4.accesscontrol.user_account");
+        List<Topic> userAccounts = dm4.getTopics("dm4.accesscontrol.user_account");
         logger.info("########## Converting " + userAccounts.size() + " user accounts");
         for (Topic userAccount : userAccounts) {
             // compare to AccessControlPlugin.createUserAccount()

@@ -41,7 +41,7 @@ public class BoxRendererPlugin extends PluginActivator implements ViewmodelCusto
     @Override
     public void serviceGone(Object service) {
         // Note 1: unregistering is crucial. Otherwise the Topicmaps plugin would hold a viewmodel customizer with
-        // a stale dms instance as soon as the Box Renderer is redeployed. A subsequent storeViewProperties() call
+        // a stale dm4 instance as soon as the Box Renderer is redeployed. A subsequent storeViewProperties() call
         // (see below) would fail.
         // Note 2: we must unregister via serviceGone() hook, that is immediately when the Topicmaps service is about
         // to go away. Using the shutdown() hook instead would be too late as the Topicmaps service might already gone.

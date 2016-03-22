@@ -6,7 +6,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 
 
 /**
- * An association type that is attached to the {@link DeepaMehtaService}.
+ * An association type that is attached to the {@link CoreService}.
  */
 class AssociationTypeImpl extends TypeImpl implements AssociationType {
 

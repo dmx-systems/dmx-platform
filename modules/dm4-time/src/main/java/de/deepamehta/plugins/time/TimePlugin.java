@@ -82,14 +82,14 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Path("/object/{id}/created")
     @Override
     public long getCreationTime(@PathParam("id") long objectId) {
-        return dms.hasProperty(objectId, PROP_CREATED) ? (Long) dms.getProperty(objectId, PROP_CREATED) : 0;
+        return dm4.hasProperty(objectId, PROP_CREATED) ? (Long) dm4.getProperty(objectId, PROP_CREATED) : 0;
     }
 
     @GET
     @Path("/object/{id}/modified")
     @Override
     public long getModificationTime(@PathParam("id") long objectId) {
-        return dms.hasProperty(objectId, PROP_MODIFIED) ? (Long) dms.getProperty(objectId, PROP_MODIFIED) : 0;
+        return dm4.hasProperty(objectId, PROP_MODIFIED) ? (Long) dm4.getProperty(objectId, PROP_MODIFIED) : 0;
     }
 
     // ---
@@ -108,7 +108,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
                                                      @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_CREATED, from, to);
+        return dm4.getTopicsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -116,7 +116,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
                                                          @PathParam("to") long to) {
-        return dms.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
+        return dm4.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
     @GET
@@ -124,7 +124,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
                                                                  @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_CREATED, from, to);
+        return dm4.getAssociationsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -132,7 +132,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
                                                                      @PathParam("to") long to) {
-        return dms.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
+        return dm4.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
 

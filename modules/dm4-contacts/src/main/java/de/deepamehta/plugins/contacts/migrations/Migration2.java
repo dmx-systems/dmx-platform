@@ -39,15 +39,15 @@ public class Migration2 extends Migration {
         //
         // 2) change model
         //
-        dms.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.phone_entry", "Phone Entry",
+        dm4.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.phone_entry", "Phone Entry",
             "dm4.core.composite")
             .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
             "dm4.contacts.phone_entry", "dm4.contacts.phone_label", "dm4.core.many", "dm4.core.one")));
-        dms.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.address_entry", "Address Entry",
+        dm4.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.address_entry", "Address Entry",
             "dm4.core.composite")
             .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
             "dm4.contacts.address_entry", "dm4.contacts.address_label", "dm4.core.many", "dm4.core.one")));
-        dms.getTopicType("dm4.contacts.person")
+        dm4.getTopicType("dm4.contacts.person")
             .addAssocDefBefore(
                 mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
                 "dm4.contacts.person", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
@@ -56,7 +56,7 @@ public class Migration2 extends Migration {
                 mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
                 "dm4.contacts.person", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.notes");
-        dms.getTopicType("dm4.contacts.institution")
+        dm4.getTopicType("dm4.contacts.institution")
             .addAssocDefBefore(
                 mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
                 "dm4.contacts.institution", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
@@ -83,16 +83,16 @@ public class Migration2 extends Migration {
         // 1) buffer entry topic content in memory
         //
         // Note: the actual conversion (as performed later) relies on the buffered content
-        for (Topic phoneEntry   : dms.getTopics("dm4.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
-        for (Topic addressEntry : dms.getTopics("dm4.contacts.address_entry")) bufferAddressEntry(addressEntry);
+        for (Topic phoneEntry   : dm4.getTopics("dm4.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
+        for (Topic addressEntry : dm4.getTopics("dm4.contacts.address_entry")) bufferAddressEntry(addressEntry);
         //
         // 2) temporarily change entry types
         //
         // Note: we change comp_def to aggr_def to avoid deleting childs when deleting the entry topics (next step).
         // The childs are the Phone and Address topics we want keep and reassign later (while the actual conversion).
-        dms.getTopicType("dm4.contacts.phone_entry").getAssocDef("dm4.contacts.phone_number")
+        dm4.getTopicType("dm4.contacts.phone_entry").getAssocDef("dm4.contacts.phone_number")
             .setTypeUri("dm4.core.aggregation_def");
-        dms.getTopicType("dm4.contacts.address_entry").getAssocDef("dm4.contacts.address")
+        dm4.getTopicType("dm4.contacts.address_entry").getAssocDef("dm4.contacts.address")
             .setTypeUri("dm4.core.aggregation_def");
         //
         // 3) delete entry topics
@@ -104,8 +104,8 @@ public class Migration2 extends Migration {
         // 4) delete entry types
         //
         // Note: the entry topic types must be deleted as they are recreated as association types with the same URI.
-        dms.deleteTopicType("dm4.contacts.phone_entry");
-        dms.deleteTopicType("dm4.contacts.address_entry");
+        dm4.deleteTopicType("dm4.contacts.phone_entry");
+        dm4.deleteTopicType("dm4.contacts.address_entry");
     }
 
     // ---

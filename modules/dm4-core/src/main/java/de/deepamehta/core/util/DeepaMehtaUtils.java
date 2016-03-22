@@ -6,7 +6,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -148,11 +148,11 @@ public class DeepaMehtaUtils {
 
 
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                 String assocTypeUri, String roleTypeUri1, String roleTypeUri2, DeepaMehtaService dms) {
+                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dm4) {
         if (!assoc.getTypeUri().equals("dm4.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dms);
+        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dm4);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -164,11 +164,11 @@ public class DeepaMehtaUtils {
     }
 
     public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                                                          DeepaMehtaService dms) {
+                                                                                          CoreService dm4) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
-        String t1 = (String) dms.getProperty(r1.getPlayerId(), "type_uri");
-        String t2 = (String) dms.getProperty(r2.getPlayerId(), "type_uri");
+        String t1 = (String) dm4.getProperty(r1.getPlayerId(), "type_uri");
+        String t2 = (String) dm4.getProperty(r2.getPlayerId(), "type_uri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {

@@ -6,7 +6,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 
 
 /**
- * A topic type that is attached to the {@link DeepaMehtaService}.
+ * A topic type that is attached to the {@link CoreService}.
  */
 class TopicTypeImpl extends TypeImpl implements TopicType {
 

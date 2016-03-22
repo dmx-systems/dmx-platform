@@ -1,6 +1,6 @@
 package de.deepamehta.core.osgi;
 
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.impl.PluginImpl;
 
@@ -23,7 +23,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected DeepaMehtaService dms;
+    protected CoreService dm4;
     protected ModelFactory mf;
     protected Bundle bundle;
 
@@ -120,9 +120,9 @@ public class PluginActivator implements BundleActivator, PluginContext {
     }
 
     @Override
-    public final void setCoreService(DeepaMehtaService dms) {
-        this.dms = dms;
-        this.mf = dms != null ? dms.getModelFactory() : null;
+    public final void setCoreService(CoreService dm4) {
+        this.dm4 = dm4;
+        this.mf = dm4 != null ? dm4.getModelFactory() : null;
     }
 
 

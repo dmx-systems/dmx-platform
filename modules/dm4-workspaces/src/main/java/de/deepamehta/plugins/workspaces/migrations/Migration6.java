@@ -42,10 +42,10 @@ public class Migration6 extends Migration {
             "DeepaMehta workspace");
         deepamehtaWorkspaceId = getDeepaMehtaWorkspace().getId();
         //
-        for (TopicType topicType : dms.getAllTopicTypes()) {
+        for (TopicType topicType : dm4.getAllTopicTypes()) {
             assignWorkspace(topicType);
         }
-        for (AssociationType assocType : dms.getAllAssociationTypes()) {
+        for (AssociationType assocType : dm4.getAllAssociationTypes()) {
             assignWorkspace(assocType);
         }
         //

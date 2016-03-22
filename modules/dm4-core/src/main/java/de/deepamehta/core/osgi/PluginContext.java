@@ -1,6 +1,6 @@
 package de.deepamehta.core.osgi;
 
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 
 import org.osgi.framework.BundleContext;
 
@@ -26,5 +26,5 @@ public interface PluginContext {
 
     BundleContext getBundleContext();
 
-    void setCoreService(DeepaMehtaService dms);
+    void setCoreService(CoreService dm4);
 }

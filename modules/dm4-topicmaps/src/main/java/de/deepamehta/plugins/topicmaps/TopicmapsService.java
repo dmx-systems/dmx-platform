@@ -72,7 +72,7 @@ public interface TopicmapsService {
 
     void registerTopicmapRenderer(TopicmapRenderer renderer);
 
-    // ### TODO: unregister needed? Might a renderer hold a stale dms instance?
+    // ### TODO: unregister needed? Might a renderer hold a stale dm4 instance?
 
     // ---
 

@@ -31,7 +31,7 @@ class MigrationManager {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private EmbeddedService dms;
+    private CoreServiceImpl dm4;
     private ModelFactory mf;
 
     private enum MigrationRunMode {
@@ -42,9 +42,9 @@ class MigrationManager {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    MigrationManager(EmbeddedService dms) {
-        this.dms = dms;
-        this.mf = dms.mf;
+    MigrationManager(CoreServiceImpl dm4) {
+        this.dm4 = dm4;
+        this.mf = dm4.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -75,7 +75,7 @@ class MigrationManager {
      * Determines the core migrations to be run and run them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int migrationNr = dms.pl.fetchMigrationNr();
+        int migrationNr = dm4.pl.fetchMigrationNr();
         int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
         int migrationsToRun = requiredMigrationNr - migrationNr;
         //
@@ -95,7 +95,7 @@ class MigrationManager {
 
     private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, null, isCleanInstall);
-        dms.pl.storeMigrationNr(migrationNr);
+        dm4.pl.storeMigrationNr(migrationNr);
     }
 
     private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {
@@ -135,7 +135,7 @@ class MigrationManager {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
                     logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
                     injectServices(migration, mi.migrationInfo, plugin);
-                    migration.setCoreService(dms);
+                    migration.setCoreService(dm4);
                     migration.run();
                 }
                 logger.info("Completing " + mi.migrationInfo);
@@ -223,25 +223,25 @@ class MigrationManager {
 
     private void createTopicTypes(JSONArray topicTypes) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
-            dms.createTopicType(mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
+            dm4.createTopicType(mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
         }
     }
 
     private void createAssociationTypes(JSONArray assocTypes) throws JSONException {
         for (int i = 0; i < assocTypes.length(); i++) {
-            dms.createAssociationType(mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
+            dm4.createAssociationType(mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
         }
     }
 
     private void createTopics(JSONArray topics) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
-            dms.createTopic(mf.newTopicModel(topics.getJSONObject(i)));
+            dm4.createTopic(mf.newTopicModel(topics.getJSONObject(i)));
         }
     }
 
     private void createAssociations(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            dms.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
+            dm4.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
         }
     }
 

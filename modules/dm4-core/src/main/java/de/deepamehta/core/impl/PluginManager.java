@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  * Activates and deactivates plugins and keeps a pool of activated plugins.
  * The pool of activated plugins is a shared resource. All access to it is synchronized.
  * <p>
- * A PluginManager singleton is hold by the {@link EmbeddedService} and is accessed concurrently
+ * A PluginManager singleton is hold by the {@link CoreServiceImpl} and is accessed concurrently
  * by all bundle activation threads (as created e.g. by the File Install bundle).
  */
 class PluginManager {
@@ -31,14 +31,14 @@ class PluginManager {
      */
     private Map<String, PluginImpl> activatedPlugins = new HashMap();
 
-    private EmbeddedService dms;
+    private CoreServiceImpl dm4;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    PluginManager(EmbeddedService dms) {
-        this.dms = dms;
+    PluginManager(CoreServiceImpl dm4) {
+        this.dm4 = dm4;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -66,7 +66,7 @@ class PluginManager {
             //
             if (checkAllPluginsActivated()) {
                 logger.info("########## All Plugins Active ##########");
-                dms.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
+                dm4.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
             }
         } else {
             logger.info("Activation of " + plugin + " ABORTED -- already activated");
@@ -117,7 +117,7 @@ class PluginManager {
      * Checks if all installed plugins are activated.
      */
     private boolean checkAllPluginsActivated() {
-        Bundle[] bundles = dms.bundleContext.getBundles();
+        Bundle[] bundles = dm4.bundleContext.getBundles();
         int plugins = 0;
         int activated = 0;
         for (Bundle bundle : bundles) {

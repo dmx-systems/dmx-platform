@@ -4,7 +4,7 @@ import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -31,7 +31,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     protected Topic geomapTopic;
     protected Map<Long, TopicModel> geoCoords = new HashMap();
 
-    protected DeepaMehtaService dms;
+    protected CoreService dm4;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -40,12 +40,12 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     /**
      * Loads a topicmap from the DB.
      */
-    public Geomap(long geomapId, DeepaMehtaService dms) {
+    public Geomap(long geomapId, CoreService dm4) {
         logger.info("Loading geomap " + geomapId);
         // Note: a Geomap is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
         // child topic loading is not applied. We must load the child topics manually here.
-        this.geomapTopic = dms.getTopic(geomapId).loadChildTopics();
-        this.dms = dms;
+        this.geomapTopic = dm4.getTopic(geomapId).loadChildTopics();
+        this.dm4 = dm4;
         //
         fetchGeoCoordinates();
     }

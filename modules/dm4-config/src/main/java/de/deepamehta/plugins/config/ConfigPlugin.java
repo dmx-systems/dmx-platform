@@ -134,7 +134,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private RelatedTopic _getConfigTopic(String configTypeUri, long topicId) {
-        return dms.getAccessControl().getConfigTopic(configTypeUri, topicId);
+        return dm4.getAccessControl().getConfigTopic(configTypeUri, topicId);
     }
 
     private RelatedTopic createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
@@ -143,11 +143,11 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             // We suppress standard workspace assignment here as a config topic requires a special assignment.
             // See assignConfigTopicToWorkspace() below.
-            return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
+            return dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
                 @Override
                 public RelatedTopic call() {
-                    Topic configTopic = dms.createTopic(configDef.getConfigValue(topic));
-                    dms.createAssociation(mf.newAssociationModel(ASSOC_TYPE_CONFIGURATION,
+                    Topic configTopic = dm4.createTopic(configDef.getConfigValue(topic));
+                    dm4.createAssociation(mf.newAssociationModel(ASSOC_TYPE_CONFIGURATION,
                         mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
                         mf.newTopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
                     assignConfigTopicToWorkspace(configTopic, configDef.getConfigModificationRole());
@@ -163,7 +163,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     private void assignConfigTopicToWorkspace(Topic configTopic, ConfigModificationRole role) {
         long workspaceId;
-        AccessControl ac = dms.getAccessControl();
+        AccessControl ac = dm4.getAccessControl();
         switch (role) {
         case ADMIN:
             workspaceId = ac.getAdministrationWorkspaceId();

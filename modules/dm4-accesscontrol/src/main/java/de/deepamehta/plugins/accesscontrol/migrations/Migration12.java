@@ -58,7 +58,7 @@ public class Migration12 extends Migration {
         // workspace remain undefined as the Administration workspace is actually created by the system itself.
         //
         // 2) reassign existing "Login enabled" and "Disk Quota" config topics
-        administrationWorkspaceId = dms.getAccessControl().getAdministrationWorkspaceId();
+        administrationWorkspaceId = dm4.getAccessControl().getAdministrationWorkspaceId();
         assignConfigTopics("dm4.accesscontrol.login_enabled");
         assignConfigTopics("dm4.files.disk_quota");
         // Note: the "Disk Quota" config topics are reassigned to the Administration workspace which is created
@@ -67,7 +67,7 @@ public class Migration12 extends Migration {
         // (as the Access Control plugin depends indirectly on the Files plugin).
         //
         // 3) create "Enabled Sharing Modes" config topics
-        List<Topic> usernames = dms.getTopics("dm4.accesscontrol.username");
+        List<Topic> usernames = dm4.getTopics("dm4.accesscontrol.username");
         logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" for " +
             usernames.size() + " usernames");
         for (Topic username : usernames) {
@@ -82,7 +82,7 @@ public class Migration12 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void assignConfigTopics(String configTypeUri) {
-        List<Topic> configTopics = dms.getTopics(configTypeUri);
+        List<Topic> configTopics = dm4.getTopics(configTypeUri);
         logger.info("########## Reassigning " + configTopics.size() + " config topics of type \"" + configTypeUri +
             "\" to workspace \"Administration\"");
         for (Topic configTopic : configTopics) {

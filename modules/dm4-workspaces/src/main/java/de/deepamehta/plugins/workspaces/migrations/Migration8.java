@@ -21,7 +21,7 @@ public class Migration8 extends Migration {
 
     @Override
     public void run() {
-        dms.addTopicPropertyIndex(PROP_WORKSPACE_ID);
-        dms.addAssociationPropertyIndex(PROP_WORKSPACE_ID);
+        dm4.addTopicPropertyIndex(PROP_WORKSPACE_ID);
+        dm4.addAssociationPropertyIndex(PROP_WORKSPACE_ID);
     }
 }

@@ -6,8 +6,8 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.osgi.PluginContext;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ModelFactory;
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 
 
 // ### TODO: refactoring? This class does too much.
-// ### It lies about its dependencies. It depends on dms but dms is not passed to constructor.
+// ### It lies about its dependencies. It depends on dm4 but dm4 is not passed to constructor.
 public class PluginImpl implements Plugin, EventHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -65,7 +65,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DeepaMehta Core and OSGi)
-    private EmbeddedService dms;
+    private CoreServiceImpl dm4;
     private ModelFactory mf;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
@@ -142,7 +142,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     "only one directory per plugin is supported");
             }
             //
-            fileSystemResources = dms.wpService.publishFileSystem(uriNamespace, path);
+            fileSystemResources = dm4.wpService.publishFileSystem(uriNamespace, path);
         } catch (Exception e) {
             throw new RuntimeException("Publishing file system \"" + path + "\" at URI namespace \"" + uriNamespace +
                 "\" failed", e);
@@ -286,7 +286,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // === Service Tracking ===
 
     private void createCoreServiceTrackers() {
-        serviceTrackers.add(createServiceTracker(DeepaMehtaService.class));
+        serviceTrackers.add(createServiceTracker(CoreService.class));
         serviceTrackers.add(createServiceTracker(EventAdmin.class));
     }
 
@@ -404,9 +404,9 @@ public class PluginImpl implements Plugin, EventHandler {
     // ---
 
     private void addService(Object service, Class serviceInterface) {
-        if (service instanceof DeepaMehtaService) {
+        if (service instanceof CoreService) {
             logger.info("Adding DeepaMehta 4 core service to " + this);
-            setCoreService((EmbeddedService) service);
+            setCoreService((CoreServiceImpl) service);
             publishWebResources();
             publishRestResources();
             checkRequirementsForActivation();
@@ -423,12 +423,12 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void removeService(Object service, Class serviceInterface) {
-        if (service == dms) {
+        if (service == dm4) {
             logger.info("Removing DeepaMehta 4 core service from " + this);
             unpublishRestResources();
             unpublishWebResources();
             unpublishFileSystem();
-            dms.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
+            dm4.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
             setCoreService(null);
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
@@ -442,10 +442,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private void setCoreService(EmbeddedService dms) {
-        this.dms = dms;
-        this.mf = dms != null ? dms.mf : null;
-        pluginContext.setCoreService(dms);
+    private void setCoreService(CoreServiceImpl dm4) {
+        this.dm4 = dm4;
+        this.mf = dm4 != null ? dm4.mf : null;
+        pluginContext.setCoreService(dm4);
     }
 
     // ---
@@ -454,13 +454,13 @@ public class PluginImpl implements Plugin, EventHandler {
      * Checks if this plugin's requirements are met, and if so, activates this plugin.
      *
      * The requirements:
-     *   - the 2 core services are available (DeepaMehtaService, EventAdmin).
+     *   - the 2 core services are available (CoreService, EventAdmin).
      *   - the injected services (according to the "Inject" annotation) are available.
      *   - the plugin dependencies (according to the "importModels" config property) are active.
      */
     private void checkRequirementsForActivation() {
-        if (dms != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
-            dms.pluginManager.activatePlugin(this);
+        if (dm4 != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
+            dm4.pluginManager.activatePlugin(this);
         }
     }
 
@@ -516,12 +516,12 @@ public class PluginImpl implements Plugin, EventHandler {
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     private void installPluginInDB() {
-        DeepaMehtaTransaction tx = dms.beginTx();
+        DeepaMehtaTransaction tx = dm4.beginTx();
         try {
             // 1) create "Plugin" topic
             boolean isCleanInstall = createPluginTopicIfNotExists();
             // 2) run migrations
-            dms.migrationManager.runPluginMigrations(this, isCleanInstall);
+            dm4.migrationManager.runPluginMigrations(this, isCleanInstall);
             // 3) type introduction
             if (isCleanInstall) {
                 introduceTopicTypesToPlugin();
@@ -556,7 +556,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private Topic createPluginTopic() {
-        return dms.createTopic(mf.newTopicModel(pluginUri, "dm4.core.plugin", mf.newChildTopicsModel()
+        return dm4.createTopic(mf.newTopicModel(pluginUri, "dm4.core.plugin", mf.newChildTopicsModel()
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
             .put("dm4.core.plugin_migration_nr", 0)
@@ -564,20 +564,20 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private Topic fetchPluginTopic() {
-        return dms.getTopic("uri", new SimpleValue(pluginUri));
+        return dm4.getTopic("uri", new SimpleValue(pluginUri));
     }
 
     // ---
 
     private void introduceTopicTypesToPlugin() {
         try {
-            for (String topicTypeUri : dms.getTopicTypeUris()) {
+            for (String topicTypeUri : dm4.getTopicTypeUris()) {
                 // ### TODO: explain
                 if (topicTypeUri.equals("dm4.core.meta_meta_type")) {
                     continue;
                 }
                 //
-                TopicType topicType = dms.getTopicType(topicTypeUri);
+                TopicType topicType = dm4.getTopicType(topicTypeUri);
                 deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
@@ -587,8 +587,8 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void introduceAssociationTypesToPlugin() {
         try {
-            for (String assocTypeUri : dms.getAssociationTypeUris()) {
-                AssociationType assocType = dms.getAssociationType(assocTypeUri);
+            for (String assocTypeUri : dm4.getAssociationTypeUris()) {
+                AssociationType assocType = dm4.getAssociationType(assocTypeUri);
                 deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {
@@ -632,7 +632,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("Registering " + events.size() + " event listeners of " + this);
             for (DeepaMehtaEvent event : events) {
-                dms.em.addListener(event, (EventListener) pluginContext);
+                dm4.em.addListener(event, (EventListener) pluginContext);
             }
         } catch (Exception e) {
             throw new RuntimeException("Registering event listeners of " + this + " failed", e);
@@ -647,7 +647,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering event listeners of " + this);
         for (DeepaMehtaEvent event : events) {
-            dms.em.removeListener(event, (EventListener) pluginContext);
+            dm4.em.removeListener(event, (EventListener) pluginContext);
         }
     }
 
@@ -675,7 +675,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Called internally to deliver the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
     private void deliverEvent(DeepaMehtaEvent event, Object... params) {
-        dms.em.deliverEvent(this, event, params);
+        dm4.em.deliverEvent(this, event, params);
     }
 
     /**
@@ -741,7 +741,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Publishing web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            webResources = dms.wpService.publishWebResources(uriNamespace, pluginBundle);
+            webResources = dm4.wpService.publishWebResources(uriNamespace, pluginBundle);
         } catch (Exception e) {
             throw new RuntimeException("Publishing web resources of " + this + " failed " +
                 "(URI namespace=\"" + uriNamespace + "\")", e);
@@ -791,7 +791,7 @@ public class PluginImpl implements Plugin, EventHandler {
             // root resources
             List<Object> rootResources = getRootResources();
             if (rootResources.size() != 0) {
-                String uriNamespace = dms.wpService.getUriNamespace(pluginContext);
+                String uriNamespace = dm4.wpService.getUriNamespace(pluginContext);
                 logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
             } else {
                 logger.info("Publishing REST resources of " + this + " ABORTED -- no REST resources provided");
@@ -805,7 +805,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
-                restResources = dms.wpService.publishRestResources(rootResources, providerClasses);
+                restResources = dm4.wpService.publishRestResources(rootResources, providerClasses);
             }
         } catch (Exception e) {
             unpublishWebResources();
@@ -825,7 +825,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private List<Object> getRootResources() {
         List<Object> rootResources = new ArrayList();
-        if (dms.wpService.isRootResource(pluginContext)) {
+        if (dm4.wpService.isRootResource(pluginContext)) {
             rootResources.add(pluginContext);
         }
         return rootResources;
@@ -837,7 +837,7 @@ public class PluginImpl implements Plugin, EventHandler {
             Class clazz = loadClass(className);
             if (clazz == null) {
                 throw new RuntimeException("Loading provider class \"" + className + "\" failed");
-            } else if (!dms.wpService.isProviderClass(clazz)) {
+            } else if (!dm4.wpService.isProviderClass(clazz)) {
                 // Note: scanPackage() also returns nested classes, so we check explicitly.
                 continue;
             }
@@ -884,7 +884,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private boolean isPluginActivated(String pluginUri) {
-        return dms.pluginManager.isPluginActivated(pluginUri);
+        return dm4.pluginManager.isPluginActivated(pluginUri);
     }
 
     // Note: PLUGIN_ACTIVATED is defined as an OSGi event and not as a DeepaMehtaEvent.

@@ -31,9 +31,9 @@ import java.util.List;
  * The DeepaMehta core service provides methods to deal with topics, associations, types, and plugins.
  * <p>
  * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
- * DeepaMehta core service is available through the <code>dms</code> object.
+ * DeepaMehta core service is available through the <code>dm4</code> object.
  */
-public interface DeepaMehtaService {
+public interface CoreService {
 
 
 

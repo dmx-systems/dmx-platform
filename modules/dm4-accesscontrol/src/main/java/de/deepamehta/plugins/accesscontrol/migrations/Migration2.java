@@ -22,11 +22,11 @@ public class Migration2 extends Migration {
     @Override
     public void run() {
         count = 0;
-        for (Topic topic : dms.getAllTopics()) {
+        for (Topic topic : dm4.getAllTopics()) {
             migrateObject(topic, "topic");
         }
         count = 0;
-        for (Association assoc : dms.getAllAssociations()) {
+        for (Association assoc : dm4.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
     }

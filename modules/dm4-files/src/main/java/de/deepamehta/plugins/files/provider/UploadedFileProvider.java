@@ -6,7 +6,7 @@ import de.deepamehta.plugins.files.UploadedFile;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.osgi.CoreActivator;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.plugins.config.ConfigService;
 
 import org.apache.commons.fileupload.FileItem;
@@ -67,12 +67,12 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
 
     @Override
     public void check(long fileSize) {
-        DeepaMehtaService dms = CoreActivator.getDeepaMehtaService();
-        String username = dms.getAccessControl().getUsername(request);
+        CoreService dm4 = CoreActivator.getCoreService();
+        String username = dm4.getAccessControl().getUsername(request);
         if (username == null) {
             throw new RuntimeException("User <anonymous> has no disk quota");
         }
-        dms.fireEvent(FilesPlugin.CHECK_DISK_QUOTA, username, fileSize, diskQuota(username));
+        dm4.fireEvent(FilesPlugin.CHECK_DISK_QUOTA, username, fileSize, diskQuota(username));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -112,7 +112,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
     }
 
     private long diskQuota(String username) {
-        Topic usernameTopic = CoreActivator.getDeepaMehtaService().getAccessControl().getUsernameTopic(username);
+        Topic usernameTopic = CoreActivator.getCoreService().getAccessControl().getUsernameTopic(username);
         ConfigService cs = CoreActivator.getService(ConfigService.class);
         Topic configTopic = cs.getConfigTopic("dm4.files.disk_quota", usernameTopic.getId());
         return 1024 * 1024 * configTopic.getSimpleValue().intValue();

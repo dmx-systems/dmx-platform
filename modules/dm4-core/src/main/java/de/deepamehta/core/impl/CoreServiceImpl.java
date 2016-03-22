@@ -12,8 +12,8 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.DeepaMehtaEvent;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 /**
  * Implementation of the DeepaMehta core service. Embeddable into Java applications.
  */
-public class EmbeddedService implements DeepaMehtaService {
+public class CoreServiceImpl implements CoreService {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -52,7 +52,7 @@ public class EmbeddedService implements DeepaMehtaService {
     /**
      * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
      */
-    public EmbeddedService(PersistenceLayer pl, BundleContext bundleContext) {
+    public CoreServiceImpl(PersistenceLayer pl, BundleContext bundleContext) {
         this.bundleContext = bundleContext;
         this.pl = pl;
         this.em = pl.em;
@@ -69,9 +69,9 @@ public class EmbeddedService implements DeepaMehtaService {
 
 
 
-    // ****************************************
-    // *** DeepaMehtaService Implementation ***
-    // ****************************************
+    // **********************************
+    // *** CoreService Implementation ***
+    // **********************************
 
 
 

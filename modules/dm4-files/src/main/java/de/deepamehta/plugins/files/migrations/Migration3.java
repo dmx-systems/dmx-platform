@@ -33,7 +33,7 @@ public class Migration3 extends Migration {
 
     @Override
     public void run() {
-        List<Topic> usernames = dms.getTopics("dm4.accesscontrol.username");
+        List<Topic> usernames = dm4.getTopics("dm4.accesscontrol.username");
         logger.info("########## Adding \"dm4.files.disk_quota\" config topic to " + usernames.size() + " usernames");
         for (Topic username : usernames) {
             configService.createConfigTopic("dm4.files.disk_quota", username);

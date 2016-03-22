@@ -28,10 +28,10 @@ public class Migration6 extends Migration {
     @Override
     public void run() {
         logger.info("########## Removing owner and acl properties");
-        for (Topic topic : dms.getAllTopics()) {
+        for (Topic topic : dm4.getAllTopics()) {
             migrateObject(topic, "topic");
         }
-        for (Association assoc : dms.getAllAssociations()) {
+        for (Association assoc : dm4.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
         logger.info("########## Removing owner and acl properties complete\n    Objects processed: " + objects +

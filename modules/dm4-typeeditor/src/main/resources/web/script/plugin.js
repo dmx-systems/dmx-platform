@@ -33,7 +33,7 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     }
 
     // Note: no "uri" is set here. A new role type gets its default URI at server-side.
-    // Note: also the "type_uri" is provided at server-side (see EmbeddedService#createRoleType()).
+    // Note: also the "type_uri" is provided at server-side (see CoreServiceImpl#createRoleType()).
     var DEFAULT_ROLE_TYPE = {
         value: "Role Type Name"
     }

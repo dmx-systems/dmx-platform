@@ -82,7 +82,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
-            List<Topic> singleTopics = dms.searchTopics(searchTerm, fieldUri);
+            List<Topic> singleTopics = dm4.searchTopics(searchTerm, fieldUri);
             Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
@@ -105,8 +105,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public Topic getTopics(@PathParam("type_uri") String typeUri) {
         try {
             logger.info("typeUri=\"" + typeUri + "\"");
-            String searchTerm = dms.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<Topic> topics = dms.getTopics(typeUri);
+            String searchTerm = dm4.getTopicType(typeUri).getSimpleValue() + "(s)";
+            List<Topic> topics = dm4.getTopics(typeUri);
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
@@ -119,7 +119,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @GET
     @Path("/topic/{id}/related_topics")
     public ResultList getRelatedTopics(@PathParam("id") long topicId) {
-        Topic topic = dms.getTopic(topicId);
+        Topic topic = dm4.getTopic(topicId);
         ResultList<RelatedTopic> topics = topic.getRelatedTopics(null);     // assocTypeUri=null
         Iterator<RelatedTopic> i = topics.iterator();
         int removed = 0;
@@ -227,15 +227,15 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             // We suppress standard workspace assignment here as a Search topic requires a special assignment.
             // That is done by the Access Control module. ### TODO: refactoring. Do the assignment here.
-            return dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            return dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    Topic searchTopic = dms.createTopic(mf.newTopicModel("dm4.webclient.search",
+                    Topic searchTopic = dm4.createTopic(mf.newTopicModel("dm4.webclient.search",
                         mf.newChildTopicsModel().put("dm4.webclient.search_term", searchTerm)
                     ));
                     // associate result items
                     for (Topic resultItem : resultItems) {
-                        dms.createAssociation(mf.newAssociationModel("dm4.webclient.search_result_item",
+                        dm4.createAssociation(mf.newAssociationModel("dm4.webclient.search_result_item",
                             mf.newTopicRoleModel(searchTopic.getId(), "dm4.core.default"),
                             mf.newTopicRoleModel(resultItem.getId(), "dm4.core.default")
                         ));
@@ -252,7 +252,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private boolean searchableAsUnit(Topic topic) {
-        TopicType topicType = dms.getTopicType(topic.getTypeUri());
+        TopicType topicType = dm4.getTopicType(topic.getTypeUri());
         Boolean searchableAsUnit = (Boolean) getViewConfig(topicType, "searchable_as_unit");
         return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
@@ -297,7 +297,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void updateTopicType(Topic type, Topic viewConfig) {
         logger.info("### Updating view configuration of topic type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
-        TopicType topicType = dms.getTopicType(type.getUri());
+        TopicType topicType = dm4.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
         Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);           // ### TODO: should be implicit
     }
@@ -305,7 +305,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private void updateAssociationType(Topic type, Topic viewConfig) {
         logger.info("### Updating view configuration of association type \"" + type.getUri() + "\" (viewConfig=" +
             viewConfig + ")");
-        AssociationType assocType = dms.getAssociationType(type.getUri());
+        AssociationType assocType = dm4.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
         Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);     // ### TODO: should be implicit
     }
@@ -364,7 +364,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     private boolean hasAssocDef(Topic parentTopic, RelatedTopic childTopic) {
-        TopicType parentType = dms.getTopicType(parentTopic.getTypeUri());
+        TopicType parentType = dm4.getTopicType(parentTopic.getTypeUri());
         String childTypeUri = childTopic.getTypeUri();
         String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();
         String assocDefUri = childTypeUri + "#" + assocTypeUri;

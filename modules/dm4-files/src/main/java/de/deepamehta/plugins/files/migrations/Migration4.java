@@ -34,7 +34,7 @@ public class Migration4 extends Migration {
     public void run() {
         // 1) Rename root Folder topics
         if (FILE_REPOSITORY_PER_WORKSPACE) {
-            List<Topic> workspaces = dms.getTopics("dm4.workspaces.workspace");
+            List<Topic> workspaces = dm4.getTopics("dm4.workspaces.workspace");
             logger.info("########## Renaming root Folder topics of " + workspaces.size() + " possible workspaces");
             int renamed = 0;
             for (Topic workspace : workspaces) {
@@ -51,7 +51,7 @@ public class Migration4 extends Migration {
         }
         //
         // 2) Rename topic type "Disk Quota"
-        dms.getTopicType("dm4.files.disk_quota").setSimpleValue("Disk Quota (MB)");
+        dm4.getTopicType("dm4.files.disk_quota").setSimpleValue("Disk Quota (MB)");
         //
         // 3) Install file size renderer
         addTopicTypeSetting("dm4.files.size", "simple_renderer_uri", "dm4.files.file_size_renderer");
@@ -64,7 +64,7 @@ public class Migration4 extends Migration {
      * If no such Folder topic exists <code>null</code> is returned.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(repoPath));
+        Topic topic = dm4.getTopic("dm4.files.path", new SimpleValue(repoPath));
         return topic != null ? topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
             "dm4.files.folder") : null;
     }

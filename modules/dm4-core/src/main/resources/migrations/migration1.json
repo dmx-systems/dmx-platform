@@ -3,7 +3,7 @@
 
         # Note: The meta types "Topic Type" and "Association Type", and the
         # topic types "Data Type" and "Role Type" are created programmatically.
-        # See EmbeddedService.setupBootstrapContent()
+        # See CoreServiceImpl.setupBootstrapContent()
 
         /*{
             "value":         "Data Type",
@@ -30,7 +30,7 @@
     "assoc_types": [
 
         # Note: The association types "Aggregation" and "Instantiation" are created programmatically.
-        # See EmbeddedService.setupBootstrapContent()
+        # See CoreServiceImpl.setupBootstrapContent()
         # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
 
         {
@@ -65,7 +65,7 @@
         ### Data Types ###
 
         # Note: The data type "Text" is created programmatically.
-        # See EmbeddedService.setupBootstrapContent()
+        # See CoreServiceImpl.setupBootstrapContent()
 
         /*{
             "value":    "Text",
@@ -96,7 +96,7 @@
         ### Role Types ###
 
         # Note: The role types "Default", "Type", and "Instance" are created programmatically.
-        # See EmbeddedService.setupBootstrapContent()
+        # See CoreServiceImpl.setupBootstrapContent()
 
         /*{
             "value":    "Default",

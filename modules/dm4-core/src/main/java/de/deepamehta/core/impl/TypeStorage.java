@@ -231,7 +231,7 @@ class TypeStorage {
 
     // --- Store ---
 
-    // ### TODO: compare to low-level method EmbeddedService._associateDataType(). Remove structural similarity.
+    // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
             pl.createAssociation("dm4.core.aggregation",
@@ -724,7 +724,7 @@ class TypeStorage {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
             // Note: we don't do the storage in a type-driven fashion here (as in new AssociationDefinitionImpl(
-            // assocDef, dms).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired for the
+            // assocDef, dm4).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired for the
             // assoc def and the Type Editor plugin would react and try to access the assoc def's parent type.
             // This means retrieving a type that is in-mid its storage process. Strange errors would occur.
             // As a workaround we create the child topic manually.

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A topic that is attached to the {@link DeepaMehtaService}.
+ * A topic that is attached to the {@link CoreService}.
  */
 class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 

@@ -88,7 +88,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                 @QueryParam("private") boolean isPrivate) {
         logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
             "\", isPrivate=" + isPrivate +")");
-        return dms.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
+        return dm4.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.private", isPrivate)
@@ -107,7 +107,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
-            Topic topicmapTopic = dms.getTopic(topicmapId).loadChildTopics();
+            Topic topicmapTopic = dm4.getTopic(topicmapId).loadChildTopics();
             Map<Long, TopicViewModel> topics = fetchTopics(topicmapTopic, includeChilds);
             Map<Long, AssociationViewModel> assocs = fetchAssociations(topicmapTopic);
             //
@@ -140,7 +140,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 throw new RuntimeException("The topic is already added");
             }
             //
-            Association assoc = dms.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+            Association assoc = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
                 mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
                 mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
             ));
@@ -166,7 +166,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 throw new RuntimeException("The association is already added");
             }
             //
-            dms.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+            dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
                 mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
                 mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
             ));
@@ -246,7 +246,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     .put("dm4.topicmaps.translation", mf.newChildTopicsModel()
                         .put("dm4.topicmaps.translation_x", transX)
                         .put("dm4.topicmaps.translation_y", transY)));
-            dms.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
+            dm4.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
                 transX + ", transY=" + transY + ")", e);
@@ -341,11 +341,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
-        return dms.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
+        return dm4.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
     }
 
     private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
-        return dms.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
+        return dm4.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION);
     }
 
@@ -412,6 +412,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private InputStream invokeWebclient() {
-        return dms.getPlugin("de.deepamehta.webclient").getStaticResource("/web/index.html");
+        return dm4.getPlugin("de.deepamehta.webclient").getStaticResource("/web/index.html");
     }
 }

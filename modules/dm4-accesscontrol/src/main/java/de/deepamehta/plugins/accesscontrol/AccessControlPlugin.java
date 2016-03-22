@@ -196,14 +196,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getUsername() {
-        return dms.getAccessControl().getUsername(request);
+        return dm4.getAccessControl().getUsername(request);
     }
 
     @GET
     @Path("/username")
     @Override
     public Topic getUsernameTopic() {
-        return dms.getAccessControl().getUsernameTopic(request);
+        return dm4.getAccessControl().getUsernameTopic(request);
     }
 
     // ---
@@ -216,7 +216,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (username == null) {
             throw new IllegalStateException("No user is logged in");
         }
-        return dms.getAccessControl().getPrivateWorkspace(username);
+        return dm4.getAccessControl().getPrivateWorkspace(username);
     }
 
 
@@ -233,13 +233,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             logger.info("Creating user account \"" + username + "\"");
             //
             // 1) create user account
-            AccessControl ac = dms.getAccessControl();
+            AccessControl ac = dm4.getAccessControl();
             // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
             // special assignments. See steps 3) and 4) below.
             Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dms.createTopic(mf.newTopicModel("dm4.accesscontrol.user_account", mf.newChildTopicsModel()
+                    return dm4.createTopic(mf.newTopicModel("dm4.accesscontrol.user_account", mf.newChildTopicsModel()
                         .put("dm4.accesscontrol.username", username)
                         .put("dm4.accesscontrol.password", cred.password)));
                 }
@@ -280,7 +280,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/username/{username}")
     @Override
     public Topic getUsernameTopic(@PathParam("username") String username) {
-        return dms.getAccessControl().getUsernameTopic(username);
+        return dm4.getAccessControl().getUsernameTopic(username);
     }
 
 
@@ -293,7 +293,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
         // ### TODO: delegate to Core's AccessControl.getOwner()?
-        return dms.hasProperty(workspaceId, PROP_OWNER) ? (String) dms.getProperty(workspaceId, PROP_OWNER) : null;
+        return dm4.hasProperty(workspaceId, PROP_OWNER) ? (String) dm4.getProperty(workspaceId, PROP_OWNER) : null;
     }
 
     @Override
@@ -314,7 +314,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            dms.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+            dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.default")
             ));
@@ -326,7 +326,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public boolean isMember(String username, long workspaceId) {
-        return dms.getAccessControl().isMember(username, workspaceId);
+        return dm4.getAccessControl().isMember(username, workspaceId);
     }
 
 
@@ -356,7 +356,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getCreator(@PathParam("id") long objectId) {
-        return dms.getAccessControl().getCreator(objectId);
+        return dm4.getAccessControl().getCreator(objectId);
     }
 
     @GET
@@ -364,7 +364,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getModifier(@PathParam("id") long objectId) {
-        return dms.hasProperty(objectId, PROP_MODIFIER) ? (String) dms.getProperty(objectId, PROP_MODIFIER) : null;
+        return dm4.hasProperty(objectId, PROP_MODIFIER) ? (String) dm4.getProperty(objectId, PROP_MODIFIER) : null;
     }
 
 
@@ -375,28 +375,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(PROP_CREATOR, username);
+        return dm4.getTopicsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dms.getTopicsByProperty(PROP_OWNER, username);
+        return dm4.getTopicsByProperty(PROP_OWNER, username);
     }
 
     @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(PROP_CREATOR, username);
+        return dm4.getAssociationsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
-        return dms.getAssociationsByProperty(PROP_OWNER, username);
+        return dm4.getAssociationsByProperty(PROP_OWNER, username);
     }
 
 
@@ -467,7 +467,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void preGetAssociation(long assocId) {
         checkReadPermission(assocId);
         //
-        long[] playerIds = dms.getPlayerIds(assocId);
+        long[] playerIds = dm4.getPlayerIds(assocId);
         checkReadPermission(playerIds[0]);
         checkReadPermission(playerIds[1]);
     }
@@ -607,7 +607,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
-        for (Topic fileTopic : dms.getTopics("dm4.files.file")) {
+        for (Topic fileTopic : dm4.getTopics("dm4.files.file")) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
                 occupiedSpace += filesService.getFile(fileTopicId).length();
@@ -688,11 +688,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private Topic checkCredentials(Credentials cred) {
-        return dms.getAccessControl().checkCredentials(cred);
+        return dm4.getAccessControl().checkCredentials(cred);
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
-        Topic loginEnabled = dms.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
+        Topic loginEnabled = dm4.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
         return loginEnabled.getSimpleValue().booleanValue();
     }
 
@@ -703,7 +703,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         session.setAttribute("username", username);
         logger.info("##### Creating new " + info(session));
         //
-        dms.fireEvent(POST_LOGIN_USER, username);
+        dm4.fireEvent(POST_LOGIN_USER, username);
     }
 
     private void _logout(HttpServletRequest request) {
@@ -713,13 +713,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         session.invalidate();
         //
-        dms.fireEvent(POST_LOGOUT_USER, username);
+        dm4.fireEvent(POST_LOGOUT_USER, username);
     }
 
     // ---
 
     private String username(HttpSession session) {
-        return dms.getAccessControl().username(session);
+        return dm4.getAccessControl().username(session);
     }
 
     // ---
@@ -858,7 +858,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
-        return dms.getAccessControl().hasPermission(username, operation, objectId);
+        return dm4.getAccessControl().hasPermission(username, operation, objectId);
     }
 
     private boolean inRequestScope() {

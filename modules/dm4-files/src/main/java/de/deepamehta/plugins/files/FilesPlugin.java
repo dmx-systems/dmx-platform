@@ -545,7 +545,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
     private Topic fetchTopic(String repoPath, String topicTypeUri) {
-        Topic topic = dms.getTopic("dm4.files.path", new SimpleValue(repoPath));
+        Topic topic = dm4.getTopic("dm4.files.path", new SimpleValue(repoPath));
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
         }
@@ -586,7 +586,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
         // if the repo path represents a workspace root directory the workspace name is used as Folder Name
         if (FILE_REPOSITORY_PER_WORKSPACE) {
             if (repoPathFile.getParent().equals("/")) {
-                String workspaceName = dms.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
+                String workspaceName = dm4.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
                 folderName = workspaceName;
             }
         }
@@ -615,10 +615,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
-        Topic topic = dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
+        Topic topic = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
             @Override
             public Topic call() {
-                return dms.createTopic(model);
+                return dm4.createTopic(model);
             }
         });
         createWorkspaceAssignment(topic, repoPath(topic));
@@ -631,13 +631,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     private void createFolderAssociation(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
-            boolean exists = dms.getAssociations(folderTopicId, topicId, "dm4.core.aggregation").size() > 0;
+            boolean exists = dm4.getAssociations(folderTopicId, topicId, "dm4.core.aggregation").size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
-                Association assoc = dms.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
+                Association assoc = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
                     @Override
                     public Association call() {
-                        return dms.createAssociation(mf.newAssociationModel("dm4.core.aggregation",
+                        return dm4.createAssociation(mf.newAssociationModel("dm4.core.aggregation",
                             mf.newTopicRoleModel(folderTopicId, "dm4.core.parent"),
                             mf.newTopicRoleModel(topicId,       "dm4.core.child")
                         ));
@@ -660,7 +660,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      */
     private void createWorkspaceAssignment(DeepaMehtaObject object, String repoPath) {
         try {
-            AccessControl ac = dms.getAccessControl();
+            AccessControl ac = dm4.getAccessControl();
             long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDeepaMehtaWorkspaceId();
             ac.assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
@@ -761,9 +761,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                     //
                     // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
-                    String username = dms.getAccessControl().getUsername(request);
+                    String username = dm4.getAccessControl().getUsername(request);
                     long fileTopicId = fileTopic.getId();
-                    if (!dms.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
+                    if (!dm4.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
                         throw new FileRepositoryException(userInfo(username) + " has no READ permission for " +
                             "repository path \"" + repoPath + "\" (File topic ID=" + fileTopicId + ")",
                             Status.UNAUTHORIZED);
@@ -817,7 +817,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * Note: the returned path is canonized.
      */
     private String repoPath(long fileTopicId) {
-        return repoPath(dms.getTopic(fileTopicId));
+        return repoPath(dm4.getTopic(fileTopicId));
     }
 
     /**

@@ -32,7 +32,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/{id}/institutions")
     @Override
     public ResultList<RelatedTopic> getInstitutions(@PathParam("id") long personId) {
-        return dms.getTopic(personId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
+        return dm4.getTopic(personId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
             "dm4.core.default", "dm4.contacts.institution");
     }
 
@@ -40,7 +40,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/{id}/persons")
     @Override
     public ResultList<RelatedTopic> getPersons(@PathParam("id") long instId) {
-        return dms.getTopic(instId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
+        return dm4.getTopic(instId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
             "dm4.core.default", "dm4.contacts.person");
     }
 
@@ -56,6 +56,6 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     public void preCreateAssociation(AssociationModel assoc) {
         // Person <-> Institution
         DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.contacts.person", "dm4.contacts.institution",
-            "dm4.contacts.organization_association", "dm4.core.default", "dm4.core.default", dms);
+            "dm4.contacts.organization_association", "dm4.core.default", "dm4.core.default", dm4);
     }
 }

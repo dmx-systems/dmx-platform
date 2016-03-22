@@ -77,7 +77,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Path("/{id}")
     @Override
     public Geomap getGeomap(@PathParam("id") long geomapId) {
-        return new Geomap(geomapId, dms);
+        return new Geomap(geomapId, dm4);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -86,7 +86,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public Topic getDomainTopic(@PathParam("id") long geoCoordId) {
         try {
-            Topic topic = dms.getTopic(geoCoordId);
+            Topic topic = dm4.getTopic(geoCoordId);
             RelatedTopic parentTopic;
             while ((parentTopic = topic.getRelatedTopic(null, "dm4.core.child", "dm4.core.parent", null)) != null) {
                 topic = parentTopic;
@@ -131,7 +131,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             mf.newTopicRoleModel(geomapId,   "dm4.core.default"),
             mf.newTopicRoleModel(geoCoordId, "dm4.topicmaps.topicmap_topic")
         );
-        dms.createAssociation(model);
+        dm4.createAssociation(model);
     }
 
     @PUT
@@ -147,7 +147,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     "dm4.topicmaps.translation_y", lat)).put(
                 "dm4.topicmaps.zoom_level", zoom)
         );
-        dms.updateTopic(mf.newTopicModel(geomapId, geomapState));
+        dm4.updateTopic(mf.newTopicModel(geomapId, geomapState));
     }
 
     @GET
@@ -311,7 +311,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         }
         //
         ChildTopics comp = topic.getChildTopics();
-        TopicType topicType = dms.getTopicType(typeUri);
+        TopicType topicType = dm4.getTopicType(typeUri);
         for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
             String assocDefUri    = assocDef.getAssocDefUri();
             String cardinalityUri = assocDef.getChildCardinalityUri();

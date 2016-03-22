@@ -9,15 +9,15 @@ public abstract class Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected DeepaMehtaService dms;
+    protected CoreService dm4;
     protected ModelFactory mf;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // ### TODO: make this internal. Define a public Migration interface?
-    public void setCoreService(DeepaMehtaService dms) {
-        this.dms = dms;
-        this.mf = dms.getModelFactory();
+    public void setCoreService(CoreService dm4) {
+        this.dm4 = dm4;
+        this.mf = dm4.getModelFactory();
     }
 
     public abstract void run();
@@ -26,12 +26,12 @@ public abstract class Migration {
 
     // Convenience method ### FIXME: belongs to Webclient module
     protected final void addTopicTypeSetting(String topicTypeUri, String setting, Object value) {
-        addTypeSetting(dms.getTopicType(topicTypeUri), setting, value);
+        addTypeSetting(dm4.getTopicType(topicTypeUri), setting, value);
     }
 
     // Convenience method ### FIXME: belongs to Webclient module
     protected final void addAssociationTypeSetting(String assocTypeUri, String setting, Object value) {
-        addTypeSetting(dms.getAssociationType(assocTypeUri), setting, value);
+        addTypeSetting(dm4.getAssociationType(assocTypeUri), setting, value);
     }
 
     // ---

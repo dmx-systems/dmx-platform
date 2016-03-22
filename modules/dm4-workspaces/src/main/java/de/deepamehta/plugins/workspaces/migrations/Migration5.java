@@ -40,10 +40,10 @@ public class Migration5 extends Migration {
         // 1) Initializes workspace properties
         //
         logger.info("########## Initializing workspace properties");
-        for (Topic topic : dms.getAllTopics()) {
+        for (Topic topic : dm4.getAllTopics()) {
             initWorkspaceProperty(topic);
         }
-        for (Association assoc : dms.getAllAssociations()) {
+        for (Association assoc : dm4.getAllAssociations()) {
             initWorkspaceProperty(assoc);
         }
         logger.info("########## Initializing workspace properties complete\n    Objects processed: " + objects +
@@ -51,16 +51,16 @@ public class Migration5 extends Migration {
         //
         // 2) Changes cardinality of the workspace facet to "one".
         //
-        dms.getTopicType("dm4.workspaces.workspace_facet").getAssocDef("dm4.workspaces.workspace")
+        dm4.getTopicType("dm4.workspaces.workspace_facet").getAssocDef("dm4.workspaces.workspace")
             .setChildCardinalityUri("dm4.core.one");
         //
         // 3) Corrects URI of the "DeepaMehta" workspace: "de." -> "dm4."
         //
-        dms.getTopic("uri", new SimpleValue("de.workspaces.deepamehta")).setUri("dm4.workspaces.deepamehta");
+        dm4.getTopic("uri", new SimpleValue("de.workspaces.deepamehta")).setUri("dm4.workspaces.deepamehta");
         //
         // 4) Sets the sharing mode of all workspaces to "Public".
         //
-        for (Topic workspace : dms.getTopics("dm4.workspaces.workspace")) {
+        for (Topic workspace : dm4.getTopics("dm4.workspaces.workspace")) {
             workspace.update(mf.newTopicModel(mf.newChildTopicsModel()
                 .putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
             ));

@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.util.JavaUtils;
 
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
@@ -24,7 +24,7 @@ public class CoreServiceTestEnvironment {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // providing the test subclasses access to the core service and logger
-    protected DeepaMehtaService dms;
+    protected CoreService dm4;
     protected ModelFactoryImpl mf;
 
     protected Logger logger = Logger.getLogger(getClass().getName());
@@ -39,7 +39,7 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dm4-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        dms = new EmbeddedService(new PersistenceLayer(storage), null);     // bundleContext=null
+        dm4 = new CoreServiceImpl(new PersistenceLayer(storage), null);     // bundleContext=null
     }
 
     @After

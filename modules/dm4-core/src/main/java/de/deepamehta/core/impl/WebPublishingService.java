@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.CoreActivator;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;

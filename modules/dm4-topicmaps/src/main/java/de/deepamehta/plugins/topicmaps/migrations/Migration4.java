@@ -30,7 +30,7 @@ public class Migration4 extends Migration {
         logger.info("########## Converting \"Topic Mapcontext\" associations");
         //
         // 1) convert the "Topic Mapcontext" association's child topics into properties
-        for (Association assoc : dms.getAssociations("dm4.topicmaps.topic_mapcontext")) {
+        for (Association assoc : dm4.getAssociations("dm4.topicmaps.topic_mapcontext")) {
             migrateMapcontextAssociation(assoc);
         }
         //
@@ -40,7 +40,7 @@ public class Migration4 extends Migration {
         deleteTopicType("dm4.topicmaps.visibility");
         //
         // 3) make "Topic Mapcontext" a simple type
-        dms.getAssociationType("dm4.topicmaps.topic_mapcontext").setDataTypeUri("dm4.core.text");
+        dm4.getAssociationType("dm4.topicmaps.topic_mapcontext").setDataTypeUri("dm4.core.text");
         //
         logger.info("########## Converting \"Topic Mapcontext\" associations complete\n    Associations processed: " +
             assocs + "\n    X, Y, Visibility topics deleted: " + topicsDeleted + "\n    Topic types deleted: " +
@@ -65,11 +65,11 @@ public class Migration4 extends Migration {
     private void deleteTopicType(String topicTypeUri) {
         typesDeleted++;
         // delete instances
-        for (Topic topic : dms.getTopics(topicTypeUri)) {
+        for (Topic topic : dm4.getTopics(topicTypeUri)) {
             topic.delete();
             topicsDeleted++;
         }
         // delete type
-        dms.deleteTopicType(topicTypeUri);
+        dm4.deleteTopicType(topicTypeUri);
     }
 }

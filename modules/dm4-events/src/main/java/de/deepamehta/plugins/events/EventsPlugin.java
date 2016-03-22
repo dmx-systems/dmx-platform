@@ -47,7 +47,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/participant/{id}")
     @Override
     public ResultList<RelatedTopic> getEvents(@PathParam("id") long personId) {
-        return dms.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
+        return dm4.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
             "dm4.events.event");
     }
 
@@ -55,7 +55,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/{id}/participants")
     @Override
     public ResultList<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
-        return dms.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
+        return dm4.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
             "dm4.contacts.person");
     }
 
@@ -71,14 +71,14 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     public void preCreateAssociation(AssociationModel assoc) {
         // Event <-> Person
         DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.person",
-            "dm4.events.participant", "dm4.core.default", "dm4.core.default", dms);
+            "dm4.events.participant", "dm4.core.default", "dm4.core.default", dm4);
         //
         // Event -> Address
         RoleModel[] roles = DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.address",
-            "dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", dms);
+            "dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", dm4);
         if (roles != null) {
             long eventId = roles[0].getPlayerId();
-            Topic event = dms.getTopic(eventId);
+            Topic event = dm4.getTopic(eventId);
             event.getChildTopics().getTopic("dm4.contacts.address").getRelatingAssociation().delete();
             timeService.setModified(event);
         }

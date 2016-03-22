@@ -191,7 +191,7 @@ class CoreEvent {
     // ---
 
     // This event has a double nature:
-    //   a) it is fired regularily (see EmbeddedService.createTopicType()).
+    //   a) it is fired regularily (see CoreServiceImpl.createTopicType()).
     //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
     static DeepaMehtaEvent INTRODUCE_TOPIC_TYPE = new DeepaMehtaEvent(IntroduceTopicTypeListener.class) {
         @Override
@@ -203,7 +203,7 @@ class CoreEvent {
     };
 
     // This event has a double nature:
-    //   a) it is fired regularily (see EmbeddedService.createAssociationType()).
+    //   a) it is fired regularily (see CoreServiceImpl.createAssociationType()).
     //   b) it is fired locally (see PluginImpl.introduceAssociationTypesToPlugin()).
     static DeepaMehtaEvent INTRODUCE_ASSOCIATION_TYPE = new DeepaMehtaEvent(IntroduceAssociationTypeListener.class) {
         @Override

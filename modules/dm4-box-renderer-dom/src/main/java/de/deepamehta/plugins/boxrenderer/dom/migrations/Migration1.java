@@ -36,7 +36,7 @@ public class Migration1 extends Migration {
     public void run() {
         logger.info("########## Moving BoxRenderer properties from topics to \"Topic Mapcontext\" associations");
         //
-        for (Topic topic : dms.getAllTopics()) {
+        for (Topic topic : dm4.getAllTopics()) {
             migrateBoxRendererProperties(topic);
         }
         //
