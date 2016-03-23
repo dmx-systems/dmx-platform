@@ -385,8 +385,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
-        em.deliverEvent(getPlugin(pluginUri), event, params);
+    public void dispatchEvent(String pluginUri, DeepaMehtaEvent event, Object... params) {
+        em.dispatchEvent(getPlugin(pluginUri), event, params);
     }
 
 

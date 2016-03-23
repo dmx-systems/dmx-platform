@@ -28,7 +28,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_GET_TOPIC = new DeepaMehtaEvent(PreGetTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreGetTopicListener) listener).preGetTopic(
                 (Long) params[0]
             );
@@ -37,7 +37,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_GET_ASSOCIATION = new DeepaMehtaEvent(PreGetAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreGetAssociationListener) listener).preGetAssociation(
                 (Long) params[0]
             );
@@ -48,7 +48,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_CREATE_TOPIC = new DeepaMehtaEvent(PreCreateTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreCreateTopicListener) listener).preCreateTopic(
                 (TopicModel) params[0]
             );
@@ -57,7 +57,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_CREATE_ASSOCIATION = new DeepaMehtaEvent(PreCreateAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreCreateAssociationListener) listener).preCreateAssociation(
                 (AssociationModel) params[0]
             );
@@ -68,7 +68,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_CREATE_TOPIC = new DeepaMehtaEvent(PostCreateTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostCreateTopicListener) listener).postCreateTopic(
                 (Topic) params[0]
             );
@@ -77,7 +77,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_CREATE_ASSOCIATION = new DeepaMehtaEvent(PostCreateAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostCreateAssociationListener) listener).postCreateAssociation(
                 (Association) params[0]
             );
@@ -88,7 +88,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_UPDATE_TOPIC = new DeepaMehtaEvent(PreUpdateTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreUpdateTopicListener) listener).preUpdateTopic(
                 (Topic) params[0], (TopicModel) params[1]
             );
@@ -97,7 +97,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_UPDATE_ASSOCIATION = new DeepaMehtaEvent(PreUpdateAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreUpdateAssociationListener) listener).preUpdateAssociation(
                 (Association) params[0], (AssociationModel) params[1]
             );
@@ -108,7 +108,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_UPDATE_TOPIC = new DeepaMehtaEvent(PostUpdateTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateTopicListener) listener).postUpdateTopic(
                 (Topic) params[0], (TopicModel) params[1], (TopicModel) params[2]
             );
@@ -117,7 +117,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_UPDATE_ASSOCIATION = new DeepaMehtaEvent(PostUpdateAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateAssociationListener) listener).postUpdateAssociation(
                 (Association) params[0], (AssociationModel) params[1], (AssociationModel) params[2]
             );
@@ -128,7 +128,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_UPDATE_TOPIC_REQUEST = new DeepaMehtaEvent(PostUpdateTopicRequestListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostUpdateTopicRequestListener) listener).postUpdateTopicRequest(
                 (Topic) params[0]
             );
@@ -143,7 +143,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_DELETE_TOPIC = new DeepaMehtaEvent(PreDeleteTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreDeleteTopicListener) listener).preDeleteTopic(
                 (Topic) params[0]
             );
@@ -152,7 +152,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_DELETE_ASSOCIATION = new DeepaMehtaEvent(PreDeleteAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreDeleteAssociationListener) listener).preDeleteAssociation(
                 (Association) params[0]
             );
@@ -163,7 +163,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_DELETE_TOPIC = new DeepaMehtaEvent(PostDeleteTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostDeleteTopicListener) listener).postDeleteTopic(
                 (TopicModel) params[0]
             );
@@ -172,7 +172,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent POST_DELETE_ASSOCIATION = new DeepaMehtaEvent(PostDeleteAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostDeleteAssociationListener) listener).postDeleteAssociation(
                 (AssociationModel) params[0]
             );
@@ -183,7 +183,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent ALL_PLUGINS_ACTIVE = new DeepaMehtaEvent(AllPluginsActiveListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((AllPluginsActiveListener) listener).allPluginsActive();
         }
     };
@@ -195,7 +195,7 @@ class CoreEvent {
     //   b) it is fired locally (see PluginImpl.introduceTopicTypesToPlugin()).
     static DeepaMehtaEvent INTRODUCE_TOPIC_TYPE = new DeepaMehtaEvent(IntroduceTopicTypeListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((IntroduceTopicTypeListener) listener).introduceTopicType(
                 (TopicType) params[0]
             );
@@ -207,7 +207,7 @@ class CoreEvent {
     //   b) it is fired locally (see PluginImpl.introduceAssociationTypesToPlugin()).
     static DeepaMehtaEvent INTRODUCE_ASSOCIATION_TYPE = new DeepaMehtaEvent(IntroduceAssociationTypeListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((IntroduceAssociationTypeListener) listener).introduceAssociationType(
                 (AssociationType) params[0]
             );
@@ -220,7 +220,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent SERVICE_REQUEST_FILTER = new DeepaMehtaEvent(ServiceRequestFilterListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((ServiceRequestFilterListener) listener).serviceRequestFilter(
                 (ContainerRequest) params[0]
             );
@@ -229,7 +229,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent SERVICE_RESPONSE_FILTER = new DeepaMehtaEvent(ServiceResponseFilterListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((ServiceResponseFilterListener) listener).serviceResponseFilter(
                 (ContainerResponse) params[0]
             );
@@ -238,7 +238,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent RESOURCE_REQUEST_FILTER = new DeepaMehtaEvent(ResourceRequestFilterListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((ResourceRequestFilterListener) listener).resourceRequestFilter(
                 (HttpServletRequest) params[0]
             );
@@ -249,7 +249,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_SEND_TOPIC = new DeepaMehtaEvent(PreSendTopicListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreSendTopicListener) listener).preSendTopic(
                 (Topic) params[0]
             );
@@ -258,7 +258,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_SEND_ASSOCIATION = new DeepaMehtaEvent(PreSendAssociationListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreSendAssociationListener) listener).preSendAssociation(
                 (Association) params[0]
             );
@@ -267,7 +267,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_SEND_TOPIC_TYPE = new DeepaMehtaEvent(PreSendTopicTypeListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreSendTopicTypeListener) listener).preSendTopicType(
                 (TopicType) params[0]
             );
@@ -276,7 +276,7 @@ class CoreEvent {
 
     static DeepaMehtaEvent PRE_SEND_ASSOCIATION_TYPE = new DeepaMehtaEvent(PreSendAssociationTypeListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PreSendAssociationTypeListener) listener).preSendAssociationType(
                 (AssociationType) params[0]
             );

@@ -117,7 +117,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // Events
     private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostLoginUserListener) listener).postLoginUser(
                 (String) params[0]
             );
@@ -125,7 +125,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     };
     private static DeepaMehtaEvent POST_LOGOUT_USER = new DeepaMehtaEvent(PostLogoutUserListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((PostLogoutUserListener) listener).postLogoutUser(
                 (String) params[0]
             );

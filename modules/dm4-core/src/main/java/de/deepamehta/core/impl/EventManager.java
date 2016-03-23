@@ -56,7 +56,7 @@ class EventManager {
         List<EventListener> listeners = getListeners(event);
         if (listeners != null) {
             for (EventListener listener : listeners) {
-                deliverEvent(listener, event, params);
+                dispatchEvent(listener, event, params);
             }
         }
     }
@@ -67,20 +67,20 @@ class EventManager {
      * Delivers an event to a particular plugin.
      * If the plugin is not a listener for that event nothing is performed.
      */
-    void deliverEvent(PluginImpl plugin, DeepaMehtaEvent event, Object... params) {
+    void dispatchEvent(PluginImpl plugin, DeepaMehtaEvent event, Object... params) {
         PluginContext pluginContext = plugin.getContext();
         if (!isListener(pluginContext, event)) {
             return;
         }
         //
-        deliverEvent((EventListener) pluginContext, event, params);
+        dispatchEvent((EventListener) pluginContext, event, params);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void deliverEvent(EventListener listener, DeepaMehtaEvent event, Object... params) {
+    private void dispatchEvent(EventListener listener, DeepaMehtaEvent event, Object... params) {
         try {
-            event.deliver(listener, params);
+            event.dispatch(listener, params);
         } catch (WebApplicationException e) {
             // Note: a WebApplicationException thrown by a event listener must reach Jersey. So we re-throw here.
             // This allow plugins to produce specific HTTP responses by throwing a WebApplicationException.

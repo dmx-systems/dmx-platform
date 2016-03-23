@@ -72,7 +72,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     // Events
     public static DeepaMehtaEvent CHECK_DISK_QUOTA = new DeepaMehtaEvent(CheckDiskQuotaListener.class) {
         @Override
-        public void deliver(EventListener listener, Object... params) {
+        public void dispatch(EventListener listener, Object... params) {
             ((CheckDiskQuotaListener) listener).checkDiskQuota(
                 (String) params[0], (Long) params[1], (Long) params[2]
             );

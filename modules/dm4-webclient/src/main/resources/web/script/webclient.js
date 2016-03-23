@@ -913,7 +913,7 @@ dm4c = new function() {
      *          Note: undefined listener return values are not included in the array, but null values are.
      */
     this.fire_event = function(event_name) {
-        return pm.deliver_event.apply(undefined, arguments)
+        return pm.dispatch_event.apply(undefined, arguments)
     }
 
     // ---

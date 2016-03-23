@@ -157,7 +157,7 @@ function PluginManager(config) {
      * @param   event_name  Name of the event.
      * @param   <varargs>   Variable number of arguments. Passed to the listeners.
      */
-    this.deliver_event = function(event_name) {
+    this.dispatch_event = function(event_name) {
         var result = []
         //
         var listeners = listener_registry[event_name]

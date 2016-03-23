@@ -23,7 +23,7 @@ import java.util.List;
  * Specification of the DeepaMehta core service -- the heart of DeepaMehta.
  * <p>
  * The responsibility of the DeepaMehta core service is to orchestrate the control flow and allow plugins to hook in.
- * The main duties of the DeepaMehta core service are to provide access to the storage layer and to deliver events to
+ * The main duties of the DeepaMehta core service are to provide access to the storage layer and to dispatch events to
  * the installed plugins. ### FIXDOC
  * <p>
  * The DeepaMehta core service is a realization of the <i>Inversion of Control</i> pattern.
@@ -230,7 +230,7 @@ public interface CoreService {
 
     void fireEvent(DeepaMehtaEvent event, Object... params);
 
-    void deliverEvent(String pluginUri, DeepaMehtaEvent event, Object... params);
+    void dispatchEvent(String pluginUri, DeepaMehtaEvent event, Object... params);
 
 
 

@@ -578,7 +578,7 @@ public class PluginImpl implements Plugin, EventHandler {
                 }
                 //
                 TopicType topicType = dm4.getTopicType(topicTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
+                dispatchEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing topic types to " + this + " failed", e);
@@ -589,7 +589,7 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             for (String assocTypeUri : dm4.getAssociationTypeUris()) {
                 AssociationType assocType = dm4.getAssociationType(assocTypeUri);
-                deliverEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
+                dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {
             throw new RuntimeException("Introducing association types to " + this + " failed", e);
@@ -669,13 +669,13 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     /**
-     * Checks weather this plugin is a listener for the given event, and if so, delivers the event to this plugin.
+     * Checks weather this plugin is a listener for the given event, and if so, dispatches the event to this plugin.
      * Otherwise nothing is performed.
      * <p>
-     * Called internally to deliver the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
+     * Called internally to dispatch the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
-    private void deliverEvent(DeepaMehtaEvent event, Object... params) {
-        dm4.em.deliverEvent(this, event, params);
+    private void dispatchEvent(DeepaMehtaEvent event, Object... params) {
+        dm4.em.dispatchEvent(this, event, params);
     }
 
     /**
