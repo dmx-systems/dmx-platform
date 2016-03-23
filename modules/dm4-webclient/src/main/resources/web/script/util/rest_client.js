@@ -93,7 +93,7 @@ function RESTClient(config) {
         var params = new RequestParameter(traversal_filter)
         var result = request("GET", "/core/topic/" + topic_id + "/related_topics" + params.to_query_string())
         if (sort) {
-            this.sort_topics(result.items)
+            this.sort_topics(result)
         }
         return result
     }
@@ -171,7 +171,7 @@ function RESTClient(config) {
         var params = new RequestParameter(traversal_filter)
         var result = request("GET", "/core/association/" + assoc_id + "/related_topics" + params.to_query_string())
         if (sort) {
-            this.sort_topics(result.items)
+            this.sort_topics(result)
         }
         return result
     }

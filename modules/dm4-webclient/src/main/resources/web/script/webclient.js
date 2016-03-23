@@ -56,7 +56,7 @@ dm4c = new function() {
     this.restc.get_related_topics = function(topic_id, sort) {
         var result = this.request("GET", "/webclient/topic/" + topic_id + "/related_topics")
         if (sort) {
-            this.sort_topics(result.items)
+            this.sort_topics(result)
         }
         return result
     }

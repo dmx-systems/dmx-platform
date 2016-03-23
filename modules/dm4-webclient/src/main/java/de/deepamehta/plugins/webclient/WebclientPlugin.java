@@ -117,7 +117,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public List getRelatedTopics(@PathParam("id") long topicId) {
+    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId) {
         Topic topic = dm4.getTopic(topicId);
         List<RelatedTopic> topics = topic.getRelatedTopics(null);   // assocTypeUri=null
         Iterator<RelatedTopic> i = topics.iterator();

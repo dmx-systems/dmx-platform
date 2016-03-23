@@ -54,7 +54,7 @@ dm4c.add_plugin("de.deepamehta.webbrowser", function() {
             my_role_type_uri: "dm4.core.child",
             others_role_type_uri: "dm4.core.parent",
             others_topic_type_uri: "dm4.webbrowser.webpage"
-        }).items
+        })
         //
         if (webpages.length > 1) {
             alert("WARNING: Data inconsistency\n\nThere are " + webpages.length + " webpages for URL \"" +

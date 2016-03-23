@@ -433,8 +433,8 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.topic_associations = function(topic_id) {
-        var result = dm4c.restc.get_related_topics(topic_id, true)  // sort=true
-        group_topics(result.items, function(title, group) {
+        var topics = dm4c.restc.get_related_topics(topic_id, true)  // sort=true
+        group_topics(topics, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group))
         })
@@ -442,9 +442,9 @@ function RenderHelper() {
 
     this.association_associations = function(assoc_id) {
         // ### TODO: filter property topics
-        var result = dm4c.restc.get_association_related_topics(assoc_id, undefined, true)  // traversal_filter=undefined
+        var topics = dm4c.restc.get_association_related_topics(assoc_id, undefined, true)  // traversal_filter=undefined
                                                                                            // sort=true
-        group_topics(result.items, function(title, group) {
+        group_topics(topics, function(title, group) {
             self.field_label(title)
             self.page(self.topic_list(group, function(topic, spot) {
                 // Note: for associations we need a custom click handler because the default
@@ -493,7 +493,7 @@ function RenderHelper() {
      * @param   parent_element  Optional: the parent element the label is rendered to.
      *                          If not specified the label is rendered directly to the page panel.
      */
-    this.field_label = function(page_model, parent_element, result_set) {
+    this.field_label = function(page_model, parent_element, topics) {
         parent_element = parent_element || $("#page-content")
         //
         if (typeof(page_model) == "string") {
@@ -502,8 +502,8 @@ function RenderHelper() {
             var label = page_model.label
         }
         //
-        if (result_set) {
-            label += " (" + result_set.items.length + ")"
+        if (topics) {
+            label += " (" + topics.length + ")"
         }
         //
         parent_element.append(this.label(label))
