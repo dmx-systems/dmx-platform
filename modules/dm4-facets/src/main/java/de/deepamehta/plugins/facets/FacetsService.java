@@ -4,7 +4,6 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.facets.FacetValueModel;
-import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -33,7 +32,7 @@ public interface FacetsService {
     // ---
 
     // ### TODO: rename to getFacetValues
-    ResultList<RelatedTopic> getFacets(long topicId, String facetTypeUri);
+    List<RelatedTopic> getFacets(long topicId, String facetTypeUri);
 
     /**
      * Retrieves the values of a multi-facet.
@@ -45,7 +44,7 @@ public interface FacetsService {
      *
      * @return  The retrieved facet values (including their child topics). The list may be empty.
      */
-    ResultList<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
+    List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
 
     // ---
 

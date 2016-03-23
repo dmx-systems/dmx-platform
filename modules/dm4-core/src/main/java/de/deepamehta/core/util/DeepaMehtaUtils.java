@@ -1,5 +1,6 @@
 package de.deepamehta.core.util;
 
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
@@ -86,6 +87,13 @@ public class DeepaMehtaUtils {
             }
         }
         return names.toString();
+    }
+
+    public static <T extends DeepaMehtaObject> List<T> loadChildTopics(List<T> objects) {
+        for (DeepaMehtaObject object : objects) {
+            object.loadChildTopics();
+        }
+        return objects;
     }
 
 

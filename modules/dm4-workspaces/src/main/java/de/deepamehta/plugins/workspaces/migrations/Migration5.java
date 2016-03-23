@@ -8,8 +8,8 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.ResultList;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -74,10 +74,10 @@ public class Migration5 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void initWorkspaceProperty(DeepaMehtaObject object) {
-        ResultList<RelatedTopic> workspaces = object.getRelatedTopics("dm4.core.aggregation",
-            "dm4.core.parent", "dm4.core.child", "dm4.workspaces.workspace");
+        List<RelatedTopic> workspaces = object.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
+            "dm4.core.child", "dm4.workspaces.workspace");
         objects++;
-        switch (workspaces.getSize()) {
+        switch (workspaces.size()) {
         case 0:
             break;
         case 1:
@@ -90,7 +90,7 @@ public class Migration5 extends Migration {
             // This is performed in Access Control migration #8 later on.
             if (!isUserAccountRelated(object)) {
                 logger.warning("##### " + info(object) + " has ambiguous workspace assignments (" +
-                    workspaces.getSize() + ") -- This object will get NO workspace assignment " +
+                    workspaces.size() + ") -- This object will get NO workspace assignment " +
                     "in DM 4.5 and will not be editable anymore");
                 ambiguous++;
             }

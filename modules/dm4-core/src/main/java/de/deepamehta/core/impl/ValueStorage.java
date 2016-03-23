@@ -10,7 +10,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ResultList;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -293,7 +292,7 @@ class ValueStorage {
         );
     }
 
-    private ResultList<RelatedTopicModelImpl> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
+    private List<RelatedTopicModelImpl> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
         return pl.fetchRelatedTopics(
             parentId,
             assocDef.getInstanceLevelAssocTypeUri(),

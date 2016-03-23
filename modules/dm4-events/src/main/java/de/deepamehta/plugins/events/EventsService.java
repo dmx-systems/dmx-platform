@@ -1,13 +1,14 @@
 package de.deepamehta.plugins.events;
 
 import de.deepamehta.core.RelatedTopic;
-import de.deepamehta.core.service.ResultList;
+
+import java.util.List;
 
 
 
 public interface EventsService {
 
-    ResultList<RelatedTopic> getEvents(long personId);
+    List<RelatedTopic> getEvents(long personId);
 
-    ResultList<RelatedTopic> getParticipants(long eventId);
+    List<RelatedTopic> getParticipants(long eventId);
 }

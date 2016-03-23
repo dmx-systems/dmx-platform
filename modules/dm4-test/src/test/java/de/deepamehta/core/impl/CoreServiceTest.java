@@ -17,7 +17,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -425,24 +424,24 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void getTopicsByType() {
         Topic type = getTopicByUri("dm4.core.data_type");
-        ResultList<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
-        assertEquals(5, topics1.getSize());
+        List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
+        assertEquals(5, topics1.size());
         List<Topic> topics2 = getTopicInstances("dm4.core.data_type");
         assertEquals(5, topics2.size());
     }
 
     @Test
     public void getAssociationsByType() {
-        ResultList<RelatedAssociation> assocs;
+        List<RelatedAssociation> assocs;
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
-        assertEquals(49, assocs.getSize());
+        assertEquals(49, assocs.size());
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
-        assertEquals(5, assocs.getSize());
+        assertEquals(5, assocs.size());
         //
         assocs = getAssociationInstancesByTraversal("dm4.core.aggregation_def");
-        assertEquals(2, assocs.getSize());
+        assertEquals(2, assocs.size());
     }
 
     // ---
@@ -451,11 +450,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociation() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         Topic type;
-        ResultList<RelatedTopic> childTypes;
+        List<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
-            assertEquals(3, childTypes.getSize());
+            assertEquals(3, childTypes.size());
             //
             // retype assoc
             Association assoc = childTypes.get(0).getRelatingAssociation();
@@ -467,7 +466,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             childTypes = getChildTypes(type);
-            assertEquals(3, childTypes.getSize());
+            assertEquals(3, childTypes.size());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -478,7 +477,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         childTypes = getChildTypes(type);
-        assertEquals(2, childTypes.getSize());
+        assertEquals(2, childTypes.size());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -488,11 +487,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeAssociationRoles() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         Topic type;
-        ResultList<RelatedTopic> childTypes;
+        List<RelatedTopic> childTypes;
         try {
             type = getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
-            assertEquals(3, childTypes.getSize());
+            assertEquals(3, childTypes.size());
             //
             // retype assoc roles
             Association assoc = childTypes.get(0).getRelatingAssociation();
@@ -501,7 +500,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             childTypes = getChildTypes(type);
-            assertEquals(3, childTypes.getSize());
+            assertEquals(3, childTypes.size());
             // ### Note: the Lucene index update is not visible within the transaction!
             // ### That's contradictory to the Neo4j documentation!
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -512,7 +511,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         childTypes = getChildTypes(type);
-        assertEquals(2, childTypes.getSize());
+        assertEquals(2, childTypes.size());
         // ### Note: the Lucene index update is only visible once the transaction is committed!
         // ### That's contradictory to the Neo4j documentation!
         // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
@@ -522,7 +521,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void retypeTopicAndTraverse() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         Topic t0;
-        ResultList<RelatedTopic> topics;
+        List<RelatedTopic> topics;
         try {
             setupTestTopics();
             //
@@ -530,7 +529,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // execute query
             topics = getTestTopics(t0);
-            assertEquals(3, topics.getSize());  // we have 3 topics
+            assertEquals(3, topics.size());  // we have 3 topics
             //
             // retype the first topic
             Topic topic = topics.get(0);
@@ -542,7 +541,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             topics = getTestTopics(t0);
-            assertEquals(2, topics.getSize());  // now we have 2 topics
+            assertEquals(2, topics.size());  // now we have 2 topics
             // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
             // ### created within the same transaction!
             //
@@ -552,14 +551,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         topics = getTestTopics(t0);
-        assertEquals(2, topics.getSize());      // we still have 2 topics
+        assertEquals(2, topics.size());      // we still have 2 topics
     }
 
     @Test
     public void retypeAssociationAndTraverse() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         Topic t0;
-        ResultList<RelatedAssociation> assocs;
+        List<RelatedAssociation> assocs;
         try {
             setupTestAssociations();
             //
@@ -567,7 +566,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // execute query
             assocs = getTestAssociations(t0);
-            assertEquals(3, assocs.getSize());  // we have 3 associations
+            assertEquals(3, assocs.size());  // we have 3 associations
             //
             // retype the first association
             Association assoc = assocs.get(0);
@@ -579,7 +578,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             assocs = getTestAssociations(t0);
-            assertEquals(2, assocs.getSize());  // now we have 2 associations
+            assertEquals(2, assocs.size());  // now we have 2 associations
             // ### Note: the Lucene index update *is* visible within the transaction *if* the test content is
             // ### created within the same transaction!
             //
@@ -589,18 +588,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         assocs = getTestAssociations(t0);
-        assertEquals(2, assocs.getSize());      // we still have 2 associations
+        assertEquals(2, assocs.size());      // we still have 2 associations
     }
 
     @Test
     public void retypeTopicAndTraverseInstantiations() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         Topic type;
-        ResultList<RelatedTopic> topics;
+        List<RelatedTopic> topics;
         try {
             type = getTopicByUri("dm4.core.data_type");
             topics = getTopicInstancesByTraversal(type);
-            assertEquals(5, topics.getSize());
+            assertEquals(5, topics.size());
             //
             // retype topic
             Topic topic = topics.get(0);
@@ -612,7 +611,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             //
             // re-execute query
             topics = getTopicInstancesByTraversal(type);
-            assertEquals(4, topics.getSize());
+            assertEquals(4, topics.size());
             // ### Note: in contrast to the above 4 tests this time the Lucene index update *is* visible
             // ### within the transaction! This suggests the following hypothesis:
             // ###     index.remove(entity) operation *is* visible within the transaction
@@ -629,7 +628,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         }
         // re-execute query
         topics = getTopicInstancesByTraversal(type);
-        assertEquals(4, topics.getSize());
+        assertEquals(4, topics.size());
         // ### Note: the Lucene index update was already visible within the transaction!
     }
 
@@ -1005,17 +1004,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         return dm4.getTopics("type_uri", new SimpleValue(topicTypeUri));
     }
 
-    private ResultList<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
+    private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {
         return type.getRelatedTopics("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", type.getUri());
     }
 
-    private ResultList<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
+    private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
         return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", assocTypeUri);
     }
 
-    private ResultList<RelatedTopic> getChildTypes(Topic type) {
+    private List<RelatedTopic> getChildTypes(Topic type) {
         return type.getRelatedTopics(asList("dm4.core.aggregation_def", "dm4.core.composition_def"),
             "dm4.core.parent_type", "dm4.core.child_type", "dm4.core.topic_type");
     }
@@ -1064,12 +1063,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     // ---
 
-    private ResultList<RelatedTopic> getTestTopics(Topic topic) {
+    private List<RelatedTopic> getTestTopics(Topic topic) {
         return topic.getRelatedTopics("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.plugin");
     }
 
-    private ResultList<RelatedAssociation> getTestAssociations(Topic topic) {
+    private List<RelatedAssociation> getTestAssociations(Topic topic) {
         return topic.getRelatedAssociations("dm4.core.association",
             "dm4.core.default", "dm4.core.default", "dm4.core.association");
     }

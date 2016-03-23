@@ -11,7 +11,6 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -85,20 +84,20 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                     String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                            String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 

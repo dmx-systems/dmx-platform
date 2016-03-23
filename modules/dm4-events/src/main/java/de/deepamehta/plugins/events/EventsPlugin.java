@@ -6,7 +6,6 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.event.PreCreateAssociationListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.plugins.time.TimeService;
@@ -17,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -46,7 +46,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @GET
     @Path("/participant/{id}")
     @Override
-    public ResultList<RelatedTopic> getEvents(@PathParam("id") long personId) {
+    public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
         return dm4.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
             "dm4.events.event");
     }
@@ -54,7 +54,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @GET
     @Path("/{id}/participants")
     @Override
-    public ResultList<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
+    public List<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
         return dm4.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
             "dm4.contacts.person");
     }

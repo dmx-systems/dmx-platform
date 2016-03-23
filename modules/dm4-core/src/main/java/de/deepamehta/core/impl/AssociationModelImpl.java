@@ -14,7 +14,6 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -177,22 +176,22 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                     String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                            String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }

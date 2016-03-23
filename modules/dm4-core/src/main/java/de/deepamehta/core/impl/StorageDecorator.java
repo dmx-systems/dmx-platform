@@ -8,11 +8,11 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import static java.util.Arrays.asList;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -333,15 +333,15 @@ class StorageDecorator {
      */
     final RelatedTopicModelImpl fetchTopicRelatedTopic(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                        String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+        List<RelatedTopicModelImpl> topics = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
-        switch (topics.getSize()) {
+        switch (topics.size()) {
         case 0:
             return null;
         case 1:
             return topics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (topicId=" +
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
@@ -356,11 +356,10 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> relTopics = (List<RelatedTopicModelImpl>) storage.fetchTopicRelatedTopics(topicId,
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return new ResultList(relTopics);
+    final List<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
+        return (List<RelatedTopicModelImpl>) storage.fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
     }
 
     /**
@@ -374,13 +373,12 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
+    final List<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> result = new ResultList();
+        List<RelatedTopicModelImpl> result = new ArrayList();
         for (String assocTypeUri : assocTypeUris) {
-            ResultList<RelatedTopicModelImpl> res = fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri,
-                othersRoleTypeUri, othersTopicTypeUri);
-            result.addAll(res);
+            result.addAll(fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersTopicTypeUri));
         }
         return result;
     }
@@ -395,15 +393,15 @@ class StorageDecorator {
      */
     final RelatedAssociationModelImpl fetchTopicRelatedAssociation(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModelImpl> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.getSize()) {
+        List<RelatedAssociationModelImpl> assocs = fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        switch (assocs.size()) {
         case 0:
             return null;
         case 1:
             return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (topicId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (topicId=" +
                 topicId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")");
         }
@@ -418,12 +416,10 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedAssociationModelImpl> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
+    final List<RelatedAssociationModelImpl> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModelImpl> relAssocs =
-            (List<RelatedAssociationModelImpl>) storage.fetchTopicRelatedAssociations(topicId, assocTypeUri,
+        return (List<RelatedAssociationModelImpl>) storage.fetchTopicRelatedAssociations(topicId, assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return new ResultList(relAssocs);
     }
 
     // ---
@@ -436,15 +432,15 @@ class StorageDecorator {
      */
     final RelatedTopicModelImpl fetchAssociationRelatedTopic(long assocId, String assocTypeUri, String myRoleTypeUri,
                                                              String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> topics = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+        List<RelatedTopicModelImpl> topics = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
-        switch (topics.getSize()) {
+        switch (topics.size()) {
         case 0:
             return null;
         case 1:
             return topics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (assocId=" +
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
@@ -454,12 +450,10 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
+    final List<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> relTopics =
-            (List<RelatedTopicModelImpl>) storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
+        return (List<RelatedTopicModelImpl>) storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
-        return new ResultList(relTopics);
     }
 
     /**
@@ -473,13 +467,12 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
+    final List<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> result = new ResultList();
+        List<RelatedTopicModelImpl> result = new ArrayList();
         for (String assocTypeUri : assocTypeUris) {
-            ResultList<RelatedTopicModelImpl> res = fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
-                othersRoleTypeUri, othersTopicTypeUri);
-            result.addAll(res);
+            result.addAll(fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+                othersTopicTypeUri));
         }
         return result;
     }
@@ -494,15 +487,15 @@ class StorageDecorator {
      */
     final RelatedAssociationModelImpl fetchAssociationRelatedAssociation(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModelImpl> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+        List<RelatedAssociationModelImpl> assocs = fetchAssociationRelatedAssociations(assocId, assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        switch (assocs.getSize()) {
+        switch (assocs.size()) {
         case 0:
             return null;
         case 1:
             return assocs.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + assocs.getSize() + " related associations (assocId=" +
+            throw new RuntimeException("Ambiguity: there are " + assocs.size() + " related associations (assocId=" +
                 assocId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri +
                 "\"),\nresult=" + assocs);
@@ -518,12 +511,10 @@ class StorageDecorator {
      * @return  The fetched associations.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedAssociationModelImpl> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
+    final List<RelatedAssociationModelImpl> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModelImpl> relAssocs =
-            (List<RelatedAssociationModelImpl>) storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri,
+        return (List<RelatedAssociationModelImpl>) storage.fetchAssociationRelatedAssociations(assocId, assocTypeUri,
             myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return new ResultList(relAssocs);
     }
 
     // ---
@@ -542,15 +533,15 @@ class StorageDecorator {
      */
     final RelatedTopicModelImpl fetchRelatedTopic(long objectId, String assocTypeUri, String myRoleTypeUri,
                                                   String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> topics = fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri,
+        List<RelatedTopicModelImpl> topics = fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
-        switch (topics.getSize()) {
+        switch (topics.size()) {
         case 0:
             return null;
         case 1:
             return topics.iterator().next();
         default:
-            throw new RuntimeException("Ambiguity: there are " + topics.getSize() + " related topics (objectId=" +
+            throw new RuntimeException("Ambiguity: there are " + topics.size() + " related topics (objectId=" +
                 objectId + ", assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri + "\", " +
                 "othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")");
         }
@@ -566,11 +557,10 @@ class StorageDecorator {
      * @return  The fetched topics.
      *          Note: their child topics are not fetched.
      */
-    final ResultList<RelatedTopicModelImpl> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
-                                                               String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> relTopics = (List<RelatedTopicModelImpl>) storage.fetchRelatedTopics(objectId,
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return new ResultList(relTopics);
+    final List<RelatedTopicModelImpl> fetchRelatedTopics(long objectId, String assocTypeUri, String myRoleTypeUri,
+                                                         String othersRoleTypeUri, String othersTopicTypeUri) {
+        return (List<RelatedTopicModelImpl>) storage.fetchRelatedTopics(objectId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
     }
 
     // ### TODO: decorator for fetchRelatedAssociations()

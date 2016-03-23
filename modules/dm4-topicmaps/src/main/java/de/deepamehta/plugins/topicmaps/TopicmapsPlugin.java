@@ -15,8 +15,8 @@ import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -305,10 +305,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewModel> topics = new HashMap();
-        ResultList<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
             "dm4.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
         if (includeChilds) {
-            relTopics.loadChildTopics();
+            DeepaMehtaUtils.loadChildTopics(relTopics);
         }
         for (RelatedTopic topic : relTopics) {
             topics.put(topic.getId(), createTopicViewModel(topic));
@@ -318,7 +318,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, AssociationViewModel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewModel> assocs = new HashMap();
-        ResultList<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
+        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), mf.newAssociationViewModel(assoc.getModel()));

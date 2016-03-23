@@ -17,7 +17,6 @@ import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -211,7 +210,7 @@ public class CoreServiceImpl implements CoreService {
         try {
             Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
                 new SimpleValue("dm4.core.topic_type")));       // ### TODO: rethink access control    
-            ResultList<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            List<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.topic_type");    // ### TODO: perform by-value search instead
             List<String> topicTypeUris = new ArrayList();
             // add meta types
@@ -285,7 +284,7 @@ public class CoreServiceImpl implements CoreService {
         try {
             Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
                 new SimpleValue("dm4.core.assoc_type")));           // ### TODO: rethink access control
-            ResultList<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
+            List<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
                 "dm4.core.instance", "dm4.core.assoc_type");        // ### TODO: perform by-value search instead
             List<String> assocTypeUris = new ArrayList();
             for (Topic assocType : assocTypes) {

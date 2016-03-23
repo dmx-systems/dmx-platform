@@ -20,7 +20,6 @@ import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.Consumes;
@@ -118,9 +117,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     @GET
     @Path("/topic/{id}/related_topics")
-    public ResultList getRelatedTopics(@PathParam("id") long topicId) {
+    public List getRelatedTopics(@PathParam("id") long topicId) {
         Topic topic = dm4.getTopic(topicId);
-        ResultList<RelatedTopic> topics = topic.getRelatedTopics(null);     // assocTypeUri=null
+        List<RelatedTopic> topics = topic.getRelatedTopics(null);   // assocTypeUri=null
         Iterator<RelatedTopic> i = topics.iterator();
         int removed = 0;
         while (i.hasNext()) {
@@ -209,7 +208,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                 searchableUnits.add(topic);
             } else {
                 List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-                    "dm4.core.parent", null).getItems();
+                    "dm4.core.parent", null);
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {

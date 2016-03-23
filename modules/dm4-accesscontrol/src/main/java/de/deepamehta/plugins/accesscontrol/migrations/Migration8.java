@@ -8,7 +8,6 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.List;
@@ -72,9 +71,9 @@ public class Migration8 extends Migration {
 
     private void createMemberships(Topic usernameTopic) {
         String username = usernameTopic.getSimpleValue().toString();
-        ResultList<RelatedTopic> workspaces = usernameTopic.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
+        List<RelatedTopic> workspaces = usernameTopic.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
             "dm4.core.child", "dm4.workspaces.workspace");
-        logger.info("######## User \"" + username + "\" is member of " + workspaces.getSize() + " workspaces");
+        logger.info("######## User \"" + username + "\" is member of " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
             long workspaceId = workspace.getId();
             String owner = acService.getWorkspaceOwner(workspaceId);

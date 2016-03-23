@@ -4,7 +4,6 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
 
@@ -99,7 +98,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                  String othersTopicTypeUri);
 
-    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri);
+    List<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     /**
      * @param   assocTypeUri        may be null
@@ -107,8 +106,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri);
+    List<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                        String othersTopicTypeUri);
 
     /**
      * @param   assocTypeUris       may *not* be null
@@ -116,8 +115,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersTopicTypeUri  may be null
      */
-    ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                              String othersTopicTypeUri);
+    List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                        String othersTopicTypeUri);
 
     // --- Association Retrieval ---
 
@@ -136,8 +135,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * @param   othersRoleTypeUri   may be null
      * @param   othersAssocTypeUri  may be null
      */
-    ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                          String othersRoleTypeUri, String othersAssocTypeUri);
+    List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                    String othersRoleTypeUri, String othersAssocTypeUri);
 
     // ---
 

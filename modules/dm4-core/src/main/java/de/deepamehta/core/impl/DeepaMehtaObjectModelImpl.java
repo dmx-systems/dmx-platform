@@ -16,7 +16,6 @@ import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -252,18 +251,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
-                                          String othersRoleTypeUri, String othersTopicTypeUri) {
+    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                     String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                            String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 
-    ResultList<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
+    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         throw new UnsupportedOperationException();
     }
 

@@ -18,7 +18,6 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
-import de.deepamehta.core.service.ResultList;
 
 import java.util.List;
 
@@ -153,11 +152,11 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // --- Topic Retrieval ---
 
     @Override
-    public ResultList<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                                     String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> topics = pl.fetchAssociationRelatedTopics(getId(),
-            assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
+    public List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                         String othersTopicTypeUri) {
+        List<RelatedTopicModelImpl> topics = pl.fetchAssociationRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
+            othersRoleTypeUri, othersTopicTypeUri);
+        return pl.checkReadAccessAndInstantiate(topics);
     }
 
     // --- Association Retrieval ---
@@ -171,11 +170,11 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     }
 
     @Override
-    public ResultList<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
-                                                                 String othersRoleTypeUri, String othersAssocTypeUri) {
-        ResultList<RelatedAssociationModelImpl> assocs = pl.fetchAssociationRelatedAssociations(getId(),
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return new ResultList(pl.checkReadAccessAndInstantiate(assocs));
+    public List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
+        List<RelatedAssociationModelImpl> assocs = pl.fetchAssociationRelatedAssociations(getId(), assocTypeUri,
+            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
+        return pl.checkReadAccessAndInstantiate(assocs);
     }
 
     // ---

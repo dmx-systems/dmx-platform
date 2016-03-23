@@ -8,7 +8,6 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.service.ResultList;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -214,16 +213,16 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     }
 
     @Override
-    public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri) {
+    public List<RelatedTopic> getRelatedTopics(String assocTypeUri) {
         return getRelatedTopics(assocTypeUri, null, null, null);
     }
 
     @Override
-    public ResultList<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
-        ResultList<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        return new ResultList(pl.checkReadAccessAndInstantiate(topics));
+    public List<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                          String othersTopicTypeUri) {
+        List<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri);
+        return pl.checkReadAccessAndInstantiate(topics);
     }
 
     // Note: this method is implemented in the subclasses (this is an abstract class):

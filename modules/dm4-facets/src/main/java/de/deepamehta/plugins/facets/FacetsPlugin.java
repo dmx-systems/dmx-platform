@@ -8,7 +8,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -68,14 +67,13 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @GET
     @Path("/multi/{facet_type_uri}/topic/{id}")
     @Override
-    public ResultList<RelatedTopic> getFacets(@PathParam("id") long topicId,
-                                              @PathParam("facet_type_uri") String facetTypeUri)
-                                                                                                                {
+    public List<RelatedTopic> getFacets(@PathParam("id") long topicId,
+                                        @PathParam("facet_type_uri") String facetTypeUri) {
         return getFacets(dm4.getTopic(topicId), facetTypeUri);
     }
 
     @Override
-    public ResultList<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
+    public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
         return fetchChildTopics(object, getAssocDef(facetTypeUri));
     }
@@ -97,7 +95,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                     childTopics.put(childTypeUri, value.getModel());
                 }
             } else {
-                ResultList<RelatedTopic> values = getFacets(topic, facetTypeUri);
+                List<RelatedTopic> values = getFacets(topic, facetTypeUri);
                 childTopics.put(childTypeUri, DeepaMehtaUtils.toTopicModels(values));
             }
         }
@@ -178,7 +176,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private ResultList<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef) {
+    private List<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri);

@@ -5,13 +5,13 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.CoreService;
-import de.deepamehta.core.service.ResultList;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -92,8 +92,8 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
         }
     }
 
-    private ResultList<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic) {
-        return geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext", "dm4.core.default",
-            "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate").loadChildTopics();
+    private List<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic) {
+        return DeepaMehtaUtils.loadChildTopics(geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext",
+            "dm4.core.default", "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate"));
     }
 }
