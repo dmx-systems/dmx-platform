@@ -1,5 +1,5 @@
 body {
-    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;    /* must match /css/ckeditor-contents.css */
+    font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;    /* style must match ckeditor-contents.css */
     margin: 0;
     word-wrap: break-word;
 }
@@ -304,8 +304,20 @@ body {
 
 /*** Menus ***/
 
+.menu-container {
+    position: fixed;
+    display: none;
+    z-index: 1001;          /* Note: OpenLayer's event layer has z-index 999. */
+}
+
 .ui-menu .icon {
     vertical-align: middle;
     margin-right: 12px;
     width: 24px;
+}
+
+/* Prevent word-breaking in menu items. This happens in Firefox and Chrome (not in Safari)      */
+/* if the menu has a vertical scrollbar. Note: "word-wrap: break-word;" is inherited from body. */
+.ui-menu {
+    word-wrap: normal;
 }
