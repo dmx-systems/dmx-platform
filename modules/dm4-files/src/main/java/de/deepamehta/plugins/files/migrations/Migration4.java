@@ -64,7 +64,7 @@ public class Migration4 extends Migration {
      * If no such Folder topic exists <code>null</code> is returned.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        Topic topic = dm4.getTopic("dm4.files.path", new SimpleValue(repoPath));
+        Topic topic = dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
         return topic != null ? topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
             "dm4.files.folder") : null;
     }

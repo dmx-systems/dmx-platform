@@ -545,7 +545,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
     private Topic fetchTopic(String repoPath, String topicTypeUri) {
-        Topic topic = dm4.getTopic("dm4.files.path", new SimpleValue(repoPath));
+        Topic topic = dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
         if (topic != null) {
             return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
         }

@@ -68,7 +68,7 @@ public interface CoreService {
      *
      * @throws  RuntimeException    If more than one topic is found.
      */
-    Topic getTopic(String key, SimpleValue value);
+    Topic getTopicByValue(String key, SimpleValue value);
 
     /**
      * Looks up topics by key and value.

@@ -67,8 +67,8 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_value/{key}/{value}")
-    public Topic getTopic(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getTopic(key, value);
+    public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dm4.getTopicByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
