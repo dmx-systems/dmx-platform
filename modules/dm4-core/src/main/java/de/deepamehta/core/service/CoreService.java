@@ -58,7 +58,7 @@ public interface CoreService {
     /**
      * Looks up a single topic by exact value.
      * <p>
-     * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
+     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
      * Compare to {@link #getTopics(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
@@ -73,7 +73,7 @@ public interface CoreService {
     /**
      * Looks up topics by key and value.
      * <p>
-     * Wildcards like "*" in String values <i>are</i> interpreted.
+     * Wildcards like "*" in String values are interpreted.
      * <p>
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.

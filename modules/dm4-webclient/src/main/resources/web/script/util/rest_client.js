@@ -38,6 +38,11 @@ function RESTClient(config) {
         return request("GET", "/core/topic/" + topic_id + params.to_query_string())
     }
 
+    this.get_topic_by_uri = function(uri, include_childs, include_assoc_childs) {
+        var params = new RequestParameter({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
+        return request("GET", "/core/topic/by_uri/" + uri + params.to_query_string())
+    }
+
     /**
      * Looks up a topic by exact property value.
      * If no such topic exists <code>null</code> is returned.
