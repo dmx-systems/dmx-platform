@@ -49,6 +49,13 @@ public interface CoreService {
     Topic getTopic(long topicId);
 
     /**
+     * Accesses a topic by URI.
+     *
+     * @return  the topic, or <code>null</code> if no such topic exists.
+     */
+    Topic getTopicByUri(String uri);
+
+    /**
      * Looks up a single topic by exact value.
      * <p>
      * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.

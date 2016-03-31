@@ -82,6 +82,11 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public Topic getTopicByUri(String uri) {
+        return pl.getTopicByUri(uri);
+    }
+
+    @Override
     public Topic getTopic(String key, SimpleValue value) {
         return pl.getTopic(key, value);
     }

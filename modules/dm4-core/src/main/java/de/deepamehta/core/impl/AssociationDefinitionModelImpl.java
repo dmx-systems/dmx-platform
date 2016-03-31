@@ -165,7 +165,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        logger.info("################################ assoc def postUpdate()!!!");
         super.postUpdate(newModel, oldModel);
         //
         updateCardinality((AssociationDefinitionModel) newModel);

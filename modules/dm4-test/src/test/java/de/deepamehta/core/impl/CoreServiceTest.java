@@ -144,7 +144,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
-            Topic topic = dm4.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
+            Topic topic = dm4.getTopicByUri("de.deepamehta.notes");
             ChildTopics comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
@@ -166,7 +166,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
-            Topic topic = dm4.getTopic("uri", new SimpleValue("de.deepamehta.notes"));
+            Topic topic = dm4.getTopicByUri("de.deepamehta.notes");
             ChildTopics comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
@@ -423,7 +423,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void getTopicsByType() {
-        Topic type = getTopicByUri("dm4.core.data_type");
+        Topic type = dm4.getTopicByUri("dm4.core.data_type");
         List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
         assertEquals(5, topics1.size());
         List<Topic> topics2 = getTopicInstances("dm4.core.data_type");
@@ -452,7 +452,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> childTypes;
         try {
-            type = getTopicByUri("dm4.core.plugin");
+            type = dm4.getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
             //
@@ -489,7 +489,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> childTypes;
         try {
-            type = getTopicByUri("dm4.core.plugin");
+            type = dm4.getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
             //
@@ -525,7 +525,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             setupTestTopics();
             //
-            t0 = getTopicByUri("dm4.test.t0");
+            t0 = dm4.getTopicByUri("dm4.test.t0");
             //
             // execute query
             topics = getTestTopics(t0);
@@ -562,7 +562,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             setupTestAssociations();
             //
-            t0 = getTopicByUri("dm4.test.t0");
+            t0 = dm4.getTopicByUri("dm4.test.t0");
             //
             // execute query
             assocs = getTestAssociations(t0);
@@ -597,7 +597,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic type;
         List<RelatedTopic> topics;
         try {
-            type = getTopicByUri("dm4.core.data_type");
+            type = dm4.getTopicByUri("dm4.core.data_type");
             topics = getTopicInstancesByTraversal(type);
             assertEquals(5, topics.size());
             //
@@ -941,11 +941,11 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             dm4.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
             //
-            Topic t0 = getTopicByUri("dm4.test.t0");
+            Topic t0 = dm4.getTopicByUri("dm4.test.t0");
             assertNotNull(t0);
             //
             t0.delete();
-            t0 = getTopicByUri("dm4.test.t0");
+            t0 = dm4.getTopicByUri("dm4.test.t0");
             assertNull(t0);
             //
             tx.success();
@@ -996,10 +996,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private Topic getTopicByUri(String uri) {
-        return dm4.getTopic("uri", new SimpleValue(uri));
-    }
-
     private List<Topic> getTopicInstances(String topicTypeUri) {
         return dm4.getTopics("type_uri", new SimpleValue(topicTypeUri));
     }
@@ -1010,7 +1006,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private List<RelatedAssociation> getAssociationInstancesByTraversal(String assocTypeUri) {
-        return getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
+        return dm4.getTopicByUri(assocTypeUri).getRelatedAssociations("dm4.core.instantiation",
             "dm4.core.type", "dm4.core.instance", assocTypeUri);
     }
 

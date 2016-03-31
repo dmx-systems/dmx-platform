@@ -140,7 +140,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getWorkspace(String uri) {
-        Topic workspace = pl.getTopic("uri", new SimpleValue(uri));
+        Topic workspace = pl.getTopicByUri(uri);
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }

@@ -56,7 +56,7 @@ public class Migration5 extends Migration {
         //
         // 3) Corrects URI of the "DeepaMehta" workspace: "de." -> "dm4."
         //
-        dm4.getTopic("uri", new SimpleValue("de.workspaces.deepamehta")).setUri("dm4.workspaces.deepamehta");
+        dm4.getTopicByUri("de.workspaces.deepamehta").setUri("dm4.workspaces.deepamehta");
         //
         // 4) Sets the sharing mode of all workspaces to "Public".
         //

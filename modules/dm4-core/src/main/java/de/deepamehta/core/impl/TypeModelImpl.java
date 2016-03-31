@@ -395,10 +395,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
         if (assoc == oldAssocDef) {
             // edited via type topic -- abort
-            logger.info("################################## assoc def " + assoc.getId() + " edited via TYPE TOPIC");
             return;
-        } else {
-            logger.info("################################## assoc def " + assoc.getId() + " edited via ASSOCIATION");
         }
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel newAssocModel = mf.newAssociationModel(assoc);

@@ -77,6 +77,10 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
+    Topic getTopicByUri(String uri) {
+        return getTopic("uri", new SimpleValue(uri));
+    }
+
     Topic getTopic(String key, SimpleValue value) {
         try {
             TopicModelImpl topic = fetchTopic(key, value);

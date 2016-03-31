@@ -564,7 +564,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private Topic fetchPluginTopic() {
-        return dm4.getTopic("uri", new SimpleValue(pluginUri));
+        return dm4.getTopicByUri(pluginUri);
     }
 
     // ---
