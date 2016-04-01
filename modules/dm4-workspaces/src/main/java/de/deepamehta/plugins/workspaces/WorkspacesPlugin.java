@@ -226,7 +226,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId,
                                                      @PathParam("assoc_type_uri") String assocTypeUri) {
-        List<Association> assocs = dm4.getAssociations(assocTypeUri);
+        List<Association> assocs = dm4.getAssociationsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
     }

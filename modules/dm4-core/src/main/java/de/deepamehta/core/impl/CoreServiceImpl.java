@@ -138,13 +138,13 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Association getAssociation(String key, SimpleValue value) {
-        return pl.getAssociation(key, value);
+    public Association getAssociationByValue(String key, SimpleValue value) {
+        return pl.getAssociationByValue(key, value);
     }
 
     @Override
-    public List<Association> getAssociations(String key, SimpleValue value) {
-        return pl.getAssociations(key, value);
+    public List<Association> getAssociationsByValue(String key, SimpleValue value) {
+        return pl.getAssociationsByValue(key, value);
     }
 
     @Override
@@ -163,8 +163,8 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public List<Association> getAssociations(String assocTypeUri) {
-        return pl.getAssociations(assocTypeUri);
+    public List<Association> getAssociationsByType(String assocTypeUri) {
+        return pl.getAssociationsByType(assocTypeUri);
     }
 
     @Override

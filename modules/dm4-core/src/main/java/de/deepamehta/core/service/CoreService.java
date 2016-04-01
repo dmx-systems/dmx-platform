@@ -111,16 +111,18 @@ public interface CoreService {
 
     /**
      * Looks up a single association by exact value.
-     * If no such association exists <code>null</code> is returned.
-     * If more than one association is found a runtime exception is thrown.
      * <p>
-     * Note: wildcards like "*" in String values are treated literally. They are <i>not</i> interpreted.
-     * Compare to {@link #getAssociations(String,SimpleValue)}
+     * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
+     * Compare to {@link #getAssociationsByValue(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up an association this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
+     *
+     * @return  the association, or <code>null</code> if no such association exists.
+     *
+     * @throws  RuntimeException    If more than one association is found.
      */
-    Association getAssociation(String key, SimpleValue value);
+    Association getAssociationByValue(String key, SimpleValue value);
 
     /**
      * Looks up associations by key and value.
@@ -130,7 +132,7 @@ public interface CoreService {
      * IMPORTANT: Looking up associations this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    List<Association> getAssociations(String key, SimpleValue value);
+    List<Association> getAssociationsByValue(String key, SimpleValue value);
 
     /**
      * Returns the association between two topics, qualified by association type and both role types.
@@ -147,7 +149,7 @@ public interface CoreService {
 
     // ---
 
-    List<Association> getAssociations(String assocTypeUri);
+    List<Association> getAssociationsByType(String assocTypeUri);
 
     /**
      * Returns all associations between two topics. If no such association exists an empty set is returned.

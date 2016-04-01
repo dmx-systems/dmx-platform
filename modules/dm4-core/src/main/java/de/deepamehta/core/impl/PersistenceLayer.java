@@ -189,7 +189,7 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Association getAssociation(String key, SimpleValue value) {
+    Association getAssociationByValue(String key, SimpleValue value) {
         try {
             AssociationModelImpl assoc = fetchAssociation(key, value);
             return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
@@ -198,7 +198,7 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Association> getAssociations(String key, SimpleValue value) {
+    List<Association> getAssociationsByValue(String key, SimpleValue value) {
         try {
             return checkReadAccessAndInstantiate(fetchAssociations(key, value));
         } catch (Exception e) {
@@ -235,7 +235,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    List<Association> getAssociations(String assocTypeUri) {
+    List<Association> getAssociationsByType(String assocTypeUri) {
         try {
             return checkReadAccessAndInstantiate(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {

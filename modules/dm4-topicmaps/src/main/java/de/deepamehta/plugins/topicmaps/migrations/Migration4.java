@@ -30,7 +30,7 @@ public class Migration4 extends Migration {
         logger.info("########## Converting \"Topic Mapcontext\" associations");
         //
         // 1) convert the "Topic Mapcontext" association's child topics into properties
-        for (Association assoc : dm4.getAssociations("dm4.topicmaps.topic_mapcontext")) {
+        for (Association assoc : dm4.getAssociationsByType("dm4.topicmaps.topic_mapcontext")) {
             migrateMapcontextAssociation(assoc);
         }
         //

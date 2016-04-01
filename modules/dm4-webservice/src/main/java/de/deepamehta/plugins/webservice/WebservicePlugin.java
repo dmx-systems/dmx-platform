@@ -133,15 +133,16 @@ public class WebservicePlugin extends PluginActivator {
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/by_value/{key}/{value}")
-    public Association getAssociation(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getAssociation(key, value);
+    public Association getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
+        return dm4.getAssociationByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
-    public List<Association> getAssociations(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getAssociations(key, value);
+    public List<Association> getAssociationsByValue(@PathParam("key") String key,
+                                                    @PathParam("value") SimpleValue value) {
+        return dm4.getAssociationsByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
