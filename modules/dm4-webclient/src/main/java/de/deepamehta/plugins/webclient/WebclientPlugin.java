@@ -105,7 +105,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             logger.info("typeUri=\"" + typeUri + "\"");
             String searchTerm = dm4.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<Topic> topics = dm4.getTopics(typeUri);
+            List<Topic> topics = dm4.getTopicsByType(typeUri);
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {

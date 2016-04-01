@@ -59,7 +59,7 @@ public interface CoreService {
      * Looks up a single topic by exact value.
      * <p>
      * Note: wildcards like "*" in String values are <i>not</i> interpreted. They are treated literally.
-     * Compare to {@link #getTopics(String,SimpleValue)}
+     * Compare to {@link #getTopicsByValue(String,SimpleValue)}
      * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
@@ -78,9 +78,9 @@ public interface CoreService {
      * IMPORTANT: Looking up topics this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      */
-    List<Topic> getTopics(String key, SimpleValue value);
+    List<Topic> getTopicsByValue(String key, SimpleValue value);
 
-    List<Topic> getTopics(String topicTypeUri);
+    List<Topic> getTopicsByType(String topicTypeUri);
 
     /**
      * Performs a fulltext search.

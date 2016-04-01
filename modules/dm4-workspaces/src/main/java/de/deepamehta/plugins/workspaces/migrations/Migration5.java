@@ -60,7 +60,7 @@ public class Migration5 extends Migration {
         //
         // 4) Sets the sharing mode of all workspaces to "Public".
         //
-        for (Topic workspace : dm4.getTopics("dm4.workspaces.workspace")) {
+        for (Topic workspace : dm4.getTopicsByType("dm4.workspaces.workspace")) {
             workspace.update(mf.newTopicModel(mf.newChildTopicsModel()
                 .putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
             ));

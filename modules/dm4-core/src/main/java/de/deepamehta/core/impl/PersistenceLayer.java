@@ -90,7 +90,7 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Topic> getTopics(String key, SimpleValue value) {
+    List<Topic> getTopicsByValue(String key, SimpleValue value) {
         try {
             return checkReadAccessAndInstantiate(fetchTopics(key, value));
         } catch (Exception e) {
@@ -98,7 +98,7 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    List<Topic> getTopics(String topicTypeUri) {
+    List<Topic> getTopicsByType(String topicTypeUri) {
         try {
             return checkReadAccessAndInstantiate(typeStorage.getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {

@@ -83,8 +83,8 @@ public class Migration2 extends Migration {
         // 1) buffer entry topic content in memory
         //
         // Note: the actual conversion (as performed later) relies on the buffered content
-        for (Topic phoneEntry   : dm4.getTopics("dm4.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
-        for (Topic addressEntry : dm4.getTopics("dm4.contacts.address_entry")) bufferAddressEntry(addressEntry);
+        for (Topic phoneEntry   : dm4.getTopicsByType("dm4.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
+        for (Topic addressEntry : dm4.getTopicsByType("dm4.contacts.address_entry")) bufferAddressEntry(addressEntry);
         //
         // 2) temporarily change entry types
         //

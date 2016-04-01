@@ -33,7 +33,7 @@ public class Migration11 extends Migration {
 
     @Override
     public void run() {
-        List<Topic> usernames = dm4.getTopics("dm4.accesscontrol.username");
+        List<Topic> usernames = dm4.getTopicsByType("dm4.accesscontrol.username");
         logger.info("########## Adding \"dm4.accesscontrol.login_enabled\" config topic to " + usernames.size() +
             " usernames");
         for (Topic username : usernames) {

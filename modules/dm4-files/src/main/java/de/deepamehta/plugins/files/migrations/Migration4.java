@@ -34,7 +34,7 @@ public class Migration4 extends Migration {
     public void run() {
         // 1) Rename root Folder topics
         if (FILE_REPOSITORY_PER_WORKSPACE) {
-            List<Topic> workspaces = dm4.getTopics("dm4.workspaces.workspace");
+            List<Topic> workspaces = dm4.getTopicsByType("dm4.workspaces.workspace");
             logger.info("########## Renaming root Folder topics of " + workspaces.size() + " possible workspaces");
             int renamed = 0;
             for (Topic workspace : workspaces) {

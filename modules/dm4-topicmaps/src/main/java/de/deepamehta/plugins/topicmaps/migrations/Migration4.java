@@ -65,7 +65,7 @@ public class Migration4 extends Migration {
     private void deleteTopicType(String topicTypeUri) {
         typesDeleted++;
         // delete instances
-        for (Topic topic : dm4.getTopics(topicTypeUri)) {
+        for (Topic topic : dm4.getTopicsByType(topicTypeUri)) {
             topic.delete();
             topicsDeleted++;
         }
