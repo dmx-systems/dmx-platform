@@ -61,7 +61,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Properties   pluginProperties;      // Read from file "plugin.properties"
     private String       pluginPackage;
     private PluginInfo   pluginInfo;
-    private List<String> pluginDependencies;    // plugin URIs as read from "importModels" property
+    private List<String> pluginDependencies;    // plugin URIs as read from "dm4.plugin.activate_after" property
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DeepaMehta Core and OSGi)
@@ -99,7 +99,8 @@ public class PluginImpl implements Plugin, EventHandler {
         this.pluginUri = pluginBundle.getSymbolicName();
         //
         this.pluginProperties = readConfigFile();
-        this.pluginPackage = getConfigProperty("pluginPackage", pluginContext.getClass().getPackage().getName());
+        this.pluginPackage = getConfigProperty("dm4.plugin.main_package", pluginContext.getClass().getPackage()
+            .getName());
         this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = pluginDependencies();
         //
@@ -227,8 +228,8 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns the migration class name for the given migration number.
      *
      * @return  the fully qualified migration class name, or <code>null</code> if the migration package is unknown.
-     *          This is the case if the plugin bundle contains no Plugin subclass and the "pluginPackage" config
-     *          property is not set.
+     *          This is the case if the plugin bundle contains no Plugin subclass and the "dm4.plugin.main_package"
+     *          config property is not set.
      */
     String getMigrationClassName(int migrationNr) {
         if (pluginPackage.equals(PLUGIN_DEFAULT_PACKAGE)) {
@@ -456,7 +457,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * The requirements:
      *   - the 2 core services are available (CoreService, EventAdmin).
      *   - the injected services (according to the "Inject" annotation) are available.
-     *   - the plugin dependencies (according to the "importModels" config property) are active.
+     *   - the plugin dependencies (according to the "dm4.plugin.activate_after" config property) are active.
      */
     private void checkRequirementsForActivation() {
         if (dm4 != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
@@ -853,9 +854,9 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private List<String> pluginDependencies() {
         List<String> pluginDependencies = new ArrayList();
-        String importModels = getConfigProperty("importModels");
-        if (importModels != null) {
-            String[] pluginUris = importModels.split(", *");
+        String activateAfter = getConfigProperty("dm4.plugin.activate_after");
+        if (activateAfter != null) {
+            String[] pluginUris = activateAfter.split(", *");
             for (int i = 0; i < pluginUris.length; i++) {
                 pluginDependencies.add(pluginUris[i]);
             }

@@ -50,43 +50,44 @@ class MigrationManager {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Determines the migrations to be run for the specified plugin and run them.
+     * Determines the migrations to be run for the specified plugin and runs them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
-        int migrationNr = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
+        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
             .getSimpleValue().intValue();
-        int requiredMigrationNr = Integer.parseInt(plugin.getConfigProperty("requiredPluginMigrationNr", "0"));
-        int migrationsToRun = requiredMigrationNr - migrationNr;
+        int requiredModelVersion = Integer.parseInt(plugin.getConfigProperty("dm4.plugin.model_version", "0"));
+        int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
-            logger.info("Running migrations for " + plugin + " ABORTED -- everything up-to-date (migrationNr=" +
-                migrationNr + ")");
+            logger.info("Running migrations for " + plugin + " ABORTED -- installed model is up-to-date (version " +
+                installedModelVersion + ")");
             return;
         }
         //
-        logger.info("Running " + migrationsToRun + " migrations for " + plugin + " (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
+        logger.info("Running " + migrationsToRun + " migrations for " + plugin + " (installed model: version " +
+            installedModelVersion + ", required model: version " + requiredModelVersion + ")");
+        for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
             runPluginMigration(plugin, i, isCleanInstall);
         }
     }
 
     /**
-     * Determines the core migrations to be run and run them.
+     * Determines the core migrations to be run and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int migrationNr = dm4.pl.fetchMigrationNr();
-        int requiredMigrationNr = REQUIRED_CORE_MIGRATION;
-        int migrationsToRun = requiredMigrationNr - migrationNr;
+        int installedModelVersion = dm4.pl.fetchMigrationNr();
+        int requiredModelVersion = REQUIRED_CORE_MIGRATION;
+        int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
-            logger.info("Running core migrations ABORTED -- everything up-to-date (migrationNr=" + migrationNr + ")");
+            logger.info("Running core migrations ABORTED -- installed model is up-to-date (version " +
+                installedModelVersion + ")");
             return;
         }
         //
-        logger.info("Running " + migrationsToRun + " core migrations (migrationNr=" + migrationNr +
-            ", requiredMigrationNr=" + requiredMigrationNr + ")");
-        for (int i = migrationNr + 1; i <= requiredMigrationNr; i++) {
+        logger.info("Running " + migrationsToRun + " core migrations (installed model: version " +
+            installedModelVersion + ", required model: version " + requiredModelVersion + ")");
+        for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
             runCoreMigration(i, isCleanInstall);
         }
     }
@@ -133,16 +134,15 @@ class MigrationManager {
                     readMigrationFile(mi.migrationIn, mi.migrationFile);
                 } else {
                     Migration migration = (Migration) mi.migrationClass.newInstance();
-                    logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
                     injectServices(migration, mi.migrationInfo, plugin);
                     migration.setCoreService(dm4);
+                    logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
                     migration.run();
                 }
-                logger.info("Completing " + mi.migrationInfo);
             } else {
                 logger.info("Running " + mi.migrationInfo + " ABORTED" + runInfo);
             }
-            logger.info("Updating migration number (" + migrationNr + ")");
+            logger.info("Updating installed model: version " + migrationNr);
         } catch (Exception e) {
             throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
         }
@@ -309,7 +309,8 @@ class MigrationManager {
                     throw new RuntimeException(message + "(" + migrationClassName + ") is found");
                 } else {
                     throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
-                        " (plugin package is unknown). Consider setting \"pluginPackage\" in plugin.properties");
+                        " (plugin package is unknown). Consider setting \"dm4.plugin.main_package\" in " +
+                        "plugin.properties");
                 }
             }
             if (isDeclarative && isImperative) {
