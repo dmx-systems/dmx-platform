@@ -1,18 +1,15 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
-
-import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
 
@@ -174,6 +171,40 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     @Override
     Directive getDeleteDirective() {
         return Directive.DELETE_TOPIC;
+    }
+
+    // ---
+
+    TopicModelImpl findChildTopic(String topicTypeUri) {
+        if (typeUri.equals(topicTypeUri)) {
+            return this;
+        }
+        //
+        for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+            String assocDefUri    = assocDef.getAssocDefUri();
+            String cardinalityUri = assocDef.getChildCardinalityUri();
+            TopicModelImpl childTopic = null;
+            if (cardinalityUri.equals("dm4.core.one")) {
+                childTopic = childTopics.getTopicOrNull(assocDefUri);                                // no load from DB
+            } else if (cardinalityUri.equals("dm4.core.many")) {
+                List<RelatedTopicModelImpl> _childTopics = childTopics.getTopicsOrNull(assocDefUri); // no load from DB
+                if (_childTopics != null && !_childTopics.isEmpty()) {
+                    childTopic = _childTopics.get(0);
+                }
+            } else {
+                throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+            }
+            // Note: topics just created have no child topics yet
+            if (childTopic == null) {
+                continue;
+            }
+            // recursion
+            childTopic = childTopic.findChildTopic(topicTypeUri);
+            if (childTopic != null) {
+                return childTopic;
+            }
+        }
+        return null;
     }
 
 

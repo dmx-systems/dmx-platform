@@ -224,15 +224,15 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
      */
     @Override
     public void preSendTopic(Topic topic) {
-        Topic address = findAddress(topic);
+        Topic address = topic.findChildTopic("dm4.contacts.address");
         if (address != null) {
+            String operation = "### Enriching address " + address.getId() + " with its geo coordinate";
             Topic geoCoordTopic = getGeoCoordinateTopic(address);
             if (geoCoordTopic != null) {
-                logger.info("### Enriching address " + address.getId() + " with its geo coordinate");
+                logger.info(operation);
                 address.getChildTopics().getModel().put("dm4.geomaps.geo_coordinate", geoCoordTopic.getModel());
             } else {
-                logger.info("### Enriching address " + address.getId() + " with its geo coordinate ABORTED " +
-                    "-- no geo coordinate in DB");
+                logger.info(operation + " ABORTED -- no geo coordinate in DB");
             }
         }
     }
@@ -284,66 +284,6 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         } catch (Exception e) {
             throw new RuntimeException("Storing geo coordinate of address " + address.getId() + " failed", e);
         }
-    }
-
-    // ---
-
-    private Topic findAddress(Topic topic) {
-        return findChildTopic(topic, "dm4.contacts.address");
-    }
-
-    /**
-     * Searches a topic's composite value for a topic of a given type.
-     * The search is driven by the topic's type definition. In other words, composite value entries which do not
-     * adhere to the topic's type definition are not found.
-     * Note: this is an in-memory search; the DB is not accessed.
-     * <p>
-     * The first topic found is returned, according to a depth-first search.
-     * For multiple-value fields only the first topic is returned.
-     * <p>
-     * TODO: make this a generally available method by adding it to the Topic interface?
-     */
-    private Topic findChildTopic(Topic topic, String topicTypeUri) {
-        String typeUri = topic.getTypeUri();
-        if (typeUri.equals(topicTypeUri)) {
-            return topic;
-        }
-        //
-        ChildTopics comp = topic.getChildTopics();
-        TopicType topicType = dm4.getTopicType(typeUri);
-        for (AssociationDefinition assocDef : topicType.getAssocDefs()) {
-            String assocDefUri    = assocDef.getAssocDefUri();
-            String cardinalityUri = assocDef.getChildCardinalityUri();
-            Topic childTopic = null;
-            if (cardinalityUri.equals("dm4.core.one")) {
-                // Note: we don't want load child topics from DB. So we use has() before getTopic().
-                // The latter would load the child topic on-demand.
-                if (comp.has(assocDefUri)) {
-                    childTopic = comp.getTopic(assocDefUri);
-                }
-            } else if (cardinalityUri.equals("dm4.core.many")) {
-                // Note: we don't want load child topics from DB. So we use has() before getTopics().
-                // The latter would load the child topics on-demand.
-                if (comp.has(assocDefUri)) {
-                    List<RelatedTopic> childTopics = comp.getTopics(assocDefUri);
-                    if (!childTopics.isEmpty()) {
-                        childTopic = childTopics.get(0);
-                    }
-                }
-            } else {
-                throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-            }
-            // Note: topics just created have no child topics yet
-            if (childTopic == null) {
-                continue;
-            }
-            // recursion
-            childTopic = findChildTopic(childTopic, topicTypeUri);
-            if (childTopic != null) {
-                return childTopic;
-            }
-        }
-        return null;
     }
 
     // ---

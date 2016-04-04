@@ -5,13 +5,7 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -46,6 +40,14 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public void update(TopicModel newModel) {
         model.update(newModel);
+    }
+
+    // ---
+
+    @Override
+    public Topic findChildTopic(String topicTypeUri) {
+        TopicModelImpl topic = getModel().findChildTopic(topicTypeUri);
+        return topic != null ? topic.instantiate() : null;
     }
 
     // ---

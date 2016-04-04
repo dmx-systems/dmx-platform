@@ -2,8 +2,6 @@ package de.deepamehta.core;
 
 import de.deepamehta.core.model.TopicModel;
 
-import java.util.List;
-
 
 
 /**
@@ -14,6 +12,25 @@ import java.util.List;
 public interface Topic extends DeepaMehtaObject {
 
     void update(TopicModel model);
+
+    // ---
+
+    /**
+     * Searches this topic's child topics for a topic of the given type.
+     * Only the child topics which are already loaded into memory are searched; the DB is not accessed.
+     * <p>
+     * The first topic found is returned, according to a depth-first search.
+     * For multiple-value childs the first topic is returned.
+     * If the given type matches this topic directly it is returned immediately.
+     * <p>
+     * The search is driven by this topic's type definition. That is child topics which do not adhere
+     * to the type definition are not found.
+     * <p>
+     * TODO: make this generic by moving to DeepaMehtaObject interface?
+     *
+     * @return  the found topic, or <code>null</code>.
+     */
+    Topic findChildTopic(String topicTypeUri);
 
     // ---
 
