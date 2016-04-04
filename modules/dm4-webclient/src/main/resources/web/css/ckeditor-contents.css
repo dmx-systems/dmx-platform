@@ -19,6 +19,15 @@ img {
     height: auto;
 }
 
+figure {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+figcaption {
+    font-style: italic;
+}
+
 .embeddedContent > iframe {
     max-width: 100%;
 }

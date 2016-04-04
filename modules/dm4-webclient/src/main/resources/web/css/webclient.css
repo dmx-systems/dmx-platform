@@ -153,6 +153,17 @@ body {
 }
 
 /* Note: style must match ckeditor-contents.css */
+#page-content figure {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Note: style must match ckeditor-contents.css */
+#page-content figcaption {
+    font-style: italic;
+}
+
+/* Note: style must match ckeditor-contents.css */
 #page-content .embeddedContent > iframe {
     max-width: 100%;
 }
