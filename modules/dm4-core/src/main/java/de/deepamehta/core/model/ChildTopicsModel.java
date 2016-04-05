@@ -54,17 +54,6 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
      */
     Object get(String assocDefUri);
 
-    /**
-     * Checks if a child is contained in this ChildTopicsModel.
-     */
-    boolean has(String assocDefUri);
-
-    /**
-     * Returns the number of childs contained in this ChildTopicsModel.
-     * Multiple-valued childs count as one.
-     */
-    int size();
-
 
 
     // === Convenience Accessors ===

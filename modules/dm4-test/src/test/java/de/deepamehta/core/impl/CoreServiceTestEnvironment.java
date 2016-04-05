@@ -24,7 +24,7 @@ public class CoreServiceTestEnvironment {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // providing the test subclasses access to the core service and logger
-    protected CoreService dm4;
+    protected CoreServiceImpl dm4;
     protected ModelFactoryImpl mf;
 
     protected Logger logger = Logger.getLogger(getClass().getName());

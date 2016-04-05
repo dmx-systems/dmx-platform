@@ -73,8 +73,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         if (configTopic == null) {
             return null;
         }
-        ChildTopicsModel childTopics = configTopic.getChildTopicsModel();
-        return childTopics.has(settingUri) ? childTopics.getObject(settingUri) : null;
+        return configTopic.getChildTopicsModel().getObject(settingUri, null);
     }
 
     // ---

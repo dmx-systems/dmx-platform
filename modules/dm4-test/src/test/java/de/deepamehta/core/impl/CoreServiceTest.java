@@ -114,7 +114,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void createWithComposite() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            Topic topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
+            // Note: has() is internal API, so we need a TopicImpl here
+            TopicImpl topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
             //
@@ -143,9 +144,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
-            //
-            Topic topic = dm4.getTopicByUri("de.deepamehta.notes");
-            ChildTopics comp = topic.getChildTopics();
+            // Note: has() is internal API, so we need a TopicImpl here
+            TopicImpl topic = dm4.getTopicByUri("de.deepamehta.notes");
+            ChildTopicsImpl comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
             Topic childTopic = comp.getTopic("dm4.core.plugin_migration_nr");
@@ -165,9 +166,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
-            //
-            Topic topic = dm4.getTopicByUri("de.deepamehta.notes");
-            ChildTopics comp = topic.getChildTopics();
+            // Note: has() is internal API, so we need a TopicImpl here
+            TopicImpl topic = dm4.getTopicByUri("de.deepamehta.notes");
+            ChildTopicsImpl comp = topic.getChildTopics();
             assertFalse(comp.has("dm4.core.plugin_migration_nr"));              // child topic is not yet loaded
             //
             assertEquals(23, comp.getInt("dm4.core.plugin_migration_nr"));      // child topic is loaded on-demand
@@ -637,7 +638,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void updateAggregationOne() {
         DeepaMehtaTransaction tx = dm4.beginTx();
-        Topic comp1, item1, item2;
+        TopicImpl comp1;    // Note: has() is internal API, so we need a TopicImpl here
+        Topic item1, item2;
         try {
             // 1) define composite type
             // child types
@@ -709,7 +711,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void updateAggregationOneFacet() {
         DeepaMehtaTransaction tx = dm4.beginTx();
-        Topic name, item1, item2;
+        TopicImpl name;     // Note: has() is internal API, so we need a TopicImpl here
+        Topic item1, item2;
         try {
             // 1) define facet
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));

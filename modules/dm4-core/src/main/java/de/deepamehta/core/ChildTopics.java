@@ -33,10 +33,6 @@ public interface ChildTopics extends Iterable<String> {
 
     Object get(String assocDefUri);
 
-    boolean has(String assocDefUri);
-
-    int size();
-
     // ---
 
     ChildTopicsModel getModel();

@@ -77,14 +77,15 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    Topic getTopicByUri(String uri) {
+    TopicImpl getTopicByUri(String uri) {
         return getTopicByValue("uri", new SimpleValue(uri));
     }
 
-    Topic getTopicByValue(String key, SimpleValue value) {
+    TopicImpl getTopicByValue(String key, SimpleValue value) {
         try {
             TopicModelImpl topic = fetchTopic(key, value);
-            return topic != null ? this.<Topic>checkReadAccessAndInstantiate(topic) : null;
+            return topic != null ? this.<TopicImpl>checkReadAccessAndInstantiate(topic) : null;
+            // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -124,14 +125,14 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    Topic createTopic(TopicModel model) {
+    TopicImpl createTopic(TopicModel model) {
         return createTopic(model, null);    // uriPrefix=null
     }
 
     /**
      * Creates a new topic in the DB.
      */
-    Topic createTopic(TopicModel model, String uriPrefix) {
+    TopicImpl createTopic(TopicModel model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
@@ -147,7 +148,7 @@ public class PersistenceLayer extends StorageDecorator {
                 ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
             }
             // 3) instantiate
-            Topic topic = new TopicImpl((TopicModelImpl) model, this);
+            TopicImpl topic = new TopicImpl((TopicModelImpl) model, this);
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -193,6 +194,7 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             AssociationModelImpl assoc = fetchAssociation(key, value);
             return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (key=\"" + key + "\", value=\"" + value + "\")", e);
         }
@@ -214,6 +216,7 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             AssociationModelImpl assoc = fetchAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
             return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }
@@ -228,6 +231,7 @@ public class PersistenceLayer extends StorageDecorator {
             AssociationModelImpl assoc = fetchAssociationBetweenTopicAndAssociation(assocTypeUri, topicId, assocId,
                 topicRoleTypeUri, assocRoleTypeUri);
             return assoc != null ? this.<Association>checkReadAccessAndInstantiate(assoc) : null;
+            // Note: inside a conditional operator the type witness is required (at least in Java 6)
         } catch (Exception e) {
             throw new RuntimeException("Fetching association failed (" + info + ")", e);
         }

@@ -1,24 +1,17 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.service.ModelFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -30,7 +23,7 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ChildTopicsModel model;             // underlying model
+    private ChildTopicsModelImpl model;         // underlying model
 
     private DeepaMehtaObjectModelImpl parent;   // the parent object this ChildTopics belongs to
 
@@ -103,16 +96,6 @@ class ChildTopicsImpl implements ChildTopics {
         } else {
             throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
         }
-    }
-
-    @Override
-    public boolean has(String assocDefUri) {
-        return model.has(assocDefUri);
-    }
-
-    @Override
-    public int size() {
-        return model.size();
     }
 
     // ---
@@ -318,6 +301,16 @@ class ChildTopicsImpl implements ChildTopics {
     @Override
     public Iterator<String> iterator() {
         return model.iterator();
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    boolean has(String assocDefUri) {
+        return model.has(assocDefUri);
+    }
+
+    int size() {
+        return model.size();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

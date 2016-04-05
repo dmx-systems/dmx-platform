@@ -82,7 +82,7 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public Topic getTopicByUri(String uri) {
+    public TopicImpl getTopicByUri(String uri) {
         return pl.getTopicByUri(uri);
     }
 
@@ -114,7 +114,7 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public Topic createTopic(TopicModel model) {
+    public TopicImpl createTopic(TopicModel model) {
         return pl.createTopic(model);
     }
 
