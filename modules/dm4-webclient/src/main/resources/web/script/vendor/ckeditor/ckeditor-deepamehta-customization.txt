@@ -6,7 +6,7 @@ CKEditor DeepaMehta Customization
 DM 4.8
 ------
 
-This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/builder
+This is a custom build of CKEditor 4.5.8 as configured via http://ckeditor.com/builder
 
     - Preset: Basic
     - Remove plugins:
@@ -14,6 +14,7 @@ This is a custom build of CKEditor 4.5.6 as configured via http://ckeditor.com/b
     - Add plugins:
         - AutoGrow                  *) Useful with framed editing
         - Enhanced Image
+        - Format
         - Media (oEmbed) Plugin     *) Author: ingo, http://ckeditor.com/addon/oembed
         - Table
         - Table Tools               *) required to e.g. add a row to existing table

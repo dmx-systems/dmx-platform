@@ -159,7 +159,7 @@ body {
 }
 
 /* Note: style must match ckeditor-contents.css */
-#page-content figcaption {
+#page-content figure > figcaption {
     font-style: italic;
 }
 

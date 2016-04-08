@@ -24,7 +24,7 @@ figure {
     margin-right: 0;
 }
 
-figcaption {
+figure > figcaption {
     font-style: italic;
 }
 
