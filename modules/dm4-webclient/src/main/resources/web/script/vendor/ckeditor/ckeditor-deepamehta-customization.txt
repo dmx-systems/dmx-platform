@@ -14,8 +14,8 @@ This is a custom build of CKEditor 4.5.8 as configured via http://ckeditor.com/b
     - Add plugins:
         - AutoGrow                  *) Useful with framed editing
         - Enhanced Image
-        - Format
         - Media (oEmbed) Plugin     *) Author: ingo, http://ckeditor.com/addon/oembed
+        - Styles Combo
         - Table
         - Table Tools               *) required to e.g. add a row to existing table
     - Skin: "Flat"
