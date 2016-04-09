@@ -147,6 +147,37 @@ body {
 }
 
 /* Note: style must match ckeditor-contents.css */
+#page-content pre.code-block {
+    background-color: #f8f8f8;
+    border: 1px solid #d8d8d8;
+    margin-left: 1.75em;
+    margin-right: 1.75em;
+    padding: 0.25em;
+    white-space: pre;
+    overflow: auto;
+}
+
+/* Note: style must match ckeditor-contents.css */
+#page-content div.blockquote {
+    border: 0 solid #ccc;
+    border-left-width: 5px;
+    margin-left: 8px;
+    margin-right: 1.75em;
+    padding: 2px 0 2px 15px;
+    line-height: 1.3em;
+}
+
+/* Note: style must match ckeditor-contents.css */
+#page-content .marker {
+    background-color: yellow;
+}
+
+/* Note: style must match ckeditor-contents.css */
+#page-content code {
+    font-size: 18px;
+}
+
+/* Note: style must match ckeditor-contents.css */
 #page-content img {
     max-width: 100%;
     height: auto;       /* overrides img height attribute, avoids distortion */
