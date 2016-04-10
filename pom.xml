@@ -52,6 +52,7 @@
         </developer>
     </developers>
 
+    <!-- For a description of the config properties see /dm4-distribution/conf/config.properties -->
     <properties>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -64,8 +65,12 @@
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
 
         <!-- Request Filter -->
-        <dm4.security.read_requires_login>false</dm4.security.read_requires_login>
-        <dm4.security.write_requires_login>true</dm4.security.write_requires_login>
+        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
+        <!-- Line breaks and tab characters are allowed however.                                     -->
+        <dm4.security.anonymous_read_allowed>ALL</dm4.security.anonymous_read_allowed>
+        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
+        <!-- Line breaks and tab characters are allowed however.                                     -->
+        <dm4.security.anonymous_write_allowed>NONE</dm4.security.anonymous_write_allowed>
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
 
         <!-- User Accounts -->
@@ -82,20 +87,18 @@
         <dm4.filerepo.path>/</dm4.filerepo.path>
         <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
 
+        <!-- Hot Deployment -->
+        <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
+        <!-- Line breaks and tab characters are allowed however.                                     -->
+        <felix.fileinstall.dir>
+            ${project.basedir}/bundle-deploy
+        </felix.fileinstall.dir>
+
         <!-- Host -->
         <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
 
         <!-- Webservice -->
         <dm4.webservice.path>/</dm4.webservice.path>
-
-        <!-- Hot Deployment -->
-        <!-- DeepaMehta plugins (jar files) from this directory are hot deployed (like any other OSGi bundle).  -->
-        <!-- You can add further directories here, separated by comma.                                          -->
-        <!-- IMPORTANT: the trimmed value of felix.fileinstall.dir must not contain any spaces. Otherwise the   -->
-        <!-- first and the last directory will be ignored. Line breaks and tab characters are allowed however.  -->
-        <felix.fileinstall.dir>
-            ${project.basedir}/bundle-deploy
-        </felix.fileinstall.dir>
 
         <!-- Database -->
         <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>

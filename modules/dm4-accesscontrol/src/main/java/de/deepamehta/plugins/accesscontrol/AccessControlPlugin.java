@@ -93,15 +93,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Security settings
-    private static final boolean READ_REQUIRES_LOGIN  = Boolean.parseBoolean(
-        System.getProperty("dm4.security.read_requires_login", "false"));
-    private static final boolean WRITE_REQUIRES_LOGIN = Boolean.parseBoolean(
-        System.getProperty("dm4.security.write_requires_login", "true"));
+    private static final String ANONYMOUS_READ_ALLOWED = System.getProperty("dm4.security.anonymous_read_allowed",
+        "ALL");
+    private static final String ANONYMOUS_WRITE_ALLOWED = System.getProperty("dm4.security.anonymous_write_allowed",
+        "NONE");
+    private static final GlobalRequestFilter requestFilter = new GlobalRequestFilter(ANONYMOUS_READ_ALLOWED,
+        ANONYMOUS_WRITE_ALLOWED);
     private static final String SUBNET_FILTER = System.getProperty("dm4.security.subnet_filter", "127.0.0.1/32");
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
         System.getProperty("dm4.security.new_accounts_are_enabled", "true"));
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
+    private static final boolean IS_PUBLIC_INSTALLATION = ANONYMOUS_READ_ALLOWED.equals("ALL");
 
     private static final String AUTHENTICATION_REALM = "DeepaMehta";
 
@@ -150,10 +153,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     static {
         logger.info("Security settings:" +
-            "\n  dm4.security.read_requires_login=" + READ_REQUIRES_LOGIN +
-            "\n  dm4.security.write_requires_login=" + WRITE_REQUIRES_LOGIN +
-            "\n  dm4.security.subnet_filter=\"" + SUBNET_FILTER + "\"" +
-            "\n  dm4.security.new_accounts_are_enabled=" + NEW_ACCOUNTS_ARE_ENABLED);
+            "\n  dm4.security.anonymous_read_allowed = " + requestFilter.dumpReadSetting() +
+            "\n  dm4.security.anonymous_write_allowed = " + requestFilter.dumpWriteSetting() +
+            "\n  dm4.security.subnet_filter = " + SUBNET_FILTER +
+            "\n  dm4.security.new_accounts_are_enabled = " + NEW_ACCOUNTS_ARE_ENABLED);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -184,8 +187,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         // For a "private" DeepaMehta installation: emulate a HTTP logout by forcing the webbrowser to bring up its
         // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
         // The login dialog can't be used to login again.
-        if (READ_REQUIRES_LOGIN) {
-            throw401Unauthorized();
+        if (!IS_PUBLIC_INSTALLATION) {
+            throw401Unauthorized(true);     // showBrowserLoginDialog=true
         }
     }
 
@@ -644,29 +647,27 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void checkAuthorization(HttpServletRequest request) {
-        boolean authorized;
         if (request.getSession(false) != null) {    // create=false
-            authorized = true;
-        } else {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null) {
-                // Note: if login fails we are NOT authorized, even if no login is required
-                authorized = tryLogin(new Credentials(authHeader), request);
-            } else {
-                authorized = !isLoginRequired(request);
-            }
+            return;     // authorized already
         }
         //
+        boolean authorized;
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null) {
+            // Note: if login fails we are NOT authorized, even if no login is required
+            authorized = tryLogin(new Credentials(authHeader), request);
+        } else {
+            authorized = requestFilter.isAnonymousRequestAllowed(request);
+        }
         if (!authorized) {
-            throw401Unauthorized();     // throws WebApplicationException
+            // Note: a non-public DM installation (anonymous_read_allowed != "ALL") utilizes the browser's login dialog.
+            // (In contrast a public DM installation utilizes DM's login dialog and must suppress the browser's login
+            // dialog.)
+            throw401Unauthorized(!IS_PUBLIC_INSTALLATION);  // throws WebApplicationException
         }
     }
 
     // ---
-
-    private boolean isLoginRequired(HttpServletRequest request) {
-        return request.getMethod().equals("GET") ? READ_REQUIRES_LOGIN : WRITE_REQUIRES_LOGIN;
-    }
 
     /**
      * Checks weather the credentials are valid and if the user account is enabled, and if both checks are positive
@@ -724,11 +725,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void throw401Unauthorized() {
-        // Note: a non-private DM installation (read_requires_login=false) utilizes DM's login dialog and must suppress
-        // the browser's login dialog. To suppress the browser's login dialog a contrived authentication scheme "xBasic"
+    private void throw401Unauthorized(boolean showBrowserLoginDialog) {
+        // Note: to suppress the browser's login dialog a contrived authentication scheme "xBasic"
         // is used (see http://loudvchar.blogspot.ca/2010/11/avoiding-browser-popup-for-401.html)
-        String authScheme = READ_REQUIRES_LOGIN ? "Basic" : "xBasic";
+        String authScheme = showBrowserLoginDialog ? "Basic" : "xBasic";
         throw new WebApplicationException(Response.status(Status.UNAUTHORIZED)
             .header("WWW-Authenticate", authScheme + " realm=" + AUTHENTICATION_REALM)
             .header("Content-Type", "text/html")    // for text/plain (default) Safari provides no Web Console
