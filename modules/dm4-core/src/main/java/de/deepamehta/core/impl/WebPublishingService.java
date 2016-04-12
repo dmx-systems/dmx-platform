@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.CoreActivator;
 import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -90,7 +91,7 @@ class WebPublishingService {
      * Web resources are found in the bundle's /web directory.
      */
     StaticResourcesPublication publishWebResources(String uriNamespace, Bundle bundle) throws NamespaceException {
-        getHttpService().registerResources(uriNamespace, "/web", new BundleHTTPContext(bundle));
+        getHttpService().registerResources(uriNamespace, "/web", new BundleResourcesHTTPContext(bundle));
         return new StaticResourcesPublication(uriNamespace, this);
     }
 
@@ -288,11 +289,11 @@ class WebPublishingService {
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
-    private class BundleHTTPContext implements HttpContext {
+    private class BundleResourcesHTTPContext implements HttpContext {
 
         private Bundle bundle;
 
-        private BundleHTTPContext(Bundle bundle) {
+        private BundleResourcesHTTPContext(Bundle bundle) {
             this.bundle = bundle;
         }
 
@@ -351,7 +352,7 @@ class WebPublishingService {
 
         @Override
         public String getMimeType(String name) {
-            return null;
+            return JavaUtils.getFileType(name);
         }
 
         @Override

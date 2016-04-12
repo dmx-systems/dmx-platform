@@ -96,7 +96,7 @@ class PluginManager {
     synchronized PluginImpl getPlugin(String pluginUri) {
         PluginImpl plugin = activatedPlugins.get(pluginUri);
         if (plugin == null) {
-            throw new RuntimeException("Plugin \"" + pluginUri + "\" not found");
+            throw new RuntimeException("Plugin \"" + pluginUri + "\" is not installed/activated");
         }
         return plugin;
     }

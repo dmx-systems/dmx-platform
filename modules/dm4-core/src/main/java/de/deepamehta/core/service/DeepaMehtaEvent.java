@@ -54,7 +54,7 @@ public abstract class DeepaMehtaEvent {
         DeepaMehtaEvent event = events.get(listenerInterface.getName());
         //
         if (event == null) {
-            throw new RuntimeException("The event for listener " + listenerInterface + " is unknown");
+            throw new RuntimeException("The event object for listener " + listenerInterface + " is unknown");
         }
         //
         return event;

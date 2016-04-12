@@ -59,13 +59,16 @@ public class JavaUtils {
         String extension = getExtension(fileName);
         if (!extension.equals("avi")) {
             // Note: for .avi Sun's file type map returns strange media type "application/x-troff-msvideo"
+            // See lib/content-types.properties under java home.
             String fileType = fileTypeMap.getContentTypeFor(fileName);
             if (fileType != null) {
                 return fileType;
             }
         }
         // fallback
-        if (extension.equals("mp3")) {
+        if (extension.equals("json")) {
+            return "application/json";
+        } else if (extension.equals("mp3")) {
             return "audio/mpeg";
         } else if (extension.equals("mp4")) {
             return "video/mp4";
