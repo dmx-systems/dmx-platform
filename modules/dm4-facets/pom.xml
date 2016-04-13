@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.facets.FacetsPlugin
+                            de.deepamehta.facets.FacetsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

@@ -49,7 +49,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.webclient.WebclientPlugin
+                            de.deepamehta.webclient.WebclientPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

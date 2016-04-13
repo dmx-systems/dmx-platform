@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.topicmaps.TopicmapsPlugin
+                            de.deepamehta.topicmaps.TopicmapsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

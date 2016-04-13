@@ -43,7 +43,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.geomaps.GeomapsPlugin
+                            de.deepamehta.geomaps.GeomapsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

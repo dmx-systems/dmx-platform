@@ -38,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.boxrenderer.dom.BoxRendererPlugin
+                            de.deepamehta.boxrenderer.dom.BoxRendererPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

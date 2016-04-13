@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.time.TimePlugin
+                            de.deepamehta.time.TimePlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

@@ -46,7 +46,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.files.FilesPlugin
+                            de.deepamehta.files.FilesPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

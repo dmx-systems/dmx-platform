@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.config.ConfigPlugin
+                            de.deepamehta.config.ConfigPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

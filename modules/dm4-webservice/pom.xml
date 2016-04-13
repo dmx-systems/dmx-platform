@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.webservice.WebservicePlugin
+                            de.deepamehta.webservice.WebservicePlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

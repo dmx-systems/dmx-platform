@@ -38,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.caching.CachingPlugin
+                            de.deepamehta.caching.CachingPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

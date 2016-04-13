@@ -48,7 +48,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.plugins.workspaces.WorkspacesPlugin
+                            de.deepamehta.workspaces.WorkspacesPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>
