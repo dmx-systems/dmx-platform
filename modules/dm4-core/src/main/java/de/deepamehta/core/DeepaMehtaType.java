@@ -10,7 +10,7 @@ import java.util.List;
 
 
 
-public interface Type extends Topic {
+public interface DeepaMehtaType extends Topic {
 
     // --- Data Type ---
 
@@ -32,15 +32,15 @@ public interface Type extends Topic {
 
     boolean hasAssocDef(String assocDefUri);
 
-    Type addAssocDef(AssociationDefinitionModel assocDef);
+    DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef);
 
     /**
      * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
+    DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
 
-    Type removeAssocDef(String assocDefUri);
+    DeepaMehtaType removeAssocDef(String assocDefUri);
 
     // --- Label Configuration ---
 

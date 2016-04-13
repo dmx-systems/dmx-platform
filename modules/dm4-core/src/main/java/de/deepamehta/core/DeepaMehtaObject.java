@@ -54,7 +54,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    Type getType();
+    DeepaMehtaType getType();
 
     DeepaMehtaObjectModel getModel();
 

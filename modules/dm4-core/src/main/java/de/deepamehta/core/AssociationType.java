@@ -4,7 +4,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 
 
 
-public interface AssociationType extends Type {
+public interface AssociationType extends DeepaMehtaType {
 
     // === Updating ===
 

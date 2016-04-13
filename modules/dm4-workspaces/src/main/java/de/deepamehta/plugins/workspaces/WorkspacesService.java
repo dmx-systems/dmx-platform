@@ -2,10 +2,8 @@ package de.deepamehta.plugins.workspaces;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.List;
@@ -58,7 +56,7 @@ public interface WorkspacesService {
     /**
      * Assigns the given type and all its view configuration topics to the given workspace.
      */
-    void assignTypeToWorkspace(Type type, long workspaceId);
+    void assignTypeToWorkspace(DeepaMehtaType type, long workspaceId);
 
     // ---
 

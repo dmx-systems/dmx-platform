@@ -11,11 +11,9 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DirectivesResponse;
@@ -173,7 +171,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     @Override
-    public void assignTypeToWorkspace(Type type, long workspaceId) {
+    public void assignTypeToWorkspace(DeepaMehtaType type, long workspaceId) {
         assignToWorkspace(type, workspaceId);
         // view config topics
         for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
@@ -403,7 +401,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Returns the ID of the DeepaMehta workspace or -1 to signal abortion of type introduction.
      */
-    private long workspaceIdForType(Type type) {
+    private long workspaceIdForType(DeepaMehtaType type) {
         return workspaceId() == -1 && isDeepaMehtaStandardType(type) ? getDeepaMehtaWorkspace().getId() : -1;
     }
 
@@ -445,7 +443,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // --- Helper ---
 
-    private boolean isDeepaMehtaStandardType(Type type) {
+    private boolean isDeepaMehtaStandardType(DeepaMehtaType type) {
         return type.getUri().startsWith("dm4.");
     }
 

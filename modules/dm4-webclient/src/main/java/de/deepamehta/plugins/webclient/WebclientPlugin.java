@@ -1,17 +1,13 @@
 package de.deepamehta.plugins.webclient;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.ViewConfiguration;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -311,7 +307,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // ---
 
-    private void updateViewConfig(Type type, Topic viewConfig) {
+    private void updateViewConfig(DeepaMehtaType type, Topic viewConfig) {
         type.getViewConfig().updateConfigTopic(viewConfig.getModel());
     }
 

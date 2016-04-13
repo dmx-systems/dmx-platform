@@ -1,6 +1,6 @@
 package de.deepamehta.core.service;
 
-import de.deepamehta.core.Type;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.service.ModelFactory;
 
 
@@ -37,7 +37,7 @@ public abstract class Migration {
     // ---
 
     // Convenience method ### FIXME: belongs to Webclient module
-    protected final void addTypeSetting(Type type, String setting, Object value) {
+    protected final void addTypeSetting(DeepaMehtaType type, String setting, Object value) {
         type.getViewConfig().addSetting("dm4.webclient.view_config", "dm4.webclient." + setting, value);
     }
 }

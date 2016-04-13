@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.Type;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
@@ -13,11 +13,11 @@ import java.util.List;
 
 
 
-abstract class TypeImpl extends TopicImpl implements Type {
+abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeImpl(TypeModelImpl model, PersistenceLayer pl) {
+    DeepaMehtaTypeImpl(TypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -25,9 +25,9 @@ abstract class TypeImpl extends TopicImpl implements Type {
 
 
 
-    // ***************************
-    // *** Type Implementation ***
-    // ***************************
+    // *************************************
+    // *** DeepaMehtaType Implementation ***
+    // *************************************
 
 
 
@@ -73,18 +73,18 @@ abstract class TypeImpl extends TopicImpl implements Type {
     }
 
     @Override
-    public Type addAssocDef(AssociationDefinitionModel assocDef) {
+    public DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public Type addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+    public DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         getModel()._addAssocDefBefore(assocDef, beforeAssocDefUri);
         return this;
     }
 
     @Override
-    public Type removeAssocDef(String assocDefUri) {
+    public DeepaMehtaType removeAssocDef(String assocDefUri) {
         getModel()._removeAssocDef(assocDefUri);
         return this;
     }

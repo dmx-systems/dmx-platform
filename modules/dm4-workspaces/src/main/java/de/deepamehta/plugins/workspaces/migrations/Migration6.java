@@ -5,9 +5,9 @@ import de.deepamehta.plugins.workspaces.WorkspacesService;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
 
@@ -57,7 +57,7 @@ public class Migration6 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    void assignWorkspace(Type type) {
+    void assignWorkspace(DeepaMehtaType type) {
         types++;
         if (isDeepaMehtaStandardType(type)) {
             standardTypes++;
@@ -82,7 +82,7 @@ public class Migration6 extends Migration {
     }
 
     // ### copy in WorkspacesPlugin.java
-    private boolean isDeepaMehtaStandardType(Type type) {
+    private boolean isDeepaMehtaStandardType(DeepaMehtaType type) {
         return type.getUri().startsWith("dm4.");
     }
 }

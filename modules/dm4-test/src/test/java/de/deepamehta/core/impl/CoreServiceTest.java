@@ -3,20 +3,13 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
-import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicReferenceModel;
-import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -340,7 +333,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void assocDefSequence() {
-        Type type = dm4.getTopicType("dm4.core.plugin");
+        DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
         //
         // find assoc def 1/3
         RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
@@ -375,7 +368,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void insertAssocDefAtPos0() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            Type type = dm4.getTopicType("dm4.core.plugin");
+            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
             //
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 0
@@ -399,7 +392,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void insertAssocDefAtPos1() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            Type type = dm4.getTopicType("dm4.core.plugin");
+            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
             //
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 1

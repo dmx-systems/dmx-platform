@@ -8,7 +8,7 @@ import de.deepamehta.core.model.AssociationTypeModel;
 /**
  * An association type that is attached to the {@link CoreService}.
  */
-class AssociationTypeImpl extends TypeImpl implements AssociationType {
+class AssociationTypeImpl extends DeepaMehtaTypeImpl implements AssociationType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

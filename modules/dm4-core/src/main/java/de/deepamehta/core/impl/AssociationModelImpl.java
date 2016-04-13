@@ -479,7 +479,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return true;
     }
 
-    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The Type interface's
+    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The DeepaMehtaType interface's
     // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter ### FIXDOC
     private void addUpdateTypeDirective(TypeModelImpl type) {
         if (type.getTypeUri().equals("dm4.core.topic_type")) {

@@ -7,24 +7,17 @@ import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.Type;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import static java.util.Arrays.asList;
@@ -565,7 +558,7 @@ class TypeStorage {
 
     // Note: the sequence is fetched in 2 situations:
     // 1) When fetching a type's association definitions.
-    //    In this situation we don't have a Type object at hand but a sole type topic.
+    //    In this situation we don't have a DeepaMehtaType object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
     private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {
         try {
