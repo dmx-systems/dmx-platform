@@ -360,6 +360,11 @@ dm4c.render.page_model = new function() {
         // 3) Semantic markup
         if (box_type == this.type.SIMPLE || box_type == this.type.COMPOSITE) {
             box.addClass(page_model.object.type_uri)
+            //
+            var assoc_def = page_model.assoc_def
+            if (assoc_def && assoc_def.assoc_def_uri != assoc_def.child_type_uri) {
+                box.addClass(assoc_def.assoc_def_uri)
+            }
         }
         // 4) Render remove button
         if (is_removable) {
