@@ -1,0 +1,8 @@
+div.dm4\.contacts\.person > div.dm4\.datetime\.date::before {
+    content: "Date of Birth";
+    font-size: 0.75em;      /* must match .field-label style in webclient.css */
+    color: gray;            /* must match .field-label style in webclient.css */
+    display: block;
+    margin-right: 2em;
+    margin-bottom: 0.5em;
+}
