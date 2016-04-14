@@ -1,3 +1,5 @@
+/* === Date of Birth === */
+
 div.dm4\.contacts\.person > div.dm4\.datetime\.date::before {
     content: "Date of Birth";
     font-size: 0.75em;      /* must match .field-label style in webclient.css */
@@ -5,4 +7,48 @@ div.dm4\.contacts\.person > div.dm4\.datetime\.date::before {
     display: block;
     margin-right: 2em;
     margin-bottom: 0.5em;
+}
+
+
+/* === Person Name === */
+
+.dm4\.contacts\.person_name .dm4\.contacts\.first_name,
+.dm4\.contacts\.person_name .dm4\.contacts\.last_name {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.dm4\.contacts\.person_name .dm4\.contacts\.last_name {
+    margin-top: 0 !important;
+    margin-left: 1.5em;
+}
+
+/* Form */
+
+.dm4\.contacts\.person_name .dm4\.contacts\.first_name input,
+.dm4\.contacts\.person_name .dm4\.contacts\.last_name  input {
+    width: 10em !important;
+}
+
+
+/* === Address === */
+
+.dm4\.contacts\.address .dm4\.contacts\.postal_code,
+.dm4\.contacts\.address .dm4\.contacts\.city {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.dm4\.contacts\.address .dm4\.contacts\.city {
+    margin-left: 1.5em;
+}
+
+/* Form */
+
+.dm4\.contacts\.address .dm4\.contacts\.postal_code input {
+    width: 4em !important;
+}
+
+.dm4\.contacts\.address .dm4\.contacts\.city  input {
+    width: 12em !important;
 }
