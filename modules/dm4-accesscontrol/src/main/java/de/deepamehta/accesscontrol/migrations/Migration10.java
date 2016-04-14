@@ -33,7 +33,7 @@ public class Migration10 extends Migration {
     public void run() {
         acService.createUserAccount(new Credentials(
             AccessControlService.ADMIN_USERNAME,
-            AccessControlService.ADMIN_DEFAULT_PASSWORD
+            AccessControlService.ADMIN_INITIAL_PASSWORD
         ));
     }
 }

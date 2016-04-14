@@ -74,6 +74,7 @@
         <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
 
         <!-- User Accounts -->
+        <dm4.security.initial_admin_password></dm4.security.initial_admin_password>
         <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
         <dm4.filerepo.disk_quota>-1</dm4.filerepo.disk_quota>
         <!-- Workspace Sharing Modes -->

@@ -16,7 +16,7 @@ public interface AccessControlService {
 
     // Admin user account
     static final String ADMIN_USERNAME = "admin";
-    static final String ADMIN_DEFAULT_PASSWORD = "";
+    static final String ADMIN_INITIAL_PASSWORD = System.getProperty("dm4.security.initial_admin_password", "");
 
     // Administration workspace
     static final String ADMINISTRATION_WORKSPACE_NAME = "Administration";
