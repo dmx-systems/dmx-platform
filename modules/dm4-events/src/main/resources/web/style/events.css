@@ -1,0 +1,17 @@
+/* === From/To === */
+
+div.dm4\.events\.event > div.dm4\.datetime\#dm4\.events\.from::before {
+    content: "From";
+    display: block;
+    margin-bottom: 0.6em;
+    font-size: 0.75em;      /* must match .field-label style in webclient.css */
+    color: gray;            /* must match .field-label style in webclient.css */
+}
+
+div.dm4\.events\.event > div.dm4\.datetime\#dm4\.events\.to::before {
+    content: "To";
+    display: block;
+    margin-bottom: 0.6em;
+    font-size: 0.75em;      /* must match .field-label style in webclient.css */
+    color: gray;            /* must match .field-label style in webclient.css */
+}
