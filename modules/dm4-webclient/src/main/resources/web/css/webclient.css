@@ -148,10 +148,9 @@ body {
 
 /* Note: style must match ckeditor-contents.css */
 #page-content pre.code-block {
-    background-color: #f8f8f8;
-    border: 1px solid #d8d8d8;
-    margin-left: 1.75em;
-    margin-right: 1.75em;
+    background-color: #e8e8e8;
+    border: 1px solid #c8c8c8;
+    margin: 1em 2em 1em 2em;
     padding: 0.25em;
     white-space: pre;
     overflow: auto;
@@ -159,12 +158,11 @@ body {
 
 /* Note: style must match ckeditor-contents.css */
 #page-content div.blockquote {
-    border: 0 solid #ccc;
+    border: 0 solid #c8c8c8;
     border-left-width: 5px;
-    margin-left: 8px;
-    margin-right: 1.75em;
-    padding: 2px 0 2px 15px;
-    line-height: 1.3em;
+    margin: 1em 3em 1em 2em;
+    padding-left: 1em;
+    line-height: 1.6em;
 }
 
 /* Note: style must match ckeditor-contents.css */
