@@ -7,14 +7,14 @@
     <name>DeepaMehta 4 Distribution</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-distribution</artifactId>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.8</version>
     <packaging>pom</packaging>
 
     <!-- Inherit properties -->
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-project</artifactId>
-        <version>4.8-SNAPSHOT</version>
+        <version>4.8</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -29,19 +29,19 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-bundles</artifactId>
-            <version>4.8-SNAPSHOT</version>
+            <version>4.8</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>3rd-party-bundles</artifactId>
-            <version>4.8-SNAPSHOT</version>
+            <version>4.8</version>
             <type>pom</type>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>felix-bundles</artifactId>
-            <version>4.8-SNAPSHOT</version>
+            <version>4.8</version>
             <type>pom</type>
         </dependency>
         <dependency>

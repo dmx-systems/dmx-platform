@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Events</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-events</artifactId>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.8</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8-SNAPSHOT</version>
+        <version>4.8</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-time</artifactId>
-            <version>4.8-SNAPSHOT</version>
+            <version>4.8</version>
         </dependency>
     </dependencies>
 

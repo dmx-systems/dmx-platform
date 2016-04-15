@@ -8,7 +8,7 @@ import de.deepamehta.core.service.Migration;
  * Add index to the workspace property.
  * Runs only in UPDATE mode.
  * <p>
- * Part of DM 4.8-SNAPSHOT
+ * Part of DM 4.8
  */
 public class Migration8 extends Migration {
 

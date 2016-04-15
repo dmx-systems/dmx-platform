@@ -6,13 +6,13 @@
     <name>DeepaMehta 4 Features</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-features</artifactId>
-    <version>4.8-SNAPSHOT</version>
+    <version>4.8</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-project</artifactId>
-        <version>4.8-SNAPSHOT</version>
+        <version>4.8</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

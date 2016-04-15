@@ -13,9 +13,9 @@ import de.deepamehta.core.service.Migration;
  * Creates the "Administration" workspace.
  * Runs only in CLEAN_INSTALL mode.
  * <p>
- * Part of DM 4.8-SNAPSHOT
+ * Part of DM 4.8
  * <p>
- * Note: when UPDATEing to 4.8-SNAPSHOT the "Administration" workspace is created in migration 12.
+ * Note: when UPDATEing to 4.8 the "Administration" workspace is created in migration 12.
  *
  * ----------
  *

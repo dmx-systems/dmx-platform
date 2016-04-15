@@ -20,13 +20,13 @@ import java.util.logging.Logger;
  * <p>
  * Runs only in UPDATE mode.
  * <p>
- * Note: when CLEAN_INSTALLing DM 4.8-SNAPSHOT the "Administration" workspace is already created in migration 4,
- * and the config topics are already assigned to the "Administration" workspace (as the Config service is already
- * in charge when the "admin" user account is created, in migration 10).
+ * Note: when CLEAN_INSTALLing DM 4.8 the "Administration" workspace is already created in migration 4, and the
+ * config topics are already assigned to the "Administration" workspace (as the Config service is already in charge
+ * when the "admin" user account is created, in migration 10).
  * <p>
  * The "Administration" workspace must exist before the "admin" user account is created (migration 10).
  * <p>
- * Part of DM 4.8-SNAPSHOT
+ * Part of DM 4.8
  */
 public class Migration12 extends Migration {
 
