@@ -169,9 +169,19 @@ Version History
 **4.8** -- Apr 15, 2016
 
 * New features:
-    * TBD
+    * Collaborative authoring in private views.
+    * 2 new standard plugins: DM4 Events and DM4 Date/Time.
+    * Standard Distribution comes with Plugin Hot Deployment.
+    * Association Auto-Typing.
+* Improvements:
+    * Meta model: more than one assoc def with the same child type are allowed.
+    * Fine granular request filter.
+    * Enable/disable workspace sharing modes.
+    * Webclient: auto-scale images and videos.
 * Plugin development framework:
-    * TBD
+    * Configuration-free Plugin Hot Deployment.
+    * Semantic markup in the detail panel.
+    * Composite renderers.
 * For more changes and details see the release notes:  
   <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
@@ -180,7 +190,7 @@ Version History
 * New features:
     * Access controlled file repositories.
     * Per-user disk quota (for file uploads).
-    * Enabling/disabling user accounts.
+    * Enable/disable user accounts.
     * Webclient works also on touch devices.
 * Plugin development framework:
     * Configuration facility.
