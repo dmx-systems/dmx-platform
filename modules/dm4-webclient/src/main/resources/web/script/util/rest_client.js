@@ -65,6 +65,8 @@ function RESTClient(config) {
     }
 
     /**
+     * ### TODO: rename to get_topics_by_type
+     *
      * @param   sort                Optional: Result sorting.
      *                              If evaluates to true the returned topics are sorted.
      *

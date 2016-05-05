@@ -162,6 +162,8 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // --- Single-valued Childs ---
 
+    // ### TODO: rename "put" methods to "set" to be consistent with ChildTopics interface.
+
     /**
      * Puts a value in a single-valued child.
      * An existing value is overwritten.
