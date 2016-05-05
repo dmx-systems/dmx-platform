@@ -90,10 +90,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
             for (FileItem item : items) {
                 String fieldName = item.getFieldName();
                 if (item.isFormField()) {
-                    String value = item.getString();
-                    logger.info("### field \"" + fieldName + "\" => \"" + value + "\"");
-                    throw new RuntimeException("\"" + fieldName + "\" is an unexpected field (value=\"" + value +
-                        "\")");
+                    logger.info("### field \"" + fieldName + "\" => \"" + item.getString() + "\"");
                 } else {
                     if (file != null) {
                         throw new RuntimeException("Only single file uploads are supported");
