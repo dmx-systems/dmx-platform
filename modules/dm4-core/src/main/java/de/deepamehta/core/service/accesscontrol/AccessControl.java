@@ -44,6 +44,8 @@ public interface AccessControl {
 
     /**
      * Returns a workspace by URI.
+     * <p>
+     * This is a privileged method: it works also if the current user has no READ permission for the workspace.
      *
      * @return  The workspace (a topic of type "Workspace").
      *
@@ -89,6 +91,7 @@ public interface AccessControl {
 
     /**
      * Checks if an association represents a workspace assignment.
+     * <p>
      * This is a privileged method: it works also if the current user has no READ permission for the potential
      * workspace.
      */

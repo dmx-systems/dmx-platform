@@ -50,14 +50,14 @@ class StorageDecorator {
 
     /**
      * Looks up a single topic by exact value.
-     * If no such topic exists <code>null</code> is returned.
-     * If more than one topic is found a runtime exception is thrown.
      * <p>
      * IMPORTANT: Looking up a topic this way requires the corresponding type to be indexed with indexing mode
      * <code>dm4.core.key</code>.
      *
-     * @return  The fetched topic.
+     * @return  The fetched topic, or <code>null</code> if no such topic exists.
      *          Note: its child topics are not fetched.
+     *
+     * @throws  RuntimeException    if more than one topic is found.
      */
     final TopicModelImpl fetchTopic(String key, SimpleValue value) {
         return (TopicModelImpl) storage.fetchTopic(key, value.value());

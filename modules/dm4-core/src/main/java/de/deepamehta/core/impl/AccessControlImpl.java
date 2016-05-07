@@ -83,7 +83,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic checkCredentials(Credentials cred) {
-        TopicModel usernameTopic = null;
+        TopicModelImpl usernameTopic = null;
         try {
             usernameTopic = _getUsernameTopic(cred.username);
             if (usernameTopic == null) {
@@ -92,7 +92,7 @@ class AccessControlImpl implements AccessControl {
             if (!matches(usernameTopic, cred.password)) {
                 return null;
             }
-            return instantiate(usernameTopic);
+            return usernameTopic.instantiate();
         } catch (Exception e) {
             throw new RuntimeException("Checking credentials for user \"" + cred.username +
                 "\" failed (usernameTopic=" + usernameTopic + ")", e);
@@ -140,11 +140,11 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getWorkspace(String uri) {
-        Topic workspace = pl.getTopicByUri(uri);
+        TopicModelImpl workspace = fetchTopic("uri", uri);
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }
-        return workspace;
+        return workspace.instantiate();
     }
 
     // ---
@@ -242,8 +242,8 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getUsernameTopic(String username) {
-        TopicModel usernameTopic = _getUsernameTopic(username);
-        return usernameTopic != null ? instantiate(usernameTopic) : null;
+        TopicModelImpl usernameTopic = _getUsernameTopic(username);
+        return usernameTopic != null ? usernameTopic.instantiate() : null;
     }
 
     @Override
@@ -252,7 +252,7 @@ class AccessControlImpl implements AccessControl {
         if (username == null) {
             return null;
         }
-        return instantiate(_getUsernameTopicOrThrow(username));
+        return _getUsernameTopicOrThrow(username).instantiate();
     }
 
     @Override
@@ -288,7 +288,7 @@ class AccessControlImpl implements AccessControl {
         if (workspaceId == -1) {
             throw new RuntimeException("User \"" + username + "\" has no private workspace");
         }
-        return instantiate(pl.fetchTopic(workspaceId));
+        return pl.fetchTopic(workspaceId).instantiate();
     }
 
     @Override
@@ -314,13 +314,13 @@ class AccessControlImpl implements AccessControl {
     @Override
     public RelatedTopic getConfigTopic(String configTypeUri, long topicId) {
         try {
-            RelatedTopicModel configTopic = pl.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
+            RelatedTopicModelImpl configTopic = pl.fetchTopicRelatedTopic(topicId, ASSOC_TYPE_CONFIGURATION,
                 ROLE_TYPE_CONFIGURABLE, ROLE_TYPE_DEFAULT, configTypeUri);
             if (configTopic == null) {
                 throw new RuntimeException("The \"" + configTypeUri + "\" configuration topic for topic " + topicId +
                     " is missing");
             }
-            return new RelatedTopicImpl((RelatedTopicModelImpl) configTopic, pl);
+            return configTopic.instantiate();
         } catch (Exception e) {
             throw new RuntimeException("Getting the \"" + configTypeUri + "\" configuration topic for topic " +
                 topicId + " failed", e);
@@ -536,35 +536,37 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    private TopicModel _getUsernameTopic(String username) {
+    private TopicModelImpl _getUsernameTopic(String username) {
         // Note: username topics are not readable by <anonymous>.
         // So direct storage access is required here.
         return fetchTopic(TYPE_USERNAME, username);
     }
 
-    private TopicModel _getUsernameTopicOrThrow(String username) {
-        TopicModel usernameTopic = _getUsernameTopic(username);
+    private TopicModelImpl _getUsernameTopicOrThrow(String username) {
+        TopicModelImpl usernameTopic = _getUsernameTopic(username);
         if (usernameTopic == null) {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
     }
 
-    // ---
+
+
+    // === Direct Storage Access ===
 
     /**
-     * Fetches a topic by key/value via direct storage access.
+     * Fetches a topic by key/value.
      * <p>
      * IMPORTANT: only applicable to values indexed with <code>dm4.core.key</code>.
      *
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
-    private TopicModel fetchTopic(String key, Object value) {
+    private TopicModelImpl fetchTopic(String key, Object value) {
         return pl.fetchTopic(key, new SimpleValue(value));
     }
 
     /**
-     * Queries topics by key/value via direct storage access.
+     * Queries topics by key/value.
      * <p>
      * IMPORTANT: only applicable to values indexed with <code>dm4.core.fulltext</code> or
      * <code>dm4.core.fulltext_key</code>.
@@ -573,15 +575,6 @@ class AccessControlImpl implements AccessControl {
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
         return pl.queryTopics(key, new SimpleValue(value));
-    }
-
-    // ---
-
-    /**
-     * Instantiates a topic without performing permission check.
-     */
-    private Topic instantiate(TopicModel model) {
-        return new TopicImpl((TopicModelImpl) model, pl);
     }
 
 
