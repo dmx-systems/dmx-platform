@@ -99,6 +99,10 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
+
+
+    // === Permissions ===
+
     @Override
     public boolean hasPermission(String username, Operation operation, long objectId) {
         String typeUri = null;
@@ -126,6 +130,54 @@ class AccessControlImpl implements AccessControl {
         } catch (Exception e) {
             throw new RuntimeException("Checking permission for object " + objectId + " failed (typeUri=\"" + typeUri +
                 "\", " + userInfo(username) + ", operation=" + operation + ")", e);
+        }
+    }
+
+    /**
+     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
+     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
+     */
+     @Override
+     public boolean hasReadPermission(String username, long workspaceId) {
+        SharingMode sharingMode = getSharingMode(workspaceId);
+        switch (sharingMode) {
+        case PRIVATE:
+            return isOwner(username, workspaceId);
+        case CONFIDENTIAL:
+            return isOwner(username, workspaceId) || isMember(username, workspaceId);
+        case COLLABORATIVE:
+            return isOwner(username, workspaceId) || isMember(username, workspaceId);
+        case PUBLIC:
+            // Note: the System workspace is treated special: although it is a public workspace
+            // its content is readable only for logged in users.
+            return workspaceId != getSystemWorkspaceId() || username != null;
+        case COMMON:
+            return true;
+        default:
+            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
+        }
+    }
+
+    /**
+     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
+     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
+     */
+     @Override
+     public boolean hasWritePermission(String username, long workspaceId) {
+        SharingMode sharingMode = getSharingMode(workspaceId);
+        switch (sharingMode) {
+        case PRIVATE:
+            return isOwner(username, workspaceId);
+        case CONFIDENTIAL:
+            return isOwner(username, workspaceId);
+        case COLLABORATIVE:
+            return isOwner(username, workspaceId) || isMember(username, workspaceId);
+        case PUBLIC:
+            return isOwner(username, workspaceId) || isMember(username, workspaceId);
+        case COMMON:
+            return true;
+        default:
+            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
         }
     }
 
@@ -413,54 +465,6 @@ class AccessControlImpl implements AccessControl {
             return hasWritePermission(username, workspaceId);
         default:
             throw new RuntimeException(operation + " is an unsupported operation");
-        }
-    }
-
-    // ---
-
-    /**
-     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
-     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
-     */
-    private boolean hasReadPermission(String username, long workspaceId) {
-        SharingMode sharingMode = getSharingMode(workspaceId);
-        switch (sharingMode) {
-        case PRIVATE:
-            return isOwner(username, workspaceId);
-        case CONFIDENTIAL:
-            return isOwner(username, workspaceId) || isMember(username, workspaceId);
-        case COLLABORATIVE:
-            return isOwner(username, workspaceId) || isMember(username, workspaceId);
-        case PUBLIC:
-            // Note: the System workspace is treated special: although it is a public workspace
-            // its content is readable only for logged in users.
-            return workspaceId != getSystemWorkspaceId() || username != null;
-        case COMMON:
-            return true;
-        default:
-            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
-        }
-    }
-
-    /**
-     * @param   username        the logged in user, or <code>null</code> if no user is logged in.
-     * @param   workspaceId     the ID of the workspace that is relevant for the permission check. Is never -1.
-     */
-    private boolean hasWritePermission(String username, long workspaceId) {
-        SharingMode sharingMode = getSharingMode(workspaceId);
-        switch (sharingMode) {
-        case PRIVATE:
-            return isOwner(username, workspaceId);
-        case CONFIDENTIAL:
-            return isOwner(username, workspaceId);
-        case COLLABORATIVE:
-            return isOwner(username, workspaceId) || isMember(username, workspaceId);
-        case PUBLIC:
-            return isOwner(username, workspaceId) || isMember(username, workspaceId);
-        case COMMON:
-            return true;
-        default:
-            throw new RuntimeException(sharingMode + " is an unsupported sharing mode");
         }
     }
 

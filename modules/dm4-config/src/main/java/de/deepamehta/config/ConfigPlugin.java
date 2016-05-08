@@ -10,10 +10,16 @@ import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+
+import javax.servlet.http.HttpServletRequest;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +47,9 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
      */
     private Map<String, List<ConfigDefinition>> registry = new HashMap();
 
+    @Context
+    private HttpServletRequest request;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -63,7 +72,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @Override
     public void createConfigTopic(String configTypeUri, Topic topic) {
-        createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic);
+        _createConfigTopic(getApplicableConfigDefinition(topic, configTypeUri), topic);
     }
 
     // ---
@@ -111,7 +120,24 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     @GET
     public ConfigDefinitions getConfigDefinitions() {
-        return new ConfigDefinitions(registry);
+        try {
+            JSONObject json = new JSONObject();
+            AccessControl ac = dm4.getAccessControl();
+            for (String configurableUri: registry.keySet()) {
+                JSONArray array = new JSONArray();
+                for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
+                    String username = ac.getUsername(request);
+                    long workspaceId = workspaceId(configDef.getConfigModificationRole());
+                    if (ac.hasReadPermission(username, workspaceId)) {
+                        array.put(configDef.getConfigTypeUri());
+                    }
+                }
+                json.put(configurableUri, array);
+            }
+            return new ConfigDefinitions(json);
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the configuration definitions failed", e);
+        }
     }
 
 
@@ -125,7 +151,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     @Override
     public void postCreateTopic(Topic topic) {
         for (ConfigDefinition configDef : getApplicableConfigDefinitions(topic)) {
-            createConfigTopic(configDef, topic);
+            _createConfigTopic(configDef, topic);
         }
     }
 
@@ -137,20 +163,20 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         return dm4.getAccessControl().getConfigTopic(configTypeUri, topicId);
     }
 
-    private RelatedTopic createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
+    private RelatedTopic _createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
         final String configTypeUri = configDef.getConfigTypeUri();
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
-            // We suppress standard workspace assignment here as a config topic requires a special assignment.
-            // See assignConfigTopicToWorkspace() below.
-            return dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
+            // suppress standard workspace assignment as a config topic requires a special assignment
+            final AccessControl ac = dm4.getAccessControl();
+            return ac.runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
                 @Override
                 public RelatedTopic call() {
                     Topic configTopic = dm4.createTopic(configDef.getConfigValue(topic));
                     dm4.createAssociation(mf.newAssociationModel(ASSOC_TYPE_CONFIGURATION,
                         mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
                         mf.newTopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
-                    assignConfigTopicToWorkspace(configTopic, configDef.getConfigModificationRole());
+                    ac.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
                     // ### TODO: extend Core API to avoid re-retrieval
                     return _getConfigTopic(configTypeUri, topic.getId());
                 }
@@ -161,20 +187,16 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         }
     }
 
-    private void assignConfigTopicToWorkspace(Topic configTopic, ConfigModificationRole role) {
-        long workspaceId;
+    private long workspaceId(ConfigModificationRole role) {
         AccessControl ac = dm4.getAccessControl();
         switch (role) {
         case ADMIN:
-            workspaceId = ac.getAdministrationWorkspaceId();
-            break;
+            return ac.getAdministrationWorkspaceId();
         case SYSTEM:
-            workspaceId = ac.getSystemWorkspaceId();
-            break;
+            return ac.getSystemWorkspaceId();
         default:
             throw new RuntimeException("Modification role \"" + role + "\" not yet implemented");
         }
-        ac.assignToWorkspace(configTopic, workspaceId);
     }
 
     // ---

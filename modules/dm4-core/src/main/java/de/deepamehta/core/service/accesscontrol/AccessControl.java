@@ -21,6 +21,10 @@ public interface AccessControl {
      */
     Topic checkCredentials(Credentials cred);
 
+
+
+    // === Permissions ===
+
     /**
      * Checks if a user is permitted to perform an operation on an object (topic or association).
      *
@@ -30,6 +34,10 @@ public interface AccessControl {
      * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
     boolean hasPermission(String username, Operation operation, long objectId);
+
+    boolean hasReadPermission(String username, long workspaceId);
+
+    boolean hasWritePermission(String username, long workspaceId);
 
     /**
      * Returns the creator of a topic or an association.
