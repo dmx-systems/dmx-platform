@@ -1,11 +1,18 @@
 dm4c.add_plugin("de.deepamehta.config", function() {
 
-    // === Requests ===
+    var config_defs
 
-    var config_defs = dm4c.restc.request("GET", "/config")
+    refresh_config_defs()
+
+
+    // === Requests ===
 
     function get_config_topic(topic_id, config_type_uri) {
         return dm4c.restc.request("GET", "/config/" + config_type_uri + "/topic/" + topic_id + "?include_childs=true")
+    }
+
+    function refresh_config_defs() {
+        config_defs = dm4c.restc.request("GET", "/config")
     }
 
 
@@ -54,6 +61,16 @@ dm4c.add_plugin("de.deepamehta.config", function() {
                 }
             }
         }
+    })
+
+    dm4c.add_listener("logged_in", function() {
+        console.log("logged_in")
+        refresh_config_defs()
+    })
+
+    dm4c.add_listener("authority_decreased", function() {
+        console.log("authority_decreased")
+        refresh_config_defs()
     })
 
 

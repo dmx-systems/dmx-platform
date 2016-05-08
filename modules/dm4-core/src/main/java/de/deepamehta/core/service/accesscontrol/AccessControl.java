@@ -14,13 +14,6 @@ import java.util.concurrent.Callable;
 
 public interface AccessControl {
 
-    /**
-     * Checks if the given credentials are valid.
-     *
-     * @return  the corresponding Username topic if the credentials are valid, or <code>null</code> otherwise.
-     */
-    Topic checkCredentials(Credentials cred);
-
 
 
     // === Permissions ===
@@ -35,9 +28,48 @@ public interface AccessControl {
      */
     boolean hasPermission(String username, Operation operation, long objectId);
 
+    // ---
+
     boolean hasReadPermission(String username, long workspaceId);
 
     boolean hasWritePermission(String username, long workspaceId);
+
+
+
+    // === User Accounts ===
+
+    /**
+     * Checks if the given credentials are valid.
+     *
+     * @return  the corresponding Username topic if the credentials are valid, or <code>null</code> otherwise.
+     */
+    Topic checkCredentials(Credentials cred);
+
+    // ---
+
+    /**
+     * Returns the Username topic that corresponds to a username.
+     *
+     * @return  the Username topic, or <code>null</code> if no such Username topic exists.
+     */
+    Topic getUsernameTopic(String username);
+
+    /**
+     * Returns the private workspace of the given user.
+     * <p>
+     * Note: a user can have more than one private workspace. The workspace returned
+     * by this method is the one that holds the user's password topic.
+     * <p>
+     * This is a privileged method, it bypasses the access control system.
+     */
+    Topic getPrivateWorkspace(String username);
+
+    /**
+     * Checks if a user is a member of a given workspace.
+     *
+     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
+     */
+    boolean isMember(String username, long workspaceId);
 
     /**
      * Returns the creator of a topic or an association.
@@ -45,6 +77,27 @@ public interface AccessControl {
      * @return  The username of the creator, or <code>null</code> if no creator is set.
      */
     String getCreator(long objectId);
+
+
+
+    // === Session ===
+
+    /**
+     * Returns the username that is associated with a request.
+     *
+     * @return  the username, or <code>null</code> if no user is associated with the request.
+     */
+    String getUsername(HttpServletRequest request);
+
+    /**
+     * Convenience method that returns the Username topic that corresponds to a request.
+     * Basically it calls <code>getUsernameTopic(getUsername(request))</code>.
+     *
+     * @return  the Username topic, or <code>null</code> if no user is associated with the request.
+     */
+    Topic getUsernameTopic(HttpServletRequest request);
+
+    String username(HttpSession session);
 
 
 
@@ -117,53 +170,6 @@ public interface AccessControl {
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
     boolean workspaceAssignmentIsSuppressed();
-
-
-
-    // === User Accounts ===
-
-    /**
-     * Returns the Username topic that corresponds to a username.
-     *
-     * @return  the Username topic, or <code>null</code> if no such Username topic exists.
-     */
-    Topic getUsernameTopic(String username);
-
-    /**
-     * Convenience method that returns the Username topic that corresponds to a request.
-     * Basically it calls <code>getUsernameTopic(getUsername(request))</code>.
-     *
-     * @return  the Username topic, or <code>null</code> if no user is associated with the request.
-     */
-    Topic getUsernameTopic(HttpServletRequest request);
-
-    /**
-     * Returns the username that is associated with a request.
-     *
-     * @return  the username, or <code>null</code> if no user is associated with the request.
-     */
-    String getUsername(HttpServletRequest request);
-
-    String username(HttpSession session);
-
-    // ---
-
-    /**
-     * Returns the private workspace of the given user.
-     * <p>
-     * Note: a user can have more than one private workspace. The workspace returned
-     * by this method is the one that holds the user's password topic.
-     * <p>
-     * This is a privileged method, it bypasses the access control system.
-     */
-    Topic getPrivateWorkspace(String username);
-
-    /**
-     * Checks if a user is a member of a given workspace.
-     *
-     * @param   username    the logged in user, or <code>null</code> if no user is logged in.
-     */
-    boolean isMember(String username, long workspaceId);
 
 
 

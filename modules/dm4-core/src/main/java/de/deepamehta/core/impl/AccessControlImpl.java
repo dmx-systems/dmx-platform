@@ -81,24 +81,6 @@ class AccessControlImpl implements AccessControl {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    @Override
-    public Topic checkCredentials(Credentials cred) {
-        TopicModelImpl usernameTopic = null;
-        try {
-            usernameTopic = _getUsernameTopic(cred.username);
-            if (usernameTopic == null) {
-                return null;
-            }
-            if (!matches(usernameTopic, cred.password)) {
-                return null;
-            }
-            return usernameTopic.instantiate();
-        } catch (Exception e) {
-            throw new RuntimeException("Checking credentials for user \"" + cred.username +
-                "\" failed (usernameTopic=" + usernameTopic + ")", e);
-        }
-    }
-
 
 
     // === Permissions ===
@@ -132,6 +114,8 @@ class AccessControlImpl implements AccessControl {
                 "\", " + userInfo(username) + ", operation=" + operation + ")", e);
         }
     }
+
+    // ---
 
     /**
      * @param   username        the logged in user, or <code>null</code> if no user is logged in.
@@ -181,9 +165,102 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
+
+
+    // === User Accounts ===
+
+    @Override
+    public Topic checkCredentials(Credentials cred) {
+        TopicModelImpl usernameTopic = null;
+        try {
+            usernameTopic = _getUsernameTopic(cred.username);
+            if (usernameTopic == null) {
+                return null;
+            }
+            if (!matches(usernameTopic, cred.password)) {
+                return null;
+            }
+            return usernameTopic.instantiate();
+        } catch (Exception e) {
+            throw new RuntimeException("Checking credentials for user \"" + cred.username +
+                "\" failed (usernameTopic=" + usernameTopic + ")", e);
+        }
+    }
+
+    // ---
+
+    @Override
+    public Topic getUsernameTopic(String username) {
+        TopicModelImpl usernameTopic = _getUsernameTopic(username);
+        return usernameTopic != null ? usernameTopic.instantiate() : null;
+    }
+
+    @Override
+    public Topic getPrivateWorkspace(String username) {
+        TopicModel passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(username));
+        long workspaceId = getAssignedWorkspaceId(passwordTopic.getId());
+        if (workspaceId == -1) {
+            throw new RuntimeException("User \"" + username + "\" has no private workspace");
+        }
+        return pl.fetchTopic(workspaceId).instantiate();
+    }
+
+    @Override
+    public boolean isMember(String username, long workspaceId) {
+        try {
+            if (username == null) {
+                return false;
+            }
+            // Note: direct storage access is required here
+            AssociationModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP,
+                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
+            return membership != null;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
+                workspaceId + " failed", e);
+        }
+    }
+
     @Override
     public String getCreator(long objectId) {
         return pl.hasProperty(objectId, PROP_CREATOR) ? (String) pl.fetchProperty(objectId, PROP_CREATOR) : null;
+    }
+
+
+
+    // === Session ===
+
+    @Override
+    public String getUsername(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);    // create=false
+            if (session == null) {
+                return null;
+            }
+            return username(session);
+        } catch (IllegalStateException e) {
+            // Note: this happens if request is a proxy object (injected by Jersey) and a request method is called
+            // outside request scope. This is the case while system startup.
+            return null;    // user is unknown
+        }
+    }
+
+    @Override
+    public Topic getUsernameTopic(HttpServletRequest request) {
+        String username = getUsername(request);
+        if (username == null) {
+            return null;
+        }
+        return _getUsernameTopicOrThrow(username).instantiate();
+    }
+
+    @Override
+    public String username(HttpSession session) {
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
+        }
+        return username;
     }
 
 
@@ -286,77 +363,6 @@ class AccessControlImpl implements AccessControl {
     @Override
     public boolean workspaceAssignmentIsSuppressed() {
         return suppressionLevel.get() > 0;
-    }
-
-
-
-    // === User Accounts ===
-
-    @Override
-    public Topic getUsernameTopic(String username) {
-        TopicModelImpl usernameTopic = _getUsernameTopic(username);
-        return usernameTopic != null ? usernameTopic.instantiate() : null;
-    }
-
-    @Override
-    public Topic getUsernameTopic(HttpServletRequest request) {
-        String username = getUsername(request);
-        if (username == null) {
-            return null;
-        }
-        return _getUsernameTopicOrThrow(username).instantiate();
-    }
-
-    @Override
-    public String getUsername(HttpServletRequest request) {
-        try {
-            HttpSession session = request.getSession(false);    // create=false
-            if (session == null) {
-                return null;
-            }
-            return username(session);
-        } catch (IllegalStateException e) {
-            // Note: this happens if request is a proxy object (injected by Jersey) and a request method is called
-            // outside request scope. This is the case while system startup.
-            return null;    // user is unknown
-        }
-    }
-
-    @Override
-    public String username(HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
-        }
-        return username;
-    }
-
-    // ---
-
-    @Override
-    public Topic getPrivateWorkspace(String username) {
-        TopicModel passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(username));
-        long workspaceId = getAssignedWorkspaceId(passwordTopic.getId());
-        if (workspaceId == -1) {
-            throw new RuntimeException("User \"" + username + "\" has no private workspace");
-        }
-        return pl.fetchTopic(workspaceId).instantiate();
-    }
-
-    @Override
-    public boolean isMember(String username, long workspaceId) {
-        try {
-            if (username == null) {
-                return false;
-            }
-            // Note: direct storage access is required here
-            AssociationModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP,
-                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
-            return membership != null;
-        } catch (Exception e) {
-            throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
-                workspaceId + " failed", e);
-        }
     }
 
 
