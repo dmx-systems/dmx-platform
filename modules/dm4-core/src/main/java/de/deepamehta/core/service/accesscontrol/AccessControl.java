@@ -45,6 +45,16 @@ public interface AccessControl {
      */
     Topic checkCredentials(Credentials cred);
 
+    /**
+     * Changes the password of an existing user account.
+     * <p>
+     * This is a privileged method: it works also if the respective user is not logged in.
+     *
+     * @param   cred    the username and new password.
+     *                  An user account with the given username must exist. (The username can't be changed.)
+     */
+    void changePassword(Credentials cred);
+
     // ---
 
     /**

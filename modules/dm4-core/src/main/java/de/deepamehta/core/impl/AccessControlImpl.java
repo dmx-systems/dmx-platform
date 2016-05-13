@@ -187,6 +187,19 @@ class AccessControlImpl implements AccessControl {
         }
     }
 
+    @Override
+    public void changePassword(Credentials cred) {
+        try {
+            logger.info("##### Changing password for user \"" + cred.username + "\"");
+            TopicModelImpl userAccount = _getUserAccount(_getUsernameTopicOrThrow(cred.username));
+            userAccount.update(mf.newTopicModel(mf.newChildTopicsModel()
+                .put("dm4.accesscontrol.password", cred.password)
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
+        }
+    }
+
     // ---
 
     @Override
@@ -418,10 +431,10 @@ class AccessControlImpl implements AccessControl {
     /**
      * Prerequisite: usernameTopic is not <code>null</code>.
      */
-    private TopicModel _getUserAccount(TopicModel usernameTopic) {
+    private TopicModelImpl _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModel userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dm4.core.composition",
+        RelatedTopicModelImpl userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dm4.core.composition",
             "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +

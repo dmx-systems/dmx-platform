@@ -64,12 +64,10 @@ dm4c.add_plugin("de.deepamehta.config", function() {
     })
 
     dm4c.add_listener("logged_in", function() {
-        console.log("logged_in")
         refresh_config_defs()
     })
 
     dm4c.add_listener("authority_decreased", function() {
-        console.log("authority_decreased")
         refresh_config_defs()
     })
 
