@@ -10,7 +10,10 @@ modules-external/
 .classpath
 .settings
 .shell_history
-
 .DS_Store
+
 commit-message.txt
+
 *.tmproj
+*.sublime-project
+*.sublime-workspace
