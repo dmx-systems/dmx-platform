@@ -570,15 +570,15 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
+    // ### TODO: move to PersistenceLayer?
     private void introduceTopicTypesToPlugin() {
         try {
-            for (String topicTypeUri : dm4.getTopicTypeUris()) {
+            for (TopicType topicType : dm4.getAllTopicTypes()) {
                 // ### TODO: explain
-                if (topicTypeUri.equals("dm4.core.meta_meta_type")) {
+                if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
                     continue;
                 }
                 //
-                TopicType topicType = dm4.getTopicType(topicTypeUri);
                 dispatchEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
@@ -586,10 +586,10 @@ public class PluginImpl implements Plugin, EventHandler {
         }
     }
 
+    // ### TODO: move to PersistenceLayer?
     private void introduceAssociationTypesToPlugin() {
         try {
-            for (String assocTypeUri : dm4.getAssociationTypeUris()) {
-                AssociationType assocType = dm4.getAssociationType(assocTypeUri);
+            for (AssociationType assocType : dm4.getAllAssociationTypes()) {
                 dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {

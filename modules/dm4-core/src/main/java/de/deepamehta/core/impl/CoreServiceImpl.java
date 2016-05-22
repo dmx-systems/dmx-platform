@@ -211,45 +211,13 @@ public class CoreServiceImpl implements CoreService {
     // === Topic Types ===
 
     @Override
-    public List<String> getTopicTypeUris() {
-        try {
-            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
-                new SimpleValue("dm4.core.topic_type")));       // ### TODO: rethink access control    
-            List<RelatedTopic> topicTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.topic_type");    // ### TODO: perform by-value search instead
-            List<String> topicTypeUris = new ArrayList();
-            // add meta types
-            topicTypeUris.add("dm4.core.topic_type");
-            topicTypeUris.add("dm4.core.assoc_type");
-            topicTypeUris.add("dm4.core.meta_type");
-            topicTypeUris.add("dm4.core.meta_meta_type");
-            // add regular types
-            for (Topic topicType : topicTypes) {
-                topicTypeUris.add(topicType.getUri());
-            }
-            return topicTypeUris;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching list of topic type URIs failed", e);
-        }
-    }
-
-    @Override
     public TopicType getTopicType(String uri) {
         return pl.getTopicType(uri);
     }
 
     @Override
     public List<TopicType> getAllTopicTypes() {
-        try {
-            List<TopicType> topicTypes = new ArrayList();
-            for (String uri : getTopicTypeUris()) {
-                TopicType topicType = getTopicType(uri);
-                topicTypes.add(topicType);
-            }
-            return topicTypes;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching all topic types failed", e);
-        }
+        return pl.getAllTopicTypes();
     }
 
     // ---
@@ -285,39 +253,13 @@ public class CoreServiceImpl implements CoreService {
     // === Association Types ===
 
     @Override
-    public List<String> getAssociationTypeUris() {
-        try {
-            Topic metaType = pl.checkReadAccessAndInstantiate(pl.fetchTopic("uri",
-                new SimpleValue("dm4.core.assoc_type")));           // ### TODO: rethink access control
-            List<RelatedTopic> assocTypes = metaType.getRelatedTopics("dm4.core.instantiation", "dm4.core.type",
-                "dm4.core.instance", "dm4.core.assoc_type");        // ### TODO: perform by-value search instead
-            List<String> assocTypeUris = new ArrayList();
-            for (Topic assocType : assocTypes) {
-                assocTypeUris.add(assocType.getUri());
-            }
-            return assocTypeUris;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching list of association type URIs failed", e);
-        }
-    }
-
-    @Override
     public AssociationType getAssociationType(String uri) {
         return pl.getAssociationType(uri);
     }
 
     @Override
     public List<AssociationType> getAllAssociationTypes() {
-        try {
-            List<AssociationType> assocTypes = new ArrayList();
-            for (String uri : getAssociationTypeUris()) {
-                AssociationType assocType = getAssociationType(uri);
-                assocTypes.add(assocType);
-            }
-            return assocTypes;
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching all association types failed", e);
-        }
+        return pl.getAllAssociationTypes();
     }
 
     // ---

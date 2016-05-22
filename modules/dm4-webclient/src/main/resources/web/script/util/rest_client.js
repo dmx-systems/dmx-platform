@@ -201,10 +201,6 @@ function RESTClient(config) {
 
     // === Topic Types ===
 
-    this.get_topic_type_uris = function() {
-        return request("GET", "/core/topictype")
-    }
-
     this.get_topic_type = function(type_uri) {
         return request("GET", "/core/topictype/" + type_uri)
     }
@@ -228,10 +224,6 @@ function RESTClient(config) {
 
 
     // === Association Types ===
-
-    this.get_association_type_uris = function() {
-        return request("GET", "/core/assoctype")
-    }
 
     this.get_association_type = function(type_uri) {
         return request("GET", "/core/assoctype/" + type_uri)

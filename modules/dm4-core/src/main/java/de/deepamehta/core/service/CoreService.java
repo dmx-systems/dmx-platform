@@ -181,8 +181,6 @@ public interface CoreService {
 
     // === Topic Types ===
 
-    List<String> getTopicTypeUris();
-
     TopicType getTopicType(String topicTypeUri);
 
     List<TopicType> getAllTopicTypes();
@@ -198,8 +196,6 @@ public interface CoreService {
 
 
     // === Association Types ===
-
-    List<String> getAssociationTypeUris();
 
     AssociationType getAssociationType(String assocTypeUri);
 

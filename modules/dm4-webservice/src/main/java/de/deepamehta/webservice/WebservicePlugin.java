@@ -207,12 +207,6 @@ public class WebservicePlugin extends PluginActivator {
     // === Topic Types ===
 
     @GET
-    @Path("/topictype")
-    public List<String> getTopicTypeUris() {
-        return dm4.getTopicTypeUris();
-    }
-
-    @GET
     @Path("/topictype/{uri}")
     public TopicType getTopicType(@PathParam("uri") String uri) {
         return dm4.getTopicType(uri);
@@ -250,12 +244,6 @@ public class WebservicePlugin extends PluginActivator {
 
 
     // === Association Types ===
-
-    @GET
-    @Path("/assoctype")
-    public List<String> getAssociationTypeUris() {
-        return dm4.getAssociationTypeUris();
-    }
 
     @GET
     @Path("/assoctype/{uri}")

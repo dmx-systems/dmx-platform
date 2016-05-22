@@ -101,7 +101,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Topic> getTopicsByType(String topicTypeUri) {
         try {
-            return checkReadAccessAndInstantiate(typeStorage.getTopicType(topicTypeUri).getAllInstances());
+            return checkReadAccessAndInstantiate(_getTopicType(topicTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching topics by type failed (topicTypeUri=\"" + topicTypeUri + "\")", e);
         }
@@ -241,7 +241,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     List<Association> getAssociationsByType(String assocTypeUri) {
         try {
-            return checkReadAccessAndInstantiate(typeStorage.getAssociationType(assocTypeUri).getAllInstances());
+            return checkReadAccessAndInstantiate(_getAssociationType(assocTypeUri).getAllInstances());
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations by type failed (assocTypeUri=\"" + assocTypeUri + "\")",
                 e);
@@ -358,11 +358,41 @@ public class PersistenceLayer extends StorageDecorator {
     // === Types ===
 
     TopicType getTopicType(String uri) {
-        return typeStorage.getTopicType(uri).instantiate();
+        TopicTypeModelImpl topicType = _getTopicType(uri);
+        if (!uri.equals("dm4.core.meta_meta_type")) {
+            checkReadAccess(topicType);
+        }
+        return topicType.instantiate();
     }
 
     AssociationType getAssociationType(String uri) {
-        return typeStorage.getAssociationType(uri).instantiate();
+        return checkReadAccessAndInstantiate(_getAssociationType(uri));
+    }
+
+    // ---
+
+    List<TopicType> getAllTopicTypes() {
+        try {
+            List<TopicType> topicTypes = new ArrayList();
+            for (String uri : getTopicTypeUris()) {
+                topicTypes.add(_getTopicType(uri).instantiate());
+            }
+            return topicTypes;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching all topic types failed", e);
+        }
+    }
+
+    List<AssociationType> getAllAssociationTypes() {
+        try {
+            List<AssociationType> assocTypes = new ArrayList();
+            for (String uri : getAssociationTypeUris()) {
+                assocTypes.add(_getAssociationType(uri).instantiate());
+            }
+            return assocTypes;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching all association types failed", e);
+        }
     }
 
     // ---
@@ -420,9 +450,7 @@ public class PersistenceLayer extends StorageDecorator {
     // === Generic Object ===
 
     DeepaMehtaObject getObject(long id) {
-        DeepaMehtaObjectModelImpl model = fetchObject(id);
-        checkReadAccess(model);
-        return model.instantiate();
+        return checkReadAccessAndInstantiate(fetchObject(id));
     }
 
 
@@ -459,13 +487,12 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     <O> List<O> checkReadAccessAndInstantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
-        filterReadables(models);
-        return instantiate(models);
+        return instantiate(filterReadables(models));
     }
 
     // ---
 
-    private void filterReadables(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+    private <M extends DeepaMehtaObjectModelImpl> Iterable<M> filterReadables(Iterable<M> models) {
         Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
             DeepaMehtaObjectModelImpl model = i.next();
@@ -475,6 +502,7 @@ public class PersistenceLayer extends StorageDecorator {
                 i.remove();
             }
         }
+        return models;
     }
 
     /**
@@ -499,6 +527,50 @@ public class PersistenceLayer extends StorageDecorator {
 
 
     // ===
+
+    private List<String> getTopicTypeUris() {
+        try {
+            List<String> topicTypeUris = new ArrayList();
+            // add meta types
+            topicTypeUris.add("dm4.core.topic_type");
+            topicTypeUris.add("dm4.core.assoc_type");
+            topicTypeUris.add("dm4.core.meta_type");
+            topicTypeUris.add("dm4.core.meta_meta_type");
+            // add regular types
+            for (TopicModel topicType : filterReadables(fetchTopics("type_uri",
+                                                                    new SimpleValue("dm4.core.topic_type")))) {
+                topicTypeUris.add(topicType.getUri());
+            }
+            return topicTypeUris;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching list of topic type URIs failed", e);
+        }
+    }
+
+    private List<String> getAssociationTypeUris() {
+        try {
+            List<String> assocTypeUris = new ArrayList();
+            for (TopicModel assocType : filterReadables(fetchTopics("type_uri",
+                                                                    new SimpleValue("dm4.core.assoc_type")))) {
+                assocTypeUris.add(assocType.getUri());
+            }
+            return assocTypeUris;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching list of association type URIs failed", e);
+        }
+    }
+
+    // ---
+
+    private TopicTypeModelImpl _getTopicType(String uri) {
+        return typeStorage.getTopicType(uri);
+    }
+
+    private AssociationTypeModelImpl _getAssociationType(String uri) {
+        return typeStorage.getAssociationType(uri);
+    }
+
+    // ---
 
     private void bootstrapTypeCache() {
         TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
