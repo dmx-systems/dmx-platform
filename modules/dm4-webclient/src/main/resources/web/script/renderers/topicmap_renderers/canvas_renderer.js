@@ -51,6 +51,10 @@ function CanvasRenderer() {
             // add type icons
             topicmap.iterate_topics(function(topic) {
                 if (topic.visibility) {
+                    // Note: accessing the type icon requires accessing the type. However the user might have no
+                    // explicit READ permission for the type. We must enforce the *implicit* READ permission.
+                    dm4c.enforce_implicit_topic_type_read_permission(topic)
+                    //
                     image_tracker.add_image(dm4c.get_type_icon(topic.type_uri))
                 }
             })

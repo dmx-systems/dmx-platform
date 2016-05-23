@@ -213,6 +213,12 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     @GET
+    @Path("/topictype/topic/{id}")
+    public TopicType getTopicTypeImplicitly(@PathParam("id") long topicId) {
+        return dm4.getTopicTypeImplicitly(topicId);
+    }
+
+    @GET
     @Path("/topictype/all")
     public List<TopicType> getAllTopicTypes() {
         return dm4.getAllTopicTypes();
@@ -249,6 +255,12 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/assoctype/{uri}")
     public AssociationType getAssociationType(@PathParam("uri") String uri) {
         return dm4.getAssociationType(uri);
+    }
+
+    @GET
+    @Path("/assoctype/assoc/{id}")
+    public AssociationType getAssociationTypeImplicitly(@PathParam("id") long assocId) {
+        return dm4.getAssociationTypeImplicitly(assocId);
     }
 
     @GET

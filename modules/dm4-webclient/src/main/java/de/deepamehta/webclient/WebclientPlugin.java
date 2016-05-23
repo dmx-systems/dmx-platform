@@ -105,7 +105,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
-            throw new RuntimeException("Searching topics failed", e);
+            throw new RuntimeException("Searching topics of type \"" + typeUri + "\" failed", e);
         }
     }
 
@@ -115,18 +115,18 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Path("/topic/{id}/related_topics")
     public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId) {
         Topic topic = dm4.getTopic(topicId);
-        List<RelatedTopic> topics = topic.getRelatedTopics(null);   // assocTypeUri=null
-        Iterator<RelatedTopic> i = topics.iterator();
+        List<RelatedTopic> relTopics = topic.getRelatedTopics(null);   // assocTypeUri=null
+        Iterator<RelatedTopic> i = relTopics.iterator();
         int removed = 0;
         while (i.hasNext()) {
             RelatedTopic relTopic = i.next();
-            if (isDirectModelledChildTopic(relTopic, topic)) {
+            if (isDirectModelledChildTopic(topic, relTopic)) {
                 i.remove();
                 removed++;
             }
         }
         logger.fine("### " + removed + " topics are removed from result set of topic " + topicId);
-        return topics;
+        return relTopics;
     }
 
 
@@ -345,7 +345,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Misc ===
 
-    private boolean isDirectModelledChildTopic(RelatedTopic childTopic, Topic parentTopic) {
+    private boolean isDirectModelledChildTopic(Topic parentTopic, RelatedTopic childTopic) {
         // association definition
         if (hasAssocDef(parentTopic, childTopic)) {
             // role types
@@ -359,7 +359,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     private boolean hasAssocDef(Topic parentTopic, RelatedTopic childTopic) {
-        TopicType parentType = dm4.getTopicType(parentTopic.getTypeUri());
+        // Note: the user might have no explicit READ permission for the type.
+        // We must enforce the *implicit* READ permission.
+        TopicType parentType = dm4.getTopicTypeImplicitly(parentTopic.getId());
+        //
         String childTypeUri = childTopic.getTypeUri();
         String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();
         String assocDefUri = childTypeUri + "#" + assocTypeUri;

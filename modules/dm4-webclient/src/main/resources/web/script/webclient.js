@@ -41,6 +41,8 @@ dm4c = new function() {
         internal_plugins: ["default_plugin.js", "fulltext_plugin.js"]
     })
 
+
+
     // === REST Client Extension ===
 
     this.restc.search_topics_and_create_bucket = function(text, field_uri) {
@@ -1032,6 +1034,8 @@ dm4c = new function() {
         })
     }
 
+
+
     // === Types ===
 
     /**
@@ -1056,6 +1060,16 @@ dm4c = new function() {
 
     function has_association_type(assoc_type_uri) {
         return type_cache.has_association_type(assoc_type_uri)
+    }
+
+    // ---
+
+    this.enforce_implicit_topic_type_read_permission = function(topic) {
+        type_cache.enforce_implicit_topic_type_read_permission(topic)
+    }
+
+    this.enforce_implicit_association_type_read_permission = function(assoc) {
+        type_cache.enforce_implicit_association_type_read_permission(assoc)
     }
 
     // ---
@@ -1132,6 +1146,8 @@ dm4c = new function() {
             adjust_create_widget()
         }))
     }
+
+
 
     // === View Configuration ===
 
@@ -1238,6 +1254,8 @@ dm4c = new function() {
         }
     }
 
+
+
     // === Commands ===
 
     this.get_topic_commands = function(topic, context) {
@@ -1274,6 +1292,8 @@ dm4c = new function() {
             }
         }
     }
+
+
 
     // === Permissions ===
 
@@ -1340,6 +1360,8 @@ dm4c = new function() {
         var workspace_id = dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
         return dm4c.has_write_permission_for_topic(workspace_id)
     }
+
+
 
     // === GUI ===
 
@@ -1521,6 +1543,8 @@ dm4c = new function() {
         })
     }
 
+
+
     // === Images ===
 
     var image_tracker   // ### FIXME: the image tracker is global. There can only be one at a time.
@@ -1575,6 +1599,8 @@ dm4c = new function() {
         }
     }
 
+
+
     // === Load Tracker ===
 
     function LoadTracker(number_of_loads, callback) {
@@ -1587,6 +1613,8 @@ dm4c = new function() {
             }
         }
     }
+
+
 
     // === History ===
 
@@ -1685,6 +1713,8 @@ dm4c = new function() {
     function build_association_type(assoc_type) {
         return new AssociationType(assoc_type)
     }
+
+
 
     // ------------------------------------------------------------------------------------------------ Constructor Code
 

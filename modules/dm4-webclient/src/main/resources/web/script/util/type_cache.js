@@ -5,6 +5,8 @@ function TypeCache() {
     var topic_types = {}        // key: Type URI, value: a TopicType object
     var assoc_types = {}        // key: Type URI, value: a AssociationType object
 
+
+
     // ------------------------------------------------------------------------------------------------------ Public API
 
     this.get_topic_type = function(topic_type_uri) {
@@ -73,6 +75,25 @@ function TypeCache() {
 
     // ---
 
+    this.enforce_implicit_topic_type_read_permission = function(topic) {
+        if (!this.has_topic_type(topic.type_uri)) {
+            console.log("Enforcing implicit READ permission for topic type \"" + topic.type_uri + "\"")
+            var topic_type = new TopicType(dm4c.restc.get_topic_type_implicitly(topic.id))
+            this.put_topic_type(topic_type)
+            topic_type.load_icon()
+        }
+    }
+
+    this.enforce_implicit_association_type_read_permission = function(assoc) {
+        if (!this.has_association_type(assoc.type_uri)) {
+            console.log("Enforcing implicit READ permission for association type \"" + assoc.type_uri + "\"")
+            var assoc_type = new AssociationType(dm4c.restc.get_association_type_implicitly(assoc.id))
+            this.put_association_type(assoc_type)
+        }
+    }
+
+    // ---
+
     this.load_types = function(tracker) {
         load_topic_types(tracker)
         load_association_types(tracker)
@@ -82,6 +103,8 @@ function TypeCache() {
         topic_types = {}
         assoc_types = {}
     }
+
+
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 

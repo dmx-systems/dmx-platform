@@ -205,6 +205,10 @@ function RESTClient(config) {
         return request("GET", "/core/topictype/" + type_uri)
     }
 
+    this.get_topic_type_implicitly = function(topic_id) {
+        return request("GET", "/core/topictype/topic/" + topic_id)
+    }
+
     this.get_all_topic_types = function(callback) {
         request("GET", "/core/topictype/all", undefined, callback)
     }
@@ -227,6 +231,10 @@ function RESTClient(config) {
 
     this.get_association_type = function(type_uri) {
         return request("GET", "/core/assoctype/" + type_uri)
+    }
+
+    this.get_association_type_implicitly = function(assoc_id) {
+        return request("GET", "/core/assoctype/assoc/" + assoc_id)
     }
 
     this.get_all_association_types = function(callback) {

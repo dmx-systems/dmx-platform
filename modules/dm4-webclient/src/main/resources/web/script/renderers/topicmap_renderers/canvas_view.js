@@ -386,6 +386,10 @@ function CanvasView() {
     function draw_association(av) {
         var tv1 = av.get_topic_1()
         var tv2 = av.get_topic_2()
+        // Note: accessing the type color requires accessing the type. However the user might have no
+        // explicit READ permission for the type. We must enforce the *implicit* READ permission.
+        dm4c.enforce_implicit_association_type_read_permission(av)
+        //
         draw_line(tv1.x, tv1.y, tv2.x, tv2.y, dm4c.ASSOC_WIDTH, dm4c.get_type_color(av.type_uri))
         draw_label()
 

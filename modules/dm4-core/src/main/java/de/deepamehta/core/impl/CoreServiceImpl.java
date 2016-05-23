@@ -216,6 +216,13 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
+    public TopicType getTopicTypeImplicitly(long topicId) {
+        return pl.getTopicTypeImplicitly(topicId);
+    }
+
+    // ---
+
+    @Override
     public List<TopicType> getAllTopicTypes() {
         return pl.getAllTopicTypes();
     }
@@ -256,6 +263,13 @@ public class CoreServiceImpl implements CoreService {
     public AssociationType getAssociationType(String uri) {
         return pl.getAssociationType(uri);
     }
+
+    @Override
+    public AssociationType getAssociationTypeImplicitly(long assocId) {
+        return pl.getAssociationTypeImplicitly(assocId);
+    }
+
+    // ---
 
     @Override
     public List<AssociationType> getAllAssociationTypes() {

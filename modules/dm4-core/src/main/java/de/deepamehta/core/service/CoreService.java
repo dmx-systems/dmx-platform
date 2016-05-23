@@ -183,6 +183,14 @@ public interface CoreService {
 
     TopicType getTopicType(String topicTypeUri);
 
+    /**
+     * Acccesses a topic type while enforcing the <i>implicit READ permission</i>.
+     * A user has implicit READ permission for the topic type if she has READ permission for the given topic.
+     */
+    TopicType getTopicTypeImplicitly(long topicId);
+
+    // ---
+
     List<TopicType> getAllTopicTypes();
 
     // ---
@@ -198,6 +206,15 @@ public interface CoreService {
     // === Association Types ===
 
     AssociationType getAssociationType(String assocTypeUri);
+
+    /**
+     * Acccesses an association type while enforcing the <i>implicit READ permission</i>.
+     * A user has implicit READ permission for the association type if she has READ permission for the given
+     * association.
+     */
+    AssociationType getAssociationTypeImplicitly(long assocId);
+
+    // ---
 
     List<AssociationType> getAllAssociationTypes();
 

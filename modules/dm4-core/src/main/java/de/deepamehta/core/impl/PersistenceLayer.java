@@ -365,8 +365,22 @@ public class PersistenceLayer extends StorageDecorator {
         return topicType.instantiate();
     }
 
+    TopicType getTopicTypeImplicitly(long topicId) {
+        checkTopicReadAccess(topicId);
+        String typeUri = (String) fetchProperty(topicId, "type_uri");
+        return _getTopicType(typeUri).instantiate();
+    }
+
+    // ---
+
     AssociationType getAssociationType(String uri) {
         return checkReadAccessAndInstantiate(_getAssociationType(uri));
+    }
+
+    AssociationType getAssociationTypeImplicitly(long assocId) {
+        checkAssociationReadAccess(assocId);
+        String typeUri = (String) fetchProperty(assocId, "type_uri");
+        return _getAssociationType(typeUri).instantiate();
     }
 
     // ---
@@ -512,6 +526,16 @@ public class PersistenceLayer extends StorageDecorator {
         em.fireEvent(model.getPreGetEvent(), model.getId());
     }
 
+    // ---
+
+    private void checkTopicReadAccess(long topicId) {
+        em.fireEvent(CoreEvent.PRE_GET_TOPIC, topicId);
+    }
+
+    private void checkAssociationReadAccess(long assocId) {
+        em.fireEvent(CoreEvent.PRE_GET_ASSOCIATION, assocId);
+    }
+
 
 
     // === Instantiation ===
@@ -537,8 +561,8 @@ public class PersistenceLayer extends StorageDecorator {
             topicTypeUris.add("dm4.core.meta_type");
             topicTypeUris.add("dm4.core.meta_meta_type");
             // add regular types
-            for (TopicModel topicType : filterReadables(fetchTopics("type_uri",
-                                                                    new SimpleValue("dm4.core.topic_type")))) {
+            for (TopicModel topicType : filterReadables(fetchTopics("type_uri", new SimpleValue(
+                                                                    "dm4.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -550,8 +574,8 @@ public class PersistenceLayer extends StorageDecorator {
     private List<String> getAssociationTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModel assocType : filterReadables(fetchTopics("type_uri",
-                                                                    new SimpleValue("dm4.core.assoc_type")))) {
+            for (TopicModel assocType : filterReadables(fetchTopics("type_uri", new SimpleValue(
+                                                                    "dm4.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;
