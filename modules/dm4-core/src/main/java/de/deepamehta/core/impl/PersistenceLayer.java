@@ -367,8 +367,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     TopicType getTopicTypeImplicitly(long topicId) {
         checkTopicReadAccess(topicId);
-        String typeUri = (String) fetchProperty(topicId, "type_uri");
-        return _getTopicType(typeUri).instantiate();
+        return _getTopicType(typeUri(topicId)).instantiate();
     }
 
     // ---
@@ -379,8 +378,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     AssociationType getAssociationTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
-        String typeUri = (String) fetchProperty(assocId, "type_uri");
-        return _getAssociationType(typeUri).instantiate();
+        return _getAssociationType(typeUri(assocId)).instantiate();
     }
 
     // ---
@@ -523,17 +521,17 @@ public class PersistenceLayer extends StorageDecorator {
      * @throws  AccessControlException
      */
     private void checkReadAccess(DeepaMehtaObjectModelImpl model) {
-        em.fireEvent(model.getPreGetEvent(), model.getId());
+        em.fireEvent(model.getReadAccessEvent(), model.getId());
     }
 
     // ---
 
     private void checkTopicReadAccess(long topicId) {
-        em.fireEvent(CoreEvent.PRE_GET_TOPIC, topicId);
+        em.fireEvent(CoreEvent.CHECK_TOPIC_READ_ACCESS, topicId);
     }
 
     private void checkAssociationReadAccess(long assocId) {
-        em.fireEvent(CoreEvent.PRE_GET_ASSOCIATION, assocId);
+        em.fireEvent(CoreEvent.CHECK_ASSOCIATION_READ_ACCESS, assocId);
     }
 
 
@@ -592,6 +590,12 @@ public class PersistenceLayer extends StorageDecorator {
 
     private AssociationTypeModelImpl _getAssociationType(String uri) {
         return typeStorage.getAssociationType(uri);
+    }
+
+    // ---
+
+    private String typeUri(long objectId) {
+        return (String) fetchProperty(objectId, "type_uri");
     }
 
     // ---

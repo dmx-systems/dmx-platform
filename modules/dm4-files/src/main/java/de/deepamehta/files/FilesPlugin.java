@@ -756,8 +756,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 if (fileTopic != null) {
                     // We must perform access control for the fetchFileTopic() call manually here.
                     //
-                    // Although the AccessControlPlugin's PreGetTopicListener kicks in, the request is *not* injected
-                    // into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
+                    // Although the AccessControlPlugin's CheckTopicReadAccessListener kicks in, the request is *not*
+                    // injected into the AccessControlPlugin letting fetchFileTopic() effectively run as "System".
                     //
                     // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.

@@ -33,13 +33,13 @@ import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
+import de.deepamehta.core.service.event.CheckAssociationReadAccessListener;
+import de.deepamehta.core.service.event.CheckTopicReadAccessListener;
 import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreCreateTopicListener;
-import de.deepamehta.core.service.event.PreGetAssociationListener;
-import de.deepamehta.core.service.event.PreGetTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
@@ -75,17 +75,17 @@ import java.util.logging.Logger;
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
-                                                                                          PreCreateTopicListener,
-                                                                                          PreUpdateTopicListener,
-                                                                                          PreGetTopicListener,
-                                                                                          PreGetAssociationListener,
-                                                                                          PostCreateTopicListener,
-                                                                                          PostCreateAssociationListener,
-                                                                                          PostUpdateTopicListener,
-                                                                                          PostUpdateAssociationListener,
-                                                                                          ServiceRequestFilterListener,
-                                                                                          ResourceRequestFilterListener,
-                                                                                          CheckDiskQuotaListener {
+                                                                                     CheckTopicReadAccessListener,
+                                                                                     CheckAssociationReadAccessListener,
+                                                                                     PreCreateTopicListener,
+                                                                                     PreUpdateTopicListener,
+                                                                                     PostCreateTopicListener,
+                                                                                     PostCreateAssociationListener,
+                                                                                     PostUpdateTopicListener,
+                                                                                     PostUpdateAssociationListener,
+                                                                                     ServiceRequestFilterListener,
+                                                                                     ResourceRequestFilterListener,
+                                                                                     CheckDiskQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -459,17 +459,17 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     @Override
-    public void preGetTopic(long topicId) {
-        checkReadPermission(topicId);
+    public void checkTopicReadAccess(long topicId) {
+        checkReadAccess(topicId);
     }
 
     @Override
-    public void preGetAssociation(long assocId) {
-        checkReadPermission(assocId);
+    public void checkAssociationReadAccess(long assocId) {
+        checkReadAccess(assocId);
         //
         long[] playerIds = dm4.getPlayerIds(assocId);
-        checkReadPermission(playerIds[0]);
-        checkReadPermission(playerIds[1]);
+        checkReadAccess(playerIds[0]);
+        checkReadAccess(playerIds[1]);
     }
 
     // ---
@@ -827,7 +827,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * @param   objectId    a topic ID, or an association ID
      */
-    private void checkReadPermission(long objectId) {
+    private void checkReadAccess(long objectId) {
         if (!inRequestScope()) {
             logger.fine("### Object " + objectId + " is accessed by \"System\" -- READ permission is granted");
             return;

@@ -26,19 +26,20 @@ import javax.servlet.http.HttpServletRequest;
  */
 class CoreEvent {
 
-    static DeepaMehtaEvent PRE_GET_TOPIC = new DeepaMehtaEvent(PreGetTopicListener.class) {
+    static DeepaMehtaEvent CHECK_TOPIC_READ_ACCESS = new DeepaMehtaEvent(CheckTopicReadAccessListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreGetTopicListener) listener).preGetTopic(
+            ((CheckTopicReadAccessListener) listener).checkTopicReadAccess(
                 (Long) params[0]
             );
         }
     };
 
-    static DeepaMehtaEvent PRE_GET_ASSOCIATION = new DeepaMehtaEvent(PreGetAssociationListener.class) {
+    static DeepaMehtaEvent CHECK_ASSOCIATION_READ_ACCESS =
+                                                         new DeepaMehtaEvent(CheckAssociationReadAccessListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((PreGetAssociationListener) listener).preGetAssociation(
+            ((CheckAssociationReadAccessListener) listener).checkAssociationReadAccess(
                 (Long) params[0]
             );
         }
