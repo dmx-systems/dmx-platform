@@ -47,6 +47,27 @@ class CoreEvent {
 
     // ---
 
+    static DeepaMehtaEvent CHECK_TOPIC_WRITE_ACCESS = new DeepaMehtaEvent(CheckTopicWriteAccessListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((CheckTopicWriteAccessListener) listener).checkTopicWriteAccess(
+                (Long) params[0]
+            );
+        }
+    };
+
+    static DeepaMehtaEvent CHECK_ASSOCIATION_WRITE_ACCESS =
+                                                        new DeepaMehtaEvent(CheckAssociationWriteAccessListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((CheckAssociationWriteAccessListener) listener).checkAssociationWriteAccess(
+                (Long) params[0]
+            );
+        }
+    };
+
+    // ---
+
     static DeepaMehtaEvent PRE_CREATE_TOPIC = new DeepaMehtaEvent(PreCreateTopicListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {

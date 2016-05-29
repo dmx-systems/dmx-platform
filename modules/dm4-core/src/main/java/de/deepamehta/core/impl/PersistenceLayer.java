@@ -161,8 +161,11 @@ public class PersistenceLayer extends StorageDecorator {
     // ---
 
     void updateTopic(TopicModel newModel) {
+        long topicId = newModel.getId();
         try {
-            TopicModelImpl model = fetchTopic(newModel.getId());
+            checkTopicWriteAccess(topicId);
+            //
+            TopicModelImpl model = fetchTopic(topicId);
             model.update(newModel);
             //
             // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
@@ -170,12 +173,18 @@ public class PersistenceLayer extends StorageDecorator {
             // (see ChildTopicsModelImpl).
             em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + newModel.getId() + " failed", e);
+            throw new RuntimeException("Updating topic " + topicId + " failed", e);
         }
     }
 
     void deleteTopic(long topicId) {
-        fetchTopic(topicId).delete();
+        try {
+            checkTopicWriteAccess(topicId);
+            //
+            fetchTopic(topicId).delete();
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
+        }
     }
 
 
@@ -306,20 +315,29 @@ public class PersistenceLayer extends StorageDecorator {
     // ---
 
     void updateAssociation(AssociationModel newModel) {
+        long assocId = newModel.getId();
         try {
-            AssociationModelImpl model = fetchAssociation(newModel.getId());
+            checkAssociationWriteAccess(assocId);
+            //
+            AssociationModelImpl model = fetchAssociation(assocId);
             model.update(newModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
             // Its childs are always topics (never associations).
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + newModel.getId() + " failed", e);
+            throw new RuntimeException("Updating association " + assocId + " failed", e);
         }
     }
 
     void deleteAssociation(long assocId) {
-        fetchAssociation(assocId).delete();
+        try {
+            checkAssociationWriteAccess(assocId);
+            //
+            fetchAssociation(assocId).delete();
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting association " + assocId + " failed", e);
+        }
     }
 
 
@@ -532,6 +550,16 @@ public class PersistenceLayer extends StorageDecorator {
 
     private void checkAssociationReadAccess(long assocId) {
         em.fireEvent(CoreEvent.CHECK_ASSOCIATION_READ_ACCESS, assocId);
+    }
+
+    // ---
+
+    private void checkTopicWriteAccess(long topicId) {
+        em.fireEvent(CoreEvent.CHECK_TOPIC_WRITE_ACCESS, topicId);
+    }
+
+    private void checkAssociationWriteAccess(long assocId) {
+        em.fireEvent(CoreEvent.CHECK_ASSOCIATION_WRITE_ACCESS, assocId);
     }
 
 
