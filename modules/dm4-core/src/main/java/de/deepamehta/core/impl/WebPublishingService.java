@@ -317,7 +317,7 @@ class WebPublishingService {
 
         @Override
         public String getMimeType(String name) {
-            return null;
+            return JavaUtils.getFileType(name);
         }
 
         @Override
