@@ -22,6 +22,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -310,7 +311,7 @@ class WebPublishingService {
             if (name.equals("/web") || name.equals("/web/")) {
                 name = "/web/index.html";
             }
-            // 2) access resource from context bundle
+            // 2) access bundle resource
             return bundle.getResource(name);
         }
 
@@ -328,13 +329,13 @@ class WebPublishingService {
 
     private class FileSystemHTTPContext implements HttpContext {
 
-        private String path;
+        private String basePath;
 
         /**
-         * @param   path    An absolute path to a directory.
+         * @param   basePath    An absolute path to a directory.
          */
-        private FileSystemHTTPContext(String path) {
-            this.path = path;
+        private FileSystemHTTPContext(String basePath) {
+            this.basePath = basePath;
         }
 
         // ---
@@ -342,7 +343,16 @@ class WebPublishingService {
         @Override
         public URL getResource(String name) {
             try {
-                URL url = new URL("file:" + path + "/" + name);     // throws java.net.MalformedURLException
+                File file = new File(basePath, name);
+                // 1) map <dir> to <dir>/index.html
+                if (file.isDirectory()) {
+                    File index = new File(file, "index.html");
+                    if (index.exists()) {
+                        file = index;
+                    }
+                }
+                // 2) access file system resource
+                URL url = file.toURI().toURL();     // toURL() throws java.net.MalformedURLException
                 logger.fine("### Mapping resource name \"" + name + "\" to URL \"" + url + "\"");
                 return url;
             } catch (Exception e) {
