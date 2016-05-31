@@ -199,6 +199,35 @@ public interface AccessControl {
     // === Email Addresses ===
 
     /**
+     * Returns the username for the given email address.
+     * <p>
+     * The username is determined by traversing from the Email Address topic along a
+     * <code>org.deepamehta.signup.user_mailbox</code> association.
+     * <p>
+     * This is a privileged method, it bypasses the access control system.
+     *
+     * @throws  RuntimeException    if no such Email Address topic exists in the DB, or
+     *                              if more than one such Email Address topics exist in the DB, or
+     *                              if the Email Address topic is not associated to a Username topic.
+     */
+    String getUsername(String emailAddress);
+
+    /**
+     * Returns the email address for the given username.
+     * <p>
+     * The email address is determined by traversing from the Username topic along a
+     * <code>org.deepamehta.signup.user_mailbox</code> association.
+     * <p>
+     * This is a privileged method, it bypasses the access control system.
+     *
+     * @throws  RuntimeException    if no such Username topic exists in the DB, or
+     *                              if the Username topic is not associated to an Email Address topic.
+     */
+    String getEmailAddress(String username);
+
+    // ---
+
+    /**
      * Returns true if an "Email Address" (dm4.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>

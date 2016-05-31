@@ -35,6 +35,7 @@ class AccessControlImpl implements AccessControl {
     //
     private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
+    private static final String ASSOC_TYPE_USER_MAILBOX = "org.deepamehta.signup.user_mailbox";
     private static final String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
     private static final String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
     private static final String ROLE_TYPE_DEFAULT = "dm4.core.default";
@@ -403,8 +404,41 @@ class AccessControlImpl implements AccessControl {
     // === Email Addresses ===
 
     @Override
+    public String getUsername(String emailAddress) {
+        try {
+            // ### TODO: index email addresses as dm4.core.key
+            // We could use fetchTopic() then, and wouldn't need the error checks.
+            List<TopicModelImpl> emailAddresses = getEmailAddressTopics(emailAddress);
+            switch (emailAddresses.size()) {
+            case 0:
+                throw new RuntimeException("Email address \"" + emailAddress + "\" doesn't exist");
+            case 1:
+                return emailAddresses.get(0).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
+                    "dm4.core.child", "dm4.core.parent", TYPE_USERNAME).getSimpleValue().toString();
+            default:
+                throw new RuntimeException("Ambiguity: email address \"" + emailAddress + "\" exists " +
+                    emailAddresses.size() + " times");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the username for email address \"" + emailAddress + "\" failed", e);
+        }
+    }
+
+    @Override
+    public String getEmailAddress(String username) {
+        try {
+            return _getUsernameTopicOrThrow(username).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
+                "dm4.core.parent", "dm4.core.child", TYPE_EMAIL_ADDRESS).getSimpleValue().toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Getting the email address for username \"" + username + "\" failed", e);
+        }
+    }
+
+    // ---
+
+    @Override
     public boolean emailAddressExists(String emailAddress) {
-        return !queryTopics(TYPE_EMAIL_ADDRESS, emailAddress).isEmpty();
+        return !getEmailAddressTopics(emailAddress).isEmpty();
     }
 
 
@@ -571,6 +605,12 @@ class AccessControlImpl implements AccessControl {
             throw new RuntimeException("User \"" + username + "\" does not exist");
         }
         return usernameTopic;
+    }
+
+    // ---
+
+    private List<TopicModelImpl> getEmailAddressTopics(String emailAddress) {
+        return queryTopics(TYPE_EMAIL_ADDRESS, emailAddress);
     }
 
 
