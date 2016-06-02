@@ -690,12 +690,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 throw new RuntimeException("File repository \"" + repo + "\" does not exist");
             }
             //
-            if (FILE_REPOSITORY_PER_WORKSPACE && repoPath.equals("/")) {
-                repo = new File(repo, _pathPrefix(getWorkspaceId()));
-                createWorkspaceFileRepository(repo);
+            String _repoPath = repoPath;
+            if (FILE_REPOSITORY_PER_WORKSPACE) {
+                String pathPrefix;
+                if (repoPath.equals("/")) {
+                    pathPrefix = _pathPrefix(getWorkspaceId());
+                    _repoPath = pathPrefix;
+                } else {
+                    pathPrefix = _pathPrefix(getWorkspaceId(repoPath));
+                }
+                createWorkspaceFileRepository(new File(repo, pathPrefix));
             }
             //
-            repo = new File(repo, repoPath);
+            repo = new File(repo, _repoPath);
             //
             return checkPath(repo);         // throws FileRepositoryException 403 Forbidden
         } catch (FileRepositoryException e) {
