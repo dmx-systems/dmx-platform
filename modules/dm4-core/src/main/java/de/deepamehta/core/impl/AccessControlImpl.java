@@ -406,19 +406,11 @@ class AccessControlImpl implements AccessControl {
     @Override
     public String getUsername(String emailAddress) {
         try {
-            // ### TODO: index email addresses as dm4.core.key
-            // We could use fetchTopic() then, and wouldn't need the error checks.
-            List<TopicModelImpl> emailAddresses = getEmailAddressTopics(emailAddress);
-            switch (emailAddresses.size()) {
-            case 0:
-                throw new RuntimeException("Email address \"" + emailAddress + "\" doesn't exist");
-            case 1:
-                return emailAddresses.get(0).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-                    "dm4.core.child", "dm4.core.parent", TYPE_USERNAME).getSimpleValue().toString();
-            default:
-                throw new RuntimeException("Ambiguity: email address \"" + emailAddress + "\" exists " +
-                    emailAddresses.size() + " times");
+            String username = _getUsername(emailAddress);
+            if (username == null) {
+                throw new RuntimeException("No username is assigned to email address \"" + emailAddress + "\"");
             }
+            return username;
         } catch (Exception e) {
             throw new RuntimeException("Getting the username for email address \"" + emailAddress + "\" failed", e);
         }
@@ -427,8 +419,11 @@ class AccessControlImpl implements AccessControl {
     @Override
     public String getEmailAddress(String username) {
         try {
-            return _getUsernameTopicOrThrow(username).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-                "dm4.core.parent", "dm4.core.child", TYPE_EMAIL_ADDRESS).getSimpleValue().toString();
+            String emailAddress = _getEmailAddress(username);
+            if (emailAddress == null) {
+                throw new RuntimeException("No email address is assigned to username \"" + username + "\"");
+            }
+            return emailAddress;
         } catch (Exception e) {
             throw new RuntimeException("Getting the email address for username \"" + username + "\" failed", e);
         }
@@ -438,7 +433,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public boolean emailAddressExists(String emailAddress) {
-        return !getEmailAddressTopics(emailAddress).isEmpty();
+        return _getUsername(emailAddress) != null;
     }
 
 
@@ -609,8 +604,26 @@ class AccessControlImpl implements AccessControl {
 
     // ---
 
-    private List<TopicModelImpl> getEmailAddressTopics(String emailAddress) {
-        return queryTopics(TYPE_EMAIL_ADDRESS, emailAddress);
+    private String _getUsername(String emailAddress) {
+        String username = null;
+        for (TopicModelImpl emailAddressTopic : queryTopics(TYPE_EMAIL_ADDRESS, emailAddress)) {
+            TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
+                "dm4.core.child", "dm4.core.parent", TYPE_USERNAME);
+            if (usernameTopic != null) {
+                if (username != null) {
+                    throw new RuntimeException("Ambiguity: the Username assignment for email address \"" +
+                        emailAddress + "\" is not unique");
+                }
+                username = usernameTopic.getSimpleValue().toString();
+            }
+        }
+        return username;
+    }
+
+    private String _getEmailAddress(String username) {
+        TopicModel emailAddress = _getUsernameTopicOrThrow(username).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
+            "dm4.core.parent", "dm4.core.child", TYPE_EMAIL_ADDRESS);
+        return emailAddress != null ? emailAddress.getSimpleValue().toString() : null;
     }
 
 
