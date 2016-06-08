@@ -115,6 +115,11 @@
         <!-- Encoding -->
         <file.encoding>UTF-8</file.encoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- OSGi -->
+        <!-- required by Neo4j 3.0 -->
+        <!-- Note: put no space after the comma -->
+        <org.osgi.framework.system.packages.extra>sun.nio.ch,sun.misc</org.osgi.framework.system.packages.extra>
     </properties>
 
     <dependencyManagement>

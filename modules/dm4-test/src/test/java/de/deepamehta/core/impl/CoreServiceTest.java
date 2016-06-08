@@ -695,7 +695,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         Topic facetValue;
         try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             assertTrue(                 name.getChildTopics().has("dm4.test.item"));
-            facetValue =        (Topic) name.getChildTopics().get("dm4.test.item");
+            facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
             assertEquals("Item 1",      facetValue.getSimpleValue().toString());
             assertEquals(item1.getId(), facetValue.getId());
             assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());

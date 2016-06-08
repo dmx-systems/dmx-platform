@@ -32,7 +32,57 @@
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-graphdb-api</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-resource</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-common</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-collections</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-primitive-collections</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-unsafe</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-io</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-logging</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-security</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
             <artifactId>neo4j-lucene-index</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-lucene-upgrade</artifactId>
             <version>3.0.2</version>
         </dependency>
         <!-- JTA Specification (required by neo4j-kernel) -->
@@ -41,6 +91,12 @@
             <artifactId>geronimo-jta_1.1_spec</artifactId>
             <version>1.1.1</version>
             <scope>runtime</scope>
+        </dependency>
+        <!-- Apache Commons Lang (required by neo4j-io) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
         </dependency>
         <!-- Lucene Core (required by neo4j-lucene-index) -->
         <dependency>
@@ -60,15 +116,14 @@
                         <Bundle-Activator>
                             de.deepamehta.storage.neo4j.Neo4jStorageActivator
                         </Bundle-Activator>
-                        <Import-Package>
-                            !ch.qos.logback.*, !org.slf4j.*, !com.sun.*, !sun.misc.*, *
+                        <Import-Package><!-- FIXME -->
+                            !org.neo4j.*, !org.apache.*, *
                         </Import-Package>
-                        <_exportcontents><!-- export package without inlining the class files (we embed the jars)   -->
-                            <!-- exporting this packages supports Neo4j specific 3rd party plugins (dm4-geospatial) -->
-                            org.neo4j.graphdb, org.neo4j.graphdb.traversal, org.neo4j.kernel
-                        </_exportcontents>
                         <Embed-Dependency>
-                            neo4j-kernel, neo4j-lucene-index, geronimo-jta_1.1_spec, lucene-core
+                            neo4j-kernel, neo4j-graphdb-api, neo4j-resource, neo4j-common, neo4j-collections,
+                            neo4j-primitive-collections, neo4j-unsafe, neo4j-io, neo4j-logging, neo4j-security,
+                            neo4j-lucene-index, neo4j-lucene-upgrade,
+                            geronimo-jta_1.1_spec, commons-lang3, lucene-core
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
