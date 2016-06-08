@@ -2,11 +2,9 @@ package de.deepamehta.core.storage.spi;
 
 
 
-public interface DeepaMehtaTransaction {
+public interface DeepaMehtaTransaction extends AutoCloseable {
 
     void success();
 
     void failure();
-
-    void finish();
 }

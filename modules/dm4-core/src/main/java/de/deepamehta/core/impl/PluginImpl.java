@@ -517,8 +517,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     private void installPluginInDB() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) create "Plugin" topic
             boolean isCleanInstall = createPluginTopicIfNotExists();
             // 2) run migrations
@@ -533,8 +532,6 @@ public class PluginImpl implements Plugin, EventHandler {
         } catch (Exception e) {
             logger.warning("ROLLBACK! (" + this + ")");
             throw new RuntimeException("Installing " + this + " in the database failed", e);
-        } finally {
-            tx.finish();
         }
     }
 

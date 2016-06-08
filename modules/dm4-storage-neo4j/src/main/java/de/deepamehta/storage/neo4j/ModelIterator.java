@@ -5,7 +5,6 @@ import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.TopicModel;
 
 import org.neo4j.graphdb.Node;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -55,7 +54,7 @@ abstract class ModelIterator<E extends DeepaMehtaObjectModel> implements Iterato
     ModelIterator(Neo4jStorage storage, NodeType nodeType) {
         this.storage = storage;
         this.nodeType = nodeType;
-        this.nodes = GlobalGraphOperations.at(storage.neo4j).getAllNodes().iterator();
+        this.nodes = storage.neo4j.getAllNodes().iterator();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

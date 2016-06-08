@@ -60,30 +60,31 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void typeDefinition() {
-        TopicType topicType = dm4.getTopicType("dm4.core.plugin");
-        assertEquals("dm4.core.plugin",     topicType.getUri());
-        assertEquals("dm4.core.topic_type", topicType.getTypeUri());
-        assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
-        assertEquals(3,                     topicType.getAssocDefs().size());
-        AssociationDefinition assocDef =    topicType.getAssocDef("dm4.core.plugin_migration_nr");
-        assertEquals("dm4.core.composition_def",     assocDef.getTypeUri());
-        assertEquals("dm4.core.plugin",              assocDef.getParentTypeUri());
-        assertEquals("dm4.core.plugin_migration_nr", assocDef.getChildTypeUri());
-        assertEquals("dm4.core.one",                 assocDef.getParentCardinalityUri());
-        assertEquals("dm4.core.one",                 assocDef.getChildCardinalityUri());
-        Topic t1 = assocDef.getTopic("dm4.core.parent_type");
-        Topic t2 = assocDef.getTopic("dm4.core.child_type");
-        assertEquals("dm4.core.plugin",              t1.getUri());
-        assertEquals("dm4.core.topic_type",          t1.getTypeUri());
-        assertEquals("dm4.core.plugin_migration_nr", t2.getUri());
-        assertEquals("dm4.core.topic_type",          t2.getTypeUri());
+    public void typeDefinition() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            TopicType topicType = dm4.getTopicType("dm4.core.plugin");
+            assertEquals("dm4.core.plugin",     topicType.getUri());
+            assertEquals("dm4.core.topic_type", topicType.getTypeUri());
+            assertEquals("dm4.core.composite",  topicType.getDataTypeUri());
+            assertEquals(3,                     topicType.getAssocDefs().size());
+            AssociationDefinition assocDef =    topicType.getAssocDef("dm4.core.plugin_migration_nr");
+            assertEquals("dm4.core.composition_def",     assocDef.getTypeUri());
+            assertEquals("dm4.core.plugin",              assocDef.getParentTypeUri());
+            assertEquals("dm4.core.plugin_migration_nr", assocDef.getChildTypeUri());
+            assertEquals("dm4.core.one",                 assocDef.getParentCardinalityUri());
+            assertEquals("dm4.core.one",                 assocDef.getChildCardinalityUri());
+            Topic t1 = assocDef.getTopic("dm4.core.parent_type");
+            Topic t2 = assocDef.getTopic("dm4.core.child_type");
+            assertEquals("dm4.core.plugin",              t1.getUri());
+            assertEquals("dm4.core.topic_type",          t1.getTypeUri());
+            assertEquals("dm4.core.plugin_migration_nr", t2.getUri());
+            assertEquals("dm4.core.topic_type",          t2.getTypeUri());
+        }
     }
 
     @Test
-    public void createWithoutComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void createWithoutComposite() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")));
             //
@@ -98,15 +99,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(42, nr);
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void createWithComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void createWithComposite() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
@@ -123,17 +121,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(42, nr);
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void onDemandChildTopicLoading() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void onDemandChildTopicLoading() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
@@ -147,15 +142,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void onDemandChildTopicLoadingWithConvenienceAccessor() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void onDemandChildTopicLoadingWithConvenienceAccessor() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
             ));
@@ -168,17 +160,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertTrue(comp.has("dm4.core.plugin_migration_nr"));               // child topic is now loaded
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void changeLabelWithSetChildTopics() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void changeLabelWithSetChildTopics() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
@@ -190,15 +179,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void changeLabelWithChildTopicsSet() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void changeLabelWithChildTopicsSet() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
             //
@@ -210,17 +196,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", fetchedTopic.getSimpleValue().toString());
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void setLabelChildWhileChildsAreNotLoaded() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void setLabelChildWhileChildsAreNotLoaded() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
                 .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
@@ -234,15 +217,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("HuHu", topic.getSimpleValue().toString());        // the label is recalculated
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void setNonlabelChildWhileChildsAreNotLoaded() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void setNonlabelChildWhileChildsAreNotLoaded() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
                 .put("dm4.core.plugin_symbolic_name", "dm4.test.my_plugin")
@@ -256,8 +236,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("My Plugin", topic.getSimpleValue().toString());   // the label is still intact
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -265,8 +243,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void uriUniquenessCreateTopic() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic.getUri());
             //
@@ -278,15 +255,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             Throwable cause = e.getCause();
             assertNotNull(cause);
             assertEquals("URI \"dm4.my.uri\" is not unique", cause.getMessage());
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
     public void uriUniquenessSetUri() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic1 = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
@@ -299,16 +273,13 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.success();
         } catch (Exception e) {
             assertEquals("URI \"dm4.my.uri\" is not unique", e.getMessage());
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
     public void uriUniquenessUpdate() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
         long topic2Id = -1;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic1 = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
             //
@@ -324,50 +295,49 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // logger.log(Level.WARNING, "Exception thrown:", e);
             assertEquals("Updating topic " + topic2Id + " failed (typeUri=\"dm4.core.plugin\")", e.getMessage());
             assertEquals("URI \"dm4.my.uri\" is not unique", e.getCause().getMessage());
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void assocDefSequence() {
-        DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
-        //
-        // find assoc def 1/3
-        RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
-            "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
-        logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
-        //
-        // find assoc def 2/3
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
-            null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 2/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
-        //
-        // find assoc def 3/3
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
-            null);                              // othersAssocTypeUri=null
-        logger.info("### assoc def ID 3/3 = " + assocDef.getId() +
-            ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
-        assertNotNull(assocDef);
-        //
-        // there is no other
-        assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
-            null);                              // othersAssocTypeUri=null
-        assertNull(assocDef);
+    public void assocDefSequence() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
+            //
+            // find assoc def 1/3
+            RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",
+                "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
+            logger.info("### assoc def ID 1/3 = " + assocDef.getId() +
+                ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+            assertNotNull(assocDef);
+            //
+            // find assoc def 2/3
+            assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+                null);                              // othersAssocTypeUri=null
+            logger.info("### assoc def ID 2/3 = " + assocDef.getId() +
+                ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+            assertNotNull(assocDef);
+            //
+            // find assoc def 3/3
+            assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+                null);                              // othersAssocTypeUri=null
+            logger.info("### assoc def ID 3/3 = " + assocDef.getId() +
+                ", relating assoc ID = " + assocDef.getRelatingAssociation().getId());
+            assertNotNull(assocDef);
+            //
+            // there is no other
+            assocDef = assocDef.getRelatedAssociation("dm4.core.sequence", "dm4.core.predecessor", "dm4.core.successor",
+                null);                              // othersAssocTypeUri=null
+            assertNull(assocDef);
+        }
     }
 
     // ---
 
     @Test
-    public void insertAssocDefAtPos0() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void insertAssocDefAtPos0() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
             //
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
@@ -383,15 +353,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.plugin_name", i.next().getChildTypeUri());   // former pos 0 is now at pos 1
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void insertAssocDefAtPos1() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void insertAssocDefAtPos1() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
             //
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
@@ -408,44 +375,45 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.plugin_symbolic_name", i.next().getChildTypeUri());  // former pos 1 is now at pos 2
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void getTopicsByType() {
-        Topic type = dm4.getTopicByUri("dm4.core.data_type");
-        List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
-        assertEquals(5, topics1.size());
-        List<Topic> topics2 = getTopicInstances("dm4.core.data_type");
-        assertEquals(5, topics2.size());
+    public void getTopicsByType() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            Topic type = dm4.getTopicByUri("dm4.core.data_type");
+            List<RelatedTopic> topics1 = getTopicInstancesByTraversal(type);
+            assertEquals(5, topics1.size());
+            List<Topic> topics2 = getTopicInstances("dm4.core.data_type");
+            assertEquals(5, topics2.size());
+        }
     }
 
     @Test
-    public void getAssociationsByType() {
-        List<RelatedAssociation> assocs;
-        //
-        assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
-        assertEquals(49, assocs.size());
-        //
-        assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
-        assertEquals(5, assocs.size());
-        //
-        assocs = getAssociationInstancesByTraversal("dm4.core.aggregation_def");
-        assertEquals(2, assocs.size());
+    public void getAssociationsByType() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            List<RelatedAssociation> assocs;
+            //
+            assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
+            assertEquals(49, assocs.size());
+            //
+            assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
+            assertEquals(5, assocs.size());
+            //
+            assocs = getAssociationInstancesByTraversal("dm4.core.aggregation_def");
+            assertEquals(2, assocs.size());
+        }
     }
 
     // ---
 
     @Test
-    public void retypeAssociation() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void retypeAssociation() throws Exception {
         Topic type;
         List<RelatedTopic> childTypes;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             type = dm4.getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
@@ -466,23 +434,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         // re-execute query
-        childTypes = getChildTypes(type);
-        assertEquals(2, childTypes.size());
-        // ### Note: the Lucene index update is only visible once the transaction is committed!
-        // ### That's contradictory to the Neo4j documentation!
-        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            childTypes = getChildTypes(type);
+            assertEquals(2, childTypes.size());
+            // ### Note: the Lucene index update is only visible once the transaction is committed!
+            // ### That's contradictory to the Neo4j documentation!
+            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        }
     }
 
     @Test
-    public void retypeAssociationRoles() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void retypeAssociationRoles() throws Exception {
         Topic type;
         List<RelatedTopic> childTypes;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             type = dm4.getTopicByUri("dm4.core.plugin");
             childTypes = getChildTypes(type);
             assertEquals(3, childTypes.size());
@@ -500,23 +467,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         // re-execute query
-        childTypes = getChildTypes(type);
-        assertEquals(2, childTypes.size());
-        // ### Note: the Lucene index update is only visible once the transaction is committed!
-        // ### That's contradictory to the Neo4j documentation!
-        // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            childTypes = getChildTypes(type);
+            assertEquals(2, childTypes.size());
+            // ### Note: the Lucene index update is only visible once the transaction is committed!
+            // ### That's contradictory to the Neo4j documentation!
+            // ### It states that QueryContext's tradeCorrectnessForSpeed behavior is off by default.
+        }
     }
 
     @Test
-    public void retypeTopicAndTraverse() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void retypeTopicAndTraverse() throws Exception {
         Topic t0;
         List<RelatedTopic> topics;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             setupTestTopics();
             //
             t0 = dm4.getTopicByUri("dm4.test.t0");
@@ -540,20 +506,19 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ### created within the same transaction!
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         // re-execute query
-        topics = getTestTopics(t0);
-        assertEquals(2, topics.size());      // we still have 2 topics
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            topics = getTestTopics(t0);
+            assertEquals(2, topics.size());      // we still have 2 topics
+        }
     }
 
     @Test
-    public void retypeAssociationAndTraverse() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void retypeAssociationAndTraverse() throws Exception {
         Topic t0;
         List<RelatedAssociation> assocs;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             setupTestAssociations();
             //
             t0 = dm4.getTopicByUri("dm4.test.t0");
@@ -577,20 +542,19 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ### created within the same transaction!
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         // re-execute query
-        assocs = getTestAssociations(t0);
-        assertEquals(2, assocs.size());      // we still have 2 associations
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assocs = getTestAssociations(t0);
+            assertEquals(2, assocs.size());      // we still have 2 associations
+        }
     }
 
     @Test
-    public void retypeTopicAndTraverseInstantiations() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void retypeTopicAndTraverseInstantiations() throws Exception {
         Topic type;
         List<RelatedTopic> topics;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             type = dm4.getTopicByUri("dm4.core.data_type");
             topics = getTopicInstancesByTraversal(type);
             assertEquals(5, topics.size());
@@ -617,23 +581,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // ### One possible difference is whether the test content is created in the same transaction or not.
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         // re-execute query
-        topics = getTopicInstancesByTraversal(type);
-        assertEquals(4, topics.size());
-        // ### Note: the Lucene index update was already visible within the transaction!
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            topics = getTopicInstancesByTraversal(type);
+            assertEquals(4, topics.size());
+            // ### Note: the Lucene index update was already visible within the transaction!
+        }
     }
 
     // ---
 
     @Test
-    public void updateAggregationOne() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void updateAggregationOne() throws Exception {
         TopicImpl comp1;    // Note: has() is internal API, so we need a TopicImpl here
         Topic item1, item2;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define composite type
             // child types
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
@@ -656,57 +619,54 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 // ### .putRef("dm4.test.item", item1.getId())
             ));
             tx.success();
-        } finally {
-            tx.finish();
         }
         // check memory
-        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
-        assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
-        comp1.loadChildTopics();
-        assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
-        assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+            assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
+            comp1.loadChildTopics();
+            assertFalse(                comp1.getChildTopics().has("dm4.test.item"));
+            assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        }
         //
         // update and check again
-        tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
                 .putRef("dm4.test.item", item2.getId())
             ));
             tx.success();
-        } finally {
-            tx.finish();
         }
         //
-        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
-        assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
-        assertEquals("Item 2",      comp1.getChildTopics().getString("dm4.test.item"));
-        assertEquals(item2.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+            assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
+            assertEquals("Item 2",      comp1.getChildTopics().getString("dm4.test.item"));
+            assertEquals(item2.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
+            assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        }
         //
         // update and check again
-        tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             comp1.update(mf.newTopicModel(comp1.getId(), mf.newChildTopicsModel()
                 .putRef("dm4.test.item", item1.getId())
             ));
             tx.success();
-        } finally {
-            tx.finish();
         }
         //
-        assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
-        assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
-        assertEquals("Item 1",      comp1.getChildTopics().getString("dm4.test.item"));
-        assertEquals(item1.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
-        assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assertEquals("Composite 1", comp1.getChildTopics().getString("dm4.test.name"));
+            assertTrue(                 comp1.getChildTopics().has("dm4.test.item"));
+            assertEquals("Item 1",      comp1.getChildTopics().getString("dm4.test.item"));
+            assertEquals(item1.getId(), comp1.getChildTopics().getTopic("dm4.test.item").getId());
+            assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        }
     }
 
     @Test
-    public void updateAggregationOneFacet() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void updateAggregationOneFacet() throws Exception {
         TopicImpl name;     // Note: has() is internal API, so we need a TopicImpl here
         Topic item1, item2;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define facet
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.item", "Item", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.item_facet", "Item Facet", "dm4.core.composite")
@@ -722,50 +682,46 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             name = dm4.createTopic(mf.newTopicModel("dm4.test.name", new SimpleValue("Name 1")));
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
         //
         AssociationDefinition assocDef = dm4.getTopicType("dm4.test.item_facet").getAssocDef("dm4.test.item");
         //
         // update facet
-        tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             name.updateChildTopic(mf.newTopicReferenceModel(item1.getId()), assocDef);
             tx.success();
-        } finally {
-            tx.finish();
         }
         //
-        assertTrue(                 name.getChildTopics().has("dm4.test.item"));
-        Topic facetValue = (Topic)  name.getChildTopics().get("dm4.test.item");
-        assertEquals("Item 1",      facetValue.getSimpleValue().toString());
-        assertEquals(item1.getId(), facetValue.getId());
-        assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        Topic facetValue;
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assertTrue(                 name.getChildTopics().has("dm4.test.item"));
+            facetValue =        (Topic) name.getChildTopics().get("dm4.test.item");
+            assertEquals("Item 1",      facetValue.getSimpleValue().toString());
+            assertEquals(item1.getId(), facetValue.getId());
+            assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        }
         //
         // update facet again
-        tx = dm4.beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             name.updateChildTopic(mf.newTopicReferenceModel(item2.getId()), assocDef);
             tx.success();
-        } finally {
-            tx.finish();
         }
         //
-        assertTrue(                 name.getChildTopics().has("dm4.test.item"));
-        facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
-        assertEquals("Item 2",      facetValue.getSimpleValue().toString());
-        assertEquals(item2.getId(), facetValue.getId());
-        assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            assertTrue(                 name.getChildTopics().has("dm4.test.item"));
+            facetValue = (Topic)        name.getChildTopics().get("dm4.test.item");
+            assertEquals("Item 2",      facetValue.getSimpleValue().toString());
+            assertEquals(item2.getId(), facetValue.getId());
+            assertEquals(2, dm4.getTopicsByType("dm4.test.item").size());
+        }
     }
 
     // ---
 
     @Test
-    public void createManyChildRefViaModel() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void createManyChildRefViaModel() throws Exception {
         Topic parent1, child1;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define composite type
             // child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
@@ -783,8 +739,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
                 .addRef("dm4.test.child", child1.getId())
             ));
             tx.success();
-        } finally {
-            tx.finish();
         }
         List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
@@ -793,10 +747,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void createManyChildRefViaObject() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void createManyChildRefViaObject() throws Exception {
         Topic parent1, child1;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define parent type (with Aggregation-Many child definition)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
@@ -810,8 +763,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             parent1 = dm4.createTopic(mf.newTopicModel("dm4.test.parent"));
             parent1.getChildTopics().addRef("dm4.test.child", child1.getId());
             tx.success();
-        } finally {
-            tx.finish();
         }
         List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
@@ -820,10 +771,9 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
-    public void createManyChildViaObject() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+    public void createManyChildViaObject() throws Exception {
         Topic parent1;
-        try {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define composite type
             // child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
@@ -837,8 +787,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             parent1 = dm4.createTopic(mf.newTopicModel("dm4.test.parent"));
             parent1.getChildTopics().add("dm4.test.child", "Child 1");
             tx.success();
-        } finally {
-            tx.finish();
         }
         List<RelatedTopic> childs = parent1.getChildTopics().getTopics("dm4.test.child");
         assertEquals(1, childs.size());
@@ -848,9 +796,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
-    public void createAndUpdateAggregationOne() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void createAndUpdateAggregationOne() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define parent type (with Aggregation-One child definition)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
@@ -870,17 +817,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("Child 2", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void createCompositionWithChildRef() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void createCompositionWithChildRef() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define composite type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
@@ -898,15 +842,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void createAggregationWithChildRef() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void createAggregationWithChildRef() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             // 1) define composite type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.parent", "Parent", "dm4.core.composite")
@@ -924,17 +865,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("Child 1", parent1.getChildTopics().getTopic("dm4.test.child").getSimpleValue().toString());
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void deleteTopic() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void deleteTopic() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             dm4.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
             //
             Topic t0 = dm4.getTopicByUri("dm4.test.t0");
@@ -945,17 +883,14 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertNull(t0);
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     // ---
 
     @Test
-    public void coreACAssignTopicToWorkspace() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void coreACAssignTopicToWorkspace() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic t1 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Topic ws = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             //
@@ -965,15 +900,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(ws.getId(), wsId);
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
     @Test
-    public void coreACAssignAssociationToWorkspace() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
-        try {
+    public void coreACAssignAssociationToWorkspace() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic t1 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Topic t2 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Topic ws = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
@@ -985,8 +917,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals(ws.getId(), wsId);
             //
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 

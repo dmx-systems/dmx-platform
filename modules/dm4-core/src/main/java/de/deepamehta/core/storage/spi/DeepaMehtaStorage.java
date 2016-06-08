@@ -237,6 +237,9 @@ public interface DeepaMehtaStorage {
 
     DeepaMehtaTransaction beginTx();
 
+    /**
+     * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
+     */
     boolean setupRootNode();
 
     void shutdown();

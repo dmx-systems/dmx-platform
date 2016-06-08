@@ -35,7 +35,7 @@ class Neo4jTransactionAdapter implements DeepaMehtaTransaction {
     }
 
     @Override
-    public void finish() {
-        tx.finish();
+    public void close() {
+        tx.close();
     }
 }

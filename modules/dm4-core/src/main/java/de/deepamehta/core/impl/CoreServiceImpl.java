@@ -474,8 +474,7 @@ public class CoreServiceImpl implements CoreService {
      *   3) runs the core migrations.
      */
     private void setupDB() {
-        DeepaMehtaTransaction tx = beginTx();
-        try {
+        try (DeepaMehtaTransaction tx = beginTx()) {
             logger.info("----- Setting up the database -----");
             boolean isCleanInstall = pl.init();
             if (isCleanInstall) {
@@ -483,13 +482,10 @@ public class CoreServiceImpl implements CoreService {
             }
             migrationManager.runCoreMigrations(isCleanInstall);
             tx.success();
-            tx.finish();
             logger.info("----- Setting up the database complete -----");
         } catch (Exception e) {
             logger.warning("ROLLBACK!");
-            // Note: we don't put finish() in a finally clause here because
-            // in case of error the database has to be shut down.
-            tx.finish();
+            // Note: in case of error the database has to be shut down ### TODO: works with try-with-resource?
             pl.shutdown();
             throw new RuntimeException("Setting up the database failed", e);
         }

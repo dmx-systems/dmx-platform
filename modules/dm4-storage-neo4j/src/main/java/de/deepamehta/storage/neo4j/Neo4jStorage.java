@@ -19,6 +19,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
@@ -33,6 +34,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
+import java.io.File;
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
 import java.util.Iterator;
@@ -83,16 +85,9 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     Neo4jStorage(String databasePath, ModelFactory mf) {
         try {
-            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(databasePath);
-            this.relTypeCache = new RelationtypeCache(neo4j);
-            // indexes
-            this.topicContentExact    = createExactIndex("topic-content-exact");
-            this.topicContentFulltext = createFulltextIndex("topic-content-fulltext");
-            this.assocContentExact    = createExactIndex("assoc-content-exact");
-            this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
-            this.assocMetadata = createExactIndex("assoc-metadata");
-            //
+            this.neo4j = new GraphDatabaseFactory().newEmbeddedDatabase(new File(databasePath));
             this.mf = mf;
+            initRelTypeCacheAndIndexes();
         } catch (Exception e) {
             if (neo4j != null) {
                 shutdown();
@@ -545,20 +540,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     @Override
     public boolean setupRootNode() {
         try {
-            Node rootNode = fetchNode(0);
-            //
-            if (rootNode.getProperty(KEY_NODE_TYPE, null) != null) {
-                return false;
+            Node rootNode = fetchTopicNodeByUriIfExists("dm4.core.meta_type");
+            boolean isCleanInstall = rootNode == null;
+            if (isCleanInstall) {
+                rootNode = neo4j.createNode();
+                rootNode.setProperty(KEY_NODE_TYPE, "topic");
+                rootNode.setProperty(KEY_VALUE, "Meta Type");
+                storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
+                storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
             }
-            //
-            rootNode.setProperty(KEY_NODE_TYPE, "topic");
-            rootNode.setProperty(KEY_VALUE, "Meta Type");
-            storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
-            storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
-            //
-            return true;
+            return isCleanInstall;
         } catch (Exception e) {
-            throw new RuntimeException("Setting up the root node (0) failed", e);
+            throw new RuntimeException("Setting up the root node failed", e);
         }
     }
 
@@ -586,7 +579,23 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         return mf;
     }
 
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void initRelTypeCacheAndIndexes() {
+        try (Transaction tx = neo4j.beginTx()) {
+            this.relTypeCache = new RelationtypeCache(neo4j);
+            // indexes
+            this.topicContentExact    = createExactIndex("topic-content-exact");
+            this.topicContentFulltext = createFulltextIndex("topic-content-fulltext");
+            this.assocContentExact    = createExactIndex("assoc-content-exact");
+            this.assocContentFulltext = createFulltextIndex("assoc-content-fulltext");
+            this.assocMetadata = createExactIndex("assoc-metadata");
+            //
+            tx.success();
+        }
+    }
 
 
 
@@ -1057,13 +1066,17 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     }
 
     private Node fetchTopicNodeByUri(String uri) {
-        Node node = topicContentExact.get(KEY_URI, uri).getSingle();
+        Node node = fetchTopicNodeByUriIfExists(uri);
         //
         if (node == null) {
             throw new RuntimeException("Topic with URI \"" + uri + "\" not found in DB");
         }
         //
         return checkType(node, NodeType.TOPIC);
+    }
+
+    private Node fetchTopicNodeByUriIfExists(String uri) {
+        return topicContentExact.get(KEY_URI, uri).getSingle();
     }
 
     private Node checkType(Node node, NodeType type) {

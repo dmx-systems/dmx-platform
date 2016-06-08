@@ -87,16 +87,18 @@ class TransactionFactory implements ResourceFilterFactory {
 
                 @Override
                 public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-                    DeepaMehtaTransaction tx = threadLocalTransaction.get();
-                    boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
-                    if (success) {
-                        logger.fine("### Comitting transaction of " + info(method));
-                        tx.success();
-                    } else {
-                        logger.warning("### Rollback transaction of " + info(method));
+                    try (DeepaMehtaTransaction tx = threadLocalTransaction.get()) {
+                        boolean success = response.getMappedThrowable() == null;  // ### TODO: is this criteria concise?
+                        if (success) {
+                            logger.fine("### Comitting transaction of " + info(method));
+                            tx.success();
+                        } else {
+                            logger.warning("### Rollback transaction of " + info(method));
+                        }
+                        return response;
+                    } catch (Exception e) {
+                        throw new RuntimeException("Closing transaction of " + info(method) + " failed", e);
                     }
-                    tx.finish();
-                    return response;
                 }
             };
         }

@@ -40,7 +40,7 @@ class RelationtypeCache {
 
     private Map<String, RelationshipType> createRelTypeCache(GraphDatabaseService neo4j) {
         Map<String, RelationshipType> relTypeCache = new HashMap();
-        for (RelationshipType relType : neo4j.getRelationshipTypes()) {
+        for (RelationshipType relType : neo4j.getAllRelationshipTypesInUse()) {
             relTypeCache.put(relType.name(), relType);
         }
         return relTypeCache;
