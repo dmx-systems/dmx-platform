@@ -104,6 +104,21 @@
             <artifactId>lucene-core</artifactId>
             <version>5.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-codecs</artifactId>
+            <version>5.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>5.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -123,7 +138,8 @@
                             neo4j-kernel, neo4j-graphdb-api, neo4j-resource, neo4j-common, neo4j-collections,
                             neo4j-primitive-collections, neo4j-unsafe, neo4j-io, neo4j-logging, neo4j-security,
                             neo4j-lucene-index, neo4j-lucene-upgrade,
-                            geronimo-jta_1.1_spec, commons-lang3, lucene-core
+                            geronimo-jta_1.1_spec, commons-lang3,
+                            lucene-core, lucene-analyzers-common, lucene-codecs, lucene-queryparser
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
