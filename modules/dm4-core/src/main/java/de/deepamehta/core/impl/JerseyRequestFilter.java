@@ -25,13 +25,11 @@ class JerseyRequestFilter implements ContainerRequestFilter {
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        try {
-            Cookies.set(request);
-            tf.create(request);
-            em.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
-            return request;
-        } catch (Exception e) {
-            throw new RuntimeException("Request filtering failed", e);
-        }
+        Cookies.set(request);
+        tf.create(request);
+        em.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
+        return request;
+        // Note: we don't catch here as a WebApplicationException (e.g. thrown by
+        // CachingPlugin's serviceRequestFilter()) must reach the exception mapper
     }
 }
