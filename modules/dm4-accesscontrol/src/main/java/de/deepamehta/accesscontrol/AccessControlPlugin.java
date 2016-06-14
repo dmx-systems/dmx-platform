@@ -26,7 +26,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.service.accesscontrol.Credentials;
@@ -229,7 +228,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/user_account")
-    @Transactional
     @Override
     public Topic createUserAccount(final Credentials cred) {
         try {
@@ -314,7 +312,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @POST
     @Path("/user/{username}/workspace/{workspace_id}")
-    @Transactional
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {

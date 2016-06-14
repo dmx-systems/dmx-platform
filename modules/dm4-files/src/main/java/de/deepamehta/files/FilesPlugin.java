@@ -19,7 +19,6 @@ import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.ResourceRequestFilterListener;
@@ -100,7 +99,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @GET
     @Path("/file/{path}")
-    @Transactional
     @Override
     public Topic getFileTopic(@PathParam("path") String repoPath) {
         String operation = "Creating File topic for repository path \"" + repoPath + "\"";
@@ -128,7 +126,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @GET
     @Path("/folder/{path}")
-    @Transactional
     @Override
     public Topic getFolderTopic(@PathParam("path") String repoPath) {
         String operation = "Creating Folder topic for repository path \"" + repoPath + "\"";
@@ -158,7 +155,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @GET
     @Path("/parent/{id}/file/{path}")
-    @Transactional
     @Override
     public Topic getChildFileTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFileTopic(repoPath);
@@ -168,7 +164,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     @GET
     @Path("/parent/{id}/folder/{path}")
-    @Transactional
     @Override
     public Topic getChildFolderTopic(@PathParam("id") long folderTopicId, @PathParam("path") String repoPath) {
         Topic topic = getFolderTopic(repoPath);
@@ -183,7 +178,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     @POST
     @Path("/{path}")
     @Consumes("multipart/form-data")
-    @Transactional
     @Override
     public StoredFile storeFile(UploadedFile file, @PathParam("path") String repoPath) {
         String operation = "Storing " + file + " at repository path \"" + repoPath + "\"";

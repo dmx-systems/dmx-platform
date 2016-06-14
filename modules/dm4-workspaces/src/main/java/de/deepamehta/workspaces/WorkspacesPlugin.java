@@ -18,7 +18,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.Inject;
-import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
@@ -94,7 +93,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     @POST
     @Path("/{name}/{uri:[^/]*?}/{sharing_mode_uri}")    // Note: default is [^/]+?     // +? is a "reluctant" quantifier
-    @Transactional
     @Override
     public Topic createWorkspace(@PathParam("name") final String name, @PathParam("uri") final String uri,
                                  @PathParam("sharing_mode_uri") final SharingMode sharingMode) {
@@ -157,7 +155,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Note: part of REST API, not part of OSGi service
     @PUT
     @Path("/{workspace_id}/object/{object_id}")
-    @Transactional
     public DirectivesResponse assignToWorkspace(@PathParam("object_id") long objectId,
                                                 @PathParam("workspace_id") long workspaceId) {
         assignToWorkspace(dm4.getObject(objectId), workspaceId);

@@ -11,11 +11,13 @@ class JerseyRequestFilter implements ContainerRequestFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private TransactionFactory tf;
     private EventManager em;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyRequestFilter(EventManager em) {
+    JerseyRequestFilter(TransactionFactory tf, EventManager em) {
+        this.tf = tf;
         this.em = em;
     }
 
@@ -23,8 +25,13 @@ class JerseyRequestFilter implements ContainerRequestFilter {
 
     @Override
     public ContainerRequest filter(ContainerRequest request) {
-        Cookies.set(request);
-        em.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
-        return request;
+        try {
+            Cookies.set(request);
+            tf.create(request);
+            em.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
+            return request;
+        } catch (Exception e) {
+            throw new RuntimeException("Request filtering failed", e);
+        }
     }
 }

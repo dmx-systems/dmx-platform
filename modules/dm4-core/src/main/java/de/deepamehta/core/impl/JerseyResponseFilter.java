@@ -25,13 +25,15 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    private TransactionFactory tf;
     private EventManager em;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EventManager em) {
+    JerseyResponseFilter(TransactionFactory tf, EventManager em) {
+        this.tf = tf;
         this.em = em;
     }
 
@@ -43,12 +45,12 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             em.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
-            boolean includeChilds = getIncludeChilds(request);
-            boolean includeAssocChilds = getIncludeAssocChilds(request);
             if (entity != null) {
                 //
                 // 1) Loading child topics
                 // ### TODO: move to Webservice module?
+                boolean includeChilds = getIncludeChilds(request);
+                boolean includeAssocChilds = getIncludeAssocChilds(request);
                 if (entity instanceof DeepaMehtaObject) {
                     loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -75,6 +77,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
             //
             Directives.remove();
+            tf.close(request, response);
             //
             return response;
         } catch (Exception e) {
@@ -83,6 +86,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Loading child topics ===
 
@@ -124,6 +129,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
+
+
     // === Firing PRE_SEND events ===
 
     private void firePreSend(DeepaMehtaObject object) {
@@ -156,6 +163,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
         }
     }
+
+
 
     // === Helper ===
 

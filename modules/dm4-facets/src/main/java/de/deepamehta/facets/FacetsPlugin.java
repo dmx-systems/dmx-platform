@@ -8,7 +8,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -104,7 +103,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @POST
     @Path("/{facet_type_uri}/topic/{id}")
-    @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         dm4.createAssociation(mf.newAssociationModel("dm4.core.instantiation",
@@ -117,7 +115,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @PUT
     @Path("/{facet_type_uri}/topic/{id}")
-    @Transactional
     @Override
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
                                                                                         FacetValueModel value) {

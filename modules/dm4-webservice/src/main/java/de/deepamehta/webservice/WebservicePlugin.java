@@ -16,7 +16,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -94,14 +93,12 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/topic")
-    @Transactional
     public DirectivesResponse createTopic(TopicModel model) {
         return new DirectivesResponse(dm4.createTopic(model));
     }
 
     @PUT
     @Path("/topic/{id}")
-    @Transactional
     public DirectivesResponse updateTopic(@PathParam("id") long topicId, TopicModel model) {
         if (model.getId() != -1 && topicId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
@@ -113,7 +110,6 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/topic/{id}")
-    @Transactional
     public DirectivesResponse deleteTopic(@PathParam("id") long topicId) {
         dm4.deleteTopic(topicId);
         return new DirectivesResponse();
@@ -177,14 +173,12 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/association")
-    @Transactional
     public DirectivesResponse createAssociation(AssociationModel model) {
         return new DirectivesResponse(dm4.createAssociation(model));
     }
 
     @PUT
     @Path("/association/{id}")
-    @Transactional
     public DirectivesResponse updateAssociation(@PathParam("id") long assocId, AssociationModel model) {
         if (model.getId() != -1 && assocId != model.getId()) {
             throw new RuntimeException("ID mismatch in update request");
@@ -196,7 +190,6 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/association/{id}")
-    @Transactional
     public DirectivesResponse deleteAssociation(@PathParam("id") long assocId) {
         dm4.deleteAssociation(assocId);
         return new DirectivesResponse();
@@ -226,14 +219,12 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/topictype")
-    @Transactional
     public TopicType createTopicType(TopicTypeModel model) {
         return dm4.createTopicType(model);
     }
 
     @PUT
     @Path("/topictype")
-    @Transactional
     public DirectivesResponse updateTopicType(TopicTypeModel model) {
         dm4.updateTopicType(model);
         return new DirectivesResponse();
@@ -241,7 +232,6 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/topictype/{uri}")
-    @Transactional
     public DirectivesResponse deleteTopicType(@PathParam("uri") String uri) {
         dm4.deleteTopicType(uri);
         return new DirectivesResponse();
@@ -265,20 +255,18 @@ public class WebservicePlugin extends PluginActivator {
 
     @GET
     @Path("/assoctype/all")
-    public List<AssociationType> getAssociationAllTypes() {
+    public List<AssociationType> getAllAssociationTypes() {
         return dm4.getAllAssociationTypes();
     }
 
     @POST
     @Path("/assoctype")
-    @Transactional
     public AssociationType createAssociationType(AssociationTypeModel model) {
         return dm4.createAssociationType(model);
     }
 
     @PUT
     @Path("/assoctype")
-    @Transactional
     public DirectivesResponse updateAssociationType(AssociationTypeModel model) {
         dm4.updateAssociationType(model);
         return new DirectivesResponse();
@@ -286,7 +274,6 @@ public class WebservicePlugin extends PluginActivator {
 
     @DELETE
     @Path("/assoctype/{uri}")
-    @Transactional
     public DirectivesResponse deleteAssociationType(@PathParam("uri") String uri) {
         dm4.deleteAssociationType(uri);
         return new DirectivesResponse();
@@ -298,7 +285,6 @@ public class WebservicePlugin extends PluginActivator {
 
     @POST
     @Path("/roletype")
-    @Transactional
     public Topic createRoleType(TopicModel model) {
         return dm4.createRoleType(model);
     }

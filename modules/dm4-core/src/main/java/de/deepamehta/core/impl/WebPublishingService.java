@@ -63,15 +63,15 @@ class WebPublishingService {
         try {
             logger.info("Setting up the WebPublishingService");
             this.pl = pl;
+            TransactionFactory tf = new TransactionFactory(pl);
             //
             // create Jersey application
             this.jerseyApplication = new DefaultResourceConfig();
             //
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(pl.em));
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(pl.em));
-            properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(pl));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(tf, pl.em));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(tf, pl.em));
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);
