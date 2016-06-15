@@ -45,8 +45,15 @@ enum NodeType {
         return valueOf(type.toUpperCase());
     }
 
+    /**
+     * Checks if the given node is of this type.
+     * <p>
+     * For a non-DM node <code>false</code> is returned.
+     * Non-DM nodes are those created by 3rd-party Neo4j components, e.g. Neo4j Spatial.
+     */
     boolean isTypeOf(Node node) {
-        return node.getProperty("node_type").equals(stringify());
+        // a node is regarded "non-DM" if it has no "node_type" property.
+        return node.getProperty("node_type", "").equals(stringify());
     }
 
     String stringify() {
