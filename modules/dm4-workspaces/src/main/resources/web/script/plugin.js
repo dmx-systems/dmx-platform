@@ -44,17 +44,16 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
             sharing_mode_uri)
     }
     dm4c.restc.get_workspace = function(uri, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/workspace/" + uri + params.to_query_string())
+        var params = this.queryParams({include_childs: include_childs})
+        return this.request("GET", "/workspace/" + uri + params)
     }
     dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri +
-            params.to_query_string())
+        var params = this.queryParams({include_childs: include_childs})
+        return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri + params)
     }
     dm4c.restc.get_assigned_workspace = function(object_id, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/workspace/object/" + object_id + params.to_query_string())
+        var params = this.queryParams({include_childs: include_childs})
+        return this.request("GET", "/workspace/object/" + object_id + params)
     }
     dm4c.restc.assign_to_workspace = function(object_id, workspace_id) {
         this.request("PUT", "/workspace/" + workspace_id + "/object/" + object_id)

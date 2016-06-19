@@ -28,12 +28,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === REST Client Extension ===
 
     dm4c.restc.create_topicmap = function(name, topicmap_renderer_uri, private) {
-        var params = this.createRequestParameter({
+        var params = this.queryParams({
             name:         name,
             renderer_uri: topicmap_renderer_uri,
             private:      private,
         })
-        return this.request("POST", "/topicmap" + params.to_query_string())
+        return this.request("POST", "/topicmap" + params)
     }
 
     /**
@@ -41,8 +41,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      *                                      include their child topics. Default is false.
      */
     dm4c.restc.get_topicmap = function(topicmap_id, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/topicmap/" + topicmap_id + params.to_query_string())
+        var params = this.queryParams({include_childs: include_childs})
+        return this.request("GET", "/topicmap/" + topicmap_id + params)
     }
     dm4c.restc.add_topic_to_topicmap = function(topicmap_id, topic_id, view_props) {
         this.request("POST", "/topicmap/" + topicmap_id + "/topic/" + topic_id, view_props)
