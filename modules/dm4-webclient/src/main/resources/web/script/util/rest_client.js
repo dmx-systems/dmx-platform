@@ -448,7 +448,7 @@ function RESTClient(config) {
         }
 
         this.to_query_string = function() {
-            var query_string = encodeURI(param_array.join("&"))
+            var query_string = param_array.join("&")
             if (query_string) {
                 query_string = "?" + query_string
             }
@@ -466,7 +466,7 @@ function RESTClient(config) {
                 value = JSON.stringify(value)
             }
             //
-            param_array.push(param_name + "=" + value)
+            param_array.push(param_name + "=" + encodeURIComponent(value))
         }
     }
 }
