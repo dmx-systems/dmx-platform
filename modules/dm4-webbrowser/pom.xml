@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Webbrowser</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webbrowser</artifactId>
-    <version>4.8.1-SNAPSHOT</version>
+    <version>4.8.1</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-module</artifactId>
-        <version>4.8.1-SNAPSHOT</version>
+        <version>4.8.1</version>
         <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 </project>
