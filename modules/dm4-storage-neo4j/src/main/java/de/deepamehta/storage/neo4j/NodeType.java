@@ -3,11 +3,12 @@ package de.deepamehta.storage.neo4j;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.service.ModelFactory;
 
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 
 
-enum NodeType {
+enum NodeType implements Label {
 
     TOPIC {
         @Override
@@ -40,10 +41,24 @@ enum NodeType {
 
     // ---
 
+    /**
+     * Returns the node type of the given node.
+     * <p>
+     * If the given node is not a DM node an exception is thrown.
+     */
     static NodeType of(Node node) {
-        String type = (String) node.getProperty("node_type");
-        return valueOf(type.toUpperCase());
+        NodeType nodeType = nodeType(node);
+        if (nodeType == null) {
+            throw new RuntimeException("Node " + node.getId() + " is not a DeepaMehta node");
+        }
+        return nodeType;
     }
+
+    static boolean isDeepaMehtaNode(Node node) {
+        return nodeType(node) != null;
+    }
+
+    // ---
 
     /**
      * Checks if the given node is of this type.
@@ -52,11 +67,23 @@ enum NodeType {
      * Non-DM nodes are those created by 3rd-party Neo4j components, e.g. Neo4j Spatial.
      */
     boolean isTypeOf(Node node) {
-        // a node is regarded "non-DM" if it has no "node_type" property.
-        return node.getProperty("node_type", "").equals(stringify());
+        // a node is regarded "non-DM" if it has neither a TOPIC nor an ASSOC label.
+        return nodeType(node) == this;
     }
 
+    // ### TODO: to be dropped?
     String stringify() {
         return name().toLowerCase();
+    }
+
+    // ---
+
+    private static NodeType nodeType(Node node) {
+        if (node.hasLabel(TOPIC)) {
+            return TOPIC;
+        } else if (node.hasLabel(ASSOC)) {
+            return ASSOC;
+        }
+        return null;
     }
 }

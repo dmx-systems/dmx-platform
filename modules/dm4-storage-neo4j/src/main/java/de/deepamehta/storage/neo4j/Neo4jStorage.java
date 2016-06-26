@@ -49,7 +49,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // --- DB Property Keys ---
-    private static final String KEY_NODE_TYPE = "node_type";
+    // ### TODO: write migration to delete all node_type properties
+    // ### private static final String KEY_NODE_TYPE = "node_type";
     private static final String KEY_VALUE     = "value";
 
     // --- Content Index Keys ---
@@ -155,7 +156,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         //
         // 1) update DB
         Node topicNode = neo4j.createNode();
-        topicNode.setProperty(KEY_NODE_TYPE, "topic");
+        topicNode.addLabel(NodeType.TOPIC);
         //
         storeAndIndexTopicUri(topicNode, topicModel.getUri());
         storeAndIndexTopicTypeUri(topicNode, topicModel.getTypeUri());
@@ -272,7 +273,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         //
         // 1) update DB
         Node assocNode = neo4j.createNode();
-        assocNode.setProperty(KEY_NODE_TYPE, "assoc");
+        assocNode.addLabel(NodeType.ASSOC);
         //
         storeAndIndexAssociationUri(assocNode, assocModel.getUri());
         storeAndIndexAssociationTypeUri(assocNode, assocModel.getTypeUri());
@@ -544,7 +545,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             boolean isCleanInstall = rootNode == null;
             if (isCleanInstall) {
                 rootNode = neo4j.createNode();
-                rootNode.setProperty(KEY_NODE_TYPE, "topic");
+                rootNode.addLabel(NodeType.TOPIC);
                 rootNode.setProperty(KEY_VALUE, "Meta Type");
                 storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
                 storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
@@ -1036,7 +1037,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
         for (Relationship rel : node.getRelationships(Direction.INCOMING)) {
             Node assocNode = rel.getStartNode();
             // skip non-DM nodes stored by 3rd-party components (e.g. Neo4j Spatial)
-            if (!assocNode.hasProperty(KEY_NODE_TYPE)) {
+            if (!NodeType.isDeepaMehtaNode(assocNode)) {
                 continue;
             }
             //
