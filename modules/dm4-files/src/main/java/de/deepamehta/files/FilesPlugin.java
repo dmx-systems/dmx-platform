@@ -309,7 +309,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 logger.info(operation + " => null");
                 return null;
             }
-            //
+            // ### TODO: compare to repoPath(HttpServletRequest request) in both regards, cutting off + 1, and decoding
             String repoPath = path.substring(FILE_REPOSITORY_URI.length());
             logger.info(operation + " => \"" + repoPath + "\"");
             return repoPath;
@@ -499,9 +499,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             throw new RuntimeException("Mapping absolute path \"" + path + "\" to a repository path failed", e);
         }
     }
-
-
-
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -835,11 +832,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @return  The repository path or <code>null</code> if the request is not a filerepo request.
      *          Note: the returned path is <i>not</i> canonized.
      */
-    public String repoPath(HttpServletRequest request) {
+    private String repoPath(HttpServletRequest request) {
         String repoPath = null;
         String requestURI = request.getRequestURI();
         if (requestURI.startsWith(FILE_REPOSITORY_URI)) {
-            repoPath = requestURI.substring(FILE_REPOSITORY_URI.length());
+            // Note: the request URI is e.g. /filerepo/%2Fworkspace-1821%2Flogo-escp-europe.gif
+            // +1 cuts off the slash following /filerepo
+            repoPath = requestURI.substring(FILE_REPOSITORY_URI.length() + 1);
             repoPath = JavaUtils.decodeURIComponent(repoPath);
         }
         return repoPath;

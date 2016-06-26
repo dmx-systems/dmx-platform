@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Notes</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-notes</artifactId>
-    <version>4.8.1-SNAPSHOT</version>
+    <version>4.8.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-module</artifactId>
-        <version>4.8.1-SNAPSHOT</version>
+        <version>4.8.2-SNAPSHOT</version>
         <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 </project>

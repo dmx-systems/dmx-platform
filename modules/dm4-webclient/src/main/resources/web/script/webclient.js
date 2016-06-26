@@ -46,8 +46,8 @@ dm4c = new function() {
     // === REST Client Extension ===
 
     this.restc.search_topics_and_create_bucket = function(text, field_uri) {
-        var params = this.createRequestParameter({search: text, field: field_uri})
-        return this.request("GET", "/webclient/search" + params.to_query_string())
+        var params = this.queryParams({search: text, field: field_uri})
+        return this.request("GET", "/webclient/search" + params)
     }
     // Note: this method is actually part of the Type Search plugin.
     // TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with

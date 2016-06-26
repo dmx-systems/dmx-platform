@@ -34,13 +34,13 @@ function RESTClient(config) {
     // === Topics ===
 
     this.get_topic_by_id = function(topic_id, include_childs, include_assoc_childs) {
-        var params = new RequestParameter({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
-        return request("GET", "/core/topic/" + topic_id + params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
+        return request("GET", "/core/topic/" + topic_id + params)
     }
 
     this.get_topic_by_uri = function(uri, include_childs, include_assoc_childs) {
-        var params = new RequestParameter({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
-        return request("GET", "/core/topic/by_uri/" + uri + params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs, include_assoc_childs: include_assoc_childs})
+        return request("GET", "/core/topic/by_uri/" + uri + params)
     }
 
     /**
@@ -53,15 +53,13 @@ function RESTClient(config) {
      * @return  the topic, or <code>null</code>.
      */
     this.get_topic_by_value = function(key, value, include_childs) {
-        var params = new RequestParameter({include_childs: include_childs})
-        return request("GET", "/core/topic/by_value/" + key + "/" + encodeURIComponent(value) +
-            params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs})
+        return request("GET", "/core/topic/by_value/" + key + "/" + encodeURIComponent(value) + params)
     }
 
     this.get_topics_by_value = function(key, value, include_childs) {
-        var params = new RequestParameter({include_childs: include_childs})
-        return request("GET", "/core/topic/multi/by_value/" + key + "/" + encodeURIComponent(value) +
-            params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs})
+        return request("GET", "/core/topic/multi/by_value/" + key + "/" + encodeURIComponent(value) + params)
     }
 
     /**
@@ -74,8 +72,8 @@ function RESTClient(config) {
      *              "items"       - array of topics, possibly empty. ### FIXDOC
      */
     this.get_topics = function(type_uri, include_childs, sort) {
-        var params = new RequestParameter({include_childs: include_childs})
-        var result = request("GET", "/core/topic/by_type/" + type_uri + params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs})
+        var result = request("GET", "/core/topic/by_type/" + type_uri + params)
         if (sort) {
             this.sort_topics(result)
         }
@@ -97,8 +95,8 @@ function RESTClient(config) {
      *              "items"       - array of topics, possibly empty.
      */
     this.get_topic_related_topics = function(topic_id, traversal_filter, sort) {
-        var params = new RequestParameter(traversal_filter)
-        var result = request("GET", "/core/topic/" + topic_id + "/related_topics" + params.to_query_string())
+        var params = new QueryParams(traversal_filter)
+        var result = request("GET", "/core/topic/" + topic_id + "/related_topics" + params)
         if (sort) {
             this.sort_topics(result)
         }
@@ -106,8 +104,8 @@ function RESTClient(config) {
     }
 
     this.search_topics = function(text, field_uri) {
-        var params = new RequestParameter({search: text, field: field_uri})
-        return request("GET", "/core/topic" + params.to_query_string())
+        var params = new QueryParams({search: text, field: field_uri})
+        return request("GET", "/core/topic" + params)
     }
 
     this.create_topic = function(topic_model) {
@@ -127,8 +125,8 @@ function RESTClient(config) {
     // === Associations ===
 
     this.get_association_by_id = function(assoc_id, include_childs) {
-        var params = new RequestParameter({include_childs: include_childs})
-        return request("GET", "/core/association/" + assoc_id + params.to_query_string())
+        var params = new QueryParams({include_childs: include_childs})
+        return request("GET", "/core/association/" + assoc_id + params)
     }
 
     /**
@@ -142,9 +140,9 @@ function RESTClient(config) {
      */
     this.get_association = function(assoc_type_uri, topic1_id, topic2_id, role_type1_uri, role_type2_uri,
                                                                                           include_childs) {
-        var params = new RequestParameter({include_childs: include_childs})
+        var params = new QueryParams({include_childs: include_childs})
         return request("GET", "/core/association/" + assoc_type_uri + "/" +  topic1_id + "/" + topic2_id + "/" +
-            role_type1_uri + "/" + role_type2_uri + params.to_query_string())
+            role_type1_uri + "/" + role_type2_uri + params)
     }
 
     /**
@@ -175,8 +173,8 @@ function RESTClient(config) {
      *              "items"       - array of topics, possibly empty.
      */
     this.get_association_related_topics = function(assoc_id, traversal_filter, sort) {
-        var params = new RequestParameter(traversal_filter)
-        var result = request("GET", "/core/association/" + assoc_id + "/related_topics" + params.to_query_string())
+        var params = new QueryParams(traversal_filter)
+        var result = request("GET", "/core/association/" + assoc_id + "/related_topics" + params)
         if (sort) {
             this.sort_topics(result)
         }
@@ -289,8 +287,8 @@ function RESTClient(config) {
      * This helper method might be useful for plugins which provides a REST service.
      * As an example see the DeepaMehta 4 Webclient plugin.
      */
-    this.createRequestParameter = function(params) {
-        return new RequestParameter(params)
+    this.queryParams = function(params) {
+        return new QueryParams(params)
     }
 
     this.sort_topics = function(topics) {
@@ -421,52 +419,43 @@ function RESTClient(config) {
     }
 
     /**
-     * @params      Optional: initial set of parameters
-     *
-     * ### TODO: rename to QueryParameter (to fit JAX-RS wording)
+     * @params      Optional: initial parameters (object of name-value pairs).
      */
-    function RequestParameter(params) {
+    function QueryParams(params) {
 
-        var param_array = []
+        var self = this
 
-        if (params && !params.length) {
-            for (var param_name in params) {
-                add(param_name, params[param_name])
-            }
+        this.params = []
+
+        for (var name in params) {
+            add(name, params[name])
         }
 
-        this.add = function(param_name, value) {
-            add(param_name, value)
+        this.add = function(name, value) {
+            add(name, value)
         }
 
-        this.add_list = function(param_name, value_list) {
+        this.add_list = function(name, value_list) {
             if (value_list) {
                 for (var i = 0; i < value_list.length; i++) {
-                    add(param_name, value_list[i])
+                    add(name, value_list[i])
                 }
             }
         }
 
-        this.to_query_string = function() {
-            var query_string = encodeURI(param_array.join("&"))
-            if (query_string) {
-                query_string = "?" + query_string
+        function add(name, value) {
+            // Do not add null or undefined values. On the other hand false *is* added.
+            if (value != null && value != undefined) {
+                self.params.push(name + "=" + encodeURIComponent(value))
             }
-            return query_string
         }
+    }
 
-        function add(param_name, value) {
-            // Do not add null or undefined values.
-            // On the other hand false *is* added.
-            if (value == null || value == undefined) {
-                return
-            }
-            //
-            if (typeof(value) == "object") {
-                value = JSON.stringify(value)
-            }
-            //
-            param_array.push(param_name + "=" + value)
+    QueryParams.prototype.toString = function() {
+        var query_string = this.params.join("&")
+        if (query_string) {
+            query_string = "?" + query_string
         }
+        return query_string
     }
 }

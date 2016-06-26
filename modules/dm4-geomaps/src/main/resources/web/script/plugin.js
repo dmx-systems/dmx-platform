@@ -16,8 +16,8 @@ dm4c.add_plugin("de.deepamehta.geomaps", function() {
         return this.request("GET", "/geomap/" + geomap_id)
     }
     dm4c.restc.get_domain_topic = function(geo_coord_id, include_childs) {
-        var params = this.createRequestParameter({include_childs: include_childs})
-        return this.request("GET", "/geomap/topic/" + geo_coord_id + params.to_query_string())
+        var params = this.queryParams({include_childs: include_childs})
+        return this.request("GET", "/geomap/topic/" + geo_coord_id + params)
     }
     dm4c.restc.add_coordinate_to_geomap = function(geomap_id, geo_coord_id) {
         return this.request("PUT", "/geomap/" + geomap_id + "/topic/" + geo_coord_id)
