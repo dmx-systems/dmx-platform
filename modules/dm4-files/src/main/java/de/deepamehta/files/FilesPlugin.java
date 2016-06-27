@@ -22,7 +22,7 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
-import de.deepamehta.core.service.event.ResourceRequestFilterListener;
+import de.deepamehta.core.service.event.StaticResourceFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener, PathMapper {
+public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilterListener, PathMapper {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -459,7 +459,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) {
+    public void staticResourceFilter(HttpServletRequest request, HttpServletResponse response) {
         try {
             String repoPath = repoPath(request);    // Note: the path is not canonized
             if (repoPath != null) {

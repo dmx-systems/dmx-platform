@@ -43,8 +43,8 @@ import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreCreateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
-import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
+import de.deepamehta.core.service.event.StaticResourceFilterListener;
 import de.deepamehta.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
@@ -89,7 +89,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                     PostUpdateTopicListener,
                                                                                     PostUpdateAssociationListener,
                                                                                     ServiceRequestFilterListener,
-                                                                                    ResourceRequestFilterListener,
+                                                                                    StaticResourceFilterListener,
                                                                                     CheckDiskQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -564,7 +564,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+    public void staticResourceFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         // Note: for the resource filter no HttpServletRequest is injected
         requestFilter(servletRequest);
     }
