@@ -144,6 +144,13 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                 commands.push({label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"})
             }
             return commands
+        } else if (topic.type_uri == "dm4.files.file") {
+            return [{
+                label: "Download",
+                handler: do_download_file,
+                context: "detail-panel-show",
+                ui_icon: "arrowthickstop-1-s"
+            }]
         }
 
         function do_create_folder() {
@@ -157,6 +164,11 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         function do_open_upload_dialog() {
             var path = topic.get("dm4.files.path")
             self.open_upload_dialog("/files/" + encodeURIComponent(path), dm4c.page_panel.refresh)
+        }
+
+        function do_download_file() {
+            var path = topic.get("dm4.files.path")
+            location.href = "/filerepo/" + encodeURIComponent(path) + "?download"
         }
     })
 

@@ -408,7 +408,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
         function init_background_image() {
             var file = info.get("dm4.files.file")
             if (file) {
-                var image_url = "/filerepo/" + file.get("dm4.files.path")
+                var image_url = "/filerepo/" + file.get("dm4.files.path")   // ### FIXME: URL encoding?
                 self.background_image = dm4c.create_image(image_url)
             }
         }

@@ -467,6 +467,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                 File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
                 checkExistence(path);                           // throws FileRepositoryException 404 Not Found
                 checkAuthorization(repoPath(path), request);    // throws FileRepositoryException 401 Unauthorized
+                //
+                // prepare downloading
+                if (request.getParameter("download") != null) {
+                    logger.info("### Downloading file \"" + path + "\"");
+                    response.setHeader("Content-Disposition", "attachment;filename=" + path.getName());
+                }
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(e, e.getStatus());
