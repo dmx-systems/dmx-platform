@@ -51,6 +51,7 @@ import de.deepamehta.core.util.JavaUtils;
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.GET;
@@ -563,7 +564,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest servletRequest) {
+    public void resourceRequestFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         // Note: for the resource filter no HttpServletRequest is injected
         requestFilter(servletRequest);
     }

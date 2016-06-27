@@ -274,7 +274,7 @@ class WebPublishingService {
 
     private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            pl.em.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
+            pl.em.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request, response);
             return true;
         } catch (Throwable e) {
             // Note: resourceRequestFilter() is called from an OSGi HTTP service static resource HttpContext.

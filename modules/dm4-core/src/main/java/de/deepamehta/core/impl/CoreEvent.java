@@ -15,6 +15,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 
@@ -262,7 +263,7 @@ class CoreEvent {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((ResourceRequestFilterListener) listener).resourceRequestFilter(
-                (HttpServletRequest) params[0]
+                (HttpServletRequest) params[0], (HttpServletResponse) params[1]
             );
         }
     };

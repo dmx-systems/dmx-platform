@@ -38,6 +38,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.FileOutputStream;
@@ -458,7 +459,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest request) {
+    public void resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) {
         try {
             String repoPath = repoPath(request);    // Note: the path is not canonized
             if (repoPath != null) {
