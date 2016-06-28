@@ -128,14 +128,22 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     })
 
     dm4c.add_listener("topic_doubleclicked", function(topic) {
-        if (topic.type_uri == "dm4.files.file" ||
-            topic.type_uri == "dm4.files.folder") {
-            dm4c.restc.open_file(topic.id)
+        if (js.is_local_connection()) {
+            if (topic.type_uri == "dm4.files.file" || topic.type_uri == "dm4.files.folder") {
+                dm4c.restc.open_file(topic.id)
+            }
         }
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
-        if (topic.type_uri == "dm4.files.folder") {
+        if (topic.type_uri == "dm4.files.file") {
+            return [{
+                label: "Download",
+                handler: do_download_file,
+                context: "detail-panel-show",
+                ui_icon: "arrowthickstop-1-s"
+            }]
+        } else if (topic.type_uri == "dm4.files.folder") {
             var commands = []
             if (dm4c.has_create_permission_for_topic_type("dm4.files.folder")) {
                 commands.push({label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"})
@@ -144,13 +152,6 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                 commands.push({label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"})
             }
             return commands
-        } else if (topic.type_uri == "dm4.files.file") {
-            return [{
-                label: "Download",
-                handler: do_download_file,
-                context: "detail-panel-show",
-                ui_icon: "arrowthickstop-1-s"
-            }]
         }
 
         function do_create_folder() {

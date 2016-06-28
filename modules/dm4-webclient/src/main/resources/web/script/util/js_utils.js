@@ -409,6 +409,19 @@ var js = {
 
 
     // ***************
+    // *** Network ***
+    // ***************
+
+
+
+    is_local_connection: function() {
+        var hostname = location.hostname
+        return hostname == "localhost" || hostname == "127.0.0.1"
+    },
+
+
+
+    // ***************
     // *** Cookies ***
     // ***************
 
