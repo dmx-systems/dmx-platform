@@ -394,7 +394,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ---
 
-    @POST
+    @GET
     @Path("/open/{id}")
     @Override
     public void openFile(@PathParam("id") long fileTopicId) {

@@ -2,6 +2,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
     var self = this
 
+
+
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
@@ -36,8 +38,10 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
-        return this.request("POST", "/files/open/" + file_topic_id)
+        return this.request("GET", "/files/open/" + file_topic_id)
     }
+
+
 
     // === Webclient Listeners ===
 
@@ -138,7 +142,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     dm4c.add_listener("topic_commands", function(topic) {
         if (topic.type_uri == "dm4.files.file") {
             return [{
-                label: "Download",
+                label: "Download File",
                 handler: do_download_file,
                 context: "detail-panel-show",
                 ui_icon: "arrowthickstop-1-s"
@@ -146,10 +150,20 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         } else if (topic.type_uri == "dm4.files.folder") {
             var commands = []
             if (dm4c.has_create_permission_for_topic_type("dm4.files.folder")) {
-                commands.push({label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"})
+                commands.push({
+                    label: "Create Folder",
+                    handler: do_create_folder,
+                    context: "detail-panel-show",
+                    ui_icon: "folder-collapsed"
+                })
             }
             if (dm4c.has_create_permission_for_topic_type("dm4.files.file")) {
-                commands.push({label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"})
+                commands.push({
+                    label: "Upload File",
+                    handler: do_open_upload_dialog,
+                    context: "detail-panel-show",
+                    ui_icon: "arrowthick-1-n"
+                })
             }
             return commands
         }
