@@ -427,7 +427,7 @@ var js = {
 
 
 
-    set_cookie: function(key, value) {
+    set_cookie: function(name, value) {
         /* var days = 2
         var expires = new Date()
         expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000) */
@@ -436,22 +436,29 @@ var js = {
         // "/de.deepamehta.webclient" (the "directory" of the page that loaded this script) and the cookie will not be
         // send back to the server for XHR requests as these are bound to "/core". ### FIXDOC: still true?
         // Vice versa we can't set the cookie's path to "/core" because it would not be accessible here at client-side.
-        document.cookie = key + "=" + value + ";path=/" // + ";expires=" + expires.toGMTString()
+        document.cookie = name + "=" + value + ";path=/" // + ";expires=" + expires.toGMTString()
     },
 
-    get_cookie: function(key) {
+    /**
+     * Returns a cookie value.
+     *
+     * @param   name    the name of the cookie, e.g. "dm4_workspace_id".
+     *
+     * @return  the cookie value (string) or undefined if no such cookie exist.
+     */
+    get_cookie: function(name) {
         // Note: document.cookie contains all cookies as one string, e.g. "dm4_workspace_id=123; dm4_topicmap_id=234"
-        if (document.cookie.match(new RegExp("\\b" + key + "=(\\w*)"))) {
+        if (document.cookie.match(new RegExp("\\b" + name + "=(\\w*)"))) {
             return RegExp.$1
         }
     },
 
-    remove_cookie: function(key) {
+    remove_cookie: function(name) {
         // Note: setting the expire date to yesterday removes the cookie
         var days = -1
         var expires = new Date()
         expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
         //
-        document.cookie = key + "=;path=/;expires=" + expires.toGMTString()
+        document.cookie = name + "=;path=/;expires=" + expires.toGMTString()
     }
 }

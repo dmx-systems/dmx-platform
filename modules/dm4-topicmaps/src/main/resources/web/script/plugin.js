@@ -74,6 +74,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Webclient Listeners ===
 
     /**
+     * Registers the installed topicmap renderers.
+     *
      * Note: plugins are supposed to register their view customizers and viewmodel customizers at init_2.
      * Registering the topicmap renderers at init(1) ensures they are available for being customized.
      */
@@ -385,17 +387,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     function init_model() {
         fetch_topicmap_topics()
         //
+        // try to obtain a topicmap ID from browser URL or from cookie, otherwise choose arbitrary topicmap
         var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
-        if (groups) {
-            var topicmap_id = groups[1]
-            var topic_id    = groups[3]
-        } else {
-            var topicmap_id = get_first_topicmap_id()
-        }
+        var topicmap_id = groups && groups[1] || js.get_cookie("dm4_topicmap_id") || get_first_topicmap_id()
         set_selected_topicmap(topicmap_id)
         //
-        if (topic_id) {
-            topicmap.set_topic_selection(topic_id)
+        if (groups) {
+            var topic_id = groups[3]
+            if (topic_id) {
+                topicmap.set_topic_selection(topic_id)
+            }
         }
     }
 

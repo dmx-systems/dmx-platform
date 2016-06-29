@@ -247,18 +247,20 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     function init_model() {
         fetch_workspaces()
         //
+        // try to obtain a topicmap ID from browser URL or from cookie
         var groups = location.pathname.match(/\/topicmap\/(\d+)/)
-        if (groups) {
-            var topicmap_id = groups[1]
+        var topicmap_id = groups && groups[1] || js.get_cookie("dm4_topicmap_id")
+        // if either one applies get the corresponding workspace, otherwise choose arbitrary workspace
+        var workspace_id = topicmap_id && get_workspace_id_of_topicmap(topicmap_id) || get_first_workspace_id()
+        set_selected_workspace(workspace_id)
+
+        function get_workspace_id_of_topicmap(topicmap_id) {
             var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
             if (!workspace) {
                 throw "WorkspacesError: topicmap " + topicmap_id + " is not assigned to any workspace"
             }
-            var workspace_id = workspace.id
-        } else {
-            var workspace_id = get_first_workspace_id()
+            return workspace.id
         }
-        set_selected_workspace(workspace_id)
     }
 
     // ---
