@@ -397,7 +397,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @GET
     @Path("/open/{id}")
     @Override
-    public void openFile(@PathParam("id") long fileTopicId) {
+    public int openFile(@PathParam("id") long fileTopicId) {
         String operation = "Opening the file of File topic " + fileTopicId;
         try {
             logger.info(operation);
@@ -408,6 +408,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
+            //
+            // Note: a HTTP GET method MUST return a non-void type
+            return 0;
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {

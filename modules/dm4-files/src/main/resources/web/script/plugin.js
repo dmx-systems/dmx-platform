@@ -27,7 +27,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         // (instead of trying to JSON-parse it). It works for non-text files as well.
     }
     dm4c.restc.create_folder = function(folder_name, path) {
-        return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
+        this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
     }
     //
     dm4c.restc.get_resource_info = function(path) {
@@ -38,7 +38,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
-        return this.request("GET", "/files/open/" + file_topic_id)
+        this.request("GET", "/files/open/" + file_topic_id)
     }
 
 
