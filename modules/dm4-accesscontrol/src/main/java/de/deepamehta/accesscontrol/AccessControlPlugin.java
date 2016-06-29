@@ -319,10 +319,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+            Association assoc = dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.default")
             ));
+            assignMembership(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -542,14 +543,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
-        if (isMembership(assoc.getModel())) {
-            if (isMembership(oldModel)) {
-                // ### TODO?
-            } else {
-                wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
-            }
-        } else if (isMembership(oldModel)) {
-            // ### TODO?
+        if (isMembership(assoc.getModel()) && !isMembership(oldModel)) {
+            assignMembership(assoc);
         }
         //
         setModifier(assoc);
@@ -604,6 +599,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean isMembership(AssociationModel assoc) {
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
+    }
+
+    private void assignMembership(Association assoc) {
+        wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
     }
 
     private void assignSearchTopic(Topic searchTopic) {
