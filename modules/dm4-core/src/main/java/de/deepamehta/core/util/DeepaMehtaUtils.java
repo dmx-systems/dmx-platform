@@ -69,12 +69,12 @@ public class DeepaMehtaUtils {
         return ids;
     }
 
-    public static List<TopicModel> toTopicModels(Iterable<? extends Topic> topics) {
-        List<TopicModel> topicModels = new ArrayList();
-        for (Topic topic : topics) {
-            topicModels.add(topic.getModel());
+    public static <M> List<M> toModelList(Iterable<? extends DeepaMehtaObject> objects) {
+        List<M> modelList = new ArrayList();
+        for (DeepaMehtaObject object : objects) {
+            modelList.add((M) object.getModel());
         }
-        return topicModels;
+        return modelList;
     }
 
     public static String topicNames(Iterable<? extends Topic> topics) {

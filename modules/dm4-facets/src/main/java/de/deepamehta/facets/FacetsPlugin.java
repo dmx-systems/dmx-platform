@@ -6,6 +6,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
@@ -85,21 +86,27 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public Topic getFacettedTopic(@PathParam("id") long topicId,
                                   @QueryParam("facet_type_uri") List<String> facetTypeUris) {
-        Topic topic = dm4.getTopic(topicId);
-        ChildTopicsModel childTopics = topic.getChildTopics().getModel();
-        for (String facetTypeUri : facetTypeUris) {
-            String childTypeUri = getChildTypeUri(facetTypeUri);
-            if (!isMultiFacet(facetTypeUri)) {
-                Topic value = getFacet(topic, facetTypeUri);
-                if (value != null) {
-                    childTopics.put(childTypeUri, value.getModel());
+        try {
+            Topic topic = dm4.getTopic(topicId);
+            ChildTopicsModel childTopics = topic.getChildTopics().getModel();
+            for (String facetTypeUri : facetTypeUris) {
+                String childTypeUri = getChildTypeUri(facetTypeUri);
+                if (!isMultiFacet(facetTypeUri)) {
+                    Topic value = getFacet(topic, facetTypeUri);
+                    if (value != null) {
+                        childTopics.put(childTypeUri, value.getModel());
+                    }
+                } else {
+                    List<RelatedTopic> values = getFacets(topic, facetTypeUri);
+                    // Note: without the type witness the generic put() method (which takes an Object) would be called
+                    childTopics.put(childTypeUri, DeepaMehtaUtils.<RelatedTopicModel>toModelList(values));
                 }
-            } else {
-                List<RelatedTopic> values = getFacets(topic, facetTypeUri);
-                childTopics.put(childTypeUri, DeepaMehtaUtils.toTopicModels(values));
             }
+            return topic;
+        } catch (Exception e) {
+            throw new RuntimeException("Getting facetted topic " + topicId + " failed (facetTypeUris=" + facetTypeUris +
+                ")", e);
         }
-        return topic;
     }
 
     @POST
