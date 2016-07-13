@@ -34,13 +34,14 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a multiple-valued child.
-     * Throws if there is no such child.
+     * Throws if there is no such child. ### TODO: return empty list instead
      */
     List<? extends RelatedTopicModel> getTopics(String assocDefUri);
 
     /**
      * Accesses a multiple-valued child.
      * Returns <code>null</code> if there is no such child.
+     * ### TODO: drop this method
      */
     List<? extends RelatedTopicModel> getTopicsOrNull(String assocDefUri);
 
