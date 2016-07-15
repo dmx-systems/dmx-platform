@@ -34,94 +34,75 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
 
     // === Single-valued Facets ===
 
-    /**
-     * Accesses a single-valued facet.
-     */
     public RelatedTopicModel getTopic() {
         return getTopic(childTypeUri);
     }
 
-    /**
-     * Accesses a multiple-valued facet.
-     */
     public List<? extends RelatedTopicModel> getTopics() {
         return getTopics(childTypeUri);
     }
 
     // ---
 
-    /**
-     * Puts a value in a single-valued facet.
-     */
     public FacetValueModel put(RelatedTopicModel value) {
         return (FacetValueModel) put(childTypeUri, value);
     }
 
     // ---
 
-    /**
-     * Convenience method to put a *simple* value in a single-valued facet.
-     */
     public FacetValueModel put(Object value) {
         return (FacetValueModel) put(childTypeUri, value);
     }
 
-    /**
-     * Convenience method to put a *composite* value in a single-valued facet.
-     */
     public FacetValueModel put(ChildTopicsModel value) {
         return (FacetValueModel) put(childTypeUri, value);
     }
 
     // ---
 
-    /**
-     * Puts a by-ID topic reference in a single-valued facet.
-     */
     public FacetValueModel putRef(long refTopicId) {
         return (FacetValueModel) putRef(childTypeUri, refTopicId);
     }
 
-    /**
-     * Puts a by-URI topic reference in a single-valued facet.
-     */
     public FacetValueModel putRef(String refTopicUri) {
         return (FacetValueModel) putRef(childTypeUri, refTopicUri);
+    }
+
+    // ---
+
+    public FacetValueModel putDeletionRef(long refTopicId) {
+        return (FacetValueModel) putDeletionRef(childTypeUri, refTopicId);
+    }
+
+    public FacetValueModel putDeletionRef(String refTopicUri) {
+        return (FacetValueModel) putDeletionRef(childTypeUri, refTopicUri);
     }
 
 
 
     // === Multiple-valued Facets ===
 
-    /**
-     * Sets the values of a multiple-valued facet.
-     */
     public FacetValueModel put(List<RelatedTopicModel> values) {
         return (FacetValueModel) put(childTypeUri, values);
     }
 
     // ---
 
-    /**
-     * Adds a by-ID topic reference to a multiple-valued facet.
-     */
     public FacetValueModel addRef(long refTopicId) {
         return (FacetValueModel) addRef(childTypeUri, refTopicId);
     }
 
-    /**
-     * Adds a by-URI topic reference to a multiple-valued facet.
-     */
     public FacetValueModel addRef(String refTopicUri) {
         return (FacetValueModel) addRef(childTypeUri, refTopicUri);
     }
 
     // ---
 
-    /**
-     * Adds a by-ID topic deletion reference to a multiple-valued facet.
-     */
     public FacetValueModel addDeletionRef(long refTopicId) {
         return (FacetValueModel) addDeletionRef(childTypeUri, refTopicId);
+    }
+
+    public FacetValueModel addDeletionRef(String refTopicUri) {
+        return (FacetValueModel) addDeletionRef(childTypeUri, refTopicUri);
     }
 }
