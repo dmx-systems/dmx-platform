@@ -18,6 +18,9 @@ public interface WorkspacesService {
     static final String      DEEPAMEHTA_WORKSPACE_URI = "dm4.workspaces.deepamehta";
     static final SharingMode DEEPAMEHTA_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
+    // Property URIs
+    static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
+
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     /**

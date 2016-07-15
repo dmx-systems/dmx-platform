@@ -66,9 +66,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
-    // Property URIs
-    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
