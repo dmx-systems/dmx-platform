@@ -116,7 +116,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
             var _assoc = assocs[assoc.id]
             if (!_assoc) {
                 // update memory
-                _assoc = add_association(assoc)
+                _assoc = add_association(assoc)     // throws exception
                 // update DB
                 if (is_writable()) {
                     restc.add_association_to_topicmap(topicmap_id, assoc.id)
@@ -399,7 +399,7 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
             var error
             for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
                 try {
-                    add_association(assoc)
+                    add_association(assoc)      // throws exception
                 } catch (e) {
                     if (!error) {
                         error = "WARNING: topicmap " + topicmap_id + " will be displayed incomplete"

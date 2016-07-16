@@ -38,6 +38,16 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
         value: "Role Type Name"
     }
 
+    // ---
+
+    function show_type_warning(type_name) {
+        alert("WARNING: Custom Association Type \"" + type_name + "\" is invalid\n\n" +
+            "You can only choose among the existing association types. If you want create " +
+            "another association type use the Create menu first.")
+    }
+
+
+
     // === Webclient Listeners ===
 
     /**
@@ -58,6 +68,21 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
     dm4c.add_listener("post_update_topic", function(topic) {
         if (topic.type_uri == "dm4.core.topic_type") {
             dm4c.refresh_create_menu()
+        }
+    })
+
+    dm4c.add_listener("pre_submit_form", function(object, new_model) {
+        if (new_model.type_uri == "dm4.core.composition_def" || new_model.type_uri == "dm4.core.aggregation_def") {
+            // Note: when retyping a non-composite assoc new_model contains no childs
+            var child = new_model.childs && new_model.childs["dm4.core.assoc_type#dm4.core.custom_assoc_type"]
+            // Note: when nothing is entered and nothing was entered before new_model doesn't contain that child
+            if (child) {
+                var val = child.value
+                if (val && !js.begins_with(val, dm4c.REF_ID_PREFIX) && !js.begins_with(val, dm4c.DEL_ID_PREFIX)) {
+                    show_type_warning(val)
+                    delete new_model.childs["dm4.core.assoc_type#dm4.core.custom_assoc_type"]
+                }
+            }
         }
     })
 
@@ -90,4 +115,12 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
             }})
         }
     })
+
+
+
+    // ------------------------------------------------------------------------------------------------------ Public API
+
+    this.show_type_warning = function(type_name) {
+        show_type_warning(type_name)
+    }
 })

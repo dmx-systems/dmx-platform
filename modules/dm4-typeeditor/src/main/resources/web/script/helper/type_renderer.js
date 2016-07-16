@@ -114,7 +114,7 @@ function TypeRenderer() {
                     } else {
                         if (val) {
                             // user entered non-empty value
-                            alert("Custom Association Type \"" + val + "\" ignored")
+                            dm4c.get_plugin("de.deepamehta.typeeditor").show_type_warning(val)
                             return null         // no update
                         } else {
                             // user entered empty value
