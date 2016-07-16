@@ -53,12 +53,12 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @GET
     @Path("/{facet_type_uri}/topic/{id}")
     @Override
-    public Topic getFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
+    public RelatedTopic getFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
         return getFacet(dm4.getTopic(topicId), facetTypeUri);
     }
 
     @Override
-    public Topic getFacet(DeepaMehtaObject object, String facetTypeUri) {
+    public RelatedTopic getFacet(DeepaMehtaObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
         return fetchChildTopic(object, getAssocDef(facetTypeUri));
     }
