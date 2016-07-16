@@ -386,18 +386,6 @@ function CanvasView() {
     function draw_association(av) {
         var tv1 = av.get_topic_1()
         var tv2 = av.get_topic_2()
-        // ### FIXME
-        if (!tv1) {
-            console.log("WARNING: association " + av.id + " can't be drawn. " +
-                "Topic " + av.topic_id_1 + " not in topicmap " + topicmap.get_id())
-            return
-        }
-        if (!tv2) {
-            console.log("WARNING: association " + av.id + " can't be drawn. " +
-                "Topic " + av.topic_id_2 + " not in topicmap " + topicmap.get_id())
-            return
-        }
-        //
         // Note: accessing the type color requires accessing the type. However the user might have no
         // explicit READ permission for the type. We must enforce the *implicit* READ permission.
         dm4c.enforce_implicit_association_type_read_permission(av)
@@ -893,10 +881,6 @@ function CanvasView() {
         return iterate_associations(function(av) {
             var tv1 = av.get_topic_1()
             var tv2 = av.get_topic_2()
-            // ### FIXME
-            if (!tv1 || !tv2) {
-                return false
-            }
             // bounding box
             var aw2 = dm4c.ASSOC_WIDTH / 2   // buffer to make orthogonal associations selectable
             var bx1 = Math.min(tv1.x, tv2.x) - aw2
