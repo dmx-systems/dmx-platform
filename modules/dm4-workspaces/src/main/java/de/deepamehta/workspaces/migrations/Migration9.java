@@ -1,6 +1,7 @@
 package de.deepamehta.workspaces.migrations;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.facets.FacetsService;
@@ -53,12 +54,14 @@ public class Migration9 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void deleteWorkspaceAssignment(Association assoc) {
-        long workspaceId = workspacesService.getAssignedWorkspace(assoc.getId()).getId();
-        // 1) delete association
-        facetsService.updateFacet(assoc, "dm4.workspaces.workspace_facet",
-            mf.newFacetValueModel("dm4.workspaces.workspace").putDeletionRef(workspaceId));
-        //
-        // 2) delete property
-        assoc.removeProperty(WorkspacesService.PROP_WORKSPACE_ID);
+        Topic workspace = workspacesService.getAssignedWorkspace(assoc.getId());
+        if (workspace != null) {
+            // 1) delete association
+            facetsService.updateFacet(assoc, "dm4.workspaces.workspace_facet",
+                mf.newFacetValueModel("dm4.workspaces.workspace").putDeletionRef(workspace.getId()));
+            //
+            // 2) delete property
+            assoc.removeProperty(WorkspacesService.PROP_WORKSPACE_ID);
+        }
     }
 }
