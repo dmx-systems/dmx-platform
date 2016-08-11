@@ -120,7 +120,5 @@ dm4c.add_plugin("de.deepamehta.typeeditor", function() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.show_type_warning = function(type_name) {
-        show_type_warning(type_name)
-    }
+    this.show_type_warning = show_type_warning
 })

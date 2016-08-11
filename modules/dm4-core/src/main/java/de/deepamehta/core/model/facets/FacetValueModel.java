@@ -2,6 +2,7 @@ package de.deepamehta.core.model.facets;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.TopicModel;
 
 import java.util.List;
 
@@ -33,6 +34,8 @@ public interface FacetValueModel extends ChildTopicsModel {
      * Puts a value in a single-valued facet.
      */
     FacetValueModel put(RelatedTopicModel value);
+
+    FacetValueModel put(TopicModel value);
 
     // ---
 

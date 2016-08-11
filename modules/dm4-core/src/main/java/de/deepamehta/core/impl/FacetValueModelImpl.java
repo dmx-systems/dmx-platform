@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.service.ModelFactory;
 
@@ -45,6 +46,10 @@ class FacetValueModelImpl extends ChildTopicsModelImpl implements FacetValueMode
     // ---
 
     public FacetValueModel put(RelatedTopicModel value) {
+        return (FacetValueModel) put(childTypeUri, value);
+    }
+
+    public FacetValueModel put(TopicModel value) {
         return (FacetValueModel) put(childTypeUri, value);
     }
 
