@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 File Manager</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-filemanager</artifactId>
-    <version>4.8.3-SNAPSHOT</version>
+    <version>4.8.3</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-module</artifactId>
-        <version>4.8.3-SNAPSHOT</version>
+        <version>4.8.3</version>
         <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 </project>
