@@ -7,7 +7,7 @@
     <name>DeepaMehta 4 Project</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-project</artifactId>
-    <version>4.8.3</version>
+    <version>4.8.4-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>DeepaMehta is a software platform for knowledge workers</description>
