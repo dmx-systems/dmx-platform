@@ -298,7 +298,9 @@ function RESTClient(config) {
                 return compare(topic_1.type_uri, topic_2.type_uri)
             } else {
                 // 2nd sort criteria: topic value
-                if (typeof topic_1.value == "string") {
+                // Note: if value1 is a string value2 might still be a number (or boolean) if the type was
+                // Number (or Boolean) before. toLowerCase() would fail.
+                if (typeof topic_1.value == "string" && typeof topic_2.value == "string") {
                     return compare(topic_1.value.toLowerCase(), topic_2.value.toLowerCase())
                 } else {
                     return compare(topic_1.value, topic_2.value)
