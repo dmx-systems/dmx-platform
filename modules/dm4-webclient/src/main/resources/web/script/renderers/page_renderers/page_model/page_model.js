@@ -5,6 +5,12 @@ dm4c.render.page_model = new function() {
     var self = this
 
     /**
+     * The page model as utilized by the "topic_renderer" and "association_renderer" standard page renderers.
+     *
+     * A PageModel object represents the topic/association to be rendered. In case of a composite topic/association the
+     * page model is a nested hierarchy of PageModel objects. A PageModel object can be used for both, rendering an info
+     * page, and rendering a form page.
+     *
      * @paran   page_model_type     SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI
      * @param   object              The object underlying this field (a Topic or an Association). Its "value" is
      *                              rendered through this page model.
@@ -48,8 +54,9 @@ dm4c.render.page_model = new function() {
         this.parent = parent_page_model
         this.label = page_model_label()
         this.input_field_rows = dm4c.get_view_config(this.object_type, "input_field_rows", assoc_def)
-        var renderer_uri
-        var renderer = lookup_renderer()
+        var renderer_uri                    // The URI of the renderer hold in "renderer". Only used for logging.
+        var renderer = lookup_renderer()    // The renderer to render the underlying topic/association.
+                                            // A single renderer (simple or composite), or a multi renderer.
         var form_reading_function
 
         // === Simple Renderer ===
