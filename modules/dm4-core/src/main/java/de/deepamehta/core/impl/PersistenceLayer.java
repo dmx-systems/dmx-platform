@@ -460,6 +460,48 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    void updateTopicType(TopicTypeModel newModel) {
+        try {
+            // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            // ### FIXME: access control
+            String topicTypeUri = fetchTopic(newModel.getId()).getUri();
+            typeStorage.getTopicType(topicTypeUri).update(newModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
+        }
+    }
+
+    void updateAssociationType(AssociationTypeModel newModel) {
+        try {
+            // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            // ### FIXME: access control
+            String assocTypeUri = fetchTopic(newModel.getId()).getUri();
+            typeStorage.getAssociationType(assocTypeUri).update(newModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
+        }
+    }
+
+    // ---
+
+    void deleteTopicType(String topicTypeUri) {
+        try {
+            typeStorage.getTopicType(topicTypeUri).delete();        // ### TODO: delete view config topics
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
+        }
+    }
+
+    void deleteAssociationType(String assocTypeUri) {
+        try {
+            typeStorage.getAssociationType(assocTypeUri).delete();  // ### TODO: delete view config topics
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
+        }
+    }
+
+    // ---
+
     Topic createRoleType(TopicModel model) {
         // check type URI argument
         String typeUri = model.getTypeUri();

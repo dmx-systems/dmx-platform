@@ -236,23 +236,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public void updateTopicType(TopicTypeModel newModel) {
-        try {
-            // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String topicTypeUri = pl.fetchTopic(newModel.getId()).getUri();
-            pl.typeStorage.getTopicType(topicTypeUri).update(newModel);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
-        }
+        pl.updateTopicType(newModel);
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
-        try {
-            pl.typeStorage.getTopicType(topicTypeUri).delete();     // ### TODO: delete view config topics
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
-        }
+        pl.deleteTopicType(topicTypeUri);
     }
 
 
@@ -285,23 +274,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public void updateAssociationType(AssociationTypeModel newModel) {
-        try {
-            // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String assocTypeUri = pl.fetchTopic(newModel.getId()).getUri();
-            pl.typeStorage.getAssociationType(assocTypeUri).update(newModel);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
-        }
+        pl.updateAssociationType(newModel);
     }
 
     @Override
     public void deleteAssociationType(String assocTypeUri) {
-        try {
-            pl.typeStorage.getAssociationType(assocTypeUri).delete();
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
-        }
+        pl.deleteAssociationType(assocTypeUri);
     }
 
 

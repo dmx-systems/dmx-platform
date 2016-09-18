@@ -173,7 +173,21 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         return Directive.DELETE_TOPIC;
     }
 
-    // ---
+
+
+    // === Core Internal Hooks ===
+
+    @Override
+    void preDelete() {
+        if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.assoc_type")) {
+            throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
+                "Use a dedicated delete-type call instead.");
+        }
+    }
+
+
+
+    // ===
 
     TopicModelImpl findChildTopic(String topicTypeUri) {
         if (typeUri.equals(topicTypeUri)) {

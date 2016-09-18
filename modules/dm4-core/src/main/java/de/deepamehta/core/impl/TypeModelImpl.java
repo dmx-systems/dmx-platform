@@ -266,7 +266,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void preUpdate(DeepaMehtaObjectModel newModel) {
-        super.preUpdate(newModel);
+        super.preUpdate(newModel);              // ### TODO: needed?
         //
         // ### TODO: is it sufficient if we rehash (remove + add) at post-time?
         if (uriChange(newModel.getUri(), uri)) {
@@ -276,10 +276,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        super.postUpdate(newModel, oldModel);
+        super.postUpdate(newModel, oldModel);   // ### TODO: needed?
         //
         if (uriChange(newModel.getUri(), oldModel.getUri())) {
-            pl.typeStorage.putInTypeCache(this);
+            putInTypeCache();
         }
         //
         updateType((TypeModel) newModel);
@@ -294,8 +294,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void preDelete() {
-        super.preDelete();
-        //
         int size = getAllInstances().size();
         if (size > 0) {
             throw new RuntimeException(size + " \"" + value + "\" instances still exist");
@@ -304,7 +302,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void postDelete() {
-        super.postDelete();
+        super.postDelete();                     // ### TODO: needed?
         //
         removeFromTypeCache();
     }
@@ -698,6 +696,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     // === Type Cache (memory access) ===
+
+    private void putInTypeCache() {
+        pl.typeStorage.putInTypeCache(this);
+    }
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.

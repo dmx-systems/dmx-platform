@@ -365,7 +365,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      */
     final void update(DeepaMehtaObjectModel newModel) {
         try {
-            logger.info("Updating " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
+            logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
             DeepaMehtaObject object = instantiate();
             DeepaMehtaObjectModel oldModel = clone();
             em.fireEvent(getPreUpdateEvent(), object, newModel);
@@ -385,8 +385,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",
-                e);
+            throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
     }
 
@@ -439,7 +438,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 ((DeepaMehtaObjectModelImpl) assoc).delete();
             }
             // delete object itself
-            logger.info("Deleting " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
+            logger.info("Deleting " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
             _delete();
             //
             postDelete();
@@ -468,7 +467,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 throw e;
             }
         } catch (Exception e) {
-            throw new RuntimeException("Deleting " + className() + " " + id + " failed (" + this + ")", e);
+            throw new RuntimeException("Deleting " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
     }
 
@@ -639,24 +638,23 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     private void _updateUri(String newUri) {
         if (uriChange(newUri, uri)) {                               // abort if no update is requested
-            logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
-                "\" -> \"" + newUri + "\"");
+            logger.info("### Changing URI of " + objectInfo() + " from \"" + uri + "\" -> \"" + newUri + "\"");
             updateUri(newUri);
         }
     }
 
     private void _updateTypeUri(String newTypeUri) {
         if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
-            logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri +
-                "\" -> \"" + newTypeUri + "\"");
+            logger.info("### Changing type URI of " + objectInfo() + " from \"" + typeUri + "\" -> \"" + newTypeUri +
+                "\"");
             updateTypeUri(newTypeUri);
         }
     }
 
     private void _updateSimpleValue(SimpleValue newValue) {
         if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
-            logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value +
-                "\" -> \"" + newValue + "\"");
+            logger.info("### Changing simple value of " + objectInfo() + " from \"" + value + "\" -> \"" + newValue +
+                "\"");
             updateSimpleValue(newValue);
         }
     }
@@ -739,8 +737,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                objectInfo() + " according to " + assocDef);
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
+                " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);
@@ -751,8 +749,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         RelatedTopicModelImpl childTopic = childTopics.findChildTopicById(newChildTopic.getId(), assocDef);
         //
         if (childTopic == null) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                objectInfo() + " according to " + assocDef);
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
+                " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);

@@ -293,9 +293,8 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         }
     }
 
+    @Override
     void preDelete() {
-        super.preDelete();
-        //
         // Type Editor Support
         if (isAssocDef(this)) {
             // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
