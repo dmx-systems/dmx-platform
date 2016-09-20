@@ -16,8 +16,6 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 
@@ -108,7 +106,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public void update(AssociationModel newModel) {
-        model.update(newModel);
+        model.update(newModel);     // ### FIXME: call through pl for access control
     }
 
     // ---

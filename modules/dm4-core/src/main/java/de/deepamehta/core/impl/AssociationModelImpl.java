@@ -277,9 +277,10 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        super.postUpdate(newModel, oldModel);
-        //
+        // update association specific parts: the 2 roles
         updateRoles((AssociationModel) newModel);
+        //
+        doubletCheck();
         //
         // Type Editor Support
         if (isAssocDef(this)) {
@@ -338,6 +339,21 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
+
+    private void doubletCheck() {
+        if (roleModel1 instanceof TopicRoleModel && roleModel2 instanceof TopicRoleModel) {
+            // ### FIXME: respect only readable assocs (access control)?
+            for (AssociationModelImpl assoc : pl.fetchAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
+                if (assoc.id != id) {
+                    throw new RuntimeException("Such a \"" + typeUri + "\" association exists already (ID=" + assoc.id +
+                        ")");
+                }
+            }
+        }
+    }
 
 
 

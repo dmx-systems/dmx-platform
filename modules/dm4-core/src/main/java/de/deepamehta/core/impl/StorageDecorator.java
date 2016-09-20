@@ -182,8 +182,8 @@ class StorageDecorator {
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      *                          ### FIXME: for methods with a singular return value all filters should be mandatory
      */
-    final AssociationModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2, String roleTypeUri1,
-                                                                                                  String roleTypeUri2) {
+    final AssociationModelImpl fetchAssociation(String assocTypeUri, long topicId1, long topicId2,
+                                                                     String roleTypeUri1, String roleTypeUri2) {
         List<AssociationModelImpl> assocs = fetchAssociations(assocTypeUri, topicId1, topicId2, roleTypeUri1,
             roleTypeUri2);
         switch (assocs.size()) {

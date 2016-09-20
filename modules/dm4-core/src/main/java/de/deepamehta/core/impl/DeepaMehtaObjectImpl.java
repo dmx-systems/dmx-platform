@@ -167,7 +167,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public final void update(DeepaMehtaObjectModel newModel) {
-        model.update(newModel);
+        model.update(newModel);     // ### FIXME: call through pl for access control
     }
 
     // ---
@@ -194,7 +194,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public final void delete() {
-        model.delete();     // ### FIXME: call pl.deleteTopic() for access control?
+        model.delete();     // ### FIXME: call through pl for access control
     }
 
 

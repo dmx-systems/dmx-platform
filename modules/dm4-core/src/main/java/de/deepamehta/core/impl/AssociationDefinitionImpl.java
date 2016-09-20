@@ -93,7 +93,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     @Override
     public void update(AssociationDefinitionModel newModel) {
-        model.update(newModel);
+        model.update(newModel);     // ### FIXME: call through pl for access control
     }
 
     // ---
