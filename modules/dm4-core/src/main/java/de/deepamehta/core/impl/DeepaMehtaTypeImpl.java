@@ -79,7 +79,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        getModel()._addAssocDefBefore(assocDef, beforeAssocDefUri);
+        getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
         return this;
     }
 
@@ -118,7 +118,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public void update(TypeModel newModel) {
-        getModel().update(newModel);    // ### FIXME: call through pl for access control
+        getModel().update((TypeModelImpl) newModel);    // ### FIXME: call through pl for access control
     }
 
     // ---

@@ -125,30 +125,30 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    TopicImpl createTopic(TopicModel model) {
+    TopicImpl createTopic(TopicModelImpl model) {
         return createTopic(model, null);    // uriPrefix=null
     }
 
     /**
      * Creates a new topic in the DB.
      */
-    TopicImpl createTopic(TopicModel model, String uriPrefix) {
+    TopicImpl createTopic(TopicModelImpl model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue((TopicModelImpl) model);
+            valueStorage.storeValue(model);
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
             // Note: this must be done *after* the topic is stored. The ID is not known before.
             // Note: in case no URI was given: once stored a topic's URI is empty (not null).
             if (uriPrefix != null && model.getUri().equals("")) {
-                ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
+                model.updateUri(uriPrefix + model.getId());
             }
             // 3) instantiate
-            TopicImpl topic = new TopicImpl((TopicModelImpl) model, this);
+            TopicImpl topic = new TopicImpl(model, this);
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -160,7 +160,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopic(TopicModel newModel) {
+    void updateTopic(TopicModelImpl newModel) {
         long topicId = newModel.getId();
         try {
             checkTopicWriteAccess(topicId);
@@ -314,7 +314,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModel newModel) {
+    void updateAssociation(AssociationModelImpl newModel) {
         long assocId = newModel.getId();
         try {
             checkAssociationWriteAccess(assocId);
@@ -460,7 +460,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopicType(TopicTypeModel newModel) {
+    void updateTopicType(TopicTypeModelImpl newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
@@ -471,7 +471,7 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    void updateAssociationType(AssociationTypeModel newModel) {
+    void updateAssociationType(AssociationTypeModelImpl newModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
@@ -502,7 +502,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    Topic createRoleType(TopicModel model) {
+    Topic createRoleType(TopicModelImpl model) {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {

@@ -115,12 +115,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public TopicImpl createTopic(TopicModel model) {
-        return pl.createTopic(model);
+        return pl.createTopic((TopicModelImpl) model);
     }
 
     @Override
     public void updateTopic(TopicModel newModel) {
-        pl.updateTopic(newModel);
+        pl.updateTopic((TopicModelImpl) newModel);
     }
 
     @Override
@@ -198,7 +198,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public void updateAssociation(AssociationModel newModel) {
-        pl.updateAssociation(newModel);
+        pl.updateAssociation((AssociationModelImpl) newModel);
     }
 
     @Override
@@ -236,7 +236,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public void updateTopicType(TopicTypeModel newModel) {
-        pl.updateTopicType(newModel);
+        pl.updateTopicType((TopicTypeModelImpl) newModel);
     }
 
     @Override
@@ -274,7 +274,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public void updateAssociationType(AssociationTypeModel newModel) {
-        pl.updateAssociationType(newModel);
+        pl.updateAssociationType((AssociationTypeModelImpl) newModel);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic createRoleType(TopicModel model) {
-        return pl.createRoleType(model);
+        return pl.createRoleType((TopicModelImpl) model);
     }
 
 

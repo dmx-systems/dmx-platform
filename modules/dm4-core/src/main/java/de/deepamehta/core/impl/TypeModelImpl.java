@@ -282,7 +282,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             putInTypeCache();
         }
         //
-        updateType((TypeModel) newModel);
+        updateType((TypeModelImpl) newModel);
         //
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
         // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
@@ -331,7 +331,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    void _addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+    void _addAssocDefBefore(AssociationDefinitionModelImpl assocDef, String beforeAssocDefUri) {
         try {
             long lastAssocDefId = lastAssocDefId();     // must be determined *before* memory is updated
             //
@@ -450,7 +450,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Update (memory + DB) ===
 
-    private void updateType(TypeModel newModel) {
+    private void updateType(TypeModelImpl newModel) {
         _updateDataTypeUri(newModel.getDataTypeUri());
         _updateAssocDefs(newModel.getAssocDefs());
         _updateSequence(newModel.getAssocDefs());
@@ -469,8 +469,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void _updateAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+    private void _updateAssocDefs(Collection<AssociationDefinitionModelImpl> newAssocDefs) {
+        for (AssociationDefinitionModelImpl assocDef : newAssocDefs) {
             // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
             // So we must identify the assoc def to update **by ID**.
             // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).

@@ -325,7 +325,7 @@ class TypeStorage {
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
-    AssociationDefinitionModel newAssociationDefinition(AssociationModel assoc) {
+    AssociationDefinitionModelImpl newAssociationDefinition(AssociationModel assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
@@ -403,14 +403,14 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeAssocDefs(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
-        for (AssociationDefinitionModel assocDef : assocDefs) {
+    private void storeAssocDefs(long typeId, Collection<AssociationDefinitionModelImpl> assocDefs) {
+        for (AssociationDefinitionModelImpl assocDef : assocDefs) {
             storeAssociationDefinition(assocDef);
         }
         storeSequence(typeId, assocDefs);
     }
 
-    void storeAssociationDefinition(AssociationDefinitionModel assocDef) {
+    void storeAssociationDefinition(AssociationDefinitionModelImpl assocDef) {
         try {
             long assocDefId = assocDef.getId();
             //
@@ -418,7 +418,7 @@ class TypeStorage {
             // Note: if the association definition has been created interactively the underlying association
             // exists already. We must not create it again. We detect this case by inspecting the ID.
             if (assocDefId == -1) {
-                assocDefId = pl.createAssociation((AssociationDefinitionModelImpl) assocDef).getId();
+                assocDefId = pl.createAssociation(assocDef).getId();
             }
             //
             // 2) cardinality
@@ -778,9 +778,9 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeViewConfig(RoleModel configurable, ViewConfigurationModel viewConfig) {
+    private void storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
         try {
-            for (TopicModel configTopic : viewConfig.getConfigTopics()) {
+            for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {
                 storeViewConfigTopic(configurable, configTopic);
             }
         } catch (Exception e) {
@@ -789,7 +789,7 @@ class TypeStorage {
         }
     }
 
-    void storeViewConfigTopic(RoleModel configurable, TopicModel configTopic) {
+    void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
         pl.createTopic(configTopic);
         pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(configTopic.getId(),
             "dm4.core.view_config"));

@@ -65,7 +65,7 @@ class AccessControlImpl implements AccessControl {
     private ContextTracker contextTracker = new ContextTracker();
 
     private PersistenceLayer pl;
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

@@ -132,21 +132,21 @@ class ValueStorage {
      * Only the childs defined in the type definition are stored.
      */
     private void storeChildTopics(DeepaMehtaObjectModelImpl parent) {
-        ChildTopicsModel model = null;
+        ChildTopicsModelImpl model = null;
         try {
             model = parent.getChildTopicsModel();
             for (AssociationDefinitionModel assocDef : parent.getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    RelatedTopicModel childTopic = model.getTopicOrNull(assocDefUri);
+                    RelatedTopicModelImpl childTopic = model.getTopicOrNull(assocDefUri);
                     if (childTopic != null) {   // skip if not contained in create request
                         storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<? extends RelatedTopicModel> childTopics = model.getTopicsOrNull(assocDefUri);
+                    List<RelatedTopicModelImpl> childTopics = model.getTopicsOrNull(assocDefUri);
                     if (childTopics != null) {  // skip if not contained in create request
-                        for (RelatedTopicModel childTopic : childTopics) {
+                        for (RelatedTopicModelImpl childTopic : childTopics) {
                             storeChildTopic(childTopic, parent, assocDef);
                         }
                     }
@@ -160,8 +160,8 @@ class ValueStorage {
         }
     }
 
-    private void storeChildTopic(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
-                                                               AssociationDefinitionModel assocDef) {
+    private void storeChildTopic(RelatedTopicModelImpl childTopic, DeepaMehtaObjectModel parent,
+                                                                   AssociationDefinitionModel assocDef) {
         if (childTopic instanceof TopicReferenceModel) {
             resolveReference((TopicReferenceModel) childTopic);
         } else {

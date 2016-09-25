@@ -363,7 +363,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
      */
-    final void update(DeepaMehtaObjectModel newModel) {
+    final void update(DeepaMehtaObjectModelImpl newModel) {
         try {
             logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
             DeepaMehtaObject object = instantiate();
@@ -391,17 +391,17 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    void updateUri(String uri) {
+    final void updateUri(String uri) {
         setUri(uri);            // update memory
         storeUri();             // update DB, "abstract"
     }
 
-    void updateTypeUri(String typeUri) {
+    final void updateTypeUri(String typeUri) {
         setTypeUri(typeUri);    // update memory
         storeTypeUri();         // update DB, "abstract"
     }
 
-    void updateSimpleValue(SimpleValue value) {
+    final void updateSimpleValue(SimpleValue value) {
         if (value == null) {
             throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
         }
@@ -476,13 +476,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Update Child Topics ===
 
     // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
-    void _updateChildTopics(ChildTopicsModel newModel) {
+    final void _updateChildTopics(ChildTopicsModelImpl newModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
-                RelatedTopicModel newChildTopic = null;                     // only used for "one"
-                List<? extends RelatedTopicModel> newChildTopics = null;    // only used for "many"
+                RelatedTopicModelImpl newChildTopic = null;             // only used for "one"
+                List<RelatedTopicModelImpl> newChildTopics = null;      // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
                     newChildTopic = newModel.getTopicOrNull(assocDefUri);
                     // skip if not contained in update request
@@ -513,8 +513,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // It may originate from a facet definition as well.
     // Called from DeepaMehtaObjectImpl.updateChildTopic() and DeepaMehtaObjectImpl.updateChildTopics().
     // ### TODO: make this private? See comments in DeepaMehtaObjectImpl.
-    void updateChildTopics(RelatedTopicModel newChildTopic, List<? extends RelatedTopicModel> newChildTopics,
-                                                            AssociationDefinitionModel assocDef) {
+    final void updateChildTopics(RelatedTopicModelImpl newChildTopic, List<RelatedTopicModelImpl> newChildTopics,
+                                                                      AssociationDefinitionModel assocDef) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
         //
@@ -665,14 +665,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // --- Composition ---
 
-    private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateCompositionOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
-            deleteChildTopicOne(childTopic, assocDef, true);                                        // deleteChild=true
+            deleteChildTopicOne(childTopic, assocDef, true);                                         // deleteChild=true
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, true);   // deleteChild=true
+            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, true);// deleteChild=true
         } else if (childTopic != null) {
             updateRelatedTopic(childTopic, newChildTopic);
         } else {
@@ -680,9 +680,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
-    private void updateCompositionMany(List<? extends RelatedTopicModel> newChildTopics,
+    private void updateCompositionMany(List<RelatedTopicModelImpl> newChildTopics,
                                        AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 deleteChildTopicMany(childTopicId, assocDef, true);                                 // deleteChild=true
@@ -698,14 +698,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // --- Aggregation ---
 
-    private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateAggregationOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
             deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, false);  // deleteChild=false
-        } else if (newChildTopic.getId() != -1) {
+            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, false);
+        } else if (newChildTopic.getId() != -1) {                                                   // deleteChild=false
             updateChildTopicOne(newChildTopic, assocDef);
         } else {
             if (childTopic != null) {
@@ -715,9 +715,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
-    private void updateAggregationMany(List<? extends RelatedTopicModel> newChildTopics,
+    private void updateAggregationMany(List<RelatedTopicModelImpl> newChildTopics,
                                        AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 deleteChildTopicMany(childTopicId, assocDef, false);                                // deleteChild=false
@@ -733,7 +733,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // --- Update ---
 
-    private void updateChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
@@ -745,7 +745,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         // Note: memory is already up-to-date. The child topic is updated in-place of parent.
     }
 
-    private void updateChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.findChildTopicById(newChildTopic.getId(), assocDef);
         //
         if (childTopic == null) {
@@ -759,27 +759,27 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModel newChildTopic) {
+    private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
         // update topic
         childTopic.update(newChildTopic);
         // update association
         updateRelatingAssociation(childTopic, newChildTopic);
     }
 
-    private void updateRelatingAssociation(RelatedTopicModelImpl childTopic, RelatedTopicModel newChildTopic) {
+    private void updateRelatingAssociation(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
         childTopic.getRelatingAssociation().update(newChildTopic.getRelatingAssociation());
     }
 
     // --- Create ---
 
-    private void createChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void createChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         // update DB
         createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         childTopics.putInChildTopics(newChildTopic, assocDef);
     }
 
-    private void createChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void createChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         // update DB
         createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
@@ -788,14 +788,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    private void createAndAssociateChildTopic(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+    private void createAndAssociateChildTopic(RelatedTopicModelImpl childTopic, AssociationDefinitionModel assocDef) {
         pl.createTopic(childTopic);
         associateChildTopic(childTopic, assocDef);
     }
 
     // --- Assignment ---
 
-    private void createAssignmentOne(RelatedTopicModelImpl childTopic, TopicReferenceModel newChildTopic,
+    private void createAssignmentOne(RelatedTopicModelImpl childTopic, TopicReferenceModelImpl newChildTopic,
                                      AssociationDefinitionModel assocDef, boolean deleteChildTopic) {
         if (childTopic != null) {
             if (newChildTopic.isReferingTo(childTopic)) {
