@@ -47,7 +47,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     }
 
     @Override
-    TopicType instantiate() {
+    TopicTypeImpl instantiate() {
         return new TopicTypeImpl(this, pl);
     }
 

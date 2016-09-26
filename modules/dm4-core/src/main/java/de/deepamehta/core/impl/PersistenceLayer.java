@@ -148,7 +148,7 @@ public class PersistenceLayer extends StorageDecorator {
                 model.updateUri(uriPrefix + model.getId());
             }
             // 3) instantiate
-            TopicImpl topic = new TopicImpl(model, this);
+            TopicImpl topic = model.instantiate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -287,14 +287,14 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    AssociationImpl createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
     /**
      * Creates a new association in the DB.
      */
-    Association createAssociation(AssociationModelImpl model) {
+    AssociationImpl createAssociation(AssociationModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
@@ -303,7 +303,7 @@ public class PersistenceLayer extends StorageDecorator {
             valueStorage.storeValue(model);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
-            Association assoc = new AssociationImpl(model, this);
+            AssociationImpl assoc = model.instantiate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;

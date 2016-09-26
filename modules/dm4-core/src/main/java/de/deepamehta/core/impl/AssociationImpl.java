@@ -75,13 +75,13 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public Topic getTopic(String roleTypeUri) {
         TopicModelImpl topic = getModel().getTopic(roleTypeUri);
-        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
+        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
     }
 
     @Override
     public Topic getTopicByType(String topicTypeUri) {
         TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
-        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
+        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
     }
 
     // ---

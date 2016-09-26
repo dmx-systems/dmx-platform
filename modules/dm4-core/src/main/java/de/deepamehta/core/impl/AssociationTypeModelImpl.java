@@ -47,7 +47,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     }
 
     @Override
-    AssociationType instantiate() {
+    AssociationTypeImpl instantiate() {
         return new AssociationTypeImpl(this, pl);
     }
 

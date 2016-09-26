@@ -25,7 +25,7 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     @Override
     public DeepaMehtaObject getPlayer() {
-        return new TopicImpl(getModel().getPlayer(), pl);   // ### TODO: permission check?
+        return getModel().getPlayer().instantiate();   // ### TODO: permission check?
     }
 
 

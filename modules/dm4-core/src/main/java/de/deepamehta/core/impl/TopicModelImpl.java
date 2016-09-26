@@ -62,7 +62,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
-    Topic instantiate() {
+    TopicImpl instantiate() {
         return new TopicImpl(this, pl);
     }
 

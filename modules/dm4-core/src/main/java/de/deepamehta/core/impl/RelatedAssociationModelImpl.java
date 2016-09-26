@@ -43,7 +43,7 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
     }
 
     @Override
-    RelatedAssociation instantiate() {
+    RelatedAssociationImpl instantiate() {
         return new RelatedAssociationImpl(this, pl);
     }
 }

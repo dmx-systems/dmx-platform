@@ -155,7 +155,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    AssociationDefinition instantiate() {
+    AssociationDefinitionImpl instantiate() {
         return new AssociationDefinitionImpl(this, pl);
     }
 

@@ -192,7 +192,7 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public Association createAssociation(AssociationModel model) {
+    public AssociationImpl createAssociation(AssociationModel model) {
         return pl.createAssociation((AssociationModelImpl) model);
     }
 

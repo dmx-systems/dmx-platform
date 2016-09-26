@@ -157,7 +157,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    Association instantiate() {
+    AssociationImpl instantiate() {
         return new AssociationImpl(this, pl);
     }
 
