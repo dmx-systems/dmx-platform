@@ -136,6 +136,8 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
+            model.preCreate();
+            //
             // 1) store in DB
             storeTopic(model);
             valueStorage.storeValue(model);
@@ -149,6 +151,8 @@ public class PersistenceLayer extends StorageDecorator {
             }
             // 3) instantiate
             TopicImpl topic = model.instantiate();
+            //
+            model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -298,12 +302,16 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
             //
+            model.preCreate();
+            //
             // 1) store in DB
             storeAssociation(model);
             valueStorage.storeValue(model);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
             AssociationImpl assoc = model.instantiate();
+            //
+            model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;

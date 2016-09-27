@@ -231,6 +231,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Abstract Methods ===
 
+    // ### TODO: make this a real abstract class.
+    // Change the model factory in a way it never instantiates DeepaMehtaObjectModels.
+
     String className() {
         throw new UnsupportedOperationException();
     }
@@ -339,6 +342,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Core Internal Hooks ===
 
+    void preCreate() {
+    }
+
+    void postCreate() {
+    }
+
+    // ---
+
     void preUpdate(DeepaMehtaObjectModel newModel) {
     }
 
@@ -422,6 +433,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     final void delete() {
         try {
             em.fireEvent(getPreDeleteEvent(), instantiate());
+            //
             preDelete();
             //
             // delete child topics (recursively)
