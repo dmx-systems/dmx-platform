@@ -276,11 +276,16 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // === Core Internal Hooks ===
 
     @Override
+    void preCreate() {
+        duplicateCheck();
+    }
+
+    @Override
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
         // update association specific parts: the 2 roles
         updateRoles((AssociationModel) newModel);
         //
-        doubletCheck();
+        duplicateCheck();
         //
         // Type Editor Support
         if (isAssocDef(this)) {
@@ -342,14 +347,14 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
 
-    private void doubletCheck() {
+    private void duplicateCheck() {
         if (roleModel1 instanceof TopicRoleModel && roleModel2 instanceof TopicRoleModel) {
             // ### FIXME: respect only readable assocs (access control)?
             for (AssociationModelImpl assoc : pl.fetchAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
                 roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
                 if (assoc.id != id) {
-                    throw new RuntimeException("Such a \"" + typeUri + "\" association exists already (ID=" + assoc.id +
-                        ")");
+                    throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
+                        ", typeUri=\"" + typeUri + "\")");
                 }
             }
         }
