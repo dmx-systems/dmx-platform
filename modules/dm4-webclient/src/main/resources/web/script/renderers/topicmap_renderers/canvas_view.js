@@ -765,18 +765,18 @@ function CanvasView() {
     }
 
     function end_association_in_progress(tv) {
-        association_in_progress = false
-        // Note: dm4c.do_create_association() implies redraw_canvas(). So association_in_progress
-        // is reset before. Otherwise the last drawn association state would stay on canvas.
-        if (tv && tv.id != action_topic.id) {
-            dm4c.do_create_association("dm4.core.association", action_topic.id, tv.id)
-        } else {
+        // Note: association creation might fail at server-side due to duplicate
+        try {
+            if (tv && tv.id != action_topic.id) {
+                dm4c.do_create_association("dm4.core.association", action_topic.id, tv.id)
+            }
+        } finally {
+            association_in_progress = false
+            action_topic = null
+            // render
             redraw_canvas()     // remove incomplete association from canvas
+            unset_drawing_cursor()
         }
-        //
-        action_topic = null
-        // render
-        unset_drawing_cursor()
     }
 
     // --- Cursor Shapes ---
