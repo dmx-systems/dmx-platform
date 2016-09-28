@@ -54,6 +54,10 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+
+
+    // === Implementation of abstract RoleModelImpl methods ===
+
     @Override
     Role instantiate(AssociationModelImpl assoc) {
         return new AssociationRoleImpl(this, assoc, pl);

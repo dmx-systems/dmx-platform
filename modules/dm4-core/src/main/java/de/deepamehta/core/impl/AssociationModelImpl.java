@@ -348,14 +348,20 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
     private void duplicateCheck() {
-        if (roleModel1 instanceof TopicRoleModel && roleModel2 instanceof TopicRoleModel) {
-            // ### FIXME: respect only readable assocs (access control)?
-            for (AssociationModelImpl assoc : pl.fetchAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
-                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
-                if (assoc.id != id) {
-                    throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
-                        ", typeUri=\"" + typeUri + "\")");
-                }
+        // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
+        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // is not yet available in case this association is part of the player's composite structure.
+        // Compare to DeepaMehtaUtils.associationAutoTyping()
+        if (!(roleModel1 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel1).topicIdentifiedByUri() ||
+            !(roleModel2 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel2).topicIdentifiedByUri()) {
+            return;
+        }
+        // ### FIXME: respect only readable assocs (access control)?
+        for (AssociationModelImpl assoc : pl.fetchAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+               roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
+            if (assoc.id != id) {
+                throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
+                    ", typeUri=\"" + typeUri + "\")");
             }
         }
     }

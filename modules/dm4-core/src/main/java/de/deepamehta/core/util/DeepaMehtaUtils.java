@@ -179,7 +179,10 @@ public class DeepaMehtaUtils {
                                                                                           CoreService dm4) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
-        // auto-typing is supported only for topic players, and if they are identified by-ID
+        // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
+        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // is not yet available in case this association is part of the player's composite structure.
+        // Compare to AssociationModelImpl.duplicateCheck()
         if (!(r1 instanceof TopicRoleModel) || ((TopicRoleModel) r1).topicIdentifiedByUri() ||
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
