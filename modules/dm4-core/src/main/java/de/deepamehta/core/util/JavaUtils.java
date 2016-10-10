@@ -241,6 +241,17 @@ public class JavaUtils {
 
     // ---
 
+    public static String cookieValue(HttpServletRequest request, String cookieName) {
+        for (Cookie cookie : request.getCookies()) {
+            if (cookie.getName().equals(cookieName)) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    // ---
+
     public static String requestInfo(HttpServletRequest request) {
         String queryString = request.getQueryString();
         return request.getMethod() + " " + request.getRequestURI() + (queryString != null ? "?" + queryString : "");
