@@ -262,17 +262,28 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     List<Association> getAssociations(long topic1Id, long topic2Id) {
-        return getAssociations(topic1Id, topic2Id, null);
+        return getAssociations(null, topic1Id, topic2Id);   // assocTypeUri=null
     }
 
-    List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
+    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id) {
+        return getAssociations(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
+    }
+
+    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                         String roleTypeUri2) {
+        return instantiate(_getAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+    }
+
+    Iterable<AssociationModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id,
+                                                    String roleTypeUri1, String roleTypeUri2) {
+        logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
+            ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
-            return checkReadAccessAndInstantiate(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
-                                                                                 // roleTypeUri1=null, roleTypeUri2=null
+            return filterReadables(fetchAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+                " failed (assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
+                "\", roleTypeUri2=\"" + roleTypeUri2 + "\")", e);
         }
     }
 

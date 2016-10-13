@@ -356,8 +356,8 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             !(roleModel2 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel2).topicIdentifiedByUri()) {
             return;
         }
-        // ### FIXME: respect only readable assocs (access control)?
-        for (AssociationModelImpl assoc : pl.fetchAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+        // Note: only readable assocs (access control) are considered
+        for (AssociationModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
             if (assoc.id != id) {
                 throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +

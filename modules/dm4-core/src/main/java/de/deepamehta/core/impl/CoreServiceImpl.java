@@ -174,7 +174,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        return pl.getAssociations(topic1Id, topic2Id, assocTypeUri);
+        return pl.getAssociations(assocTypeUri, topic1Id, topic2Id);
     }
 
     // ---
