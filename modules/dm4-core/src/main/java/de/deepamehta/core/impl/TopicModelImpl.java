@@ -181,7 +181,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     void preDelete() {
         if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.assoc_type")) {
             throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
-                "Use a dedicated delete-type call instead.");
+                "Use a delete-type call instead.");
         }
     }
 

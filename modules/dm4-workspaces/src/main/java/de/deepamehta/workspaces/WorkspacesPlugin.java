@@ -436,11 +436,22 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private void deleteWorkspaceContent(long workspaceId) {
         try {
+            // delete instances
             for (Topic topic : getAssignedTopics(workspaceId)) {
-                topic.delete();
+                String typeUri = topic.getTypeUri();
+                if (!typeUri.equals("dm4.core.topic_type") && !typeUri.equals("dm4.core.assoc_type")) {
+                   topic.delete();
+                }
             }
             for (Association assoc : getAssignedAssociations(workspaceId)) {
                 assoc.delete();
+            }
+            // delete types
+            for (Topic topic : getAssignedTopics(workspaceId, "dm4.core.topic_type")) {
+                dm4.getTopicType(topic.getUri()).delete();
+            }
+            for (Topic topic : getAssignedTopics(workspaceId, "dm4.core.assoc_type")) {
+                dm4.getAssociationType(topic.getUri()).delete();
             }
         } catch (Exception e) {
             throw new RuntimeException("Deleting content of workspace " + workspaceId + " failed", e);
