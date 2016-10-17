@@ -27,7 +27,6 @@ function TopicmapsPluginModel() {
     this.fetch_topicmap_topics = fetch_topicmap_topics
     this.get_topicmap_topics = get_topicmap_topics
     this.clear_topicmap_topics = clear_topicmap_topics
-    this.get_selected_topicmap_id = get_selected_topicmap_id
     this.select_topicmap_for_workspace = select_topicmap_for_workspace
     this.delete_topicmap = delete_topicmap
 
@@ -196,14 +195,6 @@ function TopicmapsPluginModel() {
     }
 
     // ---
-
-    function get_selected_topicmap_id() {
-        var topicmap_id = selected_topicmap_ids[get_selected_workspace_id()]
-        if (!topicmap_id) {
-            throw "TopicmapsError: no topicmap is selected yet"
-        }
-        return topicmap_id
-    }
 
     function get_selected_workspace_id() {
         return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
