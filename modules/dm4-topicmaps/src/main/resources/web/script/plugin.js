@@ -111,20 +111,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     })
 
-    /**
-     * @param   topic   a Topic object
-     */
-    dm4c.add_listener("post_delete_topic", function(topic) {
-        if (topic.type_uri == "dm4.topicmaps.topicmap") {
-            // 1) update model
-            var is_current_topicmp = model.delete_topicmap(topic.id)
-            // 2) update view
-            view.refresh_topicmap_menu()
-            if (is_current_topicmp) {
-                view.display_topicmap()
-            }
-        }
-    })
+    // Note: there is no "post_delete_topic" listener to react on deleted Topicmap topics here. It would get in the way
+    // with the delete-workspace action. While updating the model/view requests would be sent to objects already deleted
+    // at server-side.
+    // Instead the model/view update is performed in the public delete_topicmap() method (called from default_plugin.js)
 
     dm4c.add_listener("pre_push_history", function(history_entry) {
         var topicmap_id = model.get_topicmap().get_id()
@@ -157,10 +147,9 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     // === Workspace Listeners ===
 
     dm4c.add_listener("post_select_workspace", function(workspace_id) {
-        // 1) update model
+        // update model
         model.select_topicmap_for_workspace(workspace_id)
-        //
-        // 2) update view
+        // update view
         view.refresh_topicmap_menu()
         view.display_topicmap()
     })
@@ -259,6 +248,18 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         add_topicmap(topicmap_id)
     }
 
+    this.delete_topicmap = function(topicmap_id) {
+        dm4c.do_delete_topic(topicmap_id)
+        console.log("Topicmap delete_topicmap(" + topicmap_id + ")")
+        // update model
+        var is_current_topicmp = model.delete_topicmap(topicmap_id)
+        // update view
+        view.refresh_topicmap_menu()
+        if (is_current_topicmp) {
+            view.display_topicmap()
+        }
+    }
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
 
@@ -301,6 +302,8 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     }
 
     /**
+     * ### TODO: drop this (copy in plugin.js)
+     *
      * Creates an empty topicmap (a topic of type "Topicmap") in the DB.
      *
      * @param   name                    The name of the topicmap

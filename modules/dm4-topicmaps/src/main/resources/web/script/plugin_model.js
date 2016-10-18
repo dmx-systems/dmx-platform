@@ -7,7 +7,7 @@ function TopicmapsPluginModel() {
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
     var topicmap_topics = {}        // Loaded topicmap topics, grouped by workspace, an object:
                                     //   {
-                                    //     workspaceId: [topicmapTopic]
+                                    //     workspaceId: [topicmapTopic]     # real Topic objects
                                     //   }
     var selected_topicmap_ids = {}  // ID of the selected topicmap, per-workspace, an object:
                                     //   {
@@ -100,7 +100,7 @@ function TopicmapsPluginModel() {
     function get_topicmap_topic_or_throw(topicmap_id) {
         var topicmap_topic = get_topicmap_topic(topicmap_id)
         if (!topicmap_topic) {
-            throw "TopicmapsError: topicmap " + topicmap_id + " not found in model for workspace " +
+            throw "TopicmapsPluginModelError: topicmap " + topicmap_id + " not found in model for workspace " +
                 get_selected_workspace_id()
         }
         return topicmap_topic
@@ -113,6 +113,12 @@ function TopicmapsPluginModel() {
      */
     function get_topicmap_topic(topicmap_id) {
         return js.find(get_topicmap_topics(), function(topic) {
+            return topic.id == topicmap_id
+        })
+    }
+
+    function remove_topicmap_topic(topicmap_id) {
+        js.delete(get_topicmap_topics(), function(topic) {
             return topic.id == topicmap_id
         })
     }
@@ -157,20 +163,10 @@ function TopicmapsPluginModel() {
 
     /**
      * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
-     * <p>
-     * If no Topicmap topics are assigned a default topicmap is created. This happens when the user had deleted
-     * the workspace's last topicmap.
      */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
         var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
-        // create default topicmap
-        if (!topics.length) {
-            var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
-            console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
-            topics.push(topicmap_topic)
-        }
-        //
         topicmap_topics[workspace_id] = dm4c.build_topics(topics)
         // ### TODO: sort topicmaps by name
     }
@@ -185,7 +181,7 @@ function TopicmapsPluginModel() {
     function get_first_topicmap_id() {
         var topicmap_topic = get_topicmap_topics()[0]
         if (!topicmap_topic) {
-            throw "TopicmapsError: no topicmap available"
+            throw "TopicmapsPluginModelError: workspace " + get_selected_workspace_id() + " has no topicmaps"
         }
         return topicmap_topic.id
     }
@@ -222,16 +218,27 @@ function TopicmapsPluginModel() {
     function delete_topicmap(topicmap_id) {
         var is_current_topicmp = topicmap_id == topicmap.get_id()
         invalidate_topicmap_cache(topicmap_id)
-        fetch_topicmap_topics()
+        remove_topicmap_topic(topicmap_id)
+        // Create a default topicmap if the user deleted the workspace's last topicmap.
+        if (!get_topicmap_topics().length) {
+            create_default_topicmap()
+        }
+        // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
         if (is_current_topicmp) {
-            // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
-            // Note: if the last topicmap was deleted another one is already created.
+            console.log("Deleted topicmap " + topicmap_id + " was the CURRENT topicmap of workspace " +
+                get_selected_workspace_id())
             set_selected_topicmap(get_first_topicmap_id())
         }
         return is_current_topicmp
     }
 
-    // ### Copy in plugin.js ### TODO: drop this
+    function create_default_topicmap() {
+        var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
+        var workspace_id = get_selected_workspace_id()
+        console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
+        topicmap_topics[workspace_id].push(new Topic(topicmap_topic))
+    }
+
     function create_topicmap_topic(name, topicmap_renderer_uri, private) {
         return dm4c.restc.create_topicmap(name, topicmap_renderer_uri || "dm4.webclient.default_topicmap_renderer",
             private)
@@ -245,7 +252,7 @@ function TopicmapsPluginModel() {
         var renderer = topicmap_renderers[renderer_uri]
         // error check
         if (!renderer) {
-            throw "TopicmapsError: \"" + renderer_uri + "\" is an unknown topicmap renderer"
+            throw "TopicmapsPluginModelError: \"" + renderer_uri + "\" is an unknown topicmap renderer"
         }
         //
         return renderer
