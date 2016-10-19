@@ -26,26 +26,33 @@ var js = {
     },
 
     /**
-     * Keeps array elements that match a filter function.
+     * Keeps array elements for which the filter function returns a trueish value.
      * The array is manipulated in-place.
+     *
+     * @return  the number of deleted elements
      */
     filter: function(array, fn) {
         var i = 0, e
+        var deleted = 0
         while (e = array[i]) {
             if (!fn(e)) {
                 array.splice(i, 1)
+                deleted++
                 continue
             }
             i++
         }
+        return deleted
     },
 
     /**
-     * Deletes array elements that match a filter function.
+     * Deletes array elements for which the filter function returns a trueish value.
      * The array is manipulated in-place.
+     *
+     * @return  the number of deleted elements
      */
     delete: function(array, fn) {
-        this.filter(array, function(e) {
+        return this.filter(array, function(e) {
             return !fn(e)
         })
     },

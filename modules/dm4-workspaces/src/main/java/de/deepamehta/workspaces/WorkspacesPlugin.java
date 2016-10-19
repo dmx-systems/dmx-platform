@@ -509,11 +509,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
     private boolean workspaceAssignmentIsSuppressed(DeepaMehtaObject object) {
-        boolean abort = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
-        if (abort) {
-            logger.info("Standard workspace assignment for " + info(object) + " SUPPRESSED");
+        boolean suppressed = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
+        if (suppressed) {
+            logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
         }
-        return abort;
+        return suppressed;
     }
 
     // ---

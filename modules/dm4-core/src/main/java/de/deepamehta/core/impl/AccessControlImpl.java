@@ -319,15 +319,15 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public long getAssignedWorkspaceId(long objectId) {
-        long workspaceId = -1;
         try {
+            long workspaceId = -1;
             if (pl.hasProperty(objectId, PROP_WORKSPACE_ID)) {
                 workspaceId = (Long) pl.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
         } catch (Exception e) {
-            throw new RuntimeException("Object " + objectId + " is assigned to workspace " + workspaceId, e);
+            throw new RuntimeException("Workspace assignment of object " + objectId + " can't be determined", e);
         }
     }
 

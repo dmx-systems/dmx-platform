@@ -30,6 +30,8 @@ function TopicmapsPluginModel() {
     this.select_topicmap_for_workspace = select_topicmap_for_workspace
     this.delete_topicmap = delete_topicmap
 
+    this.get_selected_workspace_id = get_selected_workspace_id
+
     this.get_topicmap_renderer = get_topicmap_renderer
     this.iterate_topicmap_renderers = iterate_topicmap_renderers
 
@@ -117,10 +119,18 @@ function TopicmapsPluginModel() {
         })
     }
 
-    function remove_topicmap_topic(topicmap_id) {
-        js.delete(get_topicmap_topics(), function(topic) {
+    /**
+     * @param   workspace_id    the ID of the workspace the given topicmap was assigned to.
+     *                          Note: this is not necessarily the selected workspace.
+     */
+    function remove_topicmap_topic(topicmap_id, workspace_id) {
+        var deleted = js.delete(get_topicmap_topics(workspace_id), function(topic) {
             return topic.id == topicmap_id
         })
+        if (deleted != 1) {
+            throw "TopicmapsPluginModelError: removing topicmap " + topicmap_id + " from model of workspace " +
+                workspace_id + " failed (" + deleted + " entries deleted)"
+        }
     }
 
     /**
@@ -172,10 +182,10 @@ function TopicmapsPluginModel() {
     }
 
     /**
-     * Returns the loaded topicmap topics for the selected workspace.
+     * Returns the loaded topicmap topics for the selected workspace. ### FIXDOC
      */
-    function get_topicmap_topics() {
-        return topicmap_topics[get_selected_workspace_id()]
+    function get_topicmap_topics(workspace_id) {
+        return topicmap_topics[workspace_id || get_selected_workspace_id()]     // ### TODO: fallback needed?
     }
 
     function get_first_topicmap_id() {
@@ -199,14 +209,16 @@ function TopicmapsPluginModel() {
     // ---
 
     function select_topicmap_for_workspace(workspace_id) {
-        // load topicmap topics for that workspace, if not done already
+        // Load topicmap topics for that workspace, if not done already
         if (!get_topicmap_topics()) {
             fetch_topicmap_topics()
         }
         //
-        // restore recently selected topicmap for that workspace
+        create_default_topicmap()
+        //
+        // Restore recently selected topicmap for that workspace
         var topicmap_id = selected_topicmap_ids[workspace_id]
-        // choose an alternate topicmap if either no topicmap was selected in that workspace ever, or if
+        // Choose an alternate topicmap if either no topicmap was selected in that workspace ever, or if
         // the formerly selected topicmap is not available anymore. The latter is the case e.g. when the
         // user logs out while a public/common workspace and a private topicmap is selected.
         if (!topicmap_id || !get_topicmap_topic(topicmap_id)) {
@@ -215,28 +227,50 @@ function TopicmapsPluginModel() {
         set_selected_topicmap(topicmap_id)
     }
 
-    function delete_topicmap(topicmap_id) {
-        var is_current_topicmp = topicmap_id == topicmap.get_id()
+    /**
+     * Updates the model to reflect the given topicmap is now deleted.
+     *
+     * @param   workspace_id    the ID of the workspace the given topicmap was assigned to.
+     *                          Note: this is not necessarily the selected workspace.
+     */
+    function delete_topicmap(topicmap_id, workspace_id) {
+        var is_current_topicmap = topicmap_id == topicmap.get_id()
         invalidate_topicmap_cache(topicmap_id)
-        remove_topicmap_topic(topicmap_id)
-        // Create a default topicmap if the user deleted the workspace's last topicmap.
-        if (!get_topicmap_topics().length) {
+        remove_topicmap_topic(topicmap_id, workspace_id)
+        // If the topicmap was deleted from "within" (that is the workspace the topicmap was assigned to is currently
+        // SELECTED) we might need to select another topicmap now. This possibly requires to create a default topicmap
+        // first.
+        // In contrast, if the topicmap was deleted from "outside" (that is the workspace the topicmap was assigned to
+        // is NOT currently selected) we do NOT create the default topicmap here. It would be assigned to the wrong
+        // workspace. The default topicmap gets created as soon as the deleted topicmap's workspace is selected (see
+        // select_topicmap_for_workspace()).
+        if (workspace_id == get_selected_workspace_id()) {
+            // Create a default topicmap if the user deleted the workspace's last topicmap.
             create_default_topicmap()
+            // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
+            if (is_current_topicmap) {
+                console.log("Deleted topicmap " + topicmap_id + " was the CURRENT topicmap of workspace " +
+                    workspace_id)
+                set_selected_topicmap(get_first_topicmap_id())
+            }
         }
-        // If the deleted topicmap was the CURRENT topicmap we must select another one from the topicmap menu.
-        if (is_current_topicmp) {
-            console.log("Deleted topicmap " + topicmap_id + " was the CURRENT topicmap of workspace " +
-                get_selected_workspace_id())
-            set_selected_topicmap(get_first_topicmap_id())
-        }
-        return is_current_topicmp
+        return is_current_topicmap
     }
 
+    /**
+     * Checks the model if for the <i>selected workspace</i> topicmap topics exists, and if not creates a new default
+     * topicmap.
+     * <p>
+     * Prerequisite: the topicmap topics of the selected workspace are loaded already (which might result in an empty
+     * array though).
+     */
     function create_default_topicmap() {
-        var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
-        var workspace_id = get_selected_workspace_id()
-        console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
-        topicmap_topics[workspace_id].push(new Topic(topicmap_topic))
+        if (!get_topicmap_topics().length) {
+            var topicmap_topic = create_topicmap_topic("untitled")  // renderer=default, private=false
+            var workspace_id = get_selected_workspace_id()
+            console.log("Creating default topicmap (ID " + topicmap_topic.id + ") for workspace " + workspace_id)
+            topicmap_topics[workspace_id].push(new Topic(topicmap_topic))
+        }
     }
 
     function create_topicmap_topic(name, topicmap_renderer_uri, private) {

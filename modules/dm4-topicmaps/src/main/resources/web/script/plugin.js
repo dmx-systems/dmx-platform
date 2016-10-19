@@ -248,15 +248,25 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         add_topicmap(topicmap_id)
     }
 
+    /**
+     * Deletes a topicmap in the DB and updates the client model and view.
+     * <p>
+     * Note: it is <i>not</i> a requirement that the topicmap is assigned to the workspace which is currently selected.
+     */
     this.delete_topicmap = function(topicmap_id) {
+        console.log("delete_topicmap(" + topicmap_id + ")")
+        // Note: the workspace must be determined *before* the topicmap is deleted from DB
+        var workspace_id = get_workspace_id_of_topicmap(topicmap_id)
+        // 1) update DB
         dm4c.do_delete_topic(topicmap_id)
-        console.log("Topicmap delete_topicmap(" + topicmap_id + ")")
-        // update model
-        var is_current_topicmp = model.delete_topicmap(topicmap_id)
-        // update view
-        view.refresh_topicmap_menu()
-        if (is_current_topicmp) {
-            view.display_topicmap()
+        // 2) update model
+        var is_current_topicmap = model.delete_topicmap(topicmap_id, workspace_id)
+        // 3) update view
+        if (workspace_id == model.get_selected_workspace_id()) {
+            view.refresh_topicmap_menu()
+            if (is_current_topicmap) {
+                view.display_topicmap()
+            }
         }
     }
 
@@ -328,6 +338,16 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         // update view
         view.refresh_topicmap_menu()
         view.display_topicmap()
+    }
+
+    // ---
+
+    function get_workspace_id_of_topicmap(topicmap_id) {
+        var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
+        if (!workspace) {
+            throw "TopicmapsPluginError: topicmap " + topicmap_id + " is not assigned to any workspace"
+        }
+        return workspace.id
     }
 })
 // Enable debugging for dynamically loaded scripts:
