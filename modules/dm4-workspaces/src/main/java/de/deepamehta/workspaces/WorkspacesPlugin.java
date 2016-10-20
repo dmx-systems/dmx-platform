@@ -436,22 +436,28 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private void deleteWorkspaceContent(long workspaceId) {
         try {
-            // delete instances
-            for (Topic topic : getAssignedTopics(workspaceId)) {
-                String typeUri = topic.getTypeUri();
-                if (!typeUri.equals("dm4.core.topic_type") && !typeUri.equals("dm4.core.assoc_type")) {
-                   topic.delete();
+            // 1) delete instances by type
+            // Note: also instances assigned to other workspaces must be deleted
+            for (Topic topicType : getAssignedTopics(workspaceId, "dm4.core.topic_type")) {
+                String typeUri = topicType.getUri();
+                for (Topic topic : dm4.getTopicsByType(typeUri)) {
+                    topic.delete();
                 }
+                dm4.getTopicType(typeUri).delete();
+            }
+            for (Topic assocType : getAssignedTopics(workspaceId, "dm4.core.assoc_type")) {
+                String typeUri = assocType.getUri();
+                for (Association assoc : dm4.getAssociationsByType(typeUri)) {
+                    assoc.delete();
+                }
+                dm4.getAssociationType(typeUri).delete();
+            }
+            // 2) delete remaining instances
+            for (Topic topic : getAssignedTopics(workspaceId)) {
+                topic.delete();
             }
             for (Association assoc : getAssignedAssociations(workspaceId)) {
                 assoc.delete();
-            }
-            // delete types
-            for (Topic topic : getAssignedTopics(workspaceId, "dm4.core.topic_type")) {
-                dm4.getTopicType(topic.getUri()).delete();
-            }
-            for (Topic topic : getAssignedTopics(workspaceId, "dm4.core.assoc_type")) {
-                dm4.getAssociationType(topic.getUri()).delete();
             }
         } catch (Exception e) {
             throw new RuntimeException("Deleting content of workspace " + workspaceId + " failed", e);
