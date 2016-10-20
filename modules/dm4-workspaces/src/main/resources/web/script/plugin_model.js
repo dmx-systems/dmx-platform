@@ -12,6 +12,7 @@ function WorkspacesPluginModel() {
     this.init = init
     this.select_workspace = select_workspace
     this.get_selected_workspace_id = get_selected_workspace_id
+    this.delete_workspace = delete_workspace
     this.fetch_workspaces = fetch_workspaces
     this.is_workspace_readable = is_workspace_readable
     this.get_first_workspace_id = get_first_workspace_id
@@ -31,7 +32,7 @@ function WorkspacesPluginModel() {
         function get_workspace_id_of_topicmap(topicmap_id) {
             var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
             if (!workspace) {
-                throw "WorkspacesError: topicmap " + topicmap_id + " is not assigned to any workspace"
+                throw "WorkspacesPluginModelError: topicmap " + topicmap_id + " is not assigned to any workspace"
             }
             return workspace.id
         }
@@ -58,9 +59,22 @@ function WorkspacesPluginModel() {
 
     function get_selected_workspace_id() {
         if (!selected_workspace_id) {
-            throw "WorkspacesError: no workspace is selected yet"
+            throw "WorkspacesPluginModelError: no workspace is selected yet"
         }
         return selected_workspace_id
+    }
+
+    // ---
+
+    /**
+     * Updates the model to reflect the given workspace is now deleted.
+     */
+    function delete_workspace(workspace_id) {
+        fetch_workspaces()
+        // if the deleted workspace was the selected one select another workspace
+        if (workspace_id == get_selected_workspace_id()) {
+            select_workspace(get_first_workspace_id())
+        }
     }
 
     // ---
@@ -82,7 +96,7 @@ function WorkspacesPluginModel() {
     function get_first_workspace_id() {
         var workspace = workspaces[0]
         if (!workspace) {
-            throw "WorkspacesError: no workspace available"
+            throw "WorkspacesPluginModelError: no workspace available"
         }
         return workspace.id
     }

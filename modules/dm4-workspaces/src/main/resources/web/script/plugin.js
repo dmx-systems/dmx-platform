@@ -84,11 +84,7 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
     dm4c.add_listener("post_delete_topic", function(topic) {
         if (topic.type_uri == "dm4.workspaces.workspace") {
             // 1) update model
-            model.fetch_workspaces()
-            // if the deleted workspace was the selected one select another workspace
-            if (topic.id == model.get_selected_workspace_id()) {
-                model.select_workspace(model.get_first_workspace_id())
-            }
+            model.delete_workspace(topic.id)
             // 2) update view
             view.refresh_workspace_menu()
         }

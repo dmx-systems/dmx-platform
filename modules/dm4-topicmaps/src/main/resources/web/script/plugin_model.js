@@ -40,20 +40,6 @@ function TopicmapsPluginModel() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    function register_topicmap_renderers() {
-        // default renderer
-        register(dm4c.topicmap_renderer)
-        // custom renderers
-        var renderers = dm4c.fire_event("topicmap_renderer")
-        renderers.forEach(function(renderer) {
-            register(renderer)
-        })
-
-        function register(renderer) {
-            topicmap_renderers[renderer.get_info().uri] = renderer
-        }
-    }
-
     function init() {
         fetch_topicmap_topics()
         //
@@ -69,6 +55,14 @@ function TopicmapsPluginModel() {
             }
         }
     }
+
+    function get_selected_workspace_id() {
+        return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
+    }
+
+
+
+    // === Topicmaps ===
 
     /**
      * Updates the model to reflect the given topicmap is now selected. That includes setting a cookie
@@ -94,126 +88,15 @@ function TopicmapsPluginModel() {
     }
 
     /**
-     * Looks up a topicmap topic for the selected workspace.
-     * If no such topicmap is available in the selected workspace an exception is thrown.
-     *
-     * @return  the topicmap topic.
+     * Updates the model to reflect the given workspace is now selected.
      */
-    function get_topicmap_topic_or_throw(topicmap_id) {
-        var topicmap_topic = get_topicmap_topic(topicmap_id)
-        if (!topicmap_topic) {
-            throw "TopicmapsPluginModelError: topicmap " + topicmap_id + " not found in model for workspace " +
-                get_selected_workspace_id()
-        }
-        return topicmap_topic
-    }
-
-    /**
-     * Looks up a topicmap topic for the selected workspace.
-     *
-     * @return  the topicmap topic, or undefined if no such topicmap is available in the selected workspace.
-     */
-    function get_topicmap_topic(topicmap_id) {
-        return js.find(get_topicmap_topics(), function(topic) {
-            return topic.id == topicmap_id
-        })
-    }
-
-    /**
-     * @param   workspace_id    the ID of the workspace the given topicmap was assigned to.
-     *                          Note: this is not necessarily the selected workspace.
-     */
-    function remove_topicmap_topic(topicmap_id, workspace_id) {
-        var deleted = js.delete(get_topicmap_topics(workspace_id), function(topic) {
-            return topic.id == topicmap_id
-        })
-        if (deleted != 1) {
-            throw "TopicmapsPluginModelError: removing topicmap " + topicmap_id + " from model of workspace " +
-                workspace_id + " failed (" + deleted + " entries deleted)"
-        }
-    }
-
-    /**
-     * Returns a topicmap from the cache.
-     * If not in cache, the topicmap is loaded from DB (and then cached).
-     */
-    function get_topicmap(topicmap_id) {
-        var topicmap = topicmap_cache[topicmap_id]
-        if (!topicmap) {
-            topicmap = load_topicmap(topicmap_id)
-            topicmap_cache[topicmap_id] = topicmap
-        }
-        return topicmap
-    }
-
-    /**
-     * Loads a topicmap from DB.
-     * <p>
-     * Prerequisite: the topicmap renderer responsible for loading is already set.
-     *
-     * @return  the loaded topicmap (a TopicmapViewmodel).
-     */
-    function load_topicmap(topicmap_id) {
-        return topicmap_renderer.load_topicmap(topicmap_id, {
-            is_writable: dm4c.has_write_permission_for_topic(topicmap_id)
-        })
-    }
-
-    /**
-     * Reloads the current topicmap from DB.
-     */
-    function reload_topicmap() {
-        // Note: the cookie and the renderer are already up-to-date
-        var topicmap_id = topicmap.get_id()
-        invalidate_topicmap_cache(topicmap_id)
-        topicmap = get_topicmap(topicmap_id)
-    }
-
-    // ---
-
-    /**
-     * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
-     */
-    function fetch_topicmap_topics() {
-        var workspace_id = get_selected_workspace_id()
-        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
-        topicmap_topics[workspace_id] = dm4c.build_topics(topics)
-        // ### TODO: sort topicmaps by name
-    }
-
-    /**
-     * Returns the loaded topicmap topics for the selected workspace. ### FIXDOC
-     */
-    function get_topicmap_topics(workspace_id) {
-        return topicmap_topics[workspace_id || get_selected_workspace_id()]     // ### TODO: fallback needed?
-    }
-
-    function get_first_topicmap_id() {
-        var topicmap_topic = get_topicmap_topics()[0]
-        if (!topicmap_topic) {
-            throw "TopicmapsPluginModelError: workspace " + get_selected_workspace_id() + " has no topicmaps"
-        }
-        return topicmap_topic.id
-    }
-
-    function clear_topicmap_topics() {
-        topicmap_topics = {}
-    }
-
-    // ---
-
-    function get_selected_workspace_id() {
-        return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
-    }
-
-    // ---
-
     function select_topicmap_for_workspace(workspace_id) {
         // Load topicmap topics for that workspace, if not done already
         if (!get_topicmap_topics()) {
             fetch_topicmap_topics()
         }
-        //
+        // Note: if the last topicmap of that workspace was deleted from "outside" we create the default
+        // topicmap lazily (see delete_topicmap()).
         create_default_topicmap()
         //
         // Restore recently selected topicmap for that workspace
@@ -257,6 +140,85 @@ function TopicmapsPluginModel() {
         return is_current_topicmap
     }
 
+
+
+    // === Topicmap Topics ===
+
+    /**
+     * Looks up a topicmap topic for the selected workspace.
+     *
+     * @return  the topicmap topic, or undefined if no such topicmap is available in the selected workspace.
+     */
+    function get_topicmap_topic(topicmap_id) {
+        return js.find(get_topicmap_topics(), function(topic) {
+            return topic.id == topicmap_id
+        })
+    }
+
+    /**
+     * Looks up a topicmap topic for the selected workspace.
+     * If no such topicmap is available in the selected workspace an exception is thrown.
+     *
+     * @return  the topicmap topic.
+     */
+    function get_topicmap_topic_or_throw(topicmap_id) {
+        var topicmap_topic = get_topicmap_topic(topicmap_id)
+        if (!topicmap_topic) {
+            throw "TopicmapsPluginModelError: topicmap " + topicmap_id + " not found in model for workspace " +
+                get_selected_workspace_id()
+        }
+        return topicmap_topic
+    }
+
+    /**
+     * @param   workspace_id    the ID of the workspace the given topicmap was assigned to.
+     *                          Note: this is not necessarily the selected workspace.
+     */
+    function remove_topicmap_topic(topicmap_id, workspace_id) {
+        var deleted = js.delete(get_topicmap_topics(workspace_id), function(topic) {
+            return topic.id == topicmap_id
+        })
+        if (deleted != 1) {
+            throw "TopicmapsPluginModelError: removing topicmap " + topicmap_id + " from model of workspace " +
+                workspace_id + " failed (" + deleted + " entries deleted)"
+        }
+    }
+
+    // ---
+
+    /**
+     * Returns the loaded topicmap topics for the selected workspace. ### FIXDOC
+     */
+    function get_topicmap_topics(workspace_id) {
+        return topicmap_topics[workspace_id || get_selected_workspace_id()]     // ### TODO: fallback needed?
+    }
+
+    function get_first_topicmap_id() {
+        var topicmap_topic = get_topicmap_topics()[0]
+        if (!topicmap_topic) {
+            throw "TopicmapsPluginModelError: workspace " + get_selected_workspace_id() + " has no topicmaps"
+        }
+        return topicmap_topic.id
+    }
+
+    function clear_topicmap_topics() {
+        topicmap_topics = {}
+    }
+
+    // ---
+
+    /**
+     * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
+     */
+    function fetch_topicmap_topics() {
+        var workspace_id = get_selected_workspace_id()
+        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
+        topicmap_topics[workspace_id] = dm4c.build_topics(topics)
+        // ### TODO: sort topicmaps by name
+    }
+
+    // ---
+
     /**
      * Checks the model if for the <i>selected workspace</i> topicmap topics exists, and if not creates a new default
      * topicmap.
@@ -282,6 +244,20 @@ function TopicmapsPluginModel() {
 
     // === Topicmap Renderers ===
 
+    function register_topicmap_renderers() {
+        // default renderer
+        register(dm4c.topicmap_renderer)
+        // custom renderers
+        var renderers = dm4c.fire_event("topicmap_renderer")
+        renderers.forEach(function(renderer) {
+            register(renderer)
+        })
+
+        function register(renderer) {
+            topicmap_renderers[renderer.get_info().uri] = renderer
+        }
+    }
+
     function get_topicmap_renderer(renderer_uri) {
         var renderer = topicmap_renderers[renderer_uri]
         // error check
@@ -302,18 +278,56 @@ function TopicmapsPluginModel() {
 
     // === Topicmap Cache ===
 
+    /**
+     * Returns a topicmap from the cache.
+     * If not in cache, the topicmap is loaded from DB (and then cached).
+     */
+    function get_topicmap(topicmap_id) {
+        var topicmap = topicmap_cache[topicmap_id]
+        if (!topicmap) {
+            topicmap = load_topicmap(topicmap_id)
+            topicmap_cache[topicmap_id] = topicmap
+        }
+        return topicmap
+    }
+
+    /**
+     * Loads a topicmap from DB.
+     * <p>
+     * Prerequisite: the topicmap renderer responsible for loading is already set.
+     *
+     * @return  the loaded topicmap (a TopicmapViewmodel).
+     */
+    function load_topicmap(topicmap_id) {
+        return topicmap_renderer.load_topicmap(topicmap_id, {
+            is_writable: dm4c.has_write_permission_for_topic(topicmap_id)
+        })
+    }
+
+    /**
+     * Reloads the current topicmap from DB.
+     */
+    function reload_topicmap() {
+        // Note: the cookie and the renderer are already up-to-date
+        var topicmap_id = topicmap.get_id()
+        invalidate_topicmap_cache(topicmap_id)
+        topicmap = get_topicmap(topicmap_id)
+    }
+
+    // ---
+
     function iterate_topicmap_cache(visitor_func) {
         for (var topicmap_id in topicmap_cache) {
             visitor_func(topicmap_cache[topicmap_id])
         }
     }
 
-    function clear_topicmap_cache() {
-        topicmap_cache = {}
-    }
-
     function invalidate_topicmap_cache(topicmap_id) {
         delete topicmap_cache[topicmap_id]
+    }
+
+    function clear_topicmap_cache() {
+        topicmap_cache = {}
     }
 }
 // Enable debugging for dynamically loaded scripts:
