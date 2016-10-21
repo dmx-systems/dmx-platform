@@ -439,15 +439,15 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             // delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModel childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
+                    for (TopicModelImpl childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
                             "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        ((DeepaMehtaObjectModelImpl) childTopic).delete();
+                        childTopic.delete();
                     }
                 }
             }
             // delete direct associations
-            for (AssociationModel assoc : getAssociations()) {
-                ((DeepaMehtaObjectModelImpl) assoc).delete();
+            for (AssociationModelImpl assoc : getAssociations()) {
+                assoc.delete();
             }
             // delete object itself
             logger.info("Deleting " + objectInfo() + " (typeUri=\"" + typeUri + "\")");

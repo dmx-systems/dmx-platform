@@ -294,9 +294,24 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void preDelete() {
+        // 1) check pre-condition
         int size = getAllInstances().size();
         if (size > 0) {
             throw new RuntimeException(size + " \"" + value + "\" instances still exist");
+        }
+        // 2) delete all assoc defs
+        //
+        // Note 1: we use the preDelete() hook to delete the assoc defs *before* they would get deleted by the generic
+        // deletion logic (see "delete direct associations" in DeepaMehtaObjectModelImpl.delete()). The generic deletion
+        // logic deletes the direct associations in an *arbitrary* order. The "Sequence Start" association might get
+        // deleted *before* any other assoc def. When subsequently deleting an assoc def the sequence can't be rebuild
+        // as it is corrupted.
+        // Note 2: iterating with a for-loop here would cause ConcurrentModificationException. Deleting an assoc def
+        // implies rebuilding the sequence and that iterates with a for-loop already. Instead we must create a new
+        // iterator for every single assoc def.
+        String assocDefUri;
+        while ((assocDefUri = getFirstAssocDefUri()) != null) {
+            _getAssocDef(assocDefUri).delete();
         }
     }
 
@@ -359,7 +374,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     void _removeAssocDef(String assocDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
-        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
+        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
         getAssocDef(assocDefUri).delete();
@@ -521,7 +536,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     private void indexAllInstances(IndexMode indexMode) {
-        List<? extends DeepaMehtaObjectModel> objects = getAllInstances();
+        List<? extends DeepaMehtaObjectModelImpl> objects = getAllInstances();
         //
         String str = "\"" + value + "\" (" + uri + ") instances";
         if (indexModes.size() > 0) {
@@ -534,8 +549,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             logger.info("### Indexing " + str + " ABORTED -- no index mode set");
         }
         //
-        for (DeepaMehtaObjectModel obj : objects) {
-            ((DeepaMehtaObjectModelImpl) obj).indexSimpleValue(indexMode);
+        for (DeepaMehtaObjectModelImpl obj : objects) {
+            obj.indexSimpleValue(indexMode);
         }
     }
 
@@ -647,6 +662,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private long firstAssocDefId() {
         return getAssocDefs().iterator().next().getId();
+    }
+
+    private String getFirstAssocDefUri() {
+        Iterator<String> i = iterator();
+        return i.hasNext() ? i.next() : null;
     }
 
     // ---
