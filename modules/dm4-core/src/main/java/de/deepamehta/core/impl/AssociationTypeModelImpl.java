@@ -35,6 +35,15 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
     // ---
 
     @Override
+    public AssociationTypeModelImpl clone() {
+        try {
+            return (AssociationTypeModelImpl) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a AssociationTypeModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "association type (" + super.toString() + ")";
     }

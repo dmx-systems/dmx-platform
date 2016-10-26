@@ -234,6 +234,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     @Override
+    public TypeModelImpl clone() {
+        try {
+            TypeModelImpl model = (TypeModelImpl) super.clone();
+            model.assocDefs = (SequencedHashMap) model.assocDefs.clone();
+            return model;
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TypeModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +

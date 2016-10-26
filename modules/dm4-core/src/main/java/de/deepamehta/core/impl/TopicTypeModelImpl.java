@@ -35,6 +35,15 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // ---
 
     @Override
+    public TopicTypeModelImpl clone() {
+        try {
+            return (TopicTypeModelImpl) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TopicTypeModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "topic type (" + super.toString() + ")";
     }

@@ -198,6 +198,18 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ===
 
+    TopicModelImpl getCustomAssocType() {
+        TopicModelImpl customAssocType = getChildTopicsModel().getTopicOrNull(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
+        // Note: we can't do this sanity check because a type model would not even deserialize.
+        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
+        /* if (customAssocType instanceof TopicDeletionModel) {
+            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
+                "reference (" + this + ")");
+        } */
+        return customAssocType;
+    }
+
     /**
      * ### TODO: make private
      *
@@ -270,18 +282,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             // ### FIXME: must differentiate "no change requested" (= null) and "remove current assignment" (= del ref)?
             return oldUri != null;
         }
-    }
-
-    private RelatedTopicModel getCustomAssocType() {
-        RelatedTopicModel customAssocType = getChildTopicsModel().getTopicOrNull(
-            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
-        // Note: we can't do this sanity check because a type model would not even deserialize.
-        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
-        /* if (customAssocType instanceof TopicDeletionModel) {
-            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
-                "reference (" + this + ")");
-        } */
-        return customAssocType;
     }
 
     private String defaultInstanceLevelAssocTypeUri() {
