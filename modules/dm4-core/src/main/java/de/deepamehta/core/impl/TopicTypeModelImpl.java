@@ -57,7 +57,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     TopicTypeImpl instantiate() {
-        return new TopicTypeImpl(this, pl);
+        return new TopicTypeImpl(filterReadableAssocDefs(clone()), pl);
     }
 
 

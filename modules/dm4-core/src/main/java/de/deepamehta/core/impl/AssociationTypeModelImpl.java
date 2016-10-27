@@ -57,7 +57,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     @Override
     AssociationTypeImpl instantiate() {
-        return new AssociationTypeImpl(this, pl);
+        return new AssociationTypeImpl(filterReadableAssocDefs(clone()), pl);
     }
 
 

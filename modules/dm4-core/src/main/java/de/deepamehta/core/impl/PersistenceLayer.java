@@ -424,8 +424,7 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             List<TopicType> topicTypes = new ArrayList();
             for (String uri : getTopicTypeUris()) {
-                TopicTypeModelImpl topicType = filterReadableAssocDefs(_getTopicType(uri).clone());
-                topicTypes.add(topicType.instantiate());
+                topicTypes.add(_getTopicType(uri).instantiate());
             }
             return topicTypes;
         } catch (Exception e) {
@@ -437,8 +436,7 @@ public class PersistenceLayer extends StorageDecorator {
         try {
             List<AssociationType> assocTypes = new ArrayList();
             for (String uri : getAssociationTypeUris()) {
-                AssociationTypeModelImpl assocType = filterReadableAssocDefs(_getAssociationType(uri));
-                assocTypes.add(assocType.instantiate());
+                assocTypes.add(_getAssociationType(uri).instantiate());
             }
             return assocTypes;
         } catch (Exception e) {
@@ -486,7 +484,7 @@ public class PersistenceLayer extends StorageDecorator {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
             String topicTypeUri = fetchTopic(newModel.getId()).getUri();
-            typeStorage.getTopicType(topicTypeUri).update(newModel);
+            _getTopicType(topicTypeUri).update(newModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
         }
@@ -497,7 +495,7 @@ public class PersistenceLayer extends StorageDecorator {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
             String assocTypeUri = fetchTopic(newModel.getId()).getUri();
-            typeStorage.getAssociationType(assocTypeUri).update(newModel);
+            _getAssociationType(assocTypeUri).update(newModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
         }
@@ -507,7 +505,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void deleteTopicType(String topicTypeUri) {
         try {
-            typeStorage.getTopicType(topicTypeUri).delete();        // ### TODO: delete view config topics
+            _getTopicType(topicTypeUri).delete();           // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         }
@@ -515,7 +513,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     void deleteAssociationType(String assocTypeUri) {
         try {
-            typeStorage.getAssociationType(assocTypeUri).delete();  // ### TODO: delete view config topics
+            _getAssociationType(assocTypeUri).delete();     // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }
@@ -566,6 +564,8 @@ public class PersistenceLayer extends StorageDecorator {
         return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
 
 
     // === Access Control / Instantiation ===
@@ -595,7 +595,7 @@ public class PersistenceLayer extends StorageDecorator {
         return models;
     }
 
-    private boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
+    boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
         try {
             checkReadAccess(model);
             return true;
@@ -677,43 +677,6 @@ public class PersistenceLayer extends StorageDecorator {
         } catch (Exception e) {
             throw new RuntimeException("Fetching list of association type URIs failed", e);
         }
-    }
-
-    // ---
-
-    private <M extends TypeModelImpl> M filterReadableAssocDefs(M type) {
-        try {
-            Iterator<String> i = type.iterator();
-            while (i.hasNext()) {
-                String assocDefUri = i.next();
-                if (!isAssocDefReadable(type.getAssocDef(assocDefUri))) {
-                    i.remove();
-                }
-            }
-            return type;
-        } catch (Exception e) {
-            throw new RuntimeException("Filtering readable assoc defs of type \"" + type.uri + "\" failed", e);
-        }
-    }
-
-    private boolean isAssocDefReadable(AssociationDefinitionModelImpl assocDef) {
-        // 1) check assoc def
-        if (!hasReadAccess(assocDef)) {
-            logger.info("### Assoc def \"" + assocDef.getAssocDefUri() + "\" not READable");
-            return false;
-        }
-        // Note: we must not explicitly check READability for the child type.
-        // If the child type is not READable the entire assoc def is not READable as well.
-        //
-        // 2) check custom assoc type
-        TopicModelImpl assocType = assocDef.getCustomAssocType();
-        if (assocType != null && !hasReadAccess(assocType)) {
-            logger.info("### Assoc def \"" + assocDef.getAssocDefUri() + "\" not READable " +
-                "(custom assoc type not READable)");
-            return false;
-        }
-        //
-        return true;
     }
 
     // ---

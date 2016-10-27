@@ -196,19 +196,30 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
-    // ===
+    // === Access Control ===
 
-    TopicModelImpl getCustomAssocType() {
-        TopicModelImpl customAssocType = getChildTopicsModel().getTopicOrNull(
-            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
-        // Note: we can't do this sanity check because a type model would not even deserialize.
-        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
-        /* if (customAssocType instanceof TopicDeletionModel) {
-            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
-                "reference (" + this + ")");
-        } */
-        return customAssocType;
+    boolean isReadable() {
+        // 1) check assoc def
+        if (!pl.hasReadAccess(this)) {
+            logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable");
+            return false;
+        }
+        // Note: there is no need to explicitly check READability for the assoc def's child type.
+        // If the child type is not READable the entire assoc def is not READable as well.
+        //
+        // 2) check custom assoc type, if set
+        TopicModelImpl assocType = getCustomAssocType();
+        if (assocType != null && !pl.hasReadAccess(assocType)) {
+            logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable (custom assoc type not READable)");
+            return false;
+        }
+        //
+        return true;
     }
+
+
+
+    // ===
 
     /**
      * ### TODO: make private
@@ -282,6 +293,18 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             // ### FIXME: must differentiate "no change requested" (= null) and "remove current assignment" (= del ref)?
             return oldUri != null;
         }
+    }
+
+    private TopicModelImpl getCustomAssocType() {
+        TopicModelImpl customAssocType = getChildTopicsModel().getTopicOrNull(
+            "dm4.core.assoc_type#dm4.core.custom_assoc_type");
+        // Note: we can't do this sanity check because a type model would not even deserialize.
+        // The type model JSON constructor repeatedly calls addAssocDef() which hashes by assoc def URI. ### still true?
+        /* if (customAssocType instanceof TopicDeletionModel) {
+            throw new RuntimeException("Tried to get an assoc def's custom assoc type when it is a deletion " +
+                "reference (" + this + ")");
+        } */
+        return customAssocType;
     }
 
     private String defaultInstanceLevelAssocTypeUri() {
