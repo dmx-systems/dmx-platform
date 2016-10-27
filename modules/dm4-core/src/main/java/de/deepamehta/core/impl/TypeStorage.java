@@ -1,12 +1,6 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
-import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -243,7 +237,7 @@ class TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        List<? extends RelatedTopicModel> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
+        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
             "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
         return IndexMode.fromTopics(indexModes);
     }
@@ -597,7 +591,7 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeSequence(long typeId, Collection<? extends AssociationDefinitionModel> assocDefs) {
+    private void storeSequence(long typeId, Collection<AssociationDefinitionModelImpl> assocDefs) {
         logger.fine("### Storing " + assocDefs.size() + " sequence segments for type " + typeId);
         long predAssocDefId = -1;
         for (AssociationDefinitionModel assocDef : assocDefs) {
@@ -675,7 +669,7 @@ class TypeStorage {
 
     // ---
 
-    void rebuildSequence(TypeModel type) {
+    void rebuildSequence(TypeModelImpl type) {
         deleteSequence(type);
         storeSequence(type.getId(), type.getAssocDefs());
     }
@@ -711,8 +705,7 @@ class TypeStorage {
     /**
      * Stores the label configuration of a <i>newly created</i> type.
      */
-    private void storeLabelConfig(List<String> labelConfig,
-                                  Collection<? extends AssociationDefinitionModel> assocDefs) {
+    private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModelImpl> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
             // Note: we don't do the storage in a type-driven fashion here (as in new AssociationDefinitionImpl(
@@ -732,7 +725,7 @@ class TypeStorage {
     /**
      * Updates the label configuration of an <i>existing</i> type.
      */
-    void updateLabelConfig(List<String> labelConfig, Collection<? extends AssociationDefinitionModel> assocDefs) {
+    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModelImpl> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             // Note: the Type Editor plugin must not react
             TopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());
@@ -764,8 +757,7 @@ class TypeStorage {
             return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dm4.core.aggregation",
                 "dm4.core.assoc_def", "dm4.core.view_config", null));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for association definition " + assocDef.getId() +
-                " failed", e);
+            throw new RuntimeException("Fetching view configuration for assoc def " + assocDef.getId() + " failed", e);
         }
     }
 
