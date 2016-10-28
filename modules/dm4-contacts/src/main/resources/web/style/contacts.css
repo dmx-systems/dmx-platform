@@ -1,14 +1,3 @@
-/* === Date of Birth === */
-
-div.dm4\.contacts\.person > div.dm4\.datetime\.date::before {
-    content: "Date of Birth";
-    display: block;
-    margin-bottom: 0.6em;
-    font-size: 0.75em;      /* must match .field-label style in webclient.css */
-    color: gray;            /* must match .field-label style in webclient.css */
-}
-
-
 /* === Person Name === */
 
 .dm4\.contacts\.person_name > .dm4\.contacts\.first_name,
