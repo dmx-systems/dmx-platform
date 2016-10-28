@@ -123,7 +123,9 @@ dm4c.render.page_model = new function() {
                     return custom_assoc_type.value
                 }
             }
-            return _self.object_type.value
+            if (page_model_type == self.type.SIMPLE) {
+                return _self.object_type.value
+            }
         }
 
         function lookup_renderer() {
@@ -375,8 +377,9 @@ dm4c.render.page_model = new function() {
         }
         // 3) Semantic markup
         if (box_type == this.type.SIMPLE || box_type == this.type.COMPOSITE) {
+            // type URI
             box.addClass(page_model.object.type_uri)
-            //
+            // assoc def URI
             var assoc_def = page_model.assoc_def
             if (assoc_def && assoc_def.assoc_def_uri != assoc_def.child_type_uri) {
                 box.addClass(assoc_def.assoc_def_uri)

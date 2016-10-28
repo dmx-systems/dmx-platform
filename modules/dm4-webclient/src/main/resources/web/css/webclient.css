@@ -241,6 +241,10 @@ body {
     cursor: pointer;
 }
 
+#page-content .box.composite > .field-label {
+    margin-bottom: 0.6em;
+}
+
 /*** Page Panel Form ***/
 
 #page-content input[type=text],

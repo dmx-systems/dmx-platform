@@ -489,7 +489,9 @@ function RenderHelper() {
     // ---
 
     /**
-     * @param   page_model      a TopicRenderer.PageModel object or a string.
+     * ### TODO: don't pass page-model, only string. Drop "topics" parameter.
+     *
+     * @param   page_model      a topic/association renderer's PageModel object or a string.
      * @param   parent_element  Optional: the parent element the label is rendered to.
      *                          If not specified the label is rendered directly to the page panel.
      */
@@ -506,7 +508,9 @@ function RenderHelper() {
             label += " (" + topics.length + ")"
         }
         //
-        parent_element.append(this.label(label))
+        if (label) {
+            parent_element.append(this.label(label))
+        }
     }
 
     this.page = function(html) {
