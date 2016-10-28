@@ -146,6 +146,13 @@ dm4c.render.page_model = new function() {
         }
     }
 
+    var type_name = {
+        1: "simple",
+        2: "composite",
+        3: "related_topic",
+        4: "multi"
+    }
+
     // ------------------------------------------------------------------------------------------------------ Public API
 
     this.type = {
@@ -355,6 +362,8 @@ dm4c.render.page_model = new function() {
         if (box_type == this.type.COMPOSITE || box_type == this.type.RELATED_TOPIC) {
             box.addClass("level" + level)
         }
+        //
+        box.addClass(type_name[box_type])
         // 2) Reveal underlying topic when box is clicked
         // Note: only a SIMPLE, COMPOSITE, or RELATED_TOPIC box represents a revealable topic. A MULTI box does not.
         // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
