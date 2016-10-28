@@ -293,7 +293,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
         // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
         // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
-        Directives.get().add(getUpdateTypeDirective(), instantiate());
+        addUpdateTypeDirective();
     }
 
     // ---
@@ -392,6 +392,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     void _addAssocDef(AssociationModel assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
+        //
+        addUpdateTypeDirective();
     }
 
     /**
@@ -438,6 +440,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             // we must replace the assoc def URI in the label config
             replaceInLabelConfig(newAssocDefUri, oldAssocDefUri);
         }
+        //
+        addUpdateTypeDirective();
     }
 
     /**
@@ -454,6 +458,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         removeFromLabelConfig(assocDefUri);
         // update DB
         pl.typeStorage.rebuildSequence(this);
+        //
+        addUpdateTypeDirective();
     }
 
 
@@ -485,6 +491,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void addUpdateTypeDirective() {
+        Directives.get().add(getUpdateTypeDirective(), instantiate());
+    }
 
 
 

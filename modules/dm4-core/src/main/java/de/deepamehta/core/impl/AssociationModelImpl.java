@@ -463,8 +463,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");
         //
         parentType._addAssocDef(this);
-        //
-        addUpdateTypeDirective(parentType);
     }
 
     private void updateAssocDef() {
@@ -472,8 +470,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
         //
         parentType._updateAssocDef(this);
-        //
-        addUpdateTypeDirective(parentType);
     }
 
     private void removeAssocDef() {
@@ -481,8 +477,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         logger.info("##### Removing association definition " + id + " from type \"" + parentType.getUri() + "\"");
         //
         parentType._removeAssocDefFromMemoryAndRebuildSequence(this);
-        //
-        addUpdateTypeDirective(parentType);
     }
 
     // ---
@@ -503,17 +497,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         }
         //
         return true;
-    }
-
-    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The DeepaMehtaType interface's
-    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter ### FIXDOC
-    private void addUpdateTypeDirective(TypeModelImpl type) {
-        if (type.getTypeUri().equals("dm4.core.topic_type")) {
-            Directives.get().add(Directive.UPDATE_TOPIC_TYPE, type.instantiate());
-        } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
-            Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, type.instantiate());
-        }
-        // Note: no else here as error check already performed in fetchParentType()
     }
 
     private TypeModelImpl fetchParentType() {
