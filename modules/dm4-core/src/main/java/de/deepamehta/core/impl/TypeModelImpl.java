@@ -466,18 +466,18 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Access Control ===
 
-    static final <M extends TypeModelImpl> M filterReadableAssocDefs(M type) {
+    final <M extends TypeModelImpl> M filterReadableAssocDefs() {
         try {
-            Iterator<String> i = type.iterator();
+            Iterator<String> i = iterator();
             while (i.hasNext()) {
                 String assocDefUri = i.next();
-                if (!type.getAssocDef(assocDefUri).isReadable()) {
+                if (!getAssocDef(assocDefUri).isReadable()) {
                     i.remove();
                 }
             }
-            return type;
+            return (M) this;
         } catch (Exception e) {
-            throw new RuntimeException("Filtering readable assoc defs of type \"" + type.uri + "\" failed", e);
+            throw new RuntimeException("Filtering readable assoc defs of type \"" + uri + "\" failed", e);
         }
     }
 

@@ -57,7 +57,9 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     @Override
     AssociationTypeImpl instantiate() {
-        return new AssociationTypeImpl(filterReadableAssocDefs(clone()), pl);
+        // Note: declaration and assignment is required for type inference to work (at least in Java 6)
+        AssociationTypeModelImpl type = clone().filterReadableAssocDefs();
+        return new AssociationTypeImpl(type, pl);
     }
 
 
