@@ -102,6 +102,10 @@ function RenderHelper() {
 
         function assoc_type_label() {
             if (topic.assoc) {
+                // Note: accessing the type name requires accessing the type. However the user might have no
+                // explicit READ permission for the type. We must enforce the *implicit* READ permission.
+                dm4c.enforce_implicit_association_type_read_permission(topic.assoc)
+                //
                 return $("<div>").addClass("assoc-type-label").text("(" +
                     dm4c.association_type_name(topic.assoc.type_uri) +
                     (topic.assoc.value && ": " + topic.assoc.value) + ")")
