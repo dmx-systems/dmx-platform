@@ -57,6 +57,8 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
 
+    TopicModel newTopicModel(TopicModel topic);
+
     TopicModel newTopicModel(JSONObject topic);
 
 

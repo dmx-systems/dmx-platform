@@ -471,7 +471,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             Iterator<String> i = iterator();
             while (i.hasNext()) {
                 String assocDefUri = i.next();
-                if (!getAssocDef(assocDefUri).isReadable()) {
+                if (!_getAssocDef(assocDefUri).isReadable()) {
                     i.remove();
                 }
             }

@@ -199,22 +199,26 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // === Access Control ===
 
     boolean isReadable() {
-        // 1) check assoc def
-        if (!pl.hasReadAccess(this)) {
-            logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable");
-            return false;
+        try {
+            // 1) check assoc def
+            if (!pl.hasReadAccess(this)) {
+                logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable");
+                return false;
+            }
+            // Note: there is no need to explicitly check READability for the assoc def's child type.
+            // If the child type is not READable the entire assoc def is not READable as well.
+            //
+            // 2) check custom assoc type, if set
+            TopicModelImpl assocType = getCustomAssocType();
+            if (assocType != null && !pl.hasReadAccess(assocType)) {
+                logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable (custom assoc type not READable)");
+                return false;
+            }
+            //
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException("Checking assoc def READability failed (" + this + ")", e);
         }
-        // Note: there is no need to explicitly check READability for the assoc def's child type.
-        // If the child type is not READable the entire assoc def is not READable as well.
-        //
-        // 2) check custom assoc type, if set
-        TopicModelImpl assocType = getCustomAssocType();
-        if (assocType != null && !pl.hasReadAccess(assocType)) {
-            logger.info("### Assoc def \"" + getAssocDefUri() + "\" not READable (custom assoc type not READable)");
-            return false;
-        }
-        //
-        return true;
     }
 
 

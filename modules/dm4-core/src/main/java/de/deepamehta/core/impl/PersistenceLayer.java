@@ -147,7 +147,7 @@ public class PersistenceLayer extends StorageDecorator {
             // Note: this must be done *after* the topic is stored. The ID is not known before.
             // Note: in case no URI was given: once stored a topic's URI is empty (not null).
             if (uriPrefix != null && model.getUri().equals("")) {
-                model.updateUri(uriPrefix + model.getId());
+                model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
             // 3) instantiate
             TopicImpl topic = model.instantiate();
@@ -449,31 +449,28 @@ public class PersistenceLayer extends StorageDecorator {
     TopicType createTopicType(TopicTypeModelImpl model) {
         try {
             // store in DB
-            createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
-            typeStorage.storeType(model);                       // store type-specific parts
+            createTypeTopic(model, URI_PREFIX_TOPIC_TYPE);
             //
             TopicType topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             //
             return topicType;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
+            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed", e);
         }
     }
 
     AssociationType createAssociationType(AssociationTypeModelImpl model) {
         try {
             // store in DB
-            createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
-            typeStorage.storeType(model);                       // store type-specific parts
+            createTypeTopic(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
             AssociationType assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             //
             return assocType;
         } catch (Exception e) {
-            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
-                e);
+            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed", e);
         }
     }
 
@@ -687,6 +684,14 @@ public class PersistenceLayer extends StorageDecorator {
 
     private AssociationTypeModelImpl _getAssociationType(String uri) {
         return typeStorage.getAssociationType(uri);
+    }
+
+    private void createTypeTopic(TypeModelImpl model, String uriPrefix) {
+        TopicModelImpl typeTopic = mf.newTopicModel(model);     // ### TODO: explain
+        createTopic(typeTopic, uriPrefix);      // create generic topic
+        model.id = typeTopic.id;
+        model.uri = typeTopic.uri;
+        typeStorage.storeType(model);           // store type-specific parts
     }
 
     // ---

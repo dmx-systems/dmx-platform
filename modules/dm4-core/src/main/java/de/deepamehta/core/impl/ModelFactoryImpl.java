@@ -103,13 +103,14 @@ public class ModelFactoryImpl implements ModelFactory {
         return newTopicModel(id, null, null, null, null);
     }
 
-    /* TopicModelImpl(long id, String typeUri) {
-        super(id, typeUri);
-    } */
-
     @Override
     public TopicModelImpl newTopicModel(long id, ChildTopicsModel childTopics) {
         return newTopicModel(id, null, null, null, childTopics);
+    }
+
+    @Override
+    public TopicModelImpl newTopicModel(TopicModel topic) {
+        return new TopicModelImpl((TopicModelImpl) topic);
     }
 
     @Override
