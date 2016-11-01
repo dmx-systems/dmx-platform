@@ -40,7 +40,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public void setDataTypeUri(String dataTypeUri) {
-        getModel().updateDataTypeUri(dataTypeUri);
+        _getModel().updateDataTypeUri(dataTypeUri);
     }
 
     // --- Index Modes ---
@@ -52,7 +52,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public void addIndexMode(IndexMode indexMode) {
-        getModel()._addIndexMode(indexMode);
+        _getModel()._addIndexMode(indexMode);
     }
 
     // --- Association Definitions ---
@@ -79,13 +79,13 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
+        _getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
         return this;
     }
 
     @Override
     public DeepaMehtaType removeAssocDef(String assocDefUri) {
-        getModel()._removeAssocDef(assocDefUri);
+        _getModel()._removeAssocDef(assocDefUri);
         return this;
     }
 
@@ -98,7 +98,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public void setLabelConfig(List<String> labelConfig) {
-        getModel().updateLabelConfig(labelConfig);
+        _getModel().updateLabelConfig(labelConfig);
     }
 
     // --- View Configuration ---
@@ -118,7 +118,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public void update(TypeModel newModel) {
-        getModel().update((TypeModelImpl) newModel);    // ### FIXME: call through pl for access control
+        _getModel().update((TypeModelImpl) newModel);   // ### FIXME: call through pl for access control
     }
 
     // ---
@@ -127,4 +127,16 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     public TypeModelImpl getModel() {
         return (TypeModelImpl) model;
     }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * Returns the <i>internal</i> (= <b>kernel</b>) model underlying this type.
+     * <p>
+     * Note: type updates must be performed on the internal type model, not the userland's type model (as returned by
+     * <code>getModel()</code>). Performing an update on the <b>userland</b>'s type model would have no effect, as it
+     * is transient. The userland's type model is always a <i>cloned</i> and filtered (= "projected") version of a
+     * kernel type model which is created on-the-fly each time a specific user requests it.
+     */
+    abstract TypeModelImpl _getModel();
 }

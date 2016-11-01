@@ -533,6 +533,16 @@ public class PersistenceLayer extends StorageDecorator {
         return createTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
+    // ---
+
+    TopicTypeModelImpl _getTopicType(String uri) {
+        return typeStorage.getTopicType(uri);
+    }
+
+    AssociationTypeModelImpl _getAssociationType(String uri) {
+        return typeStorage.getAssociationType(uri);
+    }
+
 
 
     // === Generic Object ===
@@ -678,29 +688,25 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    private TopicTypeModelImpl _getTopicType(String uri) {
-        return typeStorage.getTopicType(uri);
-    }
-
-    private AssociationTypeModelImpl _getAssociationType(String uri) {
-        return typeStorage.getAssociationType(uri);
-    }
-
     private void createTypeTopic(TypeModelImpl model, String uriPrefix) {
-        TopicModelImpl typeTopic = mf.newTopicModel(model);     // ### TODO: explain
+        // Note: the type topic is instantiated explicitly on a `TopicModel` (which is freshly created from the
+        // `TypeModel`). Creating the type topic from the `TypeModel` directly would fail as topic creation implies
+        // topic instantiation, and due to the polymorphic `instantiate()` method a `Type` object would be instantiated
+        // (instead a `Topic` object). But instantiating a type newly implies per-user type projection, that is removing
+        // the assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
+        // defs are not yet stored, and the readability check would fail.
+        TopicModelImpl typeTopic = mf.newTopicModel(model);
         createTopic(typeTopic, uriPrefix);      // create generic topic
+        //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;
+        //
         typeStorage.storeType(model);           // store type-specific parts
     }
-
-    // ---
 
     private String typeUri(long objectId) {
         return (String) fetchProperty(objectId, "type_uri");
     }
-
-    // ---
 
     private void bootstrapTypeCache() {
         TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
