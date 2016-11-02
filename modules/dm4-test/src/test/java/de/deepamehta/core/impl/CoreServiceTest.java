@@ -368,14 +368,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void insertAssocDefAtPos0() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
-            //
+            // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 0
-            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
-                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_name");
+            dm4.getTopicType("dm4.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
+                "dm4.core.composition_def", "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"
+            ), "dm4.core.plugin_name");
             //
-            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
+            // change we must re-get the userland type model (by getTopicType()).
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<AssociationDefinition> i = assocDefs.iterator();
@@ -392,14 +396,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void insertAssocDefAtPos1() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
-            //
+            // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 1
-            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
-                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_symbolic_name");
+            dm4.getTopicType("dm4.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
+                "dm4.core.composition_def", "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"
+            ), "dm4.core.plugin_symbolic_name");
             //
-            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
+            // change we must re-get the userland type model (by getTopicType()).
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<AssociationDefinition> i = assocDefs.iterator();
