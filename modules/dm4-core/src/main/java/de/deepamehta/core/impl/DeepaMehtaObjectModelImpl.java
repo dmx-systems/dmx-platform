@@ -366,7 +366,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
-    // === Update ===
+    // === Update (memory + DB) ===
 
     /**
      * @param   newModel    The data to update.
@@ -377,9 +377,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     final void update(DeepaMehtaObjectModelImpl newModel) {
         try {
             logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
-            DeepaMehtaObject object = instantiate();
             DeepaMehtaObjectModel oldModel = clone();
-            em.fireEvent(getPreUpdateEvent(), object, newModel);
+            em.fireEvent(getPreUpdateEvent(), instantiate(), newModel);
             //
             preUpdate(newModel);
             //
@@ -393,6 +392,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             postUpdate(newModel, oldModel);
             //
+            // Note: in case of a type topic the instantiate() call above creates a cloned model
+            // that doesn't reflect the update. Here we instantiate the now updated model.
+            DeepaMehtaObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
         } catch (Exception e) {
@@ -485,7 +487,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
-    // === Update Child Topics ===
+    // === Update Child Topics (memory + DB) ===
 
     // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
     final void _updateChildTopics(ChildTopicsModelImpl newModel) {
@@ -673,7 +675,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
-    // === Update Child Topics ===
+    // === Update Child Topics (memory + DB) ===
 
     // --- Composition ---
 
