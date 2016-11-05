@@ -264,6 +264,126 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void changeLabelWithSetRefSimple() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // 1) define model
+            // "Person Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.text"));
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Person Name"
+            Topic karl = dm4.createTopic(mf.newTopicModel("dm4.test.person_name", new SimpleValue("Karl Albrecht")));
+            //
+            assertEquals("Karl Albrecht", karl.getSimpleValue().toString());
+            //
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().setRef("dm4.test.person_name", karl.getId());
+            //
+            assertEquals(karl.getId(), comment.getChildTopics().getTopic("dm4.test.person_name").getId());
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void changeLabelWithSetRefComposite() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // 1) define model
+            // "First Name", "Last Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
+            // "Person Name" (composite)
+            TopicType pn = dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
+                ))
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            pn.setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"));
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Person Name"
+            Topic karl = dm4.createTopic(mf.newTopicModel("dm4.test.person_name", mf.newChildTopicsModel()
+                .put("dm4.test.first_name", "Karl")
+                .put("dm4.test.last_name", "Albrecht")
+            ));
+            //
+            assertEquals("Karl Albrecht", karl.getSimpleValue().toString());
+            //
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().setRef("dm4.test.person_name", karl.getId());
+            //
+            assertEquals(karl.getId(), comment.getChildTopics().getTopic("dm4.test.person_name").getId());
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void changeLabelWithSetComposite() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // 1) define model
+            // "First Name", "Last Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
+            // "Person Name" (composite)
+            TopicType pn = dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
+                ))
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            pn.setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"));
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().set("dm4.test.person_name", mf.newChildTopicsModel()
+                .put("dm4.test.first_name", "Karl")
+                .put("dm4.test.last_name", "Albrecht")
+            );
+            //
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void uriUniquenessCreateTopic() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
