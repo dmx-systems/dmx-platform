@@ -556,18 +556,19 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     /**
      * Loads the child topics which are not loaded already.
      */
-    void loadChildTopics() {
+    final DeepaMehtaObjectModel loadChildTopics() {
         for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
             loadChildTopics(assocDef);
         }
+        return this;
     }
 
     /**
      * Loads the child topics for the given assoc def, provided they are not loaded already.
      */
-    void loadChildTopics(String assocDefUri) {
+    final DeepaMehtaObjectModel loadChildTopics(String assocDefUri) {
         try {
-            loadChildTopics(getAssocDef(assocDefUri));
+            return loadChildTopics(getAssocDef(assocDefUri));
         } catch (Exception e) {
             throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
                 e);
@@ -622,12 +623,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *                      Note: the association definition must not necessarily originate from the parent object's
      *                      type definition. It may originate from a facet definition as well.
      */
-    private void loadChildTopics(AssociationDefinitionModel assocDef) {
+    private DeepaMehtaObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());
             pl.valueStorage.fetchChildTopics(this, assocDef);
         }
+        return this;
     }
 
     private void recalculateParentLabel() {

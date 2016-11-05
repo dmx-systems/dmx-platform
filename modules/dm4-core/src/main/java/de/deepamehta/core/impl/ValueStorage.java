@@ -110,6 +110,8 @@ class ValueStorage {
      * Note: no child topics are loaded from the DB. The given parent object model is expected to contain all the
      * child topic models required for the label calculation.
      *
+     * ### TODO: move to DeepaMehtaObjectModelImpl?
+     *
      * @param   parent  The object model the label is calculated for. This is expected to be a composite model.
      */
     void recalculateLabel(DeepaMehtaObjectModelImpl parent) {
@@ -179,17 +181,17 @@ class ValueStorage {
         topicRef.set(fetchReferencedTopic(topicRef));
     }
 
-    private TopicModel fetchReferencedTopic(TopicReferenceModel topicRef) {
-        // Note: the resolved topic must be fetched including its composite value.
-        // It might be required at client-side. ### TODO
+    private DeepaMehtaObjectModel fetchReferencedTopic(TopicReferenceModel topicRef) {
+        // Note: the resolved topic must be fetched including its child topics.
+        // They might be required for label calculation and/or at client-side.
         if (topicRef.isReferenceById()) {
-            return pl.fetchTopic(topicRef.getId());                                // ### FIXME: had fetchComposite=true
+            return pl.fetchTopic(topicRef.getId()).loadChildTopics();
         } else if (topicRef.isReferenceByUri()) {
-            TopicModel topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had
-            if (topic == null) {                                                         //          fetchComposite=true
+            TopicModelImpl topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri()));
+            if (topic == null) {
                 throw new RuntimeException("Topic with URI \"" + topicRef.getUri() + "\" not found");
             }
-            return topic;
+            return topic.loadChildTopics();
         } else {
             throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
         }
@@ -213,6 +215,8 @@ class ValueStorage {
 
 
     // === Label ===
+
+    // ### TODO: move label code to DeepaMehtaObjectModelImpl?
 
     private String calculateLabel(DeepaMehtaObjectModelImpl model) {
         TypeModel type = model.getType();
