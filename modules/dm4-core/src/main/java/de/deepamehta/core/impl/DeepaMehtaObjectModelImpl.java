@@ -20,12 +20,19 @@ import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
 class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String LABEL_CHILD_SEPARATOR = " ";
+    private static final String LABEL_TOPIC_SEPARATOR = ", ";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -516,7 +523,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 updateChildTopics(newChildTopic, newChildTopics, assocDef);
             }
             //
-            recalculateParentLabel();
+            _calculateLabelAndUpdate();
             //
         } catch (Exception e) {
             throw new RuntimeException("Updating the child topics of " + objectInfo() + " failed", e);
@@ -630,22 +637,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             pl.valueStorage.fetchChildTopics(this, assocDef);
         }
         return this;
-    }
-
-    private void recalculateParentLabel() {
-        List<String> labelAssocDefUris = null;
-        try {
-            // load required childs
-            labelAssocDefUris = pl.valueStorage.getLabelAssocDefUris(this);
-            for (String assocDefUri : labelAssocDefUris) {
-                loadChildTopics(assocDefUri);
-            }
-            //
-            pl.valueStorage.recalculateLabel(this);
-        } catch (Exception e) {
-            throw new RuntimeException("Recalculating the label of " + objectInfo() +
-                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
-        }
     }
 
 
@@ -901,6 +892,112 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
         // update memory
         childTopics.removeFromChildTopics(childTopic, assocDef);
+    }
+
+
+
+    // === Label Calculation ===
+
+    private void _calculateLabelAndUpdate() {
+        List<String> labelAssocDefUris = null;
+        try {
+            // load required childs
+            labelAssocDefUris = getLabelAssocDefUris();
+            for (String assocDefUri : labelAssocDefUris) {
+                loadChildTopics(assocDefUri);
+            }
+            //
+            calculateLabelAndUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating and updating label of " + objectInfo() +
+                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
+        }
+    }
+
+    /**
+     * Calculates the label for this object model and updates it in both, memory (in-place), and DB.
+     * <p>
+     * Prerequisites:
+     * 1) this object model is a composite.
+     * 2) this object model contains all the child topic models involved in the label calculation.
+     *    Note: this method does not load any child topics from DB.
+     *
+     * ### TODO: make private
+     */
+    void calculateLabelAndUpdate() {
+        try {
+            updateSimpleValue(new SimpleValue(calculateLabel()));
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating and updating label of " + objectInfo() + " failed", e);
+        }
+    }
+
+    /**
+     * Calculates the label for this object model recursively. Recursion ends at a simple object model.
+     * <p>
+     * Note: called from this class only but can't be private as called on a different object.
+     */
+    String calculateLabel() {
+        TypeModel type = getType();
+        if (type.getDataTypeUri().equals("dm4.core.composite")) {
+            StringBuilder builder = new StringBuilder();
+            for (String assocDefUri : getLabelAssocDefUris()) {
+                appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
+            }
+            return builder.toString();
+        } else {
+            return getSimpleValue().toString();
+        }
+    }
+
+    private String calculateChildLabel(String assocDefUri) {
+        Object value = getChildTopicsModel().get(assocDefUri);
+        // Note: topics just created have no child topics yet
+        if (value == null) {
+            return "";
+        }
+        //
+        if (value instanceof TopicModel) {
+            // single value
+            return ((TopicModelImpl) value).calculateLabel();                               // recursion
+        } else if (value instanceof List) {
+            // multiple value
+            StringBuilder builder = new StringBuilder();
+            for (TopicModelImpl childTopic : (List<TopicModelImpl>) value) {
+                appendLabel(childTopic.calculateLabel(), builder, LABEL_TOPIC_SEPARATOR);   // recursion
+            }
+            return builder.toString();
+        } else {
+            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
+        }
+    }
+
+    private void appendLabel(String label, StringBuilder builder, String separator) {
+        // add separator
+        if (builder.length() > 0 && label.length() > 0) {
+            builder.append(separator);
+        }
+        //
+        builder.append(label);
+    }
+
+    /**
+     * Prerequisite: this is a composite model.
+     */
+    private List<String> getLabelAssocDefUris() {
+        TypeModel type = getType();
+        List<String> labelConfig = type.getLabelConfig();
+        if (labelConfig.size() > 0) {
+            return labelConfig;
+        } else {
+            List<String> assocDefUris = new ArrayList();
+            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
+            // Note: types just created might have no child types yet
+            if (i.hasNext()) {
+                assocDefUris.add(i.next().getAssocDefUri());
+            }
+            return assocDefUris;
+        }
     }
 
 
