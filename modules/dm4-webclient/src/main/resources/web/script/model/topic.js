@@ -53,7 +53,7 @@ Topic.prototype.get_commands = function(context) {
  *
  * @param   child_type_uri  The URI of a direct child type.
  *
- * @return  A simple value (string, number, boolean) or a composite value (a Topic object) or an array
+ * @return  A simple value (string, number, boolean) or a child topic (a Topic object) or an array
  *          (in case of multiple values), or undefined if no such direct child topic exists.
  */
 Topic.prototype.get = function(child_type_uri) {
@@ -73,7 +73,7 @@ Topic.prototype.get = function(child_type_uri) {
 }
 
 /**
- * Traverses this topic's composite value and finds a child topic by type URI.
+ * Traverses this topic's child topics and finds a child topic by type URI.
  * If this topic itself has the specified type this topic is returned immediately.
  *
  * @param   type_uri  The URI of a child type.
@@ -91,6 +91,10 @@ Topic.prototype.find_child_topic = function(type_uri) {
             var child_topic = topic.childs[child_type_uri]
             if (js.is_array(child_topic)) {
                 child_topic = child_topic[0]
+                // Note: the array may be empty
+                if (!child_topic) {
+                    continue
+                }
             }
             child_topic = find_child_topic(child_topic)
             if (child_topic) {

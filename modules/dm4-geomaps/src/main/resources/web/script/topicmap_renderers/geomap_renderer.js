@@ -130,3 +130,5 @@ function GeomapRenderer() {
         geomap.set_state(center, zoom)
     }
 }
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=geomap_renderer.js
