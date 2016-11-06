@@ -63,6 +63,9 @@
         <org.apache.felix.https.enable>false</org.apache.felix.https.enable>
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
+        <!-- WebSockets -->
+        <dm4.websockets.port>8081</dm4.websockets.port>
+        <dm4.websockets.url>ws://localhost:8081</dm4.websockets.url>
 
         <!-- Request Filter -->
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
