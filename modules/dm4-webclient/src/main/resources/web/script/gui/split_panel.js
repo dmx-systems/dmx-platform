@@ -106,7 +106,7 @@ function SplitPanel() {
     function calculate_topicmap_renderer_size() {
         // update model
         topicmap_renderer_width  = window.innerWidth  - page_panel.width - page_panel_space
-        topicmap_renderer_height = window.innerHeight - dm4c.toolbar.dom.outerHeight() - 5  // ### Safari: 3, Firefox: 5
+        topicmap_renderer_height = window.innerHeight - dm4c.toolbar.dom.outerHeight()
     }
 
     function resize_topicmap_renderer() {
