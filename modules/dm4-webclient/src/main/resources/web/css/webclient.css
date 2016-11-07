@@ -1,6 +1,7 @@
 body {
     font-family: "Lucida Grande", Verdana, Arial, Helvetica, sans-serif;    /* style must match ckeditor-contents.css */
     margin: 0;
+    overflow: hidden;   /* avoid window bounce when scrolling */
     word-wrap: break-word;
 }
 
