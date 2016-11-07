@@ -55,7 +55,7 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     List<String> getLabelConfig();
 
-    void setLabelConfig(List<String> labelConfig);
+    TypeModel setLabelConfig(List<String> labelConfig);
 
 
 

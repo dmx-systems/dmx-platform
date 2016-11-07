@@ -304,15 +304,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
-            TopicType pn = dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
+                .setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"))
             );
-            pn.setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"));
             // "Comment" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
@@ -350,15 +350,15 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
-            TopicType pn = dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
+                .setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"))
             );
-            pn.setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"));
             // "Comment" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",

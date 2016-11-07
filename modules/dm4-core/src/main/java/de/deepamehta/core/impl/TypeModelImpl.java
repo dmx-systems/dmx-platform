@@ -165,8 +165,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
-    public void setLabelConfig(List<String> labelConfig) {
+    public TypeModel setLabelConfig(List<String> labelConfig) {
         this.labelConfig = labelConfig;
+        return this;
     }
 
 
