@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * Helper for storing/fetching simple values and composite value models.
  *
- * ### TODO: unify with DeepaMehtaObjectModelImpl and then drop this class.
+ * ### TODO: unify with DeepaMehtaObjectModelImpl and then drop this class?
  */
 class ValueStorage {
 
