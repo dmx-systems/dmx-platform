@@ -603,7 +603,7 @@ public class ModelFactoryImpl implements ModelFactory {
     TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
-            typeModel.getString("data_type_uri"),
+            typeModel.optString("data_type_uri", null),
             parseIndexModes(typeModel.optJSONArray("index_mode_uris")),
             parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),
             parseLabelConfig(typeModel.optJSONArray("label_config")),
@@ -689,15 +689,6 @@ public class ModelFactoryImpl implements ModelFactory {
         return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, parentCardinalityUri,
             childCardinalityUri, (ViewConfigurationModelImpl) viewConfig);
     }
-
-    /**
-     * Note: the AssociationDefinitionModel constructed by this constructor remains partially uninitialized,
-     * which is OK for an update assoc def operation. It can not be used for a create operation.
-     *
-    AssociationDefinitionModelImpl(AssociationModel assoc) {
-        // ### FIXME: the assoc must identify its players **by URI**
-        super(assoc);
-    } */
 
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(JSONObject assocDef) {

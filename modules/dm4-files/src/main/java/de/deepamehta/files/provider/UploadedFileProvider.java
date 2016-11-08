@@ -59,7 +59,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
         try {
             return parseMultiPart();
         } catch (Exception e) {
-            throw new RuntimeException("Creating UploadedFile from message body failed", e);
+            throw new RuntimeException("Deserializing an UploadedFile object failed", e);
         }
     }
 

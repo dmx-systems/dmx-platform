@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
@@ -16,7 +15,6 @@ import de.deepamehta.core.util.SequencedHashMap;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +26,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;
+    private String dataTypeUri;                         // may be null in models used for an update operation
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private List<String> labelConfig;                                           // is never null, may be empty

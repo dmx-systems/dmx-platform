@@ -40,7 +40,7 @@ public class ClusterCoordsProvider implements MessageBodyReader<ClusterCoords> {
             String json = JavaUtils.readText(entityStream);
             return new ClusterCoords(new JSONArray(json));
         } catch (Exception e) {
-            throw new RuntimeException("Creating ClusterCoords from message body failed", e);
+            throw new RuntimeException("Deserializing a ClusterCoords object failed", e);
         }
     }
 }
