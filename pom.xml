@@ -327,6 +327,7 @@
                                 -collapsible -hide java.* -hide org.* -inferdepvis public -inferrel
                             </additionalparam>
                             <useStandardDocletOptions>true</useStandardDocletOptions>
+                            <failOnError>false</failOnError>
                         </configuration>
                     </plugin>
                 </plugins>
