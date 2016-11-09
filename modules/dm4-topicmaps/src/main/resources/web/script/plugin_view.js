@@ -56,6 +56,8 @@ function TopicmapsPluginView(controller) {
             .append(topicmap_info_button)
         // put in toolbar
         $("#workspace-widget").after(topicmap_widget)
+        //
+        refresh_topicmap_menu()
 
         function do_select_topicmap(menu_item) {
             var topicmap_id = menu_item.value

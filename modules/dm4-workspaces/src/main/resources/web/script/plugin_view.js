@@ -58,6 +58,8 @@ function WorkspacesPluginView(controller) {
             .append(workspace_info_button)
         // put in toolbar
         dm4c.toolbar.dom.prepend(workspace_widget)
+        //
+        refresh_workspace_menu()
 
         function do_select_workspace(menu_item) {
             var workspace_id = menu_item.value

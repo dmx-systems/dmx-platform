@@ -73,7 +73,7 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Registering the topicmap renderers at init(1) ensures they are available for being customized.
      */
     dm4c.add_listener("init", function() {
-        model.register_topicmap_renderers()
+        model.init()
     })
 
     /**
@@ -81,11 +81,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * the workspace widget is already added to the toolbar and a selected workspace is already known.
      */
     dm4c.add_listener("init_2", function() {
-        // init model
-        model.init()
-        // init view
-        view.create_topicmap_widget()
-        view.refresh_topicmap_menu()
     })
 
     /**
@@ -95,6 +90,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
      * Displaying the initial topicmap at init_3 ensures all customizers are registered already.
      */
     dm4c.add_listener("init_3", function() {
+        // init model
+        model.init_2()
+        // init view
+        view.create_topicmap_widget()
         view.display_topicmap()                  // ### FIXME: rethink about history update
     })
 
@@ -268,6 +267,12 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
                 view.display_topicmap()
             }
         }
+    }
+
+    // ---
+
+    this._get_initial_topicmap_id = function() {
+        return model._get_initial_topicmap_id()
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

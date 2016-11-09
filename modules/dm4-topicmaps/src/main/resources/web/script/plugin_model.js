@@ -5,10 +5,12 @@ function TopicmapsPluginModel() {
     var topicmap                    // Selected topicmap (TopicmapViewmodel object)     \ updated together by
     var topicmap_renderer           // The topicmap renderer of the selected topicmap   / set_selected_topicmap()
     var topicmap_renderers = {}     // Registered topicmap renderers (key: renderer URI, value: TopicmapRenderer object)
+                                    // Initialized by register_topicmap_renderers()
     var topicmap_topics = {}        // Loaded topicmap topics, grouped by workspace, an object:
                                     //   {
                                     //     workspaceId: [topicmapTopic]     # real Topic objects
                                     //   }
+                                    // Updated by fetch_topicmap_topics()
     var selected_topicmap_ids = {}  // ID of the selected topicmap, per-workspace, an object:
                                     //   {
                                     //     workspaceId: selectedTopicmapId
@@ -19,9 +21,10 @@ function TopicmapsPluginModel() {
 
     this.get_topicmap = function() {return topicmap}
     this.get_current_topicmap_renderer = function() {return topicmap_renderer}
+    this._get_initial_topicmap_id = function() {return _topicmap_id}
 
-    this.register_topicmap_renderers = register_topicmap_renderers
     this.init = init
+    this.init_2 = init_2
     this.set_selected_topicmap = set_selected_topicmap
     this.reload_topicmap = reload_topicmap
     this.fetch_topicmap_topics = fetch_topicmap_topics
@@ -40,21 +43,43 @@ function TopicmapsPluginModel() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    // short-term init state
+    var _topicmap_id
+    var _topic_id
+
     function init() {
-        fetch_topicmap_topics()
+        register_topicmap_renderers()
         //
-        // try to obtain a topicmap ID from browser URL or from cookie, otherwise choose arbitrary topicmap
-        var groups = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
-        var topicmap_id = groups && groups[1] || js.get_cookie("dm4_topicmap_id") || get_first_topicmap_id()
-        set_selected_topicmap(topicmap_id)
-        //
-        if (groups) {
-            var topic_id = groups[3]
-            if (topic_id) {
-                topicmap.set_topic_selection(topic_id)
+        // Try to obtain a topicmap ID from browser URL or from cookie
+        var match = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
+        if (match) {
+            _topicmap_id = match[1]
+            _topic_id    = match[3]
+            console.log("Selecting topicmap " + _topicmap_id + " (obtained from browser URL), Selected topic: " +
+                _topic_id)
+        } else {
+            _topicmap_id = js.get_cookie("dm4_topicmap_id")
+            if (_topicmap_id) {
+                console.log("Selecting topicmap " + _topicmap_id + " (obtained from cookie)")
             }
         }
     }
+
+    function init_2() {
+        fetch_topicmap_topics()
+        //
+        // ### TODO: explain
+        if (!_topicmap_id) {
+            _topicmap_id = get_first_topicmap_id()
+            console.log("Selecting topicmap " + _topicmap_id + " (obtained from 1st menu item)")
+        }
+        set_selected_topicmap(_topicmap_id)
+        if (_topic_id) {
+            topicmap.set_topic_selection(_topic_id)
+        }
+    }
+
+    // ---
 
     function get_selected_workspace_id() {
         return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
@@ -193,6 +218,9 @@ function TopicmapsPluginModel() {
         return topicmap_topics[workspace_id || get_selected_workspace_id()]     // ### TODO: fallback needed?
     }
 
+    /**
+     * Returns the ID of the first loaded topicmap topic for the selected workspace
+     */
     function get_first_topicmap_id() {
         var topicmap_topic = get_topicmap_topics()[0]
         if (!topicmap_topic) {

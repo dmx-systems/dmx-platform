@@ -39,12 +39,11 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Webclient Listeners ===
 
-    dm4c.add_listener("init", function() {
+    dm4c.add_listener("init_2", function() {
         // init model
         model.init()
         // init view
         view.create_workspace_widget()
-        view.refresh_workspace_menu()
     })
 
     dm4c.add_listener("topic_commands", function(topic) {

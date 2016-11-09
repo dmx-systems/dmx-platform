@@ -22,12 +22,14 @@ function WorkspacesPluginModel() {
     function init() {
         fetch_workspaces()
         //
-        // try to obtain a topicmap ID from browser URL or from cookie
-        var groups = location.pathname.match(/\/topicmap\/(\d+)/)
-        var topicmap_id = groups && groups[1] || js.get_cookie("dm4_topicmap_id")
+        var topicmap_id = get_initial_topicmap_id()
         // if either one applies get the corresponding workspace, otherwise choose arbitrary workspace
         var workspace_id = topicmap_id && get_workspace_id_of_topicmap(topicmap_id) || get_first_workspace_id()
         set_selected_workspace(workspace_id)
+
+        function get_initial_topicmap_id() {
+            return dm4c.get_plugin("de.deepamehta.topicmaps")._get_initial_topicmap_id()
+        }
 
         function get_workspace_id_of_topicmap(topicmap_id) {
             var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
