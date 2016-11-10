@@ -55,12 +55,31 @@ function TopicmapsPluginModel() {
         if (match) {
             _topicmap_id = match[1]
             _topic_id    = match[3]
-            console.log("Selecting topicmap " + _topicmap_id + " (obtained from browser URL), Selected topic: " +
+            console.log("Selecting topicmap " + _topicmap_id + " (ID obtained from browser URL), selected topic: " +
                 _topic_id)
         } else {
             _topicmap_id = js.get_cookie("dm4_topicmap_id")
             if (_topicmap_id) {
-                console.log("Selecting topicmap " + _topicmap_id + " (obtained from cookie)")
+                console.log("Selecting topicmap " + _topicmap_id + " (ID obtained from cookie)")
+            }
+        }
+        //
+        if (_topicmap_id && !is_valid_topicmap_id(_topicmap_id)) {
+            _topicmap_id = undefined
+            _topic_id = undefined
+        }
+
+        function is_valid_topicmap_id(id) {
+            try {
+                var topic = dm4c.restc.request("GET", "/core/topic/" + id, undefined, undefined, undefined, undefined,
+                    function() {return false}   // suppress serror dialog
+                )
+                if (topic.type_uri != "dm4.topicmaps.topicmap") {
+                    throw "it refers to a \"" + topic.type_uri + "\""
+                }
+                return true
+            } catch (e) {
+                console.log("WARNING: " + id + " is not a valid topicmap ID (" + e + ")")
             }
         }
     }
@@ -71,7 +90,7 @@ function TopicmapsPluginModel() {
         // ### TODO: explain
         if (!_topicmap_id) {
             _topicmap_id = get_first_topicmap_id()
-            console.log("Selecting topicmap " + _topicmap_id + " (obtained from 1st menu item)")
+            console.log("Selecting topicmap " + _topicmap_id + " (ID obtained from 1st menu item)")
         }
         set_selected_topicmap(_topicmap_id)
         if (_topic_id) {
@@ -189,7 +208,7 @@ function TopicmapsPluginModel() {
     function get_topicmap_topic_or_throw(topicmap_id) {
         var topicmap_topic = get_topicmap_topic(topicmap_id)
         if (!topicmap_topic) {
-            throw "TopicmapsPluginModelError: topicmap " + topicmap_id + " not found in model for workspace " +
+            throw "TopicmapsPluginError: topicmap " + topicmap_id + " not found in model for workspace " +
                 get_selected_workspace_id()
         }
         return topicmap_topic
@@ -204,7 +223,7 @@ function TopicmapsPluginModel() {
             return topic.id == topicmap_id
         })
         if (deleted != 1) {
-            throw "TopicmapsPluginModelError: removing topicmap " + topicmap_id + " from model of workspace " +
+            throw "TopicmapsPluginError: removing topicmap " + topicmap_id + " from model of workspace " +
                 workspace_id + " failed (" + deleted + " entries deleted)"
         }
     }
@@ -224,7 +243,7 @@ function TopicmapsPluginModel() {
     function get_first_topicmap_id() {
         var topicmap_topic = get_topicmap_topics()[0]
         if (!topicmap_topic) {
-            throw "TopicmapsPluginModelError: workspace " + get_selected_workspace_id() + " has no topicmaps"
+            throw "TopicmapsPluginError: workspace " + get_selected_workspace_id() + " has no topicmaps"
         }
         return topicmap_topic.id
     }
@@ -290,7 +309,7 @@ function TopicmapsPluginModel() {
         var renderer = topicmap_renderers[renderer_uri]
         // error check
         if (!renderer) {
-            throw "TopicmapsPluginModelError: \"" + renderer_uri + "\" is an unknown topicmap renderer"
+            throw "TopicmapsPluginError: \"" + renderer_uri + "\" is an unknown topicmap renderer"
         }
         //
         return renderer
