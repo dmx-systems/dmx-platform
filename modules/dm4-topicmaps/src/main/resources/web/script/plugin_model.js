@@ -30,8 +30,8 @@ function TopicmapsPluginModel() {
     this.delete_topicmap = delete_topicmap
     this.reload_topicmap = reload_topicmap
 
-    this.fetch_topicmap_topics = fetch_topicmap_topics
     this.get_topicmap_topics = get_topicmap_topics
+    this.fetch_topicmap_topics = fetch_topicmap_topics
     this.clear_topicmap_topics = clear_topicmap_topics
 
     this.get_topicmap_renderer = get_topicmap_renderer
@@ -260,6 +260,17 @@ function TopicmapsPluginModel() {
     }
 
     /**
+     * Returns the ID of the first loaded topicmap topic for the selected workspace
+     */
+    function get_first_topicmap_id() {
+        var topicmap_topic = get_topicmap_topics()[0]
+        if (!topicmap_topic) {
+            throw "TopicmapsPluginError: workspace " + get_selected_workspace_id() + " has no topicmaps"
+        }
+        return topicmap_topic.id
+    }
+
+    /**
      * @param   workspace_id    the ID of the workspace the given topicmap was assigned to.
      *                          Note: this is not necessarily the selected workspace.
      */
@@ -286,30 +297,16 @@ function TopicmapsPluginModel() {
     }
 
     /**
-     * Returns the ID of the first loaded topicmap topic for the selected workspace
-     */
-    function get_first_topicmap_id() {
-        var topicmap_topic = get_topicmap_topics()[0]
-        if (!topicmap_topic) {
-            throw "TopicmapsPluginError: workspace " + get_selected_workspace_id() + " has no topicmaps"
-        }
-        return topicmap_topic.id
-    }
-
-    function clear_topicmap_topics() {
-        topicmap_topics = {}
-    }
-
-    // ---
-
-    /**
      * Fetches all Topicmap topics assigned to the selected workspace, and updates the model ("topicmap_topics").
      */
     function fetch_topicmap_topics() {
         var workspace_id = get_selected_workspace_id()
-        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true) // include_childs=true
-        topicmap_topics[workspace_id] = dm4c.build_topics(topics)
-        // ### TODO: sort topicmaps by name
+        var topics = dm4c.restc.get_assigned_topics(workspace_id, "dm4.topicmaps.topicmap", true, true)
+        topicmap_topics[workspace_id] = dm4c.build_topics(topics)                      // include_childs=true, sort=true
+    }
+
+    function clear_topicmap_topics() {
+        topicmap_topics = {}
     }
 
     // ---

@@ -23,9 +23,13 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
         var params = this.queryParams({include_childs: include_childs})
         return this.request("GET", "/workspace/" + uri + params)
     }
-    dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs) {
+    dm4c.restc.get_assigned_topics = function(workspace_id, topic_type_uri, include_childs, sort) {
         var params = this.queryParams({include_childs: include_childs})
-        return this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri + params)
+        var result = this.request("GET", "/workspace/" + workspace_id + "/topics/" + topic_type_uri + params)
+        if (sort) {
+            this.sort_topics(result)
+        }
+        return result
     }
     dm4c.restc.get_assigned_workspace = function(object_id, include_childs) {
         var params = this.queryParams({include_childs: include_childs})
