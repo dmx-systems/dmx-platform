@@ -68,26 +68,23 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     /**
      * Registers the installed topicmap renderers.
+     * Tries to obtain a valid topicmap ID from browser URL or cookie.
      *
-     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init_2.
-     * Registering the topicmap renderers at init(1) ensures they are available for being customized.
+     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init(2) stage.
+     * Registering the topicmap renderers at init(1) stage ensures they are available for being customized.
      */
     dm4c.add_listener("init", function() {
         model.init()
     })
 
     /**
-     * Note: the Workspaces plugin initializes at init(1). Initializing the topicmaps model at init_2 ensures
-     * the workspace widget is already added to the toolbar and a selected workspace is already known.
-     */
-    dm4c.add_listener("init_2", function() {
-    })
-
-    /**
      * Displays the initial topicmap.
      *
-     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init_2.
-     * Displaying the initial topicmap at init_3 ensures all customizers are registered already.
+     * Note: the Workspaces plugin initializes at init(2) stage. Initializing the topicmaps model at init(3) stage
+     * ensures the workspace widget is already added to the toolbar and a selected workspace is already known.
+     *
+     * Note: plugins are supposed to register their view customizers and viewmodel customizers at init(2) stage.
+     * Displaying the initial topicmap at init(3) stage ensures all customizers are registered already.
      */
     dm4c.add_listener("init_3", function() {
         // init model
@@ -273,6 +270,10 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
 
     this._get_initial_topicmap_id = function() {
         return model._get_initial_topicmap_id()
+    }
+
+    this._drop_initial_state = function() {
+        return model._drop_initial_state()
     }
 
     // ----------------------------------------------------------------------------------------------- Private Functions

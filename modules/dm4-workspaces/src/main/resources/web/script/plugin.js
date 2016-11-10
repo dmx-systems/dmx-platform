@@ -39,10 +39,10 @@ dm4c.add_plugin("de.deepamehta.workspaces", function() {
 
     // === Webclient Listeners ===
 
+    // Note: selecting the initial workspace relies on the initial topicmap selection, which is performed at init(1)
+    // stage.
     dm4c.add_listener("init_2", function() {
-        // init model
         model.init()
-        // init view
         view.create_workspace_widget()
     })
 

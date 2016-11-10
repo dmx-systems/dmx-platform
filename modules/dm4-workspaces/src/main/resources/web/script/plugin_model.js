@@ -2,7 +2,8 @@ function WorkspacesPluginModel() {
 
     // --------------------------------------------------------------------------------------------------- Private State
 
-    var workspaces              // All workspaces readable by the current user (array of topic-like objects)
+    var workspaces              // All workspaces readable by the current user (array of topic-like objects).
+                                // Initialized/updated by fetch_workspaces().
     var selected_workspace_id   // ID of the selected workspace
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -19,24 +20,46 @@ function WorkspacesPluginModel() {
 
     // ----------------------------------------------------------------------------------------------- Private Functions
 
+    // Called at init(2) stage
     function init() {
         fetch_workspaces()
         //
+        // As the initial workspace choose the one that is assigned to the initially selected topicmap.
+        // Note: there might be no initial topicmap selection. In this case choose the 1st best workspace.
+        var workspace_id
         var topicmap_id = get_initial_topicmap_id()
-        // if either one applies get the corresponding workspace, otherwise choose arbitrary workspace
-        var workspace_id = topicmap_id && get_workspace_id_of_topicmap(topicmap_id) || get_first_workspace_id()
+        if (topicmap_id) {
+            workspace_id = get_assigned_workspace(topicmap_id)
+            // Note: the Topicmaps plugin might regard a topicmap ID as valid although it is not. This is the case if
+            // it obtains a stale Topicmap topic from the browser cache. (See explanation at Topicmaps model init()
+            // function.) In this is the case we must now drop the Topicmaps plugin's initial state in order to prompt
+            // for the fallback at its init(3) stage.
+            if (!workspace_id) {
+                drop_initial_topicmap_state()   // prompt the Topicmaps plugin for the fallback at init(3) stage
+            }
+        }
+        if (!workspace_id) {
+            workspace_id = get_first_workspace_id()
+        }
         set_selected_workspace(workspace_id)
+
+        function get_assigned_workspace(object_id) {
+            var workspace = dm4c.restc.get_assigned_workspace(object_id)
+            if (!workspace) {
+                console.log("WARNING: Workspace assignment of object " + object_id + " can't be determined")
+            } else {
+                return workspace.id
+            }
+        }
+
+        // ---
 
         function get_initial_topicmap_id() {
             return dm4c.get_plugin("de.deepamehta.topicmaps")._get_initial_topicmap_id()
         }
 
-        function get_workspace_id_of_topicmap(topicmap_id) {
-            var workspace = dm4c.restc.get_assigned_workspace(topicmap_id)
-            if (!workspace) {
-                throw "WorkspacesPluginModelError: topicmap " + topicmap_id + " is not assigned to any workspace"
-            }
-            return workspace.id
+        function drop_initial_topicmap_state() {
+            return dm4c.get_plugin("de.deepamehta.topicmaps")._drop_initial_state()
         }
     }
 
@@ -61,7 +84,7 @@ function WorkspacesPluginModel() {
 
     function get_selected_workspace_id() {
         if (!selected_workspace_id) {
-            throw "WorkspacesPluginModelError: no workspace is selected yet"
+            throw "WorkspacesPluginError: no workspace is selected yet"
         }
         return selected_workspace_id
     }
@@ -98,7 +121,7 @@ function WorkspacesPluginModel() {
     function get_first_workspace_id() {
         var workspace = workspaces[0]
         if (!workspace) {
-            throw "WorkspacesPluginModelError: no workspace available"
+            throw "WorkspacesPluginError: no workspace available"
         }
         return workspace.id
     }

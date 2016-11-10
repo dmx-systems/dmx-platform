@@ -19,38 +19,49 @@ function TopicmapsPluginModel() {
 
     // ------------------------------------------------------------------------------------------------------ Public API
 
-    this.get_topicmap = function() {return topicmap}
-    this.get_current_topicmap_renderer = function() {return topicmap_renderer}
-    this._get_initial_topicmap_id = function() {return _topicmap_id}
-
     this.init = init
     this.init_2 = init_2
+    this._get_initial_topicmap_id = function() {return _topicmap_id}
+    this._drop_initial_state = drop_initial_state
+
+    this.get_topicmap = function() {return topicmap}
     this.set_selected_topicmap = set_selected_topicmap
+    this.select_topicmap_for_workspace = select_topicmap_for_workspace
+    this.delete_topicmap = delete_topicmap
     this.reload_topicmap = reload_topicmap
+
     this.fetch_topicmap_topics = fetch_topicmap_topics
     this.get_topicmap_topics = get_topicmap_topics
     this.clear_topicmap_topics = clear_topicmap_topics
-    this.select_topicmap_for_workspace = select_topicmap_for_workspace
-    this.delete_topicmap = delete_topicmap
-
-    this.get_selected_workspace_id = get_selected_workspace_id
 
     this.get_topicmap_renderer = get_topicmap_renderer
+    this.get_current_topicmap_renderer = function() {return topicmap_renderer}
     this.iterate_topicmap_renderers = iterate_topicmap_renderers
 
     this.iterate_topicmap_cache = iterate_topicmap_cache
     this.clear_topicmap_cache = clear_topicmap_cache
 
+    this.get_selected_workspace_id = get_selected_workspace_id
+
     // ----------------------------------------------------------------------------------------------- Private Functions
 
-    // short-term init state
+    function get_selected_workspace_id() {
+        return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
+    }
+
+
+
+    // === Initial State ===
+
+    // Short-term init state
     var _topicmap_id
     var _topic_id
 
+    // Called from plugin at init(1) stage.
     function init() {
         register_topicmap_renderers()
         //
-        // Try to obtain a topicmap ID from browser URL or from cookie
+        // Try to obtain a topicmap ID from browser URL or from cookie, in this order
         var match = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
         if (match) {
             _topicmap_id = match[1]
@@ -65,17 +76,34 @@ function TopicmapsPluginModel() {
         }
         //
         if (_topicmap_id && !is_valid_topicmap_id(_topicmap_id)) {
-            _topicmap_id = undefined
-            _topic_id = undefined
+            drop_initial_state()    // prompt for the fallback at init(3) stage
         }
+        // Note: if at this stage a valid topicmap ID is available already the Workspaces plugin will select the
+        // corresponding workspace (at init(2) stage). Otherwise it will select the 1st best workspace and leave it to
+        // the Topicmaps plugin to choose a valid topicmap ID for that workspace. This fallback takes place at init(3)
+        // stage (see init_2() below).
+        //
+        // So, there are possible 2 situations: in one the workspace selection relies on the topicmap selection. In the
+        // other the topicmap selection relies on the workspace selection. That is what makes the initialization of the
+        // Topicmaps plugin so intricate.
+        //
+        // At this point one edge case might apply:
+        //
+        // A topicmap ID might be regarded as valid although it is not. This happens if a stale Topicmap topic is
+        // obtained from the browser cache. This happens if the GET request's condition (If-Modified-Since) is not
+        // satisfied and the response is 304 Not Modified. For this to happen it is sufficient if the pretended (stale)
+        // topicmap ID refers to *some* existing DB object (topic or association!) whose modification timestamp is
+        // "old enough"! This case is not detectable by the Topicmaps plugin at init(1) stage and will only be detected
+        // by the Workspaces plugin (at init(2) stage). A valid topicmap ID will be finally obtained through the
+        // fallback at init(3) stage (see init_2() below).
 
         function is_valid_topicmap_id(id) {
             try {
                 var topic = dm4c.restc.request("GET", "/core/topic/" + id, undefined, undefined, undefined, undefined,
-                    function() {return false}   // suppress serror dialog
+                    function() {return false}   // suppress error dialog
                 )
                 if (topic.type_uri != "dm4.topicmaps.topicmap") {
-                    throw "it refers to a \"" + topic.type_uri + "\""
+                    throw "it refers to a \"" + topic.type_uri + "\" topic"
                 }
                 return true
             } catch (e) {
@@ -84,14 +112,20 @@ function TopicmapsPluginModel() {
         }
     }
 
+    // Called from plugin at init(3) stage.
+    //
+    // At this stage we know a workspace is selected, and now we're ready to 1) retrieve the topicmap topics for the
+    // selected workspace, and 2) perform the fallback to obtain a valid topicmap ID, if not yet achieved, and 3) select
+    // the choosen topicmap finally.
     function init_2() {
         fetch_topicmap_topics()
         //
-        // ### TODO: explain
+        // fallback to obtain a valid topicmap ID
         if (!_topicmap_id) {
             _topicmap_id = get_first_topicmap_id()
             console.log("Selecting topicmap " + _topicmap_id + " (ID obtained from 1st menu item)")
         }
+        //
         set_selected_topicmap(_topicmap_id)
         if (_topic_id) {
             topicmap.set_topic_selection(_topic_id)
@@ -100,8 +134,9 @@ function TopicmapsPluginModel() {
 
     // ---
 
-    function get_selected_workspace_id() {
-        return dm4c.get_plugin("de.deepamehta.workspaces").get_selected_workspace_id()
+    function drop_initial_state() {
+        _topicmap_id = undefined
+        _topic_id = undefined
     }
 
 
@@ -184,6 +219,16 @@ function TopicmapsPluginModel() {
         return is_current_topicmap
     }
 
+    /**
+     * Reloads the current topicmap from DB.
+     */
+    function reload_topicmap() {
+        // Note: the cookie and the renderer are already up-to-date
+        var topicmap_id = topicmap.get_id()
+        invalidate_topicmap_cache(topicmap_id)
+        topicmap = get_topicmap(topicmap_id)
+    }
+
 
 
     // === Topicmap Topics ===
@@ -231,10 +276,13 @@ function TopicmapsPluginModel() {
     // ---
 
     /**
-     * Returns the loaded topicmap topics for the selected workspace. ### FIXDOC
+     * Returns the loaded topicmap topics for the given workspace.
+     *
+     * @param   workspace_id    (Optional) If not given the loaded topicmap topics for the
+     *                          *selected* workspace are returned.
      */
     function get_topicmap_topics(workspace_id) {
-        return topicmap_topics[workspace_id || get_selected_workspace_id()]     // ### TODO: fallback needed?
+        return topicmap_topics[workspace_id || get_selected_workspace_id()]
     }
 
     /**
@@ -349,16 +397,6 @@ function TopicmapsPluginModel() {
         return topicmap_renderer.load_topicmap(topicmap_id, {
             is_writable: dm4c.has_write_permission_for_topic(topicmap_id)
         })
-    }
-
-    /**
-     * Reloads the current topicmap from DB.
-     */
-    function reload_topicmap() {
-        // Note: the cookie and the renderer are already up-to-date
-        var topicmap_id = topicmap.get_id()
-        invalidate_topicmap_cache(topicmap_id)
-        topicmap = get_topicmap(topicmap_id)
     }
 
     // ---
