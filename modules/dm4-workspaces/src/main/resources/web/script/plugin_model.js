@@ -32,8 +32,8 @@ function WorkspacesPluginModel() {
             workspace_id = get_assigned_workspace(topicmap_id)
             // Note: the Topicmaps plugin might regard a topicmap ID as valid although it is not. This is the case if
             // it obtains a stale Topicmap topic from the browser cache. (See explanation at Topicmaps model init()
-            // function.) In this is the case we must now drop the Topicmaps plugin's initial state in order to prompt
-            // for the fallback at its init(3) stage.
+            // function.) In this case we must now drop the Topicmaps plugin's initial state in order to prompt for
+            // the fallback at its init(3) stage.
             if (!workspace_id) {
                 drop_initial_topicmap_state()   // prompt the Topicmaps plugin for the fallback at init(3) stage
             }
