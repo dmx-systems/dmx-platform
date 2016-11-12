@@ -12,17 +12,11 @@
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-module</artifactId>
+        <artifactId>deepamehta-plugin</artifactId>
         <version>4.8.4-SNAPSHOT</version>
-        <relativePath>../dm4-module/pom.xml</relativePath>
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-core</artifactId>
-            <version>4.8.4-SNAPSHOT</version>
-        </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-time</artifactId>

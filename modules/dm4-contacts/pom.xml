@@ -14,7 +14,6 @@
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
         <version>4.8.4-SNAPSHOT</version>
-        <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
     <build>
