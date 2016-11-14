@@ -61,7 +61,7 @@ function TopicmapsPluginModel() {
     function init() {
         register_topicmap_renderers()
         //
-        // Try to obtain a topicmap ID from browser URL or from cookie, in this order
+        // Try to obtain a topicmap ID from browser URL, then from cookie
         var match = location.pathname.match(/\/topicmap\/(\d+)(\/topic\/(\d+))?/)
         if (match) {
             _topicmap_id = match[1]

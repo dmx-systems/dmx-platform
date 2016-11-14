@@ -45,10 +45,11 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Delete",
-                handler: topic.type_uri == "dm4.core.topic_type"    ? open_delete_topic_type_dialog :
-                         topic.type_uri == "dm4.core.assoc_type"    ? open_delete_association_type_dialog :
-                         topic.type_uri == "dm4.topicmaps.topicmap" ? open_delete_topicmap_dialog :
-                                                                      open_delete_topic_dialog,
+                handler: topic.type_uri == "dm4.core.topic_type"      ? open_delete_topic_type_dialog :
+                         topic.type_uri == "dm4.core.assoc_type"      ? open_delete_association_type_dialog :
+                         topic.type_uri == "dm4.topicmaps.topicmap"   ? open_delete_topicmap_dialog :
+                         topic.type_uri == "dm4.workspaces.workspace" ? open_delete_workspace_dialog :
+                                                                        open_delete_topic_dialog,
                 context: "context-menu",
                 ui_icon: "trash"
             })
@@ -140,6 +141,21 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 button_label: "Delete",
                 button_handler: function() {
                     dm4c.get_plugin("de.deepamehta.topicmaps").delete_topicmap(topic.id)
+                }
+            })
+        }
+
+        function open_delete_workspace_dialog() {
+            dm4c.ui.dialog({
+                title: "Delete Workspace \"" + topic.value + "\"?",
+                content: $("<p>").text("CAUTION: all the workspace content will be deleted").add($("<ul>")
+                        .append($("<li>").text("all assigned topics/associations"))
+                        .append($("<li>").text("all assigned types"))
+                        .append($("<li>").text("all topics/associations of these types"))),
+                width: "500px",
+                button_label: "Delete all",
+                button_handler: function() {
+                    dm4c.do_delete_topic(topic.id)
                 }
             })
         }
@@ -258,3 +274,5 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         return dm4c.has_write_permission_for_association(assoc.id) && !assoc.get_type().is_locked()
     }
 })
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=default_plugin.js

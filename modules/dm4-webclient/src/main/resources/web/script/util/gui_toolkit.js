@@ -81,21 +81,26 @@ function GUIToolkit(config) {
 
     /**
      * @param   config  an object with these properties:
-     *                      id              - Optional: the dialog content div will get this ID. Useful to style the
-     *                                        dialog with CSS. If not specified no "id" attribute is set.
-     *                      title           - Optional: the dialog title. If not specified an empty string is used.
-     *                      content         - Optional: the dialog content (HTML or jQuery objects). If not specified
-     *                                        the dialog will be empty. It still can have a title and/or a button.
-     *                      width           - Optional: the dialog width (CSS value). If not specified "auto" is used.
-     *                      button_label    - Optional: the button label.
-     *                                        If not specified no button appears.
-     *                                        Note: the button label and button handler must be set together.
-     *                      button_handler  - Optional: the button handler function. Nothing is passed to it.
-     *                                        If not specified no button appears.
-     *                                        Note: the button label and button handler must be set together.
-     *                      auto_close      - Optional: controls if the button closes the dialog (boolean). Default is
-     *                                        true. If false is specified the caller is responsible for closing the
-     *                                        dialog.
+     *              id
+     *                  Optional: the dialog content div will get this ID. Useful to style the dialog with CSS.
+     *                  If not specified no "id" attribute is set.
+     *              title
+     *                  Optional: the dialog title. If not specified an empty string is used.
+     *              content
+     *                  Optional: the dialog content (HTML or jQuery objects). If not specified the dialog will be
+     *                  empty. It still can have a title and/or a button.
+     *              width
+     *                  Optional: the dialog width (CSS value). If not specified "auto" is used.
+     *              button_label
+     *                  Optional: the button label. If not specified no button appears.
+     *                  Note: the button label and button handler must be set together.
+     *              button_handler
+     *                  Optional: the button handler function. Nothing is passed to it.
+     *                  If not specified no button appears.
+     *                  Note: the button label and button handler must be set together.
+     *              auto_close
+     *                  Optional: controls if the button closes the dialog (boolean). Default is true.
+     *                  If false is specified the caller is responsible for closing the dialog.
      */
     this.dialog = function(config) {
 

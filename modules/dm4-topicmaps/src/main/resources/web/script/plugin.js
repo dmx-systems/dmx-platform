@@ -107,11 +107,6 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
         }
     })
 
-    // Note: there is no "post_delete_topic" listener to react on deleted Topicmap topics here. It would get in the way
-    // with the delete-workspace action. While updating the model/view requests would be sent to objects already deleted
-    // at server-side.
-    // Instead the model/view update is performed in the public delete_topicmap() method (called from default_plugin.js)
-
     dm4c.add_listener("pre_push_history", function(history_entry) {
         var topicmap_id = model.get_topicmap().get_id()
         history_entry.state.topicmap_id = topicmap_id
@@ -247,7 +242,13 @@ dm4c.add_plugin("de.deepamehta.topicmaps", function() {
     /**
      * Deletes a topicmap in the DB and updates the client model and view.
      * <p>
-     * Note: it is <i>not</i> a requirement that the topicmap is assigned to the workspace which is currently selected.
+     * It is <i>not</i> a requirement that the topicmap is assigned to the workspace which is currently selected.
+     * <p>
+     * Note: the model/view update is not performed in a "post_delete_topic" listener. It would get in the way with
+     * the delete-workspace action. While the model/view update requests would be sent to objects already deleted in
+     * the DB. ### TODO: explain better. Which requests are sent? Could we use the "pre_delete_topic" listener?
+     * <p>
+     * (called from Webclient's default_plugin.js)
      */
     this.delete_topicmap = function(topicmap_id) {
         console.log("delete_topicmap(" + topicmap_id + ")")
