@@ -149,9 +149,9 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
             dm4c.ui.dialog({
                 title: "Delete Workspace \"" + topic.value + "\"?",
                 content: $("<p>").text("CAUTION: all the workspace content will be deleted").add($("<ul>")
-                        .append($("<li>").text("all assigned topics/associations"))
-                        .append($("<li>").text("all assigned types"))
-                        .append($("<li>").text("all topics/associations of these types"))),
+                    .append($("<li>").text("all assigned topics/associations"))
+                    .append($("<li>").text("all assigned types"))
+                    .append($("<li>").text("all topics/associations of these types"))),
                 width: "500px",
                 button_label: "Delete all",
                 button_handler: function() {
