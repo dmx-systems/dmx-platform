@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Storage - Neo4j</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-storage-neo4j</artifactId>
-    <version>4.8.4</version>
+    <version>4.8.5-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8.4</version>
+        <version>4.8.5-SNAPSHOT</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
