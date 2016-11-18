@@ -359,9 +359,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         // Note: only readable assocs (access control) are considered
         for (AssociationModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
                roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
-            if (assoc.id != id) {
+            if (assoc.id != id && assoc.value.equals(value)) {
                 throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
-                    ", typeUri=\"" + typeUri + "\")");
+                    ", typeUri=\"" + typeUri + "\", value=\"" + value + "\")");
             }
         }
     }

@@ -274,6 +274,9 @@ public class PersistenceLayer extends StorageDecorator {
         return instantiate(_getAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
     }
 
+    /**
+     * Fetches from DB and filters READables. No instantiation.
+     */
     Iterable<AssociationModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id,
                                                     String roleTypeUri1, String roleTypeUri2) {
         logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
