@@ -529,7 +529,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonized.
      */
     private Topic fetchFileTopic(String repoPath) {
-        return fetchTopic(repoPath, "dm4.files.file");
+        return fetchFileOrFolderTopic(repoPath, "dm4.files.file");
     }
 
     /**
@@ -539,7 +539,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonized.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        return fetchTopic(repoPath, "dm4.files.folder");
+        return fetchFileOrFolderTopic(repoPath, "dm4.files.folder");
     }
 
     // ---
@@ -551,12 +551,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonized.
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
-    private Topic fetchTopic(String repoPath, String topicTypeUri) {
-        Topic topic = dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
-        if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
+    private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
+        Topic pathTopic = fetchPathTopic(repoPath);
+        if (pathTopic != null) {
+            return pathTopic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
         }
         return null;
+    }
+
+    /**
+     * @param   repoPath        A repository path. Must be canonized.
+     */
+    private Topic fetchPathTopic(String repoPath) {
+        return dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
     }
 
     // ---
@@ -569,7 +576,6 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
-            .put("dm4.files.path", repoPath(path))  // Note: repo path is already calculated by caller. Could be passed.
             .put("dm4.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
@@ -577,7 +583,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             childTopics.put("dm4.files.media_type", mediaType);
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics));      // throws Exception
+        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics), repoPath(path));    // throws
+        // Note: repo path is already calculated by caller. Could be passed.
     }
 
     /**
@@ -602,25 +609,28 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             folderName = repoPathFile.getName();    // Note: getName() of "/" returns ""
         }
         //
-        return createFolderTopic(folderName, repoPath);    // throws Exception
-    }
-
-    /**
-     * Creates a Folder topic.
-     *
-     * @param   folderName  The folder name.
-     * @param   repoPath    The folder repository path.
-     */
-    private Topic createFolderTopic(String folderName, String repoPath) throws Exception {
         return createFileOrFolderTopic(mf.newTopicModel("dm4.files.folder", mf.newChildTopicsModel()
-            .put("dm4.files.folder_name", folderName)
-            .put("dm4.files.path", repoPath)
-        ));    // throws Exception
+            .put("dm4.files.folder_name", folderName)), repoPath);    // throws Exception
     }
 
     // ---
 
-    private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
+    /**
+     * @param   repoPath        A repository path. Must be canonized.
+     */
+    private Topic createFileOrFolderTopic(final TopicModel model, String repoPath) throws Exception {
+        // Note: Path topics must be unique. Otherwise the path-based authorization check (for per-workspace file repos)
+        // would fail. An existing Path topic must be reused.
+        // A Path topic could already exist in case a File topic was retyped into an Icon topic. In this case
+        // fetchFileTopic() would return null (and causing File topic creation) despite a proper Path topic exists
+        // already. (Analogous for fetchFolderTopic().)
+        Topic pathTopic = fetchPathTopic(repoPath);
+        ChildTopicsModel childs = model.getChildTopicsModel();
+        if (pathTopic != null) {
+            childs.putRef("dm4.files.path", pathTopic.getId());
+        } else {
+            childs.put("dm4.files.path", repoPath);
+        }
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
         Topic topic = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
             @Override
