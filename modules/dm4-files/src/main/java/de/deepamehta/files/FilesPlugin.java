@@ -622,7 +622,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         // Note: Path topics must be unique. Otherwise the path-based authorization check (for per-workspace file repos)
         // would fail. An existing Path topic must be reused.
         // A Path topic could already exist in case a File topic was retyped into an Icon topic. In this case
-        // fetchFileTopic() would return null (and causing File topic creation) despite a proper Path topic exists
+        // fetchFileTopic() would return null (and cause File topic creation) despite a proper Path topic exists
         // already. (Analogous for fetchFolderTopic().)
         Topic pathTopic = fetchPathTopic(repoPath);
         ChildTopicsModel childs = model.getChildTopicsModel();

@@ -8,29 +8,32 @@ function RenderHelper() {
     /**
      * Renders a clickable list of topics. Each list item consist of the topic's icon and the topic's label.
      *
-     * @param   topics          Topics to render (array of Topic objects).
-     *                          Note: actually the array can contain any kind of objects as long as each object
-     *                          has these properties:
-     *                              "type_uri"
-     *                                  Required to render the icon and tooltip
-     *                              "value"
-     *                                  Required to render the topic link
-     *                              "id"
-     *                                  Only required by the default click handler
-     *                              "uri"
-     *                                  Optional. If set it is rendered in the tooltip
-     *                              "assoc"
-     *                                  Optional. If set the assoc's type name and value are rendered beneath the topic
+     * @param   topics
+     *              Topics to render (array of Topic objects).
+     *              Note: actually the array can contain any kind of objects as long as each object
+     *              has these properties:
+     *                  "type_uri"
+     *                      Required to render the icon and tooltip
+     *                  "value"
+     *                      Required to render the topic link
+     *                  "id"
+     *                      Only required by the default click handler
+     *                  "uri"
+     *                      Optional. If set it is rendered in the tooltip
+     *                  "assoc"
+     *                      Optional. If set the assoc's type name and value are rendered beneath the topic
      *
-     * @param   click_handler   Optional: the callback invoked when a topic is clicked. 2 arguments are passed:
-     *                              "topic"
-     *                                  The clicked topic (object)
-     *                              "spot"
-     *                                  Indicates where the topic is clicked: "icon" or "label" (string)
-     *                          If not specified the default handler is used. The default handler reveals the clicked
-     *                          topic by calling dm4c.do_reveal_related_topic().
+     * @param   click_handler
+     *              Optional: the callback invoked when a topic is clicked. 2 arguments are passed:
+     *                  "topic"
+     *                      The clicked topic (object)
+     *                  "spot"
+     *                      Indicates where the topic is clicked: "icon" or "label" (string)
+     *              If not specified the default handler is used. The default handler reveals the clicked
+     *              topic by calling dm4c.do_reveal_related_topic().
      *
-     * @param   render_handler  Optional.
+     * @param   render_handler
+     *              Optional.
      *
      * @return  The rendered topic list (a jQuery object)
      */
@@ -484,6 +487,10 @@ function RenderHelper() {
         }
 
         function begin_new_group(topic, pos) {
+            // Note: accessing the type name requires accessing the type. However the user might have no
+            // explicit READ permission for the type. We must enforce the *implicit* READ permission.
+            dm4c.enforce_implicit_topic_type_read_permission(topic)
+            //
             topic_type_uri = topic.type_uri
             topic_type_name = dm4c.get_topic_type(topic_type_uri).value
             begin = pos
