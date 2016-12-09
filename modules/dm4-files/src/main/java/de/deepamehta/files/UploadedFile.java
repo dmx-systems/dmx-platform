@@ -35,6 +35,8 @@ public class UploadedFile {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
+
+
     // === File Metadata ===
 
     /**
@@ -59,6 +61,8 @@ public class UploadedFile {
     public String getMediaType() {
         return fileItem.getContentType();
     }
+
+
 
     // === File Content ===
 
@@ -98,6 +102,8 @@ public class UploadedFile {
         }
     }
 
+
+
     // === Storage ===
 
     /**
@@ -111,6 +117,8 @@ public class UploadedFile {
             throw new RuntimeException("Writing uploaded file to disk failed (" + this + ")", e);
         }
     }
+
+
 
     // ===
 

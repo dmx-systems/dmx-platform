@@ -27,7 +27,7 @@ class MigrationManager {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int REQUIRED_CORE_MIGRATION = 5;
+    private static final int CORE_MODEL_VERSION = 5;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -76,7 +76,7 @@ class MigrationManager {
      */
     void runCoreMigrations(boolean isCleanInstall) {
         int installedModelVersion = dm4.pl.fetchMigrationNr();
-        int requiredModelVersion = REQUIRED_CORE_MIGRATION;
+        int requiredModelVersion = CORE_MODEL_VERSION;
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {

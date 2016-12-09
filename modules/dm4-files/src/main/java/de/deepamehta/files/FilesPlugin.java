@@ -692,6 +692,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     /**
      * Maps a repository path to an absolute path.
+     * <p>
      * Checks the repository path to fight directory traversal attacks.
      *
      * @param   repoPath    A repository path. Relative to the repository base path.
@@ -835,6 +836,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     }
 
     // ---
+
+    // Note: there is also a public repoPath() method (part of the PathMapper API).
+    // It maps an absolute path to a repository path.
 
     /**
      * Returns the repository path of a File/Folder topic.

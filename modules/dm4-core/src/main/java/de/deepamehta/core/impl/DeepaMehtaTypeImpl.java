@@ -34,57 +34,59 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     // --- Data Type ---
 
     @Override
-    public String getDataTypeUri() {
+    public final String getDataTypeUri() {
         return getModel().getDataTypeUri();
     }
 
     @Override
-    public void setDataTypeUri(String dataTypeUri) {
+    public final DeepaMehtaType setDataTypeUri(String dataTypeUri) {
         _getModel().updateDataTypeUri(dataTypeUri);
+        return this;
     }
 
     // --- Index Modes ---
 
     @Override
-    public List<IndexMode> getIndexModes() {
+    public final List<IndexMode> getIndexModes() {
         return getModel().getIndexModes();
     }
 
     @Override
-    public void addIndexMode(IndexMode indexMode) {
+    public final DeepaMehtaType addIndexMode(IndexMode indexMode) {
         _getModel()._addIndexMode(indexMode);
+        return this;
     }
 
     // --- Association Definitions ---
 
     @Override
-    public Collection<AssociationDefinition> getAssocDefs() {
+    public final Collection<AssociationDefinition> getAssocDefs() {
         return pl.instantiate(getModel().getAssocDefs());
     }
 
     @Override
-    public AssociationDefinition getAssocDef(String assocDefUri) {
+    public final AssociationDefinition getAssocDef(String assocDefUri) {
         return getModel().getAssocDef(assocDefUri).instantiate();
     }
 
     @Override
-    public boolean hasAssocDef(String assocDefUri) {
+    public final boolean hasAssocDef(String assocDefUri) {
         return getModel().hasAssocDef(assocDefUri);
     }
 
     @Override
-    public DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
+    public final DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+    public final DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         _getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
         return this;
     }
 
     @Override
-    public DeepaMehtaType removeAssocDef(String assocDefUri) {
+    public final DeepaMehtaType removeAssocDef(String assocDefUri) {
         _getModel()._removeAssocDef(assocDefUri);
         return this;
     }
@@ -92,25 +94,26 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     // --- Label Configuration ---
 
     @Override
-    public List<String> getLabelConfig() {
+    public final List<String> getLabelConfig() {
         return getModel().getLabelConfig();
     }
 
     @Override
-    public void setLabelConfig(List<String> labelConfig) {
+    public final DeepaMehtaType setLabelConfig(List<String> labelConfig) {
         _getModel().updateLabelConfig(labelConfig);
+        return this;
     }
 
     // --- View Configuration ---
 
     @Override
-    public ViewConfiguration getViewConfig() {
+    public final ViewConfiguration getViewConfig() {
         RoleModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
     @Override
-    public Object getViewConfig(String typeUri, String settingUri) {
+    public final Object getViewConfig(String typeUri, String settingUri) {
         return getModel().getViewConfig(typeUri, settingUri);
     }
 
