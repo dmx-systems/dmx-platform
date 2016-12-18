@@ -642,7 +642,7 @@ class StorageDecorator {
     final boolean init() {
         boolean isCleanInstall = storage.setupRootNode();
         if (isCleanInstall) {
-            logger.info("Starting with a fresh DB -- Setting migration number to 0");
+            logger.info("Clean install detected -- Starting with a fresh DB");
             storeMigrationNr(0);
         }
         return isCleanInstall;

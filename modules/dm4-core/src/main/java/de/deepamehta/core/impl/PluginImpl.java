@@ -802,7 +802,7 @@ public class PluginImpl implements Plugin, EventHandler {
             if (providerClasses.size() != 0) {
                 logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
             } else {
-                logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes provided");
+                logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes found");
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {

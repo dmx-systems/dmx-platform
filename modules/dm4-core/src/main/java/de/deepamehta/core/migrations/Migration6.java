@@ -6,7 +6,7 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
- * Adds index modes to "Meta Type", "Topic Type" and "Association Type".
+ * Add index modes to Core types.
  * Runs ALWAYS.
  * <p>
  * Part of DM 4.8.5
@@ -22,6 +22,18 @@ public class Migration6 extends Migration {
             .addIndexMode(IndexMode.FULLTEXT)
             .addIndexMode(IndexMode.FULLTEXT_KEY);
         dm4.getTopicType("dm4.core.assoc_type")
+            .addIndexMode(IndexMode.FULLTEXT)
+            .addIndexMode(IndexMode.FULLTEXT_KEY);
+        dm4.getTopicType("dm4.core.data_type")
+            .addIndexMode(IndexMode.FULLTEXT)
+            .addIndexMode(IndexMode.FULLTEXT_KEY);
+        dm4.getTopicType("dm4.core.role_type")
+            .addIndexMode(IndexMode.FULLTEXT)
+            .addIndexMode(IndexMode.FULLTEXT_KEY);
+        dm4.getTopicType("dm4.core.cardinality")
+            .addIndexMode(IndexMode.FULLTEXT)
+            .addIndexMode(IndexMode.FULLTEXT_KEY);
+        dm4.getTopicType("dm4.core.plugin")
             .addIndexMode(IndexMode.FULLTEXT)
             .addIndexMode(IndexMode.FULLTEXT_KEY);
     }
