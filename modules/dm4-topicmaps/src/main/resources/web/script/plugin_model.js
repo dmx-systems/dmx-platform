@@ -127,8 +127,13 @@ function TopicmapsPluginModel() {
         }
         //
         set_selected_topicmap(_topicmap_id)
+        //
         if (_topic_id) {
-            topicmap.set_topic_selection(_topic_id)
+            try {
+                topicmap.set_topic_selection(_topic_id)
+            } catch (e) {
+                console.log("WARNING: " + _topic_id + " is not a valid topic ID (" + e + ")")
+            }
         }
     }
 
