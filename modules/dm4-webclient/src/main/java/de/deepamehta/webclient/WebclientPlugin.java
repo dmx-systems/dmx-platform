@@ -15,7 +15,6 @@ import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
-import de.deepamehta.core.service.event.PreUpdateTopicListener;
 import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.Consumes;
@@ -43,7 +42,6 @@ import java.util.logging.Logger;
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
                                                                 IntroduceTopicTypeListener,
                                                                 IntroduceAssociationTypeListener,
-                                                                PreUpdateTopicListener,
                                                                 PostUpdateTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -153,18 +151,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         } catch (Exception e) {
             logger.warning("### Launching webclient failed (" + e + ")");
             logger.warning("### To launch it manually: " + webclientUrl);
-        }
-    }
-
-    // ---
-
-    // ### TODO: drop this
-    @Override
-    public void preUpdateTopic(Topic topic, TopicModel newModel) {
-        if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/filerepo/" + topic.getChildTopics().getString("dm4.files.path");
-            logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
-            newModel.setSimpleValue(iconUrl);
         }
     }
 

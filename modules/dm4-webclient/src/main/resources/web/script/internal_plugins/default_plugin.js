@@ -32,16 +32,8 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 context: "context-menu"
             })
         }
-        // ### FIXME: check locked state as well (at least for retype)
+        //
         if (dm4c.has_write_permission_for_topic(topic.id)) {
-            commands.push({is_separator: true, context: "context-menu"})
-            commands.push({
-                label: "Retype",
-                handler: do_retype,
-                context: "context-menu",
-                ui_icon: "transfer-e-w"
-            })
-            //
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
                 label: "Delete",
@@ -77,26 +69,6 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
         function do_associate(item, x, y) {
             dm4c.topicmap_renderer.begin_association(topic.id, x, y)
-        }
-
-        function do_retype() {
-            var type_menu = dm4c.ui.menu()
-            dm4c.refresh_type_menu(type_menu)   // no type list specified
-            type_menu.select(topic.type_uri)
-            open_retype_topic_dialog()
-
-            function open_retype_topic_dialog() {
-                dm4c.ui.dialog({
-                    title: "Retype Topic",
-                    content: type_menu.dom,
-                    width: "400px",
-                    button_label: "Retype",
-                    button_handler: function() {
-                        var type_uri = type_menu.get_selection().value
-                        dm4c.do_retype_topic(topic.id, type_uri)
-                    }
-                })
-            }
         }
 
         // ---
