@@ -158,6 +158,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // ---
 
+    // ### TODO: drop this
     @Override
     public void preUpdateTopic(Topic topic, TopicModel newModel) {
         if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {

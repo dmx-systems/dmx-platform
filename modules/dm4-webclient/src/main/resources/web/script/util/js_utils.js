@@ -282,6 +282,13 @@ var js = {
         return path.substr(path.lastIndexOf(".") + 1)
     },
 
+    is_image_file: function(filename) {
+        var ext = this.filename_ext(filename)
+        return ext == "png" ||
+               ext == "gif" ||
+               ext == "jpg"
+    },
+
     /**
      * "Type ID" -> "type-id"
      */

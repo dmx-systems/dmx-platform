@@ -576,6 +576,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
+            .put("dm4.files.path", repoPath(path))  // Note: repo path is already calculated by caller. Could be passed.
             .put("dm4.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
@@ -583,8 +584,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             childTopics.put("dm4.files.media_type", mediaType);
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics), repoPath(path));    // throws
-        // Note: repo path is already calculated by caller. Could be passed.
+        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics));      // throws Exception
     }
 
     /**
@@ -610,7 +610,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         }
         //
         return createFileOrFolderTopic(mf.newTopicModel("dm4.files.folder", mf.newChildTopicsModel()
-            .put("dm4.files.folder_name", folderName)), repoPath);    // throws Exception
+            .put("dm4.files.folder_name", folderName)
+            .put("dm4.files.path", repoPath)));     // throws Exception
     }
 
     // ---
@@ -618,19 +619,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     /**
      * @param   repoPath        A repository path. Must be canonized.
      */
-    private Topic createFileOrFolderTopic(final TopicModel model, String repoPath) throws Exception {
-        // Note: Path topics must be unique. Otherwise the path-based authorization check (for per-workspace file repos)
-        // would fail. An existing Path topic must be reused.
-        // A Path topic could already exist in case a File topic was retyped into an Icon topic. In this case
-        // fetchFileTopic() would return null (and cause File topic creation) despite a proper Path topic exists
-        // already. (Analogous for fetchFolderTopic().)
-        Topic pathTopic = fetchPathTopic(repoPath);
-        ChildTopicsModel childs = model.getChildTopicsModel();
-        if (pathTopic != null) {
-            childs.putRef("dm4.files.path", pathTopic.getId());
-        } else {
-            childs.put("dm4.files.path", repoPath);
-        }
+    private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
         Topic topic = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
             @Override

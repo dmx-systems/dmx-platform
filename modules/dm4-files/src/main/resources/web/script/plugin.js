@@ -140,15 +140,25 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
+        var commands = []
         if (topic.type_uri == "dm4.files.file") {
-            return [{
+            commands.push({
                 label: "Download File",
                 handler: do_download_file,
                 context: "detail-panel-show",
                 ui_icon: "arrowthickstop-1-s"
-            }]
+            })
+            commands.push({
+                is_separator: true,
+                context: "context-menu"
+            })
+            commands.push({
+                label: "Create Icon",
+                disabled: !js.is_image_file(topic.value),
+                handler: do_create_icon,
+                context: "context-menu"
+            })
         } else if (topic.type_uri == "dm4.files.folder") {
-            var commands = []
             if (dm4c.has_create_permission_for_topic_type("dm4.files.folder")) {
                 commands.push({
                     label: "Create Folder",
@@ -165,8 +175,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
                     ui_icon: "arrowthick-1-n"
                 })
             }
-            return commands
         }
+        return commands
 
         function do_create_folder() {
             dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
@@ -184,6 +194,16 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         function do_download_file() {
             var path = topic.get("dm4.files.path")
             location.href = "/filerepo/" + encodeURIComponent(path) + "?download"
+        }
+
+        function do_create_icon() {
+            // update DB
+            var icon = new Topic(dm4c.restc.create_topic({
+                type_uri: "dm4.webclient.icon",
+                value: "/filerepo/" + encodeURIComponent(topic.get("dm4.files.path"))
+            }))
+            // update model and view
+            dm4c.show_topic(icon, "show", undefined, true)      // do_center=true
         }
     })
 
