@@ -387,9 +387,17 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setIncludeInLabel() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            dm4.getTopicType("dm4.core.plugin")
-                .getAssocDef("dm4.core.plugin_name")
-                .getChildTopics().set("dm4.core.include_in_label", true);
+            TopicType tt = dm4.getTopicType("dm4.core.plugin");
+            //
+            // set individual "Include in Label" flag
+            ChildTopics ct = tt.getAssocDef("dm4.core.plugin_name").getChildTopics()
+                .set("dm4.core.include_in_label", true);
+            //
+            assertEquals(true, ct.getBoolean("dm4.core.include_in_label"));
+            //
+            List<String> lc = tt.getLabelConfig();
+            assertEquals(1, lc.size());
+            assertEquals("dm4.core.plugin_name", lc.get(0));
             //
             tx.success();
         } finally {
