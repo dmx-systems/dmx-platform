@@ -384,6 +384,22 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void setIncludeInLabel() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.core.plugin_name")
+                .getChildTopics().set("dm4.core.include_in_label", true);
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void uriUniquenessCreateTopic() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
