@@ -367,13 +367,13 @@ class TypeStorage {
     }
 
     private RelatedTopicModel fetchCustomAssocType(long assocDefId) {
-        // ### TODO: can we use type-driven retrieval?
+        // ### TODO: can we use model-driven retrieval?
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.custom_assoc_type", "dm4.core.parent",
             "dm4.core.child", "dm4.core.assoc_type");
     }
 
     private RelatedTopicModel fetchIncludeInLabel(long assocDefId) {
-        // ### TODO: can we use type-driven retrieval?
+        // ### TODO: can we use model-driven retrieval?
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition", "dm4.core.parent",
             "dm4.core.child", "dm4.core.include_in_label");
     }
@@ -708,11 +708,11 @@ class TypeStorage {
     private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModelImpl> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
             boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
-            // Note: we don't do the storage in a type-driven fashion here (as in new AssociationDefinitionImpl(
+            // Note: we don't do the storage in a model-driven fashion here (as in new AssociationDefinitionImpl(
             // assocDef, dm4).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired for the
             // assoc def and the Type Editor plugin would react and try to access the assoc def's parent type.
             // This means retrieving a type that is in-mid its storage process. Strange errors would occur.
-            // As a workaround we create the child topic manually.
+            // As a workaround we create the child topic manually. ### FIXDOC
             Topic topic = pl.createTopic(mf.newTopicModel("dm4.core.include_in_label",
                 new SimpleValue(includeInLabel)));
             pl.createAssociation("dm4.core.composition",

@@ -164,33 +164,35 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
-    AssociationTypeModel getType() {
+    final AssociationTypeModel getType() {
         return pl.typeStorage.getAssociationType(typeUri);
     }
 
     @Override
-    List<AssociationModelImpl> getAssociations() {
+    final List<AssociationModelImpl> getAssociations() {
         return pl.fetchAssociationAssociations(id);
     }
 
     // ---
 
     @Override
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                     String othersTopicTypeUri) {
+    final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                            String othersTopicTypeUri) {
+    final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    final List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
@@ -199,75 +201,77 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
-    void storeUri() {
+    final void storeUri() {
         pl.storeAssociationUri(id, uri);
     }
 
     @Override
-    void storeTypeUri() {
+    final void storeTypeUri() {
         reassignInstantiation();
         pl.storeAssociationTypeUri(id, typeUri);
     }
 
     @Override
-    void storeSimpleValue() {
+    final void storeSimpleValue() {
         TypeModel type = getType();
         pl.storeAssociationValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
     }
 
     @Override
-    void indexSimpleValue(IndexMode indexMode) {
+    final void indexSimpleValue(IndexMode indexMode) {
         pl.indexAssociationValue(id, indexMode, typeUri, getIndexValue());
     }
 
     // ---
 
+    // Note: is not final. Overridden by AssociationDefinitionModelImpl.
+    // ### TODO: refactor to "createModelWithChildTopics()"
     @Override
     void updateChildTopics(ChildTopicsModel childTopics) {
         update(mf.newAssociationModel(childTopics));
     }
 
     @Override
-    void _delete() {
+    final void _delete() {
         pl._deleteAssociation(id);
     }
 
     // ---
 
     @Override
-    DeepaMehtaEvent getReadAccessEvent() {
+    final DeepaMehtaEvent getReadAccessEvent() {
         return CoreEvent.CHECK_ASSOCIATION_READ_ACCESS;
     }
 
     @Override
-    DeepaMehtaEvent getPreUpdateEvent() {
+    final DeepaMehtaEvent getPreUpdateEvent() {
         return CoreEvent.PRE_UPDATE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPostUpdateEvent() {
+    final DeepaMehtaEvent getPostUpdateEvent() {
         return CoreEvent.POST_UPDATE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPreDeleteEvent() {
+    final DeepaMehtaEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPostDeleteEvent() {
+    final DeepaMehtaEvent getPostDeleteEvent() {
         return CoreEvent.POST_DELETE_ASSOCIATION;
     }
 
     // ---
 
     @Override
-    Directive getUpdateDirective() {
+    final Directive getUpdateDirective() {
         return Directive.UPDATE_ASSOCIATION;
     }
 
     @Override
-    Directive getDeleteDirective() {
+    final Directive getDeleteDirective() {
         return Directive.DELETE_ASSOCIATION;
     }
 

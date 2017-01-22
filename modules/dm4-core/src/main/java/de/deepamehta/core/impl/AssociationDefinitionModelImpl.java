@@ -43,7 +43,14 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * ### TODO: add include-in-label parameter?
+     * Remains partially uninitialzed. Only usable as an update-model (not as a create-model).
+     */
+    AssociationDefinitionModelImpl(AssociationModelImpl assoc) {
+        this(assoc, null, null, null);
+    }
+
+    /**
+     * ### TODO: add include-in-label parameter? Alternatively could evaluate the assoc model's child topics.
      *
      * @param   customAssocTypeUri      if null no custom association type will be set.
      */
@@ -159,6 +166,11 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         return new AssociationDefinitionImpl(this, pl);
     }
 
+    @Override
+    void updateChildTopics(ChildTopicsModel childTopics) {
+        update(mf.newAssociationDefinitionModel(childTopics));
+    }
+
 
 
     // === Core Internal Hooks ===
@@ -167,15 +179,16 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
         super.postUpdate(newModel, oldModel);
         //
-        updateCardinality((AssociationDefinitionModel) newModel);
+        AssociationDefinitionModelImpl newAssocDef = (AssociationDefinitionModelImpl) newModel;
+        AssociationDefinitionModelImpl oldAssocDef = (AssociationDefinitionModelImpl) oldModel;
+        //
+        updateCardinality(newAssocDef);
         //
         // rehash
-        boolean changeCustomAssocType = customAssocTypeChange((AssociationDefinitionModel) newModel,
-            (AssociationDefinitionModel) oldModel);
+        boolean changeCustomAssocType = customAssocTypeChange(newAssocDef, oldAssocDef);
         if (changeCustomAssocType) {
-            logger.info("### Changed custom association type URI from \"" +
-                ((AssociationDefinitionModelImpl) oldModel).getCustomAssocTypeUri() + "\" -> \"" +
-                ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull() + "\"");
+            logger.info("### Changed custom association type URI from \"" + oldAssocDef.getCustomAssocTypeUri() +
+                "\" -> \"" + newAssocDef.getCustomAssocTypeUriOrNull() + "\"");
             getParentType().rehashAssocDef(newModel.getId());
         }
     }
@@ -284,7 +297,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
-    // ====
+    // ===
 
     private boolean customAssocTypeChange(AssociationDefinitionModel newModel, AssociationDefinitionModel oldModel) {
         String oldUri = oldModel.getCustomAssocTypeUri();   // null if no assoc type is set

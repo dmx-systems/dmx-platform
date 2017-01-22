@@ -656,7 +656,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                                     ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
             newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
-                null, childTopics(customAssocTypeUri)
+                null, childTopics(customAssocTypeUri)       // value=null
             ),
             parentCardinalityUri, childCardinalityUri, (ViewConfigurationModelImpl) viewConfig
         );
@@ -712,6 +712,13 @@ public class ModelFactoryImpl implements ModelFactory {
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
         }
+    }
+
+    /**
+     * Internal.
+     */
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
+        return new AssociationDefinitionModelImpl(newAssociationModel(childTopics));
     }
 
     // ---
