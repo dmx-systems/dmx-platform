@@ -384,6 +384,41 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void hasIncludeInLabel() {
+        // Note: the assoc def is created while migration
+        RelatedTopic includeInLabel = dm4.getTopicType("dm4.core.plugin")
+            .getAssocDef("dm4.core.plugin_name").getChildTopics().getTopicOrNull("dm4.core.include_in_label");
+        assertNotNull(includeInLabel);
+        assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
+    }
+
+    @Test
+    public void hasIncludeInLabelForAddedAssocDef() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // create assoc def programmatically
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
+            dm4.getTopicType("dm4.core.plugin").addAssocDef(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.core.plugin", "dm4.test.date", "dm4.core.one", "dm4.core.one"
+                ));
+            //
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the added assoc def
+            RelatedTopic includeInLabel = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.test.date").getChildTopics().getTopicOrNull("dm4.core.include_in_label");
+            assertNotNull(includeInLabel);
+            assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void setIncludeInLabel() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
