@@ -396,17 +396,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
-     * If you want to update memory and DB use {@link AssociationDefinition#update}.
-     * <p>
-     * This method is here to support a special case: the user retypes an association which results in
-     * a changed type definition. In this case the DB is already up-to-date and only the type's memory
-     * representation must be updated. So, here the DB update is the *cause* for a necessary memory-update.
-     * Normally the situation is vice-versa: the DB update is the necessary *effect* of a memory-update.
+     * Adjust the type cache according to an updated generic association which also acts as an assoc def.
      *
-     * @param   assocDef    the new association definition.
-     *                      Note: in contrast to the other "update" methods this one does not support partial updates.
-     *                      That is all association definition fields must be initialized. ### FIXDOC
+     * @param   assoc       the updated generic association.
      */
     void _updateAssocDef(AssociationModel assoc) {
         // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
@@ -415,19 +407,23 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
         if (assoc == oldAssocDef) {
             // edited via type topic -- abort
+            // see comment on AssociationDefinitionModelImpl#postUpdate
             return;
         }
+        // 1) Build new assoc def from the generic assoc
+        //
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel newAssocModel = mf.newAssociationModel(assoc);
-        AssociationModel oldAssocModel = oldAssocDef;
         // Note: an assoc def expects by-URI roles.
-        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
-        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
+        newAssocModel.setRoleModel1(oldAssocDef.getRoleModel1());
+        newAssocModel.setRoleModel2(oldAssocDef.getRoleModel2());
         //
         AssociationDefinitionModel newAssocDef = mf.newAssociationDefinitionModel(newAssocModel,
             oldAssocDef.getParentCardinalityUri(),
             oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfigModel()
         );
+        // 2) compare old and new assoc def URI and rehash if changed
+        //
         String oldAssocDefUri = oldAssocDef.getAssocDefUri();
         String newAssocDefUri = newAssocDef.getAssocDefUri();
         if (oldAssocDefUri.equals(newAssocDefUri)) {

@@ -249,6 +249,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    DeepaMehtaObjectModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        throw new UnsupportedOperationException();
+    }
+
     // ---
 
     TypeModel getType() {
@@ -304,10 +308,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     // ---
-
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        throw new UnsupportedOperationException();
-    }
 
     void _delete() {
         throw new UnsupportedOperationException();
@@ -374,6 +374,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
     // === Update (memory + DB) ===
+
+    final void updateWithChildTopics(ChildTopicsModel childTopics) {
+        update(createModelWithChildTopics(childTopics));
+    }
 
     /**
      * @param   newModel    The data to update.

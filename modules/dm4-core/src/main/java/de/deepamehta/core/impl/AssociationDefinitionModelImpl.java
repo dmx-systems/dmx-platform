@@ -167,14 +167,35 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newAssociationDefinitionModel(childTopics));
+    AssociationDefinitionModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        return mf.newAssociationDefinitionModel(childTopics);
     }
 
 
 
     // === Core Internal Hooks ===
 
+    /**
+     * 2 assoc def specific tasks must be performed once the underlying association is updated:
+     *   - Update the assoc def's cardinality (in type cache + DB). Cardinality is technically not part of the type
+     *     model. So, it is not handled by the generic (model-driven) object update procedure.
+     *   - Possibly rehash the assoc def in type cache. Rehashing is required if the custom assoc type has changed.
+     * <p>
+     * Pre condition: these 3 assoc def parts are already up-to-date through the generic (model-driven) object update
+     * procedure:
+     *   - Assoc Def type (type URI).
+     *   - Custom assoc type (child topics).
+     *   - "Include in Label" flag (child topics).
+     * <p>
+     * Called when update() is called on an AssociationDefinitionModel object. This is in 2 cases:
+     *   - Edit a type interactively (a type topic is selected).
+     *   - Programmatically call getChildTopics().set() on an AssociationDefinitionModel object, e.g. from a migration.
+     * <p>
+     * <i>Not</i> called when an association which also acts as an assoc def is edited interactively (an association is
+     * selected). In this case:
+     *   - Cardinality doesn't need to be updated as Cardinality can't be edited interactively through an association.
+     *   - Rehashing is already performed in TypeModelImpl#_updateAssocDef (called from AssociationModelImpl#postUpdate)
+     */
     @Override
     void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
         super.postUpdate(newModel, oldModel);
@@ -185,11 +206,10 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         updateCardinality(newAssocDef);
         //
         // rehash
-        boolean changeCustomAssocType = customAssocTypeChange(newAssocDef, oldAssocDef);
-        if (changeCustomAssocType) {
+        if (customAssocTypeHasChanged(newAssocDef, oldAssocDef)) {
             logger.info("### Changed custom association type URI from \"" + oldAssocDef.getCustomAssocTypeUri() +
                 "\" -> \"" + newAssocDef.getCustomAssocTypeUriOrNull() + "\"");
-            getParentType().rehashAssocDef(newModel.getId());
+            getParentType().rehashAssocDef(newAssocDef.getId());
         }
     }
 
@@ -238,18 +258,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ===
 
-    /**
-     * ### TODO: make private
-     *
-     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
-     *          Otherwise returns the custom assoc type URI.
-     */
-    String getCustomAssocTypeUriOrNull() {
-        return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
-    }
-
-    // ---
-
     TypeModelImpl getParentType() {
         return pl.typeStorage.getType(getParentTypeUri());
     }
@@ -260,9 +268,9 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // === Update ===
 
-    private void updateCardinality(AssociationDefinitionModel newModel) {
-        updateParentCardinality(newModel.getParentCardinalityUri());
-        updateChildCardinality(newModel.getChildCardinalityUri());
+    private void updateCardinality(AssociationDefinitionModel newAssocDef) {
+        updateParentCardinality(newAssocDef.getParentCardinalityUri());
+        updateChildCardinality(newAssocDef.getChildCardinalityUri());
     }
 
     // ---
@@ -299,9 +307,10 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ===
 
-    private boolean customAssocTypeChange(AssociationDefinitionModel newModel, AssociationDefinitionModel oldModel) {
-        String oldUri = oldModel.getCustomAssocTypeUri();   // null if no assoc type is set
-        String newUri = ((AssociationDefinitionModelImpl) newModel).getCustomAssocTypeUriOrNull();  // null if del ref
+    private boolean customAssocTypeHasChanged(AssociationDefinitionModelImpl newAssocDef,
+                                              AssociationDefinitionModelImpl oldAssocDef) {
+        String oldUri = oldAssocDef.getCustomAssocTypeUri();        // null if no assoc type is set
+        String newUri = newAssocDef.getCustomAssocTypeUriOrNull();  // null if del ref
         if (newUri != null) {
             // new value is neither a deletion ref nor null, compare it to old value (which may be null)
             return !newUri.equals(oldUri);
@@ -323,6 +332,16 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         } */
         return customAssocType;
     }
+
+    /**
+     * @return  <code>null</code> if this assoc def's custom assoc type model is null or represents a deletion ref.
+     *          Otherwise returns the custom assoc type URI.
+     */
+    private String getCustomAssocTypeUriOrNull() {
+        return getCustomAssocType() instanceof TopicDeletionModel ? null : getCustomAssocTypeUri();
+    }
+
+    // ---
 
     private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dm4.core.aggregation_def")) {

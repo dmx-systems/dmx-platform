@@ -161,6 +161,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         return new AssociationImpl(this, pl);
     }
 
+    @Override
+    AssociationModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        return mf.newAssociationModel(childTopics);
+    }
+
     // ---
 
     @Override
@@ -223,13 +228,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     // ---
-
-    // Note: is not final. Overridden by AssociationDefinitionModelImpl.
-    // ### TODO: refactor to "createModelWithChildTopics()"
-    @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newAssociationModel(childTopics));
-    }
 
     @Override
     final void _delete() {

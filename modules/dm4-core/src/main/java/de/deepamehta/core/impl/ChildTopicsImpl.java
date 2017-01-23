@@ -326,12 +326,12 @@ class ChildTopicsImpl implements ChildTopics {
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test). ### still true?
 
     private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
+        parent.updateWithChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
         return this;
     }
 
     private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
+        parent.updateWithChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
     }
 

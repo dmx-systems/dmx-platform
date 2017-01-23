@@ -128,7 +128,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
-    // We should call the abstract updateChildTopics() instead.
+    // We should call the abstract updateWithChildTopics() instead.
     @Override
     public void setChildTopics(ChildTopicsModel childTopics) {
         try {

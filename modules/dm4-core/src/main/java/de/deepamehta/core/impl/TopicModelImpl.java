@@ -66,6 +66,11 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         return new TopicImpl(this, pl);
     }
 
+    @Override
+    final TopicModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        return mf.newTopicModel(childTopics);
+    }
+
     // ---
 
     @Override
@@ -125,11 +130,6 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     // ---
-
-    @Override
-    final void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newTopicModel(childTopics));
-    }
 
     @Override
     final void _delete() {
