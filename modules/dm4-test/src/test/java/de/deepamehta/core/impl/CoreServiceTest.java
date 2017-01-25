@@ -396,7 +396,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void hasIncludeInLabelForAddedAssocDef() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            // create assoc def programmatically
+            // add assoc def programmatically
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
             dm4.getTopicType("dm4.core.plugin").addAssocDef(
                 mf.newAssociationDefinitionModel("dm4.core.composition_def",

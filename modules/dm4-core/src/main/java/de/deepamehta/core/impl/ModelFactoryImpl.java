@@ -536,8 +536,8 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                            List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                            List<String> labelConfig, ViewConfigurationModel viewConfig) {
+                                                List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                                List<String> labelConfig, ViewConfigurationModel viewConfig) {
         return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
             (ViewConfigurationModelImpl) viewConfig));
     }
@@ -588,8 +588,8 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TypeModel ===
 
     TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                                  ViewConfigurationModelImpl viewConfig) {
+                               List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
+                               ViewConfigurationModelImpl viewConfig) {
         return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
             viewConfig);
     }
@@ -649,33 +649,20 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationDefinitionModel ===
 
     @Override
-    public AssociationDefinitionModelImpl newAssociationDefinitionModel(
-                                                    long id, String uri, String assocTypeUri, String customAssocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfig) {
-        return new AssociationDefinitionModelImpl(
-            newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
-                null, childTopics(customAssocTypeUri)       // value=null
-            ),
-            parentCardinalityUri, childCardinalityUri, (ViewConfigurationModelImpl) viewConfig
-        );
+                                                    String parentCardinalityUri, String childCardinalityUri) {
+        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, parentTypeUri, childTypeUri,
+            parentCardinalityUri, childCardinalityUri, null);
     }
 
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
+                                                    String customAssocTypeUri, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, parentTypeUri, childTypeUri,
-            parentCardinalityUri, childCardinalityUri, null);
-    }
-
-    @Override
-    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, parentTypeUri, childTypeUri,
-            parentCardinalityUri, childCardinalityUri, null);
+        return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, includeInLabel,
+            parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri, null);
     }
 
     /**
@@ -717,6 +704,22 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
+                                                    String customAssocTypeUri, boolean includeInLabel,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfig) {
+        return new AssociationDefinitionModelImpl(
+            newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
+                null, childTopics(customAssocTypeUri, includeInLabel)       // value=null
+            ),
+            parentCardinalityUri, childCardinalityUri,
+            (ViewConfigurationModelImpl) viewConfig);
+    }
+
+    /**
+     * Internal.
+     */
     AssociationDefinitionModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
         return new AssociationDefinitionModelImpl(newAssociationModel(childTopics));
     }
@@ -734,23 +737,30 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
-        // Note: getString() called on a key with JSON null value would return the string "null"
-        return childTopics(assocDef.isNull("custom_assoc_type_uri") ? null :
-            assocDef.getString("custom_assoc_type_uri"));
+        // Note: getString()/optString() on a key with JSON null value would return the string "null"
+        String customAssocTypeUri = assocDef.isNull("custom_assoc_type_uri") ? null :
+            assocDef.getString("custom_assoc_type_uri");
+        boolean includeInLabel = assocDef.optBoolean("include_in_label");
+        //
+        return childTopics(customAssocTypeUri, includeInLabel);
     }
 
-    private ChildTopicsModel childTopics(String customAssocTypeUri) {
+    private ChildTopicsModel childTopics(String customAssocTypeUri, boolean includeInLabel) {
+        ChildTopicsModel childTopics = newChildTopicsModel();
+        //
+        childTopics.put("dm4.core.include_in_label", includeInLabel);
+        //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                return newChildTopicsModel().putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                childTopics.putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
-                return newChildTopicsModel().putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                childTopics.putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
                     customAssocTypeUri);
             }
-        } else {
-            return null;
         }
+        //
+        return childTopics;
     }
 
 

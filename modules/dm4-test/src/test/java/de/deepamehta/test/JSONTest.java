@@ -45,13 +45,28 @@ public class JSONTest {
 
     @Test
     public void nullObject() throws JSONException {
-        String str = null;
+        String str = null;  // declaration is required. Otherwise the compiler complains "reference to put is ambiguous"
         //
         JSONObject o = new JSONObject();
         o.put("id", 123);
         o.put("value", str);
-        // null values are not put into the JSONObject
+        // if the value is null, then the key will be removed
         assertEquals("{\"id\":123}", o.toString());
+    }
+
+    @Test
+    public void remove() throws JSONException {
+        String str = null;
+        //
+        JSONObject o = new JSONObject();
+        o.put("id", 123);
+        o.put("value", "hello");
+        //
+        assertEquals("hello", o.getString("value"));
+        //
+        // if the value is null, then the key will be removed
+        o.put("value", str);
+        assertEquals("nothing", o.optString("value", "nothing"));
     }
 
     @Test
@@ -151,6 +166,35 @@ public class JSONTest {
         o.put("id", 123);
         assertNull(o.optJSONObject("id"));      // the "id" value is not a JSONObject -> null is returned
         assertNull(o.optJSONObject("value"));
+    }
+
+    // --- NULL value ---
+
+    @Test
+    public void nullValue() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("value", JSONObject.NULL);
+        assertEquals("null", o.getString("value"));     // JSONObject.NULL.toString() returns "null"
+        assertEquals("null", o.optString("value"));
+        assertEquals("null", o.optString("value", "nothing"));
+    }
+
+    @Test
+    public void nullValueForInt() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("value", JSONObject.NULL);
+        //
+        // o.getInt("value") would throw JSONException: JSONObject["value"] is not a number
+        assertEquals(0,   o.optInt("value"));
+        assertEquals(123, o.optInt("value", 123));
+    }
+
+    @Test
+    public void isNullValue() throws JSONException {
+        JSONObject o = new JSONObject();
+        o.put("value", JSONObject.NULL);
+        assertTrue(o.isNull("value"));      // isNull() returns true if the value associated with the key is null
+        assertTrue(o.isNull("id"));         // ... or if there is no value
     }
 
     // --- Iteration ---

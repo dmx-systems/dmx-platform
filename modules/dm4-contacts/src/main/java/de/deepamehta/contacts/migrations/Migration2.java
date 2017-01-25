@@ -49,20 +49,20 @@ public class Migration2 extends Migration {
             "dm4.contacts.address_entry", "dm4.contacts.address_label", "dm4.core.many", "dm4.core.one")));
         dm4.getTopicType("dm4.contacts.person")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry", false,
                 "dm4.contacts.person", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.email_address")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry", false,
                 "dm4.contacts.person", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.notes");
         dm4.getTopicType("dm4.contacts.institution")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry",
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry", false,
                 "dm4.contacts.institution", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.email_address")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry",
+                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry", false,
                 "dm4.contacts.institution", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
             "dm4.contacts.notes");
         //
