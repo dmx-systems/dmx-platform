@@ -32,11 +32,6 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
         return (TopicTypeModel) super.addAssocDef(assocDef);
     }
 
-    @Override
-    public TopicTypeModel setLabelConfig(List<String> labelConfig) {
-        return (TopicTypeModel) super.setLabelConfig(labelConfig);
-    }
-
     // ---
 
     @Override

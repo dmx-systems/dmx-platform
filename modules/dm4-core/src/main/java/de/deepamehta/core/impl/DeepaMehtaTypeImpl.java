@@ -91,19 +91,6 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
         return this;
     }
 
-    // --- Label Configuration ---
-
-    @Override
-    public final List<String> getLabelConfig() {
-        return getModel().getLabelConfig();
-    }
-
-    @Override
-    public final DeepaMehtaType setLabelConfig(List<String> labelConfig) {
-        _getModel().updateLabelConfig(labelConfig);
-        return this;
-    }
-
     // --- View Configuration ---
 
     @Override
@@ -142,4 +129,10 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
      * kernel type model which is created on-the-fly each time a specific user requests it.
      */
     abstract TypeModelImpl _getModel();
+
+    // --- Label Configuration ---
+
+    final List<String> getLabelConfig() {
+        return getModel().getLabelConfig();
+    }
 }

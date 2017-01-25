@@ -397,7 +397,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // === Types ===
 
-    TopicType getTopicType(String uri) {
+    TopicTypeImpl getTopicType(String uri) {
         TopicTypeModelImpl topicType = _getTopicType(uri);
         if (!uri.equals("dm4.core.meta_meta_type")) {
             checkReadAccess(topicType);
@@ -412,7 +412,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    AssociationType getAssociationType(String uri) {
+    AssociationTypeImpl getAssociationType(String uri) {
         return checkReadAccessAndInstantiate(_getAssociationType(uri));
     }
 

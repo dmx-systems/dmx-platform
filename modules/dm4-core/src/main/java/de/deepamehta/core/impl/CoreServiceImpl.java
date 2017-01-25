@@ -211,7 +211,7 @@ public class CoreServiceImpl implements CoreService {
     // === Topic Types ===
 
     @Override
-    public TopicType getTopicType(String uri) {
+    public TopicTypeImpl getTopicType(String uri) {
         return pl.getTopicType(uri);
     }
 
@@ -249,7 +249,7 @@ public class CoreServiceImpl implements CoreService {
     // === Association Types ===
 
     @Override
-    public AssociationType getAssociationType(String uri) {
+    public AssociationTypeImpl getAssociationType(String uri) {
         return pl.getAssociationType(uri);
     }
 

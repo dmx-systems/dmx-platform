@@ -5,7 +5,6 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directive;
@@ -15,6 +14,7 @@ import de.deepamehta.core.util.SequencedHashMap;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +29,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private String dataTypeUri;                         // may be null in models used for an update operation
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
-    private List<String> labelConfig;                                           // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -37,13 +36,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                  ViewConfigurationModelImpl viewConfig) {
+                  List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes  = indexModes;
         this.assocDefs   = toMap(assocDefs);
-        this.labelConfig = labelConfig;
         this.viewConfig  = viewConfig;
     }
 
@@ -52,7 +49,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         this.dataTypeUri = type.getDataTypeUri();
         this.indexModes  = type.getIndexModes();
         this.assocDefs   = toMap(type.getAssocDefs());
-        this.labelConfig = type.getLabelConfig();
         this.viewConfig  = type.getViewConfigModel();
     }
 
@@ -155,21 +151,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Label Configuration ===
-
-    @Override
-    public List<String> getLabelConfig() {
-        return labelConfig;
-    }
-
-    @Override
-    public TypeModel setLabelConfig(List<String> labelConfig) {
-        this.labelConfig = labelConfig;
-        return this;
-    }
-
-
-
     // === View Configuration ===
 
     @Override
@@ -216,7 +197,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 .put("data_type_uri", getDataTypeUri())
                 .put("index_mode_uris", toJSONArray(indexModes))
                 .put("assoc_defs", toJSONArray(assocDefs.values()))
-                .put("label_config", new JSONArray(getLabelConfig()))
                 .put("view_config_topics", getViewConfigModel().toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -246,7 +226,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ", labelConfig=" + getLabelConfig() + ", " + getViewConfigModel();
+            getAssocDefs() + ", " + getViewConfigModel();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -331,17 +311,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Update (memory + DB) ===
 
-    void updateDataTypeUri(String dataTypeUri) {
+    final void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
         storeDataTypeUri();             // update DB
     }
 
-    void updateLabelConfig(List<String> labelConfig) {
-        setLabelConfig(labelConfig);                                    // update memory
-        pl.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());  // update DB
-    }
-
-    void _addIndexMode(IndexMode indexMode) {
+    final void _addIndexMode(IndexMode indexMode) {
         // update memory
         addIndexMode(indexMode);
         // update DB
@@ -351,7 +326,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    void _addAssocDefBefore(AssociationDefinitionModelImpl assocDef, String beforeAssocDefUri) {
+    final void _addAssocDefBefore(AssociationDefinitionModelImpl assocDef, String beforeAssocDefUri) {
         try {
             long lastAssocDefId = lastAssocDefId();     // must be determined *before* memory is updated
             //
@@ -376,7 +351,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    void _removeAssocDef(String assocDefUri) {
+    final void _removeAssocDef(String assocDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
         // is triggered then by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
@@ -389,7 +364,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Type Editor Support ===
 
-    void _addAssocDef(AssociationModel assoc) {
+    final void _addAssocDef(AssociationModel assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
         //
         addUpdateTypeDirective();
@@ -400,7 +375,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      *
      * @param   assoc       the updated generic association.
      */
-    void _updateAssocDef(AssociationModel assoc) {
+    final void _updateAssocDef(AssociationModel assoc) {
         // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
         // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
         String[] assocDefUris = findAssocDefUris(assoc.getId());
@@ -430,10 +405,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             replaceAssocDef(newAssocDef);
         } else {
             replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
-            //
-            // Note: if the custom association type has changed and the assoc def is part the label config
-            // we must replace the assoc def URI in the label config
-            replaceInLabelConfig(newAssocDefUri, oldAssocDefUri);
         }
         //
         addUpdateTypeDirective();
@@ -445,16 +416,29 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
      * deletion of an association that represents an association definition is imminent. ### FIXDOC
      */
-    void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
+    final void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
         String[] assocDefUris = findAssocDefUris(assoc.getId());
         String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();
         // update memory
         removeAssocDef(assocDefUri);
-        removeFromLabelConfig(assocDefUri);
         // update DB
         pl.typeStorage.rebuildSequence(this);
         //
         addUpdateTypeDirective();
+    }
+
+
+
+    // === Label Configuration ===
+
+    final List<String> getLabelConfig() {
+        List<String> labelConfig = new ArrayList();
+        for (String assocDefUri : this) {
+            if (getAssocDef(assocDefUri).includeInLabel()) {
+                labelConfig.add(assocDefUri);
+            }
+        }
+        return labelConfig;
     }
 
 
@@ -480,10 +464,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ===
 
-    void rehashAssocDef(long assocDefId) {
+    final void rehashAssocDef(long assocDefId) {
         String[] assocDefUris = findAssocDefUris(assocDefId);
         rehashAssocDef(assocDefUris[0], assocDefUris[1]);
     }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
@@ -499,7 +485,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         _updateDataTypeUri(newModel.getDataTypeUri());
         _updateAssocDefs(newModel.getAssocDefs());
         _updateSequence(newModel.getAssocDefs());
-        _updateLabelConfig(newModel.getLabelConfig());
     }
 
     // ---
@@ -536,17 +521,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             pl.typeStorage.rebuildSequence(this);
         } catch (Exception e) {
             throw new RuntimeException("Updating the assoc def sequence failed", e);
-        }
-    }
-
-    private void _updateLabelConfig(List<String> newLabelConfig) {
-        try {
-            if (!getLabelConfig().equals(newLabelConfig)) {
-                logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
-                updateLabelConfig(newLabelConfig);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Updating label configuration of type \"" + uri + "\" failed", e);
         }
     }
 
@@ -715,29 +689,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             _assocDefs.put(assocDef.getAssocDefUri(), (AssociationDefinitionModelImpl) assocDef);
         }
         return _assocDefs;
-    }
-
-
-
-    // === Label Configuration (memory access) ===
-
-    private void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(oldAssocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
-                "\" (position " + i + ")");
-            labelConfig.set(i, newAssocDefUri);
-        }
-    }
-
-    private void removeFromLabelConfig(String assocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(assocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
-            labelConfig.remove(i);
-        }
     }
 
 

@@ -305,13 +305,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"))
             );
             // "Comment" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
@@ -351,13 +350,12 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .setLabelConfig(asList("dm4.test.first_name", "dm4.test.last_name"))
             );
             // "Comment" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
@@ -422,7 +420,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void setIncludeInLabel() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
-            TopicType tt = dm4.getTopicType("dm4.core.plugin");
+            TopicTypeImpl tt = dm4.getTopicType("dm4.core.plugin");
             //
             // set individual "Include in Label" flag
             ChildTopics ct = tt.getAssocDef("dm4.core.plugin_name").getChildTopics()

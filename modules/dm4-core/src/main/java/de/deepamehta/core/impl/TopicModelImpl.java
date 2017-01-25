@@ -74,7 +74,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    final TopicTypeModel getType() {
+    final TopicTypeModelImpl getType() {
         return pl.typeStorage.getTopicType(typeUri);
     }
 

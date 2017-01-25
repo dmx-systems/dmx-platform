@@ -169,7 +169,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
-    final AssociationTypeModel getType() {
+    final AssociationTypeModelImpl getType() {
         return pl.typeStorage.getAssociationType(typeUri);
     }
 

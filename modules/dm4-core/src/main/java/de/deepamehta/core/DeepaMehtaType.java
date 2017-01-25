@@ -42,12 +42,6 @@ public interface DeepaMehtaType extends Topic {
 
     DeepaMehtaType removeAssocDef(String assocDefUri);
 
-    // --- Label Configuration ---
-
-    List<String> getLabelConfig();
-
-    DeepaMehtaType setLabelConfig(List<String> labelConfig);
-
     // --- View Configuration ---
 
     ViewConfiguration getViewConfig();

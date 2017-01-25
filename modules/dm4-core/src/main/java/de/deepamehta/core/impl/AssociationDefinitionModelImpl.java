@@ -229,6 +229,14 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
+    // === Label Configuration ===
+
+    final boolean includeInLabel() {
+        return getChildTopicsModel().getBoolean("dm4.core.include_in_label");
+    }
+
+
+
     // === Access Control ===
 
     boolean isReadable() {

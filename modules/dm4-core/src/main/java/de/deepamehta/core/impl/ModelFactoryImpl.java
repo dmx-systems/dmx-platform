@@ -537,8 +537,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                List<String> labelConfig, ViewConfigurationModel viewConfig) {
-        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+                                                ViewConfigurationModel viewConfig) {
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -563,8 +563,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                 List<String> labelConfig, ViewConfigurationModel viewConfig) {
-        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
+                                                 ViewConfigurationModel viewConfig) {
+        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -588,16 +588,13 @@ public class ModelFactoryImpl implements ModelFactory {
     // === TypeModel ===
 
     TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                               List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                               ViewConfigurationModelImpl viewConfig) {
-        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, labelConfig,
-            viewConfig);
+                               List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
+        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, viewConfig);
     }
 
     TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
-        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri,
-            new ArrayList(), new ArrayList(), new ArrayList(), newViewConfigurationModel()
-        );
+        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, new ArrayList(), new ArrayList(),
+            newViewConfigurationModel());
     }
 
     TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
@@ -606,9 +603,7 @@ public class ModelFactoryImpl implements ModelFactory {
             typeModel.optString("data_type_uri", null),
             parseIndexModes(typeModel.optJSONArray("index_mode_uris")),
             parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),
-            parseLabelConfig(typeModel.optJSONArray("label_config")),
-            newViewConfigurationModel(typeModel.optJSONArray("view_config_topics"))
-        );
+            newViewConfigurationModel(typeModel.optJSONArray("view_config_topics")));
     }
 
     // ---
@@ -638,10 +633,6 @@ public class ModelFactoryImpl implements ModelFactory {
             }
         }
         return _assocDefs;
-    }
-
-    private List<String> parseLabelConfig(JSONArray labelConfig) {
-        return labelConfig != null ? DeepaMehtaUtils.toList(labelConfig) : new ArrayList();
     }
 
 

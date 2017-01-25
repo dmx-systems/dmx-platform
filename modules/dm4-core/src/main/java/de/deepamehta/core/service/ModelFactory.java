@@ -175,7 +175,7 @@ public interface ModelFactory {
 
     TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
                                      List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                     List<String> labelConfig, ViewConfigurationModel viewConfig);
+                                     ViewConfigurationModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
 
@@ -187,7 +187,7 @@ public interface ModelFactory {
 
     AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                 List<String> labelConfig, ViewConfigurationModel viewConfig);
+                                                 ViewConfigurationModel viewConfig);
 
     AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
 

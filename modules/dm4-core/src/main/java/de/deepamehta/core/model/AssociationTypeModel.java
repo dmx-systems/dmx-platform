@@ -1,7 +1,5 @@
 package de.deepamehta.core.model;
 
-import java.util.List;
-
 
 
 /**
@@ -13,7 +11,4 @@ public interface AssociationTypeModel extends TypeModel {
 
     @Override
     AssociationTypeModel addAssocDef(AssociationDefinitionModel assocDef);
-
-    @Override
-    AssociationTypeModel setLabelConfig(List<String> labelConfig);
 }

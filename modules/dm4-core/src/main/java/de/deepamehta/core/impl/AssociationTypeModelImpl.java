@@ -32,11 +32,6 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
         return (AssociationTypeModel) super.addAssocDef(assocDef);
     }
 
-    @Override
-    public AssociationTypeModel setLabelConfig(List<String> labelConfig) {
-        return (AssociationTypeModel) super.setLabelConfig(labelConfig);
-    }
-
     // ---
 
     @Override

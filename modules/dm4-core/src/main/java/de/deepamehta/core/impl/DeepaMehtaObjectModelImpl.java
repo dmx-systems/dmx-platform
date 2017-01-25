@@ -255,7 +255,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    TypeModel getType() {
+    TypeModelImpl getType() {
         throw new UnsupportedOperationException();
     }
 
@@ -989,7 +989,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      * Prerequisite: this is a composite model.
      */
     private List<String> getLabelAssocDefUris() {
-        TypeModel type = getType();
+        TypeModelImpl type = getType();
         List<String> labelConfig = type.getLabelConfig();
         if (labelConfig.size() > 0) {
             return labelConfig;

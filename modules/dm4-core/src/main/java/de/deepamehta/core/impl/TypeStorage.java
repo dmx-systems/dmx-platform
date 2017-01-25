@@ -108,12 +108,11 @@ class TypeStorage {
             String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
             List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-            List<String> labelConfig = fetchLabelConfig(assocDefs);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
             TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, labelConfig, viewConfig);
+                assocDefs, viewConfig);
             putInTypeCache(topicType);
             return topicType;
         } catch (Exception e) {
@@ -136,12 +135,11 @@ class TypeStorage {
             String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
             List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-            List<String> labelConfig = fetchLabelConfig(assocDefs);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
             AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, labelConfig, viewConfig);
+                assocDefs, viewConfig);
             putInTypeCache(assocType);
             return assocType;
         } catch (Exception e) {
@@ -191,7 +189,6 @@ class TypeStorage {
         storeDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
-        storeLabelConfig(type.getLabelConfig(), type.getAssocDefs());
         storeViewConfig(newTypeRole(type.getId()), type.getViewConfigModel());
     }
 
@@ -679,58 +676,6 @@ class TypeStorage {
         logger.info("### Deleting " + sequence.size() + " sequence segments of type \"" + typeTopic.getUri() + "\"");
         for (RelatedAssociationModelImpl assoc : sequence) {
             assoc.getRelatingAssociation().delete();
-        }
-    }
-
-
-
-    // === Label Configuration ===
-
-    // --- Fetch ---
-
-    // ### TODO: to be dropped
-    private List<String> fetchLabelConfig(List<AssociationDefinitionModel> assocDefs) {
-        List<String> labelConfig = new ArrayList();
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            RelatedTopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());
-            if (includeInLabel != null && includeInLabel.getSimpleValue().booleanValue()) {
-                labelConfig.add(assocDef.getAssocDefUri());
-            }
-        }
-        return labelConfig;
-    }
-
-    // --- Store ---
-
-    /**
-     * Stores the label configuration of a <i>newly created</i> type.
-     */
-    private void storeLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModelImpl> assocDefs) {
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            boolean includeInLabel = labelConfig.contains(assocDef.getAssocDefUri());
-            // Note: we don't do the storage in a model-driven fashion here (as in new AssociationDefinitionImpl(
-            // assocDef, dm4).getChildTopics().set(...)). A POST_UPDATE_ASSOCIATION event would be fired for the
-            // assoc def and the Type Editor plugin would react and try to access the assoc def's parent type.
-            // This means retrieving a type that is in-mid its storage process. Strange errors would occur.
-            // As a workaround we create the child topic manually. ### FIXDOC
-            Topic topic = pl.createTopic(mf.newTopicModel("dm4.core.include_in_label",
-                new SimpleValue(includeInLabel)));
-            pl.createAssociation("dm4.core.composition",
-                mf.newAssociationRoleModel(assocDef.getId(), "dm4.core.parent"),
-                mf.newTopicRoleModel(topic.getId(), "dm4.core.child")
-            );
-        }
-    }
-
-    /**
-     * Updates the label configuration of an <i>existing</i> type.
-     */
-    void updateLabelConfig(List<String> labelConfig, Collection<AssociationDefinitionModelImpl> assocDefs) {
-        for (AssociationDefinitionModel assocDef : assocDefs) {
-            // Note: the Type Editor plugin must not react
-            TopicModel includeInLabel = fetchIncludeInLabel(assocDef.getId());
-            boolean value = labelConfig.contains(assocDef.getAssocDefUri());
-            pl.storeTopicValue(includeInLabel.getId(), new SimpleValue(value));
         }
     }
 
