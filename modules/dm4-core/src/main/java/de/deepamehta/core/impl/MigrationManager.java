@@ -27,7 +27,7 @@ class MigrationManager {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final String CORE_MIGRATIONS_PACKAGE = "de.deepamehta.core.migrations";
-    private static final int CORE_MODEL_VERSION = 6;
+    private static final int CORE_MODEL_VERSION = 7;
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
