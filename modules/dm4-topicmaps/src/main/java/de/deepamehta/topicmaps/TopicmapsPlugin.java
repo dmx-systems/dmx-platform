@@ -93,8 +93,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.private", isPrivate)
-            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))
-        ));
+            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
     }
 
     // ---

@@ -59,6 +59,8 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     // === Convenience Accessors ===
 
+    // ### TODO: transform defaultValue methods into getXXOrNull() form, analogous to ChildTopics interface
+
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
      * Throws if the child doesn't exist.

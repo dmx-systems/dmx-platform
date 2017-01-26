@@ -432,13 +432,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Label Configuration ===
 
     final List<String> getLabelConfig() {
-        List<String> labelConfig = new ArrayList();
-        for (String assocDefUri : this) {
-            if (getAssocDef(assocDefUri).includeInLabel()) {
-                labelConfig.add(assocDefUri);
+        try {
+            List<String> labelConfig = new ArrayList();
+            for (String assocDefUri : this) {
+                if (getAssocDef(assocDefUri).includeInLabel()) {
+                    labelConfig.add(assocDefUri);
+                }
             }
+            return labelConfig;
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating the label configuration for type \"" + uri + "\" failed", e);
         }
-        return labelConfig;
     }
 
 

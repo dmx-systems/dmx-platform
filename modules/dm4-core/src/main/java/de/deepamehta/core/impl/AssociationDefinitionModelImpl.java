@@ -232,7 +232,11 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // === Label Configuration ===
 
     final boolean includeInLabel() {
-        return getChildTopicsModel().getBoolean("dm4.core.include_in_label");
+        TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dm4.core.include_in_label");
+        if (includeInLabel == null) {
+            throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
+        }
+        return includeInLabel.getSimpleValue().booleanValue();
     }
 
 

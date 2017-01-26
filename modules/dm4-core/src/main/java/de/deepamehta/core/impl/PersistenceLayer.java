@@ -405,7 +405,7 @@ public class PersistenceLayer extends StorageDecorator {
         return topicType.instantiate();
     }
 
-    TopicType getTopicTypeImplicitly(long topicId) {
+    TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         checkTopicReadAccess(topicId);
         return _getTopicType(typeUri(topicId)).instantiate();
     }
@@ -416,7 +416,7 @@ public class PersistenceLayer extends StorageDecorator {
         return checkReadAccessAndInstantiate(_getAssociationType(uri));
     }
 
-    AssociationType getAssociationTypeImplicitly(long assocId) {
+    AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
         return _getAssociationType(typeUri(assocId)).instantiate();
     }
@@ -449,12 +449,12 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicType createTopicType(TopicTypeModelImpl model) {
+    TopicTypeImpl createTopicType(TopicTypeModelImpl model) {
         try {
             // store in DB
             createTypeTopic(model, URI_PREFIX_TOPIC_TYPE);
             //
-            TopicType topicType = model.instantiate();
+            TopicTypeImpl topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             //
             return topicType;
@@ -463,12 +463,12 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
-    AssociationType createAssociationType(AssociationTypeModelImpl model) {
+    AssociationTypeImpl createAssociationType(AssociationTypeModelImpl model) {
         try {
             // store in DB
             createTypeTopic(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
-            AssociationType assocType = model.instantiate();
+            AssociationTypeImpl assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             //
             return assocType;

@@ -422,7 +422,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             TopicTypeImpl tt = dm4.getTopicType("dm4.core.plugin");
             //
-            // set individual "Include in Label" flag
+            // set "Include in Label" flag
             ChildTopics ct = tt.getAssocDef("dm4.core.plugin_name").getChildTopics()
                 .set("dm4.core.include_in_label", true);
             //
@@ -431,6 +431,39 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             List<String> lc = tt.getLabelConfig();
             assertEquals(1, lc.size());
             assertEquals("dm4.core.plugin_name", lc.get(0));
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void setIncludeInLabelWhenCustomAssocTypeIsSet() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // 1) create composite type, set a custom assoc type
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
+            dm4.createAssociationType(mf.newAssociationTypeModel("dm4.test.birthday", "Birthday", "dm4.core.text"));
+            TopicTypeImpl tt = dm4.createTopicType(
+                mf.newTopicTypeModel("dm4.test.person", "Person", "dm4.core.composite").addAssocDef(
+                    mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.test.birthday", false,
+                        "dm4.test.person", "dm4.test.date", "dm4.core.one", "dm4.core.one")));
+            // test assoc def childs *before* set
+            ChildTopics ct = tt.getAssocDef("dm4.test.date#dm4.test.birthday").getChildTopics();
+            assertEquals(false, ct.getBoolean("dm4.core.include_in_label"));
+            assertEquals("dm4.test.birthday", ct.getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type").getUri());
+            //
+            // 2) set "Include in Label" flag
+            ct.set("dm4.core.include_in_label", true);
+            //
+            // test assoc def childs *after* set (custom assoc type must not change)
+            assertEquals(true, ct.getBoolean("dm4.core.include_in_label"));
+            assertEquals("dm4.test.birthday", ct.getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type").getUri());
+            //
+            List<String> lc = tt.getLabelConfig();
+            assertEquals(1, lc.size());
+            assertEquals("dm4.test.date#dm4.test.birthday", lc.get(0));
             //
             tx.success();
         } finally {

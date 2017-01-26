@@ -216,7 +216,7 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public TopicType getTopicTypeImplicitly(long topicId) {
+    public TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         return pl.getTopicTypeImplicitly(topicId);
     }
 
@@ -230,7 +230,7 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public TopicType createTopicType(TopicTypeModel model) {
+    public TopicTypeImpl createTopicType(TopicTypeModel model) {
         return pl.createTopicType((TopicTypeModelImpl) model);
     }
 
@@ -254,7 +254,7 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public AssociationType getAssociationTypeImplicitly(long assocId) {
+    public AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
         return pl.getAssociationTypeImplicitly(assocId);
     }
 
@@ -268,7 +268,7 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssociationType createAssociationType(AssociationTypeModel model) {
+    public AssociationTypeImpl createAssociationType(AssociationTypeModel model) {
         return pl.createAssociationType((AssociationTypeModelImpl) model);
     }
 
