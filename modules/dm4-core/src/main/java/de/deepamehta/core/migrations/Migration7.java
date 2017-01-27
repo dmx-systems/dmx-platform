@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 /**
  * Repairs assoc defs with missing \"Include in Label\" topic.
- * Runs ALWAYS.
+ * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.8.6
  */
