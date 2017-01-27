@@ -61,7 +61,8 @@
                 {
                     "child_type_uri":        "dm4.files.file_name",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 },
                 {
                     "child_type_uri":        "dm4.files.path",
@@ -78,9 +79,6 @@
                     "child_cardinality_uri": "dm4.core.one",
                     "assoc_type_uri":        "dm4.core.composition_def"
                 },
-            ],
-            "label_config": [
-                "dm4.files.file_name"
             ],
             "view_config_topics": [
                 {

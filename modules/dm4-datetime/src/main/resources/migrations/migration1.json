@@ -25,25 +25,23 @@
                     "child_type_uri":         "dm4.datetime.month",
                     "child_cardinality_uri":  "dm4.core.one",
                     "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "include_in_label":       true
                 },
                 {
                     "child_type_uri":         "dm4.datetime.day",
                     "child_cardinality_uri":  "dm4.core.one",
                     "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "include_in_label":       true
                 },
                 {
                     "child_type_uri":         "dm4.datetime.year",
                     "child_cardinality_uri":  "dm4.core.one",
                     "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "include_in_label":       true
                 }
-            ],
-            "label_config": [
-                "dm4.datetime.month",
-                "dm4.datetime.day",
-                "dm4.datetime.year"
             ]
         },
         # Time
@@ -66,18 +64,16 @@
                     "child_type_uri":         "dm4.datetime.hour",
                     "child_cardinality_uri":  "dm4.core.one",
                     "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "include_in_label":       true
                 },
                 {
                     "child_type_uri":         "dm4.datetime.minute",
                     "child_cardinality_uri":  "dm4.core.one",
                     "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "assoc_type_uri":         "dm4.core.aggregation_def",
+                    "include_in_label":       true
                 }
-            ],
-            "label_config": [
-                "dm4.datetime.hour",
-                "dm4.datetime.minute"
             ]
         },
         # Date/Time
@@ -89,17 +85,15 @@
                 {
                     "child_type_uri":         "dm4.datetime.date",
                     "child_cardinality_uri":  "dm4.core.one",
-                    "assoc_type_uri":         "dm4.core.composition_def"
+                    "assoc_type_uri":         "dm4.core.composition_def",
+                    "include_in_label":       true
                 },
                 {
                     "child_type_uri":         "dm4.datetime.time",
                     "child_cardinality_uri":  "dm4.core.one",
-                    "assoc_type_uri":         "dm4.core.composition_def"
+                    "assoc_type_uri":         "dm4.core.composition_def",
+                    "include_in_label":       true
                 }
-            ],
-            "label_config": [
-                "dm4.datetime.date",
-                "dm4.datetime.time"
             ]
         }
     ],
