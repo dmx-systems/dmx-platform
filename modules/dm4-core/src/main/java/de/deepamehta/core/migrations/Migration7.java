@@ -43,13 +43,13 @@ public class Migration7 extends Migration {
 
     private void process(List<Association> assocs, int i) {
         for (Association assoc : assocs) {
-            count[i][0]++;
             ChildTopics childs = assoc.getChildTopics();
             Topic includeInLabel = childs.getTopicOrNull("dm4.core.include_in_label");
             if (includeInLabel == null) {
-                count[i][1]++;
                 childs.set("dm4.core.include_in_label", false);
+                count[i][1]++;
             }
+            count[i][0]++;
         }
     }
 }
