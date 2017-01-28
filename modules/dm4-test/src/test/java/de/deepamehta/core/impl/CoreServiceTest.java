@@ -474,6 +474,31 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void editAssocDefViaAssoc() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
+            dm4.getAssociation(assocDefId).getChildTopics().set("dm4.core.include_in_label", false);
+            //
+            // assoc def order must not have changed
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals(3, assocDefs.size());
+            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            assertEquals("dm4.core.plugin_name",          i.next().getAssocDefUri());
+            assertEquals("dm4.core.plugin_symbolic_name", i.next().getAssocDefUri());
+            assertEquals("dm4.core.plugin_migration_nr",  i.next().getAssocDefUri());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // ---
+
+    @Test
     public void uriUniquenessCreateTopic() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
