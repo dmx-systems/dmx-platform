@@ -166,8 +166,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Updating ===
 
     @Override
-    public final void update(DeepaMehtaObjectModel newModel) {
-        model.update((DeepaMehtaObjectModelImpl) newModel);     // ### FIXME: call through pl for access control
+    public final void update(DeepaMehtaObjectModel updateModel) {
+        model.update((DeepaMehtaObjectModelImpl) updateModel);     // ### FIXME: call through pl for access control
     }
 
     // ---

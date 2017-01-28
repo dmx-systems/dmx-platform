@@ -254,20 +254,20 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Core Internal Hooks ===
 
     @Override
-    void preUpdate(DeepaMehtaObjectModel newModel) {
+    void preUpdate(DeepaMehtaObjectModel updateModel) {
         // ### TODO: is it sufficient if we rehash (remove + add) at post-time?
-        if (uriChange(newModel.getUri(), uri)) {
+        if (uriChange(updateModel.getUri(), uri)) {
             removeFromTypeCache();
         }
     }
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        if (uriChange(newModel.getUri(), oldModel.getUri())) {
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+        if (uriChange(updateModel.getUri(), oldObject.getUri())) {
             putInTypeCache();
         }
         //
-        updateType((TypeModelImpl) newModel);
+        updateType((TypeModelImpl) updateModel);
         //
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
         // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
@@ -397,13 +397,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             oldAssocDef.getParentCardinalityUri(),
             oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfigModel()
         );
-        // 2) compare old and new assoc def URI and rehash if changed
+        // 2) rehash if custom assoc type has changed
         //
         String oldAssocDefUri = oldAssocDef.getAssocDefUri();
         String newAssocDefUri = newAssocDef.getAssocDefUri();
         if (oldAssocDefUri.equals(newAssocDefUri)) {
             replaceAssocDef(newAssocDef);
         } else {
+            logger.info("### Custom association type URI changed from \"" + oldAssocDef.getCustomAssocTypeUri() +
+                "\" -> \"" + newAssocDef.getCustomAssocTypeUri() + "\"");
             replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
         }
         //
@@ -485,10 +487,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Update (memory + DB) ===
 
-    private void updateType(TypeModelImpl newModel) {
-        _updateDataTypeUri(newModel.getDataTypeUri());
-        _updateAssocDefs(newModel.getAssocDefs());
-        _updateSequence(newModel.getAssocDefs());
+    private void updateType(TypeModelImpl updateModel) {
+        _updateDataTypeUri(updateModel.getDataTypeUri());
+        _updateAssocDefs(updateModel.getAssocDefs());
+        _updateSequence(updateModel.getAssocDefs());
     }
 
     // ---

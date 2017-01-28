@@ -8,5 +8,5 @@ import de.deepamehta.core.service.EventListener;
 
 public interface PreUpdateAssociationListener extends EventListener {
 
-    void preUpdateAssociation(Association assoc, AssociationModel newModel);
+    void preUpdateAssociation(Association assoc, AssociationModel updateModel);
 }

@@ -32,8 +32,8 @@ class AssociationTypeImpl extends DeepaMehtaTypeImpl implements AssociationType 
     }
 
     @Override
-    public void update(AssociationTypeModel newModel) {
-        model.update((AssociationTypeModelImpl) newModel);     // ### FIXME: call through pl for access control
+    public void update(AssociationTypeModel updateModel) {
+        model.update((AssociationTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
     }
 
 

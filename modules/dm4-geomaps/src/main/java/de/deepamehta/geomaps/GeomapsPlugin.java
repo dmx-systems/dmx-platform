@@ -214,11 +214,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
             if (!abortGeocoding(topic)) {
                 Address address    = new Address(topic.getChildTopics().getModel());
-                Address oldAddress = new Address(oldModel.getChildTopicsModel());
+                Address oldAddress = new Address(oldTopic.getChildTopicsModel());
                 if (!address.equals(oldAddress)) {
                     logger.info("### Address changed:" + address.changeReport(oldAddress));
                     geocodeAndStoreFacet(address, topic);

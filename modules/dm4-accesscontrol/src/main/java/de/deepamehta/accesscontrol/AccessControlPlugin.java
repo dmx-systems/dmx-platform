@@ -525,9 +525,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void preUpdateTopic(Topic topic, TopicModel newModel) {
+    public void preUpdateTopic(Topic topic, TopicModel updateModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.username")) {
-            SimpleValue newUsername = newModel.getSimpleValue();
+            SimpleValue newUsername = updateModel.getSimpleValue();
             String oldUsername = topic.getSimpleValue().toString();
             if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
                 throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
@@ -537,13 +537,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         setModifier(topic);
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
-        if (isMembership(assoc.getModel()) && !isMembership(oldModel)) {
+    public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+        if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
             assignMembership(assoc);
         }
         //

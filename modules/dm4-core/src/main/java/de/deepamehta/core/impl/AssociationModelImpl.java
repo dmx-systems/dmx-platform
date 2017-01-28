@@ -283,20 +283,20 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
         // update association specific parts: the 2 roles
-        updateRoles((AssociationModel) newModel);
+        updateRoles((AssociationModel) updateModel);
         //
         duplicateCheck();
         //
         // Type Editor Support
         if (isAssocDef(this)) {
-            if (isAssocDef((AssociationModel) oldModel)) {
+            if (isAssocDef((AssociationModel) oldObject)) {
                 updateAssocDef();
             } else {
                 createAssocDef();
             }
-        } else if (isAssocDef((AssociationModel) oldModel)) {
+        } else if (isAssocDef((AssociationModel) oldObject)) {
             removeAssocDef();
         }
     }
@@ -373,26 +373,26 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // === Update (memory + DB) ===
 
     /**
-     * @param   newModel    The data to update.
-     *                      If role 1 is <code>null</code> it is not updated.
-     *                      If role 2 is <code>null</code> it is not updated.
+     * @param   updateModel     The data to update.
+     *                          If role 1 is <code>null</code> it is not updated.
+     *                          If role 2 is <code>null</code> it is not updated.
      */
-    private void updateRoles(AssociationModel newModel) {
-        updateRole(newModel.getRoleModel1(), 1);
-        updateRole(newModel.getRoleModel2(), 2);
+    private void updateRoles(AssociationModel updateModel) {
+        updateRole(updateModel.getRoleModel1(), 1);
+        updateRole(updateModel.getRoleModel2(), 2);
     }
 
     /**
      * @param   nr      used only for logging
      */
-    private void updateRole(RoleModel newModel, int nr) {
-        if (newModel != null) {     // abort if no update is requested
+    private void updateRole(RoleModel updateModel, int nr) {
+        if (updateModel != null) {     // abort if no update is requested
             // Note: We must lookup the roles individually.
             // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            RoleModelImpl role = getRole(newModel);
-            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
-            String roleTypeUri = role.getRoleTypeUri();         // current value
-            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
+            RoleModelImpl role = getRole(updateModel);
+            String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
+            String roleTypeUri = role.getRoleTypeUri();             // current value
+            if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
                 logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
                     "\"");
                 updateRoleTypeUri(role, newRoleTypeUri);

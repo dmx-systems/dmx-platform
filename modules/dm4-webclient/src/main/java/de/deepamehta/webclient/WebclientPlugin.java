@@ -158,7 +158,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             updateType(topic);
             setConfigTopicLabel(topic);

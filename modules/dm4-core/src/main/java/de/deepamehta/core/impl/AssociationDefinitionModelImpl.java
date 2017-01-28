@@ -180,19 +180,19 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      *   - Cardinality doesn't need to be updated as Cardinality can't be edited interactively through an association.
      *   - Rehashing is already performed in TypeModelImpl#_updateAssocDef (called from AssociationModelImpl#postUpdate)
      *
-     * @param   newModel    the "update model": contains the update data/instructions.
-     *                      Note: on post-update time newModel and this (assoc def) model may differ at least because
-     *                        a) newModel might contain only certain assoc def parts; this is called a "partial update"
-     *                        b) newModel might contain refs and deletion-refs; this model never contains refs
-     *                      ### TODO: "newModel" should be renamed "updateModel". Also in the other model classes.
+     * @param   updateModel
+     *              the update data/instructions.
+     *              Note: on post-update time updateModel and this (assoc def) model may differ at least because
+     *                a) updateModel might contain only certain assoc def parts; this is called a "partial update"
+     *                b) updateModel might contain refs and deletion-refs; this model never contains refs
      */
     @Override
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        super.postUpdate(newModel, oldModel);
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+        super.postUpdate(updateModel, oldObject);
         //
-        updateCardinality((AssociationDefinitionModel) newModel);
+        updateCardinality((AssociationDefinitionModel) updateModel);
         //
-        if (customAssocTypeHasChanged((AssociationDefinitionModel) oldModel)) {
+        if (customAssocTypeHasChanged((AssociationDefinitionModel) oldObject)) {
             getParentType().rehashAssocDef(id);
         }
     }

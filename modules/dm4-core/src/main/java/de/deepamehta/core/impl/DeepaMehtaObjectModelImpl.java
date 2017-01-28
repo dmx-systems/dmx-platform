@@ -357,10 +357,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    void preUpdate(DeepaMehtaObjectModel newModel) {
+    void preUpdate(DeepaMehtaObjectModel updateModel) {
     }
 
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
     }
 
     // ---
@@ -380,34 +380,34 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     /**
-     * @param   newModel    The data to update.
+     * @param   updateModel    The data to update.
      *              If the URI is <code>null</code> it is not updated.
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
      */
-    final void update(DeepaMehtaObjectModelImpl newModel) {
+    final void update(DeepaMehtaObjectModelImpl updateModel) {
         try {
             logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
-            DeepaMehtaObjectModel oldModel = clone();
-            em.fireEvent(getPreUpdateEvent(), instantiate(), newModel);
+            DeepaMehtaObjectModel oldObject = clone();
+            em.fireEvent(getPreUpdateEvent(), instantiate(), updateModel);
             //
-            preUpdate(newModel);
+            preUpdate(updateModel);
             //
-            _updateUri(newModel.getUri());
-            _updateTypeUri(newModel.getTypeUri());
+            _updateUri(updateModel.getUri());
+            _updateTypeUri(updateModel.getTypeUri());
             if (isSimple()) {
-                _updateSimpleValue(newModel.getSimpleValue());
+                _updateSimpleValue(updateModel.getSimpleValue());
             } else {
-                _updateChildTopics(newModel.getChildTopicsModel());
+                _updateChildTopics(updateModel.getChildTopicsModel());
             }
             //
-            postUpdate(newModel, oldModel);
+            postUpdate(updateModel, oldObject);
             //
             // Note: in case of a type topic the instantiate() call above creates a cloned model
             // that doesn't reflect the update. Here we instantiate the now updated model.
             DeepaMehtaObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
-            em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
+            em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject);
         } catch (Exception e) {
             throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
@@ -501,7 +501,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Update Child Topics (memory + DB) ===
 
     // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
-    final void _updateChildTopics(ChildTopicsModelImpl newModel) {
+    final void _updateChildTopics(ChildTopicsModelImpl updateModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
@@ -509,13 +509,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 RelatedTopicModelImpl newChildTopic = null;             // only used for "one"
                 List<RelatedTopicModelImpl> newChildTopics = null;      // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newModel.getTopicOrNull(assocDefUri);
+                    newChildTopic = updateModel.getTopicOrNull(assocDefUri);
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newModel.getTopicsOrNull(assocDefUri);
+                    newChildTopics = updateModel.getTopicsOrNull(assocDefUri);
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;

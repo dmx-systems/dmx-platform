@@ -8,5 +8,5 @@ import de.deepamehta.core.service.EventListener;
 
 public interface PreUpdateTopicListener extends EventListener {
 
-    void preUpdateTopic(Topic topic, TopicModel newModel);
+    void preUpdateTopic(Topic topic, TopicModel updateModel);
 }

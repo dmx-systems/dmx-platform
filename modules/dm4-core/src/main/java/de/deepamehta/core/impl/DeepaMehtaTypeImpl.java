@@ -107,8 +107,8 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     // ---
 
     @Override
-    public void update(TypeModel newModel) {
-        _getModel().update((TypeModelImpl) newModel);   // ### FIXME: call through pl for access control
+    public void update(TypeModel updateModel) {
+        _getModel().update((TypeModelImpl) updateModel);   // ### FIXME: call through pl for access control
     }
 
     // ---

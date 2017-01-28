@@ -164,13 +164,13 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopic(TopicModelImpl newModel) {
-        long topicId = newModel.getId();
+    void updateTopic(TopicModelImpl updateModel) {
+        long topicId = updateModel.getId();
         try {
             checkTopicWriteAccess(topicId);
             //
             TopicModelImpl model = fetchTopic(topicId);
-            model.update(newModel);
+            model.update(updateModel);
             //
             // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
             // On the other hand TopicModel's update() method is called multiple times while updating the child topics
@@ -336,13 +336,13 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModelImpl newModel) {
-        long assocId = newModel.getId();
+    void updateAssociation(AssociationModelImpl updateModel) {
+        long assocId = updateModel.getId();
         try {
             checkAssociationWriteAccess(assocId);
             //
             AssociationModelImpl model = fetchAssociation(assocId);
-            model.update(newModel);
+            model.update(updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
@@ -479,25 +479,25 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopicType(TopicTypeModelImpl newModel) {
+    void updateTopicType(TopicTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
-            String topicTypeUri = fetchTopic(newModel.getId()).getUri();
-            _getTopicType(topicTypeUri).update(newModel);
+            String topicTypeUri = fetchTopic(updateModel.getId()).getUri();
+            _getTopicType(topicTypeUri).update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
+            throw new RuntimeException("Updating topic type failed (" + updateModel + ")", e);
         }
     }
 
-    void updateAssociationType(AssociationTypeModelImpl newModel) {
+    void updateAssociationType(AssociationTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
             // ### FIXME: access control
-            String assocTypeUri = fetchTopic(newModel.getId()).getUri();
-            _getAssociationType(assocTypeUri).update(newModel);
+            String assocTypeUri = fetchTopic(updateModel.getId()).getUri();
+            _getAssociationType(assocTypeUri).update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
+            throw new RuntimeException("Updating association type failed (" + updateModel + ")", e);
         }
     }
 

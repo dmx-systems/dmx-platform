@@ -99,7 +99,7 @@ public interface CoreService {
 
     Topic createTopic(TopicModel model);
 
-    void updateTopic(TopicModel newModel);
+    void updateTopic(TopicModel updateModel);
 
     void deleteTopic(long topicId);
 
@@ -173,7 +173,7 @@ public interface CoreService {
 
     Association createAssociation(AssociationModel model);
 
-    void updateAssociation(AssociationModel newModel);
+    void updateAssociation(AssociationModel updateModel);
 
     void deleteAssociation(long assocId);
 
@@ -197,7 +197,7 @@ public interface CoreService {
 
     TopicType createTopicType(TopicTypeModel model);
 
-    void updateTopicType(TopicTypeModel newModel);
+    void updateTopicType(TopicTypeModel updateModel);
 
     void deleteTopicType(String topicTypeUri);
 
@@ -222,7 +222,7 @@ public interface CoreService {
 
     AssociationType createAssociationType(AssociationTypeModel model);
 
-    void updateAssociationType(AssociationTypeModel newModel);
+    void updateAssociationType(AssociationTypeModel updateModel);
 
     void deleteAssociationType(String assocTypeUri);
 
