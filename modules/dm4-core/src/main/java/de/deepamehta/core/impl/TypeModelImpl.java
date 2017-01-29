@@ -371,42 +371,31 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * Adjust the type cache according to an updated generic association which also acts as an assoc def.
+     * Adjusts the type cache on post-update-assoc time.
+     * Called from ApplicationModel's core internal postUpdate() hook, in 2 situations:
+     *   - An assoc def has been updated.
+     *   - An assoc def's underlying assoc has been updated.
      *
-     * @param   assoc       the updated generic association.
+     * @param   assoc       the updated generic association. ### FIXDOC: might be an assoc def as well
      */
-    final void _updateAssocDef(AssociationModel assoc) {
-        // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
-        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
+    final void _updateAssocDef(AssociationModel assoc, AssociationModel oldAssoc) {
         String[] assocDefUris = findAssocDefUris(assoc.getId());
-        AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc == oldAssocDef) {
-            // edited via type topic -- abort
-            // see comment on AssociationDefinitionModelImpl#postUpdate
-            return;
-        }
-        // 1) Build new assoc def from the generic assoc
-        //
-        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel newAssocModel = mf.newAssociationModel(assoc);
-        // Note: an assoc def expects by-URI roles.
-        newAssocModel.setRoleModel1(oldAssocDef.getRoleModel1());
-        newAssocModel.setRoleModel2(oldAssocDef.getRoleModel2());
-        //
-        AssociationDefinitionModel newAssocDef = mf.newAssociationDefinitionModel(newAssocModel,
-            oldAssocDef.getParentCardinalityUri(),
-            oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfigModel()
-        );
-        // 2) rehash if custom assoc type has changed
-        //
-        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
-        String newAssocDefUri = newAssocDef.getAssocDefUri();
-        if (oldAssocDefUri.equals(newAssocDefUri)) {
-            replaceAssocDef(newAssocDef);
+        AssociationDefinitionModel assocDef = getAssocDef(assocDefUris[0]);
+        String oldAssocDefUri;
+        if (assoc == assocDef) {
+            // updated "via assoc def"
+            oldAssocDefUri = ((AssociationDefinitionModel) oldAssoc).getAssocDefUri();
         } else {
-            logger.info("### Custom association type URI changed from \"" + oldAssocDef.getCustomAssocTypeUri() +
-                "\" -> \"" + newAssocDef.getCustomAssocTypeUri() + "\"");
-            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
+            // updated "via assoc"
+            oldAssocDefUri = assocDef.getAssocDefUri();
+            // transfer assoc model to assoc def model
+            assocDef.setTypeUri(assoc.getTypeUri());
+            assocDef.setSimpleValue(assoc.getSimpleValue());
+            assocDef.setChildTopicsModel(assoc.getChildTopicsModel());
+        }
+        // rehash if assoc def URI has changed (due to changed custom assoc type)
+        if (!assocDef.getAssocDefUri().equals(oldAssocDefUri)) {
+            rehashAssocDef(oldAssocDefUri, assocDefUris[1]);
         }
         //
         addUpdateTypeDirective();
@@ -464,15 +453,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         } catch (Exception e) {
             throw new RuntimeException("Filtering readable assoc defs of type \"" + uri + "\" failed", e);
         }
-    }
-
-
-
-    // ===
-
-    final void rehashAssocDef(long assocDefId) {
-        String[] assocDefUris = findAssocDefUris(assocDefId);
-        rehashAssocDef(assocDefUris[0], assocDefUris[1]);
     }
 
 
@@ -617,25 +597,16 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
-        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
-        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
-            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
-        addAssocDefBefore(assocDef, beforeAssocDefUri);
-    }
-
     private void rehashAssocDefs(Collection<AssociationDefinitionModelImpl> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
     }
 
-    private void replaceAssocDef(AssociationDefinitionModel assocDef) {
-        replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
-    }
-
-    private void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
-        removeAssocDef(oldAssocDefUri);
+    private void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
+        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
+            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
         addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 

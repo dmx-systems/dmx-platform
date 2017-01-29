@@ -292,7 +292,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         // Type Editor Support
         if (isAssocDef(this)) {
             if (isAssocDef((AssociationModel) oldObject)) {
-                updateAssocDef();
+                updateAssocDef((AssociationModel) oldObject);
             } else {
                 createAssocDef();
             }
@@ -467,11 +467,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         parentType._addAssocDef(this);
     }
 
-    private void updateAssocDef() {
+    private void updateAssocDef(AssociationModel oldAssoc) {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
         //
-        parentType._updateAssocDef(this);
+        parentType._updateAssocDef(this, oldAssoc);
     }
 
     private void removeAssocDef() {

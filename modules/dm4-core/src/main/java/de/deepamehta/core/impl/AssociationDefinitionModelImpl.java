@@ -191,10 +191,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         super.postUpdate(updateModel, oldObject);
         //
         updateCardinality((AssociationDefinitionModel) updateModel);
-        //
-        if (customAssocTypeHasChanged((AssociationDefinitionModel) oldObject)) {
-            getParentType().rehashAssocDef(id);
-        }
     }
 
 
@@ -250,14 +246,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         }
     }
 
-
-
-    // ===
-
-    TypeModelImpl getParentType() {
-        return pl.typeStorage.getType(getParentTypeUri());
-    }
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
 
@@ -303,20 +291,9 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ===
 
-    private boolean customAssocTypeHasChanged(AssociationDefinitionModel oldAssocDef) {
-        boolean hasChanged = !getAssocDefUri().equals(oldAssocDef.getAssocDefUri());
-        if (hasChanged) {
-            logger.info("### Custom association type URI changed from \"" + oldAssocDef.getCustomAssocTypeUri() +
-                "\" -> \"" + getCustomAssocTypeUri() + "\"");
-        }
-        return hasChanged;
-    }
-
     private TopicModelImpl getCustomAssocType() {
         return getChildTopicsModel().getTopicOrNull("dm4.core.assoc_type#dm4.core.custom_assoc_type");
     }
-
-    // ---
 
     private String defaultInstanceLevelAssocTypeUri() {
         if (typeUri.equals("dm4.core.aggregation_def")) {
