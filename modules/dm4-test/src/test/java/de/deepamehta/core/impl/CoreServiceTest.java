@@ -477,6 +477,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     public void editAssocDefViaAssoc() {
         DeepaMehtaTransaction tx = dm4.beginTx();
         try {
+            // set "Include in Label" flag
             long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
             dm4.getAssociation(assocDefId).getChildTopics().set("dm4.core.include_in_label", false);
             //
@@ -489,6 +490,51 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             assertEquals("dm4.core.plugin_name",          i.next().getAssocDefUri());
             assertEquals("dm4.core.plugin_symbolic_name", i.next().getAssocDefUri());
             assertEquals("dm4.core.plugin_migration_nr",  i.next().getAssocDefUri());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void editAssocDefSetCustomAssocType() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // set Custom Association Type (via assoc def)
+            dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getChildTopics()
+                .setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", "dm4.core.association");
+            //
+            // get Custom Association Type
+            Topic assocType = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.core.plugin_name#dm4.core.association").getChildTopics()
+                .getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type");
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals("dm4.core.association", assocType.getUri());
+            //
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void editAssocDefViaAssocSetCustomAssocType() {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            // set Custom Association Type (via association)
+            long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
+            dm4.getAssociation(assocDefId).getChildTopics()
+                .setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", "dm4.core.association");
+            //
+            // get Custom Association Type
+            Topic assocType = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.core.plugin_name#dm4.core.association").getChildTopics()
+                .getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type");
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals("dm4.core.association", assocType.getUri());
             //
             tx.success();
         } finally {
