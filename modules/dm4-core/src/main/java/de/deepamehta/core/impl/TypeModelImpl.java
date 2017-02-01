@@ -371,7 +371,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     /**
-     * Adjusts the type cache on post-update-assoc time.
+     * Adjusts the type cache on post-update-assoc.
      * Called from ApplicationModel's core internal postUpdate() hook, in 2 situations:
      *   - An assoc def has been updated.
      *   - An assoc def's underlying assoc has been updated.
