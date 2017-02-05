@@ -40,14 +40,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DatomicStorage(String databasePath, ModelFactory mf) {
+    DatomicStorage(String databaseUri, ModelFactory mf) {
         try {
-            String uri = "datomic:mem://deepamehta";
-            boolean created = Peer.createDatabase(uri);
+            boolean created = Peer.createDatabase(databaseUri);
             if (!created) {
                 throw new RuntimeException("Database already exists");
             }
-            this.conn = Peer.connect(uri);
+            this.conn = Peer.connect(databaseUri);
             //
             this.mf = mf;
         } catch (Exception e) {
@@ -342,7 +341,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public DeepaMehtaTransaction beginTx() {
-        return null;
+        return new DatomicTransactionAdapter();
     }
 
     @Override

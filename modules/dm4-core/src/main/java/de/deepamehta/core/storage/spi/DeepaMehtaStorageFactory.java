@@ -12,5 +12,5 @@ import de.deepamehta.core.service.ModelFactory;
  */
 public interface DeepaMehtaStorageFactory {
 
-    DeepaMehtaStorage newDeepaMehtaStorage(String databasePath, ModelFactory mf);
+    DeepaMehtaStorage newDeepaMehtaStorage(String databaseUri, ModelFactory mf);
 }

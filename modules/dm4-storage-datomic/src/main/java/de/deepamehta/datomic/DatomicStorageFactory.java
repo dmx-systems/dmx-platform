@@ -17,7 +17,7 @@ public class DatomicStorageFactory implements DeepaMehtaStorageFactory {
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
-    public DeepaMehtaStorage newDeepaMehtaStorage(String databasePath, ModelFactory mf) {
-        return new DatomicStorage(databasePath, mf);
+    public DeepaMehtaStorage newDeepaMehtaStorage(String databaseUri, ModelFactory mf) {
+        return new DatomicStorage(databaseUri, mf);
     }
 }
