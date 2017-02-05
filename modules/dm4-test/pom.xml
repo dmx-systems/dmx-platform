@@ -25,7 +25,7 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-storage-neo4j</artifactId>
+            <artifactId>deepamehta-storage-datomic</artifactId>
             <version>4.8.6-SNAPSHOT</version>
         </dependency>
     </dependencies>

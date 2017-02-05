@@ -32,7 +32,7 @@
         <bundle>mvn:de.deepamehta/deepamehta-time/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-caching/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-config/${project.version}</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-storage-datomic/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/${project.version}</bundle>
     </feature>
 

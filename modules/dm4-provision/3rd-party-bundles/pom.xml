@@ -18,20 +18,6 @@
     </parent>
 
     <dependencies>
-        <!-- DeepaMehta Storage - Neo4j -->
-        <!-- Note: deepamehta-storage-neo4j can not be statically deployed because it depends on Core. -->
-        <!-- Core is hot-deployed and not yet available.                                               -->
-        <!--dependency>
-            <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.8.6-SNAPSHOT</version>
-        </dependency-->
-        <!-- Jersey -->
-        <!--dependency> - needed by Jersey 1.19
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency-->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-core</artifactId>

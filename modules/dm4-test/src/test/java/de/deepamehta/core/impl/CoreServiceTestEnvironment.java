@@ -19,7 +19,7 @@ public class CoreServiceTestEnvironment {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_FACTORY = "de.deepamehta.storage.neo4j.Neo4jStorageFactory";
+    private static final String DATABASE_FACTORY = "de.deepamehta.datomic.DatomicStorageFactory";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
