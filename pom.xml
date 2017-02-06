@@ -105,7 +105,7 @@
         <dm4.webservice.path>/</dm4.webservice.path>
 
         <!-- Database -->
-        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <dm4.database.path>datomic:mem://deepamehta-db</dm4.database.path>
 
         <!-- Logging -->
         <java.util.logging.config.file>

@@ -23,6 +23,46 @@
             <artifactId>datomic-free</artifactId>
             <version>0.9.5554</version>
         </dependency>
+        <dependency>
+            <groupId>com.datomic</groupId>
+            <artifactId>datomic-lucene-core</artifactId>
+            <version>3.3.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.clojure</groupId>
+            <artifactId>clojure</artifactId>
+            <version>1.8.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.171</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-core-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-json_1.0_spec</artifactId>
+            <version>1.0-alpha-1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fressian</groupId>
+            <artifactId>fressian</artifactId>
+            <version>0.6.5</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -35,6 +75,16 @@
                         <Bundle-Activator>
                             de.deepamehta.datomic.DatomicStorageActivator
                         </Bundle-Activator>
+                        <Import-Package>
+                            !org.apache.activemq.artemis, !org.apache.activemq.artemis.utils.uri,
+                            !org.apache.lucene.*, !org.apache.commons.codec.binary, !org.apache.tomcat.jdbc.pool,
+                            !org.jgroups.*, !org.jboss.logging.*, !io.netty.*,
+                            !org.codehaus.commons.compiler.jdk, !org.osgi.service.jdbc, !sun.misc, *
+                        </Import-Package>
+                        <Embed-Dependency>
+                            datomic-free, datomic-lucene-core, clojure, h2, artemis-core-client, geronimo-json_1.0_spec,
+                            guava, fressian
+                        </Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>

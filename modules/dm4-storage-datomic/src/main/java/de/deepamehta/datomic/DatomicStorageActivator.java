@@ -17,7 +17,7 @@ public class DatomicStorageActivator implements BundleActivator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String DATABASE_PATH = System.getProperty("dm4.database.path", "deepamehta-db");
+    private static final String DATABASE_URI = System.getProperty("dm4.database.path", "deepamehta-db");
     // Note: the default value is required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
@@ -133,7 +133,7 @@ public class DatomicStorageActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (mf != null) {
-            storage = new DatomicStorage(DATABASE_PATH, mf);
+            storage = new DatomicStorage(DATABASE_URI, mf);
             //
             logger.info("Registering DeepaMehta 4 storage service - Datomic - at OSGi framework");
             bundleContext.registerService(DeepaMehtaStorage.class.getName(), storage, null);

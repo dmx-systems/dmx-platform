@@ -41,17 +41,23 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DatomicStorage(String databaseUri, ModelFactory mf) {
+        ClassLoader savedCL = null;
         try {
+            savedCL = setClassLoader();
+            //
             boolean created = Peer.createDatabase(databaseUri);
             if (!created) {
                 throw new RuntimeException("Database already exists");
             }
             this.conn = Peer.connect(databaseUri);
-            //
             this.mf = mf;
-        } catch (Exception e) {
-            shutdown();
-            throw new RuntimeException("Creating the Datomic instance failed", e);
+        } catch (Throwable e) {
+            if (conn != null) {
+                shutdown();
+            }
+            throw new RuntimeException("Creating the Datomic instance failed (databaseUri=\"" + databaseUri + "\")", e);
+        } finally {
+            Thread.currentThread().setContextClassLoader(savedCL);
         }
     }
 
@@ -375,4 +381,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private ClassLoader setClassLoader() {
+        Thread t = Thread.currentThread();
+        ClassLoader savedCL = t.getContextClassLoader();
+        t.setContextClassLoader(DatomicStorage.class.getClassLoader());
+        return savedCL;
+    }
 }
