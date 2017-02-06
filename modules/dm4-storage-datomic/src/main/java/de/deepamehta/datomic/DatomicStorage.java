@@ -16,9 +16,13 @@ import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import datomic.Connection;
 import datomic.Peer;
+import static datomic.Util.map;
+import static datomic.Util.list;
+import static datomic.Util.read;
 
 import java.util.ArrayList;
 import static java.util.Arrays.asList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +35,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private boolean isCleanInstall;
 
     private Connection conn = null;
 
@@ -45,8 +51,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
         try {
             savedCL = setClassLoader();
             //
-            boolean created = Peer.createDatabase(databaseUri);
-            if (!created) {
+            this.isCleanInstall = Peer.createDatabase(databaseUri);
+            if (!isCleanInstall) {  // ### FIXME: drop this
                 throw new RuntimeException("Database already exists");
             }
             this.conn = Peer.connect(databaseUri);
@@ -351,8 +357,17 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     @Override
-    public boolean setupRootNode() {
-        return false;
+    public boolean init() {
+        try {
+            if (isCleanInstall) {
+                installSchema();
+                // create root topic ### TODO
+                storeEntity(":dm5/object-type", ":dm5.object-type/topic");
+            }
+            return isCleanInstall;
+        } catch (Exception e) {
+            throw new RuntimeException("Initializing the Datomic instance failed", e);
+        }
     }
 
     @Override
@@ -377,6 +392,39 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public ModelFactory getModelFactory() {
         return mf;
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    void installSchema() {
+        transact(
+            map(":db/ident", ":dm5/object-type",
+                ":db/valueType", ":db.type/ref",
+                ":db/cardinality", ":db.cardinality/one",
+                ":db/doc", "A DM5 object type (topic or assoc)"),
+            map(":db/ident", ":dm5.object-type/topic"),
+            map(":db/ident", ":dm5.object-type/assoc"));
+    }
+
+    // ---
+
+    Collection query(String query, Object... inputs) {
+        return Peer.query(query, conn.db(), inputs);
+    }
+
+    Collection query(List find, List in, List where, Object... inputs) {
+        return Peer.query(map(
+            read(":find"),  find,
+            read(":in"),    in,
+            read(":where"), where), conn.db(), inputs);
+    }
+
+    void storeEntity(Object... keyvals) {
+        conn.transact(list(map(keyvals)));
+    }
+
+    void transact(Map... maps) {
+        conn.transact(list(maps));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

@@ -640,7 +640,7 @@ class StorageDecorator {
      * @return  <code>true</code> if a clean install is detected, <code>false</code> otherwise.
      */
     final boolean init() {
-        boolean isCleanInstall = storage.setupRootNode();
+        boolean isCleanInstall = storage.init();
         if (isCleanInstall) {
             logger.info("Clean install detected -- Starting with a fresh DB");
             storeMigrationNr(0);

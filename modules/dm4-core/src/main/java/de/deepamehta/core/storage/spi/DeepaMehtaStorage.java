@@ -237,7 +237,11 @@ public interface DeepaMehtaStorage {
 
     DeepaMehtaTransaction beginTx();
 
-    boolean setupRootNode();
+    /**
+     * @return  <code>true</code> if a clean install is detected (the database was created),
+     *          <code>false</code> otherwise (the database existed already).
+     */
+    boolean init();
 
     void shutdown();
 
