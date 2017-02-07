@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 
@@ -33,6 +34,8 @@ import java.util.logging.Logger;
 public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String TEMP_ID = "temp-id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -113,16 +116,36 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeTopic(TopicModel topicModel) {
+        setDefaults(topicModel);
+        String uri = topicModel.getUri();
+        checkUriUniqueness(uri);
+        //
+        // 1) update DB
+        long topicId = resolveTempId(storeEntity(
+            ":db/id", TEMP_ID,
+            ":dm4/object-type", ":dm4.object-type/topic",
+            ":dm4.object/uri", uri,
+            ":dm4.object/type", topicModel.getTypeUri()));
+        //
+        // 2) update model
+        topicModel.setId(topicId);
     }
 
     @Override
     public void storeTopicUri(long topicId, String uri) {
+        checkUriUniqueness(uri);
+        storeEntity(
+            ":db/id", topicId,
+            ":dm4.object/uri", uri);
     }
 
     // Note: a storage implementation is not responsible for maintaining the "Instantiation" associations.
     // This is performed at the application layer.
     @Override
     public void storeTopicTypeUri(long topicId, String topicTypeUri) {
+        storeEntity(
+            ":db/id", topicId,
+            ":dm4.object/type", topicTypeUri);
     }
 
     @Override
@@ -362,7 +385,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
             if (isCleanInstall) {
                 installSchema();
                 // create root topic ### TODO
-                storeEntity(":dm5/object-type", ":dm5.object-type/topic");
+                storeEntity(":dm4/object-type", ":dm4.object-type/topic");
             }
             return isCleanInstall;
         } catch (Exception e) {
@@ -398,12 +421,22 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     void installSchema() {
         transact(
-            map(":db/ident", ":dm5/object-type",
-                ":db/valueType", ":db.type/ref",
+            // DM4 Object-Type
+            map(":db/ident",       ":dm4/object-type",
+                ":db/valueType",   ":db.type/ref",
                 ":db/cardinality", ":db.cardinality/one",
-                ":db/doc", "A DM5 object type (topic or assoc)"),
-            map(":db/ident", ":dm5.object-type/topic"),
-            map(":db/ident", ":dm5.object-type/assoc"));
+                ":db/doc",         "A DM4 object type (topic or assoc)"),
+            map(":db/ident", ":dm4.object-type/topic"),
+            map(":db/ident", ":dm4.object-type/assoc"),
+            // DM4 Object
+            map(":db/ident",       ":dm4.object/uri",
+                ":db/valueType",   ":db.type/string",
+                ":db/cardinality", ":db.cardinality/one",
+                ":db/doc",         "A DM4 object's URI"),
+            map(":db/ident",       ":dm4.object/type",
+                ":db/valueType",   ":db.type/string",
+                ":db/cardinality", ":db.cardinality/one",
+                ":db/doc",         "A DM4 object's type (URI)"));
     }
 
     // ---
@@ -419,15 +452,51 @@ public class DatomicStorage implements DeepaMehtaStorage {
             read(":where"), where), conn.db(), inputs);
     }
 
-    void storeEntity(Object... keyvals) {
-        conn.transact(list(map(keyvals)));
+    Future<Map> storeEntity(Object... keyvals) {
+        return transact(map(keyvals));
     }
 
-    void transact(Map... maps) {
-        conn.transact(list(maps));
+    Future<Map> transact(Map... maps) {
+        return conn.transact(list(maps));
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    // ### TODO: a principal copy exists in DeepaMehtaObjectModel
+    private void setDefaults(DeepaMehtaObjectModel model) {
+        if (model.getUri() == null) {
+            model.setUri("");
+        }
+        if (model.getSimpleValue() == null) {
+            model.setSimpleValue("");
+        }
+    }
+
+    /**
+     * Checks if a topic or an association with the given URI exists in the DB, and
+     * throws an exception if so. If an empty URI ("") is given no check is performed.
+     *
+     * @param   uri     The URI to check. Must not be null.
+     */
+    private void checkUriUniqueness(String uri) {
+        if (!uri.equals("")) {
+            Collection result = query(list(read("?e")), list(read("$")),
+                list(list(read("?e"), ":dm4.object/uri", uri)));
+            if (result.size() != 0) {
+                throw new RuntimeException("URI \"" + uri + "\" is not unique");
+            }
+        }
+    }
+
+    private long resolveTempId(Future<Map> txInfo) {
+        try {
+            return (Long) Peer.resolveTempid(conn.db(), txInfo.get().get(Connection.TEMPIDS), TEMP_ID);
+        } catch (Exception e) {
+            throw new RuntimeException("Resolving a temporary ID failed", e);
+        }
+    }
+
+    // ---
 
     private ClassLoader setClassLoader() {
         Thread t = Thread.currentThread();

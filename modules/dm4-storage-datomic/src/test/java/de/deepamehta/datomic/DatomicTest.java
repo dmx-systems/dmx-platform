@@ -26,6 +26,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -44,7 +45,7 @@ import java.util.logging.Logger;
 public class DatomicTest {
 
     private DatomicStorage storage;
-    // private ModelFactoryImpl mf;
+    private ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -53,10 +54,10 @@ public class DatomicTest {
     @Before
     public void setup() {
         String databaseUri = "datomic:mem://dm4-test-" + UUID.randomUUID();
-        // mf = new ModelFactoryImpl();
-        storage = new DatomicStorage(databaseUri, null /*mf*/);
+        mf = new ModelFactoryImpl();
+        storage = new DatomicStorage(databaseUri, mf);
         storage.installSchema();
-        // new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
+        new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
     }
 
     @After
@@ -66,7 +67,7 @@ public class DatomicTest {
         }
     }
 
-    // ---
+    // --- Datomic API ---
 
     @Test
     public void deserialize() {
@@ -77,31 +78,53 @@ public class DatomicTest {
     @Test
     public void query() {
         Collection result = storage.query(list(read("?e")), list(read("$")),
-            list(list(read("?e"), ":dm5/object-type", ":dm5.object-type/topic")));
+            list(list(read("?e"), ":dm4/object-type", ":dm4.object-type/topic")));
         assertEquals(0, result.size());
     }
 
     @Test
     public void queryString() {
-        Collection result = storage.query("[:find ?e :where [?e :dm5/object-type :dm5.object-type/topic]]");
+        Collection result = storage.query("[:find ?e :where [?e :dm4/object-type :dm4.object-type/topic]]");
         assertEquals(0, result.size());
     }
 
     @Test
     public void storeEntity() {
-        storage.storeEntity(":dm5/object-type", ":dm5.object-type/topic");
+        storage.storeEntity(":dm4/object-type", ":dm4.object-type/topic");
         //
         Collection result = storage.query(list(read("?e")), list(read("$")),
-            list(list(read("?e"), ":dm5/object-type", ":dm5.object-type/topic")));
+            list(list(read("?e"), ":dm4/object-type", ":dm4.object-type/topic")));
         assertEquals(1, result.size());
     }
 
     @Test
     public void storeEntityAndQueryAsString() {
-        storage.storeEntity(":dm5/object-type", ":dm5.object-type/topic");
+        storage.storeEntity(":dm4/object-type", ":dm4.object-type/topic");
         //
-        Collection result = storage.query("[:find ?e :where [?e :dm5/object-type :dm5.object-type/topic]]");
+        Collection result = storage.query("[:find ?e :where [?e :dm4/object-type :dm4.object-type/topic]]");
         assertEquals(1, result.size());
+    }
+
+    // --- DeepaMehtaStorage ---
+
+    @Test
+    public void storeTopic() {
+        TopicModel topic = mf.newTopicModel("dm4.test.type_uri");
+        assertEquals(-1, topic.getId());
+        storage.storeTopic(topic);
+        assertTrue(topic.getId() != -1);
+    }
+
+    @Test
+    public void uriUniqueness() {
+        try {
+            TopicModel topic = mf.newTopicModel("dm4.test.uri", "dm4.test.type_uri");
+            storage.storeTopic(topic);
+            storage.storeTopic(topic);
+            fail("\"URI not unique\" exception not thrown");
+        } catch (Exception e) {
+            assertEquals("URI \"dm4.test.uri\" is not unique", e.getMessage());
+        }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
