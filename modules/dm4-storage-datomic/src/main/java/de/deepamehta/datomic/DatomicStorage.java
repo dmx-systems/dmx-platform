@@ -15,6 +15,7 @@ import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
 import datomic.Connection;
+import datomic.Entity;
 import datomic.Peer;
 import static datomic.Util.map;
 import static datomic.Util.list;
@@ -35,7 +36,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String TEMP_ID = "temp-id";
+    static final String TEMP_ID = "temp-id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -84,32 +85,32 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public TopicModel fetchTopic(long topicId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public TopicModel fetchTopic(String key, Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<TopicModel> fetchTopics(String key, Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<TopicModel> queryTopics(Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<TopicModel> queryTopics(String key, Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public Iterator<TopicModel> fetchAllTopics() {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
@@ -121,11 +122,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
         checkUriUniqueness(uri);
         //
         // 1) update DB
-        long topicId = resolveTempId(storeEntity(
-            ":db/id", TEMP_ID,
-            ":dm4/object-type", ":dm4.object-type/topic",
-            ":dm4.object/uri", uri,
-            ":dm4.object/type", topicModel.getTypeUri()));
+        long topicId = resolveTempId(_storeTopic(
+            uri,
+            topicModel.getTypeUri()
+        ));
         //
         // 2) update model
         topicModel.setId(topicId);
@@ -151,16 +151,19 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void deleteTopic(long topicId) {
+        throw new RuntimeException("Not yet implemented");
     }
 
 
@@ -169,74 +172,81 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public AssociationModel fetchAssociation(long assocId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public AssociationModel fetchAssociation(String key, Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociations(String key, Object value) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                          String roleTypeUri1, String roleTypeUri2) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public Iterator<AssociationModel> fetchAllAssociations() {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public long[] fetchPlayerIds(long assocId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void storeAssociation(AssociationModel assocModel) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void storeAssociationUri(long assocId, String uri) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     // Note: a storage implementation is not responsible for maintaining the "Instantiation" associations.
     // This is performed at the application layer.
     @Override
     public void storeAssociationTypeUri(long assocId, String assocTypeUri) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
                                                                        String indexKey, SimpleValue indexValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void deleteAssociation(long assocId) {
+        throw new RuntimeException("Not yet implemented");
     }
 
 
@@ -245,7 +255,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public DeepaMehtaObjectModel fetchObject(long id) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
 
@@ -254,12 +264,12 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<AssociationModel> fetchTopicAssociations(long topicId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociationAssociations(long assocId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
@@ -267,13 +277,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersTopicTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
@@ -281,13 +291,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
@@ -295,13 +305,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
                                                       String othersRoleTypeUri, String othersTopicTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
                                                                   String othersRoleTypeUri, String othersAssocTypeUri) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
 
@@ -310,64 +320,76 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public Object fetchProperty(long id, String propUri) {
-        return null;
+        // ### FIXME
+        Collection result = query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", id, propUri);
+        return result;
     }
 
     @Override
     public boolean hasProperty(long id, String propUri) {
-        return false;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public List<TopicModel> fetchTopicsByProperty(String propUri, Object propValue) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<TopicModel> fetchTopicsByPropertyRange(String propUri, Number from, Number to) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociationsByProperty(String propUri, Object propValue) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public List<AssociationModel> fetchAssociationsByPropertyRange(String propUri, Number from, Number to) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
+        // ### FIXME
+        storeEntity(
+            ":db/id", topicId,
+            propUri, propValue
+        );
     }
 
     @Override
     public void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void indexTopicProperty(long topicId, String propUri, Object propValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void indexAssociationProperty(long assocId, String propUri, Object propValue) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
 
     @Override
     public void deleteTopicProperty(long topicId, String propUri) {
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void deleteAssociationProperty(long assocId, String propUri) {
+        throw new RuntimeException("Not yet implemented");
     }
 
 
@@ -384,8 +406,12 @@ public class DatomicStorage implements DeepaMehtaStorage {
         try {
             if (isCleanInstall) {
                 installSchema();
-                // create root topic ### TODO
-                storeEntity(":dm4/object-type", ":dm4.object-type/topic");
+                // create root topic
+                _storeTopic(
+                    "dm4.core.meta_type",
+                    "dm4.core.meta_meta_type"
+                );
+                // ### FIXME: set topic value
             }
             return isCleanInstall;
         } catch (Exception e) {
@@ -402,12 +428,12 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public Object getDatabaseVendorObject() {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public Object getDatabaseVendorObject(long objectId) {
-        return null;
+        throw new RuntimeException("Not yet implemented");
     }
 
     // ---
@@ -421,13 +447,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     void installSchema() {
         transact(
-            // DM4 Object-Type
-            map(":db/ident",       ":dm4/object-type",
+            // Entity Type
+            map(":db/ident",       ":dm4/entity-type",
                 ":db/valueType",   ":db.type/ref",
                 ":db/cardinality", ":db.cardinality/one",
-                ":db/doc",         "A DM4 object type (topic or assoc)"),
-            map(":db/ident", ":dm4.object-type/topic"),
-            map(":db/ident", ":dm4.object-type/assoc"),
+                ":db/doc",         "A DM4 entity type (topic or assoc)"),
+            map(":db/ident", ":dm4.entity-type/topic"),
+            map(":db/ident", ":dm4.entity-type/assoc"),
             // DM4 Object
             map(":db/ident",       ":dm4.object/uri",
                 ":db/valueType",   ":db.type/string",
@@ -436,20 +462,25 @@ public class DatomicStorage implements DeepaMehtaStorage {
             map(":db/ident",       ":dm4.object/type",
                 ":db/valueType",   ":db.type/string",
                 ":db/cardinality", ":db.cardinality/one",
-                ":db/doc",         "A DM4 object's type (URI)"));
+                ":db/doc",         "A DM4 object's type (URI)")
+        );
     }
 
-    // ---
+    // --- Datomic Helper ---
+
+    Entity entity(Object entityId) {
+        return conn.db().entity(entityId);
+    }
 
     Collection query(String query, Object... inputs) {
-        return Peer.query(query, conn.db(), inputs);
+        return Peer.query(query, addDb(inputs));
     }
 
-    Collection query(List find, List in, List where, Object... inputs) {
+    Collection query(List find, List where, Object... inputs) {
         return Peer.query(map(
-            read(":find"),  find,
-            read(":in"),    in,
-            read(":where"), where), conn.db(), inputs);
+            read(":find"), find,
+            read(":where"), where
+        ), addDb(inputs));
     }
 
     Future<Map> storeEntity(Object... keyvals) {
@@ -460,7 +491,30 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return conn.transact(list(maps));
     }
 
+    /*Connection conn() {
+        return conn;
+    }*/
+
+    long resolveTempId(Future<Map> txInfo) {
+        try {
+            return (Long) Peer.resolveTempid(conn.db(), txInfo.get().get(Connection.TEMPIDS), TEMP_ID);
+        } catch (Exception e) {
+            throw new RuntimeException("Resolving a temporary ID failed", e);
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Future<Map> _storeTopic(String uri, String typeUri) {
+        return storeEntity(
+            ":db/id", TEMP_ID,
+            ":dm4/entity-type", ":dm4.entity-type/topic",
+            ":dm4.object/uri", uri,
+            ":dm4.object/type", typeUri
+        );
+    }
+
+    // ---
 
     // ### TODO: a principal copy exists in DeepaMehtaObjectModel
     private void setDefaults(DeepaMehtaObjectModel model) {
@@ -480,20 +534,19 @@ public class DatomicStorage implements DeepaMehtaStorage {
      */
     private void checkUriUniqueness(String uri) {
         if (!uri.equals("")) {
-            Collection result = query(list(read("?e")), list(read("$")),
-                list(list(read("?e"), ":dm4.object/uri", uri)));
+            Collection result = query(list(read("?e")), list(list(read("?e"), ":dm4.object/uri", uri)));
             if (result.size() != 0) {
                 throw new RuntimeException("URI \"" + uri + "\" is not unique");
             }
         }
     }
 
-    private long resolveTempId(Future<Map> txInfo) {
-        try {
-            return (Long) Peer.resolveTempid(conn.db(), txInfo.get().get(Connection.TEMPIDS), TEMP_ID);
-        } catch (Exception e) {
-            throw new RuntimeException("Resolving a temporary ID failed", e);
-        }
+    private Object[] addDb(Object... inputs) {
+        int len = inputs.length;
+        Object[] a = new Object[len + 1];
+        a[0] = conn.db();
+        System.arraycopy(inputs, 0, a, 1, len);
+        return a;
     }
 
     // ---

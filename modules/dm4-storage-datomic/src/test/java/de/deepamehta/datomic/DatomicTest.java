@@ -15,6 +15,8 @@ import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.util.JavaUtils;
 
+import datomic.Entity;
+import datomic.Peer;
 import static datomic.Util.list;
 import static datomic.Util.read;
 
@@ -62,9 +64,11 @@ public class DatomicTest {
 
     @After
     public void shutdown() {
-        if (storage != null) {
+        // Peer.shutdown() must NOT be called between running tests (in the same JVM instance).
+        // Otherwise strange Datomic errors appear.
+        /* if (storage != null) {
             storage.shutdown();
-        }
+        } */
     }
 
     // --- Datomic API ---
@@ -76,33 +80,76 @@ public class DatomicTest {
     }
 
     @Test
+    public void entity() {
+        Entity entity = storage.entity(1234);
+        assertNotNull(entity);
+        assertEquals(0, entity.keySet().size());
+    }
+
+    @Test
     public void query() {
-        Collection result = storage.query(list(read("?e")), list(read("$")),
-            list(list(read("?e"), ":dm4/object-type", ":dm4.object-type/topic")));
+        Collection result = storage.query(list(read("?e")),
+            list(list(read("?e"), ":dm4/entity-type", ":dm4.entity-type/topic")));
         assertEquals(0, result.size());
     }
 
     @Test
     public void queryString() {
-        Collection result = storage.query("[:find ?e :where [?e :dm4/object-type :dm4.object-type/topic]]");
+        Collection result = storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
         assertEquals(0, result.size());
     }
 
     @Test
     public void storeEntity() {
-        storage.storeEntity(":dm4/object-type", ":dm4.object-type/topic");
+        storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
         //
-        Collection result = storage.query(list(read("?e")), list(read("$")),
-            list(list(read("?e"), ":dm4/object-type", ":dm4.object-type/topic")));
+        Collection result = storage.query(list(read("?e")),
+            list(list(read("?e"), ":dm4/entity-type", ":dm4.entity-type/topic")));
         assertEquals(1, result.size());
     }
 
     @Test
     public void storeEntityAndQueryAsString() {
-        storage.storeEntity(":dm4/object-type", ":dm4.object-type/topic");
+        storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
         //
-        Collection result = storage.query("[:find ?e :where [?e :dm4/object-type :dm4.object-type/topic]]");
+        Collection result = storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
         assertEquals(1, result.size());
+    }
+
+    @Test
+    public void queryWithParameter() {
+        storage.storeEntity(":dm4.object/uri", "dm4.test.uri");
+        Collection result = storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", "dm4.test.uri");
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void typeMismatch() {
+        try {
+            storage.resolveTempId(storage.storeEntity(
+                ":db/id", DatomicStorage.TEMP_ID,
+                ":dm4.object/uri", 1234,    // type mismatch!
+                ":dm4.object/type", "dm4.test.type_uri"));
+            fail("IllegalArgumentException not thrown");
+            // Note: exception is thrown only by resolveTempId(), not by storeEntity()
+        } catch (Exception e) {
+            Throwable cause = e.getCause().getCause();
+            assertTrue(cause instanceof IllegalArgumentException);
+            assertEquals(cause.getMessage(), ":db.error/wrong-type-for-attribute Value 1234 " +
+                "is not a valid :string for attribute :dm4.object/uri");
+        }
+    }
+
+    @Test
+    public void typeMismatch2() {
+        storage.storeEntity(
+            ":db/id", DatomicStorage.TEMP_ID,
+            ":dm4.object/uri", 1234,    // type mismatch!
+            ":dm4.object/type", "dm4.test.type_uri"
+        );
+        Collection result = storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", 1234);
+        assertEquals(0, result.size());
+        // Note: no error occurs; just the result is empty
     }
 
     // --- DeepaMehtaStorage ---
@@ -125,6 +172,13 @@ public class DatomicTest {
         } catch (Exception e) {
             assertEquals("URI \"dm4.test.uri\" is not unique", e.getMessage());
         }
+    }
+
+    @Test
+    @Ignore     // ### FIXME
+    public void storeTopicProperty() {
+        storage.storeTopicProperty(1234, ":dm4.test.prop_uri", "hello", false);
+        storage.fetchProperty(1234, ":dm4.test.prop_uri");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
