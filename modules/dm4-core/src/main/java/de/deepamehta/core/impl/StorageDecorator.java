@@ -655,10 +655,12 @@ class StorageDecorator {
     // ---
 
     final int fetchMigrationNr() {
+        // ### FIXME: ID 0
         return (Integer) fetchProperty(0, "core_migration_nr");
     }
 
     final void storeMigrationNr(int migrationNr) {
+        // ### FIXME: ID 0
         storage.storeTopicProperty(0, "core_migration_nr", migrationNr, false);     // addToIndex=false
     }
 

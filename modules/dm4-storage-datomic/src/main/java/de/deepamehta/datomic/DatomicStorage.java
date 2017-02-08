@@ -14,6 +14,7 @@ import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
+import datomic.Attribute;
 import datomic.Connection;
 import datomic.Entity;
 import datomic.Peer;
@@ -320,9 +321,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public Object fetchProperty(long id, String propUri) {
-        // ### FIXME
-        Collection result = query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", id, propUri);
-        return result;
+        return query("[:find ?v . :in $ ?e ?a :where [?e ?a ?v]]", id, ident(propUri));
     }
 
     @Override
@@ -356,10 +355,20 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
-        // ### FIXME
+        String ident = ident(propUri);
+        // add attribute to schema
+        Attribute attr = attribute(ident);
+        if (attr == null) {
+            logger.info("### Adding attribute \"" + ident + "\" to schema");
+            storeEntity(
+                ":db/ident",       ident,
+                ":db/valueType",   ":db.type/string",   // ### TODO: derive type from value
+                ":db/cardinality", ":db.cardinality/one");
+        }
+        //
         storeEntity(
             ":db/id", topicId,
-            propUri, propValue
+            ident, propValue
         );
     }
 
@@ -452,8 +461,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
                 ":db/valueType",   ":db.type/ref",
                 ":db/cardinality", ":db.cardinality/one",
                 ":db/doc",         "A DM4 entity type (topic or assoc)"),
-            map(":db/ident", ":dm4.entity-type/topic"),
-            map(":db/ident", ":dm4.entity-type/assoc"),
+            map(":db/ident",       ":dm4.entity-type/topic"),
+            map(":db/ident",       ":dm4.entity-type/assoc"),
             // DM4 Object
             map(":db/ident",       ":dm4.object/uri",
                 ":db/valueType",   ":db.type/string",
@@ -466,17 +475,21 @@ public class DatomicStorage implements DeepaMehtaStorage {
         );
     }
 
-    // --- Datomic Helper ---
+    // --- Datomic Helper (callable from tests) ---
 
     Entity entity(Object entityId) {
         return conn.db().entity(entityId);
     }
 
-    Collection query(String query, Object... inputs) {
+    Attribute attribute(Object attrId) {
+        return conn.db().attribute(attrId);
+    }
+
+    <T> T query(String query, Object... inputs) {
         return Peer.query(query, addDb(inputs));
     }
 
-    Collection query(List find, List where, Object... inputs) {
+    <T> T query(List find, List where, Object... inputs) {
         return Peer.query(map(
             read(":find"), find,
             read(":where"), where
@@ -490,10 +503,6 @@ public class DatomicStorage implements DeepaMehtaStorage {
     Future<Map> transact(Map... maps) {
         return conn.transact(list(maps));
     }
-
-    /*Connection conn() {
-        return conn;
-    }*/
 
     long resolveTempId(Future<Map> txInfo) {
         try {
@@ -534,7 +543,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
      */
     private void checkUriUniqueness(String uri) {
         if (!uri.equals("")) {
-            Collection result = query(list(read("?e")), list(list(read("?e"), ":dm4.object/uri", uri)));
+            Collection result = query("[:find ?e :in $ ?uri :where [?e :dm4.object/uri ?uri]]", uri);
             if (result.size() != 0) {
                 throw new RuntimeException("URI \"" + uri + "\" is not unique");
             }
@@ -547,6 +556,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
         a[0] = conn.db();
         System.arraycopy(inputs, 0, a, 1, len);
         return a;
+    }
+
+    private String ident(String uri) {
+        return ":" + uri;
     }
 
     // ---

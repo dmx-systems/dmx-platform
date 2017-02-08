@@ -13,8 +13,9 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.util.JavaUtils;
 
+import datomic.Attribute;
+import datomic.Connection;
 import datomic.Entity;
 import datomic.Peer;
 import static datomic.Util.list;
@@ -24,6 +25,8 @@ import clojure.lang.Keyword;
 import clojure.lang.Symbol;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+// import static org.junit.Assert.assertNotEquals;  // Only available in JUnit 4.11. We have 4.10.
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -31,7 +34,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -39,7 +41,9 @@ import java.io.File;
 import static java.util.Arrays.asList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+// import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 
@@ -75,8 +79,16 @@ public class DatomicTest {
 
     @Test
     public void deserialize() {
+        assertSame(Symbol.class,  read("e").getClass());
         assertSame(Symbol.class,  read("?e").getClass());
         assertSame(Keyword.class, read(":e").getClass());
+    }
+
+    @Test
+    public void keyword() {
+        assertFalse(":e".equals(read(":e")));
+        assertFalse(read(":e").equals(":e"));
+        assertEquals(":e", read(":e").toString());
     }
 
     @Test
@@ -84,6 +96,17 @@ public class DatomicTest {
         Entity entity = storage.entity(1234);
         assertNotNull(entity);
         assertEquals(0, entity.keySet().size());
+    }
+
+    @Test
+    public void attribute() {
+        // retrieve attribute
+        Attribute entityType = storage.attribute(":dm4/entity-type");
+        assertSame(Attribute.TYPE_REF, entityType.valueType());
+        //
+        // retrieve unknown attribute
+        Attribute attr = storage.attribute(":dm4.unknown_attr");
+        assertNull(attr);
     }
 
     @Test
@@ -109,6 +132,23 @@ public class DatomicTest {
     }
 
     @Test
+    public void storeEntityAndResolveTempId() {
+        long id = storage.resolveTempId(storage.storeEntity(
+            ":db/id", DatomicStorage.TEMP_ID,
+            ":dm4.object/type", "dm4.test.type_uri"
+        ));
+        assertTrue(id > 0);
+    }
+
+    @Test
+    public void storeEmptyEntity() throws Exception {
+        Map txInfo = storage.storeEntity(":db/id", DatomicStorage.TEMP_ID).get();
+        Map tempIds = (Map) txInfo.get(Connection.TEMPIDS);
+        // Note: no datom was created
+        assertTrue(tempIds.isEmpty());
+    }
+
+    @Test
     public void storeEntityAndQueryAsString() {
         storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
         //
@@ -119,7 +159,7 @@ public class DatomicTest {
     @Test
     public void queryWithParameter() {
         storage.storeEntity(":dm4.object/uri", "dm4.test.uri");
-        Collection result = storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", "dm4.test.uri");
+        Collection result = storage.query("[:find ?e :in $ ?uri :where [?e :dm4.object/uri ?uri]]", "dm4.test.uri");
         assertEquals(1, result.size());
     }
 
@@ -152,6 +192,43 @@ public class DatomicTest {
         // Note: no error occurs; just the result is empty
     }
 
+    @Test
+    public void unknownAttr() {
+        try {
+            storage.storeEntity(":dm4.unknown_attr", "hello");
+            storage.query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", 1234, ":dm4.unknown_attr");
+            fail("IllegalArgumentException not thrown");
+            // Note: exception is thrown only by query(), not by storeEntity()
+        } catch (Exception e) {
+            Throwable cause = e.getCause().getCause();
+            assertTrue(cause instanceof IllegalArgumentException);
+            assertEquals(cause.getMessage(), ":db.error/not-an-entity Unable to resolve entity: :dm4.unknown_attr");
+        }
+    }
+
+    @Test
+    public void createAttr() {
+        final String IDENT = ":dm4.time.created";
+        // Note: an attribute ident must begin with ":" when stored.
+        // Otherwise the attribute can't be retrieved (null).
+        Attribute attr = storage.attribute(IDENT);
+        assertNull(attr);
+        //
+        storage.storeEntity(
+            ":db/ident",       IDENT,
+            ":db/valueType",   ":db.type/long",
+            ":db/cardinality", ":db.cardinality/one");
+        //
+        attr = storage.attribute(IDENT);
+        assertNotNull(attr);
+        assertSame(read(IDENT), attr.ident());  // ident() returns a clojure.lang.Keyword
+        //
+        // Note: retrieval works also without ":" !!
+        attr = storage.attribute("dm4.time.created");
+        assertNotNull(attr);
+        assertEquals(read(IDENT), attr.ident());
+    }
+
     // --- DeepaMehtaStorage ---
 
     @Test
@@ -175,10 +252,16 @@ public class DatomicTest {
     }
 
     @Test
-    @Ignore     // ### FIXME
     public void storeTopicProperty() {
-        storage.storeTopicProperty(1234, ":dm4.test.prop_uri", "hello", false);
-        storage.fetchProperty(1234, ":dm4.test.prop_uri");
+        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
+        storage.storeTopic(t);
+        long id = t.getId();
+        //
+        final String PROP_URI = "dm4.accesscontrol.creator";
+        storage.storeTopicProperty(id, PROP_URI, "admin", false);
+        //
+        String creator = (String) storage.fetchProperty(id, PROP_URI);
+        assertEquals("admin", creator);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
