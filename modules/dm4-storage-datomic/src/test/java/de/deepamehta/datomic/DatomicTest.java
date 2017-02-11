@@ -136,8 +136,8 @@ public class DatomicTest {
     }
 
     @Test
-    public void storeEntity() {
-        _storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
+    public void transact() {
+        _storage.transact(":dm4/entity-type", ":dm4.entity-type/topic");
         //
         Collection result = _storage.query(list(read("?e")),
             list(list(read("?e"), ":dm4/entity-type", ":dm4.entity-type/topic")));
@@ -145,25 +145,25 @@ public class DatomicTest {
     }
 
     @Test
-    public void storeEntityAndResolveTempId() {
-        long id = _storage.resolveTempId(_storage.storeEntity(
+    public void transactAndResolveTempId() {
+        long id = _storage.resolveTempId(_storage.transact(
             ":db/id", DatomicStorage.TEMP_ID,
-            ":dm4.object/type", "dm4.test.type_uri"
+            ":dm4.object/type", ":dm4.test.type_uri"
         ));
         assertTrue(id > 0);
     }
 
     @Test
     public void storeEmptyEntity() throws Exception {
-        Map txInfo = _storage.storeEntity(":db/id", DatomicStorage.TEMP_ID).get();
+        Map txInfo = _storage.transact(":db/id", DatomicStorage.TEMP_ID).get();
         Map tempIds = (Map) txInfo.get(Connection.TEMPIDS);
         // Note: no datom was created
         assertTrue(tempIds.isEmpty());
     }
 
     @Test
-    public void storeEntityAndQueryAsString() {
-        _storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
+    public void transactAndQueryAsString() {
+        _storage.transact(":dm4/entity-type", ":dm4.entity-type/topic");
         //
         Collection result = _storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
         assertEquals(1, result.size());
@@ -171,7 +171,7 @@ public class DatomicTest {
 
     @Test
     public void queryWithParameter() {
-        _storage.storeEntity(":dm4.object/uri", "dm4.test.uri");
+        _storage.transact(":dm4.object/uri", "dm4.test.uri");
         Collection result = _storage.query("[:find ?e :in $ ?uri :where [?e :dm4.object/uri ?uri]]", "dm4.test.uri");
         assertEquals(1, result.size());
     }
@@ -179,12 +179,12 @@ public class DatomicTest {
     @Test
     public void typeMismatch() {
         try {
-            _storage.resolveTempId(_storage.storeEntity(
+            _storage.resolveTempId(_storage.transact(
                 ":db/id", DatomicStorage.TEMP_ID,
                 ":dm4.object/uri", 1234,    // type mismatch!
-                ":dm4.object/type", "dm4.test.type_uri"));
+                ":dm4.object/type", ":dm4.test.type_uri"));
             fail("IllegalArgumentException not thrown");
-            // Note: exception is thrown only by resolveTempId(), not by storeEntity()
+            // Note: exception is thrown only by resolveTempId(), not by transact()
         } catch (Exception e) {
             Throwable cause = e.getCause().getCause();
             assertTrue(cause instanceof IllegalArgumentException);
@@ -195,10 +195,10 @@ public class DatomicTest {
 
     @Test
     public void typeMismatch2() {
-        _storage.storeEntity(
+        _storage.transact(
             ":db/id", DatomicStorage.TEMP_ID,
             ":dm4.object/uri", 1234,    // type mismatch!
-            ":dm4.object/type", "dm4.test.type_uri"
+            ":dm4.object/type", ":dm4.test.type_uri"
         );
         Collection result = _storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", 1234);
         assertEquals(0, result.size());
@@ -208,10 +208,10 @@ public class DatomicTest {
     @Test
     public void unknownAttr() {
         try {
-            _storage.storeEntity(":dm4.unknown_attr", "hello");
+            _storage.transact(":dm4.unknown_attr", "hello");
             _storage.query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", 1234, ":dm4.unknown_attr");
             fail("IllegalArgumentException not thrown");
-            // Note: exception is thrown only by query(), not by storeEntity()
+            // Note: exception is thrown only by query(), not by transact()
         } catch (Exception e) {
             Throwable cause = e.getCause().getCause();
             assertTrue(cause instanceof IllegalArgumentException);
@@ -227,7 +227,7 @@ public class DatomicTest {
         Attribute attr = _storage.attribute(IDENT);
         assertNull(attr);
         //
-        _storage.storeEntity(
+        _storage.transact(
             ":db/ident",       IDENT,
             ":db/valueType",   ":db.type/long",
             ":db/cardinality", ":db.cardinality/one");
@@ -262,6 +262,17 @@ public class DatomicTest {
         } catch (Exception e) {
             assertEquals("URI \"dm4.test.uri\" is not unique", e.getMessage());
         }
+    }
+
+    @Test
+    public void storeTopicValue() {
+        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
+        storage.storeTopic(t);
+        long id = t.getId();
+        //
+        storage.storeTopicValue(id, new SimpleValue("hello!"), null, null, null);
+        //
+        assertEquals("hello!", _storage.entity(id).get(":dm4.test.type_uri"));
     }
 
     @Test

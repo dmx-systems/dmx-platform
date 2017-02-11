@@ -132,7 +132,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicUri(long topicId, String uri) {
         checkUriUniqueness(uri);
-        storeEntity(
+        transact(
             ":db/id", topicId,
             ":dm4.object/uri", uri);
     }
@@ -141,7 +141,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // This is performed at the application layer.
     @Override
     public void storeTopicTypeUri(long topicId, String topicTypeUri) {
-        storeEntity(
+        transact(
             ":db/id", topicId,
             ":dm4.object/type", topicTypeUri);
     }
@@ -149,7 +149,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
-        throw new RuntimeException("Not yet implemented");
+        String typeKey = typeKey(topicId);
+        createAttributeIfNotExists(typeKey);
+        transact(
+            ":db/id", topicId,
+            typeKey, value.value());
     }
 
     @Override
@@ -353,17 +357,9 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
         String ident = ident(propUri);
-        // add attribute to schema
-        Attribute attr = attribute(ident);
-        if (attr == null) {
-            logger.info("### Adding attribute \"" + ident + "\" to schema");
-            storeEntity(
-                ":db/ident",       ident,
-                ":db/valueType",   ":db.type/string",   // ### TODO: derive type from value
-                ":db/cardinality", ":db.cardinality/one");
-        }
+        createAttributeIfNotExists(ident);
         //
-        storeEntity(
+        transact(
             ":db/id", topicId,
             ident, propValue
         );
@@ -460,7 +456,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
                 ":db/cardinality", ":db.cardinality/one",
                 ":db/doc",         "A DM4 object's URI"),
             map(":db/ident",       ":dm4.object/type",
-                ":db/valueType",   ":db.type/string",
+                ":db/valueType",   ":db.type/keyword",
                 ":db/cardinality", ":db.cardinality/one",
                 ":db/doc",         "A DM4 object's type (URI)")
         );
@@ -487,7 +483,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         ), addDb(inputs));
     }
 
-    Future<Map> storeEntity(Object... keyvals) {
+    Future<Map> transact(Object... keyvals) {
         return transact(map(keyvals));
     }
 
@@ -506,11 +502,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Future<Map> _storeTopic(String uri, String typeUri) {
-        return storeEntity(
+        return transact(
             ":db/id", TEMP_ID,
             ":dm4/entity-type", ":dm4.entity-type/topic",
             ":dm4.object/uri", uri,
-            ":dm4.object/type", typeUri
+            ":dm4.object/type", ident(typeUri)
         );
     }
 
@@ -538,6 +534,25 @@ public class DatomicStorage implements DeepaMehtaStorage {
             if (result.size() != 0) {
                 throw new RuntimeException("URI \"" + uri + "\" is not unique");
             }
+        }
+    }
+
+    private String typeKey(long entityId) {
+        Object typeKey = entity(entityId).get(":dm4.object/type");
+        if (typeKey == null) {
+            throw new RuntimeException("Entity " + entityId + " has no type URI");
+        }
+        return typeKey.toString();
+    }
+
+    private void createAttributeIfNotExists(String ident) {
+        if (attribute(ident) == null) {
+            logger.info("### Adding attribute \"" + ident + "\" to schema");
+            transact(
+                ":db/ident",       ident,
+                ":db/valueType",   ":db.type/string",   // ### TODO: derive type from value
+                ":db/cardinality", ":db.cardinality/one"
+            );
         }
     }
 
