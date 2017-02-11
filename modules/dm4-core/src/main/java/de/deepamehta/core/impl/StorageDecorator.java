@@ -22,6 +22,10 @@ import java.util.logging.Logger;
 // ### TODO: should methods return model *impl* objects? -> Yes!
 class StorageDecorator {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String PROP_CORE_MODEL_VERSION = "core_migration_nr";  // ### TODO: -> "dm4.core.model_version"
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaStorage storage;
@@ -643,7 +647,8 @@ class StorageDecorator {
         boolean isCleanInstall = storage.init();
         if (isCleanInstall) {
             logger.info("Clean install detected -- Starting with a fresh DB");
-            storeMigrationNr(0);
+            createRootTopic();
+            storeCoreModelVersion(0);
         }
         return isCleanInstall;
     }
@@ -654,14 +659,14 @@ class StorageDecorator {
 
     // ---
 
-    final int fetchMigrationNr() {
+    final int fetchCoreModelVersion() {
         // ### FIXME: ID 0
-        return (Integer) fetchProperty(0, "core_migration_nr");
+        return (Integer) fetchProperty(0, PROP_CORE_MODEL_VERSION);
     }
 
-    final void storeMigrationNr(int migrationNr) {
+    final void storeCoreModelVersion(int version) {
         // ### FIXME: ID 0
-        storage.storeTopicProperty(0, "core_migration_nr", migrationNr, false);     // addToIndex=false
+        storeTopicProperty(0, PROP_CORE_MODEL_VERSION, version, false);     // addToIndex=false
     }
 
     // ---
@@ -672,5 +677,15 @@ class StorageDecorator {
 
     final Object getDatabaseVendorObject(long objectId) {
         return storage.getDatabaseVendorObject(objectId);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void createRootTopic() {
+        storeTopic(storage.getModelFactory().newTopicModel(
+            "dm4.core.meta_type",
+            "dm4.core.meta_meta_type"
+        ));
+        // ### FIXME: set topic value
     }
 }

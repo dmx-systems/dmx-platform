@@ -75,7 +75,7 @@ class MigrationManager {
      * Determines the core migrations to be run and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int installedModelVersion = dm4.pl.fetchMigrationNr();
+        int installedModelVersion = dm4.pl.fetchCoreModelVersion();
         int requiredModelVersion = CORE_MODEL_VERSION;
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
@@ -96,7 +96,7 @@ class MigrationManager {
 
     private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, null, isCleanInstall);
-        dm4.pl.storeMigrationNr(migrationNr);
+        dm4.pl.storeCoreModelVersion(migrationNr);
     }
 
     private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {

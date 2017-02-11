@@ -50,7 +50,8 @@ import java.util.logging.Logger;
 
 public class DatomicTest {
 
-    private DatomicStorage storage;
+    private DeepaMehtaStorage storage;  // for testing public storage API
+    private DatomicStorage _storage;    // for testing internal Datomic API
     private ModelFactoryImpl mf;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
@@ -61,8 +62,9 @@ public class DatomicTest {
     public void setup() {
         String databaseUri = "datomic:mem://dm4-test-" + UUID.randomUUID();
         mf = new ModelFactoryImpl();
-        storage = new DatomicStorage(databaseUri, mf);
-        storage.installSchema();
+        _storage = new DatomicStorage(databaseUri, mf);
+        _storage.installSchema();
+        storage = _storage;
         new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
     }
 
@@ -93,47 +95,58 @@ public class DatomicTest {
 
     @Test
     public void entity() {
-        Entity entity = storage.entity(1234);
+        Entity entity = _storage.entity(1234);
         assertNotNull(entity);
         assertEquals(0, entity.keySet().size());
     }
 
     @Test
+    @Ignore
+    public void systemEntities() {
+        // Datomic IDs 0 to 62 apparently hold the "system" schema.
+        // IDs from 63 hold the user application schema.
+        for (int i = 0; i < 1300; i++) {
+            Entity entity = _storage.entity(i).touch();
+            logger.info("### (" + entity.keySet().size() + ") " + entity);
+        }
+    }
+
+    @Test
     public void attribute() {
         // retrieve attribute
-        Attribute entityType = storage.attribute(":dm4/entity-type");
+        Attribute entityType = _storage.attribute(":dm4/entity-type");
         assertSame(Attribute.TYPE_REF, entityType.valueType());
         //
         // retrieve unknown attribute
-        Attribute attr = storage.attribute(":dm4.unknown_attr");
+        Attribute attr = _storage.attribute(":dm4.unknown_attr");
         assertNull(attr);
     }
 
     @Test
     public void query() {
-        Collection result = storage.query(list(read("?e")),
+        Collection result = _storage.query(list(read("?e")),
             list(list(read("?e"), ":dm4/entity-type", ":dm4.entity-type/topic")));
         assertEquals(0, result.size());
     }
 
     @Test
     public void queryString() {
-        Collection result = storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
+        Collection result = _storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
         assertEquals(0, result.size());
     }
 
     @Test
     public void storeEntity() {
-        storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
+        _storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
         //
-        Collection result = storage.query(list(read("?e")),
+        Collection result = _storage.query(list(read("?e")),
             list(list(read("?e"), ":dm4/entity-type", ":dm4.entity-type/topic")));
         assertEquals(1, result.size());
     }
 
     @Test
     public void storeEntityAndResolveTempId() {
-        long id = storage.resolveTempId(storage.storeEntity(
+        long id = _storage.resolveTempId(_storage.storeEntity(
             ":db/id", DatomicStorage.TEMP_ID,
             ":dm4.object/type", "dm4.test.type_uri"
         ));
@@ -142,7 +155,7 @@ public class DatomicTest {
 
     @Test
     public void storeEmptyEntity() throws Exception {
-        Map txInfo = storage.storeEntity(":db/id", DatomicStorage.TEMP_ID).get();
+        Map txInfo = _storage.storeEntity(":db/id", DatomicStorage.TEMP_ID).get();
         Map tempIds = (Map) txInfo.get(Connection.TEMPIDS);
         // Note: no datom was created
         assertTrue(tempIds.isEmpty());
@@ -150,23 +163,23 @@ public class DatomicTest {
 
     @Test
     public void storeEntityAndQueryAsString() {
-        storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
+        _storage.storeEntity(":dm4/entity-type", ":dm4.entity-type/topic");
         //
-        Collection result = storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
+        Collection result = _storage.query("[:find ?e :where [?e :dm4/entity-type :dm4.entity-type/topic]]");
         assertEquals(1, result.size());
     }
 
     @Test
     public void queryWithParameter() {
-        storage.storeEntity(":dm4.object/uri", "dm4.test.uri");
-        Collection result = storage.query("[:find ?e :in $ ?uri :where [?e :dm4.object/uri ?uri]]", "dm4.test.uri");
+        _storage.storeEntity(":dm4.object/uri", "dm4.test.uri");
+        Collection result = _storage.query("[:find ?e :in $ ?uri :where [?e :dm4.object/uri ?uri]]", "dm4.test.uri");
         assertEquals(1, result.size());
     }
 
     @Test
     public void typeMismatch() {
         try {
-            storage.resolveTempId(storage.storeEntity(
+            _storage.resolveTempId(_storage.storeEntity(
                 ":db/id", DatomicStorage.TEMP_ID,
                 ":dm4.object/uri", 1234,    // type mismatch!
                 ":dm4.object/type", "dm4.test.type_uri"));
@@ -182,12 +195,12 @@ public class DatomicTest {
 
     @Test
     public void typeMismatch2() {
-        storage.storeEntity(
+        _storage.storeEntity(
             ":db/id", DatomicStorage.TEMP_ID,
             ":dm4.object/uri", 1234,    // type mismatch!
             ":dm4.object/type", "dm4.test.type_uri"
         );
-        Collection result = storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", 1234);
+        Collection result = _storage.query("[:find ?e :in $ ?v :where [?e :dm4.object/uri ?v]]", 1234);
         assertEquals(0, result.size());
         // Note: no error occurs; just the result is empty
     }
@@ -195,8 +208,8 @@ public class DatomicTest {
     @Test
     public void unknownAttr() {
         try {
-            storage.storeEntity(":dm4.unknown_attr", "hello");
-            storage.query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", 1234, ":dm4.unknown_attr");
+            _storage.storeEntity(":dm4.unknown_attr", "hello");
+            _storage.query("[:find ?v :in $ ?e ?a :where [?e ?a ?v]]", 1234, ":dm4.unknown_attr");
             fail("IllegalArgumentException not thrown");
             // Note: exception is thrown only by query(), not by storeEntity()
         } catch (Exception e) {
@@ -211,20 +224,20 @@ public class DatomicTest {
         final String IDENT = ":dm4.time.created";
         // Note: an attribute ident must begin with ":" when stored.
         // Otherwise the attribute can't be retrieved (null).
-        Attribute attr = storage.attribute(IDENT);
+        Attribute attr = _storage.attribute(IDENT);
         assertNull(attr);
         //
-        storage.storeEntity(
+        _storage.storeEntity(
             ":db/ident",       IDENT,
             ":db/valueType",   ":db.type/long",
             ":db/cardinality", ":db.cardinality/one");
         //
-        attr = storage.attribute(IDENT);
+        attr = _storage.attribute(IDENT);
         assertNotNull(attr);
         assertSame(read(IDENT), attr.ident());  // ident() returns a clojure.lang.Keyword
         //
         // Note: retrieval works also without ":" !!
-        attr = storage.attribute("dm4.time.created");
+        attr = _storage.attribute("dm4.time.created");
         assertNotNull(attr);
         assertEquals(read(IDENT), attr.ident());
     }
@@ -261,6 +274,22 @@ public class DatomicTest {
         storage.storeTopicProperty(id, PROP_URI, "admin", false);
         //
         String creator = (String) storage.fetchProperty(id, PROP_URI);
+        assertEquals("admin", creator);
+    }
+
+    @Test
+    public void storeTopicPropertyWhenEntityDoesNotExist() {
+        final String PROP_URI = "dm4.accesscontrol.creator";
+        // Note: if no entity with ID exists behavior seems to be undefined.
+        // See also systemEntities() test above.
+        final long TOPIC_ID = 1003;     // from 1004 on the datom is NOT added!
+        storage.storeTopicProperty(TOPIC_ID, PROP_URI, "admin", false);
+        //
+        Entity e = _storage.entity(TOPIC_ID).touch();
+        logger.info("### entity " + e);
+        assertEquals(1, e.keySet().size());
+        //
+        String creator = (String) storage.fetchProperty(TOPIC_ID, PROP_URI);
         assertEquals("admin", creator);
     }
 

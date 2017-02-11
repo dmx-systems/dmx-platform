@@ -123,10 +123,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         checkUriUniqueness(uri);
         //
         // 1) update DB
-        long topicId = resolveTempId(_storeTopic(
-            uri,
-            topicModel.getTypeUri()
-        ));
+        long topicId = resolveTempId(_storeTopic(uri, topicModel.getTypeUri()));
         //
         // 2) update model
         topicModel.setId(topicId);
@@ -415,12 +412,6 @@ public class DatomicStorage implements DeepaMehtaStorage {
         try {
             if (isCleanInstall) {
                 installSchema();
-                // create root topic
-                _storeTopic(
-                    "dm4.core.meta_type",
-                    "dm4.core.meta_meta_type"
-                );
-                // ### FIXME: set topic value
             }
             return isCleanInstall;
         } catch (Exception e) {
