@@ -101,6 +101,7 @@ class TypeStorage {
             endlessRecursionDetection.check(topicTypeUri);
             //
             // fetch generic topic
+            // ### FIXME: "uri" is storage impl dependent
             TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
             checkTopicType(topicTypeUri, typeTopic);
             //
@@ -128,6 +129,7 @@ class TypeStorage {
             endlessRecursionDetection.check(assocTypeUri);
             //
             // fetch generic topic
+            // ### FIXME: "uri" is storage impl dependent
             TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
             checkAssociationType(assocTypeUri, typeTopic);
             //

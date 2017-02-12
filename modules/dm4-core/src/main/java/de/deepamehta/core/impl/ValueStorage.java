@@ -162,6 +162,7 @@ class ValueStorage {
         if (topicRef.isReferenceById()) {
             return pl.fetchTopic(topicRef.getId()).loadChildTopics();
         } else if (topicRef.isReferenceByUri()) {
+            // ### FIXME: "uri" is storage impl dependent
             TopicModelImpl topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri()));
             if (topic == null) {
                 throw new RuntimeException("Topic with URI \"" + topicRef.getUri() + "\" not found");

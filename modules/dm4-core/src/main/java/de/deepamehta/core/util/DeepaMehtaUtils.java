@@ -187,7 +187,9 @@ public class DeepaMehtaUtils {
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
+        // ### FIXME: "type_uri" is storage impl dependent
         String t1 = (String) dm4.getProperty(r1.getPlayerId(), "type_uri");
+        // ### FIXME: "type_uri" is storage impl dependent
         String t2 = (String) dm4.getProperty(r2.getPlayerId(), "type_uri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);

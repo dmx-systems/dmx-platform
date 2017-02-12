@@ -264,7 +264,7 @@ public class DatomicTest {
         long id = topic.getId();
         storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
         //
-        TopicModel t = storage.fetchTopic("dm4.object/uri", "dm4.test.uri");
+        TopicModel t = storage.fetchTopicByUri("dm4.test.uri");
         assertEquals(id, t.getId());
         assertEquals("dm4.test.uri", t.getUri());
         assertEquals("dm4.test.type_uri", t.getTypeUri());
@@ -274,16 +274,18 @@ public class DatomicTest {
 
     @Test
     public void fetchTopicByUriWhenUriDoesntExist() {
-        TopicModel t = storage.fetchTopic("dm4.object/uri", "dm4.test.uri");
+        TopicModel t = storage.fetchTopicByUri("dm4.test.uri");
         assertNull(t);
     }
 
     @Test
     public void fetchTopicByValueWithAmbiguity() {
         try {
+            long id;
             TopicModel topic = mf.newTopicModel("dm4.test.type_uri", new SimpleValue("hello!"));
+            //
             storage.storeTopic(topic);
-            long id = topic.getId();
+            id = topic.getId();
             storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
             //
             storage.storeTopic(topic);
@@ -291,8 +293,7 @@ public class DatomicTest {
             storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
             //
             TopicModel t = storage.fetchTopic("dm4.test.type_uri", "hello!");
-            fail("IllegalArgumentException not thrown");
-            // Note: exception is thrown only by resolveTempId(), not by transact()
+            fail("RuntimeException not thrown");
         } catch (Exception e) {
             assertTrue(e.getMessage().startsWith("Ambiguity: there are 2 entities"));
         }

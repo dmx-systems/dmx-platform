@@ -22,6 +22,8 @@ public interface DeepaMehtaStorage {
 
     TopicModel fetchTopic(long topicId);
 
+    TopicModel fetchTopicByUri(String uri);
+
     TopicModel fetchTopic(String key, Object value);
 
     List<? extends TopicModel> fetchTopics(String key, Object value);

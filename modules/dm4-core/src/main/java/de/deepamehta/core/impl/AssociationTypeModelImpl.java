@@ -68,6 +68,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     @Override
     List<AssociationModelImpl> getAllInstances() {
+        // ### FIXME: "type_uri" is storage impl dependent
         return pl.fetchAssociations("type_uri", new SimpleValue(uri));
     }
 

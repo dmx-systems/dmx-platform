@@ -90,6 +90,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     @Override
+    public TopicModel fetchTopicByUri(String uri) {
+        return fetchTopic("dm4.object/uri", uri);
+    }
+
+    @Override
     public TopicModel fetchTopic(String key, Object value) {
         List<Long> result = query("[:find [?e ...] :in $ ?a ?v :where [?e ?a ?v]]", ident(key), value);
         switch (result.size()) {
