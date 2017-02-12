@@ -344,6 +344,19 @@ public class DatomicTest {
     }
 
     @Test
+    public void storeTopicPropertyLong() {
+        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
+        storage.storeTopic(t);
+        long id = t.getId();
+        //
+        final String PROP_URI = "dm4.accesscontrol.creator";
+        storage.storeTopicProperty(id, PROP_URI, 1234L, false);
+        //
+        long creator = (Long) storage.fetchProperty(id, PROP_URI);
+        assertEquals(1234L, creator);
+    }
+
+    @Test
     public void storeTopicPropertyWhenEntityDoesNotExist() {
         final String PROP_URI = "dm4.accesscontrol.creator";
         // Note: if no entity with ID exists behavior seems to be undefined.
@@ -372,7 +385,4 @@ public class DatomicTest {
         storage.storeAssociation(assoc);
         assertTrue(assoc.getId() != -1);
     }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
 }

@@ -165,10 +165,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
         String typeKey = typeKey(topicId);
-        addAttributeToSchema(typeKey);
+        Object val = value.value();
+        addAttributeToSchema(typeKey, val);
         transact(
             ":db/id", topicId,
-            typeKey, value.value());
+            typeKey, val);
     }
 
     @Override
@@ -260,10 +261,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
                                                                        String indexKey, SimpleValue indexValue) {
         String typeKey = typeKey(assocId);
-        addAttributeToSchema(typeKey);
+        Object val = value.value();
+        addAttributeToSchema(typeKey, val);
         transact(
             ":db/id", assocId,
-            typeKey, value.value());
+            typeKey, val);
     }
 
     @Override
@@ -389,7 +391,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
         String ident = ident(propUri);
-        addAttributeToSchema(ident);
+        addAttributeToSchema(ident, propValue);
         //
         transact(
             ":db/id", topicId,
@@ -663,14 +665,31 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return typeKey.toString();
     }
 
-    private void addAttributeToSchema(String ident) {
+    private void addAttributeToSchema(String ident, Object value) {
         if (attribute(ident) == null) {
-            logger.info("### Adding attribute \"" + ident + "\" to schema");
+            String valueType = valueType(value);
+            logger.info("### Adding attribute \"" + ident + "\" to schema (" + valueType + ")");
             transact(
                 ":db/ident",       ident,
-                ":db/valueType",   ":db.type/string",   // ### TODO: derive type from value
+                ":db/valueType",   valueType,
                 ":db/cardinality", ":db.cardinality/one"
             );
+        }
+    }
+
+    String valueType(Object value) {
+        if (value instanceof String) {
+            return ":db.type/string";
+        } else if (value instanceof Integer) {
+            return ":db.type/long";      // Note: Datomic has no "int" type
+        } else if (value instanceof Long) {
+            return ":db.type/long";
+        } else if (value instanceof Double) {
+            return ":db.type/double";
+        } else if (value instanceof Boolean) {
+            return ":db.type/boolean";
+        } else {
+            throw new IllegalArgumentException("Supported value types are String, Integer, Long, Double, or Boolean");
         }
     }
 
