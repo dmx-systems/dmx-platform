@@ -310,7 +310,6 @@ public class DatomicTest {
         storage.storeTopicProperty(TOPIC_ID, PROP_URI, "admin", false);
         //
         Entity e = _storage.entity(TOPIC_ID).touch();
-        logger.info("### entity " + e);
         assertEquals(1, e.keySet().size());
         //
         String creator = (String) storage.fetchProperty(TOPIC_ID, PROP_URI);

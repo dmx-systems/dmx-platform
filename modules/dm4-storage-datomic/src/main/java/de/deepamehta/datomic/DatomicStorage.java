@@ -150,7 +150,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
                                                                  String indexKey, SimpleValue indexValue) {
         String typeKey = typeKey(topicId);
-        createAttributeIfNotExists(typeKey);
+        addAttributeToSchema(typeKey);
         transact(
             ":db/id", topicId,
             typeKey, value.value());
@@ -244,7 +244,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
                                                                        String indexKey, SimpleValue indexValue) {
-        throw new RuntimeException("Not yet implemented");
+        String typeKey = typeKey(assocId);
+        addAttributeToSchema(typeKey);
+        transact(
+            ":db/id", assocId,
+            typeKey, value.value());
     }
 
     @Override
@@ -370,7 +374,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public void storeTopicProperty(long topicId, String propUri, Object propValue, boolean addToIndex) {
         String ident = ident(propUri);
-        createAttributeIfNotExists(ident);
+        addAttributeToSchema(ident);
         //
         transact(
             ":db/id", topicId,
@@ -617,7 +621,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return typeKey.toString();
     }
 
-    private void createAttributeIfNotExists(String ident) {
+    private void addAttributeToSchema(String ident) {
         if (attribute(ident) == null) {
             logger.info("### Adding attribute \"" + ident + "\" to schema");
             transact(
