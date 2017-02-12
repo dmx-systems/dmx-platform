@@ -91,7 +91,17 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public TopicModel fetchTopic(String key, Object value) {
-        throw new RuntimeException("Not yet implemented");
+        List<Long> result = query("[:find [?e ...] :in $ ?a ?v :where [?e ?a ?v]]", ident(key), value);
+        switch (result.size()) {
+        case 0:
+            return null;
+        case 1:
+            long topicId = result.get(0);
+            return buildTopic(topicId);
+        default:
+            throw new RuntimeException("Ambiguity: there are " + result.size() + " entities with key \"" +
+                key + "\" and value \"" + value + "\" " + result);
+        }
     }
 
     @Override
@@ -533,6 +543,33 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // --- Datomic -> DeepaMehta Bridge ---
+
+    TopicModel buildTopic(long topicId) {
+        Entity e = entity(topicId);
+        return mf.newTopicModel(
+            topicId,
+            uri(e),
+            typeUri(e),
+            simpleValue(e),
+            null    // childTopics=null
+        );
+    }
+
+    // ---
+
+    private String uri(Entity e) {
+        return (String) e.get(":dm4.object/uri");
+    }
+
+    private String typeUri(Entity e) {
+        return uri(e.get(":dm4.object/type").toString());   // Note: e.get() returns a Keyword
+    }
+
+    private SimpleValue simpleValue(Entity e) {
+        return new SimpleValue(e.get(e.get(":dm4.object/type")));
+    }
+
     // --- DeepaMehta -> Datomic Bridge ---
 
     private Future<Map> _storeTopic(String uri, String typeUri) {
@@ -578,7 +615,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         }
     }
 
-    // ---
+    // --- Helper ---
 
     // ### TODO: a principal copy exists in DeepaMehtaObjectModel
     private void setDefaults(DeepaMehtaObjectModel model) {
@@ -614,7 +651,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     private String typeKey(long entityId) {
-        Object typeKey = entity(entityId).get(":dm4.object/type");
+        Object typeKey = entity(entityId).get(":dm4.object/type");  // typeKey is a Keyword
         if (typeKey == null) {
             throw new RuntimeException("Entity " + entityId + " has no type URI");
         }
@@ -640,8 +677,14 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return a;
     }
 
+    // ---
+
     private String ident(String uri) {
         return ":" + uri;
+    }
+
+    private String uri(String ident) {
+        return ident.substring(1);
     }
 
     // ---
