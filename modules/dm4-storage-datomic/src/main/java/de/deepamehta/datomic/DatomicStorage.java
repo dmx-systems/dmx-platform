@@ -213,7 +213,20 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeAssociation(AssociationModel assocModel) {
-        throw new RuntimeException("Not yet implemented");
+        setDefaults(assocModel);
+        String uri = assocModel.getUri();
+        checkUriUniqueness(uri);
+        //
+        // 1) update DB
+        RoleModel role1 = assocModel.getRoleModel1();
+        RoleModel role2 = assocModel.getRoleModel2();
+        long assocId = resolveTempId(_storeAssociation(uri, assocModel.getTypeUri(),
+            getPlayerId(role1), role1.getRoleTypeUri(),
+            getPlayerId(role2), role2.getRoleTypeUri()
+        ));
+        //
+        // 2) update model
+        assocModel.setId(assocId);
     }
 
     @Override
@@ -444,21 +457,36 @@ public class DatomicStorage implements DeepaMehtaStorage {
     void installSchema() {
         transact(
             // Entity Type
-            map(":db/ident",       ":dm4/entity-type",
-                ":db/valueType",   ":db.type/ref",
-                ":db/cardinality", ":db.cardinality/one",
-                ":db/doc",         "A DM4 entity type (topic or assoc)"),
-            map(":db/ident",       ":dm4.entity-type/topic"),
-            map(":db/ident",       ":dm4.entity-type/assoc"),
-            // DM4 Object
-            map(":db/ident",       ":dm4.object/uri",
-                ":db/valueType",   ":db.type/string",
-                ":db/cardinality", ":db.cardinality/one",
-                ":db/doc",         "A DM4 object's URI"),
-            map(":db/ident",       ":dm4.object/type",
-                ":db/valueType",   ":db.type/keyword",
-                ":db/cardinality", ":db.cardinality/one",
-                ":db/doc",         "A DM4 object's type (URI)")
+            map(":db/ident",        ":dm4/entity-type",
+                ":db/valueType",    ":db.type/ref",
+                ":db/cardinality",  ":db.cardinality/one",
+                ":db/doc",          "A DM4 entity type (topic or assoc)"),
+            map(":db/ident",        ":dm4.entity-type/topic"),
+            map(":db/ident",        ":dm4.entity-type/assoc"),
+            // DM4 Object (Topic or Association)
+            map(":db/ident",        ":dm4.object/uri",
+                ":db/valueType",    ":db.type/string",
+                ":db/cardinality",  ":db.cardinality/one",
+                ":db/doc",          "A DM4 object's URI"),
+            map(":db/ident",        ":dm4.object/type",
+                ":db/valueType",    ":db.type/keyword",
+                ":db/cardinality",  ":db.cardinality/one",
+                ":db/doc",          "A DM4 object's type (URI)"),
+            // Association
+            map(":db/ident",        ":dm4.assoc/role",
+                ":db/valueType",    ":db.type/ref",
+                ":db/cardinality",  ":db.cardinality/many",
+                ":db/isComponent",  true,
+                ":db/doc",          "An association's 2 roles"),
+            // Role
+            map(":db/ident",        ":dm4.role/player",
+                ":db/valueType",    ":db.type/ref",
+                ":db/cardinality",  ":db.cardinality/one",
+                ":db/doc",          "A role's player ID"),
+            map(":db/ident",        ":dm4.role/type",
+                ":db/valueType",    ":db.type/keyword",
+                ":db/cardinality",  ":db.cardinality/one",
+                ":db/doc",          "A role's type (URI)")
         );
     }
 
@@ -501,6 +529,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    // --- DeepaMehta -> Datomic Bridge ---
+
     private Future<Map> _storeTopic(String uri, String typeUri) {
         return transact(
             ":db/id", TEMP_ID,
@@ -508,6 +538,40 @@ public class DatomicStorage implements DeepaMehtaStorage {
             ":dm4.object/uri", uri,
             ":dm4.object/type", ident(typeUri)
         );
+    }
+
+    private Future<Map> _storeAssociation(String uri, String typeUri, long playerId1, String roleTypeUri1,
+                                                                      long playerId2, String roleTypeUri2) {
+        return transact(
+            ":db/id", TEMP_ID,
+            ":dm4/entity-type", ":dm4.entity-type/assoc",
+            ":dm4.object/uri", uri,
+            ":dm4.object/type", ident(typeUri),
+            ":dm4.assoc/role", list(
+                map(":dm4.role/player", playerId1, ":dm4.role/type", ident(roleTypeUri1)),
+                map(":dm4.role/player", playerId2, ":dm4.role/type", ident(roleTypeUri2))
+            )
+        );
+    }
+
+    // ---
+
+    private long getPlayerId(RoleModel roleModel) {
+        if (roleModel instanceof TopicRoleModel) {
+            return getTopicPlayerId((TopicRoleModel) roleModel);
+        } else if (roleModel instanceof AssociationRoleModel) {
+            return roleModel.getPlayerId();
+        } else {
+            throw new RuntimeException("Unexpected role model: " + roleModel);
+        }
+    }
+
+    private long getTopicPlayerId(TopicRoleModel roleModel) {
+        if (roleModel.topicIdentifiedByUri()) {
+            return entityId(roleModel.getTopicUri());
+        } else {
+            return roleModel.getPlayerId();
+        }
     }
 
     // ---
@@ -535,6 +599,14 @@ public class DatomicStorage implements DeepaMehtaStorage {
                 throw new RuntimeException("URI \"" + uri + "\" is not unique");
             }
         }
+    }
+
+    private long entityId(String uri) {
+        Long entityId = query("[:find ?e . :in $ ?uri :where [?e :dm4.object/uri ?uri]]", uri);
+        if (entityId == null) {
+            throw new RuntimeException("Entity with URI \"" + uri + "\" not found in DB");
+        }
+        return entityId;
     }
 
     private String typeKey(long entityId) {

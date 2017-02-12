@@ -101,6 +101,19 @@ public class DatomicTest {
     }
 
     @Test
+    public void entityViaLookupRef() {
+        try {
+            _storage.transact(":dm4.object/uri", "dm4.test.uri");
+            _storage.entity(list(":dm4.object/uri", "dm4.test.uri"));
+            fail("IllegalArgumentException not thrown");
+        } catch (Exception e) {
+            assertTrue(e instanceof IllegalArgumentException);
+            assertEquals(e.getMessage(), ":db.error/lookup-ref-attr-not-unique " +
+                "Attribute values not unique: :dm4.object/uri");
+        }
+    }
+
+    @Test
     @Ignore
     public void systemEntities() {
         // Datomic IDs 0 to 62 apparently hold the "system" schema.
@@ -302,6 +315,21 @@ public class DatomicTest {
         //
         String creator = (String) storage.fetchProperty(TOPIC_ID, PROP_URI);
         assertEquals("admin", creator);
+    }
+
+    @Test
+    public void storeAssociation() {
+        TopicModel t1 = mf.newTopicModel(                        "dm4.test.topic_type_uri");
+        TopicModel t2 = mf.newTopicModel("dm4.test.topic_uri_2", "dm4.test.topic_type_uri");
+        storage.storeTopic(t1);
+        storage.storeTopic(t2);
+        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+            mf.newTopicRoleModel(t1.getId(),             "dm4.core.default"),
+            mf.newTopicRoleModel("dm4.test.topic_uri_2", "dm4.core.default")
+        );
+        assertEquals(-1, assoc.getId());
+        storage.storeAssociation(assoc);
+        assertTrue(assoc.getId() != -1);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
