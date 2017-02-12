@@ -113,8 +113,7 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     @Override
     TopicModelImpl getPlayer() {
         if (topicIdentifiedByUri) {
-            // ### FIXME: "uri" is storage impl dependent
-            return pl.fetchTopic("uri", new SimpleValue(topicUri));
+            return pl.fetchTopicByUri(topicUri);
         } else {
             return pl.fetchTopic(playerId);
         }

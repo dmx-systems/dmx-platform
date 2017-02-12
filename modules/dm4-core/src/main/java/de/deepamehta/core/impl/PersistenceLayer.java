@@ -78,8 +78,13 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     TopicImpl getTopicByUri(String uri) {
-        // ### FIXME: "uri" is storage impl dependent
-        return getTopicByValue("uri", new SimpleValue(uri));
+        try {
+            TopicModelImpl topic = fetchTopicByUri(uri);
+            return topic != null ? this.<TopicImpl>checkReadAccessAndInstantiate(topic) : null;
+            // Note: inside a conditional operator the type witness is required (at least in Java 6)
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topic by URI failed (uri=\"" + uri + "\")", e);
+        }
     }
 
     TopicImpl getTopicByValue(String key, SimpleValue value) {

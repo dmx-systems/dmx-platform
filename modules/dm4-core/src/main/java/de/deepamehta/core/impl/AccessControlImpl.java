@@ -279,8 +279,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getWorkspace(String uri) {
-        // ### FIXME: "uri" is storage impl dependent
-        TopicModelImpl workspace = fetchTopic("uri", uri);
+        TopicModelImpl workspace = fetchTopicByUri(uri);
         if (workspace == null) {
             throw new RuntimeException("Workspace \"" + uri + "\" does not exist");
         }
@@ -304,8 +303,7 @@ class AccessControlImpl implements AccessControl {
         if (systemWorkspaceId == -1) {
             // Note: fetching the System workspace topic though the Core service would involve a permission check
             // and run in a vicious circle. So direct storage access is required here.
-            // ### FIXME: "uri" is storage impl dependent
-            TopicModel workspace = fetchTopic("uri", SYSTEM_WORKSPACE_URI);
+            TopicModel workspace = fetchTopicByUri(SYSTEM_WORKSPACE_URI);
             // Note: the Access Control plugin creates the System workspace before it performs its first permission
             // check.
             if (workspace == null) {
@@ -622,6 +620,10 @@ class AccessControlImpl implements AccessControl {
 
 
     // === Direct Storage Access ===
+
+    private TopicModelImpl fetchTopicByUri(String uri) {
+        return pl.fetchTopicByUri(uri);
+    }
 
     /**
      * Fetches a topic by key/value.
