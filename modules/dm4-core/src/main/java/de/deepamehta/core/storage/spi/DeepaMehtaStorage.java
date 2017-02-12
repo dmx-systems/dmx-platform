@@ -196,6 +196,8 @@ public interface DeepaMehtaStorage {
     // === Properties ===
 
     /**
+     * ### TODO: parametric return type
+     *
      * @param   id                  id of a topic or an association
      */
     Object fetchProperty(long id, String propUri);

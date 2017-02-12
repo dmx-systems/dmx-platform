@@ -52,6 +52,10 @@ class StorageDecorator {
         return (TopicModelImpl) storage.fetchTopic(topicId);
     }
 
+    final TopicModelImpl fetchTopicByUri(String uri) {
+        return (TopicModelImpl) storage.fetchTopicByUri(uri);
+    }
+
     /**
      * Looks up a single topic by exact value.
      * <p>
@@ -660,13 +664,11 @@ class StorageDecorator {
     // ---
 
     final int fetchCoreModelVersion() {
-        // ### FIXME: ID 0
-        return (Integer) fetchProperty(0, PROP_CORE_MODEL_VERSION);
+        return (Integer) fetchProperty(getRootTopicId(), PROP_CORE_MODEL_VERSION);
     }
 
     final void storeCoreModelVersion(int version) {
-        // ### FIXME: ID 0
-        storeTopicProperty(0, PROP_CORE_MODEL_VERSION, version, false);     // addToIndex=false
+        storeTopicProperty(getRootTopicId(), PROP_CORE_MODEL_VERSION, version, false);     // addToIndex=false
     }
 
     // ---
@@ -682,10 +684,15 @@ class StorageDecorator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void createRootTopic() {
-        storeTopic(storage.getModelFactory().newTopicModel(
+        TopicModel topic = storage.getModelFactory().newTopicModel(
             "dm4.core.meta_type",
             "dm4.core.meta_meta_type"
-        ));
-        // ### FIXME: set topic value
+        );
+        storeTopic(topic);
+        storeTopicValue(topic.getId(), new SimpleValue("Meta Type"));
+    }
+
+    private long getRootTopicId() {
+        return fetchTopicByUri("dm4.core.meta_type").getId();
     }
 }
