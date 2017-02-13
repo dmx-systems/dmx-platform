@@ -476,39 +476,39 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void installSchema() {
-        transact(
+        transact((List) read("[" +
             // Entity Type
-            map(":db/ident",        ":dm4/entity-type",
-                ":db/valueType",    ":db.type/ref",
-                ":db/cardinality",  ":db.cardinality/one",
-                ":db/doc",          "A DM4 entity type (topic or assoc)"),
-            map(":db/ident",        ":dm4.entity-type/topic"),
-            map(":db/ident",        ":dm4.entity-type/assoc"),
+            "{:db/ident        :dm4/entity-type" +
+            " :db/valueType    :db.type/ref" +
+            " :db/cardinality  :db.cardinality/one" +
+            " :db/doc          \"A DM4 entity type (topic or assoc)\"}" +
+            "{:db/ident        :dm4.entity-type/topic}" +
+            "{:db/ident        :dm4.entity-type/assoc}" +
             // DM4 Object (Topic or Association)
-            map(":db/ident",        ":dm4.object/uri",
-                ":db/valueType",    ":db.type/string",
-                ":db/cardinality",  ":db.cardinality/one",
-                ":db/doc",          "A DM4 object's URI"),
-            map(":db/ident",        ":dm4.object/type",
-                ":db/valueType",    ":db.type/keyword",
-                ":db/cardinality",  ":db.cardinality/one",
-                ":db/doc",          "A DM4 object's type (URI)"),
+            "{:db/ident        :dm4.object/uri" +
+            " :db/valueType    :db.type/string" +
+            " :db/cardinality  :db.cardinality/one" +
+            " :db/doc          \"A DM4 object's URI\"}" +
+            "{:db/ident        :dm4.object/type" +
+            " :db/valueType    :db.type/keyword" +
+            " :db/cardinality  :db.cardinality/one" +
+            " :db/doc          \"A DM4 object's type (URI)\"}" +
             // Association
-            map(":db/ident",        ":dm4.assoc/role",
-                ":db/valueType",    ":db.type/ref",
-                ":db/cardinality",  ":db.cardinality/many",
-                ":db/isComponent",  true,
-                ":db/doc",          "An association's 2 roles"),
+            "{:db/ident        :dm4.assoc/role" +
+            " :db/valueType    :db.type/ref" +
+            " :db/cardinality  :db.cardinality/many" +
+            " :db/isComponent  true" +
+            " :db/doc          \"An association's 2 roles\"}" +
             // Role
-            map(":db/ident",        ":dm4.role/player",
-                ":db/valueType",    ":db.type/ref",
-                ":db/cardinality",  ":db.cardinality/one",
-                ":db/doc",          "A role's player ID"),
-            map(":db/ident",        ":dm4.role/type",
-                ":db/valueType",    ":db.type/keyword",
-                ":db/cardinality",  ":db.cardinality/one",
-                ":db/doc",          "A role's type (URI)")
-        );
+            "{:db/ident        :dm4.role/player" +
+            " :db/valueType    :db.type/ref" +
+            " :db/cardinality  :db.cardinality/one" +
+            " :db/doc          \"A role's player ID\"}" +
+            "{:db/ident        :dm4.role/type" +
+            " :db/valueType    :db.type/keyword" +
+            " :db/cardinality  :db.cardinality/one" +
+            " :db/doc          \"A role's type (URI)\"}" +
+        "]"));
     }
 
     // --- Datomic Helper (callable from tests) ---
@@ -532,13 +532,21 @@ public class DatomicStorage implements DeepaMehtaStorage {
         ), addDb(inputs));
     }
 
+    // ---
+
     Future<Map> transact(Object... keyvals) {
         return transact(map(keyvals));
     }
 
     Future<Map> transact(Map... maps) {
-        return conn.transact(list(maps));
+        return transact(list(maps));
     }
+
+    Future<Map> transact(List txData) {
+        return conn.transact(txData);
+    }
+
+    // ---
 
     long resolveTempId(Future<Map> txInfo) {
         try {
