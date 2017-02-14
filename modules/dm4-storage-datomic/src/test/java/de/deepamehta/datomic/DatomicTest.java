@@ -255,6 +255,19 @@ public class DatomicTest {
         assertEquals(read(IDENT), attr.ident());
     }
 
+    @Test
+    public void retract() {
+        long id = _storage.resolveTempId(_storage.transact(
+            ":db/id", DatomicStorage.TEMP_ID,
+            ":dm4.object/uri", "dm4.test.uri",
+            ":dm4.object/type", ":dm4.test.type_uri"
+        ));
+        assertEquals(2, _storage.entity(id).keySet().size());
+        //
+        _storage.retract(id);
+        assertEquals(0, _storage.entity(id).keySet().size());
+    }
+
     // --- DeepaMehtaStorage ---
 
     @Test

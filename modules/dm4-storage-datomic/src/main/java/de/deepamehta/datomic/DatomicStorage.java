@@ -177,7 +177,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void deleteTopic(long topicId) {
-        throw new RuntimeException("Not yet implemented");
+        retract(topicId);
     }
 
 
@@ -278,7 +278,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void deleteAssociation(long assocId) {
-        throw new RuntimeException("Not yet implemented");
+        retract(assocId);
     }
 
 
@@ -531,6 +531,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     Attribute attribute(Object attrId) {
         return conn.db().attribute(attrId);
+    }
+
+    void retract(long entityId) {
+        transact(list(list(":db.fn/retractEntity", entityId)));
     }
 
     // ---
