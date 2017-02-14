@@ -48,11 +48,31 @@ class QueryBuilder {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    // objectId1 must be != -1
-    // ### TODO: process objectId2
+    // ### FIXME: process objectId2
+    // ### FIXME: entity type check on objectId1
+    /**
+     * Builds a query to get associations a given <i>start object</i> (topic or association) is involved in.
+     * Several association filters can be supplied.
+     *
+     * @param   assocTypeUri    Association type filter.
+     *                          Optional. Pass <code>null</code> for no filtering.
+     *
+     * @param   roleTypeUri1    Role type filter for the start object's end.
+     *                          Optional. Pass <code>null</code> for no filtering.
+     * @param   entityType1     Entity type (<code>TOPIC</code> or <code>ASSOC</code>) filter for the start object's
+     *                          end. Optional. Pass <code>null</code> for no filtering.
+     * @param   objectId1       The start object (topic or association).
+     *                          <b>Mandatory</b>. Don't pass <code>-1</code>.
+     * @param   objectTypeUri1  Object type (topic type or association type) filter for the start object's end.
+     *                          Optional. Pass <code>null</code> for no filtering.
+     */
     QueryRequest associationQuery(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
+        //
+        if (objectId1 == -1) {
+            throw new IllegalArgumentException("-1 is passed as start object");
+        }
         //
         List find   = new ArrayList(); find.add(read("?e2")); find.add(read("?a"));
         List in     = new ArrayList(); in.add(read("$")); in.add(read("%")); in.add(read("?e1"));

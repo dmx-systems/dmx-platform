@@ -296,19 +296,24 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<AssociationModel> fetchTopicAssociations(long topicId) {
-        throw new RuntimeException("Not yet implemented");
+        return buildAssociations(queryAssociations(null,
+            null, EntityType.TOPIC, topicId, null,
+            null, null,             -1,      null));
     }
 
     @Override
     public List<AssociationModel> fetchAssociationAssociations(long assocId) {
-        throw new RuntimeException("Not yet implemented");
+        return buildAssociations(queryAssociations(null,
+            null, EntityType.ASSOC, assocId, null,
+            null, null,             -1,      null));
     }
 
     // ---
 
     @Override
     public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                           String myRoleTypeUri, String othersRoleTypeUri,
+                                                           String othersTopicTypeUri) {
         return buildRelatedTopics(queryAssociations(assocTypeUri,
             myRoleTypeUri,     EntityType.TOPIC, topicId, null,
             othersRoleTypeUri, EntityType.TOPIC, -1,      othersTopicTypeUri));
@@ -316,7 +321,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+                                                                       String myRoleTypeUri, String othersRoleTypeUri,
+                                                                       String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociations(assocTypeUri,
             myRoleTypeUri,     EntityType.TOPIC, topicId, null,
             othersRoleTypeUri, EntityType.ASSOC, -1,      othersAssocTypeUri));
@@ -326,7 +332,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+                                                                 String myRoleTypeUri, String othersRoleTypeUri,
+                                                                 String othersTopicTypeUri) {
         return buildRelatedTopics(queryAssociations(assocTypeUri,
             myRoleTypeUri,     EntityType.ASSOC, assocId, null,
             othersRoleTypeUri, EntityType.TOPIC, -1,      othersTopicTypeUri));
@@ -334,7 +341,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+                                                                         String myRoleTypeUri, String othersRoleTypeUri,
+                                                                         String othersAssocTypeUri) {
         return buildRelatedAssociations(queryAssociations(assocTypeUri,
             myRoleTypeUri,     EntityType.ASSOC, assocId, null,
             othersRoleTypeUri, EntityType.ASSOC, -1,      othersAssocTypeUri));
@@ -613,6 +621,14 @@ public class DatomicStorage implements DeepaMehtaStorage {
             simpleValue(e),
             null    // childTopics=null
         );
+    }
+
+    private List<AssociationModel> buildAssociations(Collection<List<Long>> results) {
+        List<AssociationModel> assocs = new ArrayList();
+        for (List<Long> result : results) {
+            assocs.add(buildAssociation(result.get(1)));
+        }
+        return assocs;
     }
 
     private List<RelatedTopicModel> buildRelatedTopics(Collection<List<Long>> results) {
