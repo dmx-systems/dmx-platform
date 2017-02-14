@@ -52,10 +52,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DatomicStorage(String databaseUri, ModelFactory mf) {
-        ClassLoader savedCL = null;
-        try {
-            savedCL = setClassLoader();
-            //
+        try (ClassLoaderSwitch cl = new ClassLoaderSwitch()) {
             this.isCleanInstall = Peer.createDatabase(databaseUri);
             if (!isCleanInstall) {  // ### FIXME: drop this
                 throw new RuntimeException("Database already exists");
@@ -67,8 +64,6 @@ public class DatomicStorage implements DeepaMehtaStorage {
                 shutdown();
             }
             throw new RuntimeException("Creating the Datomic instance failed (databaseUri=\"" + databaseUri + "\")", e);
-        } finally {
-            Thread.currentThread().setContextClassLoader(savedCL);
         }
     }
 
@@ -560,7 +555,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // --- Datomic -> DeepaMehta Bridge ---
 
-    TopicModel buildTopic(long topicId) {
+    private TopicModel buildTopic(long topicId) {
         Entity e = entity(topicId);
         return mf.newTopicModel(
             topicId,
@@ -685,7 +680,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         }
     }
 
-    String valueType(Object value) {
+    private String valueType(Object value) {
         if (value instanceof String) {
             return ":db.type/string";
         } else if (value instanceof Integer) {
@@ -721,10 +716,20 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ---
 
-    private ClassLoader setClassLoader() {
-        Thread t = Thread.currentThread();
-        ClassLoader savedCL = t.getContextClassLoader();
-        t.setContextClassLoader(DatomicStorage.class.getClassLoader());
-        return savedCL;
+    private class ClassLoaderSwitch implements AutoCloseable {
+
+        private Thread t;
+        private ClassLoader savedCL;
+
+        private ClassLoaderSwitch() {
+            t = Thread.currentThread();
+            savedCL = t.getContextClassLoader();
+            t.setContextClassLoader(DatomicStorage.class.getClassLoader());
+        }
+
+        @Override
+        public void close() {
+            t.setContextClassLoader(savedCL);
+        }
     }
 }
