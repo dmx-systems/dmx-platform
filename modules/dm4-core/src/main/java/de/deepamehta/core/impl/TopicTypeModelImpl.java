@@ -68,8 +68,7 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     @Override
     List<TopicModelImpl> getAllInstances() {
-        // ### FIXME: "type_uri" is storage impl dependent
-        return pl.fetchTopics("type_uri", new SimpleValue(uri));
+        return pl.fetchTopicsByType(uri);
     }
 
     // ---

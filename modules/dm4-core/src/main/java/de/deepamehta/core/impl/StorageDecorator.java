@@ -87,6 +87,10 @@ class StorageDecorator {
 
     // ---
 
+    final List<TopicModelImpl> fetchTopicsByType(String topicTypeUri) {
+        return (List<TopicModelImpl>) storage.fetchTopicsByType(topicTypeUri);
+    }
+
     final Iterator<TopicModelImpl> fetchAllTopics() {
         return (Iterator<TopicModelImpl>) storage.fetchAllTopics();
     }
@@ -245,6 +249,10 @@ class StorageDecorator {
     }
 
     // ---
+
+    final List<AssociationModelImpl> fetchAssociationsByType(String assocTypeUri) {
+        return (List<AssociationModelImpl>) storage.fetchAssociationsByType(assocTypeUri);
+    }
 
     final Iterator<AssociationModelImpl> fetchAllAssociations() {
         return (Iterator<AssociationModelImpl>) storage.fetchAllAssociations();

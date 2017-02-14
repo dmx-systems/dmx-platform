@@ -1282,8 +1282,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private List<Topic> getTopicInstances(String topicTypeUri) {
-        // ### FIXME: "type_uri" is storage impl dependent
-        return dm4.getTopicsByValue("type_uri", new SimpleValue(topicTypeUri));
+        return dm4.getTopicsByType(topicTypeUri);
     }
 
     private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {

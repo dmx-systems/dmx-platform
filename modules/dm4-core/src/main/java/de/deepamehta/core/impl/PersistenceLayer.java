@@ -672,9 +672,7 @@ public class PersistenceLayer extends StorageDecorator {
             topicTypeUris.add("dm4.core.meta_type");
             topicTypeUris.add("dm4.core.meta_meta_type");
             // add regular types
-            // ### FIXME: "type_uri" is storage impl dependent
-            for (TopicModel topicType : filterReadables(fetchTopics("type_uri", new SimpleValue(
-                                                                    "dm4.core.topic_type")))) {
+            for (TopicModel topicType : filterReadables(fetchTopicsByType("dm4.core.topic_type"))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -686,9 +684,7 @@ public class PersistenceLayer extends StorageDecorator {
     private List<String> getAssociationTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            // ### FIXME: "type_uri" is storage impl dependent
-            for (TopicModel assocType : filterReadables(fetchTopics("type_uri", new SimpleValue(
-                                                                    "dm4.core.assoc_type")))) {
+            for (TopicModel assocType : filterReadables(fetchTopicsByType("dm4.core.assoc_type"))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;
@@ -717,6 +713,8 @@ public class PersistenceLayer extends StorageDecorator {
 
     private String typeUri(long objectId) {
         // ### FIXME: "type_uri" is storage impl dependent
+        // ### TODO: as a performance measure add getTypeUri() to storage API
+        // ### TODO: remove copy in AccessControlImpl
         return (String) fetchProperty(objectId, "type_uri");
     }
 

@@ -187,6 +187,7 @@ public class DeepaMehtaUtils {
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
+        // ### TODO: as a performance measure add getTypeUri() to Core Service API
         // ### FIXME: "type_uri" is storage impl dependent
         String t1 = (String) dm4.getProperty(r1.getPlayerId(), "type_uri");
         // ### FIXME: "type_uri" is storage impl dependent

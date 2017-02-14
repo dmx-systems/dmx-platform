@@ -574,6 +574,8 @@ class AccessControlImpl implements AccessControl {
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
         // ### FIXME: "type_uri" is storage impl dependent
+        // ### TODO: as a performance measure add getTypeUri() to storage API
+        // ### TODO: remove copy in PersistenceLayer
         return (String) pl.fetchProperty(objectId, "type_uri");
     }
 

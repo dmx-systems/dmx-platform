@@ -18,6 +18,15 @@ class QueryBuilder {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final Object RULES = read("[" +
+        // entity type filter: entity ?e is of type ?t
+        "[(entity-type ?e ?t)" +
+        " [?e :dm4/entity-type ?t]]" +
+        // object type filter: object ?o (topic or assoc) is of type ?t
+        "[(object-type ?o ?t)" +
+        " [?o :dm4.object/type ?t]]" +
+        // object value filter: object ?o's (topic or assoc) value for attribute ?a is ?v
+        "[(object-value ?o ?a ?v)" +
+        " [?o ?a ?v]]" +
         // association filter: ?e1 is associated to ?e2 via ?a; the roles are ?r1 and ?r2
         "[(association ?e1 ?e2 ?a ?r1 ?r2)" +
         " [?r1 :dm4.role/player ?e1]" +
@@ -25,18 +34,9 @@ class QueryBuilder {
         " [?a :dm4.assoc/role ?r2]" +
         " [(!= ?r1 ?r2)]" +
         " [?r2 :dm4.role/player ?e2]]" +
-        // object type filter: object ?o (topic or assoc) is of type ?t
-        "[(object-type ?o ?t)" +
-        " [?o :dm4.object/type ?t]]" +
-        // object value filter: object's ?o (topic or assoc) value for attribute ?a is ?v
-        "[(object-value ?o ?a ?v)" +
-        " [?o ?a ?v]]" +
         // role type filter: role ?r is of type ?t
         "[(role-type ?r ?t)" +
         " [?r :dm4.role/type ?t]]" +
-        // entity type filter: entity ?e is of type ?t
-        "[(entity-type ?e ?t)" +
-        " [?e :dm4/entity-type ?t]]" +
     "]");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -55,6 +55,13 @@ class QueryBuilder {
         return queryRequest(
             "[:find [?e ...] :in $ % ?et ?a ?v :where (object-value ?e ?a ?v) (entity-type ?e ?et)]",
             db, RULES, entityType.ident, ident(key), value
+        );
+    }
+
+    QueryRequest byType(EntityType entityType, String typeUri) {
+        return queryRequest(
+            "[:find [?e ...] :in $ % ?et ?ot :where (object-type ?e ?ot) (entity-type ?e ?et)]",
+            db, RULES, entityType.ident, ident(typeUri)
         );
     }
 

@@ -24,13 +24,19 @@ public interface DeepaMehtaStorage {
 
     TopicModel fetchTopicByUri(String uri);
 
+    // ### TODO: drop this?
     TopicModel fetchTopic(String key, Object value);
 
+    // ### TODO: rename to fetchTopicsByValue()
     List<? extends TopicModel> fetchTopics(String key, Object value);
 
-    List<TopicModel> queryTopics(Object value);
+    // ### TODO: drop this?
+    List<? extends TopicModel> queryTopics(Object value);
 
+    // ### TODO: drop this?
     List<? extends TopicModel> queryTopics(String key, Object value);
+
+    List<? extends TopicModel> fetchTopicsByType(String topicTypeUri);
 
     Iterator<? extends TopicModel> fetchAllTopics();
 
@@ -65,6 +71,7 @@ public interface DeepaMehtaStorage {
     void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
                                                                                       SimpleValue indexValue);
 
+    // ### TODO: drop this?
     void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue);
 
     // ---
@@ -86,6 +93,8 @@ public interface DeepaMehtaStorage {
 
     List<? extends AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                         long assocId, String topicRoleTypeUri, String assocRoleTypeUri);
+
+    List<? extends AssociationModel> fetchAssociationsByType(String assocTypeUri);
 
     Iterator<? extends AssociationModel> fetchAllAssociations();
 

@@ -120,6 +120,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     @Override
+    public List<TopicModel> fetchTopicsByType(String topicTypeUri) {
+        return buildTopics(queryByType(EntityType.TOPIC, topicTypeUri));
+    }
+
+    @Override
     public Iterator<TopicModel> fetchAllTopics() {
         throw new RuntimeException("Not yet implemented");
     }
@@ -211,6 +216,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     @Override
+    public List<AssociationModel> fetchAssociationsByType(String assocTypeUri) {
+        return buildAssociations(queryByType(EntityType.ASSOC, assocTypeUri));
+    }
+
+    @Override
     public Iterator<AssociationModel> fetchAllAssociations() {
         throw new RuntimeException("Not yet implemented");
     }
@@ -295,16 +305,16 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<AssociationModel> fetchTopicAssociations(long topicId) {
-        return buildAssociations(queryAssociations(null,
+        return buildAssociations(assocIds(queryAssociations(null,
             null, EntityType.TOPIC, topicId, null,
-            null, null,             -1,      null));
+            null, null,             -1,      null)));
     }
 
     @Override
     public List<AssociationModel> fetchAssociationAssociations(long assocId) {
-        return buildAssociations(queryAssociations(null,
+        return buildAssociations(assocIds(queryAssociations(null,
             null, EntityType.ASSOC, assocId, null,
-            null, null,             -1,      null));
+            null, null,             -1,      null)));
     }
 
     // ---
@@ -595,6 +605,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return query(queryBuilder().keyValue(entityType, key, value));
     }
 
+    public List<Long> queryByType(EntityType entityType, String topicTypeUri) {
+        return query(queryBuilder().byType(entityType, topicTypeUri));
+    }
+
     private Collection<List<Long>> queryAssociations(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
@@ -642,11 +656,10 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return topics;
     }
 
-    // ### TODO: param type
-    private List<AssociationModel> buildAssociations(Collection<List<Long>> results) {
+    private List<AssociationModel> buildAssociations(Collection<Long> assocIds) {
         List<AssociationModel> assocs = new ArrayList();
-        for (List<Long> result : results) {
-            assocs.add(buildAssociation(result.get(1)));
+        for (Long assocId : assocIds) {
+            assocs.add(buildAssociation(assocId));
         }
         return assocs;
     }
@@ -765,6 +778,14 @@ public class DatomicStorage implements DeepaMehtaStorage {
             throw new RuntimeException("Entity with URI \"" + uri + "\" not found in DB");
         }
         return entityId;
+    }
+
+    private Collection<Long> assocIds(Collection<List<Long>> results) {
+        Collection<Long> assocIds = new ArrayList();
+        for (List<Long> result : results) {
+            assocIds.add(result.get(1));
+        }
+        return assocIds;
     }
 
     private String typeKey(long entityId) {
