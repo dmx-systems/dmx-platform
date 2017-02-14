@@ -18,7 +18,7 @@ class QueryBuilder {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final Object RULES = read("[" +
-        // association filter: ?e1 is associated to ?e2 via ?a
+        // association filter: ?e1 is associated to ?e2 via ?a; the roles are ?r1 and ?r2
         "[(association ?e1 ?e2 ?a ?r1 ?r2)" +
         " [?r1 :dm4.role/player ?e1]" +
         " [?a :dm4.assoc/role ?r1]" +
@@ -28,6 +28,9 @@ class QueryBuilder {
         // object type filter: object ?o (topic or assoc) is of type ?t
         "[(object-type ?o ?t)" +
         " [?o :dm4.object/type ?t]]" +
+        // object value filter: object's ?o (topic or assoc) value for attribute ?a is ?v
+        "[(object-value ?o ?a ?v)" +
+        " [?o ?a ?v]]" +
         // role type filter: role ?r is of type ?t
         "[(role-type ?r ?t)" +
         " [?r :dm4.role/type ?t]]" +
@@ -48,6 +51,13 @@ class QueryBuilder {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    QueryRequest keyValue(EntityType entityType, String key, Object value) {
+        return queryRequest(
+            "[:find [?e ...] :in $ % ?et ?a ?v :where (object-value ?e ?a ?v) (entity-type ?e ?et)]",
+            db, RULES, entityType.ident, ident(key), value
+        );
+    }
+
     // ### FIXME: process objectId2
     // ### FIXME: entity type check on objectId1
     /**
@@ -66,7 +76,7 @@ class QueryBuilder {
      * @param   objectTypeUri1  Object type (topic type or association type) filter for the start object's end.
      *                          Optional. Pass <code>null</code> for no filtering.
      */
-    QueryRequest associationQuery(String assocTypeUri,
+    QueryRequest associations(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
         //
@@ -121,16 +131,20 @@ class QueryBuilder {
             inputs.add(ident(objectTypeUri2));
         }
         //
-        return build(find, in , where, inputs);
+        return queryRequest(find, in , where, inputs);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    QueryRequest build(List find, List in, List where, List inputs) {
-        return QueryRequest.create(map(
+    private QueryRequest queryRequest(List find, List in, List where, List inputs) {
+        return queryRequest(map(
             read(":find"),  find,
             read(":in"),    in,
             read(":where"), where
         ), inputs.toArray());
+    }
+
+    private QueryRequest queryRequest(Object query, Object... inputs) {
+        return QueryRequest.create(query, inputs);
     }
 }

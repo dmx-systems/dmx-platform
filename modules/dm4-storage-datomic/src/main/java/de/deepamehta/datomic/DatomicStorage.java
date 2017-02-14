@@ -62,7 +62,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
             this.mf = mf;
         } catch (Throwable e) {
             if (conn != null) {
-                shutdown();
+                shutdown();     // ### TODO: needed? condition?
             }
             throw new RuntimeException("Creating the Datomic instance failed (databaseUri=\"" + databaseUri + "\")", e);
         }
@@ -92,22 +92,21 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public TopicModel fetchTopic(String key, Object value) {
-        List<Long> result = query("[:find [?e ...] :in $ ?a ?v :where [?e ?a ?v]]", ident(key), value);
-        switch (result.size()) {
+        List<Long> topicIds = queryKeyValue(EntityType.TOPIC, key, value);
+        switch (topicIds.size()) {
         case 0:
             return null;
         case 1:
-            long topicId = result.get(0);
-            return buildTopic(topicId);
+            return buildTopic(topicIds.get(0));
         default:
-            throw new RuntimeException("Ambiguity: there are " + result.size() + " entities with key \"" +
-                key + "\" and value \"" + value + "\" " + result);
+            throw new RuntimeException("Ambiguity: there are " + topicIds.size() + " topics with key \"" +
+                key + "\" and value \"" + value + "\" " + topicIds);
         }
     }
 
     @Override
     public List<TopicModel> fetchTopics(String key, Object value) {
-        throw new RuntimeException("Not yet implemented");
+        return buildTopics(queryKeyValue(EntityType.TOPIC, key, value));
     }
 
     @Override
@@ -592,13 +591,21 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    public List<Long> queryKeyValue(EntityType entityType, String key, Object value) {
+        return query(queryBuilder().keyValue(entityType, key, value));
+    }
+
     private Collection<List<Long>> queryAssociations(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
-        return query(new QueryBuilder(conn.db()).associationQuery(assocTypeUri,
+        return query(queryBuilder().associations(assocTypeUri,
             roleTypeUri1, entityType1, objectId1, objectTypeUri1,
             roleTypeUri2, entityType2, objectId2, objectTypeUri2
         ));
+    }
+
+    private QueryBuilder queryBuilder() {
+        return new QueryBuilder(conn.db());
     }
 
     // --- Datomic -> DeepaMehta Bridge ---
@@ -627,6 +634,15 @@ public class DatomicStorage implements DeepaMehtaStorage {
         );
     }
 
+    private List<TopicModel> buildTopics(Collection<Long> topicIds) {
+        List<TopicModel> topics = new ArrayList();
+        for (Long topicId : topicIds) {
+            topics.add(buildTopic(topicId));
+        }
+        return topics;
+    }
+
+    // ### TODO: param type
     private List<AssociationModel> buildAssociations(Collection<List<Long>> results) {
         List<AssociationModel> assocs = new ArrayList();
         for (List<Long> result : results) {

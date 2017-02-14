@@ -308,7 +308,9 @@ public class DatomicTest {
             TopicModel t = storage.fetchTopic("dm4.test.type_uri", "hello!");
             fail("RuntimeException not thrown");
         } catch (Exception e) {
-            assertTrue(e.getMessage().startsWith("Ambiguity: there are 2 entities"));
+            if (!e.getMessage().startsWith("Ambiguity: there are 2 topics")) {
+                throw e;
+            }
         }
     }
 
