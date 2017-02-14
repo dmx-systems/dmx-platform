@@ -18,6 +18,7 @@ import datomic.Attribute;
 import datomic.Connection;
 import datomic.Entity;
 import datomic.Peer;
+import datomic.QueryRequest;
 import static datomic.Util.map;
 import static datomic.Util.list;
 import static datomic.Util.read;
@@ -306,15 +307,19 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri, String myRoleTypeUri,
-                                                           String othersRoleTypeUri, String othersTopicTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+    public List<RelatedTopicModel> fetchTopicRelatedTopics(long topicId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+        return buildRelatedTopics(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     EntityType.TOPIC, topicId, null,
+            othersRoleTypeUri, EntityType.TOPIC, -1,      othersTopicTypeUri));
     }
 
     @Override
     public List<RelatedAssociationModel> fetchTopicRelatedAssociations(long topicId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+        return buildRelatedAssociations(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     EntityType.TOPIC, topicId, null,
+            othersRoleTypeUri, EntityType.ASSOC, -1,      othersAssocTypeUri));
     }
 
     // ---
@@ -322,13 +327,17 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<RelatedTopicModel> fetchAssociationRelatedTopics(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+        return buildRelatedTopics(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     EntityType.ASSOC, assocId, null,
+            othersRoleTypeUri, EntityType.TOPIC, -1,      othersTopicTypeUri));
     }
 
     @Override
     public List<RelatedAssociationModel> fetchAssociationRelatedAssociations(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+        return buildRelatedAssociations(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     EntityType.ASSOC, assocId, null,
+            othersRoleTypeUri, EntityType.ASSOC, -1,      othersAssocTypeUri));
     }
 
     // ---
@@ -516,6 +525,14 @@ public class DatomicStorage implements DeepaMehtaStorage {
         return conn.db().attribute(attrId);
     }
 
+    // ---
+
+    <T> T query(QueryRequest query) {
+        try (ClassLoaderSwitch cl = new ClassLoaderSwitch()) {
+            return Peer.query(query);
+        }
+    }
+
     <T> T query(String query, Object... inputs) {
         return Peer.query(query, addDb(inputs));
     }
@@ -551,7 +568,26 @@ public class DatomicStorage implements DeepaMehtaStorage {
         }
     }
 
+    // ---
+
+    static String ident(String uri) {
+        return ":" + uri;
+    }
+
+    static String uri(String ident) {
+        return ident.substring(1);
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Collection<List<Long>> queryAssociations(String assocTypeUri,
+            String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
+            String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
+        return query(new QueryBuilder(conn.db()).associationQuery(assocTypeUri,
+            roleTypeUri1, entityType1, objectId1, objectTypeUri1,
+            roleTypeUri2, entityType2, objectId2, objectTypeUri2
+        ));
+    }
 
     // --- Datomic -> DeepaMehta Bridge ---
 
@@ -564,6 +600,41 @@ public class DatomicStorage implements DeepaMehtaStorage {
             simpleValue(e),
             null    // childTopics=null
         );
+    }
+
+    private AssociationModel buildAssociation(long assocId) {
+        Entity e = entity(assocId);
+        return mf.newAssociationModel(
+            assocId,
+            uri(e),
+            typeUri(e),
+            null,   // ### FIXME: set role model 1
+            null,   // ### FIXME: set role model 2
+            simpleValue(e),
+            null    // childTopics=null
+        );
+    }
+
+    private List<RelatedTopicModel> buildRelatedTopics(Collection<List<Long>> results) {
+        List<RelatedTopicModel> relTopics = new ArrayList();
+        for (List<Long> result : results) {
+            relTopics.add(mf.newRelatedTopicModel(
+                buildTopic(result.get(0)),
+                buildAssociation(result.get(1))
+            ));
+        }
+        return relTopics;
+    }
+
+    private List<RelatedAssociationModel> buildRelatedAssociations(Collection<List<Long>> results) {
+        List<RelatedAssociationModel> relAssocs = new ArrayList();
+        for (List<Long> result : results) {
+            relAssocs.add(mf.newRelatedAssociationModel(
+                buildAssociation(result.get(0)),
+                buildAssociation(result.get(1))
+            ));
+        }
+        return relAssocs;
     }
 
     // ---
@@ -702,16 +773,6 @@ public class DatomicStorage implements DeepaMehtaStorage {
         a[0] = conn.db();
         System.arraycopy(inputs, 0, a, 1, len);
         return a;
-    }
-
-    // ---
-
-    private String ident(String uri) {
-        return ":" + uri;
-    }
-
-    private String uri(String ident) {
-        return ident.substring(1);
     }
 
     // ---
