@@ -38,6 +38,40 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String SCHEMA = "[" +
+        // Entity Type
+        "{:db/ident        :dm4/entity-type" +
+        " :db/valueType    :db.type/ref" +
+        " :db/cardinality  :db.cardinality/one" +
+        " :db/doc          \"A DM4 entity type (topic or assoc)\"}" +
+        "{:db/ident        :dm4.entity-type/topic}" +
+        "{:db/ident        :dm4.entity-type/assoc}" +
+        // DM4 Object (Topic or Association)
+        "{:db/ident        :dm4.object/uri" +
+        " :db/valueType    :db.type/string" +
+        " :db/cardinality  :db.cardinality/one" +
+        " :db/doc          \"A DM4 object's URI\"}" +
+        "{:db/ident        :dm4.object/type" +
+        " :db/valueType    :db.type/keyword" +
+        " :db/cardinality  :db.cardinality/one" +
+        " :db/doc          \"A DM4 object's type (URI)\"}" +
+        // Association
+        "{:db/ident        :dm4.assoc/role" +
+        " :db/valueType    :db.type/ref" +
+        " :db/cardinality  :db.cardinality/many" +
+        " :db/isComponent  true" +
+        " :db/doc          \"An association's 2 roles\"}" +
+        // Role
+        "{:db/ident        :dm4.role/player" +
+        " :db/valueType    :db.type/ref" +
+        " :db/cardinality  :db.cardinality/one" +
+        " :db/doc          \"A role's player ID\"}" +
+        "{:db/ident        :dm4.role/type" +
+        " :db/valueType    :db.type/keyword" +
+        " :db/cardinality  :db.cardinality/one" +
+        " :db/doc          \"A role's type (URI)\"}" +
+    "]";
+
     static final String TEMP_ID = "temp-id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -174,7 +208,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
-        throw new RuntimeException("Not yet implemented");
+        // do nothing
     }
 
     // ---
@@ -206,7 +240,9 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<AssociationModel> fetchAssociations(String assocTypeUri, long topicId1, long topicId2,
                                                                          String roleTypeUri1, String roleTypeUri2) {
-        throw new RuntimeException("Not yet implemented");
+        return buildAssociations(assocIds(queryAssociations(assocTypeUri,
+            roleTypeUri1, EntityType.TOPIC, topicId1, null,
+            roleTypeUri2, EntityType.TOPIC, topicId2, null)));
     }
 
     @Override
@@ -497,39 +533,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void installSchema() {
-        transact((List) read("[" +
-            // Entity Type
-            "{:db/ident        :dm4/entity-type" +
-            " :db/valueType    :db.type/ref" +
-            " :db/cardinality  :db.cardinality/one" +
-            " :db/doc          \"A DM4 entity type (topic or assoc)\"}" +
-            "{:db/ident        :dm4.entity-type/topic}" +
-            "{:db/ident        :dm4.entity-type/assoc}" +
-            // DM4 Object (Topic or Association)
-            "{:db/ident        :dm4.object/uri" +
-            " :db/valueType    :db.type/string" +
-            " :db/cardinality  :db.cardinality/one" +
-            " :db/doc          \"A DM4 object's URI\"}" +
-            "{:db/ident        :dm4.object/type" +
-            " :db/valueType    :db.type/keyword" +
-            " :db/cardinality  :db.cardinality/one" +
-            " :db/doc          \"A DM4 object's type (URI)\"}" +
-            // Association
-            "{:db/ident        :dm4.assoc/role" +
-            " :db/valueType    :db.type/ref" +
-            " :db/cardinality  :db.cardinality/many" +
-            " :db/isComponent  true" +
-            " :db/doc          \"An association's 2 roles\"}" +
-            // Role
-            "{:db/ident        :dm4.role/player" +
-            " :db/valueType    :db.type/ref" +
-            " :db/cardinality  :db.cardinality/one" +
-            " :db/doc          \"A role's player ID\"}" +
-            "{:db/ident        :dm4.role/type" +
-            " :db/valueType    :db.type/keyword" +
-            " :db/cardinality  :db.cardinality/one" +
-            " :db/doc          \"A role's type (URI)\"}" +
-        "]"));
+        transact((List) read(SCHEMA));
     }
 
     // --- Datomic Helper (callable from tests) ---

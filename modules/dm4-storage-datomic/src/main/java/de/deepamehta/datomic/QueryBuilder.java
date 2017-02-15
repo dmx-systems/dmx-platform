@@ -34,6 +34,9 @@ class QueryBuilder {
         " [?a :dm4.assoc/role ?r2]" +
         " [(!= ?r1 ?r2)]" +
         " [?r2 :dm4.role/player ?e2]]" +
+        // role player filter: in role ?r the player is ?e
+        "[(role-player ?r ?e)" +
+        " [?r :dm4.role/player ?e]]" +
         // role type filter: role ?r is of type ?t
         "[(role-type ?r ?t)" +
         " [?r :dm4.role/type ?t]]" +
@@ -65,7 +68,6 @@ class QueryBuilder {
         );
     }
 
-    // ### FIXME: process objectId2
     // ### FIXME: entity type check on objectId1
     /**
      * Builds a query to get associations a given <i>start object</i> (topic or association) is involved in.
@@ -96,6 +98,8 @@ class QueryBuilder {
         List where  = new ArrayList(); where.add(read("(association ?e1 ?e2 ?a ?r1 ?r2)"));
         List inputs = new ArrayList(); inputs.add(db); inputs.add(RULES); inputs.add(objectId1);
         //
+        // ### TODO: optimization. Rule order?
+        //
         // entity type 1
         if (entityType1 != null) {
             where.add(read("(entity-type ?e1 ?et1)"));
@@ -124,6 +128,12 @@ class QueryBuilder {
             where.add(read("(role-type ?r2 ?rt2)"));
             in.add(read("?rt2"));
             inputs.add(ident(roleTypeUri2));
+        }
+        // role player (object 2)
+        if (objectId2 != -1) {
+            where.add(read("(role-player ?r2 ?o2)"));
+            in.add(read("?o2"));
+            inputs.add(objectId2);
         }
         // entity type 2
         if (entityType2 != null) {

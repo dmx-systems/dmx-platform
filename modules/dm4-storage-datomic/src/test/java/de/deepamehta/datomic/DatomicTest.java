@@ -400,4 +400,44 @@ public class DatomicTest {
         storage.storeAssociation(assoc);
         assertTrue(assoc.getId() != -1);
     }
+
+    @Test
+    public void fetchAssociationsBetween2Topics() {
+        // create 3 topics
+        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
+        storage.storeTopic(t);
+        long topicId1 = t.getId();
+        storage.storeTopic(t);
+        long topicId2 = t.getId();
+        storage.storeTopic(t);
+        long topicId3 = t.getId();
+        //
+        // no assoc exists between t1 and t2
+        List<? extends AssociationModel> assocs = storage.fetchAssociations("dm4.test.assoc_type_uri",
+            topicId1, topicId2, "dm4.core.default", "dm4.core.default");
+        assertEquals(0, assocs.size());
+        //
+        // associate t1 with t2
+        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+            mf.newTopicRoleModel(topicId1, "dm4.core.default"),
+            mf.newTopicRoleModel(topicId2, "dm4.core.default")
+        );
+        storage.storeAssociation(assoc);
+        long assocId = assoc.getId();
+        storage.storeAssociationValue(assocId, new SimpleValue(""), null, null, null);
+        //
+        // associate t1 with t3
+        assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+            mf.newTopicRoleModel(topicId1, "dm4.core.default"),
+            mf.newTopicRoleModel(topicId3, "dm4.core.default")
+        );
+        storage.storeAssociation(assoc);
+        assocId = assoc.getId();
+        storage.storeAssociationValue(assocId, new SimpleValue(""), null, null, null);
+        //
+        // between t1 and t2 exists one assoc
+        assocs = storage.fetchAssociations("dm4.test.assoc_type_uri", topicId1, topicId2,
+            "dm4.core.default", "dm4.core.default");
+        assertEquals(1, assocs.size());
+    }
 }
