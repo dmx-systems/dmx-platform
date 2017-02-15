@@ -116,7 +116,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public TopicModel fetchTopic(long topicId) {
-        throw new RuntimeException("Not yet implemented");
+        return buildTopic(topicId);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public TopicModel fetchTopic(String key, Object value) {
-        List<Long> topicIds = queryKeyValue(EntityType.TOPIC, key, value);
+        List<Long> topicIds = queryByValue(EntityType.TOPIC, key, value);
         switch (topicIds.size()) {
         case 0:
             return null;
@@ -140,7 +140,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public List<TopicModel> fetchTopics(String key, Object value) {
-        return buildTopics(queryKeyValue(EntityType.TOPIC, key, value));
+        return buildTopics(queryByValue(EntityType.TOPIC, key, value));
     }
 
     @Override
@@ -263,7 +263,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public long[] fetchPlayerIds(long assocId) {
-        throw new RuntimeException("Not yet implemented");
+        return queryPlayerIds(assocId);
     }
 
     // ---
@@ -396,15 +396,21 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri, String myRoleTypeUri,
-                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+    public List<RelatedTopicModel> fetchRelatedTopics(long id, String assocTypeUri,
+                                                      String myRoleTypeUri, String othersRoleTypeUri,
+                                                      String othersTopicTypeUri) {
+        return buildRelatedTopics(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     null,             id, null,
+            othersRoleTypeUri, EntityType.TOPIC, -1, othersTopicTypeUri));
     }
 
     @Override
-    public List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri, String myRoleTypeUri,
-                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+    public List<RelatedAssociationModel> fetchRelatedAssociations(long id, String assocTypeUri,
+                                                                  String myRoleTypeUri, String othersRoleTypeUri,
+                                                                  String othersAssocTypeUri) {
+        return buildRelatedAssociations(queryAssociations(assocTypeUri,
+            myRoleTypeUri,     null,             id, null,
+            othersRoleTypeUri, EntityType.ASSOC, -1, othersAssocTypeUri));
     }
 
 
@@ -458,7 +464,13 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public void storeAssociationProperty(long assocId, String propUri, Object propValue, boolean addToIndex) {
-        throw new RuntimeException("Not yet implemented");
+        String ident = ident(propUri);
+        addAttributeToSchema(ident, propValue);
+        //
+        transact(
+            ":db/id", assocId,
+            ident, propValue
+        );
     }
 
     // ---
@@ -605,21 +617,34 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    public List<Long> queryKeyValue(EntityType entityType, String key, Object value) {
-        return query(queryBuilder().keyValue(entityType, key, value));
+    private List<Long> queryByValue(EntityType entityType, String key, Object value) {
+        return query(queryBuilder().byValue(entityType, key, value));
     }
 
-    public List<Long> queryByType(EntityType entityType, String topicTypeUri) {
+    private List<Long> queryByType(EntityType entityType, String topicTypeUri) {
         return query(queryBuilder().byType(entityType, topicTypeUri));
     }
 
     private Collection<List<Long>> queryAssociations(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
-        return query(queryBuilder().associations(assocTypeUri,
+        return query(queryBuilder().related(assocTypeUri,
             roleTypeUri1, entityType1, objectId1, objectTypeUri1,
             roleTypeUri2, entityType2, objectId2, objectTypeUri2
         ));
+    }
+
+    private long[] queryPlayerIds(long assocId) {
+        Collection<Entity> roles = (Collection<Entity>) entity(assocId).get(":dm4.assoc/role");
+        if (roles.size() != 2) {
+            throw new RuntimeException("Data inconsistency: association " + assocId + " has " + roles.size() +
+                " roles (expected are 2) " + roles);
+        }
+        Iterator<Entity> i = roles.iterator();
+        return new long[] {
+            (Long) ((Entity) i.next().get(":dm4.role/player")).get(":db/id"),
+            (Long) ((Entity) i.next().get(":dm4.role/player")).get(":db/id")
+        };
     }
 
     private QueryBuilder queryBuilder() {

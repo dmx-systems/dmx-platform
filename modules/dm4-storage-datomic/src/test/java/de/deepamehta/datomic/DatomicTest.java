@@ -412,11 +412,6 @@ public class DatomicTest {
         storage.storeTopic(t);
         long topicId3 = t.getId();
         //
-        // no assoc exists between t1 and t2
-        List<? extends AssociationModel> assocs = storage.fetchAssociations("dm4.test.assoc_type_uri",
-            topicId1, topicId2, "dm4.core.default", "dm4.core.default");
-        assertEquals(0, assocs.size());
-        //
         // associate t1 with t2
         AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
             mf.newTopicRoleModel(topicId1, "dm4.core.default"),
@@ -436,8 +431,65 @@ public class DatomicTest {
         storage.storeAssociationValue(assocId, new SimpleValue(""), null, null, null);
         //
         // between t1 and t2 exists one assoc
-        assocs = storage.fetchAssociations("dm4.test.assoc_type_uri", topicId1, topicId2,
-            "dm4.core.default", "dm4.core.default");
+        List<? extends AssociationModel> assocs = storage.fetchAssociations("dm4.test.assoc_type_uri",
+            topicId1, topicId2, "dm4.core.default", "dm4.core.default");
         assertEquals(1, assocs.size());
+    }
+
+    @Test
+    public void fetchPlayerIds() {
+        // create 2 topics
+        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
+        storage.storeTopic(t);
+        long topicId1 = t.getId();
+        storage.storeTopic(t);
+        long topicId2 = t.getId();
+        //
+        // associate t1 with t2
+        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+            mf.newTopicRoleModel(topicId1, "dm4.core.default"),
+            mf.newTopicRoleModel(topicId2, "dm4.core.default")
+        );
+        storage.storeAssociation(assoc);
+        long assocId = assoc.getId();
+        //
+        // check player Ids
+        long[] ids = storage.fetchPlayerIds(assocId);
+        assertEquals(2, ids.length);
+        assertTrue(contains(ids, topicId1));
+        assertTrue(contains(ids, topicId2));
+    }
+
+    @Test
+    public void fetchPlayerIdsForSelfRelatedAssoc() {
+        // create topic
+        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
+        storage.storeTopic(t);
+        long topicId = t.getId();
+        //
+        // associate t with itself
+        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+            mf.newTopicRoleModel(topicId, "dm4.core.default"),
+            mf.newTopicRoleModel(topicId, "dm4.core.default")
+        );
+        storage.storeAssociation(assoc);
+        long assocId = assoc.getId();
+        //
+        // check player Ids
+        long[] ids = storage.fetchPlayerIds(assocId);
+        assertEquals(2, ids.length);
+        assertEquals(topicId, ids[0]);
+        assertEquals(topicId, ids[1]);
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private boolean contains(long[] a, long val) {
+        for (long v : a) {
+            if (v == val) {
+                return true;
+            }
+        }
+        return false;
     }
 }

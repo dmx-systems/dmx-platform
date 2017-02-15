@@ -98,6 +98,7 @@ public interface DeepaMehtaStorage {
 
     Iterator<? extends AssociationModel> fetchAllAssociations();
 
+    // ### TODO: return List<Long> for better testing
     long[] fetchPlayerIds(long assocId);
 
     // ---

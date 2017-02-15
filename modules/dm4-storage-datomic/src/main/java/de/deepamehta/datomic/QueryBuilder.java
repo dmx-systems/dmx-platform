@@ -17,6 +17,7 @@ class QueryBuilder {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    // ### TODO: make bound inputs explicit
     private static final Object RULES = read("[" +
         // entity type filter: entity ?e is of type ?t
         "[(entity-type ?e ?t)" +
@@ -27,8 +28,8 @@ class QueryBuilder {
         // object value filter: object ?o's (topic or assoc) value for attribute ?a is ?v
         "[(object-value ?o ?a ?v)" +
         " [?o ?a ?v]]" +
-        // association filter: ?e1 is associated to ?e2 via ?a; the roles are ?r1 and ?r2
-        "[(association ?e1 ?e2 ?a ?r1 ?r2)" +
+        // related filter: ?e1 is associated to ?e2 via ?a; the roles are ?r1 and ?r2
+        "[(related ?e1 ?e2 ?a ?r1 ?r2)" +
         " [?r1 :dm4.role/player ?e1]" +
         " [?a :dm4.assoc/role ?r1]" +
         " [?a :dm4.assoc/role ?r2]" +
@@ -54,7 +55,7 @@ class QueryBuilder {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    QueryRequest keyValue(EntityType entityType, String key, Object value) {
+    QueryRequest byValue(EntityType entityType, String key, Object value) {
         return queryRequest(
             "[:find [?e ...] :in $ % ?et ?a ?v :where (object-value ?e ?a ?v) (entity-type ?e ?et)]",
             db, RULES, entityType.ident, ident(key), value
@@ -85,7 +86,7 @@ class QueryBuilder {
      * @param   objectTypeUri1  Object type (topic type or association type) filter for the start object's end.
      *                          Optional. Pass <code>null</code> for no filtering.
      */
-    QueryRequest associations(String assocTypeUri,
+    QueryRequest related(String assocTypeUri,
             String roleTypeUri1, EntityType entityType1, long objectId1, String objectTypeUri1,
             String roleTypeUri2, EntityType entityType2, long objectId2, String objectTypeUri2) {
         //
@@ -95,7 +96,7 @@ class QueryBuilder {
         //
         List find   = new ArrayList(); find.add(read("?e2")); find.add(read("?a"));
         List in     = new ArrayList(); in.add(read("$")); in.add(read("%")); in.add(read("?e1"));
-        List where  = new ArrayList(); where.add(read("(association ?e1 ?e2 ?a ?r1 ?r2)"));
+        List where  = new ArrayList(); where.add(read("(related ?e1 ?e2 ?a ?r1 ?r2)"));
         List inputs = new ArrayList(); inputs.add(db); inputs.add(RULES); inputs.add(objectId1);
         //
         // ### TODO: optimization. Rule order?
