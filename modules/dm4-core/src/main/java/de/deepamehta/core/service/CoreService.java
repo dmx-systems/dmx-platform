@@ -238,6 +238,8 @@ public interface CoreService {
 
     DeepaMehtaObject getObject(long id);
 
+    String getTypeUri(long id);
+
 
 
     // === Plugins ===

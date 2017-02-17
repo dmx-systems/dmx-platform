@@ -131,6 +131,8 @@ public interface DeepaMehtaStorage {
 
     DeepaMehtaObjectModel fetchObject(long id);
 
+    String fetchTypeUri(long id);
+
 
 
     // === Traversal ===

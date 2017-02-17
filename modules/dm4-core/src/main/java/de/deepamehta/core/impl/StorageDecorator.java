@@ -318,6 +318,10 @@ class StorageDecorator {
         return (DeepaMehtaObjectModelImpl) storage.fetchObject(id);
     }
 
+    final String fetchTypeUri(long id) {
+        return storage.fetchTypeUri(id);
+    }
+
 
 
     // === Traversal ===

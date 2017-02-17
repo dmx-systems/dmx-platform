@@ -300,6 +300,11 @@ public class CoreServiceImpl implements CoreService {
         return pl.getObject(id);
     }
 
+    @Override
+    public String getTypeUri(long id) {
+        return pl.fetchTypeUri(id);
+    }
+
 
 
     // === Plugins ===

@@ -413,7 +413,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         checkTopicReadAccess(topicId);
-        return _getTopicType(typeUri(topicId)).instantiate();
+        return _getTopicType(fetchTypeUri(topicId)).instantiate();
     }
 
     // ---
@@ -424,7 +424,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
-        return _getAssociationType(typeUri(assocId)).instantiate();
+        return _getAssociationType(fetchTypeUri(assocId)).instantiate();
     }
 
     // ---
@@ -709,13 +709,6 @@ public class PersistenceLayer extends StorageDecorator {
         model.uri = typeTopic.uri;
         //
         typeStorage.storeType(model);           // store type-specific parts
-    }
-
-    private String typeUri(long objectId) {
-        // ### FIXME: "type_uri" is storage impl dependent
-        // ### TODO: as a performance measure add getTypeUri() to storage API
-        // ### TODO: remove copy in AccessControlImpl
-        return (String) fetchProperty(objectId, "type_uri");
     }
 
     private void bootstrapTypeCache() {
