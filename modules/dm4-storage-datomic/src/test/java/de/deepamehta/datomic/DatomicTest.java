@@ -272,10 +272,8 @@ public class DatomicTest {
 
     @Test
     public void fetchTopicByUri() {
-        TopicModel topic = mf.newTopicModel("dm4.test.uri", "dm4.test.type_uri", new SimpleValue("hello!"));
-        storage.storeTopic(topic);
-        long id = topic.getId();
-        storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
+        long id = storage.storeTopic(mf.newTopicModel("dm4.test.uri", "dm4.test.type_uri"));
+        storage.storeTopicValue(id, new SimpleValue("hello!"), null, null, null);
         //
         TopicModel t = storage.fetchTopicByUri("dm4.test.uri");
         assertEquals(id, t.getId());
@@ -295,15 +293,12 @@ public class DatomicTest {
     public void fetchTopicByValueWithAmbiguity() {
         try {
             long id;
-            TopicModel topic = mf.newTopicModel("dm4.test.type_uri", new SimpleValue("hello!"));
             //
-            storage.storeTopic(topic);
-            id = topic.getId();
-            storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
+            id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
+            storage.storeTopicValue(id, new SimpleValue("hello!"), null, null, null);
             //
-            storage.storeTopic(topic);
-            id = topic.getId();
-            storage.storeTopicValue(id, topic.getSimpleValue(), null, null, null);
+            id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
+            storage.storeTopicValue(id, new SimpleValue("hello!"), null, null, null);
             //
             TopicModel t = storage.fetchTopic("dm4.test.type_uri", "hello!");
             fail("RuntimeException not thrown");
@@ -336,10 +331,7 @@ public class DatomicTest {
 
     @Test
     public void storeTopicValue() {
-        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
-        storage.storeTopic(t);
-        long id = t.getId();
-        //
+        long id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
         storage.storeTopicValue(id, new SimpleValue("hello!"), null, null, null);
         //
         assertEquals("hello!", _storage.entity(id).get(":dm4.test.type_uri"));
@@ -347,9 +339,7 @@ public class DatomicTest {
 
     @Test
     public void storeTopicProperty() {
-        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
-        storage.storeTopic(t);
-        long id = t.getId();
+        long id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
         //
         final String PROP_URI = "dm4.accesscontrol.creator";
         storage.storeTopicProperty(id, PROP_URI, "admin", false);
@@ -360,9 +350,7 @@ public class DatomicTest {
 
     @Test
     public void storeTopicPropertyLong() {
-        TopicModel t = mf.newTopicModel("dm4.test.type_uri");
-        storage.storeTopic(t);
-        long id = t.getId();
+        long id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
         //
         final String PROP_URI = "dm4.accesscontrol.creator";
         storage.storeTopicProperty(id, PROP_URI, 1234L, false);
@@ -379,7 +367,7 @@ public class DatomicTest {
         final long TOPIC_ID = 1003;     // from 1004 on the datom is NOT added!
         storage.storeTopicProperty(TOPIC_ID, PROP_URI, "admin", false);
         //
-        Entity e = _storage.entity(TOPIC_ID).touch();
+        Entity e = _storage.entity(TOPIC_ID);
         assertEquals(1, e.keySet().size());
         //
         String creator = (String) storage.fetchProperty(TOPIC_ID, PROP_URI);
@@ -388,12 +376,13 @@ public class DatomicTest {
 
     @Test
     public void storeAssociation() {
-        TopicModel t1 = mf.newTopicModel(                        "dm4.test.topic_type_uri");
-        TopicModel t2 = mf.newTopicModel("dm4.test.topic_uri_2", "dm4.test.topic_type_uri");
-        storage.storeTopic(t1);
-        storage.storeTopic(t2);
+        // create 2 topics
+        long id = storage.storeTopic(mf.newTopicModel(              "dm4.test.topic_type_uri"));
+        storage.storeTopic(mf.newTopicModel("dm4.test.topic_uri_2", "dm4.test.topic_type_uri"));
+        //
+        // associate them (one by-id, one by-uri)
         AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
-            mf.newTopicRoleModel(t1.getId(),             "dm4.core.default"),
+            mf.newTopicRoleModel(id,                     "dm4.core.default"),
             mf.newTopicRoleModel("dm4.test.topic_uri_2", "dm4.core.default")
         );
         assertEquals(-1, assoc.getId());
@@ -404,30 +393,22 @@ public class DatomicTest {
     @Test
     public void fetchAssociationsBetween2Topics() {
         // create 3 topics
-        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
-        storage.storeTopic(t);
-        long topicId1 = t.getId();
-        storage.storeTopic(t);
-        long topicId2 = t.getId();
-        storage.storeTopic(t);
-        long topicId3 = t.getId();
+        long topicId1 = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
+        long topicId2 = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
+        long topicId3 = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
         //
         // associate t1 with t2
-        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+        long assocId = storage.storeAssociation(mf.newAssociationModel("dm4.test.assoc_type_uri",
             mf.newTopicRoleModel(topicId1, "dm4.core.default"),
             mf.newTopicRoleModel(topicId2, "dm4.core.default")
-        );
-        storage.storeAssociation(assoc);
-        long assocId = assoc.getId();
+        ));
         storage.storeAssociationValue(assocId, new SimpleValue(""), null, null, null);
         //
         // associate t1 with t3
-        assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+        assocId = storage.storeAssociation(mf.newAssociationModel("dm4.test.assoc_type_uri",
             mf.newTopicRoleModel(topicId1, "dm4.core.default"),
             mf.newTopicRoleModel(topicId3, "dm4.core.default")
-        );
-        storage.storeAssociation(assoc);
-        assocId = assoc.getId();
+        ));
         storage.storeAssociationValue(assocId, new SimpleValue(""), null, null, null);
         //
         // between t1 and t2 exists one assoc
@@ -439,19 +420,14 @@ public class DatomicTest {
     @Test
     public void fetchPlayerIds() {
         // create 2 topics
-        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
-        storage.storeTopic(t);
-        long topicId1 = t.getId();
-        storage.storeTopic(t);
-        long topicId2 = t.getId();
+        long topicId1 = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
+        long topicId2 = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
         //
         // associate t1 with t2
-        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+        long assocId = storage.storeAssociation(mf.newAssociationModel("dm4.test.assoc_type_uri",
             mf.newTopicRoleModel(topicId1, "dm4.core.default"),
             mf.newTopicRoleModel(topicId2, "dm4.core.default")
-        );
-        storage.storeAssociation(assoc);
-        long assocId = assoc.getId();
+        ));
         //
         // check player Ids
         long[] ids = storage.fetchPlayerIds(assocId);
@@ -463,17 +439,13 @@ public class DatomicTest {
     @Test
     public void fetchPlayerIdsForSelfRelatedAssoc() {
         // create topic
-        TopicModel t = mf.newTopicModel("dm4.test.topic_type_uri");
-        storage.storeTopic(t);
-        long topicId = t.getId();
+        long topicId = storage.storeTopic(mf.newTopicModel("dm4.test.topic_type_uri"));
         //
         // associate t with itself
-        AssociationModel assoc = mf.newAssociationModel("dm4.test.assoc_type_uri",
+        long assocId = storage.storeAssociation(mf.newAssociationModel("dm4.test.assoc_type_uri",
             mf.newTopicRoleModel(topicId, "dm4.core.default"),
             mf.newTopicRoleModel(topicId, "dm4.core.default")
-        );
-        storage.storeAssociation(assoc);
-        long assocId = assoc.getId();
+        ));
         //
         // check player Ids
         long[] ids = storage.fetchPlayerIds(assocId);

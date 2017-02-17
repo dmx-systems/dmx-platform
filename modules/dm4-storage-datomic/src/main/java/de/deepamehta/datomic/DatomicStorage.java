@@ -166,7 +166,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public void storeTopic(TopicModel topicModel) {
+    public long storeTopic(TopicModel topicModel) {
         setDefaults(topicModel);
         String uri = topicModel.getUri();
         checkUriUniqueness(uri);
@@ -176,6 +176,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
         //
         // 2) update model
         topicModel.setId(topicId);
+        //
+        return topicId;
     }
 
     @Override
@@ -269,7 +271,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---
 
     @Override
-    public void storeAssociation(AssociationModel assocModel) {
+    public long storeAssociation(AssociationModel assocModel) {
         setDefaults(assocModel);
         String uri = assocModel.getUri();
         checkUriUniqueness(uri);
@@ -284,6 +286,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
         //
         // 2) update model
         assocModel.setId(assocId);
+        //
+        return assocId;
     }
 
     @Override
@@ -424,7 +428,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public Object fetchProperty(long id, String propUri) {
-        return query("[:find ?v . :in $ ?e ?a :where [?e ?a ?v]]", id, ident(propUri));
+        return entity(id).get(ident(propUri));      // ### FIXME: throw if prop not set
     }
 
     @Override

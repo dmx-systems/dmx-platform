@@ -56,8 +56,10 @@ public interface DeepaMehtaStorage {
      *                          - the ID of the stored topic.
      *                          - an empty URI ("") in case <code>null</code> was passed.
      *                          - an empty simple value ("") in case <code>null</code> was passed.
+     *
+     * @return  the ID of the stored topic
      */
-    void storeTopic(TopicModel topicModel);
+    long storeTopic(TopicModel topicModel);
 
     void storeTopicUri(long topicId, String uri);
 
@@ -103,7 +105,10 @@ public interface DeepaMehtaStorage {
 
     // ---
 
-    void storeAssociation(AssociationModel assocModel);
+    /**
+     * @return  the ID of the stored association
+     */
+    long storeAssociation(AssociationModel assocModel);
 
     void storeAssociationUri(long assocId, String uri);
 
