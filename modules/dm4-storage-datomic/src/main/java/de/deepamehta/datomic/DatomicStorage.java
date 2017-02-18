@@ -654,16 +654,20 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // ---
 
     private long[] queryPlayerIds(long assocId) {
-        Collection<Entity> roles = (Collection<Entity>) entity(assocId).get(":dm4.assoc/role");
+        Iterator<Entity> i = roles(entity(assocId)).iterator();
+        return new long[] {
+            playerId(i.next()),
+            playerId(i.next())
+        };
+    }
+
+    private Iterable<Entity> roles(Entity assoc) {
+        Collection<Entity> roles = (Collection<Entity>) assoc.get(":dm4.assoc/role");
         if (roles.size() != 2) {
-            throw new RuntimeException("Data inconsistency: association " + assocId + " has " + roles.size() +
+            throw new RuntimeException("Data inconsistency: association " + id(assoc) + " has " + roles.size() +
                 " roles (expected are 2) " + roles);
         }
-        Iterator<Entity> i = roles.iterator();
-        return new long[] {
-            (Long) ((Entity) i.next().get(":dm4.role/player")).get(":db/id"),
-            (Long) ((Entity) i.next().get(":dm4.role/player")).get(":db/id")
-        };
+        return roles;
     }
 
     private Object _fetchProperty(long id, String propUri) {
@@ -673,27 +677,39 @@ public class DatomicStorage implements DeepaMehtaStorage {
     // --- Datomic -> DeepaMehta Bridge ---
 
     private TopicModel buildTopic(long topicId) {
-        Entity e = entity(topicId);
+        Entity topic = entity(topicId);
         return mf.newTopicModel(
             topicId,
-            uri(e),
-            typeUri(e),
-            simpleValue(e),
+            uri(topic),
+            typeUri(topic),
+            simpleValue(topic),
             null    // childTopics=null
         );
     }
 
     private AssociationModel buildAssociation(long assocId) {
-        Entity e = entity(assocId);
+        Entity assoc = entity(assocId);
+        List<RoleModel> roleModels = buildRoleModels(assoc);
         return mf.newAssociationModel(
             assocId,
-            uri(e),
-            typeUri(e),
-            null,   // ### FIXME: set role model 1
-            null,   // ### FIXME: set role model 2
-            simpleValue(e),
+            uri(assoc),
+            typeUri(assoc),
+            roleModels.get(0),
+            roleModels.get(1),
+            simpleValue(assoc),
             null    // childTopics=null
         );
+    }
+
+    private List<RoleModel> buildRoleModels(Entity assoc) {
+        List<RoleModel> roleModels = new ArrayList();
+        for (Entity role : roles(assoc)) {
+            Entity player = player(role);
+            String roleTypeUri = roleTypeUri(role);
+            RoleModel roleModel = EntityType.of(player).createRoleModel(id(player), roleTypeUri, mf);
+            roleModels.add(roleModel);
+        }
+        return roleModels;
     }
 
     private List<TopicModel> buildTopics(Collection<Long> topicIds) {
@@ -746,6 +762,22 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     private SimpleValue simpleValue(Entity e) {
         return new SimpleValue(e.get(e.get(":dm4.object/type")));
+    }
+
+    private long playerId(Entity role) {
+        return id(player(role));
+    }
+
+    private Entity player(Entity role) {
+        return (Entity) role.get(":dm4.role/player");
+    }
+
+    private String roleTypeUri(Entity role) {
+        return uri(role.get(":dm4.role/type").toString());  // Note: role.get() returns a Keyword
+    }
+
+    private long id(Entity e) {
+        return (Long) e.get(":db/id");
     }
 
     // --- DeepaMehta -> Datomic Bridge ---
