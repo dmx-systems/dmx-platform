@@ -39,13 +39,11 @@ Association.prototype.get_topic_2 = function() {
 // ---
 
 Association.prototype.get_role_type_1 = function() {
-    // ### FIXME: "uri" is storage impl dependent
-    return dm4c.restc.get_topic_by_value("uri", this.role_1.role_type_uri)
+    return dm4c.restc.get_topic_by_uri(this.role_1.role_type_uri)
 }
 
 Association.prototype.get_role_type_2 = function() {
-    // ### FIXME: "uri" is storage impl dependent
-    return dm4c.restc.get_topic_by_value("uri", this.role_2.role_type_uri)
+    return dm4c.restc.get_topic_by_uri(this.role_2.role_type_uri)
 }
 
 // ---

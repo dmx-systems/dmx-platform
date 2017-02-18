@@ -226,7 +226,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public AssociationModel fetchAssociation(long assocId) {
-        throw new RuntimeException("Not yet implemented");
+        return buildAssociation(assocId);
     }
 
     @Override
@@ -250,7 +250,9 @@ public class DatomicStorage implements DeepaMehtaStorage {
     @Override
     public List<AssociationModel> fetchAssociationsBetweenTopicAndAssociation(String assocTypeUri, long topicId,
                                                        long assocId, String topicRoleTypeUri, String assocRoleTypeUri) {
-        throw new RuntimeException("Not yet implemented");
+        return buildAssociations(assocIds(queryRelated(assocTypeUri,
+            topicRoleTypeUri, EntityType.TOPIC, topicId, null,
+            assocRoleTypeUri, EntityType.ASSOC, assocId, null)));
     }
 
     @Override
@@ -757,7 +759,11 @@ public class DatomicStorage implements DeepaMehtaStorage {
     }
 
     private String typeUri(Entity e) {
-        return uri(e.get(":dm4.object/type").toString());   // Note: e.get() returns a Keyword
+        Object type = e.get(":dm4.object/type");
+        if (type == null) {
+            throw new RuntimeException("Object " + id(e) + " has no type URI");
+        }
+        return uri(type.toString());   // Note: e.get() returns a Keyword
     }
 
     private SimpleValue simpleValue(Entity e) {
