@@ -428,12 +428,16 @@ public class DatomicStorage implements DeepaMehtaStorage {
 
     @Override
     public Object fetchProperty(long id, String propUri) {
-        return entity(id).get(ident(propUri));      // ### FIXME: throw if prop not set
+        Object propValue = _fetchProperty(id, propUri);
+        if (propValue == null) {
+            throw new RuntimeException("Property \"" + propUri + "\" is not set for object " + id);
+        }
+        return propValue;
     }
 
     @Override
     public boolean hasProperty(long id, String propUri) {
-        throw new RuntimeException("Not yet implemented");
+        return _fetchProperty(id, propUri) != null;
     }
 
     // ---
@@ -643,6 +647,12 @@ public class DatomicStorage implements DeepaMehtaStorage {
         ));
     }
 
+    private QueryBuilder queryBuilder() {
+        return new QueryBuilder(conn.db());
+    }
+
+    // ---
+
     private long[] queryPlayerIds(long assocId) {
         Collection<Entity> roles = (Collection<Entity>) entity(assocId).get(":dm4.assoc/role");
         if (roles.size() != 2) {
@@ -656,8 +666,8 @@ public class DatomicStorage implements DeepaMehtaStorage {
         };
     }
 
-    private QueryBuilder queryBuilder() {
-        return new QueryBuilder(conn.db());
+    private Object _fetchProperty(long id, String propUri) {
+        return entity(id).get(ident(propUri));
     }
 
     // --- Datomic -> DeepaMehta Bridge ---

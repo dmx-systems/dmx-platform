@@ -338,6 +338,21 @@ public class DatomicTest {
     }
 
     @Test
+    public void fetchPropertyThatIsNotSet() {
+        final String PROP_URI = "dm4.accesscontrol.creator";
+        long id = -1;
+        try {
+            id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
+            //
+            storage.fetchProperty(id, PROP_URI);
+            fail("No exception is thrown");
+        } catch (Exception e) {
+            assertSame(RuntimeException.class, e.getClass());
+            assertEquals("Property \"" + PROP_URI + "\" is not set for object " + id, e.getMessage());
+        }
+    }
+
+    @Test
     public void storeTopicProperty() {
         long id = storage.storeTopic(mf.newTopicModel("dm4.test.type_uri"));
         //

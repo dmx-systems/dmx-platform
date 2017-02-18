@@ -212,14 +212,18 @@ public interface DeepaMehtaStorage {
 
     // === Properties ===
 
+    // ### TODO: parametric return type
     /**
-     * ### TODO: parametric return type
+     * Returns a topic's or association's property value associated with the given property URI.
+     * If there's no property value associated with the property URI an exception is thrown.
      *
      * @param   id                  id of a topic or an association
      */
     Object fetchProperty(long id, String propUri);
 
     /**
+     * Checks whether for a given topic or association a property value is associated with a given property URI.
+     *
      * @param   id                  id of a topic or an association
      */
     boolean hasProperty(long id, String propUri);
