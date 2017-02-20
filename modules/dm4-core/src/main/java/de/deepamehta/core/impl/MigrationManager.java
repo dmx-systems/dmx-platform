@@ -53,10 +53,10 @@ class MigrationManager {
      * Determines the migrations to be run for the specified plugin and runs them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
-        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
-            .getSimpleValue().intValue();
-        int requiredModelVersion = Integer.parseInt(plugin.getConfigProperty("dm4.plugin.model_version", "0"));
-        int migrationsToRun = requiredModelVersion - installedModelVersion;
+        long installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
+            .getSimpleValue().longValue();
+        long requiredModelVersion = Long.parseLong(plugin.getConfigProperty("dm4.plugin.model_version", "0"));
+        long migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
             logger.info("Running migrations for " + plugin + " ABORTED -- installed model is up-to-date (version " +
@@ -66,7 +66,7 @@ class MigrationManager {
         //
         logger.info("Running " + migrationsToRun + " migrations for " + plugin + " (installed model: version " +
             installedModelVersion + ", required model: version " + requiredModelVersion + ")");
-        for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
+        for (long i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
             runPluginMigration(plugin, i, isCleanInstall);
         }
     }
@@ -99,7 +99,7 @@ class MigrationManager {
         dm4.pl.storeCoreModelVersion(migrationNr);
     }
 
-    private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {
+    private void runPluginMigration(PluginImpl plugin, long migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, plugin, isCleanInstall);
         plugin.setMigrationNr(migrationNr);
     }

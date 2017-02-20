@@ -367,8 +367,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private ViewProperties fetchViewProperties(Association mapcontextAssoc) {
-        int x = (Integer) mapcontextAssoc.getProperty(PROP_X);
-        int y = (Integer) mapcontextAssoc.getProperty(PROP_Y);
+        long x = (Long) mapcontextAssoc.getProperty(PROP_X);
+        long y = (Long) mapcontextAssoc.getProperty(PROP_Y);
         boolean visibility = (Boolean) mapcontextAssoc.getProperty(PROP_VISIBILITY);
         return new ViewProperties(x, y, visibility);
     }

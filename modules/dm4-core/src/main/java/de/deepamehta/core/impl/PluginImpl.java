@@ -239,7 +239,7 @@ public class PluginImpl implements Plugin, EventHandler {
         return pluginPackage + ".migrations.Migration" + migrationNr;
     }
 
-    void setMigrationNr(int migrationNr) {
+    void setMigrationNr(long migrationNr) {
         pluginTopic.getChildTopics().set("dm4.core.plugin_migration_nr", migrationNr);
     }
 

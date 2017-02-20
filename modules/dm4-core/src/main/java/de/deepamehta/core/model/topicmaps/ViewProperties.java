@@ -32,7 +32,7 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
      * Convenience constructor that initializes the "dm4.topicmaps.x", "dm4.topicmaps.y", and "dm4.topicmaps.visibility"
      * standard view properties.
      */
-    public ViewProperties(int x, int y, boolean visibility) {
+    public ViewProperties(long x, long y, boolean visibility) {
         initPos(x, y);
         initVisibility(visibility);
     }
@@ -91,7 +91,7 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
 
     // ------------------------------------------------------------------------------------------------ Private  Methods
 
-    private void initPos(int x, int y) {
+    private void initPos(long x, long y) {
         put("dm4.topicmaps.x", x);
         put("dm4.topicmaps.y", y);
     }
