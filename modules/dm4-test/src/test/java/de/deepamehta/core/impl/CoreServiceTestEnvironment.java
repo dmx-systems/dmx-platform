@@ -39,9 +39,11 @@ public class CoreServiceTestEnvironment {
 
     @After
     public void shutdown() {
-        if (storage != null) {
+        // Peer.shutdown() must NOT be called between running tests (in the same JVM instance).
+        // Otherwise strange Datomic errors appear.
+        /* if (storage != null) {
             storage.shutdown();
-        }
+        } */
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
