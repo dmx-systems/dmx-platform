@@ -95,9 +95,6 @@ public class DatomicStorage implements DeepaMehtaStorage {
     DatomicStorage(String databaseUri, ModelFactory mf) {
         try (ClassLoaderSwitch cl = new ClassLoaderSwitch()) {
             this.isCleanInstall = Peer.createDatabase(databaseUri);
-            if (!isCleanInstall) {  // ### FIXME: drop this
-                throw new RuntimeException("Database already exists");
-            }
             this.conn = Peer.connect(databaseUri);
             this.mf = mf;
         } catch (Throwable e) {

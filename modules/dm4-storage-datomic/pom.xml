@@ -42,9 +42,45 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>7.0.27</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-juli</artifactId>
+            <version>7.0.27</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>artemis-core-client</artifactId>
             <version>1.4.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>artemis-commons</artifactId>
+            <version>1.4.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.0.39.Final</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.3.0.Final</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.9.2</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -78,14 +114,19 @@
                             de.deepamehta.datomic.DatomicStorageActivator
                         </Bundle-Activator>
                         <Import-Package>
-                            !org.apache.activemq.artemis, !org.apache.activemq.artemis.utils.uri,
-                            !org.apache.lucene.*, !org.apache.commons.codec.binary, !org.apache.tomcat.jdbc.pool,
-                            !org.jgroups.*, !org.jboss.logging.*, !io.netty.*,
-                            !org.codehaus.commons.compiler.jdk, !org.osgi.service.jdbc, !sun.misc, *
+                            !org.apache.lucene.*, !org.apache.commons.codec.binary, !org.apache.commons.logging,
+                            !org.apache.log4j, !org.apache.logging.log4j.*, !org.apache.tomcat.jni,
+                            !org.apache.commons.collections.*,
+                            !org.jboss.marshalling, !org.jboss.logmanager, !org.jboss.logging.annotations,
+                            !org.jgroups.*, !org.eclipse.jetty.*, !org.codehaus.commons.compiler.jdk,
+                            !org.osgi.service.jdbc, !com.google.protobuf, !org.bouncycastle.*,
+                            !com.barchart.udt.*, !com.jcraft.jzlib, !gnu.io, !javassist,
+                            !com.sun.nio.sctp, !sun.security.*, !sun.misc, *
                         </Import-Package>
                         <Embed-Dependency>
-                            datomic-free, datomic-lucene-core, clojure, h2, artemis-core-client, geronimo-json_1.0_spec,
-                            guava, fressian
+                            datomic-free, datomic-lucene-core, clojure, h2, tomcat-jdbc, tomcat-juli,
+                            artemis-core-client, artemis-commons, netty-all, jboss-logging, commons-beanutils,
+                            geronimo-json_1.0_spec, guava, fressian
                         </Embed-Dependency>
                     </instructions>
                 </configuration>
