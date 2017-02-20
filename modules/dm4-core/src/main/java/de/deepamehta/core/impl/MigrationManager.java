@@ -75,9 +75,9 @@ class MigrationManager {
      * Determines the core migrations to be run and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int installedModelVersion = dm4.pl.fetchCoreModelVersion();
-        int requiredModelVersion = CORE_MODEL_VERSION;
-        int migrationsToRun = requiredModelVersion - installedModelVersion;
+        long installedModelVersion = dm4.pl.fetchCoreModelVersion();
+        long requiredModelVersion = CORE_MODEL_VERSION;
+        long migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
             logger.info("Running core migrations ABORTED -- installed model is up-to-date (version " +
@@ -87,14 +87,14 @@ class MigrationManager {
         //
         logger.info("Running " + migrationsToRun + " core migrations (installed model: version " +
             installedModelVersion + ", required model: version " + requiredModelVersion + ")");
-        for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
+        for (long i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
             runCoreMigration(i, isCleanInstall);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
+    private void runCoreMigration(long migrationNr, boolean isCleanInstall) {
         runMigration(migrationNr, null, isCleanInstall);
         dm4.pl.storeCoreModelVersion(migrationNr);
     }
@@ -115,7 +115,7 @@ class MigrationManager {
      * @param   isCleanInstall  <code>true</code> if the migration is run as part of a clean install,
      *                          <code>false</code> if the migration is run as part of an update.
      */
-    private void runMigration(int migrationNr, PluginImpl plugin, boolean isCleanInstall) {
+    private void runMigration(long migrationNr, PluginImpl plugin, boolean isCleanInstall) {
         MigrationInfo mi = null;
         try {
             // collect info
@@ -268,7 +268,7 @@ class MigrationManager {
         boolean success;            // error occurred while construction?
         Exception exception;        // the error
 
-        MigrationInfo(int migrationNr, PluginImpl plugin) {
+        MigrationInfo(long migrationNr, PluginImpl plugin) {
             try {
                 String configFile = migrationConfigFile(migrationNr);
                 InputStream configIn;
@@ -343,15 +343,15 @@ class MigrationManager {
 
         // ---
 
-        private String migrationFile(int migrationNr) {
+        private String migrationFile(long migrationNr) {
             return "/migrations/migration" + migrationNr + ".json";
         }
 
-        private String migrationConfigFile(int migrationNr) {
+        private String migrationConfigFile(long migrationNr) {
             return "/migrations/migration" + migrationNr + ".properties";
         }
 
-        private String coreMigrationClassName(int migrationNr) {
+        private String coreMigrationClassName(long migrationNr) {
             return CORE_MIGRATIONS_PACKAGE + ".Migration" + migrationNr;
         }
 

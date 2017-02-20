@@ -231,7 +231,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *          This is the case if the plugin bundle contains no Plugin subclass and the "dm4.plugin.main_package"
      *          config property is not set.
      */
-    String getMigrationClassName(int migrationNr) {
+    String getMigrationClassName(long migrationNr) {
         if (pluginPackage.equals(PLUGIN_DEFAULT_PACKAGE)) {
             return null;    // migration package is unknown
         }

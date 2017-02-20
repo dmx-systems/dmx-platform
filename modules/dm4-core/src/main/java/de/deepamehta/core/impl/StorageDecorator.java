@@ -675,11 +675,11 @@ class StorageDecorator {
 
     // ---
 
-    final int fetchCoreModelVersion() {
-        return (Integer) fetchProperty(getRootTopicId(), PROP_CORE_MODEL_VERSION);
+    final long fetchCoreModelVersion() {
+        return (Long) fetchProperty(getRootTopicId(), PROP_CORE_MODEL_VERSION);
     }
 
-    final void storeCoreModelVersion(int version) {
+    final void storeCoreModelVersion(long version) {
         storeTopicProperty(getRootTopicId(), PROP_CORE_MODEL_VERSION, version, false);     // addToIndex=false
     }
 
