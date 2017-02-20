@@ -43,6 +43,7 @@ public class DatomicStorage implements DeepaMehtaStorage {
         "{:db/ident        :dm4/entity-type" +
         " :db/valueType    :db.type/ref" +
         " :db/cardinality  :db.cardinality/one" +
+        " :db/index        true" +
         " :db/doc          \"A DM4 entity type (topic or assoc)\"}" +
         "{:db/ident        :dm4.entity-type/topic}" +
         "{:db/ident        :dm4.entity-type/assoc}" +
@@ -50,25 +51,30 @@ public class DatomicStorage implements DeepaMehtaStorage {
         "{:db/ident        :dm4.object/uri" +
         " :db/valueType    :db.type/string" +
         " :db/cardinality  :db.cardinality/one" +
+        " :db/index        true" +
         " :db/doc          \"A DM4 object's URI\"}" +
         "{:db/ident        :dm4.object/type" +
         " :db/valueType    :db.type/keyword" +
         " :db/cardinality  :db.cardinality/one" +
+        " :db/index        true" +
         " :db/doc          \"A DM4 object's type (URI)\"}" +
         // Association
         "{:db/ident        :dm4.assoc/role" +
         " :db/valueType    :db.type/ref" +
         " :db/cardinality  :db.cardinality/many" +
         " :db/isComponent  true" +
+        " :db/index        true" +
         " :db/doc          \"An association's 2 roles\"}" +
         // Role
         "{:db/ident        :dm4.role/player" +
         " :db/valueType    :db.type/ref" +
         " :db/cardinality  :db.cardinality/one" +
+        " :db/index        true" +
         " :db/doc          \"A role's player ID\"}" +
         "{:db/ident        :dm4.role/type" +
         " :db/valueType    :db.type/keyword" +
         " :db/cardinality  :db.cardinality/one" +
+        " :db/index        true" +
         " :db/doc          \"A role's type (URI)\"}" +
     "]";
 
