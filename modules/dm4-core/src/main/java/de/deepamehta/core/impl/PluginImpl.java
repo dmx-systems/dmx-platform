@@ -560,7 +560,7 @@ public class PluginImpl implements Plugin, EventHandler {
         return dm4.createTopic(mf.newTopicModel(pluginUri, "dm4.core.plugin", mf.newChildTopicsModel()
             .put("dm4.core.plugin_name", pluginName())
             .put("dm4.core.plugin_symbolic_name", pluginUri)
-            .put("dm4.core.plugin_migration_nr", 0)
+            .put("dm4.core.plugin_migration_nr", 0L)
         ));
     }
 
