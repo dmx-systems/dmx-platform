@@ -22,69 +22,57 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-graphdb-api</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-resource</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-collections</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-primitive-collections</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-unsafe</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-io</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-logging</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-security</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-lucene-index</artifactId>
-            <version>3.0.2</version>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-lucene-upgrade</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <!-- JTA Specification (required by neo4j-kernel) -->
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jta_1.1_spec</artifactId>
-            <version>1.1.1</version>
-            <scope>runtime</scope>
+            <version>3.1.1</version>
         </dependency>
         <!-- Apache Commons Lang (required by neo4j-io) -->
         <dependency>
@@ -125,14 +113,14 @@
                         <Bundle-Activator>
                             de.deepamehta.storage.neo4j.Neo4jStorageActivator
                         </Bundle-Activator>
-                        <Import-Package><!-- FIXME -->
-                            !org.neo4j.*, !org.apache.*, *
+                        <Import-Package>
+                            !org.neo4j.csv.*, !org.apache.lucene.*, *
                         </Import-Package>
                         <Embed-Dependency>
                             neo4j-kernel, neo4j-graphdb-api, neo4j-resource, neo4j-common, neo4j-collections,
-                            neo4j-primitive-collections, neo4j-unsafe, neo4j-io, neo4j-logging, neo4j-security,
+                            neo4j-primitive-collections, neo4j-unsafe, neo4j-io, neo4j-logging,
                             neo4j-lucene-index, neo4j-lucene-upgrade,
-                            geronimo-jta_1.1_spec, commons-lang3,
+                            commons-lang3,
                             lucene-core, lucene-analyzers-common, lucene-codecs, lucene-queryparser
                         </Embed-Dependency>
                     </instructions>
