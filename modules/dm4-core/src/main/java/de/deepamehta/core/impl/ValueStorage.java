@@ -9,10 +9,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.Directives;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -20,13 +17,10 @@ import java.util.logging.Logger;
 
 /**
  * Helper for storing/fetching simple values and composite value models.
+ *
+ * ### TODO: unify with DeepaMehtaObjectModelImpl and then drop this class?
  */
 class ValueStorage {
-
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String LABEL_CHILD_SEPARATOR = " ";
-    private static final String LABEL_TOPIC_SEPARATOR = ", ";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -99,26 +93,9 @@ class ValueStorage {
     void storeValue(DeepaMehtaObjectModelImpl model) {
         if (model.getType().getDataTypeUri().equals("dm4.core.composite")) {
             storeChildTopics(model);
-            recalculateLabel(model);
+            model.calculateLabelAndUpdate();
         } else {
             model.storeSimpleValue();
-        }
-    }
-
-    /**
-     * Recalculates the label of the given parent object model and updates it in-place.
-     * Note: no child topics are loaded from the DB. The given parent object model is expected to contain all the
-     * child topic models required for the label calculation.
-     *
-     * @param   parent  The object model the label is calculated for. This is expected to be a composite model.
-     */
-    void recalculateLabel(DeepaMehtaObjectModelImpl parent) {
-        try {
-            String label = calculateLabel(parent);
-            parent.updateSimpleValue(new SimpleValue(label));
-        } catch (Exception e) {
-            throw new RuntimeException("Recalculating label of object " + parent.getId() + " failed (" + parent + ")",
-                e);
         }
     }
 
@@ -132,21 +109,21 @@ class ValueStorage {
      * Only the childs defined in the type definition are stored.
      */
     private void storeChildTopics(DeepaMehtaObjectModelImpl parent) {
-        ChildTopicsModel model = null;
+        ChildTopicsModelImpl model = null;
         try {
             model = parent.getChildTopicsModel();
             for (AssociationDefinitionModel assocDef : parent.getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    RelatedTopicModel childTopic = model.getTopicOrNull(assocDefUri);
+                    RelatedTopicModelImpl childTopic = model.getTopicOrNull(assocDefUri);
                     if (childTopic != null) {   // skip if not contained in create request
                         storeChildTopic(childTopic, parent, assocDef);
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    List<? extends RelatedTopicModel> childTopics = model.getTopicsOrNull(assocDefUri);
+                    List<RelatedTopicModelImpl> childTopics = model.getTopicsOrNull(assocDefUri);
                     if (childTopics != null) {  // skip if not contained in create request
-                        for (RelatedTopicModel childTopic : childTopics) {
+                        for (RelatedTopicModelImpl childTopic : childTopics) {
                             storeChildTopic(childTopic, parent, assocDef);
                         }
                     }
@@ -160,8 +137,8 @@ class ValueStorage {
         }
     }
 
-    private void storeChildTopic(RelatedTopicModel childTopic, DeepaMehtaObjectModel parent,
-                                                               AssociationDefinitionModel assocDef) {
+    private void storeChildTopic(RelatedTopicModelImpl childTopic, DeepaMehtaObjectModel parent,
+                                                                   AssociationDefinitionModel assocDef) {
         if (childTopic instanceof TopicReferenceModel) {
             resolveReference((TopicReferenceModel) childTopic);
         } else {
@@ -179,17 +156,17 @@ class ValueStorage {
         topicRef.set(fetchReferencedTopic(topicRef));
     }
 
-    private TopicModel fetchReferencedTopic(TopicReferenceModel topicRef) {
-        // Note: the resolved topic must be fetched including its composite value.
-        // It might be required at client-side. ### TODO
+    private DeepaMehtaObjectModel fetchReferencedTopic(TopicReferenceModel topicRef) {
+        // Note: the resolved topic must be fetched including its child topics.
+        // They might be required for label calculation and/or at client-side.
         if (topicRef.isReferenceById()) {
-            return pl.fetchTopic(topicRef.getId());                                // ### FIXME: had fetchComposite=true
+            return pl.fetchTopic(topicRef.getId()).loadChildTopics();
         } else if (topicRef.isReferenceByUri()) {
-            TopicModel topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri())); // ### FIXME: had
-            if (topic == null) {                                                         //          fetchComposite=true
+            TopicModelImpl topic = pl.fetchTopic("uri", new SimpleValue(topicRef.getUri()));
+            if (topic == null) {
                 throw new RuntimeException("Topic with URI \"" + topicRef.getUri() + "\" not found");
             }
-            return topic;
+            return topic.loadChildTopics();
         } else {
             throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
         }
@@ -208,72 +185,6 @@ class ValueStorage {
         assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
         assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
         pl.createAssociation((AssociationModelImpl) assoc);
-    }
-
-
-
-    // === Label ===
-
-    private String calculateLabel(DeepaMehtaObjectModelImpl model) {
-        TypeModel type = model.getType();
-        if (type.getDataTypeUri().equals("dm4.core.composite")) {
-            StringBuilder label = new StringBuilder();
-            for (String assocDefUri : getLabelAssocDefUris(model)) {
-                appendLabel(buildChildLabel(model, assocDefUri), label, LABEL_CHILD_SEPARATOR);
-            }
-            return label.toString();
-        } else {
-            return model.getSimpleValue().toString();
-        }
-    }
-
-    /**
-     * Prerequisite: parent is a composite model.
-     */
-    List<String> getLabelAssocDefUris(DeepaMehtaObjectModel parent) {
-        TypeModel type = ((DeepaMehtaObjectModelImpl) parent).getType();
-        List<String> labelConfig = type.getLabelConfig();
-        if (labelConfig.size() > 0) {
-            return labelConfig;
-        } else {
-            List<String> assocDefUris = new ArrayList();
-            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
-            // Note: types just created might have no child types yet
-            if (i.hasNext()) {
-                assocDefUris.add(i.next().getAssocDefUri());
-            }
-            return assocDefUris;
-        }
-    }
-
-    private String buildChildLabel(DeepaMehtaObjectModel parent, String assocDefUri) {
-        Object value = parent.getChildTopicsModel().get(assocDefUri);
-        // Note: topics just created have no child topics yet
-        if (value == null) {
-            return "";
-        }
-        //
-        if (value instanceof TopicModel) {
-            TopicModelImpl childTopic = (TopicModelImpl) value;
-            return calculateLabel(childTopic);                                                          // recursion
-        } else if (value instanceof List) {
-            StringBuilder label = new StringBuilder();
-            for (TopicModel childTopic : (List<TopicModel>) value) {
-                appendLabel(calculateLabel((TopicModelImpl) childTopic), label, LABEL_TOPIC_SEPARATOR); // recursion
-            }
-            return label.toString();
-        } else {
-            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
-        }
-    }
-
-    private void appendLabel(String label, StringBuilder builder, String separator) {
-        // add separator
-        if (builder.length() > 0 && label.length() > 0) {
-            builder.append(separator);
-        }
-        //
-        builder.append(label);
     }
 
 

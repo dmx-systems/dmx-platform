@@ -7,6 +7,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -68,12 +69,12 @@ public class DeepaMehtaUtils {
         return ids;
     }
 
-    public static List<TopicModel> toTopicModels(Iterable<? extends Topic> topics) {
-        List<TopicModel> topicModels = new ArrayList();
-        for (Topic topic : topics) {
-            topicModels.add(topic.getModel());
+    public static <M> List<M> toModelList(Iterable<? extends DeepaMehtaObject> objects) {
+        List<M> modelList = new ArrayList();
+        for (DeepaMehtaObject object : objects) {
+            modelList.add((M) object.getModel());
         }
-        return topicModels;
+        return modelList;
     }
 
     public static String topicNames(Iterable<? extends Topic> topics) {
@@ -155,6 +156,9 @@ public class DeepaMehtaUtils {
 
 
 
+    /**
+     * Retypes the given association if its player types match the given topic types.
+     */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
                                        String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dm4) {
         if (!assoc.getTypeUri().equals("dm4.core.association")) {
@@ -175,6 +179,14 @@ public class DeepaMehtaUtils {
                                                                                           CoreService dm4) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
+        // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
+        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // is not yet available in case this association is part of the player's composite structure.
+        // Compare to AssociationModelImpl.duplicateCheck()
+        if (!(r1 instanceof TopicRoleModel) || ((TopicRoleModel) r1).topicIdentifiedByUri() ||
+            !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
+            return null;
+        }
         String t1 = (String) dm4.getProperty(r1.getPlayerId(), "type_uri");
         String t2 = (String) dm4.getProperty(r2.getPlayerId(), "type_uri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);

@@ -5,6 +5,12 @@ dm4c.render.page_model = new function() {
     var self = this
 
     /**
+     * The page model as utilized by the "topic_renderer" and "association_renderer" standard page renderers.
+     *
+     * A PageModel object represents the topic/association to be rendered. In case of a composite topic/association the
+     * page model is a nested hierarchy of PageModel objects. A PageModel object can be used for both, rendering an info
+     * page, and rendering a form page.
+     *
      * @paran   page_model_type     SIMPLE, COMPOSITE, RELATED_TOPIC, or MULTI
      * @param   object              The object underlying this field (a Topic or an Association). Its "value" is
      *                              rendered through this page model.
@@ -48,8 +54,9 @@ dm4c.render.page_model = new function() {
         this.parent = parent_page_model
         this.label = page_model_label()
         this.input_field_rows = dm4c.get_view_config(this.object_type, "input_field_rows", assoc_def)
-        var renderer_uri
-        var renderer = lookup_renderer()
+        var renderer_uri                    // The URI of the renderer hold in "renderer". Only used for logging.
+        var renderer = lookup_renderer()    // The renderer to render the underlying topic/association.
+                                            // A single renderer (simple or composite), or a multi renderer.
         var form_reading_function
 
         // === Simple Renderer ===
@@ -116,7 +123,9 @@ dm4c.render.page_model = new function() {
                     return custom_assoc_type.value
                 }
             }
-            return _self.object_type.value
+            if (page_model_type == self.type.SIMPLE) {
+                return _self.object_type.value
+            }
         }
 
         function lookup_renderer() {
@@ -137,6 +146,13 @@ dm4c.render.page_model = new function() {
                 throw "PageModelError: \"" + page_model_type + "\" is an unknown page model type"
             }
         }
+    }
+
+    var type_name = {
+        1: "simple",
+        2: "composite",
+        3: "related_topic",
+        4: "multi"
     }
 
     // ------------------------------------------------------------------------------------------------------ Public API
@@ -348,6 +364,8 @@ dm4c.render.page_model = new function() {
         if (box_type == this.type.COMPOSITE || box_type == this.type.RELATED_TOPIC) {
             box.addClass("level" + level)
         }
+        //
+        box.addClass(type_name[box_type])
         // 2) Reveal underlying topic when box is clicked
         // Note: only a SIMPLE, COMPOSITE, or RELATED_TOPIC box represents a revealable topic. A MULTI box does not.
         // Note: topic ID is -1 if there is no underlying topic in the DB. This is the case e.g. for a Search
@@ -359,8 +377,9 @@ dm4c.render.page_model = new function() {
         }
         // 3) Semantic markup
         if (box_type == this.type.SIMPLE || box_type == this.type.COMPOSITE) {
+            // type URI
             box.addClass(page_model.object.type_uri)
-            //
+            // assoc def URI
             var assoc_def = page_model.assoc_def
             if (assoc_def && assoc_def.assoc_def_uri != assoc_def.child_type_uri) {
                 box.addClass(assoc_def.assoc_def_uri)

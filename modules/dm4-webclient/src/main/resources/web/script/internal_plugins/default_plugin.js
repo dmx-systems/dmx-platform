@@ -32,22 +32,16 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 context: "context-menu"
             })
         }
-        // ### FIXME: check locked state as well (at least for retype)
+        //
         if (dm4c.has_write_permission_for_topic(topic.id)) {
             commands.push({is_separator: true, context: "context-menu"})
             commands.push({
-                label: "Retype",
-                handler: do_retype,
-                context: "context-menu",
-                ui_icon: "transfer-e-w"
-            })
-            //
-            commands.push({is_separator: true, context: "context-menu"})
-            commands.push({
                 label: "Delete",
-                handler: topic.type_uri == "dm4.core.topic_type" ? open_delete_topic_type_dialog :
-                         topic.type_uri == "dm4.core.assoc_type" ? open_delete_association_type_dialog :
-                                                                   open_delete_topic_dialog,
+                handler: topic.type_uri == "dm4.core.topic_type"      ? open_delete_topic_type_dialog :
+                         topic.type_uri == "dm4.core.assoc_type"      ? open_delete_association_type_dialog :
+                         topic.type_uri == "dm4.topicmaps.topicmap"   ? open_delete_topicmap_dialog :
+                         topic.type_uri == "dm4.workspaces.workspace" ? open_delete_workspace_dialog :
+                                                                        open_delete_topic_dialog,
                 context: "context-menu",
                 ui_icon: "trash"
             })
@@ -75,26 +69,6 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
 
         function do_associate(item, x, y) {
             dm4c.topicmap_renderer.begin_association(topic.id, x, y)
-        }
-
-        function do_retype() {
-            var type_menu = dm4c.ui.menu()
-            dm4c.refresh_type_menu(type_menu)   // no type list specified
-            type_menu.select(topic.type_uri)
-            open_retype_topic_dialog()
-
-            function open_retype_topic_dialog() {
-                dm4c.ui.dialog({
-                    title: "Retype Topic",
-                    content: type_menu.dom,
-                    width: "400px",
-                    button_label: "Retype",
-                    button_handler: function() {
-                        var type_uri = type_menu.get_selection().value
-                        dm4c.do_retype_topic(topic.id, type_uri)
-                    }
-                })
-            }
         }
 
         // ---
@@ -128,6 +102,32 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
                 button_label: "Delete",
                 button_handler: function() {
                     dm4c.do_delete_association_type(topic.uri)
+                }
+            })
+        }
+
+        function open_delete_topicmap_dialog() {
+            dm4c.ui.dialog({
+                title: "Delete Topicmap?",
+                width: "300px",
+                button_label: "Delete",
+                button_handler: function() {
+                    dm4c.get_plugin("de.deepamehta.topicmaps").delete_topicmap(topic.id)
+                }
+            })
+        }
+
+        function open_delete_workspace_dialog() {
+            dm4c.ui.dialog({
+                title: "Delete Workspace \"" + topic.value + "\"?",
+                content: $("<p>").text("CAUTION: all the workspace content will be deleted").add($("<ul>")
+                    .append($("<li>").text("all assigned topics/associations"))
+                    .append($("<li>").text("all assigned types"))
+                    .append($("<li>").text("all topics/associations of these types"))),
+                width: "500px",
+                button_label: "Delete all",
+                button_handler: function() {
+                    dm4c.do_delete_topic(topic.id)
                 }
             })
         }
@@ -246,3 +246,5 @@ dm4c.add_plugin("de.deepamehta.webclient.default", function() {
         return dm4c.has_write_permission_for_association(assoc.id) && !assoc.get_type().is_locked()
     }
 })
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=default_plugin.js

@@ -8,5 +8,5 @@ import de.deepamehta.core.service.EventListener;
 
 public interface PostUpdateAssociationListener extends EventListener {
 
-    void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel);
+    void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc);
 }

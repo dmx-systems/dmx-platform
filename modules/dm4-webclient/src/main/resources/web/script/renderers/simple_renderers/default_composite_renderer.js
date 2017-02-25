@@ -1,10 +1,12 @@
 dm4c.add_simple_renderer("dm4.webclient.default_composite_renderer", new function() {
 
     this.render_info = function(page_model, parent_element, level) {
+        dm4c.render.field_label(page_model, parent_element)
         render_page_model(page_model, parent_element, dm4c.render.page_model.mode.INFO, level)
     }
 
     this.render_form = function(page_model, parent_element, level) {
+        dm4c.render.field_label(page_model, parent_element)
         render_page_model(page_model, parent_element, dm4c.render.page_model.mode.FORM, level)
         //
         return function() {

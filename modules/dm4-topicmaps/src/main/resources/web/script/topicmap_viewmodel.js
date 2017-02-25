@@ -112,18 +112,22 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
      * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
      */
     this.add_association = function(assoc) {
-        var _assoc = assocs[assoc.id]
-        if (!_assoc) {
-            // update memory
-            _assoc = add_association(assoc)
-            // update DB
-            if (is_writable()) {
-                restc.add_association_to_topicmap(topicmap_id, assoc.id)
+        try {
+            var _assoc = assocs[assoc.id]
+            if (!_assoc) {
+                // update memory
+                _assoc = add_association(assoc)     // throws exception
+                // update DB
+                if (is_writable()) {
+                    restc.add_association_to_topicmap(topicmap_id, assoc.id)
+                }
+                //
+                return _assoc
+            } else {
+                // association already in topicmap
             }
-            //
-            return _assoc
-        } else {
-            // association already in topicmap
+        } catch (e) {
+            alert(e)
         }
     }
 
@@ -392,8 +396,19 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
         }
 
         function init_associations() {
+            var error
             for (var i = 0, assoc; assoc = topicmap.assocs[i]; i++) {
-                add_association(assoc)
+                try {
+                    add_association(assoc)      // throws exception
+                } catch (e) {
+                    if (!error) {
+                        error = "WARNING: topicmap " + topicmap_id + " will be displayed incomplete"
+                    }
+                    error += "\n\n" + e
+                }
+            }
+            if (error) {
+                alert(error)
             }
         }
 
@@ -408,7 +423,8 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
         function init_background_image() {
             var file = info.get("dm4.files.file")
             if (file) {
-                var image_url = "/filerepo/" + file.get("dm4.files.path")
+                var path = file.get("dm4.files.path")
+                var image_url = "/filerepo/" + encodeURIComponent(path)
                 self.background_image = dm4c.create_image(image_url)
             }
         }
@@ -416,10 +432,16 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
 
     // ---
 
+    /**
+     * @return  A TopicViewmodel
+     */
     function get_topic(id) {
         return topics[id]
     }
 
+    /**
+     * @return  A AssociationViewmodel
+     */
     function get_association(id) {
         return assocs[id]
     }
@@ -444,25 +466,24 @@ function TopicmapViewmodel(topicmap_id, config, restc) {
      * @param   topic   a domain topic (has "id", "type_uri", "value", "childs" properties).
      */
     function add_topic(topic, view_props) {
-        var _topic = new TopicViewmodel(topic, view_props)
-        topics[topic.id] = _topic
-        return _topic
+        return topics[topic.id] = new TopicViewmodel(topic, view_props)
     }
 
     /**
      * @param   assoc   a domain association (has "id", "type_uri", "role_1", "role_2" properties).
      */
     function add_association(assoc) {
-        // error check
-        if (!get_topic(assoc.role_1.topic_id) || !get_topic(assoc.role_2.topic_id)) {
-            throw "TopicmapViewmodelError: can't add association " + assoc.id + " to topicmap " + topicmap_id +
-                " because a player topic is missing (player IDs=" + assoc.role_1.topic_id + ", " +
-                assoc.role_2.topic_id + ")"
+        var topic_1 = get_topic(assoc.role_1.topic_id)
+        var topic_2 = get_topic(assoc.role_2.topic_id)
+        if (topic_1 && topic_2) {
+            if (topic_1.visibility && topic_2.visibility) {
+                return assocs[assoc.id] = new AssociationViewmodel(assoc)
+            }
+            throw "Association " + assoc.id + " can't be displayed because a topic is not visible\n(topic IDs=" +
+                assoc.role_1.topic_id + ", " + assoc.role_2.topic_id + ")"
         }
-        //
-        var _assoc = new AssociationViewmodel(assoc)
-        assocs[assoc.id] = _assoc
-        return _assoc
+        throw "Association " + assoc.id + " can't be displayed because a topic is missing\n(topic IDs=" +
+            assoc.role_1.topic_id + ", " + assoc.role_2.topic_id + ")"
     }
 
     // ---

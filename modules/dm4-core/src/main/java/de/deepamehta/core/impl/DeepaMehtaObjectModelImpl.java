@@ -20,12 +20,19 @@ import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
 
 
 class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
+
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static final String LABEL_CHILD_SEPARATOR = " ";
+    private static final String LABEL_TOPIC_SEPARATOR = ", ";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -231,6 +238,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Abstract Methods ===
 
+    // ### TODO: make this a real abstract class.
+    // Change the model factory in a way it never instantiates DeepaMehtaObjectModels.
+
     String className() {
         throw new UnsupportedOperationException();
     }
@@ -239,9 +249,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    DeepaMehtaObjectModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        throw new UnsupportedOperationException();
+    }
+
     // ---
 
-    TypeModel getType() {
+    TypeModelImpl getType() {
         throw new UnsupportedOperationException();
     }
 
@@ -295,10 +309,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        throw new UnsupportedOperationException();
-    }
-
     void _delete() {
         throw new UnsupportedOperationException();
     }
@@ -339,10 +349,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Core Internal Hooks ===
 
-    void preUpdate(DeepaMehtaObjectModel newModel) {
+    void preCreate() {
     }
 
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
+    void postCreate() {
+    }
+
+    // ---
+
+    void preUpdate(DeepaMehtaObjectModel updateModel) {
+    }
+
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
     }
 
     // ---
@@ -355,54 +373,59 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
-    // === Update ===
+    // === Update (memory + DB) ===
+
+    final void updateWithChildTopics(ChildTopicsModel childTopics) {
+        update(createModelWithChildTopics(childTopics));
+    }
 
     /**
-     * @param   newModel    The data to update.
+     * @param   updateModel    The data to update.
      *              If the URI is <code>null</code> it is not updated.
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
      */
-    final void update(DeepaMehtaObjectModel newModel) {
+    final void update(DeepaMehtaObjectModelImpl updateModel) {
         try {
-            logger.info("Updating " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
-            DeepaMehtaObject object = instantiate();
-            DeepaMehtaObjectModel oldModel = clone();
-            em.fireEvent(getPreUpdateEvent(), object, newModel);
+            logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
+            DeepaMehtaObjectModel oldObject = clone();
+            em.fireEvent(getPreUpdateEvent(), instantiate(), updateModel);
             //
-            preUpdate(newModel);
+            preUpdate(updateModel);
             //
-            _updateUri(newModel.getUri());
-            _updateTypeUri(newModel.getTypeUri());
+            _updateUri(updateModel.getUri());
+            _updateTypeUri(updateModel.getTypeUri());
             if (isSimple()) {
-                _updateSimpleValue(newModel.getSimpleValue());
+                _updateSimpleValue(updateModel.getSimpleValue());
             } else {
-                _updateChildTopics(newModel.getChildTopicsModel());
+                _updateChildTopics(updateModel.getChildTopicsModel());
             }
             //
-            postUpdate(newModel, oldModel);
+            postUpdate(updateModel, oldObject);
             //
+            // Note: in case of a type topic the instantiate() call above creates a cloned model
+            // that doesn't reflect the update. Here we instantiate the now updated model.
+            DeepaMehtaObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
-            em.fireEvent(getPostUpdateEvent(), object, newModel, oldModel);
+            em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject);
         } catch (Exception e) {
-            throw new RuntimeException("Updating " + className() + " " + id + " failed (typeUri=\"" + typeUri + "\")",
-                e);
+            throw new RuntimeException("Updating " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
     }
 
     // ---
 
-    void updateUri(String uri) {
+    final void updateUri(String uri) {
         setUri(uri);            // update memory
         storeUri();             // update DB, "abstract"
     }
 
-    void updateTypeUri(String typeUri) {
+    final void updateTypeUri(String typeUri) {
         setTypeUri(typeUri);    // update memory
         storeTypeUri();         // update DB, "abstract"
     }
 
-    void updateSimpleValue(SimpleValue value) {
+    final void updateSimpleValue(SimpleValue value) {
         if (value == null) {
             throw new IllegalArgumentException("Tried to set a null SimpleValue (" + this + ")");
         }
@@ -423,23 +446,24 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     final void delete() {
         try {
             em.fireEvent(getPreDeleteEvent(), instantiate());
+            //
             preDelete();
             //
             // delete child topics (recursively)
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModel childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
+                    for (TopicModelImpl childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
                             "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        ((DeepaMehtaObjectModelImpl) childTopic).delete();
+                        childTopic.delete();
                     }
                 }
             }
             // delete direct associations
-            for (AssociationModel assoc : getAssociations()) {
-                ((DeepaMehtaObjectModelImpl) assoc).delete();
+            for (AssociationModelImpl assoc : getAssociations()) {
+                assoc.delete();
             }
             // delete object itself
-            logger.info("Deleting " + className() + " " + id + " (typeUri=\"" + typeUri + "\")");
+            logger.info("Deleting " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
             _delete();
             //
             postDelete();
@@ -468,30 +492,30 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 throw e;
             }
         } catch (Exception e) {
-            throw new RuntimeException("Deleting " + className() + " " + id + " failed (" + this + ")", e);
+            throw new RuntimeException("Deleting " + objectInfo() + " failed (typeUri=\"" + typeUri + "\")", e);
         }
     }
 
 
 
-    // === Update Child Topics ===
+    // === Update Child Topics (memory + DB) ===
 
     // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
-    void _updateChildTopics(ChildTopicsModel newModel) {
+    final void _updateChildTopics(ChildTopicsModelImpl updateModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
-                RelatedTopicModel newChildTopic = null;                     // only used for "one"
-                List<? extends RelatedTopicModel> newChildTopics = null;    // only used for "many"
+                RelatedTopicModelImpl newChildTopic = null;             // only used for "one"
+                List<RelatedTopicModelImpl> newChildTopics = null;      // only used for "many"
                 if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = newModel.getTopicOrNull(assocDefUri);
+                    newChildTopic = updateModel.getTopicOrNull(assocDefUri);
                     // skip if not contained in update request
                     if (newChildTopic == null) {
                         continue;
                     }
                 } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = newModel.getTopicsOrNull(assocDefUri);
+                    newChildTopics = updateModel.getTopicsOrNull(assocDefUri);
                     // skip if not contained in update request
                     if (newChildTopics == null) {
                         continue;
@@ -503,7 +527,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
                 updateChildTopics(newChildTopic, newChildTopics, assocDef);
             }
             //
-            recalculateParentLabel();
+            _calculateLabelAndUpdate();
             //
         } catch (Exception e) {
             throw new RuntimeException("Updating the child topics of " + objectInfo() + " failed", e);
@@ -514,8 +538,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // It may originate from a facet definition as well.
     // Called from DeepaMehtaObjectImpl.updateChildTopic() and DeepaMehtaObjectImpl.updateChildTopics().
     // ### TODO: make this private? See comments in DeepaMehtaObjectImpl.
-    void updateChildTopics(RelatedTopicModel newChildTopic, List<? extends RelatedTopicModel> newChildTopics,
-                                                            AssociationDefinitionModel assocDef) {
+    final void updateChildTopics(RelatedTopicModelImpl newChildTopic, List<RelatedTopicModelImpl> newChildTopics,
+                                                                      AssociationDefinitionModel assocDef) {
         // Note: updating the child topics requires them to be loaded
         loadChildTopics(assocDef);
         //
@@ -543,18 +567,19 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     /**
      * Loads the child topics which are not loaded already.
      */
-    void loadChildTopics() {
+    final DeepaMehtaObjectModel loadChildTopics() {
         for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
             loadChildTopics(assocDef);
         }
+        return this;
     }
 
     /**
      * Loads the child topics for the given assoc def, provided they are not loaded already.
      */
-    void loadChildTopics(String assocDefUri) {
+    final DeepaMehtaObjectModel loadChildTopics(String assocDefUri) {
         try {
-            loadChildTopics(getAssocDef(assocDefUri));
+            return loadChildTopics(getAssocDef(assocDefUri));
         } catch (Exception e) {
             throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
                 e);
@@ -609,28 +634,13 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *                      Note: the association definition must not necessarily originate from the parent object's
      *                      type definition. It may originate from a facet definition as well.
      */
-    private void loadChildTopics(AssociationDefinitionModel assocDef) {
+    private DeepaMehtaObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());
             pl.valueStorage.fetchChildTopics(this, assocDef);
         }
-    }
-
-    private void recalculateParentLabel() {
-        List<String> labelAssocDefUris = null;
-        try {
-            // load required childs
-            labelAssocDefUris = pl.valueStorage.getLabelAssocDefUris(this);
-            for (String assocDefUri : labelAssocDefUris) {
-                loadChildTopics(assocDefUri);
-            }
-            //
-            pl.valueStorage.recalculateLabel(this);
-        } catch (Exception e) {
-            throw new RuntimeException("Recalculating the label of " + objectInfo() +
-                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
-        }
+        return this;
     }
 
 
@@ -639,42 +649,41 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     private void _updateUri(String newUri) {
         if (uriChange(newUri, uri)) {                               // abort if no update is requested
-            logger.info("### Changing URI of " + className() + " " + id + " from \"" + uri +
-                "\" -> \"" + newUri + "\"");
+            logger.info("### Changing URI of " + objectInfo() + " from \"" + uri + "\" -> \"" + newUri + "\"");
             updateUri(newUri);
         }
     }
 
     private void _updateTypeUri(String newTypeUri) {
         if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
-            logger.info("### Changing type URI of " + className() + " " + id + " from \"" + typeUri +
-                "\" -> \"" + newTypeUri + "\"");
+            logger.info("### Changing type URI of " + objectInfo() + " from \"" + typeUri + "\" -> \"" + newTypeUri +
+                "\"");
             updateTypeUri(newTypeUri);
         }
     }
 
     private void _updateSimpleValue(SimpleValue newValue) {
         if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
-            logger.info("### Changing simple value of " + className() + " " + id + " from \"" + value +
-                "\" -> \"" + newValue + "\"");
+            logger.info("### Changing simple value of " + objectInfo() + " from \"" + value + "\" -> \"" + newValue +
+                "\"");
             updateSimpleValue(newValue);
         }
     }
 
 
 
-    // === Update Child Topics ===
+    // === Update Child Topics (memory + DB) ===
 
     // --- Composition ---
 
-    private void updateCompositionOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateCompositionOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
-            deleteChildTopicOne(childTopic, assocDef, true);                                        // deleteChild=true
+            deleteChildTopicOne(childTopic, assocDef, true);                                         // deleteChild=true
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, true);   // deleteChild=true
+            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, true);// deleteChild=true
         } else if (childTopic != null) {
             updateRelatedTopic(childTopic, newChildTopic);
         } else {
@@ -682,9 +691,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
-    private void updateCompositionMany(List<? extends RelatedTopicModel> newChildTopics,
+    private void updateCompositionMany(List<RelatedTopicModelImpl> newChildTopics,
                                        AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 deleteChildTopicMany(childTopicId, assocDef, true);                                 // deleteChild=true
@@ -700,14 +709,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // --- Aggregation ---
 
-    private void updateAggregationOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateAggregationOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
         if (newChildTopic instanceof TopicDeletionModel) {
             deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
         } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModel) newChildTopic, assocDef, false);  // deleteChild=false
-        } else if (newChildTopic.getId() != -1) {
+            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, false);
+        } else if (newChildTopic.getId() != -1) {                                                   // deleteChild=false
             updateChildTopicOne(newChildTopic, assocDef);
         } else {
             if (childTopic != null) {
@@ -717,9 +726,9 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
-    private void updateAggregationMany(List<? extends RelatedTopicModel> newChildTopics,
+    private void updateAggregationMany(List<RelatedTopicModelImpl> newChildTopics,
                                        AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModel newChildTopic : newChildTopics) {
+        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
             long childTopicId = newChildTopic.getId();
             if (newChildTopic instanceof TopicDeletionModel) {
                 deleteChildTopicMany(childTopicId, assocDef, false);                                // deleteChild=false
@@ -735,24 +744,24 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // --- Update ---
 
-    private void updateChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
         //
         if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                objectInfo() + " according to " + assocDef);
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
+                " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);
         // Note: memory is already up-to-date. The child topic is updated in-place of parent.
     }
 
-    private void updateChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void updateChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl childTopic = childTopics.findChildTopicById(newChildTopic.getId(), assocDef);
         //
         if (childTopic == null) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " +
-                objectInfo() + " according to " + assocDef);
+            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
+                " according to " + assocDef);
         }
         //
         updateRelatedTopic(childTopic, newChildTopic);
@@ -761,27 +770,27 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModel newChildTopic) {
+    private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
         // update topic
         childTopic.update(newChildTopic);
         // update association
         updateRelatingAssociation(childTopic, newChildTopic);
     }
 
-    private void updateRelatingAssociation(RelatedTopicModelImpl childTopic, RelatedTopicModel newChildTopic) {
+    private void updateRelatingAssociation(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
         childTopic.getRelatingAssociation().update(newChildTopic.getRelatingAssociation());
     }
 
     // --- Create ---
 
-    private void createChildTopicOne(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void createChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         // update DB
         createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
         childTopics.putInChildTopics(newChildTopic, assocDef);
     }
 
-    private void createChildTopicMany(RelatedTopicModel newChildTopic, AssociationDefinitionModel assocDef) {
+    private void createChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
         // update DB
         createAndAssociateChildTopic(newChildTopic, assocDef);
         // update memory
@@ -790,14 +799,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    private void createAndAssociateChildTopic(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
+    private void createAndAssociateChildTopic(RelatedTopicModelImpl childTopic, AssociationDefinitionModel assocDef) {
         pl.createTopic(childTopic);
         associateChildTopic(childTopic, assocDef);
     }
 
     // --- Assignment ---
 
-    private void createAssignmentOne(RelatedTopicModelImpl childTopic, TopicReferenceModel newChildTopic,
+    private void createAssignmentOne(RelatedTopicModelImpl childTopic, TopicReferenceModelImpl newChildTopic,
                                      AssociationDefinitionModel assocDef, boolean deleteChildTopic) {
         if (childTopic != null) {
             if (newChildTopic.isReferingTo(childTopic)) {
@@ -887,6 +896,112 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
         // update memory
         childTopics.removeFromChildTopics(childTopic, assocDef);
+    }
+
+
+
+    // === Label Calculation ===
+
+    private void _calculateLabelAndUpdate() {
+        List<String> labelAssocDefUris = null;
+        try {
+            // load required childs
+            labelAssocDefUris = getLabelAssocDefUris();
+            for (String assocDefUri : labelAssocDefUris) {
+                loadChildTopics(assocDefUri);
+            }
+            //
+            calculateLabelAndUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating and updating label of " + objectInfo() +
+                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
+        }
+    }
+
+    /**
+     * Calculates the label for this object model and updates it in both, memory (in-place), and DB.
+     * <p>
+     * Prerequisites:
+     * 1) this object model is a composite.
+     * 2) this object model contains all the child topic models involved in the label calculation.
+     *    Note: this method does not load any child topics from DB.
+     *
+     * ### TODO: make private
+     */
+    void calculateLabelAndUpdate() {
+        try {
+            updateSimpleValue(new SimpleValue(calculateLabel()));
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating and updating label of " + objectInfo() + " failed", e);
+        }
+    }
+
+    /**
+     * Calculates the label for this object model recursively. Recursion ends at a simple object model.
+     * <p>
+     * Note: called from this class only but can't be private as called on a different object.
+     */
+    String calculateLabel() {
+        TypeModel type = getType();
+        if (type.getDataTypeUri().equals("dm4.core.composite")) {
+            StringBuilder builder = new StringBuilder();
+            for (String assocDefUri : getLabelAssocDefUris()) {
+                appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
+            }
+            return builder.toString();
+        } else {
+            return getSimpleValue().toString();
+        }
+    }
+
+    private String calculateChildLabel(String assocDefUri) {
+        Object value = getChildTopicsModel().get(assocDefUri);
+        // Note: topics just created have no child topics yet
+        if (value == null) {
+            return "";
+        }
+        //
+        if (value instanceof TopicModel) {
+            // single value
+            return ((TopicModelImpl) value).calculateLabel();                               // recursion
+        } else if (value instanceof List) {
+            // multiple value
+            StringBuilder builder = new StringBuilder();
+            for (TopicModelImpl childTopic : (List<TopicModelImpl>) value) {
+                appendLabel(childTopic.calculateLabel(), builder, LABEL_TOPIC_SEPARATOR);   // recursion
+            }
+            return builder.toString();
+        } else {
+            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
+        }
+    }
+
+    private void appendLabel(String label, StringBuilder builder, String separator) {
+        // add separator
+        if (builder.length() > 0 && label.length() > 0) {
+            builder.append(separator);
+        }
+        //
+        builder.append(label);
+    }
+
+    /**
+     * Prerequisite: this is a composite model.
+     */
+    private List<String> getLabelAssocDefUris() {
+        TypeModelImpl type = getType();
+        List<String> labelConfig = type.getLabelConfig();
+        if (labelConfig.size() > 0) {
+            return labelConfig;
+        } else {
+            List<String> assocDefUris = new ArrayList();
+            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
+            // Note: types just created might have no child types yet
+            if (i.hasNext()) {
+                assocDefUris.add(i.next().getAssocDefUri());
+            }
+            return assocDefUris;
+        }
     }
 
 

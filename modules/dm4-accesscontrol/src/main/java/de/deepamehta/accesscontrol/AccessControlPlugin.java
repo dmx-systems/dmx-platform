@@ -42,14 +42,15 @@ import de.deepamehta.core.service.event.PostUpdateAssociationListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreCreateTopicListener;
 import de.deepamehta.core.service.event.PreUpdateTopicListener;
-import de.deepamehta.core.service.event.ResourceRequestFilterListener;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
+import de.deepamehta.core.service.event.StaticResourceFilterListener;
 import de.deepamehta.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.GET;
@@ -87,7 +88,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                     PostUpdateTopicListener,
                                                                                     PostUpdateAssociationListener,
                                                                                     ServiceRequestFilterListener,
-                                                                                    ResourceRequestFilterListener,
+                                                                                    StaticResourceFilterListener,
                                                                                     CheckDiskQuotaListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -315,10 +316,11 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+            Association assoc = dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dm4.core.default")
             ));
+            assignMembership(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -520,9 +522,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     @Override
-    public void preUpdateTopic(Topic topic, TopicModel newModel) {
+    public void preUpdateTopic(Topic topic, TopicModel updateModel) {
         if (topic.getTypeUri().equals("dm4.accesscontrol.username")) {
-            SimpleValue newUsername = newModel.getSimpleValue();
+            SimpleValue newUsername = updateModel.getSimpleValue();
             String oldUsername = topic.getSimpleValue().toString();
             if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
                 throw new RuntimeException("A Username can't be changed (tried \"" + oldUsername + "\" -> \"" +
@@ -532,20 +534,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         setModifier(topic);
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
-        if (isMembership(assoc.getModel())) {
-            if (isMembership(oldModel)) {
-                // ### TODO?
-            } else {
-                wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
-            }
-        } else if (isMembership(oldModel)) {
-            // ### TODO?
+    public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
+        if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
+            assignMembership(assoc);
         }
         //
         setModifier(assoc);
@@ -560,7 +556,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest servletRequest) {
+    public void staticResourceFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
         // Note: for the resource filter no HttpServletRequest is injected
         requestFilter(servletRequest);
     }
@@ -600,6 +596,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean isMembership(AssociationModel assoc) {
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
+    }
+
+    private void assignMembership(Association assoc) {
+        wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
     }
 
     private void assignSearchTopic(Topic searchTopic) {

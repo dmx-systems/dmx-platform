@@ -35,6 +35,15 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     // ---
 
     @Override
+    public TopicTypeModelImpl clone() {
+        try {
+            return (TopicTypeModelImpl) super.clone();
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TopicTypeModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "topic type (" + super.toString() + ")";
     }
@@ -47,8 +56,10 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
     }
 
     @Override
-    TopicType instantiate() {
-        return new TopicTypeImpl(this, pl);
+    TopicTypeImpl instantiate() {
+        // Note: declaration and assignment is required for type inference to work (at least in Java 6)
+        TopicTypeModelImpl type = clone().filterReadableAssocDefs();
+        return new TopicTypeImpl(type, pl);
     }
 
 

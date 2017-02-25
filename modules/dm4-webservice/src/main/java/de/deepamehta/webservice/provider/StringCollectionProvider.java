@@ -61,7 +61,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
             String json = JavaUtils.readText(entityStream);
             return DeepaMehtaUtils.toList(new JSONArray(json));
         } catch (Exception e) {
-            throw new RuntimeException("Creating a List<String> from message body failed", e);
+            throw new RuntimeException("Deserializing a List<String> object failed", e);
         }
     }
 

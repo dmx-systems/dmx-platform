@@ -15,7 +15,6 @@ import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
-import de.deepamehta.core.service.event.PreUpdateTopicListener;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -42,7 +41,6 @@ import java.util.logging.Logger;
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
                                                                 IntroduceTopicTypeListener,
                                                                 IntroduceAssociationTypeListener,
-                                                                PreUpdateTopicListener,
                                                                 PostUpdateTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -153,22 +151,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
-    // ---
-
-    @Override
-    public void preUpdateTopic(Topic topic, TopicModel newModel) {
-        if (topic.getTypeUri().equals("dm4.files.file") && newModel.getTypeUri().equals("dm4.webclient.icon")) {
-            String iconUrl = "/filerepo/" + topic.getChildTopics().getString("dm4.files.path");
-            logger.info("### Retyping a file to an icon (iconUrl=" + iconUrl + ")");
-            newModel.setSimpleValue(iconUrl);
-        }
-    }
-
     /**
      * Once a view configuration is updated in the DB we must update the cached view configuration model.
      */
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
             updateType(topic);
             setConfigTopicLabel(topic);

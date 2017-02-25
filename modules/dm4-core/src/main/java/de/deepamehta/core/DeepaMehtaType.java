@@ -16,13 +16,13 @@ public interface DeepaMehtaType extends Topic {
 
     String getDataTypeUri();
 
-    void setDataTypeUri(String dataTypeUri);
+    DeepaMehtaType setDataTypeUri(String dataTypeUri);
 
     // --- Index Modes ---
 
     List<IndexMode> getIndexModes();
 
-    void addIndexMode(IndexMode indexMode);
+    DeepaMehtaType addIndexMode(IndexMode indexMode);
 
     // --- Association Definitions ---
 
@@ -41,12 +41,6 @@ public interface DeepaMehtaType extends Topic {
     DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
 
     DeepaMehtaType removeAssocDef(String assocDefUri);
-
-    // --- Label Configuration ---
-
-    List<String> getLabelConfig();
-
-    void setLabelConfig(List<String> labelConfig);
 
     // --- View Configuration ---
 

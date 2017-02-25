@@ -331,13 +331,6 @@ dm4c = new function() {
 
     // ---
 
-    this.do_retype_topic = function(topic_id, type_uri) {
-        // update DB, model, and view
-        dm4c.restc.update_topic({id: topic_id, type_uri: type_uri})
-    }
-
-    // ---
-
     /**
      * Deletes a topic (including its associations) from the DB and the view.
      * Fires the "post_delete_topic" event and the "post_delete_association" event (for each association).

@@ -4,6 +4,8 @@ import de.deepamehta.geomaps.model.GeoCoordinate;
 import de.deepamehta.geomaps.model.Geomap;
 import de.deepamehta.core.Topic;
 
+import java.util.concurrent.Callable;
+
 
 
 public interface GeomapsService {
@@ -39,4 +41,13 @@ public interface GeomapsService {
      * Calculates the distance between 2 geo coordinates in kilometer.
      */
     double getDistance(GeoCoordinate coord1, GeoCoordinate coord2);
+
+    // ---
+
+    /**
+     * Executes the passed codeblock and suppresses geocoding for Address topics created/updated while execution.
+     *
+     * @return  the value returned by the codeblock.
+     */
+    <V> V runWithoutGeocoding(Callable<V> callable) throws Exception;
 }

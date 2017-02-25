@@ -16,8 +16,6 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
-import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
 
 import java.util.List;
 
@@ -77,13 +75,13 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     @Override
     public Topic getTopic(String roleTypeUri) {
         TopicModelImpl topic = getModel().getTopic(roleTypeUri);
-        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
+        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
     }
 
     @Override
     public Topic getTopicByType(String topicTypeUri) {
         TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
-        return topic != null ? new TopicImpl(topic, pl) : null;    // ### TODO: permission check?
+        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
     }
 
     // ---
@@ -107,8 +105,8 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
-    public void update(AssociationModel newModel) {
-        model.update(newModel);
+    public void update(AssociationModel updateModel) {
+        model.update((AssociationModelImpl) updateModel);     // ### FIXME: call through pl for access control
     }
 
     // ---

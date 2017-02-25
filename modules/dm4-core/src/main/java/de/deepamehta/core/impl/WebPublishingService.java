@@ -272,14 +272,14 @@ class WebPublishingService {
 
     // === Resource Request Filter ===
 
-    private boolean resourceRequestFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private boolean staticResourceFilter(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            pl.em.fireEvent(CoreEvent.RESOURCE_REQUEST_FILTER, request);
+            pl.em.fireEvent(CoreEvent.STATIC_RESOURCE_FILTER, request, response);
             return true;
         } catch (Throwable e) {
-            // Note: resourceRequestFilter() is called from an OSGi HTTP service static resource HttpContext.
+            // Note: staticResourceFilter() is called from an OSGi HTTP service static resource HttpContext.
             // JAX-RS is not involved here. No JAX-RS exception mapper kicks in. Though the application's
-            // ResourceRequestFilterListener can throw a WebApplicationException (which is JAX-RS API)
+            // StaticResourceFilterListener can throw a WebApplicationException (which is JAX-RS API)
             // in order to provide error response info.
             new UniversalExceptionMapper(e, request).initResponse(response);
             return false;
@@ -323,7 +323,7 @@ class WebPublishingService {
         @Override
         public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
                                                                             throws java.io.IOException {
-            return resourceRequestFilter(request, response);
+            return staticResourceFilter(request, response);
         }
     }
 
@@ -368,7 +368,7 @@ class WebPublishingService {
         @Override
         public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response)
                                                                             throws java.io.IOException {
-            return resourceRequestFilter(request, response);
+            return staticResourceFilter(request, response);
         }
     }
 }

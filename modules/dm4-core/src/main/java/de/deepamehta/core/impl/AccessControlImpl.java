@@ -13,6 +13,7 @@ import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Credentials;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
+import de.deepamehta.core.util.ContextTracker;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -60,16 +61,11 @@ class AccessControlImpl implements AccessControl {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    // standard workspace assignment suppression
-    private ThreadLocal<Integer> suppressionLevel = new ThreadLocal() {
-        @Override
-        protected Integer initialValue() {
-            return 0;
-        }
-    };
+    // used for workspace assignment suppression
+    private ContextTracker contextTracker = new ContextTracker();
 
     private PersistenceLayer pl;
-    private ModelFactory mf;
+    private ModelFactoryImpl mf;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -323,15 +319,15 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public long getAssignedWorkspaceId(long objectId) {
-        long workspaceId = -1;
         try {
+            long workspaceId = -1;
             if (pl.hasProperty(objectId, PROP_WORKSPACE_ID)) {
                 workspaceId = (Long) pl.fetchProperty(objectId, PROP_WORKSPACE_ID);
                 checkWorkspaceId(workspaceId);
             }
             return workspaceId;
         } catch (Exception e) {
-            throw new RuntimeException("Object " + objectId + " is assigned to workspace " + workspaceId, e);
+            throw new RuntimeException("Workspace assignment of object " + objectId + " can't be determined", e);
         }
     }
 
@@ -365,18 +361,12 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public <V> V runWithoutWorkspaceAssignment(Callable<V> callable) throws Exception {
-        int level = suppressionLevel.get();
-        try {
-            suppressionLevel.set(level + 1);
-            return callable.call();     // throws exception
-        } finally {
-            suppressionLevel.set(level);
-        }
+        return contextTracker.run(callable);
     }
 
     @Override
     public boolean workspaceAssignmentIsSuppressed() {
-        return suppressionLevel.get() > 0;
+        return contextTracker.runsInTrackedContext();
     }
 
 

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
@@ -90,8 +91,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.private", isPrivate)
-            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))
-        ));
+            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
     }
 
     // ---
@@ -130,18 +130,25 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @POST
     @Path("/{id}/topic/{topic_id}")
     @Override
-    public void addTopicToTopicmap(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                   ViewProperties viewProps) {
+    public void addTopicToTopicmap(@PathParam("id") final long topicmapId,
+                                   @PathParam("topic_id") final long topicId, final ViewProperties viewProps) {
         try {
-            if (isTopicInTopicmap(topicmapId, topicId)) {
-                throw new RuntimeException("The topic is already added");
-            }
-            //
-            Association assoc = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
-                mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-                mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
-            ));
-            storeViewProperties(assoc, viewProps);
+            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+                @Override
+                public Void call() {
+                    if (isTopicInTopicmap(topicmapId, topicId)) {
+                        throw new RuntimeException("The topic is already added");
+                    }
+                    //
+                    Association assoc = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+                        mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
+                        mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
+                    ));
+                    storeViewProperties(assoc, viewProps);
+                    return null;
+                }
+            });
         } catch (Exception e) {
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
@@ -156,16 +163,24 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @POST
     @Path("/{id}/association/{assoc_id}")
     @Override
-    public void addAssociationToTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
+    public void addAssociationToTopicmap(@PathParam("id") final long topicmapId,
+                                         @PathParam("assoc_id") final long assocId) {
         try {
-            if (isAssociationInTopicmap(topicmapId, assocId)) {
-                throw new RuntimeException("The association is already added");
-            }
-            //
-            dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
-                mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-                mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
-            ));
+            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+                @Override
+                public Void call() {
+                    if (isAssociationInTopicmap(topicmapId, assocId)) {
+                        throw new RuntimeException("The association is already added");
+                    }
+                    //
+                    dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+                        mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
+                        mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+                    ));
+                    return null;
+                }
+            });
         } catch (Exception e) {
             throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed", e);
         }

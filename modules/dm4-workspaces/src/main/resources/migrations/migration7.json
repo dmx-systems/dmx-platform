@@ -39,35 +39,33 @@
                 {
                     "child_type_uri":        "dm4.workspaces.private.enabled",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 },
                 {
                     "child_type_uri":        "dm4.workspaces.confidential.enabled",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 },
                 {
                     "child_type_uri":        "dm4.workspaces.collaborative.enabled",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 },
                 {
                     "child_type_uri":        "dm4.workspaces.public.enabled",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 },
                 {
                     "child_type_uri":        "dm4.workspaces.common.enabled",
                     "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "include_in_label":      true
                 }
-            ],
-            "label_config": [
-                "dm4.workspaces.private.enabled",
-                "dm4.workspaces.confidential.enabled",
-                "dm4.workspaces.collaborative.enabled",
-                "dm4.workspaces.public.enabled",
-                "dm4.workspaces.common.enabled"
             ]
         }
     ]

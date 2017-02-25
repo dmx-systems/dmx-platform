@@ -23,11 +23,11 @@ public interface ChildTopics extends Iterable<String> {
 
     /**
      * Accesses a multiple-valued child.
-     * Throws if there is no such child.
+     * Throws if there is no such child. ### TODO: return empty list instead
      */
     List<RelatedTopic> getTopics(String assocDefUri);
 
-    List<RelatedTopic> getTopicsOrNull(String assocDefUri);
+    List<RelatedTopic> getTopicsOrNull(String assocDefUri); // ### TODO: drop this method
 
     // ---
 

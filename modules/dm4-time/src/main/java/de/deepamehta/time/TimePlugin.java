@@ -171,12 +171,12 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         storeTimestamp(topic);
     }
 
     @Override
-    public void postUpdateAssociation(Association assoc, AssociationModel newModel, AssociationModel oldModel) {
+    public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
         storeTimestamp(assoc);
     }
 

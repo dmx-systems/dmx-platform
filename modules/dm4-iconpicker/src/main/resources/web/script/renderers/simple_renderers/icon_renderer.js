@@ -29,7 +29,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
             }
         }
 
-        // --------------------------------------------------------------------------------------- Private Functions
+        // ------------------------------------------------------------------------------------------- Private Functions
 
         function open_choose_icon_dialog() {
             // retrieve icon topics

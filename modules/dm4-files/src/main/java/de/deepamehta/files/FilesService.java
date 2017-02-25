@@ -272,5 +272,5 @@ public interface FilesService {
 
     // ---
 
-    void openFile(long fileTopicId);
+    int openFile(long fileTopicId);
 }

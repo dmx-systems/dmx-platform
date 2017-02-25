@@ -298,7 +298,9 @@ function RESTClient(config) {
                 return compare(topic_1.type_uri, topic_2.type_uri)
             } else {
                 // 2nd sort criteria: topic value
-                if (typeof topic_1.value == "string") {
+                // Note: if value1 is a string value2 might still be a number (or boolean) if the type was
+                // Number (or Boolean) before. toLowerCase() would fail.
+                if (typeof topic_1.value == "string" && typeof topic_2.value == "string") {
                     return compare(topic_1.value.toLowerCase(), topic_2.value.toLowerCase())
                 } else {
                     return compare(topic_1.value, topic_2.value)
@@ -387,7 +389,6 @@ function RESTClient(config) {
                 status_code:  jq_xhr.status,
                 status_text:  jq_xhr.statusText
             }
-            console.error("Server response:", server_response)
             // Note: by returning false the per-request error handler can prevent the global error handler
             var prevent_default_error = on_error && on_error(server_response) == false
             if (!prevent_default_error && config && config.on_request_error) {
@@ -397,7 +398,8 @@ function RESTClient(config) {
             // $.ajax() settings object) does not reach the calling plugin. (In jQuery 1.7.2 it did.) Apparently the
             // exception is catched by jQuery. That's why we use the Promise style to register our callbacks (done(),
             // fail(), always()). An exception thrown from fail() does reach the calling plugin.
-            throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown + ")"
+            throw "RESTClientError: " + method + " request failed (" + text_status + ": " + error_thrown +
+                "), response: " + JSON.stringify(server_response)
         })
         .always(function(dummy, text_status) {
             // Note: the signature of the always() callback varies. Depending on the response status it takes

@@ -32,7 +32,16 @@ class TopicTypeImpl extends DeepaMehtaTypeImpl implements TopicType {
     }
 
     @Override
-    public void update(TopicTypeModel newModel) {
-        model.update(newModel);
+    public void update(TopicTypeModel updateModel) {
+        model.update((TopicTypeModelImpl) updateModel);     // ### FIXME: call through pl for access control
+    }
+
+
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    TopicTypeModelImpl _getModel() {
+        return pl._getTopicType(getUri());
     }
 }

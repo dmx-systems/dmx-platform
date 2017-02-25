@@ -78,11 +78,7 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    Role instantiate(AssociationModelImpl assoc) {
-        throw new UnsupportedOperationException();
-    }
+    abstract Role instantiate(AssociationModelImpl assoc);
 
-    DeepaMehtaObjectModel getPlayer() {
-        throw new UnsupportedOperationException();
-    }
+    abstract DeepaMehtaObjectModel getPlayer();
 }

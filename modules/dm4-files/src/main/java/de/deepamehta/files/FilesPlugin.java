@@ -21,7 +21,7 @@ import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
-import de.deepamehta.core.service.event.ResourceRequestFilterListener;
+import de.deepamehta.core.service.event.StaticResourceFilterListener;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 import de.deepamehta.core.util.JavaUtils;
 
@@ -37,6 +37,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.awt.Desktop;
 import java.io.FileOutputStream;
@@ -53,13 +54,13 @@ import java.util.regex.Pattern;
 
 @Path("/files")
 @Produces("application/json")
-public class FilesPlugin extends PluginActivator implements FilesService, ResourceRequestFilterListener, PathMapper {
+public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilterListener, PathMapper {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
     public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "/");
     public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
-    public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", 150);
+    public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
@@ -387,10 +388,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     // ---
 
-    @POST
+    @GET
     @Path("/open/{id}")
     @Override
-    public void openFile(@PathParam("id") long fileTopicId) {
+    public int openFile(@PathParam("id") long fileTopicId) {
         String operation = "Opening the file of File topic " + fileTopicId;
         try {
             logger.info(operation);
@@ -401,6 +402,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             //
             logger.info("### Opening file \"" + file + "\"");
             Desktop.getDesktop().open(file);
+            //
+            // Note: a HTTP GET method MUST return a non-void type
+            return 0;
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -452,7 +456,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
 
     @Override
-    public void resourceRequestFilter(HttpServletRequest request) {
+    public void staticResourceFilter(HttpServletRequest request, HttpServletResponse response) {
         try {
             String repoPath = repoPath(request);    // Note: the path is not canonized
             if (repoPath != null) {
@@ -460,6 +464,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
                 File path = absolutePath(repoPath);             // throws FileRepositoryException 403 Forbidden
                 checkExistence(path);                           // throws FileRepositoryException 404 Not Found
                 checkAuthorization(repoPath(path), request);    // throws FileRepositoryException 401 Unauthorized
+                //
+                // prepare downloading
+                if (request.getParameter("download") != null) {
+                    logger.info("### Downloading file \"" + path + "\"");
+                    response.setHeader("Content-Disposition", "attachment;filename=" + path.getName());
+                }
             }
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(e, e.getStatus());
@@ -513,7 +523,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   repoPath        A repository path. Must be canonized.
      */
     private Topic fetchFileTopic(String repoPath) {
-        return fetchTopic(repoPath, "dm4.files.file");
+        return fetchFileOrFolderTopic(repoPath, "dm4.files.file");
     }
 
     /**
@@ -523,7 +533,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   repoPath        A repository path. Must be canonized.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        return fetchTopic(repoPath, "dm4.files.folder");
+        return fetchFileOrFolderTopic(repoPath, "dm4.files.folder");
     }
 
     // ---
@@ -535,12 +545,19 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
      * @param   repoPath        A repository path. Must be canonized.
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
-    private Topic fetchTopic(String repoPath, String topicTypeUri) {
-        Topic topic = dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
-        if (topic != null) {
-            return topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
+    private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
+        Topic pathTopic = fetchPathTopic(repoPath);
+        if (pathTopic != null) {
+            return pathTopic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
         }
         return null;
+    }
+
+    /**
+     * @param   repoPath        A repository path. Must be canonized.
+     */
+    private Topic fetchPathTopic(String repoPath) {
+        return dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
     }
 
     // ---
@@ -586,24 +603,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
             folderName = repoPathFile.getName();    // Note: getName() of "/" returns ""
         }
         //
-        return createFolderTopic(folderName, repoPath);    // throws Exception
-    }
-
-    /**
-     * Creates a Folder topic.
-     *
-     * @param   folderName  The folder name.
-     * @param   repoPath    The folder repository path.
-     */
-    private Topic createFolderTopic(String folderName, String repoPath) throws Exception {
         return createFileOrFolderTopic(mf.newTopicModel("dm4.files.folder", mf.newChildTopicsModel()
             .put("dm4.files.folder_name", folderName)
-            .put("dm4.files.path", repoPath)
-        ));    // throws Exception
+            .put("dm4.files.path", repoPath)));     // throws Exception
     }
 
     // ---
 
+    /**
+     * @param   repoPath        A repository path. Must be canonized.
+     */
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
         Topic topic = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
@@ -666,6 +675,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
 
     /**
      * Maps a repository path to an absolute path.
+     * <p>
      * Checks the repository path to fight directory traversal attacks.
      *
      * @param   repoPath    A repository path. Relative to the repository base path.
@@ -809,6 +819,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Resour
     }
 
     // ---
+
+    // Note: there is also a public repoPath() method (part of the PathMapper API).
+    // It maps an absolute path to a repository path.
 
     /**
      * Returns the repository path of a File/Folder topic.

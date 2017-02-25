@@ -45,3 +45,5 @@ dm4c.add_plugin("de.deepamehta.geomaps", function() {
         return topic.find_child_topic("dm4.geomaps.geo_coordinate")
     }
 })
+// Enable debugging for dynamically loaded scripts:
+//# sourceURL=geomaps_plugin.js

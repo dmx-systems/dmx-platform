@@ -38,8 +38,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
     @Override
-    public void update(TopicModel newModel) {
-        model.update(newModel);
+    public void update(TopicModel updateModel) {
+        model.update((TopicModelImpl) updateModel);    // ### FIXME: call through pl for access control
     }
 
     // ---

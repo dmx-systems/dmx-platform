@@ -80,7 +80,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     public void registerConfigDefinition(ConfigDefinition configDef) {
         try {
             if (isRegistered(configDef)) {
-                throw new RuntimeException("A definition for configuration type \"" + configDef.getConfigTypeUri() +
+                throw new RuntimeException("A definition for config type \"" + configDef.getConfigTypeUri() +
                     "\" is already registered");
             }
             //
@@ -92,7 +92,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             }
             configDefs.add(configDef);
         } catch (Exception e) {
-            throw new RuntimeException("Registering a configuration definition failed", e);
+            throw new RuntimeException("Registering a config definition failed", e);
         }
     }
 
@@ -103,15 +103,14 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
                 ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
                 if (configDef != null) {
                     if (!configDefs.remove(configDef)) {
-                        throw new RuntimeException("Configuration definition could not be removed from registry");
+                        throw new RuntimeException("Config definition could not be removed from registry");
                     }
                     return;
                 }
             }
-            throw new RuntimeException("No such configuration definition registered");
+            throw new RuntimeException("No such config definition registered");
         } catch (Exception e) {
-            throw new RuntimeException("Unregistering definition for configuration type \"" + configTypeUri +
-                "\" failed", e);
+            throw new RuntimeException("Unregistering definition for config type \"" + configTypeUri + "\" failed", e);
         }
     }
 
@@ -135,7 +134,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
             }
             return new ConfigDefinitions(json);
         } catch (Exception e) {
-            throw new RuntimeException("Getting the configuration definitions failed", e);
+            throw new RuntimeException("Retrieving the registered config definitions failed", e);
         }
     }
 
@@ -201,9 +200,9 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ---
 
     /**
-     * Returns all configuration definitions applicable to a given topic.
+     * Returns all config definitions applicable to a given topic.
      *
-     * @return  a list of configuration definitions, possibly empty.
+     * @return  a list of config definitions, possibly empty.
      */
     private List<ConfigDefinition> getApplicableConfigDefinitions(Topic topic) {
         List<ConfigDefinition> configDefs1 = lookupConfigDefinitions(ConfigTarget.SINGLETON.hashKey(topic));
@@ -218,20 +217,19 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     }
 
     /**
-     * Returns the configuration definition for the given config type that is applicable to the given topic.
+     * Returns the config definition for the given config type that is applicable to the given topic.
      *
-     * @throws RuntimeException     if no such configuration definition is registered.
+     * @throws RuntimeException     if no such config definition is registered.
      */
     private ConfigDefinition getApplicableConfigDefinition(Topic topic, String configTypeUri) {
         List<ConfigDefinition> configDefs = getApplicableConfigDefinitions(topic);
         if (configDefs.size() == 0) {
-            throw new RuntimeException("None of the registered configuration definitions are applicable to " +
-                info(topic));
+            throw new RuntimeException("None of the registered config definitions are applicable to " + info(topic));
         }
         ConfigDefinition configDef = findByConfigTypeUri(configDefs, configTypeUri);
         if (configDef == null) {
-            throw new RuntimeException("For " + info(topic) + " no configuration definition for type \"" +
-                configTypeUri + "\" registered");
+            throw new RuntimeException("For " + info(topic) + " no config definition for type \"" + configTypeUri +
+                "\" registered");
         }
         return configDef;
     }

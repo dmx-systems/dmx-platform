@@ -20,6 +20,7 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
 import de.deepamehta.core.service.event.PreSendTopicListener;
+import de.deepamehta.core.util.ContextTracker;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -35,6 +36,7 @@ import javax.ws.rs.Consumes;
 
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,6 +60,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @Inject private TopicmapsService topicmapsService;
     @Inject private FacetsService facetsService;
+
+    // used for geocoding suppression
+    private ContextTracker contextTracker = new ContextTracker();
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -159,6 +164,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         return EARTH_RADIUS_KM * Math.sqrt(Math.pow(latDiff, 2) + Math.pow(Math.cos(latMean) * lonDiff, 2));
     }
 
+    // ---
+
+    @Override
+    public <V> V runWithoutGeocoding(Callable<V> callable) throws Exception {
+        return contextTracker.run(callable);
+    }
+
 
 
     // ****************************
@@ -183,7 +195,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void postCreateTopic(Topic topic) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            if (!abortGeocoding()) {
+            if (!abortGeocoding(topic)) {
                 //
                 facetsService.addFacetTypeToTopic(topic.getId(), "dm4.geomaps.geo_coordinate_facet");
                 //
@@ -199,11 +211,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     }
 
     @Override
-    public void postUpdateTopic(Topic topic, TopicModel newModel, TopicModel oldModel) {
+    public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dm4.contacts.address")) {
-            if (!abortGeocoding()) {
+            if (!abortGeocoding(topic)) {
                 Address address    = new Address(topic.getChildTopics().getModel());
-                Address oldAddress = new Address(oldModel.getChildTopicsModel());
+                Address oldAddress = new Address(oldTopic.getChildTopicsModel());
                 if (!address.equals(oldAddress)) {
                     logger.info("### Address changed:" + address.changeReport(oldAddress));
                     geocodeAndStoreFacet(address, topic);
@@ -285,19 +297,33 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ---
 
-    private boolean abortGeocoding() {
+    private boolean abortGeocoding(Topic address) {
+        return abortGeocodingByCookie(address) || abortGeocodingByExcecutionContext(address);
+    }
+
+    private boolean abortGeocodingByCookie(Topic address) {
+        boolean abort = false;
         Cookies cookies = Cookies.get();
-        if (!cookies.has(COOKIE_NO_GEOCODING)) {
-            return false;
+        if (cookies.has(COOKIE_NO_GEOCODING)) {
+            String value = cookies.get(COOKIE_NO_GEOCODING);
+            if (!value.equals("false") && !value.equals("true")) {
+                throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
+                    "\" cookie (expected are \"false\" or \"true\")");
+            }
+            abort = value.equals("true");
+            if (abort) {
+                logger.info("Geocoding for Address topic " + address.getId() + " SUPPRESSED -- \"" +
+                    COOKIE_NO_GEOCODING + "\" cookie detected");
+            }
         }
-        String value = cookies.get(COOKIE_NO_GEOCODING);
-        if (!value.equals("false") && !value.equals("true")) {
-            throw new RuntimeException("\"" + value + "\" is an unexpected value for the \"" + COOKIE_NO_GEOCODING +
-                "\" cookie (expected are \"false\" or \"true\")");
-        }
-        boolean abort = value.equals("true");
+        return abort;
+    }
+
+    private boolean abortGeocodingByExcecutionContext(Topic address) {
+        boolean abort = contextTracker.runsInTrackedContext();
         if (abort) {
-            logger.info("### Geocoding ABORTED -- \"" + COOKIE_NO_GEOCODING + "\" cookie detected");
+            logger.info("Geocoding for Address topic " + address.getId() + " SUPPRESSED -- runWithoutGeocoding() " +
+                "context detected");
         }
         return abort;
     }

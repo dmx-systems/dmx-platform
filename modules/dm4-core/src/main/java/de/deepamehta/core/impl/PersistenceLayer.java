@@ -125,30 +125,34 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    TopicImpl createTopic(TopicModel model) {
+    TopicImpl createTopic(TopicModelImpl model) {
         return createTopic(model, null);    // uriPrefix=null
     }
 
     /**
      * Creates a new topic in the DB.
      */
-    TopicImpl createTopic(TopicModel model, String uriPrefix) {
+    TopicImpl createTopic(TopicModelImpl model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
+            model.preCreate();
+            //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue((TopicModelImpl) model);
+            valueStorage.storeValue(model);
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
             // Note: this must be done *after* the topic is stored. The ID is not known before.
             // Note: in case no URI was given: once stored a topic's URI is empty (not null).
             if (uriPrefix != null && model.getUri().equals("")) {
-                ((TopicModelImpl) model).updateUri(uriPrefix + model.getId());
+                model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
             // 3) instantiate
-            TopicImpl topic = new TopicImpl((TopicModelImpl) model, this);
+            TopicImpl topic = model.instantiate();
+            //
+            model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
@@ -160,13 +164,13 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateTopic(TopicModel newModel) {
-        long topicId = newModel.getId();
+    void updateTopic(TopicModelImpl updateModel) {
+        long topicId = updateModel.getId();
         try {
             checkTopicWriteAccess(topicId);
             //
             TopicModelImpl model = fetchTopic(topicId);
-            model.update(newModel);
+            model.update(updateModel);
             //
             // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
             // On the other hand TopicModel's update() method is called multiple times while updating the child topics
@@ -258,17 +262,31 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     List<Association> getAssociations(long topic1Id, long topic2Id) {
-        return getAssociations(topic1Id, topic2Id, null);
+        return getAssociations(null, topic1Id, topic2Id);   // assocTypeUri=null
     }
 
-    List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        logger.info("topic1Id=" + topic1Id + ", topic2Id=" + topic2Id + ", assocTypeUri=\"" + assocTypeUri + "\"");
+    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id) {
+        return getAssociations(assocTypeUri, topic1Id, topic2Id, null, null);   // roleTypeUri1=null, roleTypeUri2=null
+    }
+
+    List<Association> getAssociations(String assocTypeUri, long topic1Id, long topic2Id, String roleTypeUri1,
+                                                                                         String roleTypeUri2) {
+        return instantiate(_getAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
+    }
+
+    /**
+     * Fetches from DB and filters READables. No instantiation.
+     */
+    Iterable<AssociationModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id,
+                                                    String roleTypeUri1, String roleTypeUri2) {
+        logger.fine("assocTypeUri=\"" + assocTypeUri + "\", topic1Id=" + topic1Id + ", topic2Id=" + topic2Id +
+            ", roleTypeUri1=\"" + roleTypeUri1 + "\", roleTypeUri2=\"" + roleTypeUri2 + "\"");
         try {
-            return checkReadAccessAndInstantiate(fetchAssociations(assocTypeUri, topic1Id, topic2Id, null, null));
-                                                                                 // roleTypeUri1=null, roleTypeUri2=null
+            return filterReadables(fetchAssociations(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2));
         } catch (Exception e) {
             throw new RuntimeException("Fetching associations between topics " + topic1Id + " and " + topic2Id +
-                " failed (assocTypeUri=\"" + assocTypeUri + "\")", e);
+                " failed (assocTypeUri=\"" + assocTypeUri + "\", roleTypeUri1=\"" + roleTypeUri1 +
+                "\", roleTypeUri2=\"" + roleTypeUri2 + "\")", e);
         }
     }
 
@@ -287,23 +305,27 @@ public class PersistenceLayer extends StorageDecorator {
     /**
      * Convenience.
      */
-    Association createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
+    AssociationImpl createAssociation(String typeUri, RoleModel roleModel1, RoleModel roleModel2) {
         return createAssociation(mf.newAssociationModel(typeUri, roleModel1, roleModel2));
     }
 
     /**
      * Creates a new association in the DB.
      */
-    Association createAssociation(AssociationModelImpl model) {
+    AssociationImpl createAssociation(AssociationModelImpl model) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION, model);
+            //
+            model.preCreate();
             //
             // 1) store in DB
             storeAssociation(model);
             valueStorage.storeValue(model);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
-            Association assoc = new AssociationImpl(model, this);
+            AssociationImpl assoc = model.instantiate();
+            //
+            model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;
@@ -314,13 +336,13 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    void updateAssociation(AssociationModel newModel) {
-        long assocId = newModel.getId();
+    void updateAssociation(AssociationModelImpl updateModel) {
+        long assocId = updateModel.getId();
         try {
             checkAssociationWriteAccess(assocId);
             //
             AssociationModelImpl model = fetchAssociation(assocId);
-            model.update(newModel);
+            model.update(updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
@@ -375,7 +397,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     // === Types ===
 
-    TopicType getTopicType(String uri) {
+    TopicTypeImpl getTopicType(String uri) {
         TopicTypeModelImpl topicType = _getTopicType(uri);
         if (!uri.equals("dm4.core.meta_meta_type")) {
             checkReadAccess(topicType);
@@ -383,18 +405,18 @@ public class PersistenceLayer extends StorageDecorator {
         return topicType.instantiate();
     }
 
-    TopicType getTopicTypeImplicitly(long topicId) {
+    TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         checkTopicReadAccess(topicId);
         return _getTopicType(typeUri(topicId)).instantiate();
     }
 
     // ---
 
-    AssociationType getAssociationType(String uri) {
+    AssociationTypeImpl getAssociationType(String uri) {
         return checkReadAccessAndInstantiate(_getAssociationType(uri));
     }
 
-    AssociationType getAssociationTypeImplicitly(long assocId) {
+    AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
         checkAssociationReadAccess(assocId);
         return _getAssociationType(typeUri(assocId)).instantiate();
     }
@@ -427,40 +449,79 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicType createTopicType(TopicTypeModelImpl model) {
+    TopicTypeImpl createTopicType(TopicTypeModelImpl model) {
         try {
             // store in DB
-            createTopic(model, URI_PREFIX_TOPIC_TYPE);          // create generic topic
-            typeStorage.storeType(model);                       // store type-specific parts
+            createTypeTopic(model, URI_PREFIX_TOPIC_TYPE);
             //
-            TopicType topicType = model.instantiate();
+            TopicTypeImpl topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             //
             return topicType;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed (" + model + ")", e);
+            throw new RuntimeException("Creating topic type \"" + model.getUri() + "\" failed", e);
         }
     }
 
-    AssociationType createAssociationType(AssociationTypeModelImpl model) {
+    AssociationTypeImpl createAssociationType(AssociationTypeModelImpl model) {
         try {
             // store in DB
-            createTopic(model, URI_PREFIX_ASSOCIATION_TYPE);    // create generic topic
-            typeStorage.storeType(model);                       // store type-specific parts
+            createTypeTopic(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
-            AssociationType assocType = model.instantiate();
+            AssociationTypeImpl assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             //
             return assocType;
         } catch (Exception e) {
-            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed (" + model + ")",
-                e);
+            throw new RuntimeException("Creating association type \"" + model.getUri() + "\" failed", e);
         }
     }
 
     // ---
 
-    Topic createRoleType(TopicModel model) {
+    void updateTopicType(TopicTypeModelImpl updateModel) {
+        try {
+            // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            // ### FIXME: access control
+            String topicTypeUri = fetchTopic(updateModel.getId()).getUri();
+            _getTopicType(topicTypeUri).update(updateModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating topic type failed (" + updateModel + ")", e);
+        }
+    }
+
+    void updateAssociationType(AssociationTypeModelImpl updateModel) {
+        try {
+            // Note: type lookup is by ID. The URI might have changed, the ID does not.
+            // ### FIXME: access control
+            String assocTypeUri = fetchTopic(updateModel.getId()).getUri();
+            _getAssociationType(assocTypeUri).update(updateModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating association type failed (" + updateModel + ")", e);
+        }
+    }
+
+    // ---
+
+    void deleteTopicType(String topicTypeUri) {
+        try {
+            _getTopicType(topicTypeUri).delete();           // ### TODO: delete view config topics
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
+        }
+    }
+
+    void deleteAssociationType(String assocTypeUri) {
+        try {
+            _getAssociationType(assocTypeUri).delete();     // ### TODO: delete view config topics
+        } catch (Exception e) {
+            throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
+        }
+    }
+
+    // ---
+
+    Topic createRoleType(TopicModelImpl model) {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {
@@ -473,6 +534,16 @@ public class PersistenceLayer extends StorageDecorator {
         }
         //
         return createTopic(model, URI_PREFIX_ROLE_TYPE);
+    }
+
+    // ---
+
+    TopicTypeModelImpl _getTopicType(String uri) {
+        return typeStorage.getTopicType(uri);
+    }
+
+    AssociationTypeModelImpl _getAssociationType(String uri) {
+        return typeStorage.getAssociationType(uri);
     }
 
 
@@ -503,6 +574,8 @@ public class PersistenceLayer extends StorageDecorator {
         return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
     }
 
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
 
 
     // === Access Control / Instantiation ===
@@ -525,14 +598,20 @@ public class PersistenceLayer extends StorageDecorator {
     private <M extends DeepaMehtaObjectModelImpl> Iterable<M> filterReadables(Iterable<M> models) {
         Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
-            DeepaMehtaObjectModelImpl model = i.next();
-            try {
-                checkReadAccess(model);
-            } catch (AccessControlException e) {
+            if (!hasReadAccess(i.next())) {
                 i.remove();
             }
         }
         return models;
+    }
+
+    boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
+        try {
+            checkReadAccess(model);
+            return true;
+        } catch (AccessControlException e) {
+            return false;
+        }
     }
 
     /**
@@ -612,21 +691,25 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    private TopicTypeModelImpl _getTopicType(String uri) {
-        return typeStorage.getTopicType(uri);
+    private void createTypeTopic(TypeModelImpl model, String uriPrefix) {
+        // Note: the type topic is instantiated explicitly on a `TopicModel` (which is freshly created from the
+        // `TypeModel`). Creating the type topic from the `TypeModel` directly would fail as topic creation implies
+        // topic instantiation, and due to the polymorphic `instantiate()` method a `Type` object would be instantiated
+        // (instead a `Topic` object). But instantiating a type newly implies per-user type projection, that is removing
+        // the assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
+        // defs are not yet stored, and the readability check would fail.
+        TopicModelImpl typeTopic = mf.newTopicModel(model);
+        createTopic(typeTopic, uriPrefix);      // create generic topic
+        //
+        model.id = typeTopic.id;
+        model.uri = typeTopic.uri;
+        //
+        typeStorage.storeType(model);           // store type-specific parts
     }
-
-    private AssociationTypeModelImpl _getAssociationType(String uri) {
-        return typeStorage.getAssociationType(uri);
-    }
-
-    // ---
 
     private String typeUri(long objectId) {
         return (String) fetchProperty(objectId, "type_uri");
     }
-
-    // ---
 
     private void bootstrapTypeCache() {
         TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",

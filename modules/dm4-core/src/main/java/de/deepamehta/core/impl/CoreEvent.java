@@ -15,6 +15,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 
@@ -258,11 +259,11 @@ class CoreEvent {
         }
     };
 
-    static DeepaMehtaEvent RESOURCE_REQUEST_FILTER = new DeepaMehtaEvent(ResourceRequestFilterListener.class) {
+    static DeepaMehtaEvent STATIC_RESOURCE_FILTER = new DeepaMehtaEvent(StaticResourceFilterListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
-            ((ResourceRequestFilterListener) listener).resourceRequestFilter(
-                (HttpServletRequest) params[0]
+            ((StaticResourceFilterListener) listener).staticResourceFilter(
+                (HttpServletRequest) params[0], (HttpServletResponse) params[1]
             );
         }
     };

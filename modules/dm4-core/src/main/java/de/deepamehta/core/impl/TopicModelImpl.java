@@ -62,38 +62,45 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     }
 
     @Override
-    Topic instantiate() {
+    TopicImpl instantiate() {
         return new TopicImpl(this, pl);
+    }
+
+    @Override
+    final TopicModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        return mf.newTopicModel(childTopics);
     }
 
     // ---
 
     @Override
-    TopicTypeModel getType() {
+    final TopicTypeModelImpl getType() {
         return pl.typeStorage.getTopicType(typeUri);
     }
 
     @Override
-    List<AssociationModelImpl> getAssociations() {
+    final List<AssociationModelImpl> getAssociations() {
         return pl.fetchTopicAssociations(id);
     }
 
     // ---
 
     @Override
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                     String othersTopicTypeUri) {
+    final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                            String othersTopicTypeUri) {
+    final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    final List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
         return pl.fetchTopicRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
@@ -101,79 +108,88 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    void storeUri() {
+    final void storeUri() {
         pl.storeTopicUri(id, uri);
     }
 
     @Override
-    void storeTypeUri() {
+    final void storeTypeUri() {
         reassignInstantiation();
         pl.storeTopicTypeUri(id, typeUri);
     }
 
     @Override
-    void storeSimpleValue() {
+    final void storeSimpleValue() {
         TypeModel type = getType();
         pl.storeTopicValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
     }
 
     @Override
-    void indexSimpleValue(IndexMode indexMode) {
+    final void indexSimpleValue(IndexMode indexMode) {
         pl.indexTopicValue(id, indexMode, typeUri, getIndexValue());
     }
 
     // ---
 
     @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newTopicModel(childTopics));
-    }
-
-    @Override
-    void _delete() {
+    final void _delete() {
         pl._deleteTopic(id);
     }
 
     // ---
 
     @Override
-    DeepaMehtaEvent getReadAccessEvent() {
+    final DeepaMehtaEvent getReadAccessEvent() {
         return CoreEvent.CHECK_TOPIC_READ_ACCESS;
     }
 
     @Override
-    DeepaMehtaEvent getPreUpdateEvent() {
+    final DeepaMehtaEvent getPreUpdateEvent() {
         return CoreEvent.PRE_UPDATE_TOPIC;
     }
 
     @Override
-    DeepaMehtaEvent getPostUpdateEvent() {
+    final DeepaMehtaEvent getPostUpdateEvent() {
         return CoreEvent.POST_UPDATE_TOPIC;
     }
 
     @Override
-    DeepaMehtaEvent getPreDeleteEvent() {
+    final DeepaMehtaEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_TOPIC;
     }
 
     @Override
-    DeepaMehtaEvent getPostDeleteEvent() {
+    final DeepaMehtaEvent getPostDeleteEvent() {
         return CoreEvent.POST_DELETE_TOPIC;
     }
 
     // ---
 
     @Override
-    Directive getUpdateDirective() {
+    final Directive getUpdateDirective() {
         return Directive.UPDATE_TOPIC;
     }
 
     @Override
-    Directive getDeleteDirective() {
+    final Directive getDeleteDirective() {
         return Directive.DELETE_TOPIC;
     }
 
-    // ---
+
+
+    // === Core Internal Hooks ===
+
+    @Override
+    void preDelete() {
+        if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.assoc_type")) {
+            throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
+                "Use a delete-type call instead.");
+        }
+    }
+
+
+
+    // ===
 
     TopicModelImpl findChildTopic(String topicTypeUri) {
         if (typeUri.equals(topicTypeUri)) {

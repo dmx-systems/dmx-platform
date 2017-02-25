@@ -57,6 +57,8 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
 
+    TopicModel newTopicModel(TopicModel topic);
+
     TopicModel newTopicModel(JSONObject topic);
 
 
@@ -173,7 +175,7 @@ public interface ModelFactory {
 
     TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
                                      List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                     List<String> labelConfig, ViewConfigurationModel viewConfig);
+                                     ViewConfigurationModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
 
@@ -185,7 +187,7 @@ public interface ModelFactory {
 
     AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                 List<String> labelConfig, ViewConfigurationModel viewConfig);
+                                                 ViewConfigurationModel viewConfig);
 
     AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);
 
@@ -195,17 +197,12 @@ public interface ModelFactory {
 
     // === AssociationDefinitionModel ===
 
-    AssociationDefinitionModel newAssociationDefinitionModel(long id, String uri,
-                                                    String assocTypeUri, String customAssocTypeUri,
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfigModel);
-
     AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri, String customAssocTypeUri,
+    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
+                                                    String customAssocTypeUri, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri);
 

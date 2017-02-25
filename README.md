@@ -20,6 +20,9 @@ Live demo:
 Download:  
 <http://download.deepamehta.de/>
 
+Hosted service:  
+<https://my.deepamehta.de/>
+
 Mailing lists:  
 <http://lists.deepamehta.de/>
 
@@ -52,8 +55,10 @@ To install and use DeepaMehta follow 5 mandatory steps:
 
 * **Java 1.6** (or newer).
 
-  If you don't know weather Java is already installed on your computer or what Java is at all go to
-  <http://www.java.com>.
+  To find out whether Java is already installed on your computer go to a terminal window and type `java -version`.
+  For more information about Java go to <http://www.java.com>.
+
+  Note: you do *not* need a Java plugin for your browser. DeepaMehta uses Java only at its backend.
 
 * A **webbrowser**.
 
@@ -61,25 +66,25 @@ To install and use DeepaMehta follow 5 mandatory steps:
   Doesn't work with IE8. Possibly works with IE9 or IE10 (not tested).
 
 
-2. Download DeepaMehta
-----------------------
+2. Download
+-----------
 
-<http://download.deepamehta.de/deepamehta-4.8.1.zip> (7.2 MB)
+<http://download.deepamehta.de/deepamehta-4.8.5.zip> (7.2 MB)
 
 
-3. Install DeepaMehta
----------------------
+3. Install
+----------
 
-Unzip the downloaded file. A folder `deepamehta-4.8.1` is created.  
+Unzip the downloaded file. A folder `deepamehta-4.8.5` is created.  
 You can move that folder to any place you want.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
 
 
-4. Start DeepaMehta
--------------------
+4. Start
+--------
 
-Open the `deepamehta-4.8.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.8.5` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -94,8 +99,8 @@ To open the DeepaMehta browser window manually:
 Login with `admin` and empty password. Now you're ready to create content.
 
 
-5. Stop DeepaMehta
-------------------
+5. Stop
+-------
 
 Go to the terminal window that opened while startup and press:
 
@@ -110,36 +115,38 @@ You can now close the terminal window.
 Auxiliary tasks follow:
 
 
-Updating DeepaMehta
--------------------
+Updating
+--------
 
-You can update from DeepaMehta 4.1 or newer to 4.8.1 while keeping your existing DeepaMehta content:
+You can update from DeepaMehta 4.1 or newer to 4.8.5 while keeping your existing DeepaMehta content:
 
-1. Install DeepaMehta 4.8.1 (see steps 2. and 3. above).
-2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.8.1 if already started.)
-3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.8.1` folder.
+1. Install DeepaMehta 4.8.5 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.8.5 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.8.5` folder.
    (Replace as necessary.)
-4. Proceed with "Start DeepaMehta" (see step 4. above).
+4. Proceed with "Start" (see step 4. above).
 
 IMPORTANT: generally you're not required to install all intermediate versions. However there are certain versions that are mandatory to be installed. These versions comprise:
+
     DeepaMehta 4.5
     DeepaMehta 4.7
-So, to update e.g. from DeepaMehta 4.3 to 4.8.1 you must install and run these versions consecutively: 4.5, 4.7, 4.8.1.
+
+So, to update e.g. from DeepaMehta 4.3 to 4.8.5 you must install and run these versions consecutively: 4.5, 4.7, 4.8.5.
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported. Even updating from 4.0.x is not supported.
 The first updatable DeepaMehta version is 4.1.
 
 
-Install DeepaMehta plugins
---------------------------
+Install plugins
+---------------
 
 You can extend DeepaMehta's functionality by installing plugins.  
 See the list of available plugins:  
 <https://www.deepamehta.de/content/download>
 
 
-Reset the DeepaMehta database
------------------------------
+Reset the database
+------------------
 
 Sometimes you might want to restart DeepaMehta with a fresh database:
 
@@ -150,17 +157,17 @@ Sometimes you might want to restart DeepaMehta with a fresh database:
 Caution: you will loose all your DeepaMehta content.
 
 
-Uninstall DeepaMehta
---------------------
+Uninstall
+---------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.8.1` folder.
+2. Delete the entire `deepamehta-4.8.5` folder.
 
 This removes DeepaMehta completely from your computer, including all your DeepaMehta content.
 
 
-Build DeepaMehta from Source
-----------------------------
+Build from Source
+-----------------
 
 <https://trac.deepamehta.de/wiki/BuildFromSource>
 
@@ -170,6 +177,50 @@ Build DeepaMehta from Source
 
 Version History
 ---------------
+
+**4.8.5** -- Jan 4, 2017
+
+* Improvements:
+    * Core type instances are searchable by-text
+* Changes:
+    * The "Retype Topic" feature is removed
+    * Explicit "Create Icon" command
+* Bug fix:
+    * Icon topics work for access controlled file repos
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
+
+**4.8.4** -- Nov 14, 2016
+
+* Improvements:
+    * Non-shared type extensions
+    * Deleting workspaces
+    * Association Duplicate Check
+    * WebSockets server is configurable
+* Bug fix:
+    * Webclient starts if stale cookies are present
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
+
+**4.8.3** -- Aug 30, 2016
+
+* Improvement:
+    * More robust topicmap rendering.
+* Plugin development framework:
+    * Suppress geocoding per code block.
+* Bug fixes:
+    * Facets API.
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
+
+**4.8.2** -- Jun 30, 2016
+
+* New feature:
+    * Download files from remote file repository.
+* Improvement:
+    * When starting the Webclient the last used topicmap is selected automatically.
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.8.1** -- Jun 21, 2016
 
@@ -638,4 +689,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Jun 21, 2016
+Jan 4, 2017

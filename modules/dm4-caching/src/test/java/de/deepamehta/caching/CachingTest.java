@@ -37,11 +37,12 @@ public class CachingTest {
     @Test
     public void parent() {
         File f = new File("/home/terry");
-        assertEquals("/home/terry", f.getPath());
+        String s = File.separator;
+        assertEquals(s + "home" + s + "terry", f.getPath());
         f = f.getParentFile();
-        assertEquals("/home", f.getPath());
+        assertEquals(s + "home", f.getPath());
         f = f.getParentFile();
-        assertEquals("/", f.getPath());
+        assertEquals(s, f.getPath());
         f = f.getParentFile();
         assertNull(f);
     }

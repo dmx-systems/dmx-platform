@@ -80,7 +80,7 @@ function TypeCache() {
             console.log("Enforcing implicit READ permission for topic type \"" + topic.type_uri + "\"")
             var topic_type = new TopicType(dm4c.restc.get_topic_type_implicitly(topic.id))
             this.put_topic_type(topic_type)
-            topic_type.load_icon()
+            topic_type.load_icon()    // ### FIXME: load tracking needed?
         }
     }
 

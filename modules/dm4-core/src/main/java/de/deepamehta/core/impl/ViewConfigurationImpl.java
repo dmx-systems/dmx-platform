@@ -59,7 +59,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
             model.addConfigTopic(configTopic);                                  // update memory
             pl.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
         } else {
-            configTopic.updateChildTopics(childs);                              // update memory + DB
+            configTopic.updateWithChildTopics(childs);                          // update memory + DB
         }
     }
 

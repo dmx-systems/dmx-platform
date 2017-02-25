@@ -1049,13 +1049,13 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     private Node fetchTopicNode(long topicId) {
-        return checkType(
+        return checkNodeType(
             fetchNode(topicId), NodeType.TOPIC
         );
     }
 
     private Node fetchAssociationNode(long assocId) {
-        return checkType(
+        return checkNodeType(
             fetchNode(assocId), NodeType.ASSOC
         );
     }
@@ -1073,14 +1073,14 @@ public class Neo4jStorage implements DeepaMehtaStorage {
             throw new RuntimeException("Topic with URI \"" + uri + "\" not found in DB");
         }
         //
-        return checkType(node, NodeType.TOPIC);
+        return checkNodeType(node, NodeType.TOPIC);
     }
 
     private Node fetchTopicNodeByUriIfExists(String uri) {
         return topicContentExact.get(KEY_URI, uri).getSingle();
     }
 
-    private Node checkType(Node node, NodeType type) {
+    private Node checkNodeType(Node node, NodeType type) {
         if (NodeType.of(node) != type) {
             throw new IllegalArgumentException(type.error(node));
         }

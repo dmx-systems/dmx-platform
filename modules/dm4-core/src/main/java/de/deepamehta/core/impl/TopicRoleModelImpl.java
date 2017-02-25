@@ -101,6 +101,10 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+
+
+    // === Implementation of abstract RoleModelImpl methods ===
+
     @Override
     Role instantiate(AssociationModelImpl assoc) {
         return new TopicRoleImpl(this, assoc, pl);

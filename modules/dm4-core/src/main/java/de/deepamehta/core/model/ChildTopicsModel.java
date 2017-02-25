@@ -34,13 +34,14 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     /**
      * Accesses a multiple-valued child.
-     * Throws if there is no such child.
+     * Throws if there is no such child. ### TODO: return empty list instead
      */
     List<? extends RelatedTopicModel> getTopics(String assocDefUri);
 
     /**
      * Accesses a multiple-valued child.
      * Returns <code>null</code> if there is no such child.
+     * ### TODO: drop this method
      */
     List<? extends RelatedTopicModel> getTopicsOrNull(String assocDefUri);
 
@@ -57,6 +58,8 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
 
     // === Convenience Accessors ===
+
+    // ### TODO: transform defaultValue methods into getXXOrNull() form, analogous to ChildTopics interface
 
     /**
      * Convenience accessor for the *simple* value of a single-valued child.
@@ -209,13 +212,13 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
     // ---
 
     /**
-     * Puts a by-ID topic deletion reference to a single-valued child.
+     * Puts a by-ID topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
     ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId);
 
     /**
-     * Puts a by-URI topic deletion reference to a single-valued child.
+     * Puts a by-URI topic deletion reference in a single-valued child.
      * An existing value is overwritten.
      */
     ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri);

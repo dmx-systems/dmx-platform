@@ -34,16 +34,12 @@ function TypeRenderer() {
             editors_list = $("<ul>").attr("id", "assoc-def-editors")
             dm4c.render.page(editors_list)
             for (var i = 0, assoc_def; assoc_def = type.assoc_defs[i]; i++) {
-                var label_state = type.get_label_config(assoc_def.assoc_def_uri)
-                editors_list.append(new AssociationDefEditor(assoc_def, label_state).dom)
+                editors_list.append(new AssociationDefEditor(assoc_def).dom)
             }
             editors_list.sortable()
         }
 
-        /**
-         * @param   label_state     a boolean
-         */
-        function AssociationDefEditor(assoc_def, label_state) {
+        function AssociationDefEditor(assoc_def) {
             var parent_type_label = $("<span>").addClass("label").text(type.value)
             var child_type_label = $("<span>").addClass("label").addClass("child-type-label")
                 .text(dm4c.topic_type_name(assoc_def.child_type_uri))
@@ -51,14 +47,14 @@ function TypeRenderer() {
             var child_card_menu = dm4c.render.topic_menu("dm4.core.cardinality", assoc_def.child_cardinality_uri)
             var assoc_type_menu = create_assoc_type_menu()
             var custom_assoc_type_menu = create_custom_assoc_type_menu()
-            var label_config_checkbox = dm4c.render.checkbox(label_state)
+            var include_in_label_checkbox = dm4c.render.checkbox(assoc_def.include_in_label)
             //
             var optional_card_div = $("<div>").append(parent_type_label).append(parent_card_menu.dom)
             optional_card_div.toggle(is_aggregation_selected())
             //
             this.dom = $("<li>").addClass("assoc-def-editor").addClass("ui-state-default")
                 .append($("<div>").append(child_type_label).append(child_card_menu.dom)
-                                  .append(label_config_checkbox).append(small_label("Include in Label")))
+                                  .append(include_in_label_checkbox).append(small_label("Include in Label")))
                 .append(optional_card_div)
                 .append($("<div>").append(small_label("Association Type")).append(assoc_type_menu.dom))
                 .append($("<div>").append(small_label("Custom Association Type")).append(custom_assoc_type_menu.dom))
@@ -94,15 +90,13 @@ function TypeRenderer() {
 
             function build_assoc_def_model() {
                 return {
-                    assoc_def: {
-                        id:                     assoc_def.id,
-                        child_type_uri:         assoc_def.child_type_uri,
-                        child_cardinality_uri:  child_card_menu.get_selection().value,
-                        parent_cardinality_uri: parent_card_menu.get_selection().value,
-                        assoc_type_uri:         assoc_type_menu.get_selection().value,
-                        custom_assoc_type_uri:  custom_assoc_type_uri()
-                    },
-                    label_state: label_config_checkbox.get(0).checked
+                    id:                     assoc_def.id,
+                    child_type_uri:         assoc_def.child_type_uri,
+                    child_cardinality_uri:  child_card_menu.get_selection().value,
+                    parent_cardinality_uri: parent_card_menu.get_selection().value,
+                    assoc_type_uri:         assoc_type_menu.get_selection().value,
+                    custom_assoc_type_uri:  custom_assoc_type_uri(),
+                    include_in_label:       include_in_label_checkbox.get(0).checked
                 }
 
                 // compare to form_element_function() in webclient's render_helper.js
@@ -114,7 +108,7 @@ function TypeRenderer() {
                     } else {
                         if (val) {
                             // user entered non-empty value
-                            alert("Custom Association Type \"" + val + "\" ignored")
+                            dm4c.get_plugin("de.deepamehta.typeeditor").show_type_warning(val)
                             return null         // no update
                         } else {
                             // user entered empty value
@@ -145,30 +139,18 @@ function TypeRenderer() {
             }
             //
             if (type.data_type_uri == "dm4.core.composite") {
-                var model = composite_model()
-                type_model.assoc_defs   = model.assoc_defs
-                type_model.label_config = model.label_config
+                type_model.assoc_defs = assoc_defs()
             }
             //
             return type_model
 
-            function composite_model() {
+            function assoc_defs() {
                 var assoc_defs = []
-                var label_config = []
                 editors_list.children().each(function() {
-                    var editor_model = $(this).data("model_func")()
-                    var assoc_def = editor_model.assoc_def
+                    var assoc_def = $(this).data("model_func")()
                     assoc_defs.push(assoc_def)
-                    if (editor_model.label_state) {
-                        var type_uri = assoc_def.custom_assoc_type_uri
-                        var qualifier = type_uri && !js.begins_with(type_uri, dm4c.DEL_URI_PREFIX) ? "#" + type_uri : ""
-                        label_config.push(assoc_def.child_type_uri + qualifier)
-                    }
                 })
-                return {
-                    assoc_defs: assoc_defs,
-                    label_config: label_config
-                }
+                return assoc_defs
             }
         }
     }

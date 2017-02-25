@@ -2,6 +2,8 @@ dm4c.add_plugin("de.deepamehta.files", function() {
 
     var self = this
 
+
+
     // === REST Client Extension ===
 
     dm4c.restc.create_file_topic = function(path) {
@@ -25,7 +27,7 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         // (instead of trying to JSON-parse it). It works for non-text files as well.
     }
     dm4c.restc.create_folder = function(folder_name, path) {
-        return this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
+        this.request("POST", "/files/" + encodeURIComponent(path) + "/folder/" + encodeURIComponent(folder_name))
     }
     //
     dm4c.restc.get_resource_info = function(path) {
@@ -36,8 +38,10 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     }
     //
     dm4c.restc.open_file = function(file_topic_id) {
-        return this.request("POST", "/files/open/" + file_topic_id)
+        this.request("GET", "/files/open/" + file_topic_id)
     }
+
+
 
     // === Webclient Listeners ===
 
@@ -128,23 +132,51 @@ dm4c.add_plugin("de.deepamehta.files", function() {
     })
 
     dm4c.add_listener("topic_doubleclicked", function(topic) {
-        if (topic.type_uri == "dm4.files.file" ||
-            topic.type_uri == "dm4.files.folder") {
-            dm4c.restc.open_file(topic.id)
+        if (js.is_local_connection()) {
+            if (topic.type_uri == "dm4.files.file" || topic.type_uri == "dm4.files.folder") {
+                dm4c.restc.open_file(topic.id)
+            }
         }
     })
 
     dm4c.add_listener("topic_commands", function(topic) {
-        if (topic.type_uri == "dm4.files.folder") {
-            var commands = []
+        var commands = []
+        if (topic.type_uri == "dm4.files.file") {
+            commands.push({
+                label: "Download File",
+                handler: do_download_file,
+                context: "detail-panel-show",
+                ui_icon: "arrowthickstop-1-s"
+            })
+            commands.push({
+                is_separator: true,
+                context: "context-menu"
+            })
+            commands.push({
+                label: "Create Icon",
+                disabled: !js.is_image_file(topic.value),
+                handler: do_create_icon,
+                context: "context-menu"
+            })
+        } else if (topic.type_uri == "dm4.files.folder") {
             if (dm4c.has_create_permission_for_topic_type("dm4.files.folder")) {
-                commands.push({label: "Create Folder", handler: do_create_folder,      context: "detail-panel-show"})
+                commands.push({
+                    label: "Create Folder",
+                    handler: do_create_folder,
+                    context: "detail-panel-show",
+                    ui_icon: "folder-collapsed"
+                })
             }
             if (dm4c.has_create_permission_for_topic_type("dm4.files.file")) {
-                commands.push({label: "Upload File",   handler: do_open_upload_dialog, context: "detail-panel-show"})
+                commands.push({
+                    label: "Upload File",
+                    handler: do_open_upload_dialog,
+                    context: "detail-panel-show",
+                    ui_icon: "arrowthick-1-n"
+                })
             }
-            return commands
         }
+        return commands
 
         function do_create_folder() {
             dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
@@ -157,6 +189,21 @@ dm4c.add_plugin("de.deepamehta.files", function() {
         function do_open_upload_dialog() {
             var path = topic.get("dm4.files.path")
             self.open_upload_dialog("/files/" + encodeURIComponent(path), dm4c.page_panel.refresh)
+        }
+
+        function do_download_file() {
+            var path = topic.get("dm4.files.path")
+            location.href = "/filerepo/" + encodeURIComponent(path) + "?download"
+        }
+
+        function do_create_icon() {
+            // update DB
+            var icon = new Topic(dm4c.restc.create_topic({
+                type_uri: "dm4.webclient.icon",
+                value: "/filerepo/" + encodeURIComponent(topic.get("dm4.files.path"))
+            }))
+            // update model and view
+            dm4c.show_topic(icon, "show", undefined, true)      // do_center=true
         }
     })
 

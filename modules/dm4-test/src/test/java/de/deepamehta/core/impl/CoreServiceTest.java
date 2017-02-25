@@ -242,6 +242,260 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ---
 
     @Test
+    public void changeLabelWithSetRefSimple() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // 1) define model
+            // "Person Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.text"));
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Person Name"
+            Topic karl = dm4.createTopic(mf.newTopicModel("dm4.test.person_name", new SimpleValue("Karl Albrecht")));
+            //
+            assertEquals("Karl Albrecht", karl.getSimpleValue().toString());
+            //
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().setRef("dm4.test.person_name", karl.getId());
+            //
+            assertEquals(karl.getId(), comment.getChildTopics().getTopic("dm4.test.person_name").getId());
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        }
+    }
+
+    @Test
+    public void changeLabelWithSetRefComposite() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // 1) define model
+            // "First Name", "Last Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
+            // "Person Name" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                    "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
+                ))
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                    "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Person Name"
+            Topic karl = dm4.createTopic(mf.newTopicModel("dm4.test.person_name", mf.newChildTopicsModel()
+                .put("dm4.test.first_name", "Karl")
+                .put("dm4.test.last_name", "Albrecht")
+            ));
+            //
+            assertEquals("Karl Albrecht", karl.getSimpleValue().toString());
+            //
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().setRef("dm4.test.person_name", karl.getId());
+            //
+            assertEquals(karl.getId(), comment.getChildTopics().getTopic("dm4.test.person_name").getId());
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        }
+    }
+
+    @Test
+    public void changeLabelWithSetComposite() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // 1) define model
+            // "First Name", "Last Name" (simple)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.first_name", "First Name", "dm4.core.text"));
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
+            // "Person Name" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                    "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
+                ))
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                    "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // "Comment" (composite)
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.comment", "Comment", "dm4.core.composite")
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.test.comment", "dm4.test.person_name", "dm4.core.one", "dm4.core.one"
+                ))
+            );
+            // 2) create instances
+            // "Comment"
+            Topic comment = dm4.createTopic(mf.newTopicModel("dm4.test.comment"));
+            comment.getChildTopics().set("dm4.test.person_name", mf.newChildTopicsModel()
+                .put("dm4.test.first_name", "Karl")
+                .put("dm4.test.last_name", "Albrecht")
+            );
+            //
+            assertEquals("Karl Albrecht", comment.getSimpleValue().toString());
+            //
+            tx.success();
+        }
+    }
+
+    // ---
+
+    @Test
+    public void hasIncludeInLabel() {
+        // Note: the assoc def is created while migration
+        RelatedTopic includeInLabel = dm4.getTopicType("dm4.core.plugin")
+            .getAssocDef("dm4.core.plugin_name").getChildTopics().getTopicOrNull("dm4.core.include_in_label");
+        assertNotNull(includeInLabel);
+        assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
+    }
+
+    @Test
+    public void hasIncludeInLabelForAddedAssocDef() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // add assoc def programmatically
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
+            dm4.getTopicType("dm4.core.plugin").addAssocDef(
+                mf.newAssociationDefinitionModel("dm4.core.composition_def",
+                    "dm4.core.plugin", "dm4.test.date", "dm4.core.one", "dm4.core.one"
+                ));
+            //
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the added assoc def
+            RelatedTopic includeInLabel = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.test.date").getChildTopics().getTopicOrNull("dm4.core.include_in_label");
+            assertNotNull(includeInLabel);
+            assertEquals(false, includeInLabel.getSimpleValue().booleanValue());
+            //
+            tx.success();
+        }
+    }
+
+    // ---
+
+    @Test
+    public void setIncludeInLabel() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            TopicTypeImpl tt = dm4.getTopicType("dm4.core.plugin");
+            //
+            // set "Include in Label" flag
+            ChildTopics ct = tt.getAssocDef("dm4.core.plugin_name").getChildTopics()
+                .set("dm4.core.include_in_label", true);
+            //
+            assertEquals(true, ct.getBoolean("dm4.core.include_in_label"));
+            //
+            List<String> lc = tt.getLabelConfig();
+            assertEquals(1, lc.size());
+            assertEquals("dm4.core.plugin_name", lc.get(0));
+            //
+            tx.success();
+        }
+    }
+
+    @Test
+    public void setIncludeInLabelWhenCustomAssocTypeIsSet() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // 1) create composite type, set a custom assoc type
+            dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
+            dm4.createAssociationType(mf.newAssociationTypeModel("dm4.test.birthday", "Birthday", "dm4.core.text"));
+            TopicTypeImpl tt = dm4.createTopicType(
+                mf.newTopicTypeModel("dm4.test.person", "Person", "dm4.core.composite").addAssocDef(
+                    mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.test.birthday", false,
+                        "dm4.test.person", "dm4.test.date", "dm4.core.one", "dm4.core.one")));
+            // test assoc def childs *before* set
+            ChildTopics ct = tt.getAssocDef("dm4.test.date#dm4.test.birthday").getChildTopics();
+            assertEquals(false, ct.getBoolean("dm4.core.include_in_label"));
+            assertEquals("dm4.test.birthday", ct.getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type").getUri());
+            //
+            // 2) set "Include in Label" flag
+            ct.set("dm4.core.include_in_label", true);
+            //
+            // test assoc def childs *after* set (custom assoc type must not change)
+            assertEquals(true, ct.getBoolean("dm4.core.include_in_label"));
+            assertEquals("dm4.test.birthday", ct.getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type").getUri());
+            //
+            List<String> lc = tt.getLabelConfig();
+            assertEquals(1, lc.size());
+            assertEquals("dm4.test.date#dm4.test.birthday", lc.get(0));
+            //
+            tx.success();
+        }
+    }
+
+    // ---
+
+    @Test
+    public void editAssocDefViaAssoc() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // set "Include in Label" flag
+            long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
+            dm4.getAssociation(assocDefId).getChildTopics().set("dm4.core.include_in_label", false);
+            //
+            // assoc def order must not have changed
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals(3, assocDefs.size());
+            Iterator<AssociationDefinition> i = assocDefs.iterator();
+            assertEquals("dm4.core.plugin_name",          i.next().getAssocDefUri());
+            assertEquals("dm4.core.plugin_symbolic_name", i.next().getAssocDefUri());
+            assertEquals("dm4.core.plugin_migration_nr",  i.next().getAssocDefUri());
+            //
+            tx.success();
+        }
+    }
+
+    @Test
+    public void editAssocDefSetCustomAssocType() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // set Custom Association Type (via assoc def)
+            dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getChildTopics()
+                .setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", "dm4.core.association");
+            //
+            // get Custom Association Type
+            Topic assocType = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.core.plugin_name#dm4.core.association").getChildTopics()
+                .getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type");
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals("dm4.core.association", assocType.getUri());
+            //
+            tx.success();
+        }
+    }
+
+    @Test
+    public void editAssocDefViaAssocSetCustomAssocType() throws Exception {
+        try (DeepaMehtaTransaction tx = dm4.beginTx()) {
+            // set Custom Association Type (via association)
+            long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
+            dm4.getAssociation(assocDefId).getChildTopics()
+                .setRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", "dm4.core.association");
+            //
+            // get Custom Association Type
+            Topic assocType = dm4.getTopicType("dm4.core.plugin")
+                .getAssocDef("dm4.core.plugin_name#dm4.core.association").getChildTopics()
+                .getTopic("dm4.core.assoc_type#dm4.core.custom_assoc_type");
+            // Note: the topic type must be re-get as getTopicType() creates
+            // a cloned model that doesn't contain the manipulated assoc defs
+            assertEquals("dm4.core.association", assocType.getUri());
+            //
+            tx.success();
+        }
+    }
+
+    // ---
+
+    @Test
     public void uriUniquenessCreateTopic() {
         try (DeepaMehtaTransaction tx = dm4.beginTx()) {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
@@ -338,14 +592,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void insertAssocDefAtPos0() throws Exception {
         try (DeepaMehtaTransaction tx = dm4.beginTx()) {
-            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
-            //
+            // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 0
-            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
-                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_name");
+            dm4.getTopicType("dm4.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
+                "dm4.core.composition_def", "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"
+            ), "dm4.core.plugin_name");
             //
-            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
+            // change we must re-get the userland type model (by getTopicType()).
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<AssociationDefinition> i = assocDefs.iterator();
@@ -359,14 +617,18 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     @Test
     public void insertAssocDefAtPos1() throws Exception {
         try (DeepaMehtaTransaction tx = dm4.beginTx()) {
-            DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
-            //
+            // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
             // insert assoc def at pos 1
-            type.addAssocDefBefore(mf.newAssociationDefinitionModel("dm4.core.composition_def",
-                "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"), "dm4.core.plugin_symbolic_name");
+            dm4.getTopicType("dm4.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
+                "dm4.core.composition_def", "dm4.core.plugin", "dm4.test.name", "dm4.core.one", "dm4.core.one"
+            ), "dm4.core.plugin_symbolic_name");
             //
-            Collection<AssociationDefinition> assocDefs = type.getAssocDefs();
+            // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
+            // accessors (here: getAssocDefs()) operate on the *userland* type model, which is a cloned (and filtered)
+            // kernel type model. The manipulation is not immediately visible in the userland type model. To see the
+            // change we must re-get the userland type model (by getTopicType()).
+            Collection<AssociationDefinition> assocDefs = dm4.getTopicType("dm4.core.plugin").getAssocDefs();
             assertSame(4, assocDefs.size());
             //
             Iterator<AssociationDefinition> i = assocDefs.iterator();
@@ -397,7 +659,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             List<RelatedAssociation> assocs;
             //
             assocs = getAssociationInstancesByTraversal("dm4.core.instantiation");
-            assertEquals(49, assocs.size());
+            assertEquals(51, assocs.size());
             //
             assocs = getAssociationInstancesByTraversal("dm4.core.composition_def");
             assertEquals(5, assocs.size());

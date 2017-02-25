@@ -1,12 +1,10 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directive;
@@ -28,10 +26,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;
+    private String dataTypeUri;                         // may be null in models used for an update operation
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
-    private List<String> labelConfig;                                           // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -39,13 +36,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                  List<AssociationDefinitionModel> assocDefs, List<String> labelConfig,
-                  ViewConfigurationModelImpl viewConfig) {
+                  List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri = dataTypeUri;
         this.indexModes  = indexModes;
         this.assocDefs   = toMap(assocDefs);
-        this.labelConfig = labelConfig;
         this.viewConfig  = viewConfig;
     }
 
@@ -54,7 +49,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         this.dataTypeUri = type.getDataTypeUri();
         this.indexModes  = type.getIndexModes();
         this.assocDefs   = toMap(type.getAssocDefs());
-        this.labelConfig = type.getLabelConfig();
         this.viewConfig  = type.getViewConfigModel();
     }
 
@@ -129,15 +123,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             String assocDefUri = assocDef.getAssocDefUri();
             AssociationDefinitionModel existing = _getAssocDef(assocDefUri);
             if (existing != null) {
-                throw new RuntimeException("Ambiguity: type \"" + getUri() + "\" has more than one \"" + assocDefUri +
-                    "\" association definitions");
+                throw new RuntimeException("Ambiguity: type \"" + uri + "\" has more than one \"" + assocDefUri +
+                    "\" assoc defs");
             }
             //
             assocDefs.putBefore(assocDefUri, (AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
-                beforeAssocDefUri + "\" failed" + assocDef, e);
+            throw new RuntimeException("Adding an assoc def to type \"" + uri + "\" before \"" + beforeAssocDefUri +
+                "\" failed" + assocDef, e);
         }
     }
 
@@ -146,28 +140,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             AssociationDefinitionModel assocDef = assocDefs.remove(assocDefUri);
             if (assocDef == null) {
-                throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
-                    assocDefs.keySet());
+                throw new RuntimeException("Assoc def \"" + assocDefUri + "\" not found in " + assocDefs.keySet());
             }
             return assocDef;
         } catch (Exception e) {
-            throw new RuntimeException("Removing association definition \"" + assocDefUri + "\" from type \"" +
-                getUri() + "\" failed", e);
+            throw new RuntimeException("Removing assoc def \"" + assocDefUri + "\" from type \"" + uri + "\" failed",
+                e);
         }
-    }
-
-
-
-    // === Label Configuration ===
-
-    @Override
-    public List<String> getLabelConfig() {
-        return labelConfig;
-    }
-
-    @Override
-    public void setLabelConfig(List<String> labelConfig) {
-        this.labelConfig = labelConfig;
     }
 
 
@@ -218,7 +197,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 .put("data_type_uri", getDataTypeUri())
                 .put("index_mode_uris", toJSONArray(indexModes))
                 .put("assoc_defs", toJSONArray(assocDefs.values()))
-                .put("label_config", new JSONArray(getLabelConfig()))
                 .put("view_config_topics", getViewConfigModel().toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
@@ -234,10 +212,21 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     @Override
+    public TypeModelImpl clone() {
+        try {
+            TypeModelImpl model = (TypeModelImpl) super.clone();
+            model.assocDefs = (SequencedHashMap) model.assocDefs.clone();
+            return model;
+        } catch (Exception e) {
+            throw new RuntimeException("Cloning a TypeModel failed", e);
+        }
+    }
+
+    @Override
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ", labelConfig=" + getLabelConfig() + ", " + getViewConfigModel();
+            getAssocDefs() + ", " + getViewConfigModel();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -265,46 +254,55 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Core Internal Hooks ===
 
     @Override
-    void preUpdate(DeepaMehtaObjectModel newModel) {
-        super.preUpdate(newModel);
-        //
+    void preUpdate(DeepaMehtaObjectModel updateModel) {
         // ### TODO: is it sufficient if we rehash (remove + add) at post-time?
-        if (uriChange(newModel.getUri(), uri)) {
+        if (uriChange(updateModel.getUri(), uri)) {
             removeFromTypeCache();
         }
     }
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        super.postUpdate(newModel, oldModel);
-        //
-        if (uriChange(newModel.getUri(), oldModel.getUri())) {
-            pl.typeStorage.putInTypeCache(this);
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+        if (uriChange(updateModel.getUri(), oldObject.getUri())) {
+            putInTypeCache();
         }
         //
-        updateType((TypeModel) newModel);
+        updateType((TypeModelImpl) updateModel);
         //
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
         // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
         // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
-        Directives.get().add(getUpdateTypeDirective(), instantiate());
+        addUpdateTypeDirective();
     }
 
     // ---
 
     @Override
     void preDelete() {
-        super.preDelete();
-        //
+        // 1) check pre-condition
         int size = getAllInstances().size();
         if (size > 0) {
             throw new RuntimeException(size + " \"" + value + "\" instances still exist");
+        }
+        // 2) delete all assoc defs
+        //
+        // Note 1: we use the preDelete() hook to delete the assoc defs *before* they would get deleted by the generic
+        // deletion logic (see "delete direct associations" in DeepaMehtaObjectModelImpl.delete()). The generic deletion
+        // logic deletes the direct associations in an *arbitrary* order. The "Sequence Start" association might get
+        // deleted *before* any other assoc def. When subsequently deleting an assoc def the sequence can't be rebuild
+        // as it is corrupted.
+        // Note 2: iterating with a for-loop here would cause ConcurrentModificationException. Deleting an assoc def
+        // implies rebuilding the sequence and that iterates with a for-loop already. Instead we must create a new
+        // iterator for every single assoc def.
+        String assocDefUri;
+        while ((assocDefUri = getFirstAssocDefUri()) != null) {
+            _getAssocDef(assocDefUri).delete();
         }
     }
 
     @Override
     void postDelete() {
-        super.postDelete();
+        super.postDelete();                     // ### TODO: needed?
         //
         removeFromTypeCache();
     }
@@ -313,17 +311,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Update (memory + DB) ===
 
-    void updateDataTypeUri(String dataTypeUri) {
+    final void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
         storeDataTypeUri();             // update DB
     }
 
-    void updateLabelConfig(List<String> labelConfig) {
-        setLabelConfig(labelConfig);                                    // update memory
-        pl.typeStorage.updateLabelConfig(labelConfig, getAssocDefs());  // update DB
-    }
-
-    void _addIndexMode(IndexMode indexMode) {
+    final void _addIndexMode(IndexMode indexMode) {
         // update memory
         addIndexMode(indexMode);
         // update DB
@@ -333,7 +326,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    void _addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+    final void _addAssocDefBefore(AssociationDefinitionModelImpl assocDef, String beforeAssocDefUri) {
         try {
             long lastAssocDefId = lastAssocDefId();     // must be determined *before* memory is updated
             //
@@ -353,15 +346,15 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
                 lastAssocDefId);
         } catch (Exception e) {
-            throw new RuntimeException("Adding an association definition to type \"" + getUri() + "\" before \"" +
-                beforeAssocDefUri + "\" failed" + assocDef, e);
+            throw new RuntimeException("Adding an assoc def to type \"" + uri + "\" before \"" + beforeAssocDefUri +
+                "\" failed" + assocDef, e);
         }
     }
 
-    void _removeAssocDef(String assocDefUri) {
+    final void _removeAssocDef(String assocDefUri) {
         // We trigger deleting an association definition by deleting the underlying association. This mimics deleting an
         // association definition interactively in the webclient. Updating this type definition's memory and DB sequence
-        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook.
+        // is triggered then by the Type Editor plugin's preDeleteAssociation() hook. ### FIXDOC
         // This way deleting an association definition works for both cases: 1) interactive deletion (when the user
         // deletes an association), and 2) programmatical deletion (e.g. from a migration).
         getAssocDef(assocDefUri).delete();
@@ -371,54 +364,41 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Type Editor Support ===
 
-    void _addAssocDef(AssociationModel assoc) {
+    final void _addAssocDef(AssociationModel assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
+        //
+        addUpdateTypeDirective();
     }
 
     /**
-     * Note: in contrast to the other "update" methods this one updates the memory only, not the DB!
-     * If you want to update memory and DB use {@link AssociationDefinition#update}.
-     * <p>
-     * This method is here to support a special case: the user retypes an association which results in
-     * a changed type definition. In this case the DB is already up-to-date and only the type's memory
-     * representation must be updated. So, here the DB update is the *cause* for a necessary memory-update.
-     * Normally the situation is vice-versa: the DB update is the necessary *effect* of a memory-update.
+     * Adjusts the type cache on post-update-assoc.
+     * Called from ApplicationModel's core internal postUpdate() hook, in 2 situations:
+     *   - An assoc def has been updated.
+     *   - An assoc def's underlying assoc has been updated.
      *
-     * @param   assocDef    the new association definition.
-     *                      Note: in contrast to the other "update" methods this one does not support partial updates.
-     *                      That is all association definition fields must be initialized. ### FIXDOC
+     * @param   assoc       the updated generic association. ### FIXDOC: might be an assoc def as well
      */
-    void _updateAssocDef(AssociationModel assoc) {
-        // Note: if the assoc def's custom association type is changed the assoc def URI changes as well.
-        // So we must identify the assoc def to update **by ID** and rehash (that is remove + add).
+    final void _updateAssocDef(AssociationModel assoc, AssociationModel oldAssoc) {
         String[] assocDefUris = findAssocDefUris(assoc.getId());
-        AssociationDefinitionModel oldAssocDef = getAssocDef(assocDefUris[0]);
-        if (assoc == oldAssocDef) {
-            // edited via type topic -- abort
-            return;
-        }
-        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel newAssocModel = mf.newAssociationModel(assoc);
-        AssociationModel oldAssocModel = oldAssocDef;
-        // Note: an assoc def expects by-URI roles.
-        newAssocModel.setRoleModel1(oldAssocModel.getRoleModel1());
-        newAssocModel.setRoleModel2(oldAssocModel.getRoleModel2());
-        //
-        AssociationDefinitionModel newAssocDef = mf.newAssociationDefinitionModel(newAssocModel,
-            oldAssocDef.getParentCardinalityUri(),
-            oldAssocDef.getChildCardinalityUri(), oldAssocDef.getViewConfigModel()
-        );
-        String oldAssocDefUri = oldAssocDef.getAssocDefUri();
-        String newAssocDefUri = newAssocDef.getAssocDefUri();
-        if (oldAssocDefUri.equals(newAssocDefUri)) {
-            replaceAssocDef(newAssocDef);
+        AssociationDefinitionModel assocDef = getAssocDef(assocDefUris[0]);
+        String oldAssocDefUri;
+        if (assoc == assocDef) {
+            // updated "via assoc def"
+            oldAssocDefUri = ((AssociationDefinitionModel) oldAssoc).getAssocDefUri();
         } else {
-            replaceAssocDef(newAssocDef, oldAssocDefUri, assocDefUris[1]);
-            //
-            // Note: if the custom association type has changed and the assoc def is part the label config
-            // we must replace the assoc def URI in the label config
-            replaceInLabelConfig(newAssocDefUri, oldAssocDefUri);
+            // updated "via assoc"
+            oldAssocDefUri = assocDef.getAssocDefUri();
+            // transfer assoc model to assoc def model
+            assocDef.setTypeUri(assoc.getTypeUri());
+            assocDef.setSimpleValue(assoc.getSimpleValue());
+            assocDef.setChildTopicsModel(assoc.getChildTopicsModel());
         }
+        // rehash if assoc def URI has changed (due to changed custom assoc type)
+        if (!assocDef.getAssocDefUri().equals(oldAssocDefUri)) {
+            rehashAssocDef(oldAssocDefUri, assocDefUris[1]);
+        }
+        //
+        addUpdateTypeDirective();
     }
 
     /**
@@ -427,36 +407,70 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
      * This method is called (by the Type Editor plugin's preDeleteAssociation() hook) when the
      * deletion of an association that represents an association definition is imminent. ### FIXDOC
      */
-    void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
+    final void _removeAssocDefFromMemoryAndRebuildSequence(AssociationModel assoc) {
         String[] assocDefUris = findAssocDefUris(assoc.getId());
         String assocDefUri = getAssocDef(assocDefUris[0]).getAssocDefUri();
         // update memory
         removeAssocDef(assocDefUri);
-        removeFromLabelConfig(assocDefUri);
         // update DB
         pl.typeStorage.rebuildSequence(this);
+        //
+        addUpdateTypeDirective();
     }
 
 
 
-    // ===
+    // === Label Configuration ===
 
-    void rehashAssocDef(long assocDefId) {
-        String[] assocDefUris = findAssocDefUris(assocDefId);
-        rehashAssocDef(assocDefUris[0], assocDefUris[1]);
+    final List<String> getLabelConfig() {
+        try {
+            List<String> labelConfig = new ArrayList();
+            for (String assocDefUri : this) {
+                if (getAssocDef(assocDefUri).includeInLabel()) {
+                    labelConfig.add(assocDefUri);
+                }
+            }
+            return labelConfig;
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating the label configuration for type \"" + uri + "\" failed", e);
+        }
     }
+
+
+
+    // === Access Control ===
+
+    final <M extends TypeModelImpl> M filterReadableAssocDefs() {
+        try {
+            Iterator<String> i = iterator();
+            while (i.hasNext()) {
+                String assocDefUri = i.next();
+                if (!_getAssocDef(assocDefUri).isReadable()) {
+                    i.remove();
+                }
+            }
+            return (M) this;
+        } catch (Exception e) {
+            throw new RuntimeException("Filtering readable assoc defs of type \"" + uri + "\" failed", e);
+        }
+    }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void addUpdateTypeDirective() {
+        Directives.get().add(getUpdateTypeDirective(), instantiate());
+    }
 
 
 
     // === Update (memory + DB) ===
 
-    private void updateType(TypeModel newModel) {
-        _updateDataTypeUri(newModel.getDataTypeUri());
-        _updateAssocDefs(newModel.getAssocDefs());
-        _updateSequence(newModel.getAssocDefs());
-        _updateLabelConfig(newModel.getLabelConfig());
+    private void updateType(TypeModelImpl updateModel) {
+        _updateDataTypeUri(updateModel.getDataTypeUri());
+        _updateAssocDefs(updateModel.getAssocDefs());
+        _updateSequence(updateModel.getAssocDefs());
     }
 
     // ---
@@ -471,8 +485,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void _updateAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
-        for (AssociationDefinitionModel assocDef : newAssocDefs) {
+    private void _updateAssocDefs(Collection<AssociationDefinitionModelImpl> newAssocDefs) {
+        for (AssociationDefinitionModelImpl assocDef : newAssocDefs) {
             // Note: if the assoc def's custom association type was changed the assoc def URI changes as well.
             // So we must identify the assoc def to update **by ID**.
             // ### TODO: drop updateAssocDef() and rehash here (that is remove + add).
@@ -481,32 +495,18 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         }
     }
 
-    private void _updateSequence(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
+    private void _updateSequence(Collection<AssociationDefinitionModelImpl> newAssocDefs) {
         try {
-            if (getAssocDefs().size() != newAssocDefs.size()) {
-                throw new RuntimeException("adding/removing of assoc defs not yet supported via type update");
-            }
-            if (hasSameAssocDefSequence(newAssocDefs)) {
-                return;
-            }
+            // ### TODO: only update sequence if there is a change request
+            //
             // update memory
-            logger.info("### Changing assoc def sequence (" + getAssocDefs().size() + " items)");
+            logger.info("##### Updating sequence (" + newAssocDefs.size() + "/" + getAssocDefs().size() +
+                " assoc defs)");
             rehashAssocDefs(newAssocDefs);
             // update DB
             pl.typeStorage.rebuildSequence(this);
         } catch (Exception e) {
             throw new RuntimeException("Updating the assoc def sequence failed", e);
-        }
-    }
-
-    private void _updateLabelConfig(List<String> newLabelConfig) {
-        try {
-            if (!getLabelConfig().equals(newLabelConfig)) {
-                logger.info("### Changing label configuration from " + getLabelConfig() + " -> " + newLabelConfig);
-                updateLabelConfig(newLabelConfig);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Updating label configuration of type \"" + getUri() + "\" failed", e);
         }
     }
 
@@ -523,7 +523,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     private void indexAllInstances(IndexMode indexMode) {
-        List<? extends DeepaMehtaObjectModel> objects = getAllInstances();
+        List<? extends DeepaMehtaObjectModelImpl> objects = getAllInstances();
         //
         String str = "\"" + value + "\" (" + uri + ") instances";
         if (indexModes.size() > 0) {
@@ -536,8 +536,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             logger.info("### Indexing " + str + " ABORTED -- no index mode set");
         }
         //
-        for (DeepaMehtaObjectModel obj : objects) {
-            ((DeepaMehtaObjectModelImpl) obj).indexSimpleValue(indexMode);
+        for (DeepaMehtaObjectModelImpl obj : objects) {
+            obj.indexSimpleValue(indexMode);
         }
     }
 
@@ -567,12 +567,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             }
         }
         if (assocDefUris[0] == null) {
-            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" +
-                getUri() + "\" (" + assocDefs.keySet() + ")");
+            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" + uri +
+                "\" (" + assocDefs.keySet() + ")");
         }
         return assocDefUris;
     }
 
+    // ### TODO: not called
     private boolean hasSameAssocDefSequence(Collection<? extends AssociationDefinitionModel> assocDefs) {
         Collection<? extends AssociationDefinitionModel> _assocDefs = getAssocDefs();
         if (assocDefs.size() != _assocDefs.size()) {
@@ -582,7 +583,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         Iterator<? extends AssociationDefinitionModel> i = assocDefs.iterator();
         for (AssociationDefinitionModel _assocDef : _assocDefs) {
             AssociationDefinitionModel assocDef = i.next();
-            // Note: if the assoc def's custom association type changedes the assoc def URI changes as well.
+            // Note: if the assoc def's custom association type changed the assoc def URI changes as well.
             // So we must identify the assoc defs to compare **by ID**.
             long assocDefId  = checkAssocDefId(assocDef);
             long _assocDefId = checkAssocDefId(_assocDef);
@@ -596,25 +597,16 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
-    private void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
-        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
-        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
-            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
-        addAssocDefBefore(assocDef, beforeAssocDefUri);
-    }
-
-    private void rehashAssocDefs(Collection<? extends AssociationDefinitionModel> newAssocDefs) {
+    private void rehashAssocDefs(Collection<AssociationDefinitionModelImpl> newAssocDefs) {
         for (AssociationDefinitionModel assocDef : newAssocDefs) {
             rehashAssocDef(assocDef.getAssocDefUri(), null);
         }
     }
 
-    private void replaceAssocDef(AssociationDefinitionModel assocDef) {
-        replaceAssocDef(assocDef, assocDef.getAssocDefUri(), null);
-    }
-
-    private void replaceAssocDef(AssociationDefinitionModel assocDef, String oldAssocDefUri, String beforeAssocDefUri) {
-        removeAssocDef(oldAssocDefUri);
+    private void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
+        AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
+        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
+            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
         addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 
@@ -623,8 +615,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private AssociationDefinitionModelImpl getAssocDefOrThrow(String assocDefUri) {
         AssociationDefinitionModelImpl assocDef = _getAssocDef(assocDefUri);
         if (assocDef == null) {
-            throw new RuntimeException("Association definition \"" + assocDefUri + "\" not found in " +
-                assocDefs.keySet());
+            throw new RuntimeException("Assoc def \"" + assocDefUri + "\" not found in " + assocDefs.keySet());
         }
         return assocDef;
     }
@@ -651,6 +642,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return getAssocDefs().iterator().next().getId();
     }
 
+    private String getFirstAssocDefUri() {
+        Iterator<String> i = iterator();
+        return i.hasNext() ? i.next() : null;
+    }
+
     // ---
 
     private long checkAssocDefId(AssociationDefinitionModel assocDef) {
@@ -674,30 +670,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Label Configuration (memory access) ===
-
-    private void replaceInLabelConfig(String newAssocDefUri, String oldAssocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(oldAssocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: replacing \"" + oldAssocDefUri + "\" -> \"" + newAssocDefUri +
-                "\" (position " + i + ")");
-            labelConfig.set(i, newAssocDefUri);
-        }
-    }
-
-    private void removeFromLabelConfig(String assocDefUri) {
-        List<String> labelConfig = getLabelConfig();
-        int i = labelConfig.indexOf(assocDefUri);
-        if (i != -1) {
-            logger.info("### Label config: removing \"" + assocDefUri + "\" (position " + i + ")");
-            labelConfig.remove(i);
-        }
-    }
-
-
-
     // === Type Cache (memory access) ===
+
+    private void putInTypeCache() {
+        pl.typeStorage.putInTypeCache(this);
+    }
 
     /**
      * Removes this type from type cache and adds a DELETE TYPE directive to the given set of directives.

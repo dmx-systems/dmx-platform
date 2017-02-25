@@ -157,40 +157,47 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    Association instantiate() {
+    AssociationImpl instantiate() {
         return new AssociationImpl(this, pl);
+    }
+
+    @Override
+    AssociationModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+        return mf.newAssociationModel(childTopics);
     }
 
     // ---
 
     @Override
-    AssociationTypeModel getType() {
+    final AssociationTypeModelImpl getType() {
         return pl.typeStorage.getAssociationType(typeUri);
     }
 
     @Override
-    List<AssociationModelImpl> getAssociations() {
+    final List<AssociationModelImpl> getAssociations() {
         return pl.fetchAssociationAssociations(id);
     }
 
     // ---
 
     @Override
-    RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                     String othersTopicTypeUri) {
+    final RelatedTopicModelImpl getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopic(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                            String othersTopicTypeUri) {
+    final List<RelatedTopicModelImpl> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
+                                                                                           String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
 
     @Override
-    List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
+    final List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                                                           String othersRoleTypeUri,
                                                                                            String othersTopicTypeUri) {
         return pl.fetchAssociationRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
@@ -199,75 +206,70 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ---
 
     @Override
-    void storeUri() {
+    final void storeUri() {
         pl.storeAssociationUri(id, uri);
     }
 
     @Override
-    void storeTypeUri() {
+    final void storeTypeUri() {
         reassignInstantiation();
         pl.storeAssociationTypeUri(id, typeUri);
     }
 
     @Override
-    void storeSimpleValue() {
+    final void storeSimpleValue() {
         TypeModel type = getType();
         pl.storeAssociationValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
     }
 
     @Override
-    void indexSimpleValue(IndexMode indexMode) {
+    final void indexSimpleValue(IndexMode indexMode) {
         pl.indexAssociationValue(id, indexMode, typeUri, getIndexValue());
     }
 
     // ---
 
     @Override
-    void updateChildTopics(ChildTopicsModel childTopics) {
-        update(mf.newAssociationModel(childTopics));
-    }
-
-    @Override
-    void _delete() {
+    final void _delete() {
         pl._deleteAssociation(id);
     }
 
     // ---
 
     @Override
-    DeepaMehtaEvent getReadAccessEvent() {
+    final DeepaMehtaEvent getReadAccessEvent() {
         return CoreEvent.CHECK_ASSOCIATION_READ_ACCESS;
     }
 
     @Override
-    DeepaMehtaEvent getPreUpdateEvent() {
+    final DeepaMehtaEvent getPreUpdateEvent() {
         return CoreEvent.PRE_UPDATE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPostUpdateEvent() {
+    final DeepaMehtaEvent getPostUpdateEvent() {
         return CoreEvent.POST_UPDATE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPreDeleteEvent() {
+    final DeepaMehtaEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_ASSOCIATION;
     }
 
     @Override
-    DeepaMehtaEvent getPostDeleteEvent() {
+    final DeepaMehtaEvent getPostDeleteEvent() {
         return CoreEvent.POST_DELETE_ASSOCIATION;
     }
 
     // ---
 
     @Override
-    Directive getUpdateDirective() {
+    final Directive getUpdateDirective() {
         return Directive.UPDATE_ASSOCIATION;
     }
 
     @Override
-    Directive getDeleteDirective() {
+    final Directive getDeleteDirective() {
         return Directive.DELETE_ASSOCIATION;
     }
 
@@ -276,26 +278,31 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // === Core Internal Hooks ===
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel newModel, DeepaMehtaObjectModel oldModel) {
-        super.postUpdate(newModel, oldModel);
+    void preCreate() {
+        duplicateCheck();
+    }
+
+    @Override
+    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+        // update association specific parts: the 2 roles
+        updateRoles((AssociationModel) updateModel);
         //
-        updateRoles((AssociationModel) newModel);
+        duplicateCheck();
         //
         // Type Editor Support
         if (isAssocDef(this)) {
-            if (isAssocDef((AssociationModel) oldModel)) {
-                updateAssocDef();
+            if (isAssocDef((AssociationModel) oldObject)) {
+                updateAssocDef((AssociationModel) oldObject);
             } else {
                 createAssocDef();
             }
-        } else if (isAssocDef((AssociationModel) oldModel)) {
+        } else if (isAssocDef((AssociationModel) oldObject)) {
             removeAssocDef();
         }
     }
 
+    @Override
     void preDelete() {
-        super.preDelete();
-        //
         // Type Editor Support
         if (isAssocDef(this)) {
             // Note: we listen to the PRE event here, not the POST event. At POST time the assocdef sequence might be
@@ -342,29 +349,50 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
 
 
+    private void duplicateCheck() {
+        // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
+        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // is not yet available in case this association is part of the player's composite structure.
+        // Compare to DeepaMehtaUtils.associationAutoTyping()
+        if (!(roleModel1 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel1).topicIdentifiedByUri() ||
+            !(roleModel2 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel2).topicIdentifiedByUri()) {
+            return;
+        }
+        // Note: only readable assocs (access control) are considered
+        for (AssociationModelImpl assoc : pl._getAssociations(typeUri, roleModel1.playerId, roleModel2.playerId,
+               roleModel1.roleTypeUri, roleModel2.roleTypeUri)) {
+            if (assoc.id != id && assoc.value.equals(value)) {
+                throw new RuntimeException("Duplicate: such an association exists already (ID=" + assoc.id +
+                    ", typeUri=\"" + typeUri + "\", value=\"" + value + "\")");
+            }
+        }
+    }
+
+
+
     // === Update (memory + DB) ===
 
     /**
-     * @param   newModel    The data to update.
-     *                      If role 1 is <code>null</code> it is not updated.
-     *                      If role 2 is <code>null</code> it is not updated.
+     * @param   updateModel     The data to update.
+     *                          If role 1 is <code>null</code> it is not updated.
+     *                          If role 2 is <code>null</code> it is not updated.
      */
-    private void updateRoles(AssociationModel newModel) {
-        updateRole(newModel.getRoleModel1(), 1);
-        updateRole(newModel.getRoleModel2(), 2);
+    private void updateRoles(AssociationModel updateModel) {
+        updateRole(updateModel.getRoleModel1(), 1);
+        updateRole(updateModel.getRoleModel2(), 2);
     }
 
     /**
      * @param   nr      used only for logging
      */
-    private void updateRole(RoleModel newModel, int nr) {
-        if (newModel != null) {     // abort if no update is requested
+    private void updateRole(RoleModel updateModel, int nr) {
+        if (updateModel != null) {     // abort if no update is requested
             // Note: We must lookup the roles individually.
             // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            RoleModelImpl role = getRole(newModel);
-            String newRoleTypeUri = newModel.getRoleTypeUri();  // new value
-            String roleTypeUri = role.getRoleTypeUri();         // current value
-            if (!roleTypeUri.equals(newRoleTypeUri)) {          // has changed?
+            RoleModelImpl role = getRole(updateModel);
+            String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
+            String roleTypeUri = role.getRoleTypeUri();             // current value
+            if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
                 logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
                     "\"");
                 updateRoleTypeUri(role, newRoleTypeUri);
@@ -437,17 +465,13 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");
         //
         parentType._addAssocDef(this);
-        //
-        addUpdateTypeDirective(parentType);
     }
 
-    private void updateAssocDef() {
+    private void updateAssocDef(AssociationModel oldAssoc) {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Updating association definition " + id + " of type \"" + parentType.getUri() + "\"");
         //
-        parentType._updateAssocDef(this);
-        //
-        addUpdateTypeDirective(parentType);
+        parentType._updateAssocDef(this, oldAssoc);
     }
 
     private void removeAssocDef() {
@@ -455,8 +479,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         logger.info("##### Removing association definition " + id + " from type \"" + parentType.getUri() + "\"");
         //
         parentType._removeAssocDefFromMemoryAndRebuildSequence(this);
-        //
-        addUpdateTypeDirective(parentType);
     }
 
     // ---
@@ -477,17 +499,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         }
         //
         return true;
-    }
-
-    // ### TODO: adding the UPDATE directive should be the responsibility of a type. The DeepaMehtaType interface's
-    // ### addAssocDef(), updateAssocDef(), and removeAssocDef() methods should have a "directives" parameter ### FIXDOC
-    private void addUpdateTypeDirective(TypeModelImpl type) {
-        if (type.getTypeUri().equals("dm4.core.topic_type")) {
-            Directives.get().add(Directive.UPDATE_TOPIC_TYPE, type.instantiate());
-        } else if (type.getTypeUri().equals("dm4.core.assoc_type")) {
-            Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, type.instantiate());
-        }
-        // Note: no else here as error check already performed in fetchParentType()
     }
 
     private TypeModelImpl fetchParentType() {

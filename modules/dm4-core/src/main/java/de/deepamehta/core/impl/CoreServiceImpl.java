@@ -115,12 +115,12 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public TopicImpl createTopic(TopicModel model) {
-        return pl.createTopic(model);
+        return pl.createTopic((TopicModelImpl) model);
     }
 
     @Override
-    public void updateTopic(TopicModel newModel) {
-        pl.updateTopic(newModel);
+    public void updateTopic(TopicModel updateModel) {
+        pl.updateTopic((TopicModelImpl) updateModel);
     }
 
     @Override
@@ -174,7 +174,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public List<Association> getAssociations(long topic1Id, long topic2Id, String assocTypeUri) {
-        return pl.getAssociations(topic1Id, topic2Id, assocTypeUri);
+        return pl.getAssociations(assocTypeUri, topic1Id, topic2Id);
     }
 
     // ---
@@ -192,13 +192,13 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public Association createAssociation(AssociationModel model) {
+    public AssociationImpl createAssociation(AssociationModel model) {
         return pl.createAssociation((AssociationModelImpl) model);
     }
 
     @Override
-    public void updateAssociation(AssociationModel newModel) {
-        pl.updateAssociation(newModel);
+    public void updateAssociation(AssociationModel updateModel) {
+        pl.updateAssociation((AssociationModelImpl) updateModel);
     }
 
     @Override
@@ -211,12 +211,12 @@ public class CoreServiceImpl implements CoreService {
     // === Topic Types ===
 
     @Override
-    public TopicType getTopicType(String uri) {
+    public TopicTypeImpl getTopicType(String uri) {
         return pl.getTopicType(uri);
     }
 
     @Override
-    public TopicType getTopicTypeImplicitly(long topicId) {
+    public TopicTypeImpl getTopicTypeImplicitly(long topicId) {
         return pl.getTopicTypeImplicitly(topicId);
     }
 
@@ -230,29 +230,18 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public TopicType createTopicType(TopicTypeModel model) {
+    public TopicTypeImpl createTopicType(TopicTypeModel model) {
         return pl.createTopicType((TopicTypeModelImpl) model);
     }
 
     @Override
-    public void updateTopicType(TopicTypeModel newModel) {
-        try {
-            // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String topicTypeUri = pl.fetchTopic(newModel.getId()).getUri();
-            pl.typeStorage.getTopicType(topicTypeUri).update(newModel);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + newModel + ")", e);
-        }
+    public void updateTopicType(TopicTypeModel updateModel) {
+        pl.updateTopicType((TopicTypeModelImpl) updateModel);
     }
 
     @Override
     public void deleteTopicType(String topicTypeUri) {
-        try {
-            pl.typeStorage.getTopicType(topicTypeUri).delete();     // ### TODO: delete view config topics
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
-        }
+        pl.deleteTopicType(topicTypeUri);
     }
 
 
@@ -260,12 +249,12 @@ public class CoreServiceImpl implements CoreService {
     // === Association Types ===
 
     @Override
-    public AssociationType getAssociationType(String uri) {
+    public AssociationTypeImpl getAssociationType(String uri) {
         return pl.getAssociationType(uri);
     }
 
     @Override
-    public AssociationType getAssociationTypeImplicitly(long assocId) {
+    public AssociationTypeImpl getAssociationTypeImplicitly(long assocId) {
         return pl.getAssociationTypeImplicitly(assocId);
     }
 
@@ -279,29 +268,18 @@ public class CoreServiceImpl implements CoreService {
     // ---
 
     @Override
-    public AssociationType createAssociationType(AssociationTypeModel model) {
+    public AssociationTypeImpl createAssociationType(AssociationTypeModel model) {
         return pl.createAssociationType((AssociationTypeModelImpl) model);
     }
 
     @Override
-    public void updateAssociationType(AssociationTypeModel newModel) {
-        try {
-            // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String assocTypeUri = pl.fetchTopic(newModel.getId()).getUri();
-            pl.typeStorage.getAssociationType(assocTypeUri).update(newModel);
-        } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + newModel + ")", e);
-        }
+    public void updateAssociationType(AssociationTypeModel updateModel) {
+        pl.updateAssociationType((AssociationTypeModelImpl) updateModel);
     }
 
     @Override
     public void deleteAssociationType(String assocTypeUri) {
-        try {
-            pl.typeStorage.getAssociationType(assocTypeUri).delete();
-        } catch (Exception e) {
-            throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
-        }
+        pl.deleteAssociationType(assocTypeUri);
     }
 
 
@@ -310,7 +288,7 @@ public class CoreServiceImpl implements CoreService {
 
     @Override
     public Topic createRoleType(TopicModel model) {
-        return pl.createRoleType(model);
+        return pl.createRoleType((TopicModelImpl) model);
     }
 
 

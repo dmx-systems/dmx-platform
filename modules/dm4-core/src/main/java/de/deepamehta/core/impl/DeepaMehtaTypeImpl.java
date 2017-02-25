@@ -34,91 +34,81 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     // --- Data Type ---
 
     @Override
-    public String getDataTypeUri() {
+    public final String getDataTypeUri() {
         return getModel().getDataTypeUri();
     }
 
     @Override
-    public void setDataTypeUri(String dataTypeUri) {
-        getModel().updateDataTypeUri(dataTypeUri);
+    public final DeepaMehtaType setDataTypeUri(String dataTypeUri) {
+        _getModel().updateDataTypeUri(dataTypeUri);
+        return this;
     }
 
     // --- Index Modes ---
 
     @Override
-    public List<IndexMode> getIndexModes() {
+    public final List<IndexMode> getIndexModes() {
         return getModel().getIndexModes();
     }
 
     @Override
-    public void addIndexMode(IndexMode indexMode) {
-        getModel()._addIndexMode(indexMode);
+    public final DeepaMehtaType addIndexMode(IndexMode indexMode) {
+        _getModel()._addIndexMode(indexMode);
+        return this;
     }
 
     // --- Association Definitions ---
 
     @Override
-    public Collection<AssociationDefinition> getAssocDefs() {
+    public final Collection<AssociationDefinition> getAssocDefs() {
         return pl.instantiate(getModel().getAssocDefs());
     }
 
     @Override
-    public AssociationDefinition getAssocDef(String assocDefUri) {
+    public final AssociationDefinition getAssocDef(String assocDefUri) {
         return getModel().getAssocDef(assocDefUri).instantiate();
     }
 
     @Override
-    public boolean hasAssocDef(String assocDefUri) {
+    public final boolean hasAssocDef(String assocDefUri) {
         return getModel().hasAssocDef(assocDefUri);
     }
 
     @Override
-    public DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
+    public final DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
-        getModel()._addAssocDefBefore(assocDef, beforeAssocDefUri);
+    public final DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+        _getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
         return this;
     }
 
     @Override
-    public DeepaMehtaType removeAssocDef(String assocDefUri) {
-        getModel()._removeAssocDef(assocDefUri);
+    public final DeepaMehtaType removeAssocDef(String assocDefUri) {
+        _getModel()._removeAssocDef(assocDefUri);
         return this;
-    }
-
-    // --- Label Configuration ---
-
-    @Override
-    public List<String> getLabelConfig() {
-        return getModel().getLabelConfig();
-    }
-
-    @Override
-    public void setLabelConfig(List<String> labelConfig) {
-        getModel().updateLabelConfig(labelConfig);
     }
 
     // --- View Configuration ---
 
     @Override
-    public ViewConfiguration getViewConfig() {
+    public final ViewConfiguration getViewConfig() {
         RoleModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
         return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
     }
 
     @Override
-    public Object getViewConfig(String typeUri, String settingUri) {
+    public final Object getViewConfig(String typeUri, String settingUri) {
         return getModel().getViewConfig(typeUri, settingUri);
     }
 
     // ---
 
     @Override
-    public void update(TypeModel newModel) {
-        getModel().update(newModel);
+    public void update(TypeModel updateModel) {
+        _getModel().update((TypeModelImpl) updateModel);   // ### FIXME: call through pl for access control
     }
 
     // ---
@@ -126,5 +116,23 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     @Override
     public TypeModelImpl getModel() {
         return (TypeModelImpl) model;
+    }
+
+    // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    /**
+     * Returns the <i>internal</i> (= <b>kernel</b>) model underlying this type.
+     * <p>
+     * Note: type updates must be performed on the internal type model, not the userland's type model (as returned by
+     * <code>getModel()</code>). Performing an update on the <b>userland</b>'s type model would have no effect, as it
+     * is transient. The userland's type model is always a <i>cloned</i> and filtered (= "projected") version of a
+     * kernel type model which is created on-the-fly each time a specific user requests it.
+     */
+    abstract TypeModelImpl _getModel();
+
+    // --- Label Configuration ---
+
+    final List<String> getLabelConfig() {
+        return getModel().getLabelConfig();
     }
 }

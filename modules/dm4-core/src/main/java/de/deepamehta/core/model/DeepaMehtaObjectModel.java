@@ -3,8 +3,6 @@ package de.deepamehta.core.model;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 
-import org.codehaus.jettison.json.JSONObject;
-
 
 
 public interface DeepaMehtaObjectModel extends Identifiable, JSONEnabled, Cloneable {

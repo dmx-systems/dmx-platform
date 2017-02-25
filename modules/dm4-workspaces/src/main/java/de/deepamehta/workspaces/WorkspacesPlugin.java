@@ -65,9 +65,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
-    // Property URIs
-    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
@@ -157,30 +154,44 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{workspace_id}/object/{object_id}")
     public DirectivesResponse assignToWorkspace(@PathParam("object_id") long objectId,
                                                 @PathParam("workspace_id") long workspaceId) {
-        assignToWorkspace(dm4.getObject(objectId), workspaceId);
-        return new DirectivesResponse();
+        try {
+            checkWorkspaceId(workspaceId);
+            _assignToWorkspace(dm4.getObject(objectId), workspaceId);
+            return new DirectivesResponse();
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning object " + objectId + " to workspace " + workspaceId + " failed", e);
+        }
     }
 
     @Override
     public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        checkArgument(workspaceId);
-        _assignToWorkspace(object, workspaceId);
+        try {
+            checkWorkspaceId(workspaceId);
+            _assignToWorkspace(object, workspaceId);
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed", e);
+        }
     }
 
     @Override
     public void assignTypeToWorkspace(DeepaMehtaType type, long workspaceId) {
-        assignToWorkspace(type, workspaceId);
-        // view config topics
-        for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
-            _assignToWorkspace(configTopic, workspaceId);
-        }
-        // association definitions
-        for (AssociationDefinition assocDef : type.getAssocDefs()) {
-            _assignToWorkspace(assocDef, workspaceId);
-            // view config topics (of association definition)
-            for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {
+        try {
+            checkWorkspaceId(workspaceId);
+            _assignToWorkspace(type, workspaceId);
+            // view config topics
+            for (Topic configTopic : type.getViewConfig().getConfigTopics()) {
                 _assignToWorkspace(configTopic, workspaceId);
             }
+            // association definitions
+            for (AssociationDefinition assocDef : type.getAssocDefs()) {
+                _assignToWorkspace(assocDef, workspaceId);
+                // view config topics (of association definition)
+                for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {
+                    _assignToWorkspace(configTopic, workspaceId);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning " + info(type) + " to workspace " + workspaceId + " failed", e);
         }
     }
 
@@ -409,24 +420,36 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
-        try {
-            // 1) create assignment association
-            facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
-                mf.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
-            // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
-            //
-            // 2) store assignment property
-            object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning " + info(object) + " to workspace " + workspaceId + " failed (" +
-                object + ")", e);
-        }
+        // 1) create assignment association
+        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
+            mf.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
+        // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
+        //
+        // 2) store assignment property
+        object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
     }
 
     // ---
 
     private void deleteWorkspaceContent(long workspaceId) {
         try {
+            // 1) delete instances by type
+            // Note: also instances assigned to other workspaces must be deleted
+            for (Topic topicType : getAssignedTopics(workspaceId, "dm4.core.topic_type")) {
+                String typeUri = topicType.getUri();
+                for (Topic topic : dm4.getTopicsByType(typeUri)) {
+                    topic.delete();
+                }
+                dm4.getTopicType(typeUri).delete();
+            }
+            for (Topic assocType : getAssignedTopics(workspaceId, "dm4.core.assoc_type")) {
+                String typeUri = assocType.getUri();
+                for (Association assoc : dm4.getAssociationsByType(typeUri)) {
+                    assoc.delete();
+                }
+                dm4.getAssociationType(typeUri).delete();
+            }
+            // 2) delete remaining instances
             for (Topic topic : getAssignedTopics(workspaceId)) {
                 topic.delete();
             }
@@ -477,7 +500,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      *
      * ### TODO: principle copy in AccessControlImpl.checkWorkspaceId()
      */
-    private void checkArgument(long topicId) {
+    private void checkWorkspaceId(long topicId) {
         String typeUri = dm4.getTopic(topicId).getTypeUri();
         if (!typeUri.equals("dm4.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
@@ -489,11 +512,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
     private boolean workspaceAssignmentIsSuppressed(DeepaMehtaObject object) {
-        boolean abort = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
-        if (abort) {
-            logger.info("Standard workspace assignment for " + info(object) + " SUPPRESSED");
+        boolean suppressed = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
+        if (suppressed) {
+            logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
         }
-        return abort;
+        return suppressed;
     }
 
     // ---

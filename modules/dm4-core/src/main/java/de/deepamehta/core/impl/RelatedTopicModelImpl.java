@@ -83,7 +83,7 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
     }
 
     @Override
-    RelatedTopic instantiate() {
+    RelatedTopicImpl instantiate() {
         return new RelatedTopicImpl(this, pl);
     }
 }

@@ -52,7 +52,7 @@ public class ObjectProvider implements MessageBodyReader<Object> {
                 return getJSONConstructor(type).newInstance(json);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Creating a " + type.getName() + " object from message body failed", e);
+            throw new RuntimeException("Deserializing a " + type.getName() + " object failed", e);
         }
     }
 

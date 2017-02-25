@@ -2,6 +2,7 @@ package de.deepamehta.core.model.facets;
 
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.RelatedTopicModel;
+import de.deepamehta.core.model.TopicModel;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public interface FacetValueModel extends ChildTopicsModel {
      */
     FacetValueModel put(RelatedTopicModel value);
 
+    FacetValueModel put(TopicModel value);
+
     // ---
 
     /**
@@ -50,13 +53,29 @@ public interface FacetValueModel extends ChildTopicsModel {
 
     /**
      * Puts a by-ID topic reference in a single-valued facet.
+     * An existing reference is overwritten.
      */
     FacetValueModel putRef(long refTopicId);
 
     /**
      * Puts a by-URI topic reference in a single-valued facet.
+     * An existing reference is overwritten.
      */
     FacetValueModel putRef(String refTopicUri);
+
+    // ---
+
+    /**
+     * Puts a by-ID topic deletion reference in a single-valued facet.
+     * An existing value is overwritten.
+     */
+    FacetValueModel putDeletionRef(long refTopicId);
+
+    /**
+     * Puts a by-URI topic deletion reference in a single-valued facet.
+     * An existing value is overwritten.
+     */
+    FacetValueModel putDeletionRef(String refTopicUri);
 
 
 
@@ -85,4 +104,9 @@ public interface FacetValueModel extends ChildTopicsModel {
      * Adds a by-ID topic deletion reference to a multiple-valued facet.
      */
     FacetValueModel addDeletionRef(long refTopicId);
+
+    /**
+     * Adds a by-URI topic deletion reference to a multiple-valued facet.
+     */
+    FacetValueModel addDeletionRef(String refTopicUri);
 }
