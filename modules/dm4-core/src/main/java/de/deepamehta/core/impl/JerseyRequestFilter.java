@@ -26,7 +26,7 @@ class JerseyRequestFilter implements ContainerRequestFilter {
     @Override
     public ContainerRequest filter(ContainerRequest request) {
         Cookies.set(request);
-        tf.create(request);
+        tf.createTx(request);
         em.fireEvent(CoreEvent.SERVICE_REQUEST_FILTER, request);
         return request;
         // Note: we don't catch here as a WebApplicationException (e.g. thrown by

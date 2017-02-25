@@ -77,7 +77,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
             //
             Directives.remove();
-            tf.close(request, response);
+            tf.commitTx(request, response);
             //
             return response;
         } catch (Exception e) {

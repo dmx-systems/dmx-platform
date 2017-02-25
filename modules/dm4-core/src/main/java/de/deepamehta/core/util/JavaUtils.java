@@ -2,7 +2,10 @@ package de.deepamehta.core.util;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+
+import com.sun.jersey.spi.container.ContainerRequest;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -255,6 +258,25 @@ public class JavaUtils {
     public static String requestInfo(HttpServletRequest request) {
         String queryString = request.getQueryString();
         return request.getMethod() + " " + request.getRequestURI() + (queryString != null ? "?" + queryString : "");
+    }
+
+    public static String requestInfo(ContainerRequest request) {
+        return request.getMethod() + " /" + request.getPath() + queryString(request);
+    }
+
+    public static String queryString(ContainerRequest request) {
+        MultivaluedMap<String, String> map = request.getQueryParameters();
+        StringBuilder queryString = new StringBuilder();
+        for (String key : map.keySet()) {
+            if (queryString.length() > 0) {
+                queryString.append("&");
+            }
+            queryString.append(key + "=" + map.getFirst(key));
+        }
+        if (queryString.length() > 0) {
+            queryString.insert(0, "?");
+        }
+        return queryString.toString();
     }
 
     public static String responseInfo(Response.StatusType status) {
