@@ -7,7 +7,11 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicTypeModel;
+import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
@@ -15,6 +19,8 @@ import de.deepamehta.core.service.event.AllPluginsActiveListener;
 import de.deepamehta.core.service.event.IntroduceTopicTypeListener;
 import de.deepamehta.core.service.event.IntroduceAssociationTypeListener;
 import de.deepamehta.core.service.event.PostUpdateTopicListener;
+import de.deepamehta.core.service.event.PreCreateTopicTypeListener;
+import de.deepamehta.core.service.event.PreCreateAssociationTypeListener;
 import de.deepamehta.core.service.Transactional;
 
 import javax.ws.rs.Consumes;
@@ -42,6 +48,8 @@ import java.util.logging.Logger;
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
                                                                 IntroduceTopicTypeListener,
                                                                 IntroduceAssociationTypeListener,
+                                                                PreCreateTopicTypeListener,
+                                                                PreCreateAssociationTypeListener,
                                                                 PostUpdateTopicListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -152,6 +160,16 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             logger.warning("### Launching webclient failed (" + e + ")");
             logger.warning("### To launch it manually: " + webclientUrl);
         }
+    }
+
+    @Override
+    public void preCreateTopicType(TopicTypeModel model) {
+        initDefaultViewConfig(model);
+    }
+
+    @Override
+    public void preCreateAssociationType(AssociationTypeModel model) {
+        initDefaultViewConfig(model);
     }
 
     /**
@@ -308,6 +326,22 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private void setConfigTopicLabel(Topic viewConfig) {
         viewConfig.setSimpleValue(VIEW_CONFIG_LABEL);
+    }
+
+    // --- Default Value ---
+
+    /**
+     * Add a default view config topic to the given type model in case no one is set already.
+     * <p>
+     * This ensures a programmatically created type (through a migration) will
+     * have a view config in any case, for being edited interactively afterwards.
+     */
+    private void initDefaultViewConfig(TypeModel typeModel) {
+        ViewConfigurationModel viewConfig = typeModel.getViewConfigModel();
+        TopicModel configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
+        if (configTopic == null) {
+            viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
+        }
     }
 
 
