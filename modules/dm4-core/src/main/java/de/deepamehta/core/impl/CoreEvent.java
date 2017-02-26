@@ -5,7 +5,9 @@ import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.event.*;
@@ -83,6 +85,24 @@ class CoreEvent {
         public void dispatch(EventListener listener, Object... params) {
             ((PreCreateAssociationListener) listener).preCreateAssociation(
                 (AssociationModel) params[0]
+            );
+        }
+    };
+
+    static DeepaMehtaEvent PRE_CREATE_TOPIC_TYPE = new DeepaMehtaEvent(PreCreateTopicTypeListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((PreCreateTopicTypeListener) listener).preCreateTopicType(
+                (TopicTypeModel) params[0]
+            );
+        }
+    };
+
+    static DeepaMehtaEvent PRE_CREATE_ASSOCIATION_TYPE = new DeepaMehtaEvent(PreCreateAssociationTypeListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((PreCreateAssociationTypeListener) listener).preCreateAssociationType(
+                (AssociationTypeModel) params[0]
             );
         }
     };

@@ -37,9 +37,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     /**
-     * ### TODO: add include-in-label parameter? Alternatively could evaluate the assoc model's child topics.
-     *
-     * @param   customAssocTypeUri      if null no custom association type will be set.
+     * @param   assoc   the underlying association.
      */
     AssociationDefinitionModelImpl(AssociationModelImpl assoc, String parentCardinalityUri, String childCardinalityUri,
                                                                                 ViewConfigurationModelImpl viewConfig) {
@@ -47,7 +45,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri  = childCardinalityUri;
         this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
-        // ### TODO: why null check? Compare to TypeModelImpl constructor
+        // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

@@ -601,9 +601,9 @@ public class ModelFactoryImpl implements ModelFactory {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("data_type_uri", null),
-            parseIndexModes(typeModel.optJSONArray("index_mode_uris")),
-            parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),
-            newViewConfigurationModel(typeModel.optJSONArray("view_config_topics")));
+            parseIndexModes(typeModel.optJSONArray("index_mode_uris")),                 // optJSONArray may return null
+            parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),   // optJSONArray may return null
+            newViewConfigurationModel(typeModel.optJSONArray("view_config_topics")));   // optJSONArray may return null
     }
 
     // ---
@@ -773,7 +773,7 @@ public class ModelFactoryImpl implements ModelFactory {
     }    
 
     /**
-     * @param   configurable    A topic type, an association type, or an association definition. ### FIXDOC
+     * @param   configTopics    may be null
      */
     @Override
     public ViewConfigurationModelImpl newViewConfigurationModel(JSONArray configTopics) {

@@ -451,8 +451,10 @@ public class PersistenceLayer extends StorageDecorator {
 
     TopicTypeImpl createTopicType(TopicTypeModelImpl model) {
         try {
+            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC_TYPE, model);
+            //
             // store in DB
-            createTypeTopic(model, URI_PREFIX_TOPIC_TYPE);
+            createType(model, URI_PREFIX_TOPIC_TYPE);
             //
             TopicTypeImpl topicType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
@@ -465,8 +467,10 @@ public class PersistenceLayer extends StorageDecorator {
 
     AssociationTypeImpl createAssociationType(AssociationTypeModelImpl model) {
         try {
+            em.fireEvent(CoreEvent.PRE_CREATE_ASSOCIATION_TYPE, model);
+            //
             // store in DB
-            createTypeTopic(model, URI_PREFIX_ASSOCIATION_TYPE);
+            createType(model, URI_PREFIX_ASSOCIATION_TYPE);
             //
             AssociationTypeImpl assocType = model.instantiate();
             em.fireEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
@@ -691,12 +695,12 @@ public class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    private void createTypeTopic(TypeModelImpl model, String uriPrefix) {
+    private void createType(TypeModelImpl model, String uriPrefix) {
         // Note: the type topic is instantiated explicitly on a `TopicModel` (which is freshly created from the
         // `TypeModel`). Creating the type topic from the `TypeModel` directly would fail as topic creation implies
         // topic instantiation, and due to the polymorphic `instantiate()` method a `Type` object would be instantiated
-        // (instead a `Topic` object). But instantiating a type newly implies per-user type projection, that is removing
-        // the assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
+        // (instead a `Topic` object). But instantiating a type implies per-user type projection, that is removing the
+        // assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
         createTopic(typeTopic, uriPrefix);      // create generic topic

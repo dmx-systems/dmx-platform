@@ -1,9 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.Migration;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;

@@ -21,11 +21,15 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
 
     /**
      * Key: config topic type URI
+     * Value: config topic
      */
     private Map<String, TopicModelImpl> configTopics;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    /**
+     * @param   configTopics    must not be null
+     */
     ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics) {
         this.configTopics = configTopics;
     }
