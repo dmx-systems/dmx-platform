@@ -1,113 +1,113 @@
 {
-    topic_types: [
+    "topic_types": [
 
         ### View Configuration ###
 
         {
-            value: "Icon",
-            uri: "dm4.webclient.icon",
-            data_type_uri: "dm4.core.text"
+            "value": "Icon",
+            "uri": "dm4.webclient.icon",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Color",
-            uri: "dm4.webclient.color",
-            data_type_uri: "dm4.core.text"
+            "value": "Color",
+            "uri": "dm4.webclient.color",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Show in Create Menu",
-            uri: "dm4.webclient.show_in_create_menu",
-            data_type_uri: "dm4.core.boolean"
+            "value": "Show in Create Menu",
+            "uri": "dm4.webclient.show_in_create_menu",
+            "data_type_uri": "dm4.core.boolean"
         },
         {
-            value: "Input Field Rows",
-            uri: "dm4.webclient.input_field_rows",
-            data_type_uri: "dm4.core.number"
+            "value": "Input Field Rows",
+            "uri": "dm4.webclient.input_field_rows",
+            "data_type_uri": "dm4.core.number"
         },
         {
-            value: "Hidden",
-            uri: "dm4.webclient.hidden",
-            data_type_uri: "dm4.core.boolean"
+            "value": "Hidden",
+            "uri": "dm4.webclient.hidden",
+            "data_type_uri": "dm4.core.boolean"
         },
         {
-            value: "Locked",
-            uri: "dm4.webclient.locked",
-            data_type_uri: "dm4.core.boolean"
+            "value": "Locked",
+            "uri": "dm4.webclient.locked",
+            "data_type_uri": "dm4.core.boolean"
         },
         {
-            value: "Page Renderer URI",
-            uri: "dm4.webclient.page_renderer_uri",
-            data_type_uri: "dm4.core.text"
+            "value": "Page Renderer URI",
+            "uri": "dm4.webclient.page_renderer_uri",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Simple Renderer URI",
-            uri: "dm4.webclient.simple_renderer_uri",
-            data_type_uri: "dm4.core.text"
+            "value": "Simple Renderer URI",
+            "uri": "dm4.webclient.simple_renderer_uri",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Multi Renderer URI",
-            uri: "dm4.webclient.multi_renderer_uri",
-            data_type_uri: "dm4.core.text"
+            "value": "Multi Renderer URI",
+            "uri": "dm4.webclient.multi_renderer_uri",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Searchable as Unit",
-            uri: "dm4.webclient.searchable_as_unit",
-            data_type_uri: "dm4.core.boolean"
+            "value": "Searchable as Unit",
+            "uri": "dm4.webclient.searchable_as_unit",
+            "data_type_uri": "dm4.core.boolean"
         },
         {
-            value: "View Configuration",
-            uri: "dm4.webclient.view_config",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value": "View Configuration",
+            "uri": "dm4.webclient.view_config",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:         "dm4.webclient.icon",
-                    child_cardinality_uri:  "dm4.core.one",
-                    parent_cardinality_uri: "dm4.core.many",
-                    assoc_type_uri:         "dm4.core.aggregation_def"
+                    "child_type_uri":         "dm4.webclient.icon",
+                    "child_cardinality_uri":  "dm4.core.one",
+                    "parent_cardinality_uri": "dm4.core.many",
+                    "assoc_type_uri":         "dm4.core.aggregation_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.color",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.color",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.show_in_create_menu",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.show_in_create_menu",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.input_field_rows",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.input_field_rows",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.hidden",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.hidden",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.locked",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.locked",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.page_renderer_uri",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.page_renderer_uri",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.simple_renderer_uri",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.simple_renderer_uri",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.multi_renderer_uri",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.multi_renderer_uri",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.searchable_as_unit",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.searchable_as_unit",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
@@ -118,97 +118,97 @@
         ### Search ###
 
         {
-            value: "Search Term",
-            uri: "dm4.webclient.search_term",
-            data_type_uri: "dm4.core.text"
+            "value": "Search Term",
+            "uri": "dm4.webclient.search_term",
+            "data_type_uri": "dm4.core.text"
         },
         {
-            value: "Search Result",
-            uri: "dm4.webclient.search_result",
-            data_type_uri: "dm4.core.text",
-            view_config_topics: [
+            "value": "Search Result",
+            "uri": "dm4.webclient.search_result",
+            "data_type_uri": "dm4.core.text",
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.simple_renderer_uri: "dm4.webclient.search_result_renderer"
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.simple_renderer_uri": "dm4.webclient.search_result_renderer"
                     }
                 }
             ]
         },
         {
-            value: "Search",
-            uri: "dm4.webclient.search",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value": "Search",
+            "uri": "dm4.webclient.search",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.webclient.search_term",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.search_term",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 },
                 {
-                    child_type_uri:        "dm4.webclient.search_result",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
+                    "child_type_uri":        "dm4.webclient.search_result",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.icon: "/de.deepamehta.webclient/images/balls.png",
-                        dm4.webclient.locked: true
+                    "type_uri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.icon": "/de.deepamehta.webclient/images/balls.png",
+                        "dm4.webclient.locked": true
                     }
                 }
             ]
         }
     ],
 
-    assoc_types: [
+    "assoc_types": [
         {
-            value:         "Search Result Item",
-            uri:           "dm4.webclient.search_result_item",
-            data_type_uri: "dm4.core.text"
+            "value":         "Search Result Item",
+            "uri":           "dm4.webclient.search_result_item",
+            "data_type_uri": "dm4.core.text"
         }
     ],
 
-    topics: [
+    "topics": [
 
         ### Icons ###
 
         {
-            value:    "/de.deepamehta.webclient/images/ball-blue.png",
-            uri:      "dm4.webclient.icons.ball_blue",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-blue.png",
+            "uri":      "dm4.webclient.icons.ball_blue",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-gray.png",
-            uri:      "dm4.webclient.icons.ball_gray",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-gray.png",
+            "uri":      "dm4.webclient.icons.ball_gray",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-green.png",
-            uri:      "dm4.webclient.icons.ball_green",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-green.png",
+            "uri":      "dm4.webclient.icons.ball_green",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-orange.png",
-            uri:      "dm4.webclient.icons.ball_orange",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-orange.png",
+            "uri":      "dm4.webclient.icons.ball_orange",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-purple.png",
-            uri:      "dm4.webclient.icons.ball_purple",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-purple.png",
+            "uri":      "dm4.webclient.icons.ball_purple",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-red.png",
-            uri:      "dm4.webclient.icons.ball_red",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-red.png",
+            "uri":      "dm4.webclient.icons.ball_red",
+            "type_uri": "dm4.webclient.icon"
         },
         {
-            value:    "/de.deepamehta.webclient/images/ball-yellow.png",
-            uri:      "dm4.webclient.icons.ball_yellow",
-            type_uri: "dm4.webclient.icon"
+            "value":    "/de.deepamehta.webclient/images/ball-yellow.png",
+            "uri":      "dm4.webclient.icons.ball_yellow",
+            "type_uri": "dm4.webclient.icon"
         }
     ]
 }
