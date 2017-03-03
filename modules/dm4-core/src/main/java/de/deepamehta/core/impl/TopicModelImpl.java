@@ -129,6 +129,16 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         pl.indexTopicValue(id, indexMode, typeUri, getIndexValue());
     }
 
+    @Override
+    final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
+        pl.storeTopicProperty(id, propUri, propValue, addToIndex);
+    }
+
+    @Override
+    final void removeProperty(String propUri) {
+        pl.removeTopicProperty(id, propUri);
+    }
+
     // ---
 
     @Override

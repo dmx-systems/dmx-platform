@@ -130,18 +130,4 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     public List<Association> getAssociations() {
         return pl.checkReadAccessAndInstantiate(pl.fetchTopicAssociations(getId()));
     }
-
-
-
-    // === Properties ===
-
-    @Override
-    public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        pl.storeTopicProperty(getId(), propUri, propValue, addToIndex);
-    }
-
-    @Override
-    public void removeProperty(String propUri) {
-        pl.removeTopicProperty(getId(), propUri);
-    }
 }

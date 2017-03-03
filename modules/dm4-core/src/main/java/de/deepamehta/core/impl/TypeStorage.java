@@ -728,8 +728,8 @@ class TypeStorage {
 
     void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
         pl.createTopic(configTopic);
-        pl.createAssociation("dm4.core.aggregation", configurable, mf.newTopicRoleModel(configTopic.getId(),
-            "dm4.core.view_config"));
+        pl.createAssociation("dm4.core.aggregation", configurable,
+            mf.newTopicRoleModel(configTopic.getId(), "dm4.core.view_config"));
     }
 
     // --- Helper ---

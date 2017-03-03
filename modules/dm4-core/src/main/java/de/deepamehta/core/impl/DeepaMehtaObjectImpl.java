@@ -249,9 +249,15 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
         return pl.hasProperty(getId(), propUri);
     }
 
-    // Note: these methods are implemented in the subclasses:
-    //     setProperty(...)
-    //     removeProperty(...)
+    @Override
+    public void setProperty(String propUri, Object propValue, boolean addToIndex) {
+        model.storeProperty(propUri, propValue, addToIndex);
+    }
+
+    @Override
+    public void removeProperty(String propUri) {
+        model.removeProperty(propUri);
+    }
 
 
 

@@ -307,6 +307,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
+    void storeProperty(String propUri, Object propValue, boolean addToIndex) {
+        throw new UnsupportedOperationException();
+    }
+
+    void removeProperty(String propUri) {
+        throw new UnsupportedOperationException();
+    }
+
     // ---
 
     void _delete() {

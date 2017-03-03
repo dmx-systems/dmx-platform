@@ -192,20 +192,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
 
 
-    // === Properties ===
-
-    @Override
-    public void setProperty(String propUri, Object propValue, boolean addToIndex) {
-        pl.storeAssociationProperty(getId(), propUri, propValue, addToIndex);
-    }
-
-    @Override
-    public void removeProperty(String propUri) {
-        pl.removeAssociationProperty(getId(), propUri);
-    }
-
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // --- Helper ---

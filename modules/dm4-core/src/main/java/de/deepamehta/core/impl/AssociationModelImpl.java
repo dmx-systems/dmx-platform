@@ -227,6 +227,16 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         pl.indexAssociationValue(id, indexMode, typeUri, getIndexValue());
     }
 
+    @Override
+    final void storeProperty(String propUri, Object propValue, boolean addToIndex) {
+        pl.storeAssociationProperty(id, propUri, propValue, addToIndex);
+    }
+
+    @Override
+    final void removeProperty(String propUri) {
+        pl.removeAssociationProperty(id, propUri);
+    }
+
     // ---
 
     @Override
