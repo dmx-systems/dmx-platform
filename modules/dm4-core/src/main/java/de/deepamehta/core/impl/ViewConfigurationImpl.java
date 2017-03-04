@@ -51,15 +51,27 @@ class ViewConfigurationImpl implements ViewConfiguration {
     }
 
     @Override
+    public Topic getConfigTopic(String configTypeUri) {
+        TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
+        return configTopic != null ? configTopic.instantiate() : null;
+    }
+
+    @Override
+    public Topic addConfigTopic(TopicModel configTopic) {
+        TopicModelImpl _configTopic = (TopicModelImpl) configTopic;
+        _addConfigTopic(_configTopic);                      // update memory
+        return _configTopic.instantiate();
+    }
+
+    @Override
     public void addSetting(String configTypeUri, String settingUri, Object value) {
         ChildTopicsModel childs = mf.newChildTopicsModel().put(settingUri, value);
         TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = mf.newTopicModel(configTypeUri, childs);
-            model.addConfigTopic(configTopic);                                  // update memory
-            pl.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
+            _addConfigTopic(configTopic);
         } else {
-            configTopic.updateWithChildTopics(childs);                          // update memory + DB
+            configTopic.updateWithChildTopics(childs);      // update memory + DB
         }
     }
 
@@ -73,5 +85,12 @@ class ViewConfigurationImpl implements ViewConfiguration {
     @Override
     public ViewConfigurationModel getModel() {
         return model;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    public void _addConfigTopic(TopicModelImpl configTopic) {
+        model.addConfigTopic(configTopic);                                  // update memory
+        pl.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
     }
 }
