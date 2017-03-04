@@ -4,6 +4,12 @@ import de.deepamehta.core.service.Migration;
 
 
 
+/**
+ * Adding icons and colors to the Core types.
+ * Runs ALWAYS.
+ * <p>
+ * Part of DM 4.0
+ */
 public class Migration2 extends Migration {
 
     // -------------------------------------------------------------------------------------------------- Public Methods

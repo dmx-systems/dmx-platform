@@ -162,14 +162,32 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
+    /**
+     * Add a default view config to the type in case no one is set.
+     * <p>
+     * Note: the default view config needs a workspace assignment. The default view config must be added *before* the
+     * assignment can take place. Workspace assignment for a type (including its components like the view config) is
+     * performed by the type-introduction hook of the Workspaces module. Here we use the pre-create-type hook (instead
+     * of type-introduction too) as the pre-create-type hook is guaranteed to be invoked *before* type-introduction.
+     * On the other hand the order of type-introduction invocations is not deterministic accross plugins.
+     */
     @Override
     public void preCreateTopicType(TopicTypeModel model) {
-        initDefaultViewConfig(model);
+        addDefaultViewConfig(model);
     }
 
+    /**
+     * Add a default view config to the type in case no one is set.
+     * <p>
+     * Note: the default view config needs a workspace assignment. The default view config must be added *before* the
+     * assignment can take place. Workspace assignment for a type (including its components like the view config) is
+     * performed by the type-introduction hook of the Workspaces module. Here we use the pre-create-type hook (instead
+     * of type-introduction too) as the pre-create-type hook is guaranteed to be invoked *before* type-introduction.
+     * On the other hand the order of type-introduction invocations is not deterministic accross plugins.
+     */
     @Override
     public void preCreateAssociationType(AssociationTypeModel model) {
-        initDefaultViewConfig(model);
+        addDefaultViewConfig(model);
     }
 
     /**
@@ -288,7 +306,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
                     "unexpected topic (type=" + type + "\nviewConfig=" + viewConfig + ")");
             }
         } else {
-            // ### TODO: association definitions
+            // ### FIXME: handle association definitions
         }
     }
 
@@ -313,7 +331,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private void updateViewConfig(DeepaMehtaType type, Topic viewConfig) {
-        type.getViewConfig().updateConfigTopic(viewConfig.getModel());
+        type.getModel().getViewConfigModel().updateConfigTopic(viewConfig.getModel());
     }
 
     // --- Label ---
@@ -336,7 +354,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * This ensures a programmatically created type (through a migration) will
      * have a view config in any case, for being edited interactively afterwards.
      */
-    private void initDefaultViewConfig(TypeModel typeModel) {
+    private void addDefaultViewConfig(TypeModel typeModel) {
         ViewConfigurationModel viewConfig = typeModel.getViewConfigModel();
         TopicModel configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
         if (configTopic == null) {

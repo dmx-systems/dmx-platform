@@ -59,7 +59,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
     @Override
     public Topic addConfigTopic(TopicModel configTopic) {
         TopicModelImpl _configTopic = (TopicModelImpl) configTopic;
-        _addConfigTopic(_configTopic);                      // update memory
+        _addConfigTopic(_configTopic);                      // update memory + DB
         return _configTopic.instantiate();
     }
 
@@ -69,7 +69,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
         TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = mf.newTopicModel(configTypeUri, childs);
-            _addConfigTopic(configTopic);
+            _addConfigTopic(configTopic);                   // update memory + DB
         } else {
             configTopic.updateWithChildTopics(childs);      // update memory + DB
         }
@@ -77,7 +77,7 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     @Override
     public void updateConfigTopic(TopicModel configTopic) {
-        model.updateConfigTopic(configTopic);
+        model.updateConfigTopic(configTopic);               // update memory
     }
 
     // ---

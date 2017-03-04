@@ -33,6 +33,7 @@ public interface ViewConfiguration {
 
     void addSetting(String configTypeUri, String settingUri, Object value);
 
+    // ### TODO: drop this
     void updateConfigTopic(TopicModel configTopic);
 
     // ---
