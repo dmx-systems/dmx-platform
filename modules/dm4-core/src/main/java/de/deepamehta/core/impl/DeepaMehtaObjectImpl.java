@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -58,79 +59,79 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // --- ID ---
 
     @Override
-    public long getId() {
+    public final long getId() {
         return model.getId();
     }
 
     // --- URI ---
 
     @Override
-    public String getUri() {
+    public final String getUri() {
         return model.getUri();
     }
 
     @Override
-    public void setUri(String uri) {
+    public final void setUri(String uri) {
         model.updateUri(uri);
     }
 
     // --- Type URI ---
 
     @Override
-    public String getTypeUri() {
+    public final String getTypeUri() {
         return model.getTypeUri();
     }
 
     @Override
-    public void setTypeUri(String typeUri) {
+    public final void setTypeUri(String typeUri) {
         model.updateTypeUri(typeUri);
     }
 
     // --- Simple Value ---
 
     @Override
-    public SimpleValue getSimpleValue() {
+    public final SimpleValue getSimpleValue() {
         return model.getSimpleValue();
     }
 
     // ---
 
     @Override
-    public void setSimpleValue(String value) {
+    public final void setSimpleValue(String value) {
         setSimpleValue(new SimpleValue(value));
     }
 
     @Override
-    public void setSimpleValue(int value) {
+    public final void setSimpleValue(int value) {
         setSimpleValue(new SimpleValue(value));
     }
 
     @Override
-    public void setSimpleValue(long value) {
+    public final void setSimpleValue(long value) {
         setSimpleValue(new SimpleValue(value));
     }
 
     @Override
-    public void setSimpleValue(boolean value) {
+    public final void setSimpleValue(boolean value) {
         setSimpleValue(new SimpleValue(value));
     }
 
     @Override
-    public void setSimpleValue(SimpleValue value) {
+    public final void setSimpleValue(SimpleValue value) {
         model.updateSimpleValue(value);
     }
 
     // --- Child Topics ---
 
     @Override
-    public ChildTopicsImpl getChildTopics() {
+    public final ChildTopicsImpl getChildTopics() {
         return new ChildTopicsImpl(model.childTopics, model, pl);
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
     // We should call the abstract updateWithChildTopics() instead.
     @Override
-    public void setChildTopics(ChildTopicsModel childTopics) {
+    public final void setChildTopics(ChildTopicsModel childTopics) {
         try {
             model._updateChildTopics((ChildTopicsModelImpl) childTopics);
         } catch (Exception e) {
@@ -154,7 +155,10 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---
 
-    // Note: getType() remains abstract
+    @Override
+    public final DeepaMehtaType getType() {
+        return model.getType().instantiate();
+    }
 
     @Override
     public DeepaMehtaObjectModelImpl getModel() {
@@ -176,7 +180,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Directives/events is handled only in the high-level update() method.
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
-    public void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
+    public final void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         model.updateChildTopics((RelatedTopicModelImpl) newChildTopic, null, assocDef.getModel());
                                                                                                 // newChildTopics=null
     }
@@ -185,7 +189,8 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Directives/events is handled only in the high-level update() method.
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
-    public void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef) {
+    public final void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics,
+                                                                                       AssociationDefinition assocDef) {
         model.updateChildTopics(null, (List<RelatedTopicModelImpl>) newChildTopics, assocDef.getModel());
                                                                                                 // newChildTopic=null
     }
@@ -206,21 +211,21 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // --- Topic Retrieval ---
 
     @Override
-    public RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                   String othersTopicTypeUri) {
+    public final RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri,
+                                              String othersRoleTypeUri, String othersTopicTypeUri) {
         RelatedTopicModelImpl topic = model.getRelatedTopic(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
         return topic != null ? pl.<RelatedTopic>checkReadAccessAndInstantiate(topic) : null;
     }
 
     @Override
-    public List<RelatedTopic> getRelatedTopics(String assocTypeUri) {
+    public final List<RelatedTopic> getRelatedTopics(String assocTypeUri) {
         return getRelatedTopics(assocTypeUri, null, null, null);
     }
 
     @Override
-    public List<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                          String othersTopicTypeUri) {
+    public final List<RelatedTopic> getRelatedTopics(String assocTypeUri, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
         List<RelatedTopicModelImpl> topics = model.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
         return pl.checkReadAccessAndInstantiate(topics);
@@ -240,22 +245,22 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Properties ===
 
     @Override
-    public Object getProperty(String propUri) {
+    public final Object getProperty(String propUri) {
         return pl.fetchProperty(getId(), propUri);
     }
 
     @Override
-    public boolean hasProperty(String propUri) {
+    public final boolean hasProperty(String propUri) {
         return pl.hasProperty(getId(), propUri);
     }
 
     @Override
-    public void setProperty(String propUri, Object propValue, boolean addToIndex) {
+    public final void setProperty(String propUri, Object propValue, boolean addToIndex) {
         model.storeProperty(propUri, propValue, addToIndex);
     }
 
     @Override
-    public void removeProperty(String propUri) {
+    public final void removeProperty(String propUri) {
         model.removeProperty(propUri);
     }
 
@@ -264,7 +269,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // === Misc ===
 
     @Override
-    public Object getDatabaseVendorObject() {
+    public final Object getDatabaseVendorObject() {
         return pl.getDatabaseVendorObject(getId());
     }
 
@@ -277,7 +282,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
 
     @Override
-    public JSONObject toJSON() {
+    public final JSONObject toJSON() {
         return model.toJSON();
     }
 
@@ -290,17 +295,17 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         return ((DeepaMehtaObjectImpl) o).model.equals(model);
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return model.hashCode();
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return model.toString();
     }
 

@@ -399,7 +399,7 @@ public class PersistenceLayer extends StorageDecorator {
 
     TopicTypeImpl getTopicType(String uri) {
         TopicTypeModelImpl topicType = _getTopicType(uri);
-        if (!uri.equals("dm4.core.meta_meta_type")) {
+        if (!uri.equals("dm4.core.meta_meta_type")) {   // ### TODO: refactor and drop this condition
             checkReadAccess(topicType);
         }
         return topicType.instantiate();
@@ -619,6 +619,8 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     /**
+     * ### TODO: move to DeepaMehtaObjectModelImpl?
+     *
      * @throws  AccessControlException
      */
     private void checkReadAccess(DeepaMehtaObjectModelImpl model) {

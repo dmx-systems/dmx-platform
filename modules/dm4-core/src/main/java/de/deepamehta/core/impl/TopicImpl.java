@@ -4,7 +4,6 @@ import de.deepamehta.core.Association;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.TopicModel;
 
 import java.util.List;
@@ -65,11 +64,6 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     }
 
     // ---
-
-    @Override
-    public TopicType getType() {
-        return pl.getTopicType(getTypeUri());
-    }
 
     @Override
     public TopicModelImpl getModel() {

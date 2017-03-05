@@ -145,6 +145,7 @@ function RenderHelper() {
         return this.type_icon(topic.type_uri, title).click(handler).addClass(css_class)
     }
 
+    // ### TODO: rename to topic_label()
     this.link_text = function(topic) {
         var data_type_uri = dm4c.get_topic_type(topic.type_uri).data_type_uri
         return data_type_uri == "dm4.core.html" ? js.strip_html(topic.value) : topic.value.toString()

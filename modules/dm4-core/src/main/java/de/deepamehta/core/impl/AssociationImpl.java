@@ -1,7 +1,6 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
@@ -9,12 +8,7 @@ import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 
 import java.util.List;
@@ -124,11 +118,6 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     }
 
     // ---
-
-    @Override
-    public AssociationType getType() {
-        return pl.getAssociationType(getTypeUri());
-    }
 
     @Override
     public AssociationModelImpl getModel() {

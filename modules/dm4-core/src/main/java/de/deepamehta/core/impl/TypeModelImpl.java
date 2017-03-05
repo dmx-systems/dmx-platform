@@ -233,6 +233,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Abstract Methods ===
 
+    DeepaMehtaTypeImpl instantiate() {
+        throw new UnsupportedOperationException();
+    }
+
     List<? extends DeepaMehtaObjectModelImpl> getAllInstances() {
         throw new UnsupportedOperationException();
     }

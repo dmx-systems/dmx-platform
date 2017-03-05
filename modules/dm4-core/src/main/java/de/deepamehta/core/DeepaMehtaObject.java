@@ -54,6 +54,15 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
+    /**
+     * Returns the type of this object.
+     * <p>
+     * No access control is performed as <i>Implicit READ permission</i> applies: if a user has READ access to an object
+     * she has READ access to its type as well.
+     * <p>
+     * Note: if the user would have no READ access to this object the DeepaMehta Core would not instantiate it in the
+     * first place, but throw an <code>AccessControlException</code>.
+     */
     DeepaMehtaType getType();
 
     DeepaMehtaObjectModel getModel();
