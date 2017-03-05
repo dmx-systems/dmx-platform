@@ -49,7 +49,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         this.dataTypeUri = type.getDataTypeUri();
         this.indexModes  = type.getIndexModes();
         this.assocDefs   = toMap(type.getAssocDefs());
-        this.viewConfig  = type.getViewConfigModel();
+        this.viewConfig  = type.getViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -154,15 +154,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === View Configuration ===
 
     @Override
-    public ViewConfigurationModelImpl getViewConfigModel() {
+    public ViewConfigurationModelImpl getViewConfig() {
         return viewConfig;
     }
 
-    // FIXME: server-side operations on the view config settings possibly suggest they are not acually
-    // view config settings but part of the topic type model. Possibly this method should be dropped.
     @Override
-    public Object getViewConfig(String typeUri, String settingUri) {
-        return viewConfig.getSetting(typeUri, settingUri);
+    public Object getViewConfigValue(String configTypeUri, String childTypeUri) {
+        return viewConfig.getConfigValue(configTypeUri, childTypeUri);
     }
 
     @Override
@@ -197,7 +195,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 .put("data_type_uri", getDataTypeUri())
                 .put("index_mode_uris", toJSONArray(indexModes))
                 .put("assoc_defs", toJSONArray(assocDefs.values()))
-                .put("view_config_topics", getViewConfigModel().toJSONArray());
+                .put("view_config_topics", getViewConfig().toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -226,7 +224,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
             "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ", " + getViewConfigModel();
+            getAssocDefs() + ", " + getViewConfig();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

@@ -33,18 +33,16 @@ public interface ViewConfigurationModel {
     // ---
 
     /**
-     * FIXME: to be dropped.
-     * <p>
-     * Read out a view config setting.
+     * Lookup a view config value.
      * <p>
      * Compare to client-side counterpart: function get_view_config() in webclient.js
      *
      * @param   configTypeUri   The type URI of the config topic, e.g. "dm4.webclient.view_config"
-     * @param   settingUri      The setting URI, e.g. "dm4.webclient.icon"
+     * @param   childTypeUri    The child type URI of the config value to lookup, e.g. "dm4.webclient.icon"
      *
-     * @return  The setting value, or <code>null</code> if there is no such setting
+     * @return  The config value, or <code>null</code> if no value is set
      */
-    Object getSetting(String configTypeUri, String settingUri);
+    Object getConfigValue(String configTypeUri, String childTypeUri);
 
     // ---
 

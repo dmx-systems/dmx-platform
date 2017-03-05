@@ -54,7 +54,7 @@ public class Migration4 extends Migration {
         dm4.getTopicType("dm4.files.disk_quota").setSimpleValue("Disk Quota (MB)");
         //
         // 3) Install file size renderer
-        addTopicTypeSetting("dm4.files.size", "simple_renderer_uri", "dm4.files.file_size_renderer");
+        setTopicTypeViewConfigValue("dm4.files.size", "simple_renderer_uri", "dm4.files.file_size_renderer");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

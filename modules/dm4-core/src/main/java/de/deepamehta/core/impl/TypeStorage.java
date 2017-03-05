@@ -189,7 +189,7 @@ class TypeStorage {
         storeDataType(type.getUri(), type.getDataTypeUri());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
-        storeViewConfig(newTypeRole(type.getId()), type.getViewConfigModel());
+        storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
     }
 
 

@@ -53,11 +53,11 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     // === View Configuration ===
 
-    ViewConfigurationModel getViewConfigModel();
+    ViewConfigurationModel getViewConfig();
 
-    // FIXME: server-side operations on the view config settings possibly suggest they are not acually
-    // view config settings but part of the topic type model. Possibly this method should be dropped.
-    Object getViewConfig(String typeUri, String settingUri);
+    // TODO: server-side operations on the view config settings possibly suggest they are not acually
+    // view config settings but part of the core type model.
+    Object getViewConfigValue(String configTypeUri, String childTypeUri);
 
     void setViewConfig(ViewConfigurationModel viewConfig);
 }

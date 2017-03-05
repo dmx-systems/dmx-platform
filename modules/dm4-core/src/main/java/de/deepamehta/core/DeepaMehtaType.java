@@ -12,19 +12,25 @@ import java.util.List;
 
 public interface DeepaMehtaType extends Topic {
 
-    // --- Data Type ---
+
+
+    // === Data Type ===
 
     String getDataTypeUri();
 
     DeepaMehtaType setDataTypeUri(String dataTypeUri);
 
-    // --- Index Modes ---
+
+
+    // === Index Modes ===
 
     List<IndexMode> getIndexModes();
 
     DeepaMehtaType addIndexMode(IndexMode indexMode);
 
-    // --- Association Definitions ---
+
+
+    // === Association Definitions ===
 
     Collection<AssociationDefinition> getAssocDefs();
 
@@ -42,13 +48,17 @@ public interface DeepaMehtaType extends Topic {
 
     DeepaMehtaType removeAssocDef(String assocDefUri);
 
-    // --- View Configuration ---
+
+
+    // === View Configuration ===
 
     ViewConfiguration getViewConfig();
 
-    Object getViewConfig(String typeUri, String settingUri);
+    Object getViewConfigValue(String configTypeUri, String childTypeUri);
 
-    // ---
+
+
+    // ===
 
     void update(TypeModel model);
 

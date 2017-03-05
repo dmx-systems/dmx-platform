@@ -72,12 +72,12 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     // ---
 
     @Override
-    public Object getSetting(String configTypeUri, String settingUri) {
+    public Object getConfigValue(String configTypeUri, String childTypeUri) {
         TopicModel configTopic = getConfigTopic(configTypeUri);
         if (configTopic == null) {
             return null;
         }
-        return configTopic.getChildTopicsModel().getObject(settingUri, null);
+        return configTopic.getChildTopicsModel().getObject(childTypeUri, null);
     }
 
     // ---

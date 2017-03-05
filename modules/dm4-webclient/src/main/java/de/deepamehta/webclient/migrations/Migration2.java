@@ -38,10 +38,10 @@ public class Migration2 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void addIconToTopicType(String topicTypeUri, String iconfile) {
-        addTopicTypeSetting(topicTypeUri, "icon", "/de.deepamehta.webclient/images/" + iconfile);
+        setTopicTypeViewConfigValue(topicTypeUri, "icon", "/de.deepamehta.webclient/images/" + iconfile);
     }
 
     private void addColorToAssociationType(String assocTypeUri, String color) {
-        addAssociationTypeSetting(assocTypeUri, "color", color);
+        setAssocTypeViewConfigValue(assocTypeUri, "color", color);
     }
 }

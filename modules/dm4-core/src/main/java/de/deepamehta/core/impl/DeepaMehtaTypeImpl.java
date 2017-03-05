@@ -31,7 +31,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
 
 
-    // --- Data Type ---
+    // === Data Type ===
 
     @Override
     public final String getDataTypeUri() {
@@ -44,7 +44,9 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
         return this;
     }
 
-    // --- Index Modes ---
+
+
+    // === Index Modes ===
 
     @Override
     public final List<IndexMode> getIndexModes() {
@@ -57,7 +59,9 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
         return this;
     }
 
-    // --- Association Definitions ---
+
+
+    // === Association Definitions ===
 
     @Override
     public final Collection<AssociationDefinition> getAssocDefs() {
@@ -91,20 +95,24 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
         return this;
     }
 
-    // --- View Configuration ---
+
+
+    // === View Configuration ===
 
     @Override
     public final ViewConfiguration getViewConfig() {
         RoleModel configurable = pl.typeStorage.newTypeRole(getId());   // ### type ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 
     @Override
-    public final Object getViewConfig(String typeUri, String settingUri) {
-        return getModel().getViewConfig(typeUri, settingUri);
+    public final Object getViewConfigValue(String configTypeUri, String childTypeUri) {
+        return getModel().getViewConfigValue(configTypeUri, childTypeUri);
     }
 
-    // ---
+
+
+    // ===
 
     @Override
     public void update(TypeModel updateModel) {
@@ -117,6 +125,8 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     public TypeModelImpl getModel() {
         return (TypeModelImpl) model;
     }
+
+
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 

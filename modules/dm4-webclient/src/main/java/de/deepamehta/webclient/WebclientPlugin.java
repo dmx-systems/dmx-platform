@@ -271,22 +271,22 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private boolean searchableAsUnit(Topic topic) {
         TopicType topicType = dm4.getTopicType(topic.getTypeUri());
-        Boolean searchableAsUnit = (Boolean) getViewConfig(topicType, "searchable_as_unit");
+        Boolean searchableAsUnit = (Boolean) getViewConfigValue(topicType, "searchable_as_unit");
         return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
 
     /**
-     * Read out a view configuration setting.
+     * Convenience method to lookup a Webclient view config value.
      * <p>
      * Compare to client-side counterpart: function get_view_config() in webclient.js
      *
-     * @param   topicType   The topic type whose view configuration is read out.
-     * @param   setting     Last component of the setting URI, e.g. "icon".
+     * @param   topicType   The topic type whose view configuration is used for lookup.
+     * @param   setting     Last component of the child type URI whose value to lookup, e.g. "icon".
      *
-     * @return  The setting value, or <code>null</code> if there is no such setting
+     * @return  The config value, or <code>null</code> if no value is set
      */
-    private Object getViewConfig(TopicType topicType, String setting) {
-        return topicType.getViewConfig("dm4.webclient.view_config", "dm4.webclient." + setting);
+    private Object getViewConfigValue(TopicType topicType, String setting) {
+        return topicType.getViewConfigValue("dm4.webclient.view_config", "dm4.webclient." + setting);
     }
 
 
@@ -331,7 +331,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private void updateViewConfig(DeepaMehtaType type, Topic viewConfig) {
-        type.getModel().getViewConfigModel().updateConfigTopic(viewConfig.getModel());
+        type.getModel().getViewConfig().updateConfigTopic(viewConfig.getModel());
     }
 
     // --- Label ---
@@ -355,7 +355,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * have a view config in any case, for being edited interactively afterwards.
      */
     private void addDefaultViewConfig(TypeModel typeModel) {
-        ViewConfigurationModel viewConfig = typeModel.getViewConfigModel();
+        ViewConfigurationModel viewConfig = typeModel.getViewConfig();
         TopicModel configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
         if (configTopic == null) {
             viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));

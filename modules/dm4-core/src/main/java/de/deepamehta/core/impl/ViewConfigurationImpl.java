@@ -64,8 +64,8 @@ class ViewConfigurationImpl implements ViewConfiguration {
     }
 
     @Override
-    public void addSetting(String configTypeUri, String settingUri, Object value) {
-        ChildTopicsModel childs = mf.newChildTopicsModel().put(settingUri, value);
+    public void setConfigValue(String configTypeUri, String childTypeUri, Object value) {
+        ChildTopicsModel childs = mf.newChildTopicsModel().put(childTypeUri, value);
         TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = mf.newTopicModel(configTypeUri, childs);
@@ -73,11 +73,6 @@ class ViewConfigurationImpl implements ViewConfiguration {
         } else {
             configTopic.updateWithChildTopics(childs);      // update memory + DB
         }
-    }
-
-    @Override
-    public void updateConfigTopic(TopicModel configTopic) {
-        model.updateConfigTopic(configTopic);               // update memory
     }
 
     // ---
