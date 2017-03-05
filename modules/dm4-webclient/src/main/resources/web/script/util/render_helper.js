@@ -119,6 +119,8 @@ function RenderHelper() {
     /**
      * Renders a topic label as a link.
      *
+     * @param   topic       The label for this topic is rendered.
+     * @param   handler     The callback invoked when the label is clicked (function).
      * @param   title       Optional: the tooltip title.
      *                      If not specified the topic's type name is used.
      */
@@ -144,8 +146,10 @@ function RenderHelper() {
     }
 
     this.link_text = function(topic) {
-        var is_html = dm4c.get_topic_type(topic.type_uri).data_type_uri == "dm4.core.html"
-        return is_html ? js.strip_html(topic.value) : topic.value
+        var data_type_uri = dm4c.get_topic_type(topic.type_uri).data_type_uri
+        return data_type_uri == "dm4.core.html" ? js.strip_html(topic.value) : topic.value.toString()
+        // Note: toString() is needed for boolean topic values.
+        // Otherwise false would be rendered as empty.
     }
 
     /**
