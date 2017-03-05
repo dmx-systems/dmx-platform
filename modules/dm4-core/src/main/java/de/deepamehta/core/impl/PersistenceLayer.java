@@ -400,7 +400,7 @@ public class PersistenceLayer extends StorageDecorator {
     TopicTypeImpl getTopicType(String uri) {
         TopicTypeModelImpl topicType = _getTopicType(uri);
         if (!uri.equals("dm4.core.meta_meta_type")) {   // ### TODO: refactor and drop this condition
-            checkReadAccess(topicType);
+            topicType.checkReadAccess();
         }
         return topicType.instantiate();
     }
@@ -589,7 +589,7 @@ public class PersistenceLayer extends StorageDecorator {
     // ### TODO: make these private?
 
     <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
-        checkReadAccess(model);
+        model.checkReadAccess();
         return (O) model.instantiate();
     }
 
@@ -611,29 +611,20 @@ public class PersistenceLayer extends StorageDecorator {
 
     boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
         try {
-            checkReadAccess(model);
+            model.checkReadAccess();
             return true;
         } catch (AccessControlException e) {
             return false;
         }
     }
 
-    /**
-     * ### TODO: move to DeepaMehtaObjectModelImpl?
-     *
-     * @throws  AccessControlException
-     */
-    private void checkReadAccess(DeepaMehtaObjectModelImpl model) {
-        em.fireEvent(model.getReadAccessEvent(), model.getId());
-    }
-
     // ---
 
-    private void checkTopicReadAccess(long topicId) {
+    void checkTopicReadAccess(long topicId) {
         em.fireEvent(CoreEvent.CHECK_TOPIC_READ_ACCESS, topicId);
     }
 
-    private void checkAssociationReadAccess(long assocId) {
+    void checkAssociationReadAccess(long assocId) {
         em.fireEvent(CoreEvent.CHECK_ASSOCIATION_READ_ACCESS, assocId);
     }
 

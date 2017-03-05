@@ -323,9 +323,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    DeepaMehtaEvent getReadAccessEvent() {
+    /**
+     * @throws  AccessControlException
+     */
+    void checkReadAccess() {
         throw new UnsupportedOperationException();
     }
+
+    // ---
 
     DeepaMehtaEvent getPreUpdateEvent() {
         throw new UnsupportedOperationException();

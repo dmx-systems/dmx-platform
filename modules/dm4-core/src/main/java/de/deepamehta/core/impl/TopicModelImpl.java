@@ -149,9 +149,11 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    final DeepaMehtaEvent getReadAccessEvent() {
-        return CoreEvent.CHECK_TOPIC_READ_ACCESS;
+    final void checkReadAccess() {
+        pl.checkTopicReadAccess(id);
     }
+
+    // ---
 
     @Override
     final DeepaMehtaEvent getPreUpdateEvent() {
