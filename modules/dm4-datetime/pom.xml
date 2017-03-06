@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Date/Time</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-datetime</artifactId>
-    <version>4.8.6-SNAPSHOT</version>
+    <version>4.8.6</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8.6-SNAPSHOT</version>
+        <version>4.8.6</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 </project>

@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Access Control</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-accesscontrol</artifactId>
-    <version>4.8.6-SNAPSHOT</version>
+    <version>4.8.6</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8.6-SNAPSHOT</version>
+        <version>4.8.6</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-workspaces</artifactId>
-            <version>4.8.6-SNAPSHOT</version>
+            <version>4.8.6</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-files</artifactId>
-            <version>4.8.6-SNAPSHOT</version>
+            <version>4.8.6</version>
         </dependency>
     </dependencies>
 
