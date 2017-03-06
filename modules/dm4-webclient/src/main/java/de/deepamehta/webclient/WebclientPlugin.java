@@ -2,8 +2,10 @@ package de.deepamehta.webclient;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
@@ -97,8 +99,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Performs a by-type search and creates a search result topic.
      * <p>
      * Note: this resource method is actually part of the Type Search plugin.
-     * TODO: proper modularization. Either let the Type Search plugin provide its own REST resource (with
-     * another namespace again) or make the Type Search plugin an integral part of the Webclient plugin.
+     * TODO: proper modularization. Either let the Type Search plugin provide its own REST service or make the
+     * Type Search plugin an integral part of the Webclient plugin.
      */
     @GET
     @Path("/search/by_type/{type_uri}")
@@ -118,20 +120,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     @GET
-    @Path("/topic/{id}/related_topics")
-    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long topicId) {
-        Topic topic = dm4.getTopic(topicId);
-        List<RelatedTopic> relTopics = topic.getRelatedTopics(null);   // assocTypeUri=null
+    @Path("/object/{id}/related_topics")
+    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long objectId) {
+        DeepaMehtaObject object = dm4.getObject(objectId);
+        List<RelatedTopic> relTopics = object.getRelatedTopics(null);   // assocTypeUri=null
         Iterator<RelatedTopic> i = relTopics.iterator();
         int removed = 0;
         while (i.hasNext()) {
             RelatedTopic relTopic = i.next();
-            if (isDirectModelledChildTopic(topic, relTopic)) {
+            if (isDirectModelledChildTopic(object, relTopic)) {
                 i.remove();
                 removed++;
             }
         }
-        logger.fine("### " + removed + " topics are removed from result set of topic " + topicId);
+        logger.fine("### " + removed + " topics are removed from result set of object " + objectId);
         return relTopics;
     }
 
@@ -384,23 +386,20 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Misc ===
 
-    private boolean isDirectModelledChildTopic(Topic parentTopic, RelatedTopic childTopic) {
+    private boolean isDirectModelledChildTopic(DeepaMehtaObject parentObject, RelatedTopic childTopic) {
         // association definition
-        if (hasAssocDef(parentTopic, childTopic)) {
+        if (hasAssocDef(parentObject, childTopic)) {
             // role types
             Association assoc = childTopic.getRelatingAssociation();
-            if (assoc.isPlayer(mf.newTopicRoleModel(parentTopic.getId(), "dm4.core.parent")) &&
-                assoc.isPlayer(mf.newTopicRoleModel(childTopic.getId(),  "dm4.core.child"))) {
-                return true;
-            }
+            return assoc.matches("dm4.core.parent", parentObject.getId(), "dm4.core.child", childTopic.getId());
         }
         return false;
     }
 
-    private boolean hasAssocDef(Topic parentTopic, RelatedTopic childTopic) {
+    private boolean hasAssocDef(DeepaMehtaObject parentObject, RelatedTopic childTopic) {
         // Note: the user might have no explicit READ permission for the type.
-        // We must enforce the *implicit* READ permission.
-        TopicType parentType = dm4.getTopicTypeImplicitly(parentTopic.getId());
+        // DeepaMehtaObject's getType() has *implicit* READ permission.
+        DeepaMehtaType parentType = parentObject.getType();
         //
         String childTypeUri = childTopic.getTypeUri();
         String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();

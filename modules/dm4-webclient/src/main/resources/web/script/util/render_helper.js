@@ -445,30 +445,31 @@ function RenderHelper() {
     // === Direct-to-page Rendering ===
 
     this.topic_associations = function(topic_id) {
-        var topics = dm4c.restc.get_related_topics(topic_id, true)  // sort=true
-        group_topics(topics, function(title, group) {
-            self.field_label(title)
-            self.page(self.topic_list(group))
-        })
+        render_object_associations(topic_id)
     }
 
     this.association_associations = function(assoc_id) {
-        // ### TODO: filter property topics
-        var topics = dm4c.restc.get_association_related_topics(assoc_id, undefined, true)  // traversal_filter=undefined
-                                                                                           // sort=true
-        group_topics(topics, function(title, group) {
-            self.field_label(title)
-            self.page(self.topic_list(group, function(topic, spot) {
-                // Note: for associations we need a custom click handler because the default
-                // one (do_reveal_related_topic()) assumes a topic as the source.
-                var action = spot == "label" && "show"
-                dm4c.show_topic(dm4c.fetch_topic(topic.id), action, undefined, true)    // coordinates=undefined,
-            }))                                                                         // do_center=true
-        })
+        render_object_associations(assoc_id, function(topic, spot) {
+            // Note: for associations we need a custom click handler because the default
+            // one (do_reveal_related_topic()) assumes a topic as the source.
+            var action = spot == "label" && "show"
+            dm4c.show_topic(dm4c.fetch_topic(topic.id), action, undefined, true)    // coordinates=undefined,
+        })                                                                          // do_center=true
     }
 
     // ---
 
+    function render_object_associations(object_id, click_handler) {
+        var topics = dm4c.restc.get_related_topics(object_id, true)     // sort=true
+        group_topics(topics, function(title, group) {
+            self.field_label(title)
+            self.page(self.topic_list(group, click_handler))
+        })
+    }
+
+    /**
+     * Groups the topics by type and invokes the callback for each group.
+     */
     function group_topics(topics, callback) {
         var topic_type_uri      // topic type URI of current group  - initialized by begin_new_group()
         var topic_type_name     // topic type name of current group - initialized by begin_new_group()

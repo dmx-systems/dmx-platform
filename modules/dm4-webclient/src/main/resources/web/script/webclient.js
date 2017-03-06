@@ -55,8 +55,9 @@ dm4c = new function() {
     this.restc.get_topics_and_create_bucket = function(type_uri) {
         return this.request("GET", "/webclient/search/by_type/" + type_uri)
     }
-    this.restc.get_related_topics = function(topic_id, sort) {
-        var result = this.request("GET", "/webclient/topic/" + topic_id + "/related_topics")
+    //
+    this.restc.get_related_topics = function(object_id, sort) {
+        var result = this.request("GET", "/webclient/object/" + object_id + "/related_topics")
         if (sort) {
             this.sort_topics(result)
         }
