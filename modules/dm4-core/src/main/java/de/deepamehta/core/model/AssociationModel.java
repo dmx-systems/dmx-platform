@@ -22,16 +22,26 @@ public interface AssociationModel extends DeepaMehtaObjectModel {
     // --- Convenience Methods ---
 
     /**
-     * @teturn  this association's role that matches the given role type.
+     * @return  this association's role that matches the given role type.
      *          If no role matches, null is returned.
-     *          <p>
      *          If both roles are matching an exception is thrown.
      */
     RoleModel getRoleModel(String roleTypeUri);
 
-    long getOtherPlayerId(long id);
-
     boolean hasSameRoleTypeUris();
+
+    /**
+     * Checks if the given players match this association.
+     * The given role type URIs must be different.
+     * The player position ("1" vs. "2") is not relevant.
+     *
+     * @return  true if the given players match this association.
+     *
+     * @throws  IllegalArgumentException    if both given role type URIs are identical.
+     */
+    boolean matches(String roleTypeUri1, long playerId1, String roleTypeUri2, long playerId2);
+
+    long getOtherPlayerId(long id);
 
     // ---
 

@@ -74,7 +74,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // --- Convenience Methods ---
 
     @Override
-    public RoleModel getRoleModel(String roleTypeUri) {
+    public RoleModelImpl getRoleModel(String roleTypeUri) {
         boolean rm1 = roleModel1.getRoleTypeUri().equals(roleTypeUri);
         boolean rm2 = roleModel2.getRoleTypeUri().equals(roleTypeUri);
         if (rm1 && rm2) {
@@ -82,6 +82,28 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
                 "\" (" + this + ")");
         }
         return rm1 ? roleModel1 : rm2 ? roleModel2 : null;
+    }
+
+    @Override
+    public boolean hasSameRoleTypeUris() {
+        return roleModel1.getRoleTypeUri().equals(roleModel2.getRoleTypeUri());
+    }
+
+    @Override
+    public boolean matches(String roleTypeUri1, long playerId1, String roleTypeUri2, long playerId2) {
+        if (roleTypeUri1.equals(roleTypeUri2)) {
+            throw new IllegalArgumentException("matches() was called with 2 identical role type URIs (\"" +
+                roleTypeUri1 + "\")");
+        }
+        if (!hasSameRoleTypeUris()) {
+            RoleModel r1 = getRoleModel(roleTypeUri1);
+            RoleModel r2 = getRoleModel(roleTypeUri2);
+            if (r1 != null && r1.getPlayerId() == playerId1 &&
+                r2 != null && r2.getPlayerId() == playerId2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -95,11 +117,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         } else {
             throw new IllegalArgumentException("ID " + id + " doesn't refer to a player in " + this);
         }
-    }
-
-    @Override
-    public boolean hasSameRoleTypeUris() {
-        return roleModel1.getRoleTypeUri().equals(roleModel2.getRoleTypeUri());
     }
 
 

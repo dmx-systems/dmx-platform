@@ -64,6 +64,28 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
         return getRole2().getPlayer();
     }
 
+    // --- Convenience Methods ---
+
+    @Override
+    public Role getRole(String roleTypeUri) {
+        return getModel().getRoleModel(roleTypeUri).instantiate(getModel());
+    }
+
+    @Override
+    public boolean hasSameRoleTypeUris() {
+        return getModel().hasSameRoleTypeUris();
+    }
+
+    @Override
+    public boolean matches(String roleTypeUri1, long playerId1, String roleTypeUri2, long playerId2) {
+        return getModel().matches(roleTypeUri1, playerId1, roleTypeUri2, playerId2);
+    }
+
+    @Override
+    public long getOtherPlayerId(long id) {
+        return getModel().getOtherPlayerId(id);
+    }
+
     // ---
 
     @Override

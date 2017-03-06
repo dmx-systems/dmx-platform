@@ -78,6 +78,9 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * @param   assoc   the association this role is involved in
+     */
     abstract Role instantiate(AssociationModelImpl assoc);
 
     abstract DeepaMehtaObjectModel getPlayer();
