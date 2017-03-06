@@ -5,7 +5,6 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Migration;
-import de.deepamehta.core.service.accesscontrol.AccessControl;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -23,13 +22,18 @@ import java.util.logging.Logger;
  */
 public class Migration3 extends Migration {
 
+    private long deepaMehtaWorkspaceId;
+
     private int[][] count = new int[2][2];
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
     public void run() {
-        logger.info("########## Repairing types with missing \"View Config\" topic");
+        initDeepaMehtaWorkspaceId();
+        //
+        logger.info("########## Repairing types with missing \"View Config\" topic (" +
+            (deepaMehtaWorkspaceId == -1 ? "clean install" : "update") + " detected)");
         //
         repair(dm4.getAllTopicTypes(), 0);
         repair(dm4.getAllAssociationTypes(), 1);
@@ -58,19 +62,30 @@ public class Migration3 extends Migration {
             ViewConfiguration viewConfig = type.getViewConfig();
             Topic configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
             if (configTopic == null) {
-                // create config topic
+                // 1) create config topic
                 configTopic = viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
-                // assign workspace
-                if (isDeepaMehtaStandardType(type)) {
-                    AccessControl ac = dm4.getAccessControl();
-                    ac.assignToWorkspace(configTopic, ac.getDeepaMehtaWorkspaceId());
+                //
+                // 2) assign workspace
+                // In case of a CLEAN_INSTALL the DeepaMehta workspace does not yet exist. The config topic gets its
+                // workspace assignment via type-introduction of the Workspaces module. The Workspaces module is
+                // activated *after* the Webclient module.
+                // In case of a UPDATE the DeepaMehta workspace exists already and we make the assignment here.
+                // Type-introduction of the Workspaces module will not perform as this module is installed already.
+                if (deepaMehtaWorkspaceId != -1 && isDeepaMehtaStandardType(type)) {
+                    dm4.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);
                 }
+                //
                 count[i][1]++;
             }
             count[i][0]++;
         } catch (Exception e) {
             throw new RuntimeException("Repairing type \"" + type.getUri() + "\" failed", e);
         }
+    }
+
+    private void initDeepaMehtaWorkspaceId() {
+        Topic ws = dm4.getTopicByUri("dm4.workspaces.deepamehta");
+        deepaMehtaWorkspaceId = ws != null ? ws.getId() : -1;
     }
 
     // Copied from WorkspacePlugin.java
