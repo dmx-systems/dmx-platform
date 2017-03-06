@@ -532,10 +532,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             if (objects.size() > 0) {
                 logger.info("### Indexing " + objects.size() + " " + str + " (indexMode=" + indexMode + ")");
             } else {
-                logger.info("### Indexing " + str + " ABORTED -- no instances in DB");
+                logger.info("### Indexing " + str + " SKIPPED -- no instances in DB");
             }
         } else {
-            logger.info("### Indexing " + str + " ABORTED -- no index mode set");
+            logger.info("### Indexing " + str + " SKIPPED -- no index mode set");
         }
         //
         for (DeepaMehtaObjectModelImpl obj : objects) {

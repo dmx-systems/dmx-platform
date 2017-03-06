@@ -269,7 +269,7 @@ public class PluginImpl implements Plugin, EventHandler {
             Properties properties = new Properties();
             //
             if (!hasStaticResource(PLUGIN_CONFIG_FILE)) {
-                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " ABORTED " +
+                logger.info("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " SKIPPED " +
                     "-- file does not exist");
                 return properties;
             }
@@ -295,7 +295,7 @@ public class PluginImpl implements Plugin, EventHandler {
         List<InjectableService> injectableServices = createInjectableServices();
         //
         if (injectableServices.isEmpty()) {
-            logger.info("Tracking services for " + this + " ABORTED -- no services consumed");
+            logger.info("Tracking services for " + this + " SKIPPED -- no services consumed");
             return;
         }
         //
@@ -542,7 +542,7 @@ public class PluginImpl implements Plugin, EventHandler {
         pluginTopic = fetchPluginTopic();
         //
         if (pluginTopic != null) {
-            logger.info("Installing " + this + " in the database ABORTED -- already installed");
+            logger.info("Installing " + this + " in the database SKIPPED -- already installed");
             return false;
         }
         //
@@ -622,7 +622,7 @@ public class PluginImpl implements Plugin, EventHandler {
             List<DeepaMehtaEvent> events = getEvents();
             //
             if (events.size() == 0) {
-                logger.info("Registering event listeners of " + this + " ABORTED -- no event listeners implemented");
+                logger.info("Registering event listeners of " + this + " SKIPPED -- no event listeners implemented");
                 return;
             }
             //
@@ -696,7 +696,7 @@ public class PluginImpl implements Plugin, EventHandler {
         // *before* registerProvidedService().
         try {
             if (providedServiceInterface == null) {
-                logger.info("Registering OSGi service of " + this + " ABORTED -- no OSGi service provided");
+                logger.info("Registering OSGi service of " + this + " SKIPPED -- no OSGi service provided");
                 return;
             }
             //
@@ -732,7 +732,7 @@ public class PluginImpl implements Plugin, EventHandler {
         try {
             uriNamespace = getWebResourcesNamespace();
             if (uriNamespace == null) {
-                logger.info("Publishing web resources of " + this + " ABORTED -- no web resources provided");
+                logger.info("Publishing web resources of " + this + " SKIPPED -- no web resources provided");
                 return;
             }
             //
@@ -790,14 +790,14 @@ public class PluginImpl implements Plugin, EventHandler {
                 String uriNamespace = dm4.wpService.getUriNamespace(pluginContext);
                 logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
             } else {
-                logger.info("Publishing REST resources of " + this + " ABORTED -- no REST resources provided");
+                logger.info("Publishing REST resources of " + this + " SKIPPED -- no REST resources provided");
             }
             // provider classes
             List<Class<?>> providerClasses = getProviderClasses();
             if (providerClasses.size() != 0) {
                 logger.info("Registering " + providerClasses.size() + " provider classes of " + this);
             } else {
-                logger.info("Registering provider classes of " + this + " ABORTED -- no provider classes found");
+                logger.info("Registering provider classes of " + this + " SKIPPED -- no provider classes found");
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
@@ -860,7 +860,7 @@ public class PluginImpl implements Plugin, EventHandler {
         if (!pluginDependencies.isEmpty()) {
             logger.info("Tracking " + pluginDependencies.size() + " plugins for " + this + " " + pluginDependencies);
         } else {
-            logger.info("Tracking plugins for " + this + " ABORTED -- no plugin dependencies declared");
+            logger.info("Tracking plugins for " + this + " SKIPPED -- no plugin dependencies declared");
         }
         //
         return pluginDependencies;

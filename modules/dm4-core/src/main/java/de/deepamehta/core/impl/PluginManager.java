@@ -69,7 +69,7 @@ class PluginManager {
                 dm4.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
             }
         } else {
-            logger.info("Activation of " + plugin + " ABORTED -- already activated");
+            logger.info("Activation of " + plugin + " SKIPPED -- already activated");
         }
     }
 
@@ -81,7 +81,7 @@ class PluginManager {
             plugin.deactivate();
             removeFromActivatedPlugins(pluginUri);
         } else {
-            logger.info("Deactivation of " + plugin + " ABORTED -- it was not successfully activated");
+            logger.info("Deactivation of " + plugin + " SKIPPED -- it was not successfully activated");
         }
     }
 

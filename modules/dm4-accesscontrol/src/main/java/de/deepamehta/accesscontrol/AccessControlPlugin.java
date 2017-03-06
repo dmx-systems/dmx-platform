@@ -569,7 +569,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void checkDiskQuota(String username, long fileSize, long diskQuota) {
         if (diskQuota < 0) {
-            logger.info("### Checking disk quota of " + userInfo(username) + " ABORTED -- disk quota is disabled");
+            logger.info("### Checking disk quota of " + userInfo(username) + " SKIPPED -- disk quota is disabled");
             return;
         }
         //
@@ -775,7 +775,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
             // the other hand we don't have such a mechanism (and don't want one either).
             if (username == null) {
-                logger.fine("Setting the creator/modifier of " + info(object) + " ABORTED -- no user is logged in");
+                logger.fine("Setting the creator/modifier of " + info(object) + " SKIPPED -- no user is logged in");
                 return;
             }
             //

@@ -46,7 +46,7 @@ public class Migration4 extends Migration {
             }
             logger.info("########## Root Folder topics renamed: " + renamed);
         } else {
-            logger.info("########## Renaming root Folder topics ABORTED -- per-workspace file repositories are " +
+            logger.info("########## Renaming root Folder topics SKIPPED -- per-workspace file repositories are " +
                 "switched off");
         }
         //

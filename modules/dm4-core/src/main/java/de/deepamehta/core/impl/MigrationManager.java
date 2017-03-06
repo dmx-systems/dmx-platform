@@ -55,7 +55,7 @@ class MigrationManager {
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
-            logger.info("Running migrations for " + plugin + " ABORTED -- installed model is up-to-date (version " +
+            logger.info("Running migrations for " + plugin + " SKIPPED -- installed model is up-to-date (version " +
                 installedModelVersion + ")");
             return;
         }
@@ -76,7 +76,7 @@ class MigrationManager {
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
-            logger.info("Running core migrations ABORTED -- installed model is up-to-date (version " +
+            logger.info("Running core migrations SKIPPED -- installed model is up-to-date (version " +
                 installedModelVersion + ")");
             return;
         }
@@ -136,7 +136,7 @@ class MigrationManager {
                     migration.run();
                 }
             } else {
-                logger.info("Running " + mi.migrationInfo + " ABORTED" + runInfo);
+                logger.info("Running " + mi.migrationInfo + " SKIPPED" + runInfo);
             }
             logger.info("Updating installed model: version " + migrationNr);
         } catch (Exception e) {
@@ -324,7 +324,7 @@ class MigrationManager {
                     logger.info("Reading migration config file \"" + configFile + "\"");
                     migrationConfig.load(in);
                 } else {
-                    logger.info("Reading migration config file \"" + configFile + "\" ABORTED -- file does not exist");
+                    logger.info("Reading migration config file \"" + configFile + "\" SKIPPED -- file does not exist");
                 }
                 //
                 runMode = migrationConfig.getProperty("migrationRunMode", MigrationRunMode.ALWAYS.name());

@@ -115,7 +115,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // 2) check if topic already exists
             Topic fileTopic = fetchFileTopic(repoPath(file));
             if (fileTopic != null) {
-                logger.info(operation + " ABORTED -- already exists");
+                logger.info(operation + " SKIPPED -- already exists");
                 return fileTopic.loadChildTopics();
             }
             // 3) create topic
@@ -143,7 +143,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             // 2) check if topic already exists
             Topic folderTopic = fetchFolderTopic(repoPath(file));
             if (folderTopic != null) {
-                logger.info(operation + " ABORTED -- already exists");
+                logger.info(operation + " SKIPPED -- already exists");
                 return folderTopic.loadChildTopics();
             }
             // 3) create topic

@@ -66,7 +66,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     public void stop(BundleContext context) {
         try {
             if (plugin == null) {
-                logger.info("Stopping " + this + " ABORTED -- it was not successfully started");
+                logger.info("Stopping " + this + " SKIPPED -- it was not successfully started");
                 return;
             }
             //

@@ -150,7 +150,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         String webclientUrl = getWebclientUrl();
         //
         if (hasWebclientLaunched == true) {
-            logger.info("### Launching webclient (url=\"" + webclientUrl + "\") ABORTED -- already launched");
+            logger.info("### Launching webclient (url=\"" + webclientUrl + "\") SKIPPED -- already launched");
             return;
         }
         //

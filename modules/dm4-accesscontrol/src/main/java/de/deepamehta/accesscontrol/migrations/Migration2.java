@@ -43,7 +43,7 @@ public class Migration2 extends Migration {
                 renameProperty(object, "owner",   "dm4.accesscontrol.owner",   true);   // addToIndex=true
                 renameProperty(object, "acl",     "dm4.accesscontrol.acl",     false);  // addToIndex=false
             } else {
-                logger.info(info + " ABORTED -- Access control information not availble");
+                logger.info(info + " SKIPPED -- Access control information not availble");
             }
         } catch (Exception e) {
             throw new RuntimeException("Migrating " + type + " " + object.getId() + " failed (" + object + ")", e);

@@ -244,7 +244,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 logger.info(operation);
                 address.getChildTopics().getModel().put("dm4.geomaps.geo_coordinate", geoCoordTopic.getModel());
             } else {
-                logger.info(operation + " ABORTED -- no geo coordinate in DB");
+                logger.info(operation + " SKIPPED -- no geo coordinate in DB");
             }
         }
     }
