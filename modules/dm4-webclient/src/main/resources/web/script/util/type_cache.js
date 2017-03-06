@@ -95,6 +95,7 @@ function TypeCache() {
     // ---
 
     this.load_types = function(tracker) {
+        bootstrap()
         load_topic_types(tracker)
         load_association_types(tracker)
     }
@@ -107,6 +108,19 @@ function TypeCache() {
 
 
     // ----------------------------------------------------------------------------------------------- Private Functions
+
+    function bootstrap() {
+        self.put_topic_type(new TopicType({
+            uri: "dm4.core.meta_meta_type",
+            type_uri: "dm4.core.meta_meta_meta_type",
+            value: "Meta Meta Type",
+            data_type_uri: "dm4.core.text",
+            assoc_defs: [],
+            view_config_topics: []
+        }))
+    }
+
+    // ---
 
     function load_topic_types(tracker) {
         dm4c.restc.get_all_topic_types(function(topic_types) {

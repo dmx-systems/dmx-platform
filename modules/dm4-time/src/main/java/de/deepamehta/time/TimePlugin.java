@@ -82,14 +82,22 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Path("/object/{id}/created")
     @Override
     public long getCreationTime(@PathParam("id") long objectId) {
-        return dm4.hasProperty(objectId, PROP_CREATED) ? (Long) dm4.getProperty(objectId, PROP_CREATED) : 0;
+        try {
+            return dm4.hasProperty(objectId, PROP_CREATED) ? (Long) dm4.getProperty(objectId, PROP_CREATED) : 0;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching creation time of object " + objectId + " failed", e);
+        }
     }
 
     @GET
     @Path("/object/{id}/modified")
     @Override
     public long getModificationTime(@PathParam("id") long objectId) {
-        return dm4.hasProperty(objectId, PROP_MODIFIED) ? (Long) dm4.getProperty(objectId, PROP_MODIFIED) : 0;
+        try {
+            return dm4.hasProperty(objectId, PROP_MODIFIED) ? (Long) dm4.getProperty(objectId, PROP_MODIFIED) : 0;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching modification time of object " + objectId + " failed", e);
+        }
     }
 
     // ---

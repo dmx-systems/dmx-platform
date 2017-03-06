@@ -204,35 +204,39 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
     // ===
 
     TopicModelImpl findChildTopic(String topicTypeUri) {
-        if (typeUri.equals(topicTypeUri)) {
-            return this;
-        }
-        //
-        for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
-            String assocDefUri    = assocDef.getAssocDefUri();
-            String cardinalityUri = assocDef.getChildCardinalityUri();
-            TopicModelImpl childTopic = null;
-            if (cardinalityUri.equals("dm4.core.one")) {
-                childTopic = childTopics.getTopicOrNull(assocDefUri);                                // no load from DB
-            } else if (cardinalityUri.equals("dm4.core.many")) {
-                List<RelatedTopicModelImpl> _childTopics = childTopics.getTopicsOrNull(assocDefUri); // no load from DB
-                if (_childTopics != null && !_childTopics.isEmpty()) {
-                    childTopic = _childTopics.get(0);
+        try {
+            if (typeUri.equals(topicTypeUri)) {
+                return this;
+            }
+            //
+            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+                String assocDefUri    = assocDef.getAssocDefUri();
+                String cardinalityUri = assocDef.getChildCardinalityUri();
+                TopicModelImpl childTopic = null;
+                if (cardinalityUri.equals("dm4.core.one")) {
+                    childTopic = childTopics.getTopicOrNull(assocDefUri);                                // no DB access
+                } else if (cardinalityUri.equals("dm4.core.many")) {
+                    List<RelatedTopicModelImpl> _childTopics = childTopics.getTopicsOrNull(assocDefUri); // no DB access
+                    if (_childTopics != null && !_childTopics.isEmpty()) {
+                        childTopic = _childTopics.get(0);
+                    }
+                } else {
+                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
                 }
-            } else {
-                throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
+                // Note: topics just created have no child topics yet
+                if (childTopic == null) {
+                    continue;
+                }
+                // recursion
+                childTopic = childTopic.findChildTopic(topicTypeUri);
+                if (childTopic != null) {
+                    return childTopic;
+                }
             }
-            // Note: topics just created have no child topics yet
-            if (childTopic == null) {
-                continue;
-            }
-            // recursion
-            childTopic = childTopic.findChildTopic(topicTypeUri);
-            if (childTopic != null) {
-                return childTopic;
-            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("Searching topic " + id + " for \"" + topicTypeUri + "\" failed", e);
         }
-        return null;
     }
 
 

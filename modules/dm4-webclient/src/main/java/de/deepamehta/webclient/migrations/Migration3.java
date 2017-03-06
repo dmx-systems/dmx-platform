@@ -41,16 +41,20 @@ public class Migration3 extends Migration {
 
     private void repair(List<? extends DeepaMehtaType> types, int i) {
         for (DeepaMehtaType type : types) {
-            String typeUri = type.getUri();
-            // Note: to these 2 types no View Config can be associated:
-            // 1) "Meta Meta Type" as it does not exist in the DB (its in-memory ID is -1).
-            // 2) "View Configuration" itself as this would cause an endless recursion while fetching that type.
-            // Fetching a type involves fetching its view config, that is all its view config topics, including
-            // their child topics. Fetching child topics is driven by the topic's type (its assoc defs),
-            // here: "View Configuration" -- the one we're fetching just now.
-            if (typeUri.equals("dm4.core.meta_meta_type") || typeUri.equals("dm4.webclient.view_config")) {
+            // Note: no View Config can be associated to the type "View Configuration" itself as this would cause an
+            // endless recursion while fetching that type. Fetching a type involves fetching its view config, that is
+            // all its view config topics, including their child topics. Fetching child topics is driven by the topic's
+            // type (its assoc defs), here: "View Configuration" -- the one we're fetching just now.
+            if (type.getUri().equals("dm4.webclient.view_config")) {
                 continue;
             }
+            //
+            repair(type, i);
+        }
+    }
+
+    private void repair(DeepaMehtaType type, int i) {
+        try {
             ViewConfiguration viewConfig = type.getViewConfig();
             Topic configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
             if (configTopic == null) {
@@ -64,6 +68,8 @@ public class Migration3 extends Migration {
                 count[i][1]++;
             }
             count[i][0]++;
+        } catch (Exception e) {
+            throw new RuntimeException("Repairing type \"" + type.getUri() + "\" failed", e);
         }
     }
 

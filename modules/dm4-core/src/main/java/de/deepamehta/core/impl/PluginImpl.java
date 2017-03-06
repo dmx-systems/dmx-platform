@@ -574,11 +574,6 @@ public class PluginImpl implements Plugin, EventHandler {
     private void introduceTopicTypesToPlugin() {
         try {
             for (TopicType topicType : dm4.getAllTopicTypes()) {
-                // ### TODO: explain
-                if (topicType.getUri().equals("dm4.core.meta_meta_type")) {
-                    continue;
-                }
-                //
                 dispatchEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {

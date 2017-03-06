@@ -398,11 +398,7 @@ public class PersistenceLayer extends StorageDecorator {
     // === Types ===
 
     TopicTypeImpl getTopicType(String uri) {
-        TopicTypeModelImpl topicType = _getTopicType(uri);
-        if (!uri.equals("dm4.core.meta_meta_type")) {   // ### TODO: refactor and drop this condition
-            topicType.checkReadAccess();
-        }
-        return topicType.instantiate();
+        return checkReadAccessAndInstantiate(_getTopicType(uri));
     }
 
     TopicTypeImpl getTopicTypeImplicitly(long topicId) {
@@ -661,7 +657,6 @@ public class PersistenceLayer extends StorageDecorator {
             topicTypeUris.add("dm4.core.topic_type");
             topicTypeUris.add("dm4.core.assoc_type");
             topicTypeUris.add("dm4.core.meta_type");
-            topicTypeUris.add("dm4.core.meta_meta_type");
             // add regular types
             for (TopicModel topicType : filterReadables(fetchTopics("type_uri", new SimpleValue(
                                                                     "dm4.core.topic_type")))) {
