@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Geomaps</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-geomaps</artifactId>
-    <version>4.8.6</version>
+    <version>4.8.7-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8.6</version>
+        <version>4.8.7-SNAPSHOT</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-topicmaps</artifactId>
-            <version>4.8.6</version>
+            <version>4.8.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-facets</artifactId>
-            <version>4.8.6</version>
+            <version>4.8.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
