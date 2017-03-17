@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.DeepaMehtaType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
@@ -72,8 +73,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getChildTypeUri());
         assertEquals("dm4.core.one",                 assocDef.getParentCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getChildCardinalityUri());
-        Topic t1 = assocDef.getTopic("dm4.core.parent_type");
-        Topic t2 = assocDef.getTopic("dm4.core.child_type");
+        DeepaMehtaObject t1 = assocDef.getPlayer("dm4.core.parent_type");
+        DeepaMehtaObject t2 = assocDef.getPlayer("dm4.core.child_type");
         assertEquals("dm4.core.plugin",              t1.getUri());
         assertEquals("dm4.core.topic_type",          t1.getTypeUri());
         assertEquals("dm4.core.plugin_migration_nr", t2.getUri());

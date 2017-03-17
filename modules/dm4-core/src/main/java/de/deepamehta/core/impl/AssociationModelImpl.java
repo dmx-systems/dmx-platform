@@ -1,19 +1,14 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
-import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.Directive;
-import de.deepamehta.core.service.Directives;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -347,14 +342,14 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     // ===
 
     /**
-     * @teturn  this association's topic which plays the given role.
-     *          If there is no such topic, null is returned.
+     * @return  this association's player which plays the given role.
+     *          If there is no such player, null is returned.
      *          <p>
-     *          If there are 2 such topics an exception is thrown.
+     *          If there are 2 such players an exception is thrown.
      */
-    TopicModelImpl getTopic(String roleTypeUri) {
-        RoleModel role = getRoleModel(roleTypeUri);
-        return role instanceof TopicRoleModel ? ((TopicRoleModelImpl) role).getPlayer() : null;
+    DeepaMehtaObjectModelImpl getPlayer(String roleTypeUri) {
+        RoleModelImpl role = getRoleModel(roleTypeUri);
+        return role != null ? role.getPlayer(this) : null;
     }
 
     TopicModelImpl getTopicByType(String topicTypeUri) {
@@ -453,7 +448,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     private TopicModelImpl filterTopic(RoleModelImpl role, String topicTypeUri) {
         if (role instanceof TopicRoleModel) {
-            TopicModelImpl topic = ((TopicRoleModelImpl) role).getPlayer();
+            TopicModelImpl topic = ((TopicRoleModelImpl) role).getPlayer(this);
             if (topic.getTypeUri().equals(topicTypeUri)) {
                 return topic;
             }

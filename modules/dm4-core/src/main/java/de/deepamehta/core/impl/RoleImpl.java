@@ -1,6 +1,6 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.model.RoleModel;
 
@@ -16,14 +16,11 @@ abstract class RoleImpl implements Role {
 
     AssociationModelImpl assoc;     // the association this role is involved in
 
-    PersistenceLayer pl;
-
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    RoleImpl(RoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
+    RoleImpl(RoleModelImpl model, AssociationModelImpl assoc) {
         this.model = model;
         this.assoc = assoc;
-        this.pl = pl;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -42,7 +39,10 @@ abstract class RoleImpl implements Role {
         return model.getPlayerId();
     }
 
-    // Note: getPlayer() remains abstract
+    @Override
+    public DeepaMehtaObject getPlayer() {
+        return model.getPlayer(assoc).instantiate();    // ### TODO: permission check?
+    }
 
     // ---
 

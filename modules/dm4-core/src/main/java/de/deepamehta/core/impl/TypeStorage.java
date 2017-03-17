@@ -316,7 +316,7 @@ class TypeStorage {
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
-    AssociationDefinitionModelImpl newAssociationDefinition(AssociationModel assoc) {
+    AssociationDefinitionModelImpl newAssociationDefinition(AssociationModelImpl assoc) {
         // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
         AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
@@ -440,8 +440,8 @@ class TypeStorage {
      * @return  the parent type topic.
      *          A topic representing either a topic type or an association type.
      */
-    private TopicModel fetchParentTypeTopic(AssociationModel assoc) {
-        TopicModel parentType = ((AssociationModelImpl) assoc).getTopic("dm4.core.parent_type");
+    private TopicModel fetchParentTypeTopic(AssociationModelImpl assoc) {
+        TopicModel parentType = (TopicModel) assoc.getPlayer("dm4.core.parent_type");
         // error check
         if (parentType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dm4.core.parent_type\" is missing in " + assoc);
@@ -456,8 +456,8 @@ class TypeStorage {
      * @return  the child type topic.
      *          A topic representing a topic type.
      */
-    private TopicModel fetchChildTypeTopic(AssociationModel assoc) {
-        TopicModel childType = ((AssociationModelImpl) assoc).getTopic("dm4.core.child_type");
+    private TopicModel fetchChildTypeTopic(AssociationModelImpl assoc) {
+        TopicModel childType = (TopicModel) assoc.getPlayer("dm4.core.child_type");
         // error check
         if (childType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dm4.core.child_type\" is missing in " + assoc);
@@ -468,7 +468,7 @@ class TypeStorage {
 
     // ---
 
-    TypeModelImpl fetchParentType(AssociationModel assoc) {
+    TypeModelImpl fetchParentType(AssociationModelImpl assoc) {
         TopicModel type = fetchParentTypeTopic(assoc);
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dm4.core.topic_type")) {

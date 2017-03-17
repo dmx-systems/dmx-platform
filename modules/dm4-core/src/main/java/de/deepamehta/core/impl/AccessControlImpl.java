@@ -5,6 +5,7 @@ import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
+import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
@@ -348,7 +349,7 @@ class AccessControlImpl implements AccessControl {
     @Override
     public boolean isWorkspaceAssignment(Association assoc) {
         if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
-            TopicModel topic = ((AssociationModelImpl) assoc.getModel()).getTopic("dm4.core.child");
+            DeepaMehtaObjectModel topic = ((AssociationImpl) assoc).getModel().getPlayer("dm4.core.child");
             if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
                 return true;
             }

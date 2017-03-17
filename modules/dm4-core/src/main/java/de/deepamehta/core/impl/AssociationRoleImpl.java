@@ -2,7 +2,6 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationRole;
-import de.deepamehta.core.DeepaMehtaObject;
 
 
 
@@ -13,20 +12,11 @@ class AssociationRoleImpl extends RoleImpl implements AssociationRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationRoleImpl(AssociationRoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
-        super(model, assoc, pl);
+    AssociationRoleImpl(AssociationRoleModelImpl model, AssociationModelImpl assoc) {
+        super(model, assoc);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // === Role Implementation ===
-
-    @Override
-    public DeepaMehtaObject getPlayer() {
-        return getModel().getPlayer().instantiate();     // ### TODO: permission check?
-    }
 
 
 

@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicRole;
 
@@ -13,24 +12,22 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicRoleImpl(TopicRoleModelImpl model, AssociationModelImpl assoc, PersistenceLayer pl) {
-        super(model, assoc, pl);
+    TopicRoleImpl(TopicRoleModelImpl model, AssociationModelImpl assoc) {
+        super(model, assoc);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
 
 
-    // === Role Implementation ===
+    // === TopicRole Implementation ===
 
     @Override
-    public DeepaMehtaObject getPlayer() {
-        return getModel().getPlayer().instantiate();   // ### TODO: permission check?
+    public Topic getTopic() {
+        return (Topic) getPlayer();
     }
 
-
-
-    // === TopicRole Implementation ===
+    // ---
 
     @Override
     public String getTopicUri() {
@@ -40,13 +37,6 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
     @Override
     public boolean topicIdentifiedByUri() {
         return getModel().topicIdentifiedByUri();
-    }
-
-    // ---
-
-    @Override
-    public Topic getTopic() {
-        return (Topic) getPlayer();
     }
 
 

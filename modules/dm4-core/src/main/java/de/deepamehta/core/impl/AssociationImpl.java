@@ -3,6 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.RelatedAssociation;
+import de.deepamehta.core.RelatedObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
@@ -89,15 +90,15 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
-    public Topic getTopic(String roleTypeUri) {
-        TopicModelImpl topic = getModel().getTopic(roleTypeUri);
-        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
+    public RelatedObject getPlayer(String roleTypeUri) {
+        DeepaMehtaObjectModelImpl object = getModel().getPlayer(roleTypeUri);
+        return object != null ? (RelatedObject) object.instantiate() : null;    // ### TODO: permission check?
     }
 
     @Override
     public Topic getTopicByType(String topicTypeUri) {
         TopicModelImpl topic = getModel().getTopicByType(topicTypeUri);
-        return topic != null ? topic.instantiate() : null;    // ### TODO: permission check?
+        return topic != null ? topic.instantiate() : null;                      // ### TODO: permission check?
     }
 
     // ---

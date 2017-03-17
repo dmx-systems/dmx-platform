@@ -1,11 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Role;
-import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RoleModel;
-
-import org.codehaus.jettison.json.JSONObject;
 
 
 
@@ -17,6 +13,7 @@ abstract class RoleModelImpl implements RoleModel {
     String roleTypeUri;             // is never null
 
     PersistenceLayer pl;
+    ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -28,6 +25,7 @@ abstract class RoleModelImpl implements RoleModel {
         setPlayerId(playerId);
         setRoleTypeUri(roleTypeUri);
         this.pl = pl;
+        this.mf = pl.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -83,5 +81,8 @@ abstract class RoleModelImpl implements RoleModel {
      */
     abstract Role instantiate(AssociationModelImpl assoc);
 
-    abstract DeepaMehtaObjectModel getPlayer();
+    /**
+     * @param   assoc   the association this role is involved in
+     */
+    abstract DeepaMehtaObjectModelImpl getPlayer(AssociationModelImpl assoc);
 }

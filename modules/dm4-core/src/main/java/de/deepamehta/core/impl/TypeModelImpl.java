@@ -366,7 +366,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Type Editor Support ===
 
-    final void _addAssocDef(AssociationModel assoc) {
+    final void _addAssocDef(AssociationModelImpl assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
         //
         addUpdateTypeDirective();

@@ -52,19 +52,17 @@ public interface Association extends DeepaMehtaObject {
     // ---
 
     /**
-     * ### TODO: make it work for assoc players as well or drop it
-     *
-     * @teturn  this association's topic which plays the given role.
-     *          If there is no such topic, null is returned.
+     * @return  this association's player which plays the given role.
+     *          If there is no such player, null is returned.
      *          <p>
-     *          If there are 2 such topics an exception is thrown.
+     *          If there are 2 such players an exception is thrown.
      */
-    Topic getTopic(String roleTypeUri);
+    RelatedObject getPlayer(String roleTypeUri);
 
     /**
      * ### TODO: make it work for assoc players as well or drop it
      *
-     * @teturn  this association's topic which has the given type.
+     * @return  this association's topic which has the given type.
      *          If there is no such topic, null is returned.
      *          <p>
      *          If there are 2 such topics an exception is thrown.
