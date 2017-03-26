@@ -21,17 +21,21 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>false</filtering>
                 <excludes>
-                    <exclude>web/index.html</exclude>
+                    <exclude>web/build/</exclude>
+                    <exclude>web/config/</exclude>
+                    <exclude>web/dist/</exclude>
+                    <exclude>web/node_modules/</exclude>
+                    <exclude>web/src/</exclude>
+                    <exclude>web/templates/</exclude>
+                    <exclude>web/.babelrc</exclude>
+                    <exclude>web/.editorconfig</exclude>
+                    <exclude>web/.eslintignore</exclude>
+                    <exclude>web/.eslintrc.js</exclude>
+                    <exclude>web/.stylintrc</exclude>
+                    <exclude>web/package.json</exclude>
+                    <exclude>web/README.md</exclude>
                 </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>web/index.html</include>
-                </includes>
             </resource>
         </resources>
         <plugins>
@@ -43,6 +47,10 @@
                         <Bundle-Activator>
                             de.deepamehta.webclient.WebclientPlugin
                         </Bundle-Activator>
+                        <Include-Resource>
+                            {maven-resources},
+                            web=src/main/resources/web/dist
+                        </Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>
