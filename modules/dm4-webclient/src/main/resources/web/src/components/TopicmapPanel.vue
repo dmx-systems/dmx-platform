@@ -14,7 +14,9 @@ export default {
   },
 
   watch: {
-    topicmapId: topicmapId => console.log('select topicmap', topicmapId)
+    topicmapId: function (topicmapId) {
+      console.log('select topicmap', topicmapId)
+    }
   },
 
   computed: {

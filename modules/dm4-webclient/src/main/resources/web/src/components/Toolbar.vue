@@ -1,5 +1,5 @@
 <template>
-  <div id="detail-panel" class="bg-light"></div>
+  <div>DeepaMehta 5</div>
 </template>
 
 <script>
