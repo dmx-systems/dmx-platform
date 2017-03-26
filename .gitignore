@@ -4,6 +4,8 @@ runner/
 target/
 bundle-deploy/
 modules-external/
+node_modules/
+dist/
 
 *~
 .project
@@ -11,6 +13,9 @@ modules-external/
 .settings
 .shell_history
 .DS_Store
+
+npm-debug.log
+npm-debug.log.*
 
 commit-message.txt
 
