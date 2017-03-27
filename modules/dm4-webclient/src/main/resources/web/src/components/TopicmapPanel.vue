@@ -1,5 +1,6 @@
 <template>
   <div id="topicmap-panel">
+    <workspace-selector></workspace-selector>
     <q-select label="Topicmap" :options="options" v-model="topicmapId"></q-select>
   </div>
 </template>
