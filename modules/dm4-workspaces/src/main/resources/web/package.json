@@ -1,0 +1,11 @@
+{
+  "name": "dm4-workspaces",
+  "version": "0.0.1",
+  "description": "A Quasar App",
+  "author": "Your Name",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1"
+  }
+}
