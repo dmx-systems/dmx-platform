@@ -1,8 +1,8 @@
 {
-  "name": "quasar-app",
-  "version": "0.0.1",
+  "name": "dm5-webclient",
+  "version": "5.0.0-SNAPSHOT",
   "description": "A Quasar App",
-  "author": "Your Name",
+  "author": "Jörg Richter",
   "scripts": {
     "clean": "node build/script.clean.js",
     "dev": "node build/script.dev.js",

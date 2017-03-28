@@ -1,6 +1,13 @@
 var path = require('path')
 
 module.exports = {
+
+  // Webpack entry points
+  entry: {
+    'dm4-webclient': './src/main.js',
+    'dm4-workspaces': '../../../../../dm4-workspaces/src/main/resources/web/src/main.js'
+  },
+
   // Webpack aliases
   aliases: {
     quasar: path.resolve(__dirname, '../node_modules/quasar-framework/'),

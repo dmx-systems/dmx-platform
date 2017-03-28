@@ -16,9 +16,7 @@ function resolve (dir) {
 }
 
 module.exports = {
-  entry: {
-    app: './src/main.js'
-  },
+  entry: config.entry,
   output: {
     path: path.resolve(__dirname, '../dist'),
     publicPath: config[env.prod ? 'build' : 'dev'].publicPath,
