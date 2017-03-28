@@ -8,10 +8,21 @@
 
 <script>
 export default {
+
+  mounted () {
+    console.log('DOM ready!')
+    initPlugins()
+  },
+
   components: {
     'toolbar': require('./Toolbar.vue'),
     'topicmap-panel': require('./TopicmapPanel.vue'),
     'detail-panel': require('./DetailPanel.vue')
   }
+}
+
+function initPlugins () {
+  // ### TODO: load plugins dynamically
+  require('../../../../../../../dm4-workspaces/src/main/resources/web/src/main.js').default.init()
 }
 </script>

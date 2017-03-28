@@ -5,7 +5,7 @@
 <script>
 export default {
 
-  data() {
+  data () {
     return {
       workspaceId: undefined,
       workspaceTopics: [

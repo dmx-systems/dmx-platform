@@ -1,7 +1,13 @@
-import Vue from 'vue'
+var plugins = [
+  '/de.deepamehta.workspaces/js/manifest.js',
+  '/de.deepamehta.workspaces/js/app.js'
+]
 
-var plugin = 'dm4-workspaces'
-var comp = 'WorkspaceSelector'
+plugins.forEach(url => loadScript(url))
 
-Vue.component('workspace-selector', require(
-  '../../../../../../../modules/' + plugin + '/src/main/resources/web/components/' + comp + '.vue'))
+function loadScript (url) {
+  console.log('Loading script', url)
+  var script = document.createElement('script')
+  script.src = url
+  document.head.appendChild(script)
+}
