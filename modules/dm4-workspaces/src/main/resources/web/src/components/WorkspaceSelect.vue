@@ -22,9 +22,12 @@ export default {
   },
 
   computed: {
+
     state () {
-      return this.$store.state.workspace
+      console.log('$store ...', this.$store)
+      return null // this.$store.state.workspaces
     },
+
     options () {
       return this.workspaceTopics.map(topic => ({
         label: topic.value,
