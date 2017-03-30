@@ -5,7 +5,8 @@ module.exports = {
   // Webpack entry points
   entry: {
     'dm4-webclient': './src/main.js',
-    'dm4-workspaces': '../../../../../dm4-workspaces/src/main/resources/web/src/main.js'
+    'dm4-workspaces': '../../../../../dm4-workspaces/src/main/resources/web/src/main.js',
+    'dm4-topicmaps': '../../../../../dm4-topicmaps/src/main/resources/web/src/main.js'
   },
 
   // Webpack aliases

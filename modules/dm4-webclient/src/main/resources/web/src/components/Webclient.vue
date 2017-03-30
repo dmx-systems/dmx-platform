@@ -23,8 +23,7 @@ export default {
     initPlugins () {
       // ### TODO: load plugins dynamically
       require('../../../../../../../dm4-workspaces/src/main/resources/web/src/main.js').default.init({Vue, store})
-      //
-      this.$store.dispatch('addToToolbar', require('./TopicmapSelect'))
+      require('../../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js').default.init({Vue, store})
     }
   },
 

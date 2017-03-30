@@ -1,0 +1,11 @@
+{
+  "name": "dm5-topicmaps",
+  "version": "5.0.0-SNAPSHOT",
+  "description": "A Quasar App",
+  "author": "Jörg Richter",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.24.0",
+    "babel-loader": "^6.4.1"
+  }
+}

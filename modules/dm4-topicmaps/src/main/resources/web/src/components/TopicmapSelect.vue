@@ -21,7 +21,7 @@ export default {
 
     topicmapTopics () {
       console.log('Computing "topicmapTopics"')
-      return this.$store.state.topicmapPanel.topicmapTopics
+      return this.$store.state.topicmaps.topicmapTopics
     },
 
     options () {
