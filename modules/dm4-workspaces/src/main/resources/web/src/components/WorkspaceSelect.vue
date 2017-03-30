@@ -7,11 +7,7 @@ export default {
 
   data () {
     return {
-      workspaceId: undefined,
-      workspaceTopics: [
-        {id: 1234, value: 'DeepaMehta'},
-        {id: 2345, value: 'Infobits'}
-      ]
+      workspaceId: undefined
     }
   },
 
@@ -23,9 +19,9 @@ export default {
 
   computed: {
 
-    state () {
-      console.log('$store ...', this.$store)
-      return null // this.$store.state.workspaces
+    workspaceTopics () {
+      console.log('Computing "workspaceTopics"')
+      return this.$store.state.workspaces.workspaceTopics
     },
 
     options () {

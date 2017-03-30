@@ -15,6 +15,8 @@ export default {
   mounted () {
     console.log('DOM ready!')
     this.initPlugins()
+    console.log('dispatch "init"')
+    this.$store.dispatch('init')
   },
 
   methods: {

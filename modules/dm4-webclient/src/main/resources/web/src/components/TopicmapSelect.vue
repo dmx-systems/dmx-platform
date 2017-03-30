@@ -20,6 +20,7 @@ export default {
   computed: {
 
     topicmapTopics () {
+      console.log('Computing "topicmapTopics"')
       return this.$store.state.topicmapPanel.topicmapTopics
     },
 
