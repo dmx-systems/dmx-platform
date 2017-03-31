@@ -1,28 +1,51 @@
 import Vue from 'vue'
 import store from './store'
 
+// ### TODO: retrieve plugin list from server
+var pluginUris = [
+  'de.deepamehta.workspaces'
+]
+
 export default {
   loadPlugins () {
-    // ### TODO: load plugins dynamically
-    require('../../../../../../dm4-workspaces/src/main/resources/web/src/main.js').default.init({Vue, store})
-    require('../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js').default.init({Vue, store})
+    pluginUris.forEach(pluginUri => loadPlugin(pluginUri, function (exports) {
+      exports.default.init({Vue, store})
+    }))
   }
 }
 
-// doesn't work
+function loadPlugin (pluginUri, callback) {
+  console.log('Loading plugin', pluginUri)
+  loadPluginChunk(pluginUri, 'manifest')
+  loadPluginChunk(pluginUri, 'vendor')
+  loadPluginAppChunk(pluginUri, callback)
+}
 
-/*
-var plugins = [
-  '/de.deepamehta.workspaces/js/manifest.js',
-  '/de.deepamehta.workspaces/js/app.js'
-]
+function loadPluginAppChunk (pluginUri, callback) {
+  var pluginIdent = getPluginIdent(pluginUri)
+  window[pluginIdent] = function (exports) {
+    delete window[pluginIdent]
+    removeScript()
+    callback(exports)
+  }
+  var removeScript = loadPluginChunk(pluginUri, 'app')
+}
 
-plugins.forEach(url => loadScript(url))
+function getPluginIdent (pluginUri) {
+  return '_' + pluginUri.replace(/\./g, '_')
+}
+
+function loadPluginChunk (pluginUri, name) {
+  return loadScript('/' + pluginUri + '/js/' + name + '.js')
+}
 
 function loadScript (url) {
-  console.log('Loading script', url)
   var script = document.createElement('script')
+  script.type = 'text/javascript'
+  script.charset = 'utf-8'
   script.src = url
   document.head.appendChild(script)
+  return function remove () {
+    document.head.removeChild(script)
+  }
 }
-*/
