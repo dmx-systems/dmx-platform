@@ -10,7 +10,6 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import store from './store'
 import router from './router'
-// import './plugin-manager'
 
 Vue.use(Quasar) // Install Quasar Framework
 

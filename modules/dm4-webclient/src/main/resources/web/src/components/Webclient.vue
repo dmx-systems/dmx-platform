@@ -7,24 +7,12 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import store from '../store'
+import pluginManager from '../plugin-manager'
 
 export default {
 
   mounted () {
-    console.log('DOM ready!')
-    this.initPlugins()
-    console.log('dispatch "init"')
-    this.$store.dispatch('init')
-  },
-
-  methods: {
-    initPlugins () {
-      // ### TODO: load plugins dynamically
-      require('../../../../../../../dm4-workspaces/src/main/resources/web/src/main.js').default.init({Vue, store})
-      require('../../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js').default.init({Vue, store})
-    }
+    pluginManager.loadPlugins()
   },
 
   components: {
