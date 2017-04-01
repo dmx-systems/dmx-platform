@@ -3,7 +3,8 @@ import store from './store'
 
 // ### TODO: retrieve plugin list from server
 var pluginUris = [
-  'de.deepamehta.workspaces'
+  'de.deepamehta.workspaces',
+  'de.deepamehta.topicmaps'
 ]
 
 export default {
@@ -19,7 +20,7 @@ function loadPlugin (pluginUri, callback) {
   installAppCallback(pluginUri, callback)
   loadPluginChunk(pluginUri, 'manifest', () =>
     loadPluginChunk(pluginUri, 'vendor', () =>
-      loadPluginChunk(pluginUri, 'app')
+      loadPluginChunk(pluginUri, 'main')
     )
   )
 }

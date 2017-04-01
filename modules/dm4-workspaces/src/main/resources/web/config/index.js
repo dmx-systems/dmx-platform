@@ -1,3 +1,3 @@
 module.exports = {
-  pluginUri: 'de.deepamehta.workspaces',
+  pluginUri: 'de.deepamehta.workspaces'
 }

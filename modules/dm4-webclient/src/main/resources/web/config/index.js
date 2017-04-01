@@ -55,7 +55,7 @@ module.exports = {
     // Also see /build/script.dev.js and search for "proxy api requests"
     // https://github.com/chimurai/http-proxy-middleware
     proxyTable: {
-      context: ['/core', '/accesscontrol'],
+      context: ['/core', '/de.deepamehta.workspaces', '/de.deepamehta.topicmaps'],
       target: 'http://localhost:8080'
     }
   }
