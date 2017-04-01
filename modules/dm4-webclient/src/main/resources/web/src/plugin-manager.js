@@ -16,36 +16,40 @@ export default {
 
 function loadPlugin (pluginUri, callback) {
   console.log('Loading plugin', pluginUri)
-  loadPluginChunk(pluginUri, 'manifest')
-  loadPluginChunk(pluginUri, 'vendor')
-  loadPluginAppChunk(pluginUri, callback)
+  installAppCallback(pluginUri, callback)
+  loadPluginChunk(pluginUri, 'manifest', () =>
+    loadPluginChunk(pluginUri, 'vendor', () =>
+      loadPluginChunk(pluginUri, 'app')
+    )
+  )
 }
 
-function loadPluginAppChunk (pluginUri, callback) {
-  var pluginIdent = getPluginIdent(pluginUri)
-  window[pluginIdent] = function (exports) {
-    delete window[pluginIdent]
-    removeScript()
+function installAppCallback (pluginUri, callback) {
+  var _pluginIdent = pluginIdent(pluginUri)
+  window[_pluginIdent] = function (exports) {
+    delete window[_pluginIdent]
     callback(exports)
   }
-  var removeScript = loadPluginChunk(pluginUri, 'app')
 }
 
-function getPluginIdent (pluginUri) {
+function loadPluginChunk (pluginUri, name, callback) {
+  return loadScript(pluginChunk(pluginUri, name), callback)
+}
+
+function pluginIdent (pluginUri) {
   return '_' + pluginUri.replace(/\./g, '_')
 }
 
-function loadPluginChunk (pluginUri, name) {
-  return loadScript('/' + pluginUri + '/js/' + name + '.js')
+function pluginChunk (pluginUri, name) {
+  return '/' + pluginUri + '/js/' + name + '.js'
 }
 
-function loadScript (url) {
+function loadScript (url, callback) {
   var script = document.createElement('script')
-  script.type = 'text/javascript'
-  script.charset = 'utf-8'
   script.src = url
-  document.head.appendChild(script)
-  return function remove () {
+  script.onload = function () {
     document.head.removeChild(script)
+    callback && callback()
   }
+  document.head.appendChild(script)
 }
