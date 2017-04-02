@@ -18,9 +18,7 @@ export default {
   },
 
   computed: {
-
     workspaceTopics () {
-      console.log('Computing "workspaceTopics"')
       return this.$store.state.workspaces.workspaceTopics
     },
 

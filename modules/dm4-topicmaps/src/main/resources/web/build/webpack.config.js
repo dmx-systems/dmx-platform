@@ -25,8 +25,7 @@ var webpackConfig = {
     filename: 'js/[name].js',
     chunkFilename: 'js/[id].[chunkhash].js',
     library: pluginIdent,
-    libraryTarget: 'jsonp',
-    jsonpFunction: "webpackJsonp" + pluginIdent
+    libraryTarget: 'jsonp'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
