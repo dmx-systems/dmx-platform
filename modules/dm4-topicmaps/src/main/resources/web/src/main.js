@@ -7,7 +7,7 @@ export default {
   init ({store}) {
     // install component
     console.log('Topicmaps init() called!!')
-    store.dispatch('addToToolbar', require('./components/TopicmapSelect'))
+    store.dispatch('addToToolbar', require('./components/TopicmapSelect.vue'))
     // install store module
     store.registerModule('topicmaps', storeModule)
   }

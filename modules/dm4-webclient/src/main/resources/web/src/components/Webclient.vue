@@ -1,9 +1,9 @@
 <template>
-  <q-layout>
-    <toolbar slot="header"></toolbar>
-    <topicmap-panel class="width-3of4"></topicmap-panel>
-    <detail-panel class="width-1of4"></detail-panel>
-  </q-layout>
+  <div>
+    <toolbar></toolbar>
+    <topicmap-panel></topicmap-panel>
+    <detail-panel></detail-panel>
+  </div>
 </template>
 
 <script>
@@ -16,9 +16,9 @@ export default {
   },
 
   components: {
-    'toolbar': require('./Toolbar.vue'),
+    'toolbar':        require('./Toolbar.vue'),
     'topicmap-panel': require('./TopicmapPanel.vue'),
-    'detail-panel': require('./DetailPanel.vue')
+    'detail-panel':   require('./DetailPanel.vue')
   }
 }
 </script>

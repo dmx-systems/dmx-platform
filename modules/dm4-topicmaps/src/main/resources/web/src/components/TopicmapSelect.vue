@@ -1,5 +1,10 @@
 <template>
-  <q-select label="Topicmap" :options="options" v-model="topicmapId"></q-select>
+  <div>
+    Topicmap
+    <select>
+      <option v-for="topic in topicmapTopics" :value="topic.id">{{topic.value}}</option>
+    </select>
+  </div>
 </template>
 
 <script>
@@ -20,13 +25,6 @@ export default {
   computed: {
     topicmapTopics () {
       return this.$store.state.topicmaps.topicmapTopics
-    },
-
-    options () {
-      return this.topicmapTopics.map(topic => ({
-        label: topic.value,
-        value: topic.id
-      }))
     }
   }
 }

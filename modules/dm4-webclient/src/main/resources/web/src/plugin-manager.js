@@ -4,11 +4,11 @@ import store from './store'
 export default {
   loadPlugins () {
     if (DEV) {
-      console.log('DM5 development mode: plugins are loaded from file system and are hot replaced')
+      console.info('DM5 development mode: plugins are loaded from file system and are hot replaced')
       initPlugin(require('../../../../../../dm4-workspaces/src/main/resources/web/src/main.js'))
       initPlugin(require('../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js'))
     } else {
-      console.log('DM5 production mode: plugins are loaded from server')
+      console.info('DM5 production mode: plugins are loaded from server')
       loadPluginsFromServer()
     }
   }

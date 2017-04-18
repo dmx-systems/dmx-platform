@@ -1,19 +1,15 @@
-# Quasar App
+# DM5 Webclient
 
-> A Quasar project
-
-## Build Setup
+## Develop
 
 ``` bash
-# install dependencies
-$ npm install
+# serve with hot reload at localhost:8010
+npm run dev
+```
 
-# serve with hot reload at localhost:8080
-$ quasar dev
+## Build
 
+``` bash
 # build for production with minification
-$ quasar build
-
-# lint code
-$ quasar lint
+npm run build
 ```

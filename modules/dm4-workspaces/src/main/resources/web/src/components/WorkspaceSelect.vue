@@ -1,5 +1,10 @@
 <template>
-  <q-select label="Workspace" :options="options" v-model="workspaceId"></q-select>
+  <div>
+    Workspace
+    <select>
+      <option v-for="topic in workspaceTopics" :value="topic.id">{{topic.value}}</option>
+    </select>
+  </div>
 </template>
 
 <script>
@@ -20,13 +25,6 @@ export default {
   computed: {
     workspaceTopics () {
       return this.$store.state.workspaces.workspaceTopics
-    },
-
-    options () {
-      return this.workspaceTopics.map(topic => ({
-        label: topic.value,
-        value: topic.id
-      }))
     }
   }
 }
