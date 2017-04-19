@@ -4,14 +4,14 @@ import http from 'axios'
 
 export default {
   loadPlugins () {
+    console.log('Loading DM5 standard plugins ...')
     if (DEV) {
-      console.info('DM5 development mode: plugins are loaded from file system and are hot replaced')
-      initPlugin(require('../../../../../../dm4-workspaces/src/main/resources/web/src/main.js'))
-      initPlugin(require('../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js'))
-    } else {
-      console.info('DM5 production mode: plugins are loaded from server')
-      loadPluginsFromServer()
+      console.info('DM5 development mode: these plugins are loaded from file system and are hot replaced')
     }
+    initPlugin(require('../../../../../../dm4-workspaces/src/main/resources/web/src/main.js'))
+    initPlugin(require('../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js'))
+    console.log('Loading 3rd-party DM5 plugins ...')
+    loadPluginsFromServer()
   }
 }
 
@@ -25,11 +25,10 @@ function initPlugin (plugin) {
 
 function loadPluginsFromServer () {
   http.get('/core/plugin').then(response => {
-    var plugins = response.data
-    plugins.forEach(plugin => {
-      if (plugin.hasPluginFile) {
-        loadPlugin(plugin.pluginUri, function (exports) {
-          exports.default.init({Vue, store})
+    response.data.forEach(pluginInfo => {
+      if (pluginInfo.hasPluginFile) {
+        loadPlugin(pluginInfo.pluginUri, function (plugin) {
+          plugin.default.init({Vue, store})
         })
       }
     })
@@ -37,7 +36,7 @@ function loadPluginsFromServer () {
 }
 
 function loadPlugin (pluginUri, callback) {
-  console.log('Loading plugin', pluginUri)
+  console.log('Loading plugin from server', pluginUri)
   installCallback(pluginUri, callback)
   loadScript(pluginURL(pluginUri))
 }

@@ -8,7 +8,7 @@ module.exports = (env = {}) => {
     entry: './src/main.js',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'build.js'
+      filename: 'webclient.js'
     },
     module: {
       rules: [
