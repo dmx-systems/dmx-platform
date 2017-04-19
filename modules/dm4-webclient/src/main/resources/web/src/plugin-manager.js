@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import store from './store'
+import http from 'axios'
 
 export default {
   loadPlugins () {
@@ -23,15 +24,16 @@ function initPlugin (plugin) {
 // --- Load from server ---
 
 function loadPluginsFromServer () {
-  // ### TODO: retrieve plugin list from server
-  var pluginUris = [
-    'de.deepamehta.workspaces',
-    'de.deepamehta.topicmaps'
-  ]
-  //
-  pluginUris.forEach(pluginUri => loadPlugin(pluginUri, function (exports) {
-    exports.default.init({Vue, store})
-  }))
+  http.get('/core/plugin').then(response => {
+    var plugins = response.data
+    plugins.forEach(plugin => {
+      if (plugin.hasPluginFile) {
+        loadPlugin(plugin.pluginUri, function (exports) {
+          exports.default.init({Vue, store})
+        })
+      }
+    })
+  })
 }
 
 function loadPlugin (pluginUri, callback) {
@@ -49,7 +51,7 @@ function installCallback (pluginUri, callback) {
 }
 
 function pluginIdent (pluginUri) {
-  return '_' + pluginUri.replace(/\./g, '_')
+  return '_' + pluginUri.replace(/[.-]/g, '_')
 }
 
 function pluginURL (pluginUri) {

@@ -8,6 +8,7 @@
     "build": "webpack -p --progress --hide-modules"
   },
   "dependencies": {
+    "axios": "^0.16.1",
     "vue": "^2.2.6",
     "vue-router": "^2.4.0",
     "vuex": "^2.3.1"
