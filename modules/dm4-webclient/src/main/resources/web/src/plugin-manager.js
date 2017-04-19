@@ -14,6 +14,12 @@ export default {
   }
 }
 
+// --- Load from file system ---
+
+function initPlugin (plugin) {
+  plugin.default.init({Vue, store})
+}
+
 // --- Load from server ---
 
 function loadPluginsFromServer () {
@@ -28,50 +34,33 @@ function loadPluginsFromServer () {
   }))
 }
 
-function loadPlugin (pluginUri, mainCallback) {
+function loadPlugin (pluginUri, callback) {
   console.log('Loading plugin', pluginUri)
-  installMainCallback(pluginUri, mainCallback)
-  loadPluginChunk(pluginUri, 'manifest', () =>
-    loadPluginChunk(pluginUri, 'vendor', () =>
-      loadPluginChunk(pluginUri, 'main')
-    )
-  )
+  installCallback(pluginUri, callback)
+  loadScript(pluginURL(pluginUri))
 }
 
-function installMainCallback (pluginUri, mainCallback) {
+function installCallback (pluginUri, callback) {
   var _pluginIdent = pluginIdent(pluginUri)
   window[_pluginIdent] = function (exports) {
     delete window[_pluginIdent]
-    mainCallback(exports)
+    callback(exports)
   }
-}
-
-function loadPluginChunk (pluginUri, name, callback) {
-  return loadScript(pluginChunk(pluginUri, name), callback)
 }
 
 function pluginIdent (pluginUri) {
   return '_' + pluginUri.replace(/\./g, '_')
 }
 
-function pluginChunk (pluginUri, name) {
-  return '/' + pluginUri + '/js/' + name + '.js'
+function pluginURL (pluginUri) {
+  return '/' + pluginUri + '/plugin' + '.js'
 }
 
-function loadScript (url, callback) {
+function loadScript (url) {
   var script = document.createElement('script')
   script.src = url
   script.onload = function () {
     document.head.removeChild(script)
-    callback && callback()
   }
   document.head.appendChild(script)
-}
-
-// --- Load from file system ---
-
-function initPlugin (plugin) {
-  plugin.default.init({
-    store
-  })
 }

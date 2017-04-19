@@ -4,8 +4,6 @@ var path = require('path')
 
 module.exports = (env = {}) => {
 
-  console.log("environ", env, process.env.NODE_ENV)
-
   var webpackConfig = {
     entry: './src/main.js',
     output: {

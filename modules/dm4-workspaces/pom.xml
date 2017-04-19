@@ -40,17 +40,12 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>web/build/</exclude>
-                    <exclude>web/config/</exclude>
                     <exclude>web/dist/</exclude>
                     <exclude>web/node_modules/</exclude>
                     <exclude>web/src/</exclude>
                     <exclude>web/.babelrc</exclude>
-                    <exclude>web/.editorconfig</exclude>
-                    <exclude>web/.eslintignore</exclude>
-                    <exclude>web/.eslintrc.js</exclude>
-                    <exclude>web/.stylintrc</exclude>
                     <exclude>web/package.json</exclude>
+                    <exclude>web/webpack.config.js</exclude>
                     <exclude>web/README.md</exclude>
                 </excludes>
             </resource>
