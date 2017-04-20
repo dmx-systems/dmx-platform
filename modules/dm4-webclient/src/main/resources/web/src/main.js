@@ -6,5 +6,5 @@ new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(require('./App.vue'))
+  render: h => h(require('./components/App.vue'))
 })

@@ -22,13 +22,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>web/dist/</exclude>
-                    <exclude>web/node_modules/</exclude>
                     <exclude>web/src/</exclude>
-                    <exclude>web/.babelrc</exclude>
-                    <exclude>web/package.json</exclude>
-                    <exclude>web/webpack.config.js</exclude>
-                    <exclude>web/README.md</exclude>
                 </excludes>
             </resource>
         </resources>
@@ -41,10 +35,6 @@
                         <Bundle-Activator>
                             de.deepamehta.webclient.WebclientPlugin
                         </Bundle-Activator>
-                        <Include-Resource>
-                            {maven-resources},
-                            web=src/main/resources/web/dist
-                        </Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>

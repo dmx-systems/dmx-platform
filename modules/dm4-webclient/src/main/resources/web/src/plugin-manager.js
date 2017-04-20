@@ -8,8 +8,8 @@ export default {
     if (DEV) {
       console.info('DM5 development mode: these plugins are loaded from file system and are hot replaced')
     }
-    initPlugin(require('../../../../../../dm4-workspaces/src/main/resources/web/src/main.js'))
-    initPlugin(require('../../../../../../dm4-topicmaps/src/main/resources/web/src/main.js'))
+    initPlugin(require('modules/dm4-workspaces/src/main/resources/web/src/main.js'))
+    initPlugin(require('modules/dm4-topicmaps/src/main/resources/web/src/main.js'))
     console.log('Loading 3rd-party DM5 plugins ...')
     loadPluginsFromServer()
   }
