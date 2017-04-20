@@ -4,7 +4,7 @@
   "description": "",
   "author": "Jörg Richter",
   "scripts": {
-    "dev": "webpack-dev-server -d --env.dev",
+    "dev": "webpack-dev-server -d --env.dev --hot",
     "build": "webpack -p --progress --hide-modules"
   },
   "dependencies": {
