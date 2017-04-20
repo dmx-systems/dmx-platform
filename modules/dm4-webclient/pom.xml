@@ -22,6 +22,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
+                    <exclude>web/dist/</exclude>
                     <exclude>web/src/</exclude>
                 </excludes>
             </resource>
@@ -35,6 +36,10 @@
                         <Bundle-Activator>
                             de.deepamehta.webclient.WebclientPlugin
                         </Bundle-Activator>
+                        <Include-Resource>
+                            {maven-resources},
+                            web=src/main/resources/web/dist
+                        </Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>

@@ -1,4 +1,5 @@
 var webpack = require('webpack')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
 var path = require('path')
 
 module.exports = (env = {}) => {
@@ -7,7 +8,7 @@ module.exports = (env = {}) => {
     entry: './dm4-webclient/src/main/resources/web/src/main.js',
     output: {
       filename: 'webclient.js',
-      path: path.resolve(__dirname, './dm4-webclient/src/main/resources/web/dist/'),
+      path: path.resolve(__dirname, './dm4-webclient/src/main/resources/web/dist/')
     },
     resolve: {
       alias: {
@@ -30,6 +31,9 @@ module.exports = (env = {}) => {
     plugins: [
       new webpack.DefinePlugin({
         DEV: env.dev,
+      }),
+      new HtmlWebpackPlugin({
+        template: './dm4-webclient/src/main/resources/web/index.html'
       })
     ]
   }
@@ -37,7 +41,6 @@ module.exports = (env = {}) => {
   if (env.dev) {
     webpackConfig.devServer = {
       port: 8082,
-      contentBase: './dm4-webclient/src/main/resources/web/',
       proxy: [
         {
           context: ['/core'],
