@@ -1,9 +1,9 @@
 <template>
   <div>
     Topicmap
-    <select>
-      <option v-for="topic in topicmapTopics" :value="topic.id">{{topic.value}}</option>
-    </select>
+    <el-select v-model="topicmapId" size="small">
+      <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+    </el-select>
   </div>
 </template>
 

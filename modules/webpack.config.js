@@ -8,7 +8,7 @@ module.exports = (env = {}) => {
     entry: './dm4-webclient/src/main/resources/web/src/main.js',
     output: {
       filename: 'webclient.js',
-      path: path.resolve(__dirname, './dm4-webclient/src/main/resources/web/dist/')
+      path: path.resolve(__dirname, 'dm4-webclient/src/main/resources/web/dist/')
     },
     resolve: {
       alias: {
@@ -25,6 +25,14 @@ module.exports = (env = {}) => {
           test: /\.js$/,
           loader: 'babel-loader',
           exclude: /node_modules/
+        },
+        {
+          test: /\.css$/,
+          loader: ['style-loader', 'css-loader']
+        },
+        {
+          test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
+          loader: 'file-loader'
         }
       ]
     },
@@ -33,7 +41,7 @@ module.exports = (env = {}) => {
         DEV: env.dev,
       }),
       new HtmlWebpackPlugin({
-        template: './dm4-webclient/src/main/resources/web/index.html'
+        template: 'dm4-webclient/src/main/resources/web/index.html'
       })
     ]
   }

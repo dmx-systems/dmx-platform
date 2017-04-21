@@ -1,9 +1,9 @@
 <template>
   <div>
     Workspace
-    <select>
-      <option v-for="topic in workspaceTopics" :value="topic.id">{{topic.value}}</option>
-    </select>
+    <el-select v-model="workspaceId" size="small">
+      <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+    </el-select>
   </div>
 </template>
 

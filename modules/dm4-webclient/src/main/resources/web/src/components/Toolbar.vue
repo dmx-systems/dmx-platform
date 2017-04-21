@@ -18,6 +18,7 @@ export default {
 <style>
 #toolbar {
   display: flex;
+  align-items: baseline;
   background-color: #e8e8e8;
 }
 </style>
