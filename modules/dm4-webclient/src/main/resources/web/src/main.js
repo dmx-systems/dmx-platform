@@ -1,11 +1,11 @@
 import Vue from 'vue'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import {Select, Option} from 'element-ui'
 
 import store from './store'
 import router from './router'
 
-Vue.use(ElementUI)
+Vue.use(Select)
+Vue.use(Option)
 
 new Vue({
   el: '#app',

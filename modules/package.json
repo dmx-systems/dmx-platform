@@ -17,6 +17,7 @@
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^6.4.1",
+    "babel-plugin-component": "^0.9.1",
     "babel-preset-es2015": "^6.24.1",
     "css-loader": "^0.28.0",
     "file-loader": "^0.11.1",
