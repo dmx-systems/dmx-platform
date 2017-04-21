@@ -1,9 +1,7 @@
 <template>
-  <div>
+  <div id="toolbar">
     <div>DeepaMehta 5</div>
-    <div>
-      <component v-for="comp in components" :is="comp" :key="comp._dm4_id"></component>
-    </div>
+    <component v-for="comp in components" :is="comp" :key="comp._dm4_id"></component>
   </div>
 </template>
 
@@ -16,3 +14,10 @@ export default {
   }
 }
 </script>
+
+<style>
+#toolbar {
+  display: flex;
+  background-color: #e8e8e8;
+}
+</style>

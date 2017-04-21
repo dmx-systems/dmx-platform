@@ -9,3 +9,10 @@ export default {
   }
 }
 </script>
+
+<style>
+#detail-panel {
+  flex-basis: 30%;
+  background-color: #eff;
+}
+</style>

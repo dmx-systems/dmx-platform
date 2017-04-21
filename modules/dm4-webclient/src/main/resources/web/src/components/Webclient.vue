@@ -1,8 +1,10 @@
 <template>
-  <div>
+  <div id="webclient">
     <toolbar></toolbar>
-    <topicmap-panel></topicmap-panel>
-    <detail-panel></detail-panel>
+    <div id="content">
+      <topicmap-panel></topicmap-panel>
+      <detail-panel></detail-panel>
+    </div>
   </div>
 </template>
 
@@ -10,11 +12,9 @@
 import pluginManager from '../plugin-manager'
 
 export default {
-
   mounted () {
     pluginManager.loadPlugins()
   },
-
   components: {
     'toolbar':        require('./Toolbar.vue'),
     'topicmap-panel': require('./TopicmapPanel.vue'),
@@ -22,3 +22,16 @@ export default {
   }
 }
 </script>
+
+<style>
+#webclient {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+}
+
+#webclient #content {
+  display: flex;
+  flex: auto;
+}
+</style>
