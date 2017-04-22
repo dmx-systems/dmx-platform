@@ -1,15 +1,12 @@
 import Vue from 'vue'
-import {Select, Option} from 'element-ui'
-
 import store from './store'
 import router from './router'
-
-Vue.use(Select)
-Vue.use(Option)
+import './element-ui'
+import App from './components/App.vue'
 
 new Vue({
   el: '#app',
   store,
   router,
-  render: h => h(require('./components/App.vue'))
+  render: h => h(App)
 })
