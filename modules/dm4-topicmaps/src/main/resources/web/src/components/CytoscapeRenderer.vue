@@ -14,11 +14,16 @@ export default {
     console.log('CytoscapeRenderer created!', this.$refs.container)
     this.cy = cytoscape({
       container: this.$refs.container,
+      elements: [
+        {data: {id: 'n1', label: 'Click Me!'}, position: {x: 100, y: 40}}
+      ],
       style: [
         {
           selector: 'node',
           style: {
             'shape': 'rectangle',
+            'background-color': 'hsl(210, 100%, 90%)',
+            'padding': '2px',
             'width': 'label',
             'height': 'label',
             'label': 'data(label)',
@@ -28,11 +33,24 @@ export default {
         {
           selector: 'edge',
           style: {
-            'width': 5,
+            'width': 4,
+            'line-color': 'rgb(178, 178, 178)',
             'curve-style': 'bezier',
-            'target-arrow-shape': 'triangle',
-            'label': 'data(id)',
+            'label': 'data(label)',
             'text-rotation': 'autorotate'
+          }
+        },
+        {
+          selector: 'node:selected',
+          style: {
+            'border-width': 3,
+            'border-color': 'red'
+          }
+        },
+        {
+          selector: 'edge:selected',
+          style: {
+            'line-color': 'red'
           }
         }
       ],
@@ -50,7 +68,8 @@ export default {
   methods: {
     setTopicmapData (topicmap) {
       console.log('setTopicmapData', topicmap)
-      var elements = topicmap.topics.map(topic => ({
+      // topics
+      var topics = topicmap.topics.map(topic => ({
         data: {
           id: topic.id,
           label: topic.value
@@ -60,7 +79,17 @@ export default {
           y: topic.view_props['dm4.topicmaps.y']
         }
       }))
-      this.cy.add(elements)
+      this.cy.add(topics)
+      // assocs
+      var assocs = topicmap.assocs.map(assoc => ({
+        data: {
+          id: assoc.id,
+          label: assoc.value,
+          source: assoc.role_1.topic_id,
+          target: assoc.role_2.topic_id
+        }
+      }))
+      this.cy.add(assocs)
     }
   }
 }
@@ -70,6 +99,5 @@ export default {
 .cytoscape-renderer {
   flex: auto;
   overflow: hidden;
-  background-color: #fef;
 }
 </style>

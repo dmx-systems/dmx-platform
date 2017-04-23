@@ -19,6 +19,5 @@ export default {
   display: flex;
   flex-basis: 70%;
   overflow: hidden;
-  background-color: #ffe;
 }
 </style>
