@@ -7,7 +7,10 @@ const state = {
 
 const actions = {
   selectTopicmap (_, topicmapId) {
-    state.topicmap = http.get('/topicmap/' + topicmapId)
+    console.log('select topicmap', topicmapId)
+    http.get('/topicmap/' + topicmapId).then(response => {
+      state.topicmap = response.data
+    })
   }
 }
 

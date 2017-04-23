@@ -51,7 +51,7 @@ module.exports = (env = {}) => {
       port: 8082,
       proxy: [
         {
-          context: ['/core'],
+          context: ['/core', '/topicmap'],
           target: 'http://localhost:8080'
         }
       ],

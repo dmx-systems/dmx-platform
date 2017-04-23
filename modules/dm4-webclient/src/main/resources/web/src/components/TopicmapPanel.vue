@@ -1,20 +1,24 @@
 <template>
   <div id="topicmap-panel">
-    <cytoscape-renderer></cytoscape-renderer>
+    <component :is="renderer"></component>
   </div>
 </template>
 
 <script>
 export default {
-  components: {
-    'cytoscape-renderer': require('../../../../../../../dm4-topicmaps/src/main/resources/web/src/components/CytoscapeRenderer.vue')
+  computed: {
+    renderer () {
+      return this.$store.state.topicmapPanel.renderer
+    }
   }
 }
 </script>
 
 <style>
 #topicmap-panel {
+  display: flex;
   flex-basis: 70%;
+  overflow: hidden;
   background-color: #ffe;
 }
 </style>
