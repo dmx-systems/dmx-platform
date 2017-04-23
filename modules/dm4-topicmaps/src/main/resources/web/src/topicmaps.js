@@ -1,10 +1,14 @@
 import http from 'axios'
 
 const state = {
+  topicmap: undefined,
   topicmapTopics: []
 }
 
 const actions = {
+  selectTopicmap (_, topicmapId) {
+    state.topicmap = http.get('/topicmap/' + topicmapId)
+  }
 }
 
 // init state
