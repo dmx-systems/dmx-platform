@@ -6,12 +6,7 @@ const state = {
 
 const actions = {
   selectTopicmap ({dispatch}, topicmapId) {
-    console.log('select topicmap', topicmapId)
-    http.get('/topicmap/' + topicmapId).then(response => {
-      dispatch("setTopicmapData", response.data)
-    }).catch(response => {
-      console.error(response)
-    })
+    dispatch('onSelectTopicmap', topicmapId)
   }
 }
 

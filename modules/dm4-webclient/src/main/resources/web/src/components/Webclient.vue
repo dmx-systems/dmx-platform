@@ -11,6 +11,7 @@
 <script>
 import pluginManager from '../plugin-manager'
 import TopicmapPanel from 'dm5-topicmap-panel'
+import DetailPanel   from 'dm5-detail-panel'
 
 export default {
   mounted () {
@@ -19,7 +20,7 @@ export default {
   components: {
     'toolbar':        require('./Toolbar.vue'),
     'topicmap-panel': TopicmapPanel.component,
-    'detail-panel':   require('./DetailPanel.vue')
+    'detail-panel':   DetailPanel.component
   }
 }
 </script>
