@@ -9,10 +9,9 @@
   },
   "dependencies": {
     "axios": "^0.16.1",
-    "cytoscape": "^3.0.0",
     "element-ui": "^1.2.9",
     "vue": "^2.2.6",
-    "vue-router": "^2.4.0",
+    "vue-router": "^2.5.1",
     "vuex": "^2.3.1"
   },
   "devDependencies": {
@@ -27,6 +26,6 @@
     "vue-loader": "^11.3.4",
     "vue-template-compiler": "^2.2.6",
     "webpack": "^2.4.1",
-    "webpack-dev-server": "^2.4.3"
+    "webpack-dev-server": "^2.4.4"
   }
 }

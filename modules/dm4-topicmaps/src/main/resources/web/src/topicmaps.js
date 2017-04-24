@@ -1,15 +1,16 @@
 import http from 'axios'
 
 const state = {
-  topicmap: undefined,
   topicmapTopics: []
 }
 
 const actions = {
-  selectTopicmap (_, topicmapId) {
+  selectTopicmap ({dispatch}, topicmapId) {
     console.log('select topicmap', topicmapId)
     http.get('/topicmap/' + topicmapId).then(response => {
-      state.topicmap = response.data
+      dispatch("setTopicmapData", response.data)
+    }).catch(response => {
+      console.error(response)
     })
   }
 }

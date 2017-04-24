@@ -6,7 +6,6 @@ export default {
     // install store module
     store.registerModule('topicmaps', storeModule)
     // install component
-    store.dispatch('addToToolbar',             require('./components/TopicmapSelect.vue'))
-    store.dispatch('registerTopicmapRenderer', require('./components/CytoscapeRenderer.vue'))
+    store.dispatch('addToToolbar', require('./components/TopicmapSelect.vue'))
   }
 }
