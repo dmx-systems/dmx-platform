@@ -1,6 +1,6 @@
-import Vue from 'vue'
-import store from './store'
 import http from 'axios'
+import Vue from 'vue'
+import store from './store/webclient'
 
 export default {
   loadPlugins () {

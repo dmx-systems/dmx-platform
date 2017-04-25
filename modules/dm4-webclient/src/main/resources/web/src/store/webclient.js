@@ -1,4 +1,5 @@
 import http from 'axios'
+import dm5 from '../rest-client'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -15,25 +16,19 @@ const state = {
 }
 
 const actions = {
-  onSelectTopicmap ({dispatch}, topicmapId) {
-    http.get('/topicmap/' + topicmapId).then(response => {
-      dispatch("displayTopicmap", response.data)
-    }).catch(response => {
-      console.error(response)
+  onSelectTopic ({dispatch}, id) {
+    dm5.getTopic(id).then(topic => {
+      dispatch("displayObject", topic)
     })
   },
-  onSelectTopic ({dispatch}, topicId) {
-    http.get('/core/topic/' + topicId).then(response => {
-      dispatch("displayObject", response.data)
-    }).catch(response => {
-      console.error(response)
+  onSelectAssoc ({dispatch}, id) {
+    dm5.getAssoc(id).then(assoc => {
+      dispatch("displayObject", assoc)
     })
   },
-  onSelectAssoc ({dispatch}, assocId) {
-    http.get('/core/association/' + assocId).then(response => {
-      dispatch("displayObject", response.data)
-    }).catch(response => {
-      console.error(response)
+  onSelectTopicmap ({dispatch}, id) {
+    dm5.getTopicmap(id).then(topicmap => {
+      dispatch("displayTopicmap", topicmap)
     })
   }
 }
