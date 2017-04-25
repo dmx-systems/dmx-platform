@@ -9,9 +9,9 @@
 </template>
 
 <script>
+import TopicmapPanel from 'modules-nodejs/dm5-topicmap-panel/src/main.js'
+import DetailPanel   from 'modules-nodejs/dm5-detail-panel/src/main.js'
 import pluginManager from '../plugin-manager'
-import TopicmapPanel from 'dm5-topicmap-panel'
-import DetailPanel   from 'dm5-detail-panel'
 
 export default {
   mounted () {

@@ -5,14 +5,15 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = (env = {}) => {
 
   var webpackConfig = {
-    entry: './dm4-webclient/src/main/resources/web/src/main.js',
+    entry: './modules/dm4-webclient/src/main/resources/web/src/main.js',
     output: {
       filename: 'webclient.js',
-      path: path.resolve(__dirname, 'dm4-webclient/src/main/resources/web/dist/')
+      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist/')
     },
     resolve: {
       alias: {
-        modules: __dirname
+        'modules':        path.resolve(__dirname, 'modules'),
+        'modules-nodejs': path.resolve(__dirname, 'modules-nodejs')
       }
     },
     module: {
@@ -41,7 +42,7 @@ module.exports = (env = {}) => {
         DEV: env.dev,
       }),
       new HtmlWebpackPlugin({
-        template: 'dm4-webclient/src/main/resources/web/index.html'
+        template: 'modules/dm4-webclient/src/main/resources/web/index.html'
       })
     ]
   }
@@ -49,12 +50,10 @@ module.exports = (env = {}) => {
   if (env.dev) {
     webpackConfig.devServer = {
       port: 8082,
-      proxy: [
-        {
-          context: ['/core', '/topicmap'],
-          target: 'http://localhost:8080'
-        }
-      ],
+      proxy: [{
+        context: ['/core', '/topicmap'],
+        target: 'http://localhost:8080'
+      }],
       open: true
     }
   }

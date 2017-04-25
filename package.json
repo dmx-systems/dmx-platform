@@ -3,15 +3,20 @@
   "version": "5.0.0-SNAPSHOT",
   "description": "",
   "author": "Jörg Richter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jri/deepamehta.git"
+  },
   "scripts": {
     "dev": "webpack-dev-server -d --env.dev --hot",
     "build": "webpack -p --progress --hide-modules"
   },
   "dependencies": {
     "axios": "^0.16.1",
+    "cytoscape": "https://github.com/cytoscape/cytoscape.js.git",
     "element-ui": "^1.2.9",
     "vue": "^2.2.6",
-    "vue-router": "^2.5.1",
+    "vue-router": "^2.5.2",
     "vuex": "^2.3.1"
   },
   "devDependencies": {

@@ -4,13 +4,13 @@ import http from 'axios'
 
 export default {
   loadPlugins () {
-    console.log('Loading DM5 standard plugins ...')
     if (DEV) {
-      console.info('DM5 development mode: these plugins are loaded from file system and are hot replaced')
+      console.info('You are running DM5 in development mode.\n' +
+        'The standard plugins are loaded from file system and are hot replaced.')
     }
     initPlugin(require('modules/dm4-workspaces/src/main/resources/web/src/main.js'))
     initPlugin(require('modules/dm4-topicmaps/src/main/resources/web/src/main.js'))
-    console.log('Loading 3rd-party DM5 plugins ...')
+    //
     loadPluginsFromServer()
   }
 }
@@ -36,7 +36,6 @@ function loadPluginsFromServer () {
 }
 
 function loadPlugin (pluginUri, callback) {
-  console.log('Loading plugin from server', pluginUri)
   installCallback(pluginUri, callback)
   loadScript(pluginURL(pluginUri))
 }

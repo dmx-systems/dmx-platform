@@ -4,8 +4,8 @@ import Vuex from 'vuex'
 
 // store modules
 import toolbar from './modules/toolbar'
-import TopicmapPanel from 'dm5-topicmap-panel'
-import DetailPanel   from 'dm5-detail-panel'
+import TopicmapPanel from 'modules-nodejs/dm5-topicmap-panel/src/main.js'
+import DetailPanel   from 'modules-nodejs/dm5-detail-panel/src/main.js'
 
 Vue.use(Vuex)
 
@@ -44,7 +44,7 @@ const store = new Vuex.Store({
   modules: {
     toolbar,
     topicmapPanel: TopicmapPanel.storeModule,
-    detailPanel:   DetailPanel.storeModule
+    detailPanel: DetailPanel.storeModule
   }
 })
 
