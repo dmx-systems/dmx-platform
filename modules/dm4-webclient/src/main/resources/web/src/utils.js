@@ -1,5 +1,5 @@
-function newTypes (types, typeClass) {
-  return types.map(type => new typeClass(type))
+function instantiate (objects, clazz) {
+  return objects.map(object => new clazz(object))
 }
 
 function mapByUri (topics) {
@@ -9,6 +9,6 @@ function mapByUri (topics) {
 }
 
 export default {
-  newTypes,
+  instantiate,
   mapByUri
 }

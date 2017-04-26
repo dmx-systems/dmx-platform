@@ -1,5 +1,5 @@
 <template>
-  <div id="topicmap-panel">
+  <div class="topicmap-panel">
     <component :is="renderer"></component>
   </div>
 </template>
@@ -15,9 +15,8 @@ export default {
 </script>
 
 <style>
-#topicmap-panel {
+.topicmap-panel {
   display: flex;
-  flex-basis: 70%;    /* ### TODO: make independent from parent */
   overflow: hidden;
 }
 </style>

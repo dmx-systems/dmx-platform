@@ -32,7 +32,7 @@ export default {
 
   getAllTopicTypes () {
     return http.get('/core/topictype/all').then(response =>
-      Utils.newTypes(response.data, TopicType)
+      Utils.instantiate(response.data, TopicType)
     ).catch(error => {
       console.error(error)
     })
@@ -40,7 +40,7 @@ export default {
 
   getAllAssocTypes () {
     return http.get('/core/assoctype/all').then(response =>
-      Utils.newTypes(response.data, AssocType)
+      Utils.instantiate(response.data, AssocType)
     ).catch(error => {
       console.error(error)
     })

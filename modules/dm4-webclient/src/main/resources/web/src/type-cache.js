@@ -15,6 +15,24 @@ function init () {
   })
 }
 
+function getTopicType (uri) {
+  const type = store.state.topicTypes[uri]
+  if (!type) {
+    throw Error(`Topic type ${uri} not found in type cache`)
+  }
+  return type
+}
+
+function getAssocType (uri) {
+  const type = store.state.assocTypes[uri]
+  if (!type) {
+    throw Error(`Assoc type ${uri} not found in type cache`)
+  }
+  return type
+}
+
 export default {
-  init
+  init,
+  getTopicType,
+  getAssocType
 }

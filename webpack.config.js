@@ -11,6 +11,7 @@ module.exports = (env = {}) => {
       path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist/')
     },
     resolve: {
+      extensions: [".js", ".vue"],
       alias: {
         'modules':        path.resolve(__dirname, 'modules'),
         'modules-nodejs': path.resolve(__dirname, 'modules-nodejs')

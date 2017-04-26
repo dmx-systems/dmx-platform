@@ -1,7 +1,7 @@
 <template>
-  <div id="webclient">
+  <div class="webclient">
     <toolbar></toolbar>
-    <div id="content">
+    <div class="content">
       <topicmap-panel></topicmap-panel>
       <detail-panel></detail-panel>
     </div>
@@ -26,14 +26,22 @@ export default {
 </script>
 
 <style>
-#webclient {
+.webclient {
   height: 100%;
   display: flex;
   flex-flow: column;
 }
 
-#webclient #content {
+.webclient .content {
   display: flex;
   flex: auto;
+}
+
+.webclient .content .topicmap-panel {
+  flex-basis: 70%;
+}
+
+.webclient .content .detail-panel {
+  flex-basis: 30%;
 }
 </style>

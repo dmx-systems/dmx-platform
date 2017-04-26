@@ -1,6 +1,9 @@
 <template>
-  <div id="detail-panel">
-    <h3 v-if="object">{{object.value}}</h3>
+  <div class="detail-panel">
+    <div v-if="object">
+      <h3>{{object.value}}</h3>
+      <field-renderer :object="object" :type="type"></field-renderer>
+    </div>
   </div>
 </template>
 
@@ -9,14 +12,19 @@ export default {
   computed: {
     object () {
       return this.$store.state.detailPanel.object
+    },
+    type () {
+      return this.object.getType()
     }
+  },
+  components: {
+    'field-renderer': require('./FieldRenderer')
   }
 }
 </script>
 
 <style>
-#detail-panel {
-  flex-basis: 30%;    /* ### TODO: make independent from parent */
-  background-color: #eff;
+.detail-panel {
+  background-color: #f4f4f4;
 }
 </style>
