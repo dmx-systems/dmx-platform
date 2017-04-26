@@ -1,5 +1,6 @@
 import http from 'axios'
-import { Topic, Assoc } from './model'
+import Utils from './utils'
+import { Topic, Assoc, TopicType, AssocType } from './model'
 
 export default {
 
@@ -24,6 +25,22 @@ export default {
   getAssoc (id) {
     return http.get('/core/association/' + id).then(response =>
       new Assoc(response.data)
+    ).catch(error => {
+      console.error(error)
+    })
+  },
+
+  getAllTopicTypes () {
+    return http.get('/core/topictype/all').then(response =>
+      Utils.newTypes(response.data, TopicType)
+    ).catch(error => {
+      console.error(error)
+    })
+  },
+
+  getAllAssocTypes () {
+    return http.get('/core/assoctype/all').then(response =>
+      Utils.newTypes(response.data, AssocType)
     ).catch(error => {
       console.error(error)
     })

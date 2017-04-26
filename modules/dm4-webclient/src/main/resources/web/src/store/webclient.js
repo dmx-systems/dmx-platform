@@ -1,5 +1,5 @@
-import http from 'axios'
 import dm5 from '../rest-client'
+import typeCache from '../type-cache'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -18,12 +18,12 @@ const state = {
 const actions = {
   onSelectTopic ({dispatch}, id) {
     dm5.getTopic(id).then(topic => {
-      dispatch("displayObject", topic)
+      dispatch("displayDetails", topic)
     })
   },
   onSelectAssoc ({dispatch}, id) {
     dm5.getAssoc(id).then(assoc => {
-      dispatch("displayObject", assoc)
+      dispatch("displayDetails", assoc)
     })
   },
   onSelectTopicmap ({dispatch}, id) {
@@ -45,19 +45,6 @@ const store = new Vuex.Store({
 
 // init state
 
-http.get('/core/topictype/all').then(response => {
-  state.topicTypes = hashByUri(response.data)
-})
-http.get('/core/assoctype/all').then(response => {
-  state.assocTypes = hashByUri(response.data)
-})
-
-// utilities
-
-function mapByUri (topics) {
-  var map = {}
-  topics.forEach(topic => map[topic.uri] = topic)
-  return map
-}
+typeCache.init()
 
 export default store

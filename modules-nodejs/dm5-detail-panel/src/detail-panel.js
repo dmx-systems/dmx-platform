@@ -3,7 +3,7 @@ const state = {
 }
 
 const actions = {
-  displayObject (_, object) {
+  displayDetails (_, object) {
     state.object = object
   }
 }
