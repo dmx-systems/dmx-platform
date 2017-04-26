@@ -2,25 +2,33 @@
   <div class="webclient">
     <toolbar></toolbar>
     <div class="content">
-      <topicmap-panel></topicmap-panel>
-      <detail-panel></detail-panel>
+      <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
+      <detail-panel :object="object"></detail-panel>
     </div>
   </div>
 </template>
 
 <script>
-import TopicmapPanel from 'modules-nodejs/dm5-topicmap-panel/src/main.js'
-import DetailPanel   from 'modules-nodejs/dm5-detail-panel/src/main.js'
 import pluginManager from '../plugin-manager'
 
 export default {
+
   mounted () {
     pluginManager.loadPlugins()
   },
+
+  computed: {
+    object () {
+      return this.$store.state.selectedObject
+    },
+    components () {
+      return this.$store.state.componentRegistry.components['dm5.webclient.content']
+    }
+  },
+
   components: {
-    'toolbar':        require('./Toolbar.vue'),
-    'topicmap-panel': TopicmapPanel.component,
-    'detail-panel':   DetailPanel.component
+    'toolbar':      require('./Toolbar'),
+    'detail-panel': require('modules-nodejs/dm5-detail-panel/src/components/DetailPanel')
   }
 }
 </script>

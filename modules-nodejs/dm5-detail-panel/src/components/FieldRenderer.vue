@@ -5,7 +5,7 @@
       <div class="value" v-if="object">{{object.value}}</div>
       <!--component :is="simpleComp" ></component-->
     </div>
-    <field-renderer v-else v-for="assocDef in assocDefs" :key="assocDef.assocDefUri"
+    <field-renderer v-else v-for="assocDef in assocDefs" :key="assocDef.id"
       :object="childObject(assocDef)" :type="childType(assocDef)">
     </field-renderer>
   </div>
@@ -13,8 +13,11 @@
 
 <script>
 export default {
+
   name: 'field-renderer',
+
   props: ['object', 'type'],  // object may be null, type is not null
+
   computed: {
     label () {
       return this.type.value
@@ -26,6 +29,7 @@ export default {
       return this.type.assocDefs
     }
   },
+
   methods: {
     childObject (assocDef) {
       return this.object && this.object.childs[assocDef.assocDefUri]

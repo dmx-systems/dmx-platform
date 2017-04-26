@@ -1,7 +1,6 @@
 <template>
-  <div id="toolbar">
-    <div>DeepaMehta 5</div>
-    <component v-for="comp in components" :is="comp" :key="comp._dm4_id"></component>
+  <div class="toolbar">
+    <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
   </div>
 </template>
 
@@ -9,14 +8,14 @@
 export default {
   computed: {
     components () {
-      return this.$store.state.toolbar.components
+      return this.$store.state.componentRegistry.components['dm5.webclient.toolbar']
     }
   }
 }
 </script>
 
 <style>
-#toolbar {
+.toolbar {
   display: flex;
   align-items: baseline;
   background-color: #e8e8e8;

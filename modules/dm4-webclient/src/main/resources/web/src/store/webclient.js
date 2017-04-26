@@ -4,31 +4,27 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 // store modules
-import toolbar from './modules/toolbar'
-import TopicmapPanel from 'modules-nodejs/dm5-topicmap-panel/src/main.js'
-import DetailPanel   from 'modules-nodejs/dm5-detail-panel/src/main.js'
+import componentRegistry from './modules/component-registry'
 
 Vue.use(Vuex)
 
 const state = {
+  selectedObject: undefined,    // Topic or Association or undefined if nothing is selected
   topicTypes: undefined,
   assocTypes: undefined
 }
 
 const actions = {
+
   onSelectTopic ({dispatch}, id) {
     dm5.getTopic(id).then(topic => {
-      dispatch("displayDetails", topic)
+      state.selectedObject = topic
     })
   },
+
   onSelectAssoc ({dispatch}, id) {
     dm5.getAssoc(id).then(assoc => {
-      dispatch("displayDetails", assoc)
-    })
-  },
-  onSelectTopicmap ({dispatch}, id) {
-    dm5.getTopicmap(id).then(topicmap => {
-      dispatch("displayTopicmap", topicmap)
+      state.selectedObject = assoc
     })
   }
 }
@@ -37,9 +33,7 @@ const store = new Vuex.Store({
   state,
   actions,
   modules: {
-    toolbar,
-    topicmapPanel: TopicmapPanel.storeModule,
-    detailPanel: DetailPanel.storeModule
+    componentRegistry
   }
 })
 

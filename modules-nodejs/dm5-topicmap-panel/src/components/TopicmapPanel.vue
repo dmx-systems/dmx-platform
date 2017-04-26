@@ -1,14 +1,18 @@
 <template>
   <div class="topicmap-panel">
-    <component :is="renderer"></component>
+    <component :is="renderer" :topicmap="topicmap"></component>
   </div>
 </template>
 
 <script>
 export default {
+
+  props: ['topicmap'],
+
   computed: {
     renderer () {
-      return this.$store.state.topicmapPanel.renderer
+      // ### TODO: renderer registry
+      return require('./CytoscapeRenderer')
     }
   }
 }

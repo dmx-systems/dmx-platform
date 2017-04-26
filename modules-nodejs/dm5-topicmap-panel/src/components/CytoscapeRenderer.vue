@@ -6,9 +6,18 @@
 import cytoscape from 'cytoscape'
 
 export default {
+
+  props: ['topicmap'],
+
   data: () => ({
     cy: undefined
   }),
+
+  watch: {
+    topicmap: function() {
+      this.refresh()
+    }
+  },
 
   mounted () {
     this.cy = cytoscape({
@@ -61,17 +70,11 @@ export default {
     this.cy.on('select', 'edge', event => {
       this.$store.dispatch('onSelectAssoc', event.target.id())
     })
-    //
-    this.$store.watch(
-      state => state.topicmapPanel.topicmap,
-      topicmap => this.refresh(topicmap)
-    )
   },
 
   methods: {
-    refresh (topicmap) {
-      // topics
-      var topics = topicmap.topics.map(topic => ({
+    refresh () {
+      this.cy.add(this.topicmap.topics.map(topic => ({
         data: {
           id: topic.id,
           label: topic.value
@@ -80,18 +83,15 @@ export default {
           x: topic.view_props['dm4.topicmaps.x'],
           y: topic.view_props['dm4.topicmaps.y']
         }
-      }))
-      this.cy.add(topics)
-      // assocs
-      var assocs = topicmap.assocs.map(assoc => ({
+      })))
+      this.cy.add(this.topicmap.assocs.map(assoc => ({
         data: {
           id: assoc.id,
           label: assoc.value,
           source: assoc.role_1.topic_id,
           target: assoc.role_2.topic_id
         }
-      }))
-      this.cy.add(assocs)
+      })))
     }
   }
 }

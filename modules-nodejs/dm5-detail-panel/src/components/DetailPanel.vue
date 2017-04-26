@@ -9,14 +9,15 @@
 
 <script>
 export default {
+
+  props: ['object'],    // the Topic/Association to display, may be undefined
+
   computed: {
-    object () {
-      return this.$store.state.detailPanel.object
-    },
     type () {
       return this.object.getType()
     }
   },
+
   components: {
     'field-renderer': require('./FieldRenderer')
   }

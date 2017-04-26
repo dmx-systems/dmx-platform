@@ -22,6 +22,14 @@ export default {
     })
   },
 
+  getTopicsByType (typeUri) {
+    return http.get('/core/topic/by_type/' + typeUri).then(response =>
+      Utils.instantiate(response.data, Topic)
+    ).catch(error => {
+      console.error(error)
+    })
+  },
+
   getAssoc (id) {
     return http.get('/core/association/' + id).then(response =>
       new Assoc(response.data)
