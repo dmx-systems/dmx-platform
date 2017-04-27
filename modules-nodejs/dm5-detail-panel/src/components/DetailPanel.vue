@@ -2,7 +2,7 @@
   <div class="detail-panel">
     <div v-if="object">
       <h3>{{object.value}}</h3>
-      <field-renderer :object="object" :type="type" :mode="mode"></field-renderer>
+      <field-renderer :object="object" :mode="mode"></field-renderer>
     </div>
   </div>
 </template>
@@ -11,7 +11,7 @@
 export default {
 
   props: [
-    'object',   // the Topic/Association to display, may be undefined
+    'object',   // the Topic/Association to display; if undefined an empty detail panel is rendered
     'mode'      // 'info' or 'form'
   ],
 

@@ -25,7 +25,7 @@ export default {
 
   getTopicsByType (typeUri) {
     return http.get('/core/topic/by_type/' + typeUri).then(response =>
-      Utils.instantiate(response.data, Topic)
+      Utils.instantiateMany(response.data, Topic)
     ).catch(error => {
       console.error(error)
     })
@@ -42,7 +42,7 @@ export default {
 
   getAllTopicTypes () {
     return http.get('/core/topictype/all').then(response =>
-      Utils.instantiate(response.data, TopicType)
+      Utils.instantiateMany(response.data, TopicType)
     ).catch(error => {
       console.error(error)
     })
@@ -50,7 +50,7 @@ export default {
 
   getAllAssocTypes () {
     return http.get('/core/assoctype/all').then(response =>
-      Utils.instantiate(response.data, AssocType)
+      Utils.instantiateMany(response.data, AssocType)
     ).catch(error => {
       console.error(error)
     })

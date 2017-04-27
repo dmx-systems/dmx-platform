@@ -8,28 +8,34 @@
     <!-- composite -->
     <div v-else v-for="assocDef in assocDefs" :key="assocDef.id">
       <!-- single -->
-      <field-renderer v-if="cardOne(assocDef)" :object="childObject(assocDef)" :type="childType(assocDef)" :mode="mode">
+      <field-renderer v-if="cardOne(assocDef)" :object="childObject(assocDef)" :mode="mode">
       </field-renderer>
       <!-- multi -->
-      <field-renderer v-else v-for="object in childObject(assocDef)" :object="object" :type="childType(assocDef)"
-        :mode="mode" :key="object.id">
+      <field-renderer v-else v-for="object in childObjects(assocDef)" :object="object" :mode="mode" :key="object.id">
       </field-renderer>
     </div>
   </div>
 </template>
 
 <script>
+// TODO: publish model as package "dm5-model"
+import { Topic } from 'modules/dm4-webclient/src/main/resources/web/src/model'
+
 export default {
 
   name: 'field-renderer',
 
   props: [
-    'object',   // the Topic/Assoc to render, may be undefined
-    'type',     // a TopicType or AssocType, is not undefined
+    'object',   // the Topic/Assoc to render; is never undefined;
+                // may be an "empty" topic/assoc, without ID, with just type set
     'mode'      // 'info' or 'form'
   ],
 
   computed: {
+
+    type () {
+      return this.object.getType()
+    },
 
     label () {
       return this.type.value
@@ -50,12 +56,20 @@ export default {
 
   methods: {
 
+    // single
     childObject (assocDef) {
-      return this.object && this.object.childs[assocDef.assocDefUri]
+      return this.object.childs[assocDef.assocDefUri] || this.emptyTopic(assocDef)
     },
 
-    childType (assocDef) {
-      return assocDef.getChildType()
+    // multi
+    childObjects (assocDef) {
+      return this.object.childs[assocDef.assocDefUri] || []
+    },
+
+    emptyTopic (assocDef) {
+      return new Topic({
+        type_uri: assocDef.childTypeUri
+      })
     },
 
     cardOne (assocDef) {
