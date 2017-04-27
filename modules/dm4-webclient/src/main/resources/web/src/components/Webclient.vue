@@ -3,7 +3,7 @@
     <toolbar></toolbar>
     <div class="content">
       <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
-      <detail-panel :object="object"></detail-panel>
+      <detail-panel :object="object" :mode="mode"></detail-panel>
     </div>
   </div>
 </template>
@@ -18,9 +18,15 @@ export default {
   },
 
   computed: {
+
     object () {
       return this.$store.state.selectedObject
     },
+
+    mode () {
+      return this.$store.state.detailPanelMode
+    },
+
     components () {
       return this.$store.state.componentRegistry.components['dm5.webclient.content']
     }

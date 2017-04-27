@@ -8,7 +8,7 @@ export default {
     // install component
     store.dispatch('registerComponent', {
       extensionPoint: 'dm5.webclient.toolbar',
-      component: require('./components/WorkspaceSelect.vue')
+      component: require('./components/WorkspaceSelect')
     })
   }
 }

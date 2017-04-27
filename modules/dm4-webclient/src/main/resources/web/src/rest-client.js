@@ -14,8 +14,9 @@ export default {
   // As a workaround we catch here explicitly and log the error at least.
   // Note: the caller continues to work with flawed (undefined) data then!
 
-  getTopic (id) {
-    return http.get('/core/topic/' + id).then(response =>
+  getTopic (id, includeChilds) {
+    const config = {params: {include_childs: includeChilds}}
+    return http.get('/core/topic/' + id, config).then(response =>
       new Topic(response.data)
     ).catch(error => {
       console.error(error)
@@ -30,8 +31,9 @@ export default {
     })
   },
 
-  getAssoc (id) {
-    return http.get('/core/association/' + id).then(response =>
+  getAssoc (id, includeChilds) {
+    const config = {params: {include_childs: includeChilds}}
+    return http.get('/core/association/' + id, config).then(response =>
       new Assoc(response.data)
     ).catch(error => {
       console.error(error)

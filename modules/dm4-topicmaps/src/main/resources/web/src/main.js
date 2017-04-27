@@ -8,11 +8,11 @@ export default {
     // install components
     store.dispatch('registerComponent', {
       extensionPoint: 'dm5.webclient.toolbar',
-      component: require('./components/TopicmapSelect.vue')
+      component: require('./components/TopicmapSelect')
     })
     store.dispatch('registerComponent', {
       extensionPoint: 'dm5.webclient.content',
-      component: require('./components/TopicmapPanel.vue')
+      component: require('./components/TopicmapPanel')
     })
   }
 }

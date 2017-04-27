@@ -65,10 +65,10 @@ export default {
     })
     //
     this.cy.on('select', 'node', event => {
-      this.$store.dispatch('onSelectTopic', event.target.id())
+      this.$store.dispatch('selectTopic', event.target.id())
     })
     this.cy.on('select', 'edge', event => {
-      this.$store.dispatch('onSelectAssoc', event.target.id())
+      this.$store.dispatch('selectAssoc', event.target.id())
     })
   },
 

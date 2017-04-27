@@ -10,21 +10,25 @@ Vue.use(Vuex)
 
 const state = {
   selectedObject: undefined,    // Topic or Association or undefined if nothing is selected
+  detailPanelMode: undefined,   // 'info' or 'form'
+  // type cache
   topicTypes: undefined,
   assocTypes: undefined
 }
 
 const actions = {
 
-  onSelectTopic ({dispatch}, id) {
-    dm5.getTopic(id).then(topic => {
+  selectTopic (_, id) {
+    dm5.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic
+      state.detailPanelMode = 'info'
     })
   },
 
-  onSelectAssoc ({dispatch}, id) {
-    dm5.getAssoc(id).then(assoc => {
+  selectAssoc (_, id) {
+    dm5.getAssoc(id, true).then(assoc => {    // includeChilds=true
       state.selectedObject = assoc
+      state.detailPanelMode = 'info'
     })
   }
 }
