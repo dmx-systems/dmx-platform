@@ -1,0 +1,10 @@
+{
+  "name": "dm5",
+  "version": "0.1.0",
+  "description": "DeepaMehta 5 base types and API as a Node.js module",
+  "author": "Jörg Richter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jri/dm5.git"
+  }
+}

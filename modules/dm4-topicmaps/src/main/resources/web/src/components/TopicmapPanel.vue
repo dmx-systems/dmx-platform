@@ -10,7 +10,7 @@ export default {
     }
   },
   components: {
-    'topicmap-panel': require('modules-nodejs/dm5-topicmap-panel/src/components/TopicmapPanel')
+    'topicmap-panel': require('dm5-topicmap-panel')
   }
 }
 </script>

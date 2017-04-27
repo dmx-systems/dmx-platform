@@ -19,7 +19,7 @@
 
 <script>
 // TODO: publish model as package "dm5-model"
-import { Topic } from 'modules/dm4-webclient/src/main/resources/web/src/model'
+import dm5 from 'dm5'
 
 export default {
 
@@ -67,7 +67,7 @@ export default {
     },
 
     emptyTopic (assocDef) {
-      return new Topic({
+      return new dm5.Topic({
         type_uri: assocDef.childTypeUri
       })
     },

@@ -1,32 +1,25 @@
-import dm5 from '../rest-client'
-import typeCache from '../type-cache'
+import dm5 from 'dm5'
 import Vue from 'vue'
 import Vuex from 'vuex'
-
-// store modules
-import componentRegistry from './modules/component-registry'
 
 Vue.use(Vuex)
 
 const state = {
   selectedObject: undefined,    // Topic or Association or undefined if nothing is selected
   detailPanelMode: undefined,   // 'info' or 'form'
-  // type cache
-  topicTypes: undefined,
-  assocTypes: undefined
 }
 
 const actions = {
 
   selectTopic (_, id) {
-    dm5.getTopic(id, true).then(topic => {    // includeChilds=true
+    dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic
       state.detailPanelMode = 'info'
     })
   },
 
   selectAssoc (_, id) {
-    dm5.getAssoc(id, true).then(assoc => {    // includeChilds=true
+    dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
       state.selectedObject = assoc
       state.detailPanelMode = 'info'
     })
@@ -37,12 +30,10 @@ const store = new Vuex.Store({
   state,
   actions,
   modules: {
-    componentRegistry
+    componentRegistry: require('./modules/component-registry').default
   }
 })
 
-// init state
-
-typeCache.init()
+dm5.typeCache.init(store)
 
 export default store

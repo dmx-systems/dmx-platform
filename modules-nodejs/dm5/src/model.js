@@ -1,5 +1,5 @@
 import typeCache from './type-cache'
-import Utils from './utils'
+import utils from './utils'
 
 class DeepaMehtaObject {
   constructor (object) {
@@ -7,7 +7,7 @@ class DeepaMehtaObject {
     this.uri     = object.uri
     this.typeUri = object.type_uri
     this.value   = object.value
-    this.childs  = Utils.instantiateChilds(object.childs)
+    this.childs  = utils.instantiateChilds(object.childs)
   }
 }
 
@@ -45,7 +45,7 @@ class Type extends Topic {
     super(type)
     this.dataType   = type.data_type_uri
     this.indexModes = type.index_mode_uris
-    this.assocDefs  = Utils.instantiateMany(type.assoc_defs, AssocDef)
+    this.assocDefs  = utils.instantiateMany(type.assoc_defs, AssocDef)
     this.viewConfig = type.view_config_topics
   }
 

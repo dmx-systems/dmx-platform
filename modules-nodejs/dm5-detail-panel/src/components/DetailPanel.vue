@@ -15,12 +15,6 @@ export default {
     'mode'      // 'info' or 'form'
   ],
 
-  computed: {
-    type () {
-      return this.object.getType()
-    }
-  },
-
   components: {
     'field-renderer': require('./FieldRenderer')
   }

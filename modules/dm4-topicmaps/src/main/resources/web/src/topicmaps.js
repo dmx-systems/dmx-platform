@@ -1,4 +1,4 @@
-import dm5 from 'modules/dm4-webclient/src/main/resources/web/src/rest-client'
+import dm5 from 'dm5'
 
 const state = {
   topicmap: undefined,      // selected topicmap
@@ -7,14 +7,14 @@ const state = {
 
 const actions = {
   selectTopicmap (_, id) {
-    dm5.getTopicmap(id).then(topicmap => {
+    dm5.restClient.getTopicmap(id).then(topicmap => {
       state.topicmap = topicmap
     })
   }
 }
 
 // init state
-dm5.getTopicsByType('dm4.topicmaps.topicmap').then(topics => {
+dm5.restClient.getTopicsByType('dm4.topicmaps.topicmap').then(topics => {
   state.topicmapTopics = topics
 })
 
