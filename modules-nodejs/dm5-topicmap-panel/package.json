@@ -8,7 +8,6 @@
     "url": "https://github.com/jri/dm5-topicmap-panel.git"
   },
   "dependencies": {
-    "cytoscape": "https://github.com/cytoscape/cytoscape.js.git",
-    "dm5": "^0.1.0"
+    "cytoscape": "https://github.com/cytoscape/cytoscape.js.git"
   }
 }

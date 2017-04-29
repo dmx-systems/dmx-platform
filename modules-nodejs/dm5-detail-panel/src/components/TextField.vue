@@ -1,14 +1,21 @@
 <template>
   <div v-if="mode=='info'">
-    {{object.value}}
+    {{value}}
   </div>
   <div v-else-if="mode=='form'">
-    <input v-model="object.value">
+    <input :value="value" @input="updateValue($event)">
   </div>
 </template>
 
 <script>
 export default {
-  props: ['object', 'mode']
+  props: ['value', 'mode'],
+
+  methods: {
+    updateValue (event) {
+      console.log('input change!')
+      this.$emit("input", event.target.value)
+    }
+  }
 }
 </script>

@@ -3,7 +3,7 @@
     <!-- simple -->
     <div v-if="isSimple" class="field">
       <div class="label">{{label}}</div>
-      <component :is="simpleComp" v-if="object" :object="object" :mode="mode"></component>
+      <component :is="simpleComp" v-if="object" v-model="object.value" :mode="mode"></component>
     </div>
     <!-- composite -->
     <div v-else v-for="assocDef in assocDefs" :key="assocDef.id">

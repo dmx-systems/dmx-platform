@@ -1,19 +1,19 @@
 <template>
-  <div v-if="mode=='info'" v-html="object.value">
+  <div v-if="mode=='info'" v-html="value">
   </div>
   <div v-else-if="mode=='form'">
-    <quill-editor v-model="object.value" :config="quillConfig"></quill-editor>
+    <quill-editor :content="value" :options="quillOptions" @change="updateValue($event)"></quill-editor>
   </div>
 </template>
 
 <script>
 export default {
 
-  props: ['object', 'mode'],
+  props: ['value', 'mode'],
 
   data () {
     return {
-      quillConfig: {
+      quillOptions: {
         modules: {
           toolbar: [
             ['bold', 'italic', 'code'],
@@ -25,6 +25,13 @@ export default {
         },
         placeholder: undefined
       }
+    }
+  },
+
+  methods: {
+    updateValue ({event, html, text}) {
+      console.log('editor change!')
+      this.$emit("input", html)
     }
   },
 
