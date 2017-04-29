@@ -6,5 +6,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/jri/dm5-detail-panel.git"
+  },
+  "dependencies": {
+    "dm5": "^0.1.0",
+    "vue-quill-editor": "^2.1.6"
   }
 }

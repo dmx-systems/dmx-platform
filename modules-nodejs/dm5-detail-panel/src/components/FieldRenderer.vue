@@ -18,7 +18,6 @@
 </template>
 
 <script>
-// TODO: publish model as package "dm5-model"
 import dm5 from 'dm5'
 
 export default {

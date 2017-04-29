@@ -23,6 +23,14 @@ const actions = {
       state.selectedObject = assoc
       state.detailPanelMode = 'info'
     })
+  },
+
+  edit () {
+    state.detailPanelMode = 'form'
+  },
+
+  submit () {
+    state.detailPanelMode = 'info'
   }
 }
 

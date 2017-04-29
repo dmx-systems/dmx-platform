@@ -1,7 +1,7 @@
 {
   "name": "dm5",
   "version": "0.1.0",
-  "description": "DeepaMehta 5 base types and API as a Node.js module",
+  "description": "DeepaMehta 5 base types and API",
   "author": "Jörg Richter",
   "repository": {
     "type": "git",

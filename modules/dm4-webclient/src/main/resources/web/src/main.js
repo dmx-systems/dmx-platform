@@ -1,12 +1,10 @@
 import Vue from 'vue'
-import store from './store/webclient'
-import router from './router'
-import './element-ui'
 import App from './components/App.vue'
+import './element-ui'
 
 new Vue({
   el: '#app',
-  store,
-  router,
+  store:  require('./store/webclient').default,
+  router: require('./router').default,
   render: h => h(App)
 })

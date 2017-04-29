@@ -1,11 +1,11 @@
 import Vue from 'vue'
-import {Select, Option} from 'element-ui'
-import lang from 'element-ui/lib/locale/lang/en'
+import { Button, Select, Option } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
-// configure language
-locale.use(lang)
+// set locale
+locale.use(require('element-ui/lib/locale/lang/en').default)
 
 // register components
+Vue.use(Button)
 Vue.use(Select)
 Vue.use(Option)

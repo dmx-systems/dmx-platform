@@ -3,6 +3,8 @@
     <div v-if="object">
       <h3>{{object.value}}</h3>
       <field-renderer :object="object" :mode="mode"></field-renderer>
+      <!-- Button -->
+      <el-button size="small" @click="buttonAction">{{buttonLabel}}</el-button>
     </div>
   </div>
 </template>
@@ -14,6 +16,24 @@ export default {
     'object',   // the Topic/Association to display; if undefined an empty detail panel is rendered
     'mode'      // 'info' or 'form'
   ],
+
+  computed: {
+
+    infoMode () {
+      return this.mode === 'info'
+    },
+
+    buttonLabel () {
+      return this.infoMode ? 'Edit' : 'OK'
+    }
+  },
+
+  methods: {
+    buttonAction () {
+      var action = this.infoMode ? 'edit' : 'submit'
+      this.$store.dispatch(action)
+    }
+  },
 
   components: {
     'field-renderer': require('./FieldRenderer')
