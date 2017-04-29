@@ -1,7 +1,6 @@
 <template>
-  <div v-if="mode=='info'" v-html="value">
-  </div>
-  <div v-else-if="mode=='form'">
+  <div v-if="infoMode" v-html="value"></div>
+  <div v-else>
     <quill-editor :content="value" :options="quillOptions" @change="updateValue($event)"></quill-editor>
   </div>
 </template>
@@ -30,10 +29,13 @@ export default {
 
   methods: {
     updateValue ({event, html, text}) {
-      console.log('editor change!')
       this.$emit("input", html)
     }
   },
+
+  mixins: [
+    require('./mixins/infoMode').default
+  ],
 
   components: {
     'quill-editor': require('vue-quill-editor/src/editor.vue')

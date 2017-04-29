@@ -18,11 +18,6 @@ export default {
   ],
 
   computed: {
-
-    infoMode () {
-      return this.mode === 'info'
-    },
-
     buttonLabel () {
       return this.infoMode ? 'Edit' : 'OK'
     }
@@ -34,6 +29,10 @@ export default {
       this.$store.dispatch(action)
     }
   },
+
+  mixins: [
+    require('./mixins/infoMode').default
+  ],
 
   components: {
     'field-renderer': require('./FieldRenderer')

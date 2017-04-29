@@ -1,8 +1,6 @@
 <template>
-  <div v-if="mode=='info'">
-    {{value}}
-  </div>
-  <div v-else-if="mode=='form'">
+  <div v-if="infoMode">{{value}}</div>
+  <div v-else>
     <input :value="value" @input="updateValue($event)">
   </div>
 </template>
@@ -13,9 +11,12 @@ export default {
 
   methods: {
     updateValue (event) {
-      console.log('input change!')
       this.$emit("input", event.target.value)
     }
-  }
+  },
+
+  mixins: [
+    require('./mixins/infoMode').default
+  ]
 }
 </script>
