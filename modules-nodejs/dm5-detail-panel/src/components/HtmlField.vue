@@ -1,7 +1,7 @@
 <template>
   <div v-if="infoMode" v-html="value"></div>
   <div v-else>
-    <quill-editor :content="value" :options="quillOptions" @change="updateValue($event)"></quill-editor>
+    <quill :value="value" :options="quillOptions" @input="updateValue($event)"></quill>
   </div>
 </template>
 
@@ -22,13 +22,13 @@ export default {
             ['link', 'image', 'video']
           ]
         },
-        placeholder: undefined
+        theme: 'snow'
       }
     }
   },
 
   methods: {
-    updateValue ({event, html, text}) {
+    updateValue (html) {
       this.$emit("input", html)
     }
   },
@@ -38,7 +38,7 @@ export default {
   ],
 
   components: {
-    'quill-editor': require('vue-quill-editor/src/editor.vue')
+    'quill': require('vue-quill-minimum')
   }
 }
 </script>

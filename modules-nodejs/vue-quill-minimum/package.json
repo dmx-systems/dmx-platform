@@ -1,0 +1,13 @@
+{
+  "name": "vue-quill-minimum",
+  "version": "1.0.0",
+  "description": "A minimum quill vue component",
+  "author": "Jörg Richter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jri/vue-quill-minimum.git"
+  },
+  "dependencies": {
+    "quill": "^1.2.4"
+  }
+}
