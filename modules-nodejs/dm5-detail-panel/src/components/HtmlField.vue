@@ -55,11 +55,10 @@ export default {
 }
 
 .ql-editor p + p {
-  margin-top: 1em;
+  margin-top: 0.75em;
 }
 
 .ql-toolbar.ql-snow {
-  font-family: "Avenir", Helvetica, Arial, sans-serif !important;
   padding: 4px 0 !important;
 }
 
@@ -75,9 +74,8 @@ export default {
 .ql-snow .ql-toolbar .ql-picker-item:hover,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected {
-  color: #0cf !important;     /* should match ".clickable:hover" style in infobits-app.vue */
+  color: #20a0ff !important;    /* should match element-ui primary color */
 }
-
 .ql-snow.ql-toolbar button:hover .ql-fill,
 .ql-snow .ql-toolbar button:hover .ql-fill,
 .ql-snow.ql-toolbar button.ql-active .ql-fill,
@@ -102,9 +100,8 @@ export default {
 .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
-  fill: #0cf !important;      /* should match ".clickable:hover" style in infobits-app.vue */
+  fill: #20a0ff !important;     /* should match element-ui primary color */
 }
-
 .ql-snow.ql-toolbar button:hover .ql-stroke,
 .ql-snow .ql-toolbar button:hover .ql-stroke,
 .ql-snow.ql-toolbar button.ql-active .ql-stroke,
@@ -129,6 +126,6 @@ export default {
 .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
-  stroke: #0cf !important;    /* should match ".clickable:hover" style in infobits-app.vue */
+  stroke: #20a0ff !important;   /* should match element-ui primary color */
 }
 </style>
