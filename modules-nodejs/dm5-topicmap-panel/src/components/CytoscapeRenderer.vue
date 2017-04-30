@@ -5,13 +5,11 @@
 <script>
 import cytoscape from 'cytoscape'
 
+var cy
+
 export default {
 
   props: ['topicmap'],
-
-  data: () => ({
-    cy: undefined
-  }),
 
   watch: {
     topicmap: function() {
@@ -20,7 +18,7 @@ export default {
   },
 
   mounted () {
-    this.cy = cytoscape({
+    cy = cytoscape({
       container: this.$refs.container,
       style: [
         {
@@ -61,20 +59,36 @@ export default {
       ],
       layout: {
         name: 'preset'
-      }
+      },
+      wheelSensitivity: 0.2
     })
     //
-    this.cy.on('select', 'node', event => {
-      this.$store.dispatch('selectTopic', event.target.id())
+    cy.on('select', 'node', e => {
+      this.$store.dispatch('selectTopic', e.target.id())
     })
-    this.cy.on('select', 'edge', event => {
-      this.$store.dispatch('selectAssoc', event.target.id())
+    cy.on('select', 'edge', e => {
+      this.$store.dispatch('selectAssoc', e.target.id())
+    })
+    cy.on('tapstart', 'node', e => {
+      var node = e.target
+      var drag = false
+      node.one('tapdrag', e => {
+        drag = true
+      })
+      cy.one('tapend', e => {
+        if (drag) {
+          this.$store.dispatch('setTopicPosition', {
+            id: node.id(),
+            pos: node.position()
+          })
+        }
+      })
     })
   },
 
   methods: {
     refresh () {
-      this.cy.add(this.topicmap.topics.map(topic => ({
+      cy.add(this.topicmap.topics.map(topic => ({
         data: {
           id: topic.id,
           label: topic.value
@@ -84,7 +98,7 @@ export default {
           y: topic.view_props['dm4.topicmaps.y']
         }
       })))
-      this.cy.add(this.topicmap.assocs.map(assoc => ({
+      cy.add(this.topicmap.assocs.map(assoc => ({
         data: {
           id: assoc.id,
           label: assoc.value,

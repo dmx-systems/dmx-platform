@@ -9,16 +9,19 @@
 
 <script>
 export default {
+
   data () {
     return {
       topicmapId: undefined
     }
   },
+
   watch: {
     topicmapId: function (topicmapId) {
       this.$store.dispatch('selectTopicmap', topicmapId)
     }
   },
+
   computed: {
     topicmapTopics () {
       return this.$store.state.topicmaps.topicmapTopics

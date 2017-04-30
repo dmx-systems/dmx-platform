@@ -16,7 +16,7 @@ export default {
 
   getTopic (id, includeChilds) {
     const config = {params: {include_childs: includeChilds}}
-    return http.get('/core/topic/' + id, config).then(response =>
+    return http.get(`/core/topic/${id}`, config).then(response =>
       new Topic(response.data)
     ).catch(error => {
       console.error(error)
@@ -24,7 +24,7 @@ export default {
   },
 
   getTopicsByType (typeUri) {
-    return http.get('/core/topic/by_type/' + typeUri).then(response =>
+    return http.get(`/core/topic/by_type/${typeUri}`).then(response =>
       utils.instantiateMany(response.data, Topic)
     ).catch(error => {
       console.error(error)
@@ -33,7 +33,7 @@ export default {
 
   getAssoc (id, includeChilds) {
     const config = {params: {include_childs: includeChilds}}
-    return http.get('/core/association/' + id, config).then(response =>
+    return http.get(`/core/association/${id}`, config).then(response =>
       new Assoc(response.data)
     ).catch(error => {
       console.error(error)
@@ -56,10 +56,19 @@ export default {
     })
   },
 
-  getTopicmap (id) {
-    return http.get('/topicmap/' + id).then(response =>
+  // Topicmaps ### TODO: move to topicmaps module and provide rest-client extension mechanism?
+
+  getTopicmap (topicmapId) {
+    return http.get(`/topicmap/${topicmapId}`).then(response =>
       response.data
     ).catch(error => {
+      console.error(error)
+    })
+  },
+
+  setTopicPosition (topicmapId, topicId, pos) {
+    http.put(`/topicmap/${topicmapId}/topic/${topicId}/${pos.x}/${pos.y}`)
+    .catch(error => {
       console.error(error)
     })
   }

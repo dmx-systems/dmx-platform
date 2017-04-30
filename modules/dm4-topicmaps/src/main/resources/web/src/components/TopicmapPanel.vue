@@ -4,11 +4,13 @@
 
 <script>
 export default {
+
   computed: {
     topicmap () {
       return this.$store.state.topicmaps.topicmap
     }
   },
+
   components: {
     'topicmap-panel': require('dm5-topicmap-panel')
   }
