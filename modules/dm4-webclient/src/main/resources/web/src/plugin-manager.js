@@ -1,5 +1,4 @@
 import http from 'axios'
-import Vue from 'vue'
 import store from './store/webclient'
 
 export default {
@@ -10,6 +9,7 @@ export default {
     }
     initPlugin(require('modules/dm4-workspaces/src/main/resources/web/src/main.js'))
     initPlugin(require('modules/dm4-topicmaps/src/main/resources/web/src/main.js'))
+    initPlugin(require('modules/dm4-accesscontrol/src/main/resources/web/src/main.js'))
     //
     loadPluginsFromServer()
   }

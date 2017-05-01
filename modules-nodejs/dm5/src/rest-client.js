@@ -56,7 +56,7 @@ export default {
     })
   },
 
-  // Topicmaps ### TODO: move to topicmaps module and provide rest-client extension mechanism?
+  // Topicmaps
 
   getTopicmap (topicmapId) {
     return http.get(`/topicmap/${topicmapId}`).then(response =>
@@ -67,8 +67,29 @@ export default {
   },
 
   setTopicPosition (topicmapId, topicId, pos) {
-    http.put(`/topicmap/${topicmapId}/topic/${topicId}/${pos.x}/${pos.y}`)
-    .catch(error => {
+    http.put(`/topicmap/${topicmapId}/topic/${topicId}/${pos.x}/${pos.y}`).catch(error => {
+      console.error(error)
+    })
+  },
+
+  // Access Control
+
+  getUsername () {
+    return http.get("/accesscontrol/user").then(response =>
+      response.data
+    ).catch(error => {
+      console.error(error)
+    })
+  },
+
+  login (credentials) {
+    return http.post("/accesscontrol/login", undefined, {
+      auth: credentials
+    })
+  },
+
+  logout () {
+    http.post("/accesscontrol/logout").catch(error => {
       console.error(error)
     })
   }
