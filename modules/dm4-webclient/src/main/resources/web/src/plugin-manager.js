@@ -15,10 +15,26 @@ export default {
   }
 }
 
-// --- Load from file system ---
-
 function initPlugin (plugin) {
-  plugin.default.init({Vue, store})
+  // register store modules
+  const storeModule = plugin.default.storeModule
+  if (storeModule) {
+    console.log('Registering store module', storeModule.name)
+    store.registerModule(
+      storeModule.name,
+      storeModule.module.default
+    )
+  }
+  // register components
+  const components = plugin.default.components
+  if (components) {
+    components.forEach(comp => {
+      store.dispatch('registerComponent', {
+        extensionPoint: comp.extensionPoint,
+        component:      comp.component
+      })
+    })
+  }
 }
 
 // --- Load from server ---
@@ -28,7 +44,7 @@ function loadPluginsFromServer () {
     response.data.forEach(pluginInfo => {
       if (pluginInfo.hasPluginFile) {
         loadPlugin(pluginInfo.pluginUri, function (plugin) {
-          plugin.default.init({Vue, store})
+          initPlugin(plugin)
         })
       }
     })

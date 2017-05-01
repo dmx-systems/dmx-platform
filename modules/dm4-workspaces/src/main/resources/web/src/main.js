@@ -1,14 +1,14 @@
-import storeModule from './workspaces'
-
 export default {
 
-  init ({store}) {
-    // install store module
-    store.registerModule('workspaces', storeModule)
-    // install component
-    store.dispatch('registerComponent', {
+  storeModule: {
+    name: 'workspaces',
+    module: require('./workspaces')
+  },
+
+  components: [
+    {
       extensionPoint: 'dm5.webclient.toolbar',
       component: require('./components/WorkspaceSelect')
-    })
-  }
+    }
+  ]
 }
