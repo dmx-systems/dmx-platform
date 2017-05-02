@@ -15,8 +15,11 @@ import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
+import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
+
+import de.deepamehta.websockets.WebSocketsService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -61,6 +64,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
 
+    @Inject
+    private WebSocketsService webSocketsService;
+    private Messenger me;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -69,7 +76,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     public TopicmapsPlugin() {
         // Note: registering the default renderer in the init() hook would be too late.
-        // The renderer is already needed at install-in-DB time ### Still true?
+        // The renderer is already needed at install-in-DB time ### Still true? Use preInstall() hook?
         registerTopicmapRenderer(new DefaultTopicmapRenderer());
     }
 
@@ -208,7 +215,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
-        storeViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+        try {
+            storeViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+            me.setTopicPosition(topicmapId, topicId, x, y);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting position of topic " + topicId + " in topicmap " + topicmapId +
+                " failed ", e);
+        }
     }
 
     @PUT
@@ -310,6 +323,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public InputStream getTopicmapAndTopicInWebclient() {
         // Note: the path parameters are evaluated at client-side
         return invokeWebclient();
+    }
+
+
+
+    // *************
+    // *** Hooks ***
+    // *************
+
+
+
+    @Override
+    public void init() {
+        // ### TODO: repurpose WebSocketsService's "pluginUri" as "frontendUri"
+        me = new Messenger("de.deepamehta.webclient", webSocketsService);
     }
 
 

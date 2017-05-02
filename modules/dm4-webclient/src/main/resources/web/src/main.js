@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './components/App.vue'
 import './element-ui'
+import './websocket'
 
 new Vue({
   el: '#app',

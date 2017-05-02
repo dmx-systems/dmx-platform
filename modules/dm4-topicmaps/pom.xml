@@ -17,6 +17,14 @@
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>dm48-websockets</artifactId>
+            <version>0.4</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <resources>
             <resource>

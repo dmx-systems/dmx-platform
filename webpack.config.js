@@ -52,7 +52,7 @@ module.exports = (env = {}) => {
     webpackConfig.devServer = {
       port: 8082,
       proxy: [{
-        context: ['/core', '/topicmap', '/accesscontrol'],
+        context: ['/core', '/topicmap', '/accesscontrol', '/websocket'],
         target: 'http://localhost:8080'
       }],
       open: true

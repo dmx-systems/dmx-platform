@@ -67,6 +67,10 @@ export default {
   },
 
   setTopicPosition (topicmapId, topicId, pos) {
+    // ### TODO: drop rounding and let the backend work with floats?
+    pos.x = Math.round(pos.x)
+    pos.y = Math.round(pos.y)
+    //
     http.put(`/topicmap/${topicmapId}/topic/${topicId}/${pos.x}/${pos.y}`).catch(error => {
       console.error(error)
     })

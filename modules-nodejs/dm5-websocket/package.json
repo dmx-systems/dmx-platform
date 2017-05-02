@@ -1,0 +1,12 @@
+{
+  "name": "dm5-websocket",
+  "version": "0.1.0",
+  "description": "",
+  "author": "Jörg Richter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jri/dm5-websocket.git"
+  },
+  "dependencies": {
+  }
+}

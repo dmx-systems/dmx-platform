@@ -3,6 +3,7 @@ deepamehta-files/
 runner/
 target/
 bundle-deploy/
+bundle-disabled/
 modules-external/
 node_modules/
 dist/
