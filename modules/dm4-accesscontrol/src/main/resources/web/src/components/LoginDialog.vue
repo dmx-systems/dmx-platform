@@ -34,18 +34,8 @@ export default {
 
   methods: {
     login () {
-      this.$store.dispatch('login', this.credentials).then(response => {
-        console.log('Login OK', this.credentials.username)
-        this.message = 'Login OK'
-        return this.credentials.username
-      }).catch(error => {
-        console.log('Login failed', error)
-        this.message = 'Login failed'
-      }).then(username => {
-        if (username) {
-          this.$store.dispatch('closeLoginDialog')
-          this.$store.dispatch('setUser', username)
-        }
+      this.$store.dispatch('login', this.credentials).then(success => {
+        this.message = success ? 'Login OK' : 'Login failed'
       })
     }
   }

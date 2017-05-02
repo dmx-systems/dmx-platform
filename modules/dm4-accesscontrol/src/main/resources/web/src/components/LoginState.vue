@@ -1,10 +1,9 @@
 <template>
   <div class="login-state">
-    <div v-if="user">
-      Logged in as {{user}}<br>
-      <el-button type="text" size="mini" @click="logout">Logout</el-button>
+    <div v-if="username">
+      Logged in as {{username}}
     </div>
-    <el-button v-else type="text" size="mini" @click="openLoginDialog">Login</el-button>
+    <el-button type="text" size="mini" @click="dispatch">{{buttonLabel}}</el-button>
   </div>
 </template>
 
@@ -12,21 +11,23 @@
 export default {
 
   computed: {
-    user () {
-      return this.$store.state.accesscontrol.user
+
+    username () {
+      return this.$store.state.accesscontrol.username
+    },
+
+    buttonLabel () {
+      return this.username ? 'Logout' : 'Login'
+    },
+
+    buttonAction () {
+      return this.username ? 'logout' : 'openLoginDialog'
     }
   },
 
   methods: {
-
-    openLoginDialog () {
-      this.$store.dispatch('openLoginDialog')
-    },
-
-    logout () {
-      console.log('Logout', this.user)
-      this.$store.dispatch('logout')
-      this.$store.dispatch('setUser', '')
+    dispatch () {
+      this.$store.dispatch(this.buttonAction)
     }
   }
 }
