@@ -1,6 +1,6 @@
 import cytoscape from 'cytoscape'
 
-// Note: the topicmap is not vuex state. (This store module provides not state at all, only actions.)
+// Note: the topicmap is not vuex state. (This store module provides no state at all, only actions.)
 // In conjunction with Cytoscape the topicmap is not considered reactive data.
 // We have to bind topicmap data to the Cytoscape graph model manually anyways.
 // (This is because Cytoscape deploys a canvas, not a DOM).
@@ -20,12 +20,9 @@ const actions = {
 
   // WebSocket messages
 
-  _setTopicPosition ({rootState}, {topicmapId, topicId, x, y}) {
+  _setTopicPosition ({rootState}, {topicmapId, topicId, pos}) {
     if (topicmapId === topicmap.id) {
-      // ### TODO
-      console.log('renderer _setTopicPosition CURRENT TOPICMAP')
-    } else {
-      console.log('renderer _setTopicPosition')
+      cy.getElementById(topicId).position(pos)
     }
   }
 }

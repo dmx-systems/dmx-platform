@@ -29,8 +29,10 @@ class Messenger {
             .put("args", new JSONObject()
                 .put("topicmapId", topicmapId)
                 .put("topicId", topicId)
-                .put("x", x)
-                .put("y", y)
+                .put("pos", new JSONObject()
+                    .put("x", x)
+                    .put("y", y)
+                )
             )
         );
     }

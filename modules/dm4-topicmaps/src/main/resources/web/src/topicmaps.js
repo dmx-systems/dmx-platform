@@ -24,9 +24,9 @@ const actions = {
 
   // WebSocket messages
 
-  _setTopicPosition (_, {topicmapId, topicId, x, y}) {
+  _setTopicPosition (_, {topicmapId, topicId, pos}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.getTopic(topicId).setPosition(x, y)
+      state.topicmap.getTopic(topicId).setPosition(pos)
     }
   }
 }

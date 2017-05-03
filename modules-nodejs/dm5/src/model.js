@@ -135,9 +135,9 @@ class TopicmapTopic extends Topic {
     }
   }
 
-  setPosition (x, y) {
-    this.viewProps['dm4.topicmaps.x'] = x
-    this.viewProps['dm4.topicmaps.y'] = y
+  setPosition (pos) {
+    this.viewProps['dm4.topicmaps.x'] = pos.x
+    this.viewProps['dm4.topicmaps.y'] = pos.y
   }
 }
 
