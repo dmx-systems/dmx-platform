@@ -82,4 +82,63 @@ class AssocDef extends Assoc {
   }
 }
 
-export { Topic, Assoc, TopicType, AssocType }
+class Topicmap extends Topic {
+
+  constructor (topicmap) {
+    super(topicmap.info)
+    this.topics = utils.mapById(utils.instantiateMany(topicmap.topics, TopicmapTopic))
+    this.assocs = utils.mapById(utils.instantiateMany(topicmap.assocs, Assoc))
+  }
+
+  getTopic (id) {
+    var topic = this.topics[id]
+    if (!topic) {
+      throw Error(`Topic ${id} not found in topicmap ${this.id}`)
+    }
+    return topic
+  }
+
+  getAssoc (id) {
+    var assoc = this.assocs[id]
+    if (!assoc) {
+      throw Error(`Assoc ${id} not found in topicmap ${this.id}`)
+    }
+    return assoc
+  }
+
+  forEachTopic (visitor) {
+    this.forEachValue(this.topics, visitor)
+  }
+
+  forEachAssoc (visitor) {
+    this.forEachValue(this.assocs, visitor)
+  }
+
+  forEachValue (map, visitor) {
+    for (var key in map) {
+      visitor(map[key])
+    }
+  }
+}
+
+class TopicmapTopic extends Topic {
+
+  constructor (topic) {
+    super(topic)
+    this.viewProps = topic.view_props
+  }
+
+  getPosition () {
+    return {
+      x: this.viewProps['dm4.topicmaps.x'],
+      y: this.viewProps['dm4.topicmaps.y']
+    }
+  }
+
+  setPosition (x, y) {
+    this.viewProps['dm4.topicmaps.x'] = x
+    this.viewProps['dm4.topicmaps.y'] = y
+  }
+}
+
+export { Topic, Assoc, TopicType, AssocType, Topicmap }

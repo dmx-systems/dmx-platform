@@ -12,7 +12,7 @@ export default {
     },
     {
       extensionPoint: 'dm5.webclient.content',
-      component: require('./components/TopicmapPanel')
+      component: require('dm5-topicmap-panel')
     }
   ]
 }

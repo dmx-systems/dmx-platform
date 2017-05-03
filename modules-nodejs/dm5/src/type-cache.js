@@ -2,8 +2,8 @@ import restClient from './rest-client'
 import utils from './utils'
 
 const state = {
-  topicTypes: undefined,
-  assocTypes: undefined
+  topicTypes: undefined,    // an object: type URI (string) -> TopicType
+  assocTypes: undefined     // an object: type URI (string) -> AssocType
 }
 
 function init (store) {

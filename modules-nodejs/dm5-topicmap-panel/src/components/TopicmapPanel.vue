@@ -1,13 +1,11 @@
 <template>
   <div class="topicmap-panel">
-    <component :is="renderer" :topicmap="topicmap"></component>
+    <component :is="renderer"></component>
   </div>
 </template>
 
 <script>
 export default {
-
-  props: ['topicmap'],
 
   computed: {
     renderer () {

@@ -1,6 +1,6 @@
 import http from 'axios'
 import utils from './utils'
-import { Topic, Assoc, TopicType, AssocType } from './model'
+import { Topic, Assoc, TopicType, AssocType, Topicmap } from './model'
 
 export default {
 
@@ -60,7 +60,7 @@ export default {
 
   getTopicmap (topicmapId) {
     return http.get(`/topicmap/${topicmapId}`).then(response =>
-      response.data
+      new Topicmap(response.data)
     ).catch(error => {
       console.error(error)
     })

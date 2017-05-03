@@ -1,7 +1,7 @@
 {
   "name": "dm5-websocket",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.1.0-SNAPSHOT",
+  "description": "WebSocket support for DeepaMehta 5",
   "author": "Jörg Richter",
   "repository": {
     "type": "git",

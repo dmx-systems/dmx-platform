@@ -23,14 +23,25 @@ function instantiateChild (child) {
 
 // ---
 
-function mapByUri (topics) {
+function mapById (objects) {
+  return mapByProp(objects, 'id')
+}
+
+function mapByUri (objects) {
+  return mapByProp(objects, 'uri')
+}
+
+function mapByProp (objects, prop) {
   var map = {}
-  topics.forEach(topic => map[topic.uri] = topic)
+  objects.forEach(object => map[object[prop]] = object)
   return map
 }
+
+// ---
 
 export default {
   instantiateMany,
   instantiateChilds,
+  mapById,
   mapByUri
 }
