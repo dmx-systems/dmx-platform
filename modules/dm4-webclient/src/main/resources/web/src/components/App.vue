@@ -11,9 +11,20 @@
 html {
   height: 100%;
 }
+
 body {
   height: 100%;
   margin: 0;
   overflow: hidden;   /* avoid window bounce when scrolling reaches top/bottom */
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+}
+
+input, button {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-size: 16px !important;   /* fixed absolute size for all element-ui size */
+}
+
+.el-select-dropdown__item {
+  font-size: 1em;
 }
 </style>

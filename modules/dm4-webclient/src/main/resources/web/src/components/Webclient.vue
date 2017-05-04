@@ -57,5 +57,6 @@ export default {
 
 .webclient .content .detail-panel {
   flex-basis: 30%;
+  background-color: #f4f4f4;
 }
 </style>

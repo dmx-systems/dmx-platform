@@ -20,7 +20,7 @@ const actions = {
 
   // WebSocket messages
 
-  _setTopicPosition ({rootState}, {topicmapId, topicId, pos}) {
+  _setTopicPosition (_, {topicmapId, topicId, pos}) {
     if (topicmapId === topicmap.id) {
       cy.getElementById(topicId).position(pos)
     }
@@ -56,6 +56,8 @@ function initialize() {
           'line-color': 'rgb(178, 178, 178)',
           'curve-style': 'bezier',
           'label': 'data(label)',
+          'font-size': 13,
+          'text-margin-y': '-10',
           'text-rotation': 'autorotate'
         }
       },

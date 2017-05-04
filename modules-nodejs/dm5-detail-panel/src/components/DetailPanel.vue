@@ -42,6 +42,6 @@ export default {
 
 <style>
 .detail-panel {
-  background-color: #f4f4f4;
+  overflow: auto;
 }
 </style>
