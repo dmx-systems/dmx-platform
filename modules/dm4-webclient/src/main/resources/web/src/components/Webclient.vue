@@ -1,10 +1,9 @@
 <template>
   <div class="webclient">
-    <toolbar></toolbar>
-    <div class="content">
-      <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
-      <detail-panel :object="object" :mode="mode"></detail-panel>
-    </div>
+    <component v-for="comp in components" :is="comp" :key="comp._dm5_id">
+      <toolbar slot="dm5-topicmap-panel"></toolbar>
+    </component>
+    <detail-panel :object="object" :mode="mode"></detail-panel>
   </div>
 </template>
 
@@ -28,7 +27,7 @@ export default {
     },
 
     components () {
-      return this.$store.state.componentRegistry.components['dm5.webclient.content']
+      return this.$store.state.componentRegistry.components['dm5.webclient']
     }
   },
 
@@ -43,19 +42,13 @@ export default {
 .webclient {
   height: 100%;
   display: flex;
-  flex-flow: column;
 }
 
-.webclient .content {
-  display: flex;
-  flex: auto;
-}
-
-.webclient .content .topicmap-panel {
+.webclient .topicmap-panel {
   flex-basis: 70%;
 }
 
-.webclient .content .detail-panel {
+.webclient .detail-panel {
   flex-basis: 30%;
   background-color: #f4f4f4;
 }

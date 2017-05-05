@@ -11,7 +11,7 @@ export default {
       component: require('./components/TopicmapSelect')
     },
     {
-      extensionPoint: 'dm5.webclient.content',
+      extensionPoint: 'dm5.webclient',
       component: require('dm5-topicmap-panel')
     }
   ]

@@ -18,7 +18,9 @@ export default {
 .toolbar {
   display: flex;
   flex: none;
-  align-items: center;
-  background-color: #e8e8e8;
+  position: absolute;
+  width: 100%;
+  z-index: 10;    /* Cytoscape canvases are at 1, 2, 3 */
+  background-color: rgba(0, 0, 0, 0);
 }
 </style>

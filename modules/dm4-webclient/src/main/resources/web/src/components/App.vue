@@ -19,12 +19,13 @@ body {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 }
 
-input, button {
+input {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
-  font-size: 16px !important;   /* fixed absolute size for all element-ui size */
+  font-size: 16px !important;   /* fixed absolute size for all el-input sizes */
 }
 
-.el-select-dropdown__item {
-  font-size: 1em;
+button {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-size: 14px !important;   /* fixed absolute size for all el-button sizes */
 }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="topicmap-panel">
+    <slot name="dm5-topicmap-panel"></slot>
     <component :is="renderer"></component>
   </div>
 </template>
@@ -18,6 +19,7 @@ export default {
 
 <style>
 .topicmap-panel {
+  position: relative;
   display: flex;
   overflow: hidden;
 }

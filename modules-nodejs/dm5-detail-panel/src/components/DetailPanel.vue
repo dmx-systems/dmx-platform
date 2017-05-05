@@ -3,7 +3,6 @@
     <div v-if="object">
       <h3>{{object.value}}</h3>
       <field-renderer :object="object" :mode="mode"></field-renderer>
-      <!-- Button -->
       <el-button size="small" @click="buttonAction">{{buttonLabel}}</el-button>
     </div>
   </div>
@@ -43,5 +42,7 @@ export default {
 <style>
 .detail-panel {
   overflow: auto;
+  box-sizing: border-box;
+  padding: 0 12px 12px 12px;
 }
 </style>

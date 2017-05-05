@@ -11,7 +11,7 @@ export default {
       component: require('./components/LoginState')
     },
     {
-      extensionPoint: 'dm5.webclient.toolbar',
+      extensionPoint: 'dm5.webclient',
       component: require('./components/LoginDialog')
     }
   ]

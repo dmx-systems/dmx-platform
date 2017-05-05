@@ -1,7 +1,7 @@
 <template>
   <div class="login-state">
-    <div v-if="username">
-      Logged in as {{username}}
+    <div v-if="username" class="info">
+      Logged in as <span class="username">{{username}}</span>
     </div>
     <el-button type="text" size="mini" @click="dispatch">{{buttonLabel}}</el-button>
   </div>
@@ -37,6 +37,14 @@ export default {
 .login-state {
   flex: auto;
   text-align: right;
-  font-size: 75%;
+}
+
+.login-state .info {
+  font-size: 14px;    /* should match .el-dialog__body style */
+  color: #48576a;     /* should match .el-dialog__body style */
+}
+
+.login-state .info .username {
+  color: black;
 }
 </style>
