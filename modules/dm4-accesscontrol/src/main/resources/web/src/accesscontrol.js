@@ -2,7 +2,7 @@ import dm5 from 'dm5'
 
 const state = {
   username: undefined,    // the logged in user (string); falsish if no user is logged in
-  loginDialog: false      // true if the Login dialog is open
+  loginDialog: false      // true if the Login dialog is visible
 }
 
 const actions = {

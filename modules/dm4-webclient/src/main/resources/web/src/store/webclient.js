@@ -5,32 +5,39 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-  selectedObject: undefined,    // Topic or Association or undefined if nothing is selected
-  detailPanelMode: undefined,   // 'info' or 'form'
+  selectedObject: undefined,  // Topic or Association or undefined if nothing is selected
+  detailPanel: {
+    mode: undefined           // 'info' or 'form'
+  }
 }
 
 const actions = {
 
-  selectTopic (_, id) {
+  onTopicSelect (_, id) {
     dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic
-      state.detailPanelMode = 'info'
+      state.detailPanel.mode = 'info'
     })
   },
 
-  selectAssoc (_, id) {
+  onAssocSelect (_, id) {
     dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
       state.selectedObject = assoc
-      state.detailPanelMode = 'info'
+      state.detailPanel.mode = 'info'
     })
+  },
+
+  onBackgroundTap ({dispatch}, pos) {
+    console.log('onBackgroundTap')
+    dispatch('openSearchWidget')
   },
 
   edit () {
-    state.detailPanelMode = 'form'
+    state.detailPanel.mode = 'form'
   },
 
   submit () {
-    state.detailPanelMode = 'info'
+    state.detailPanel.mode = 'info'
   }
 }
 

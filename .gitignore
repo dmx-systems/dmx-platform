@@ -5,6 +5,7 @@ target/
 bundle-deploy/
 bundle-disabled/
 modules-external/
+modules-nodejs/
 node_modules/
 dist/
 

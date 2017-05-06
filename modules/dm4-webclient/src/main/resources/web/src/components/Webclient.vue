@@ -4,6 +4,7 @@
       <toolbar slot="dm5-topicmap-panel"></toolbar>
     </component>
     <detail-panel :object="object" :mode="mode"></detail-panel>
+    <search-widget></search-widget>
   </div>
 </template>
 
@@ -23,7 +24,7 @@ export default {
     },
 
     mode () {
-      return this.$store.state.detailPanelMode
+      return this.$store.state.detailPanel.mode
     },
 
     components () {
@@ -32,8 +33,9 @@ export default {
   },
 
   components: {
-    'toolbar':      require('./Toolbar'),
-    'detail-panel': require('dm5-detail-panel')
+    'toolbar':       require('./Toolbar'),
+    'detail-panel':  require('dm5-detail-panel'),
+    'search-widget': require('dm5-search-widget')
   }
 }
 </script>

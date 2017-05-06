@@ -17,8 +17,8 @@ const actions = {
     state.topicmap = topicmap
   },
 
-  setTopicPosition (_, {id, pos}) {
-    console.log('setTopicPosition', state.topicmap.id, id, pos)
+  onTopicDragged (_, {id, pos}) {
+    console.log('onTopicDragged', state.topicmap.id, id, pos)
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
