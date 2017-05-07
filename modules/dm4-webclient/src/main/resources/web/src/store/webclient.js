@@ -28,8 +28,8 @@ const actions = {
   },
 
   onBackgroundTap ({dispatch}, pos) {
-    console.log('onBackgroundTap')
-    dispatch('openSearchWidget')
+    console.log('onBackgroundTap', pos)
+    dispatch('openSearchWidget', pos.rendered)
   },
 
   edit () {
