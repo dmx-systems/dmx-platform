@@ -15,23 +15,23 @@ const actions = {
   },
 
   onTopicDragged (_, {id, pos}) {
-    console.log('onTopicDragged', state.topicmap.id, id, pos)
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
-  onTopicReveal (_, id) {
-    console.log('onTopicReveal', id)
+  onTopicReveal (_, {id, pos}) {
     dm5.restClient.addTopicToTopicmap(state.topicmap.id, id, {
-      'dm4.topicmaps.x': 100,   // TODO
-      'dm4.topicmaps.y': 100,   // TODO
+      'dm4.topicmaps.x': pos.x,
+      'dm4.topicmaps.y': pos.y,
       'dm4.topicmaps.visibility': true,
     })
   },
 
   // WebSocket messages
 
-  _addTopicToTopicmap (_, {topicmapId, topic, viewProps}) {
-    // TODO
+  _addTopicToTopicmap (_, {topicmapId, topic}) {
+    if (topicmapId === state.topicmap.id) {
+      state.topicmap.addTopic(new dm5.TopicmapTopic(topic))   // TODO: let the websocket dispatcher do the instantiation
+    }
   },
 
   _setTopicPosition (_, {topicmapId, topicId, pos}) {

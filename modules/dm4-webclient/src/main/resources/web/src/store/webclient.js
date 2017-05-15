@@ -27,8 +27,11 @@ const actions = {
     })
   },
 
+  /**
+   * @param   pos   `model` and `rendered` positions
+   */
   onBackgroundTap ({dispatch}, pos) {
-    dispatch('openSearchWidget', pos.rendered)
+    dispatch('openSearchWidget', pos)
   },
 
   edit () {
