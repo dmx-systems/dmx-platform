@@ -7,14 +7,11 @@ const state = {
 
 const actions = {
 
-  selectTopicmap ({dispatch}, id) {
+  onTopicmapSelect ({dispatch}, id) {
     dm5.restClient.getTopicmap(id).then(topicmap => {
-      dispatch('setTopicmap', topicmap)   // get render libraries hold of the topicmap
+      state.topicmap = topicmap
+      dispatch('renderTopicmap', topicmap)   // get render libraries hold of the topicmap
     })
-  },
-
-  setTopicmap (_, topicmap) {
-    state.topicmap = topicmap
   },
 
   onTopicDragged (_, {id, pos}) {
@@ -22,7 +19,20 @@ const actions = {
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
+  onTopicReveal (_, id) {
+    console.log('onTopicReveal', id)
+    dm5.restClient.addTopicToTopicmap(state.topicmap.id, id, {
+      'dm4.topicmaps.x': 100,   // TODO
+      'dm4.topicmaps.y': 100,   // TODO
+      'dm4.topicmaps.visibility': true,
+    })
+  },
+
   // WebSocket messages
+
+  _addTopicToTopicmap (_, {topicmapId, topic, viewProps}) {
+    // TODO
+  },
 
   _setTopicPosition (_, {topicmapId, topicId, pos}) {
     if (topicmapId === state.topicmap.id) {

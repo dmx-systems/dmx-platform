@@ -159,6 +159,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     return null;
                 }
             });
+            TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
+            me.addTopicToTopicmap(topicmapId, topic);
         } catch (Exception e) {
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
                 "(viewProps=" + viewProps + ")", e);

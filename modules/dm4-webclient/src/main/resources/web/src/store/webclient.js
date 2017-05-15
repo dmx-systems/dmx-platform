@@ -28,7 +28,6 @@ const actions = {
   },
 
   onBackgroundTap ({dispatch}, pos) {
-    console.log('onBackgroundTap', pos)
     dispatch('openSearchWidget', pos.rendered)
   },
 
