@@ -1,4 +1,4 @@
-import http from 'axios'
+import dm5 from 'dm5'
 import store from './store/webclient'
 
 export default {
@@ -40,8 +40,8 @@ function initPlugin (plugin) {
 // --- Load from server ---
 
 function loadPluginsFromServer () {
-  http.get('/core/plugin').then(response => {
-    response.data.forEach(pluginInfo => {
+  dm5.restClient.getPlugins().then(plugins => {
+    plugins.forEach(pluginInfo => {
       if (pluginInfo.hasPluginFile) {
         loadPlugin(pluginInfo.pluginUri, function (plugin) {
           initPlugin(plugin)

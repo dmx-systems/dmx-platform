@@ -1,4 +1,4 @@
-import http from 'axios'
+import dm5 from 'dm5'
 
 const state = {
   workspaceTopics: []
@@ -8,8 +8,8 @@ const actions = {
 }
 
 // init state
-http.get('/core/topic/by_type/dm4.workspaces.workspace').then(response => {
-  state.workspaceTopics = response.data
+dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
+  state.workspaceTopics = topics
 })
 
 export default {
