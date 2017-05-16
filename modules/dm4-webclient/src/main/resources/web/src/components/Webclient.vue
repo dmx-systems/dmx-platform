@@ -3,8 +3,8 @@
     <component v-for="comp in components" :is="comp" :key="comp._dm5_id">
       <toolbar slot="dm5-topicmap-panel"></toolbar>
     </component>
-    <detail-panel :object="object" :mode="mode"></detail-panel>
-    <search-widget></search-widget>
+    <dm5-detail-panel :object="object" :mode="mode"></dm5-detail-panel>
+    <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
 
@@ -29,13 +29,17 @@ export default {
 
     components () {
       return this.$store.state.componentRegistry.components['dm5.webclient']
+    },
+
+    menuTopicTypes () {
+      return this.$store.getters.menuTopicTypes
     }
   },
 
   components: {
     'toolbar':       require('./Toolbar'),
-    'detail-panel':  require('dm5-detail-panel'),
-    'search-widget': require('dm5-search-widget')
+    'dm5-detail-panel':  require('dm5-detail-panel'),
+    'dm5-search-widget': require('dm5-search-widget')
   }
 }
 </script>
@@ -51,7 +55,7 @@ export default {
   position: relative;
 }
 
-.webclient .detail-panel {
+.webclient .dm5-detail-panel {
   flex-basis: 30%;
   overflow: auto;
   box-sizing: border-box;

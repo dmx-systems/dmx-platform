@@ -11,6 +11,8 @@ const actions = {
     dm5.restClient.getTopicmap(id).then(topicmap => {
       state.topicmap = topicmap
       dispatch('renderTopicmap', topicmap)   // get render libraries hold of the topicmap
+    }).catch(error => {
+      console.error(error)
     })
   },
 
