@@ -25,7 +25,7 @@ class Messenger {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     void addTopicToTopicmap(long topicmapId, TopicViewModel topic) throws JSONException {
-        broadcast(new JSONObject()
+        messageToAllButOne(new JSONObject()
             .put("type", "addTopicToTopicmap")
             .put("args", new JSONObject()
                 .put("topicmapId", topicmapId)
@@ -35,7 +35,7 @@ class Messenger {
     }
 
     void setTopicPosition(long topicmapId, long topicId, int x, int y) throws JSONException {
-        broadcast(new JSONObject()
+        messageToAll(new JSONObject()
             .put("type", "setTopicPosition")
             .put("args", new JSONObject()
                 .put("topicmapId", topicmapId)
@@ -50,7 +50,12 @@ class Messenger {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void broadcast(JSONObject message) {
-        webSocketsService.broadcast(pluginUri, message.toString());
+    // ### TODO: drop this
+    private void messageToAll(JSONObject message) {
+        webSocketsService.messageToAll(pluginUri, message.toString());
+    }
+
+    private void messageToAllButOne(JSONObject message) {
+        webSocketsService.messageToAllButOne(pluginUri, message.toString());
     }
 }
