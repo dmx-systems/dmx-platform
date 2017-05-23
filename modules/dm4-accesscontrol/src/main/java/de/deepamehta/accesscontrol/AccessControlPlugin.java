@@ -99,7 +99,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         "ALL");
     private static final String ANONYMOUS_WRITE_ALLOWED = System.getProperty("dm4.security.anonymous_write_allowed",
         "NONE");
-    private static final GlobalRequestFilter requestFilter = new GlobalRequestFilter(ANONYMOUS_READ_ALLOWED,
+    private static final AnonymousAccessFilter accessFilter = new AnonymousAccessFilter(ANONYMOUS_READ_ALLOWED,
         ANONYMOUS_WRITE_ALLOWED);
     private static final String SUBNET_FILTER = System.getProperty("dm4.security.subnet_filter", "127.0.0.1/32");
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
@@ -155,8 +155,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     static {
         logger.info("Security settings:" +
-            "\n  dm4.security.anonymous_read_allowed = " + requestFilter.dumpReadSetting() +
-            "\n  dm4.security.anonymous_write_allowed = " + requestFilter.dumpWriteSetting() +
+            "\n  dm4.security.anonymous_read_allowed = " + accessFilter.dumpReadSetting() +
+            "\n  dm4.security.anonymous_write_allowed = " + accessFilter.dumpWriteSetting() +
             "\n  dm4.security.subnet_filter = " + SUBNET_FILTER +
             "\n  dm4.security.new_accounts_are_enabled = " + NEW_ACCOUNTS_ARE_ENABLED);
     }
@@ -670,7 +670,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // Note: if login fails we are NOT authorized, even if no login is required
             authorized = tryLogin(new Credentials(authHeader), request);
         } else {
-            authorized = requestFilter.isAnonymousRequestAllowed(request);
+            authorized = accessFilter.isAnonymousAccessAllowed(request);
         }
         if (!authorized) {
             // Note: a non-public DM installation (anonymous_read_allowed != "ALL") utilizes the browser's login dialog.

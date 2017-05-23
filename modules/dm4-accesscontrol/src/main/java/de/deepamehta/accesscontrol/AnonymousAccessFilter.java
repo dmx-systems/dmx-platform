@@ -7,7 +7,7 @@ import java.util.List;
 
 
 
-class GlobalRequestFilter {
+class AnonymousAccessFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -16,14 +16,14 @@ class GlobalRequestFilter {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    GlobalRequestFilter(String settingRead, String settingWrite) {
+    AnonymousAccessFilter(String settingRead, String settingWrite) {
         this.prefixesRead  = initPrefixes(settingRead);
         this.prefixesWrite = initPrefixes(settingWrite);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    boolean isAnonymousRequestAllowed(HttpServletRequest request) {
+    boolean isAnonymousAccessAllowed(HttpServletRequest request) {
         return request.getMethod().equals("GET") ?
             prefixMatch(request, prefixesRead) :
             prefixMatch(request, prefixesWrite);
@@ -50,7 +50,7 @@ class GlobalRequestFilter {
             String[] p = setting.split(",\\s*");    // ignore whitespace after comma
             List<String> prefixes = new ArrayList();
             for (int i = 0; i < p.length; i++) {
-                prefixes.add(p[i] + "/");
+                prefixes.add(p[i]);
             }
             return prefixes;
         }
