@@ -19,12 +19,17 @@ import java.util.logging.Logger;
 
 
 
-// ### TODO: should methods return model *impl* objects? -> Yes!
+/**
+ * A thin convenience layer above vendor specific storage.
+ * 2 responsibilites:
+ *  - Adapts public storage API to Core internal API (type casting).
+ *  - Adds fetch-single calls on top of fetch-multiple calls and performs sanity checks.
+ */
 class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaStorage storage;
+    private final DeepaMehtaStorage storage;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 

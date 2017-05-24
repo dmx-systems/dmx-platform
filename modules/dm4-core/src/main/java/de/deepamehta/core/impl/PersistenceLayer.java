@@ -27,7 +27,10 @@ import java.util.logging.Logger;
 
 
 
-public class PersistenceLayer extends StorageDecorator {
+/**
+ * Adds access control on top of vendor specific storage.
+ */
+public final class PersistenceLayer extends StorageDecorator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -181,13 +184,18 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
+    // ---
+
     void deleteTopic(long topicId) {
+        deleteTopic(fetchTopic(topicId));
+    }
+
+    void deleteTopic(TopicModelImpl topic) {
         try {
-            checkTopicWriteAccess(topicId);
-            //
-            fetchTopic(topicId).delete();
+            checkTopicWriteAccess(topic.getId());
+            topic.delete();
         } catch (Exception e) {
-            throw new RuntimeException("Deleting topic " + topicId + " failed", e);
+            throw new RuntimeException("Deleting topic " + topic.getId() + " failed", e);
         }
     }
 
@@ -352,13 +360,18 @@ public class PersistenceLayer extends StorageDecorator {
         }
     }
 
+    // ---
+
     void deleteAssociation(long assocId) {
+        deleteAssociation(fetchAssociation(assocId));
+    }
+
+    void deleteAssociation(AssociationModelImpl assoc) {
         try {
-            checkAssociationWriteAccess(assocId);
-            //
-            fetchAssociation(assocId).delete();
+            checkAssociationWriteAccess(assoc.getId());
+            assoc.delete();
         } catch (Exception e) {
-            throw new RuntimeException("Deleting association " + assocId + " failed", e);
+            throw new RuntimeException("Deleting association " + assoc.getId() + " failed", e);
         }
     }
 

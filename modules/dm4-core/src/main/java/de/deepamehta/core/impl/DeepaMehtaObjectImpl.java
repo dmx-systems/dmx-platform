@@ -197,15 +197,6 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
 
 
-    // === Deletion ===
-
-    @Override
-    public final void delete() {
-        model.delete();     // ### FIXME: call through pl for access control
-    }
-
-
-
     // === Traversal ===
 
     // --- Topic Retrieval ---
