@@ -38,7 +38,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     @Override
     public final void update(TopicModel updateModel) {
-        model.update((TopicModelImpl) updateModel);    // ### FIXME: call through pl for access control
+        pl.updateTopic(getModel(), (TopicModelImpl) updateModel);
     }
 
     @Override
@@ -91,8 +91,8 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     // --- Topic Retrieval ---
 
     @Override
-    public final List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri, String othersRoleTypeUri,
-                                                                                         String othersTopicTypeUri) {
+    public final List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
+                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
         List<RelatedTopicModelImpl> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
         return pl.checkReadAccessAndInstantiate(topics);

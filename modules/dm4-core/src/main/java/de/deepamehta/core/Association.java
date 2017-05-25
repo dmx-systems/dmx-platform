@@ -93,10 +93,14 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
+    @Override
     Association loadChildTopics();
+
+    @Override
     Association loadChildTopics(String assocDefUri);
 
     // ---
 
+    @Override
     AssociationModel getModel();
 }

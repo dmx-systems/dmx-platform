@@ -71,10 +71,6 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // === Updating ===
 
-    void update(DeepaMehtaObjectModel model);
-
-    // ---
-
     void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef);
     void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef);
 

@@ -34,10 +34,14 @@ public interface Topic extends DeepaMehtaObject {
 
     // ---
 
+    @Override
     Topic loadChildTopics();
+
+    @Override
     Topic loadChildTopics(String assocDefUri);
 
     // ---
 
+    @Override
     TopicModel getModel();
 }

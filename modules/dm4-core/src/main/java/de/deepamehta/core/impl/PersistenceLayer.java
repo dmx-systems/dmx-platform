@@ -168,19 +168,25 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     void updateTopic(TopicModelImpl updateModel) {
-        long topicId = updateModel.getId();
         try {
-            checkTopicWriteAccess(topicId);
-            //
-            TopicModelImpl model = fetchTopic(topicId);
-            model.update(updateModel);
+            TopicModelImpl model = fetchTopic(updateModel.getId());
+            updateTopic(model, updateModel);
             //
             // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
             // On the other hand TopicModel's update() method is called multiple times while updating the child topics
             // (see ChildTopicsModelImpl).
             em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + topicId + " failed", e);
+            throw new RuntimeException("Updating topic " + updateModel.getId() + " failed", e);
+        }
+    }
+
+    void updateTopic(TopicModelImpl topic, TopicModelImpl updateModel) {
+        try {
+            checkTopicWriteAccess(topic.getId());
+            topic.update(updateModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating topic " + topic.getId() + " failed", e);
         }
     }
 
@@ -345,18 +351,24 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     void updateAssociation(AssociationModelImpl updateModel) {
-        long assocId = updateModel.getId();
         try {
-            checkAssociationWriteAccess(assocId);
-            //
-            AssociationModelImpl model = fetchAssociation(assocId);
-            model.update(updateModel);
+            AssociationModelImpl model = fetchAssociation(updateModel.getId());
+            updateAssociation(model, updateModel);
             //
             // Note: there is no possible POST_UPDATE_ASSOCIATION_REQUEST event to fire here (compare to updateTopic()).
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
             // Its childs are always topics (never associations).
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + assocId + " failed", e);
+            throw new RuntimeException("Updating association " + updateModel.getId() + " failed", e);
+        }
+    }
+
+    void updateAssociation(AssociationModelImpl assoc, AssociationModelImpl updateModel) {
+        try {
+            checkAssociationWriteAccess(assoc.getId());
+            assoc.update(updateModel);
+        } catch (Exception e) {
+            throw new RuntimeException("Updating association " + assoc.getId() + " failed", e);
         }
     }
 

@@ -169,20 +169,13 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // === Updating ===
 
-    @Override
-    public final void update(DeepaMehtaObjectModel updateModel) {
-        model.update((DeepaMehtaObjectModelImpl) updateModel);     // ### FIXME: call through pl for access control
-    }
-
-    // ---
-
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
     // Directives/events is handled only in the high-level update() method.
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public final void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
         model.updateChildTopics((RelatedTopicModelImpl) newChildTopic, null, assocDef.getModel());
-                                                                                                // newChildTopics=null
+            // newChildTopics=null
     }
 
     // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
@@ -190,9 +183,9 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
     @Override
     public final void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics,
-                                                                                       AssociationDefinition assocDef) {
+                                        AssociationDefinition assocDef) {
         model.updateChildTopics(null, (List<RelatedTopicModelImpl>) newChildTopics, assocDef.getModel());
-                                                                                                // newChildTopic=null
+            // newChildTopic=null
     }
 
 

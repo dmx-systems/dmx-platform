@@ -123,7 +123,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
     @Override
     public final void update(AssociationModel updateModel) {
-        model.update((AssociationModelImpl) updateModel);     // ### FIXME: call through pl for access control
+        pl.updateAssociation(getModel(), (AssociationModelImpl) updateModel);
     }
 
     @Override

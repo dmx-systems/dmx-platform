@@ -604,8 +604,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             tx.success();
         } catch (Exception e) {
             // logger.log(Level.WARNING, "Exception thrown:", e);
-            assertEquals("Updating topic " + topic2Id + " failed (typeUri=\"dm4.core.plugin\")", e.getMessage());
-            assertEquals("URI \"dm4.my.uri\" is not unique", e.getCause().getMessage());
+            assertEquals("Updating topic " + topic2Id + " failed", e.getMessage());
+            assertEquals("URI \"dm4.my.uri\" is not unique", e.getCause().getCause().getMessage());
         } finally {
             tx.finish();
         }
