@@ -200,7 +200,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             //
             // 3) create topic
             Topic fileTopic = createFileTopic(repoFile);
-            return new StoredFile(repoFile.getName(), fileTopic.getId());
+            return new StoredFile(repoFile.getName(), repoPath(fileTopic), fileTopic.getId());
         } catch (FileRepositoryException e) {
             throw new WebApplicationException(new RuntimeException(operation + " failed", e), e.getStatus());
         } catch (Exception e) {
@@ -526,7 +526,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * Fetches the File topic representing the file at the given repository path.
      * If no such File topic exists <code>null</code> is returned.
      *
-     * @param   repoPath        A repository path. Must be canonized.
+     * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFileTopic(String repoPath) {
         return fetchFileOrFolderTopic(repoPath, "dm4.files.file");
@@ -536,7 +536,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * Fetches the Folder topic representing the folder at the given repository path.
      * If no such Folder topic exists <code>null</code> is returned.
      *
-     * @param   repoPath        A repository path. Must be canonized.
+     * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFolderTopic(String repoPath) {
         return fetchFileOrFolderTopic(repoPath, "dm4.files.folder");
@@ -548,7 +548,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * Fetches the File/Folder topic representing the file/directory at the given repository path.
      * If no such File/Folder topic exists <code>null</code> is returned.
      *
-     * @param   repoPath        A repository path. Must be canonized.
+     * @param   repoPath        A repository path. Must be canonic.
      * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
      */
     private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
@@ -560,7 +560,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     }
 
     /**
-     * @param   repoPath        A repository path. Must be canonized.
+     * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchPathTopic(String repoPath) {
         return dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
@@ -571,12 +571,14 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     /**
      * Creates a File topic representing the file at the given absolute path.
      *
-     * @param   path    A canonized absolute path.
+     * @param   path    A canonic absolute path.
+     *
+     * @return  The created File topic.
      */
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
             .put("dm4.files.file_name", path.getName())
-            .put("dm4.files.path", repoPath(path))  // Note: repo path is already calculated by caller. Could be passed.
+            .put("dm4.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
             .put("dm4.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
@@ -590,7 +592,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     /**
      * Creates a Folder topic representing the directory at the given absolute path.
      *
-     * @param   path    A canonized absolute path.
+     * @param   path    A canonic absolute path.
      */
     private Topic createFolderTopic(File path) throws Exception {
         String folderName = null;
@@ -617,7 +619,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     // ---
 
     /**
-     * @param   repoPath        A repository path. Must be canonized.
+     * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
@@ -759,7 +761,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * Checks if the user associated with a request is authorized to access a repository file.
      * If not authorized a FileRepositoryException (401 Unauthorized) is thrown.
      *
-     * @param   repoPath    The repository path of the file to check. Must be canonized.
+     * @param   repoPath    The repository path of the file to check. Must be canonic.
      * @param   request     The request.
      */
     private void checkAuthorization(String repoPath, HttpServletRequest request) throws FileRepositoryException {
@@ -816,7 +818,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * is stored with a unique name (by adding a number).
      *
      * @param   directory   The directory to store the uploaded file to.
-     *                      A canonized absolute path.
+     *                      A canonic absolute path.
      *
      * @return  The canonized absolute path.
      */
@@ -831,7 +833,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     /**
      * Returns the repository path of a File/Folder topic.
-     * Note: the returned path is canonized.
+     *
+     * @return  The repository path, is canonic.
      */
     private String repoPath(long fileTopicId) {
         return repoPath(dm4.getTopic(fileTopicId));
@@ -839,7 +842,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     /**
      * Returns the repository path of a File/Folder topic.
-     * Note: the returned path is canonized.
+     *
+     * @return  The repository path, is canonic.
      */
     private String repoPath(Topic topic) {
         return topic.getChildTopics().getString("dm4.files.path");

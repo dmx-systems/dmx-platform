@@ -10,13 +10,15 @@ public class StoredFile implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String fileName;
-    private long fileTopicId;
+    private final String fileName;
+    private final String repoPath;
+    private final long fileTopicId;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    StoredFile(String fileName, long fileTopicId) {
+    StoredFile(String fileName, String repoPath, long fileTopicId) {
         this.fileName = fileName;
+        this.repoPath = repoPath;
         this.fileTopicId = fileTopicId;
     }
 
@@ -24,6 +26,10 @@ public class StoredFile implements JSONEnabled {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getRepoPath() {
+        return repoPath;
     }
 
     public long getFileTopicId() {
@@ -37,6 +43,7 @@ public class StoredFile implements JSONEnabled {
         try {
             JSONObject storedFile = new JSONObject();
             storedFile.put("file_name", fileName);
+            storedFile.put("repo_path", repoPath);
             storedFile.put("topic_id", fileTopicId);
             return storedFile;
         } catch (Exception e) {
