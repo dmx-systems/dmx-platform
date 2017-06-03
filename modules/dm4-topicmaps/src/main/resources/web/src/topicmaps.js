@@ -7,16 +7,22 @@ const state = {
 
 const actions = {
 
-  onTopicmapSelect ({dispatch}, id) {
+  selectTopicmap ({dispatch}, id) {
     dm5.restClient.getTopicmap(id).then(topicmap => {
+      // update view model
       state.topicmap = topicmap
-      dispatch('renderTopicmap', topicmap)   // get render libraries hold of the topicmap
+      // notify renderer
+      dispatch('renderTopicmap', topicmap)
     }).catch(error => {
       console.error(error)
     })
   },
 
   onTopicDragged (_, {id, pos}) {
+    // update view model
+    state.topicmap.getTopic(id).setPosition(pos)
+    // notify renderer (Note: the view is up-to-date already)
+    // sync clients
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
@@ -28,23 +34,30 @@ const actions = {
     }
     // update view model
     state.topicmap.addTopic(topic.newViewTopic(viewProps))
-    // update view
-    dispatch('addTopicAndSelect', topic.id)
-    // update server
+    // notify renderer
+    dispatch('addTopic', topic.id)
+    dispatch('select', topic.id)
+    // sync clients
     dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
   },
 
   // WebSocket messages
 
-  _addTopicToTopicmap (_, {topicmapId, viewTopic}) {
+  _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))  // TODO: let the websocket dispatcher do the instantiation?
+      // update view model
+      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))
+      // notify renderer
+      dispatch('addTopic', viewTopic.id)
     }
   },
 
-  _setTopicPosition (_, {topicmapId, topicId, pos}) {
+  _setTopicPosition ({dispatch}, {topicmapId, topicId, pos}) {
     if (topicmapId === state.topicmap.id) {
+      // update view model
       state.topicmap.getTopic(topicId).setPosition(pos)
+      // notify renderer
+      dispatch('setTopicPosition', topicId)
     }
   }
 }

@@ -18,7 +18,7 @@ export default {
 
   watch: {
     topicmapId: function (topicmapId) {
-      this.$store.dispatch('onTopicmapSelect', topicmapId)
+      this.$store.dispatch('selectTopicmap', topicmapId)
     }
   },
 
