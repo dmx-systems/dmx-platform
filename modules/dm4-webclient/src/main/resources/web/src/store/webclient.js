@@ -13,18 +13,28 @@ const state = {
 
 const actions = {
 
-  onTopicSelect (_, id) {
+  selectTopic (_, id) {
     dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic
       state.detailPanel.mode = 'info'
     })
   },
 
-  onAssocSelect (_, id) {
+  selectAssoc (_, id) {
     dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
       state.selectedObject = assoc
       state.detailPanel.mode = 'info'
     })
+  },
+
+  edit () {
+    state.selectedObject.fillChilds()
+    console.log('edit', state.selectedObject)
+    state.detailPanel.mode = 'form'
+  },
+
+  submit () {
+    state.detailPanel.mode = 'info'
   },
 
   /**
@@ -32,14 +42,6 @@ const actions = {
    */
   onBackgroundTap ({dispatch}, pos) {
     dispatch('openSearchWidget', pos)
-  },
-
-  edit () {
-    state.detailPanel.mode = 'form'
-  },
-
-  submit () {
-    state.detailPanel.mode = 'info'
   }
 }
 

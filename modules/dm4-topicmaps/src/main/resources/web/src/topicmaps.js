@@ -20,15 +20,14 @@ const actions = {
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
-  onTopicReveal ({dispatch}, {topic, pos}) {
-    // update view model
+  revealTopic ({dispatch}, {topic, pos}) {
     const viewProps = {
       'dm4.topicmaps.x': pos.x,
       'dm4.topicmaps.y': pos.y,
       'dm4.topicmaps.visibility': true,
     }
-    topic.view_props = viewProps
-    state.topicmap.addTopic(new dm5.TopicmapTopic(topic))
+    // update view model
+    state.topicmap.addTopic(topic.newViewTopic(viewProps))
     // update view
     dispatch('addTopicAndSelect', topic.id)
     // update server
@@ -37,9 +36,9 @@ const actions = {
 
   // WebSocket messages
 
-  _addTopicToTopicmap (_, {topicmapId, topic}) {
+  _addTopicToTopicmap (_, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.addTopic(new dm5.TopicmapTopic(topic))   // TODO: let the websocket dispatcher do the instantiation
+      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))  // TODO: let the websocket dispatcher do the instantiation?
     }
   },
 

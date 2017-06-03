@@ -29,7 +29,7 @@ class Messenger {
             .put("type", "addTopicToTopicmap")
             .put("args", new JSONObject()
                 .put("topicmapId", topicmapId)
-                .put("topic", topic.toJSON())
+                .put("viewTopic", topic.toJSON())
             )
         );
     }

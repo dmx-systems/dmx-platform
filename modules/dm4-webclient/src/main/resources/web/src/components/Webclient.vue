@@ -37,7 +37,7 @@ export default {
   },
 
   components: {
-    'toolbar':       require('./Toolbar'),
+    'toolbar':           require('./Toolbar'),
     'dm5-detail-panel':  require('dm5-detail-panel'),
     'dm5-search-widget': require('dm5-search-widget')
   }
