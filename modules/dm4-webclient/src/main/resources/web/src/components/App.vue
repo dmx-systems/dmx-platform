@@ -8,6 +8,14 @@
 </template>
 
 <style>
+:root {
+  --main-font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
+  --main-font-size:  15px;
+  --label-font-size: 12px;      /* TODO: should match .el-dialog__body style? */
+  --label-color: #48576a;       /* TODO: should match .el-dialog__body style? */
+  --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
+}
+
 html {
   height: 100%;
 }
@@ -16,16 +24,17 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;   /* avoid window bounce when scrolling reaches top/bottom */
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: var(--main-font-family);
+  font-size:   var(--main-font-size);
 }
 
 input {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  font-size: 16px !important;   /* fixed absolute size for all el-input sizes */
+  font-family: var(--main-font-family);
+  font-size:   var(--main-font-size) !important;   /* fixed absolute size for all el-input sizes */
 }
 
 button {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  font-size: 14px !important;   /* fixed absolute size for all el-button sizes */
+  font-family: var(--main-font-family);
+  font-size:   var(--main-font-size) !important;   /* fixed absolute size for all el-button sizes */
 }
 </style>

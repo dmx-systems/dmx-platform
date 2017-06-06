@@ -32,7 +32,7 @@ export default {
 
 <style>
 .workspace-select .label {
-  font-size: 14px;    /* should match .el-dialog__body style */
-  color: #48576a;     /* should match .el-dialog__body style */
+  font-size: var(--label-font-size);
+  color:     var(--label-color);
 }
 </style>
