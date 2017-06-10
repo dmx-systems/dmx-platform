@@ -6,7 +6,7 @@
             "data_type_uri": "dm4.core.text",
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.color": "hsl(240, 66%, 66%)"
                     }
@@ -20,7 +20,7 @@
         {
             "value":    "Configurable",
             "uri":      "dm4.config.configurable",
-            "type_uri": "dm4.core.role_type"
+            "typeUri": "dm4.core.role_type"
         }
     ]
 }

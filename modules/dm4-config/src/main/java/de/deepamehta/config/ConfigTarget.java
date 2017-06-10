@@ -13,7 +13,7 @@ public enum ConfigTarget {
         }
     },
 
-    TYPE_INSTANCES("type_uri") {
+    TYPE_INSTANCES("typeUri") {
         @Override
         String hashKey(Topic topic) {
             return hashKey(topic.getTypeUri());

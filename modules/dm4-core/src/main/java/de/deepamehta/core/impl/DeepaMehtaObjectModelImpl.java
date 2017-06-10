@@ -192,7 +192,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             JSONObject o = new JSONObject();
             o.put("id", id);
             o.put("uri", uri);
-            o.put("type_uri", typeUri);
+            o.put("typeUri", typeUri);
             o.put("value", value.value());
             o.put("childs", childTopics.toJSON());
             return o;

@@ -1,57 +1,57 @@
 {
-    topic_types: [
+    "topic_types": [
         {
-            value: "Title",
-            uri: "dm4.notes.title",
-            data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value": "Title",
+            "uri": "dm4.notes.title",
+            "data_type_uri": "dm4.core.text",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value: "Text",
-            uri: "dm4.notes.text",
-            data_type_uri: "dm4.core.html",
-            index_mode_uris: ["dm4.core.fulltext"]
+            "value": "Text",
+            "uri": "dm4.notes.text",
+            "data_type_uri": "dm4.core.html",
+            "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            value: "Note",
-            uri: "dm4.notes.note",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value": "Note",
+            "uri": "dm4.notes.note",
+            "data_type_uri": "dm4.core.composite",
+            "assoc_defs": [
                 {
-                    child_type_uri:        "dm4.notes.title",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def",
-                    view_config_topics: [
+                    "child_type_uri":        "dm4.notes.title",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "view_config_topics": [
                         {
-                            type_uri: "dm4.webclient.view_config",
-                            childs: {
-                                dm4.webclient.simple_renderer_uri: "dm4.webclient.title_renderer"
+                            "typeUri": "dm4.webclient.view_config",
+                            "childs": {
+                                "dm4.webclient.simple_renderer_uri": "dm4.webclient.title_renderer"
                             }
                         }
                     ]
                 },
                 {
-                    child_type_uri:        "dm4.notes.text",
-                    child_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def",
-                    view_config_topics: [
+                    "child_type_uri":        "dm4.notes.text",
+                    "child_cardinality_uri": "dm4.core.one",
+                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "view_config_topics": [
                         {
-                            type_uri: "dm4.webclient.view_config",
-                            childs: {
-                                dm4.webclient.input_field_rows: 15,
-                                dm4.webclient.simple_renderer_uri: "dm4.webclient.body_text_renderer"
+                            "typeUri": "dm4.webclient.view_config",
+                            "childs": {
+                                "dm4.webclient.input_field_rows": 15,
+                                "dm4.webclient.simple_renderer_uri": "dm4.webclient.body_text_renderer"
                             }
                         }
                     ]
                 }
             ],
-            view_config_topics: [
+            "view_config_topics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.icon: "/de.deepamehta.notes/images/yellow-ball.png",
-                        dm4.webclient.show_in_create_menu: true,
-                        dm4.webclient.searchable_as_unit: true
+                    "typeUri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.icon": "/de.deepamehta.notes/images/yellow-ball.png",
+                        "dm4.webclient.show_in_create_menu": true,
+                        "dm4.webclient.searchable_as_unit": true
                     }
                 }
             ]

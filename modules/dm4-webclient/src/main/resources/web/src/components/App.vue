@@ -9,8 +9,8 @@
 
 <style>
 :root {
-  --main-font-family: "Lucida Grande", "Trebuchet MS", sans-serif;
-  --main-font-size:  15px;
+  --main-font-family: "Lucida Grande", Verdana, sans-serif;
+  --main-font-size: 14px;
   --label-font-size: 12px;      /* TODO: should match .el-dialog__body style? */
   --label-color: #48576a;       /* TODO: should match .el-dialog__body style? */
   --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */

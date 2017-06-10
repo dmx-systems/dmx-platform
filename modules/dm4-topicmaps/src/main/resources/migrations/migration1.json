@@ -18,7 +18,7 @@
             "data_type_uri":   "dm4.core.text",
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.hidden": true,
                         "dm4.webclient.locked": true
@@ -53,7 +53,7 @@
                     "assoc_type_uri":         "dm4.core.aggregation_def",
                     "view_config_topics": [
                         {
-                            "type_uri": "dm4.webclient.view_config",
+                            "typeUri": "dm4.webclient.view_config",
                             "childs": {
                                 "dm4.webclient.hidden": true
                             }
@@ -63,7 +63,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.topicmaps/images/network.png"
                     }
@@ -88,14 +88,14 @@
     "topics": [
         ### Role Types ###
         {
-            "value":    "Topicmap Topic",
-            "uri":      "dm4.topicmaps.topicmap_topic",
-            "type_uri": "dm4.core.role_type"
+            "value":   "Topicmap Topic",
+            "uri":     "dm4.topicmaps.topicmap_topic",
+            "typeUri": "dm4.core.role_type"
         },
         {
-            "value":    "Topicmap Association",
-            "uri":      "dm4.topicmaps.topicmap_association",
-            "type_uri": "dm4.core.role_type"
+            "value":   "Topicmap Association",
+            "uri":     "dm4.topicmaps.topicmap_association",
+            "typeUri": "dm4.core.role_type"
         }
     ]
 }

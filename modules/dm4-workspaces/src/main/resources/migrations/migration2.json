@@ -13,29 +13,29 @@
 
     "topics": [
         {
-            "value":    "Private",
-            "uri":      "dm4.workspaces.private",
-            "type_uri": "dm4.workspaces.sharing_mode"
+            "value":   "Private",
+            "uri":     "dm4.workspaces.private",
+            "typeUri": "dm4.workspaces.sharing_mode"
         },
         {
-            "value":    "Confidential",
-            "uri":      "dm4.workspaces.confidential",
-            "type_uri": "dm4.workspaces.sharing_mode"
+            "value":   "Confidential",
+            "uri":     "dm4.workspaces.confidential",
+            "typeUri": "dm4.workspaces.sharing_mode"
         },
         {
-            "value":    "Collaborative",
-            "uri":      "dm4.workspaces.collaborative",
-            "type_uri": "dm4.workspaces.sharing_mode"
+            "value":   "Collaborative",
+            "uri":     "dm4.workspaces.collaborative",
+            "typeUri": "dm4.workspaces.sharing_mode"
         },
         {
-            "value":    "Public",
-            "uri":      "dm4.workspaces.public",
-            "type_uri": "dm4.workspaces.sharing_mode"
+            "value":   "Public",
+            "uri":     "dm4.workspaces.public",
+            "typeUri": "dm4.workspaces.sharing_mode"
         },
         {
-            "value":    "Common",
-            "uri":      "dm4.workspaces.common",
-            "type_uri": "dm4.workspaces.sharing_mode"
+            "value":   "Common",
+            "uri":     "dm4.workspaces.common",
+            "typeUri": "dm4.workspaces.sharing_mode"
         }
     ]
 }

@@ -10,7 +10,7 @@
             "index_mode_uris": ["dm4.core.fulltext"],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.file_content_renderer"
                     }
@@ -41,7 +41,7 @@
             "data_type_uri": "dm4.core.number",
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.file_size_renderer",
                     }
@@ -82,7 +82,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.files/images/sheet.png",
                         "dm4.webclient.locked": true
@@ -106,7 +106,7 @@
             "index_mode_uris": ["dm4.core.fulltext"],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.folder_content_renderer"
                     }
@@ -136,7 +136,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.files/images/folder.png",
                         "dm4.webclient.locked": true

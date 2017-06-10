@@ -187,8 +187,8 @@ public class DeepaMehtaUtils {
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
-        String t1 = (String) dm4.getProperty(r1.getPlayerId(), "type_uri");
-        String t2 = (String) dm4.getProperty(r2.getPlayerId(), "type_uri");
+        String t1 = (String) dm4.getProperty(r1.getPlayerId(), "typeUri");
+        String t2 = (String) dm4.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {

@@ -213,7 +213,7 @@ public class ModelFactoryImpl implements ModelFactory {
         return newDeepaMehtaObjectModel(
             object.optLong("id", -1),
             object.optString("uri", null),
-            object.optString("type_uri", null),
+            object.optString("typeUri", null),
             object.has("value") ? new SimpleValue(object.get("value")) : null,
             object.has("childs") ? newChildTopicsModel(object.getJSONObject("childs")) : null
         );
@@ -335,13 +335,13 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     private void initTypeUri(JSONObject value, String childTypeUri) throws JSONException {
-        if (!value.has("type_uri")) {
-            value.put("type_uri", childTypeUri);
+        if (!value.has("typeUri")) {
+            value.put("typeUri", childTypeUri);
         } else {
             // sanity check
-            String typeUri = value.getString("type_uri");
+            String typeUri = value.getString("typeUri");
             if (!typeUri.equals(childTypeUri)) {
-                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has type_uri=\"" +
+                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has typeUri=\"" +
                     typeUri + "\"");
             }
         }
@@ -551,7 +551,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicTypeModelImpl newTopicTypeModel(JSONObject topicType) {
         try {
-            return new TopicTypeModelImpl(newTypeModel(topicType.put("type_uri", "dm4.core.topic_type")));
+            return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", "dm4.core.topic_type")));
         } catch (Exception e) {
             throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicType + ")", e);
         }
@@ -578,7 +578,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
         try {
-            return new AssociationTypeModelImpl(newTypeModel(assocType.put("type_uri", "dm4.core.assoc_type")));
+            return new AssociationTypeModelImpl(newTypeModel(assocType.put("typeUri", "dm4.core.assoc_type")));
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationTypeModel failed (JSONObject=" + assocType + ")", e);
         }

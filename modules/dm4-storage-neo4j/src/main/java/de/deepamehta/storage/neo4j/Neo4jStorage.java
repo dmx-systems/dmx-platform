@@ -52,7 +52,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // --- Content Index Keys ---
     private static final String KEY_URI      = "uri";                       // used as property key as well
-    private static final String KEY_TPYE_URI = "type_uri";                  // used as property key as well
+    private static final String KEY_TPYE_URI = "typeUri";                   // used as property key as well
     private static final String KEY_FULLTEXT = "_fulltext_";
 
     // --- Association Metadata Index Keys ---

@@ -10,7 +10,7 @@
             "index_mode_uris": ["dm4.core.key", "dm4.core.fulltext"],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.locked": true
                     }
@@ -23,7 +23,7 @@
             "data_type_uri": "dm4.core.text",
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.hidden": true,
                         "dm4.webclient.locked": true
@@ -43,7 +43,7 @@
                     "assoc_type_uri":        "dm4.core.composition_def",
                     "view_config_topics": [
                         {
-                            "type_uri": "dm4.webclient.view_config",
+                            "typeUri": "dm4.webclient.view_config",
                             "childs": {
                                 "dm4.webclient.locked": false
                             }
@@ -56,7 +56,7 @@
                     "assoc_type_uri":        "dm4.core.composition_def",
                     "view_config_topics": [
                         {
-                            "type_uri": "dm4.webclient.view_config",
+                            "typeUri": "dm4.webclient.view_config",
                             "childs": {
                                 "dm4.webclient.locked": false
                             }
@@ -66,7 +66,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.accesscontrol/images/top-hat.png"
                     }

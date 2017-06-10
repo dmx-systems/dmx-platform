@@ -220,7 +220,7 @@
                 ],
                 "view_config_topics": [
                     {
-                        "type_uri": "dm4.webclient.view_config",
+                        "typeUri": "dm4.webclient.view_config",
                         "childs": {
                             "dm4.webclient.icon": "/de.deepamehta.contacts/images/person.png",
                             "dm4.webclient.show_in_create_menu": true,
@@ -272,7 +272,7 @@
                 ],
                 "view_config_topics": [
                     {
-                        "type_uri": "dm4.webclient.view_config",
+                        "typeUri": "dm4.webclient.view_config",
                         "childs": {
                             "dm4.webclient.icon": "/de.deepamehta.contacts/images/house.png",
                             "dm4.webclient.show_in_create_menu": true,
@@ -290,27 +290,27 @@
             {
                 "value": "work",
                 "uri": "dm4.contacts.work_phone",
-                "type_uri": "dm4.contacts.phone_label"
+                "typeUri": "dm4.contacts.phone_label"
             },
             {
                 "value": "home",
                 "uri": "dm4.contacts.home_phone",
-                "type_uri": "dm4.contacts.phone_label"
+                "typeUri": "dm4.contacts.phone_label"
             },
             {
                 "value": "mobile",
                 "uri": "dm4.contacts.mobile",
-                "type_uri": "dm4.contacts.phone_label"
+                "typeUri": "dm4.contacts.phone_label"
             },
             {
                 "value": "work fax",
                 "uri": "dm4.contacts.work_fax",
-                "type_uri": "dm4.contacts.phone_label"
+                "typeUri": "dm4.contacts.phone_label"
             },
             {
                 "value": "home fax",
                 "uri": "dm4.contacts.home_fax",
-                "type_uri": "dm4.contacts.phone_label"
+                "typeUri": "dm4.contacts.phone_label"
             },
 
             ### Address Labels ###
@@ -318,12 +318,12 @@
             {
                 "value": "work",
                 "uri": "dm4.contacts.work_address",
-                "type_uri": "dm4.contacts.address_label"
+                "typeUri": "dm4.contacts.address_label"
             },
             {
                 "value": "home",
                 "uri": "dm4.contacts.home_address",
-                "type_uri": "dm4.contacts.address_label"
+                "typeUri": "dm4.contacts.address_label"
             }
         ]
     }

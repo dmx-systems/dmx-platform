@@ -658,7 +658,7 @@ public class PersistenceLayer extends StorageDecorator {
             topicTypeUris.add("dm4.core.assoc_type");
             topicTypeUris.add("dm4.core.meta_type");
             // add regular types
-            for (TopicModel topicType : filterReadables(fetchTopics("type_uri", new SimpleValue(
+            for (TopicModel topicType : filterReadables(fetchTopics("typeUri", new SimpleValue(
                                                                     "dm4.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
@@ -671,7 +671,7 @@ public class PersistenceLayer extends StorageDecorator {
     private List<String> getAssociationTypeUris() {
         try {
             List<String> assocTypeUris = new ArrayList();
-            for (TopicModel assocType : filterReadables(fetchTopics("type_uri", new SimpleValue(
+            for (TopicModel assocType : filterReadables(fetchTopics("typeUri", new SimpleValue(
                                                                     "dm4.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
@@ -700,7 +700,7 @@ public class PersistenceLayer extends StorageDecorator {
     }
 
     private String typeUri(long objectId) {
-        return (String) fetchProperty(objectId, "type_uri");
+        return (String) fetchProperty(objectId, "typeUri");
     }
 
     private void bootstrapTypeCache() {

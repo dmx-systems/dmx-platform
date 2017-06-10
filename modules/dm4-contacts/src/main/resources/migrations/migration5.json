@@ -23,7 +23,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.color": "hsl(48, 80%, 50%)"
                     }
@@ -34,35 +34,35 @@
     "topics": [
         {
             "value": "Executive Director",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Founder",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Chairman",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Partner",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Collaborator",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Employee",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Member",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         },
         {
             "value": "Associate",
-            "type_uri": "dm4.contacts.organizational_role"
+            "typeUri": "dm4.contacts.organizational_role"
         }
     ]
 }

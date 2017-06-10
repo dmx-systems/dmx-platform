@@ -128,7 +128,7 @@
             "data_type_uri": "dm4.core.text",
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.webclient.search_result_renderer"
                     }
@@ -153,7 +153,7 @@
             ],
             "view_config_topics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.icon": "/de.deepamehta.webclient/images/balls.png",
                         "dm4.webclient.locked": true
@@ -176,39 +176,39 @@
         ### Icons ###
 
         {
-            "value":    "/de.deepamehta.webclient/images/ball-blue.png",
-            "uri":      "dm4.webclient.icons.ball_blue",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-blue.png",
+            "uri":     "dm4.webclient.icons.ball_blue",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-gray.png",
-            "uri":      "dm4.webclient.icons.ball_gray",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-gray.png",
+            "uri":     "dm4.webclient.icons.ball_gray",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-green.png",
-            "uri":      "dm4.webclient.icons.ball_green",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-green.png",
+            "uri":     "dm4.webclient.icons.ball_green",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-orange.png",
-            "uri":      "dm4.webclient.icons.ball_orange",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-orange.png",
+            "uri":     "dm4.webclient.icons.ball_orange",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-purple.png",
-            "uri":      "dm4.webclient.icons.ball_purple",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-purple.png",
+            "uri":     "dm4.webclient.icons.ball_purple",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-red.png",
-            "uri":      "dm4.webclient.icons.ball_red",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-red.png",
+            "uri":     "dm4.webclient.icons.ball_red",
+            "typeUri": "dm4.webclient.icon"
         },
         {
-            "value":    "/de.deepamehta.webclient/images/ball-yellow.png",
-            "uri":      "dm4.webclient.icons.ball_yellow",
-            "type_uri": "dm4.webclient.icon"
+            "value":   "/de.deepamehta.webclient/images/ball-yellow.png",
+            "uri":     "dm4.webclient.icons.ball_yellow",
+            "typeUri": "dm4.webclient.icon"
         }
     ]
 }
