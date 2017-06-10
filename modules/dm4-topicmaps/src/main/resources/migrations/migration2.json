@@ -14,7 +14,7 @@
             "value":       "Translation",
             "uri":         "dm4.topicmaps.translation",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.topicmaps.translation_x",
                     "child_cardinality_uri": "dm4.core.one",
@@ -38,7 +38,7 @@
             "value":       "Topicmap State",
             "uri":         "dm4.topicmaps.state",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.topicmaps.translation",
                     "child_cardinality_uri": "dm4.core.one",
@@ -52,7 +52,7 @@
                     "include_in_label":      true
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

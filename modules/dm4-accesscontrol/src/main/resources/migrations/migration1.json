@@ -4,11 +4,11 @@
         ### User Account ###
 
         {
-            "value":            "Username",
-            "uri":              "dm4.accesscontrol.username",
-            "dataTypeUri":      "dm4.core.text",
-            "index_mode_uris": ["dm4.core.key", "dm4.core.fulltext"],
-            "view_config_topics": [
+            "value":          "Username",
+            "uri":            "dm4.accesscontrol.username",
+            "dataTypeUri":    "dm4.core.text",
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -21,7 +21,7 @@
             "value":       "Password",
             "uri":         "dm4.accesscontrol.password",
             "dataTypeUri": "dm4.core.text",
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -32,16 +32,16 @@
             ]
         },
         {
-            "value":            "User Account",
-            "uri":              "dm4.accesscontrol.user_account",
-            "dataTypeUri":      "dm4.core.composite",
-            "index_mode_uris": ["dm4.core.key"],
-            "assoc_defs": [
+            "value":          "User Account",
+            "uri":            "dm4.accesscontrol.user_account",
+            "dataTypeUri":    "dm4.core.composite",
+            "indexModeUris": ["dm4.core.key"],
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.accesscontrol.username",
                     "child_cardinality_uri": "dm4.core.one",
                     "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
                             "childs": {
@@ -54,7 +54,7 @@
                     "child_type_uri":        "dm4.accesscontrol.password",
                     "child_cardinality_uri": "dm4.core.one",
                     "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
                             "childs": {
@@ -64,7 +64,7 @@
                     ]
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

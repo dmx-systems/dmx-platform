@@ -13,7 +13,7 @@
             "value":       "Organization Association",
             "uri":         "dm4.contacts.organization_association",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":         "dm4.contacts.organizational_role",
                     "child_cardinality_uri":  "dm4.core.one",
@@ -21,7 +21,7 @@
                     "assoc_type_uri":         "dm4.core.aggregation_def"
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

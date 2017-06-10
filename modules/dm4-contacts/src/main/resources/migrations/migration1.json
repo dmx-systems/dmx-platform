@@ -17,7 +17,7 @@
                 "value":       "Phone Entry",
                 "uri":         "dm4.contacts.phone_entry",
                 "dataTypeUri": "dm4.core.composite",
-                "assoc_defs": [
+                "assocDefs": [
                     {
                         "child_type_uri":         "dm4.contacts.phone_label",
                         "child_cardinality_uri":  "dm4.core.one",
@@ -30,7 +30,7 @@
                 "value":       "Address Entry",
                 "uri":         "dm4.contacts.address_entry",
                 "dataTypeUri": "dm4.core.composite",
-                "assoc_defs": [
+                "assocDefs": [
                     {
                         "child_type_uri":         "dm4.contacts.address_label",
                         "child_cardinality_uri":  "dm4.core.one",
@@ -47,23 +47,23 @@
             ### Person Name ###
 
             {
-                "value":            "First Name",
-                "uri":              "dm4.contacts.first_name",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "First Name",
+                "uri":            "dm4.contacts.first_name",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "Last Name",
-                "uri":              "dm4.contacts.last_name",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Last Name",
+                "uri":            "dm4.contacts.last_name",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "Person Name",
-                "uri":              "dm4.contacts.person_name",
-                "dataTypeUri":      "dm4.core.composite",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
-                "assoc_defs": [
+                "value":          "Person Name",
+                "uri":            "dm4.contacts.person_name",
+                "dataTypeUri":    "dm4.core.composite",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
+                "assocDefs": [
                     {
                         "child_type_uri":        "dm4.contacts.first_name",
                         "child_cardinality_uri": "dm4.core.one",
@@ -82,62 +82,62 @@
             ### Institution Name ###
 
             {
-                "value":            "Institution Name",
-                "uri":              "dm4.contacts.institution_name",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Institution Name",
+                "uri":            "dm4.contacts.institution_name",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Phone ###
 
             {
-                "value":            "Phone",
-                "uri":              "dm4.contacts.phone_number",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Phone",
+                "uri":            "dm4.contacts.phone_number",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Email Address ###
 
             {
-                "value":            "Email Address",
-                "uri":              "dm4.contacts.email_address",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Email Address",
+                "uri":            "dm4.contacts.email_address",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Address ###
 
             {
-                "value":            "Street",
-                "uri":              "dm4.contacts.street",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Street",
+                "uri":            "dm4.contacts.street",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "Postal Code",
-                "uri":              "dm4.contacts.postal_code",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Postal Code",
+                "uri":            "dm4.contacts.postal_code",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "City",
-                "uri":              "dm4.contacts.city",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "City",
+                "uri":            "dm4.contacts.city",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "Country",
-                "uri":              "dm4.contacts.country",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+                "value":          "Country",
+                "uri":            "dm4.contacts.country",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":            "Address",
-                "uri":              "dm4.contacts.address",
-                "dataTypeUri":      "dm4.core.composite",
-                "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
-                "assoc_defs": [
+                "value":          "Address",
+                "uri":            "dm4.contacts.address",
+                "dataTypeUri":    "dm4.core.composite",
+                "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
+                "assocDefs": [
                     {
                         "child_type_uri":         "dm4.contacts.street",
                         "child_cardinality_uri":  "dm4.core.one",
@@ -172,10 +172,10 @@
             ### Notes ###
 
             {
-                "value":            "Notes",
-                "uri":              "dm4.contacts.notes",
-                "dataTypeUri":      "dm4.core.html",
-                "index_mode_uris": ["dm4.core.fulltext"]
+                "value":          "Notes",
+                "uri":            "dm4.contacts.notes",
+                "dataTypeUri":    "dm4.core.html",
+                "indexModeUris": ["dm4.core.fulltext"]
             },
 
             ### Person ###
@@ -184,7 +184,7 @@
                 "value":       "Person",
                 "uri":         "dm4.contacts.person",
                 "dataTypeUri": "dm4.core.composite",
-                "assoc_defs": [
+                "assocDefs": [
                     {
                         "child_type_uri":        "dm4.contacts.person_name",
                         "child_cardinality_uri": "dm4.core.one",
@@ -218,7 +218,7 @@
                         "assoc_type_uri":        "dm4.core.composition_def"
                     }
                 ],
-                "view_config_topics": [
+                "viewConfigTopics": [
                     {
                         "typeUri": "dm4.webclient.view_config",
                         "childs": {
@@ -236,7 +236,7 @@
                 "value":       "Institution",
                 "uri":         "dm4.contacts.institution",
                 "dataTypeUri": "dm4.core.composite",
-                "assoc_defs": [
+                "assocDefs": [
                     {
                         "child_type_uri":        "dm4.contacts.institution_name",
                         "child_cardinality_uri": "dm4.core.one",
@@ -270,7 +270,7 @@
                         "assoc_type_uri":        "dm4.core.composition_def"
                     }
                 ],
-                "view_config_topics": [
+                "viewConfigTopics": [
                     {
                         "typeUri": "dm4.webclient.view_config",
                         "childs": {

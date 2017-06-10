@@ -7,8 +7,8 @@
             "value": "File Content",
             "uri": "dm4.files.file_content",
             "dataTypeUri": "dm4.core.html",
-            "index_mode_uris": ["dm4.core.fulltext"],
-            "view_config_topics": [
+            "indexModeUris": ["dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -21,25 +21,25 @@
             "value": "File Name",
             "uri": "dm4.files.file_name",
             "dataTypeUri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Path",
             "uri": "dm4.files.path",
             "dataTypeUri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.key"]
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Media Type",
             "uri": "dm4.files.media_type",
             "dataTypeUri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Size",
             "uri": "dm4.files.size",
             "dataTypeUri": "dm4.core.number",
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -52,7 +52,7 @@
             "value": "File",
             "uri": "dm4.files.file",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.files.file_content",
                     "child_cardinality_uri": "dm4.core.one",
@@ -80,7 +80,7 @@
                     "assoc_type_uri":        "dm4.core.composition_def"
                 },
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -97,14 +97,14 @@
             "value": "Folder Name",
             "uri": "dm4.files.folder_name",
             "dataTypeUri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Folder Content",
             "uri": "dm4.files.folder_content",
             "dataTypeUri": "dm4.core.html",
-            "index_mode_uris": ["dm4.core.fulltext"],
-            "view_config_topics": [
+            "indexModeUris": ["dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
@@ -117,7 +117,7 @@
             "value": "Folder",
             "uri": "dm4.files.folder",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.files.folder_name",
                     "child_cardinality_uri": "dm4.core.one",
@@ -134,7 +134,7 @@
                     "assoc_type_uri":        "dm4.core.composition_def"
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

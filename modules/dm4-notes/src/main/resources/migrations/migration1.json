@@ -4,24 +4,24 @@
             "value": "Title",
             "uri": "dm4.notes.title",
             "dataTypeUri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Text",
             "uri": "dm4.notes.text",
             "dataTypeUri": "dm4.core.html",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Note",
             "uri": "dm4.notes.note",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.notes.title",
                     "child_cardinality_uri": "dm4.core.one",
                     "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
                             "childs": {
@@ -34,7 +34,7 @@
                     "child_type_uri":        "dm4.notes.text",
                     "child_cardinality_uri": "dm4.core.one",
                     "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
                             "childs": {
@@ -45,7 +45,7 @@
                     ]
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

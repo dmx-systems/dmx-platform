@@ -15,7 +15,7 @@
                 "value":       "Participant",
                 "uri":         "dm4.events.participant",
                 "dataTypeUri": "dm4.core.text",
-                "view_config_topics": [
+                "viewConfigTopics": [
                     {
                         "typeUri": "dm4.webclient.view_config",
                         "childs": {
@@ -30,22 +30,22 @@
         "topic_types": [
             # Event
             {
-                "value":            "Title",
-                "uri":              "dm4.events.title",
-                "dataTypeUri":      "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext"]
+                "value":          "Title",
+                "uri":            "dm4.events.title",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext"]
             },
             {
-                "value":            "Notes",
-                "uri":              "dm4.events.notes",
-                "dataTypeUri":      "dm4.core.html",
-                "index_mode_uris": ["dm4.core.fulltext"]
+                "value":          "Notes",
+                "uri":            "dm4.events.notes",
+                "dataTypeUri":    "dm4.core.html",
+                "indexModeUris": ["dm4.core.fulltext"]
             },
             {
                 "value":       "Event",
                 "uri":         "dm4.events.event",
                 "dataTypeUri": "dm4.core.composite",
-                "assoc_defs": [
+                "assocDefs": [
                     {
                         "child_type_uri":         "dm4.events.title",
                         "child_cardinality_uri":  "dm4.core.one",
@@ -80,7 +80,7 @@
                         "assoc_type_uri":         "dm4.core.composition_def"
                     }
                 ],
-                "view_config_topics": [
+                "viewConfigTopics": [
                     {
                         "typeUri": "dm4.webclient.view_config",
                         "childs": {

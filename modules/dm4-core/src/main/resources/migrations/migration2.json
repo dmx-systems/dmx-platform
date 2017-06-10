@@ -16,7 +16,7 @@
             "value":       "Composition Definition",
             "uri":         "dm4.core.composition_def",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.core.include_in_label",
                     "child_cardinality_uri": "dm4.core.one",
@@ -28,7 +28,7 @@
             "value":       "Aggregation Definition",
             "uri":         "dm4.core.aggregation_def",
             "dataTypeUri": "dm4.core.composite",
-            "assoc_defs": [
+            "assocDefs": [
                 {
                     "child_type_uri":        "dm4.core.include_in_label",
                     "child_cardinality_uri": "dm4.core.one",

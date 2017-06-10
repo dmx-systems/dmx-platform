@@ -4,7 +4,7 @@
             "value":       "Membership",
             "uri":         "dm4.accesscontrol.membership",
             "dataTypeUri": "dm4.core.text",
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {

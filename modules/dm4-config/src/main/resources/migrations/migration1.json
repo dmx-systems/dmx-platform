@@ -4,7 +4,7 @@
             "value":       "Configuration",
             "uri":         "dm4.config.configuration",
             "dataTypeUri": "dm4.core.text",
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
