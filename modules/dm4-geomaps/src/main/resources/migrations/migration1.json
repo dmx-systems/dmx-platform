@@ -1,19 +1,19 @@
 {
     "topic_types": [
         {
-            "value":         "Longitude",
-            "uri":           "dm4.geomaps.longitude",
-            "data_type_uri": "dm4.core.number"
+            "value":       "Longitude",
+            "uri":         "dm4.geomaps.longitude",
+            "dataTypeUri": "dm4.core.number"
         },
         {
-            "value":         "Latitude",
-            "uri":           "dm4.geomaps.latitude",
-            "data_type_uri": "dm4.core.number"
+            "value":       "Latitude",
+            "uri":         "dm4.geomaps.latitude",
+            "dataTypeUri": "dm4.core.number"
         },
         {
-            "value":         "Geo Coordinate",
-            "uri":           "dm4.geomaps.geo_coordinate",
-            "data_type_uri": "dm4.core.composite",
+            "value":       "Geo Coordinate",
+            "uri":         "dm4.geomaps.geo_coordinate",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.geomaps.longitude",
@@ -30,9 +30,9 @@
             ]
         },
         {
-            "value":         "Geo Coordinate Facet",
-            "uri":           "dm4.geomaps.geo_coordinate_facet",
-            "data_type_uri": "dm4.core.composite",
+            "value":       "Geo Coordinate Facet",
+            "uri":         "dm4.geomaps.geo_coordinate_facet",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.geomaps.geo_coordinate",
@@ -45,9 +45,9 @@
 
     "assoc_types": [
         {
-            "value":         "Geotopic Mapcontext",
-            "uri":           "dm4.geomaps.geotopic_mapcontext",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Geotopic Mapcontext",
+            "uri":         "dm4.geomaps.geotopic_mapcontext",
+            "dataTypeUri": "dm4.core.text"
         }
     ]
 }

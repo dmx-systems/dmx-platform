@@ -3,16 +3,16 @@
 {
     "topic_types": [
         {
-            "value": "Organizational Role",
-            "uri": "dm4.contacts.organizational_role",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Organizational Role",
+            "uri":         "dm4.contacts.organizational_role",
+            "dataTypeUri": "dm4.core.text"
         }
     ],
     "assoc_types": [
         {
-            "value": "Organization Association",
-            "uri": "dm4.contacts.organization_association",
-            "data_type_uri": "dm4.core.composite",
+            "value":       "Organization Association",
+            "uri":         "dm4.contacts.organization_association",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":         "dm4.contacts.organizational_role",

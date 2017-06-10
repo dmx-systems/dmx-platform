@@ -6,7 +6,7 @@
         {
             "value": "File Content",
             "uri": "dm4.files.file_content",
-            "data_type_uri": "dm4.core.html",
+            "dataTypeUri": "dm4.core.html",
             "index_mode_uris": ["dm4.core.fulltext"],
             "view_config_topics": [
                 {
@@ -20,25 +20,25 @@
         {
             "value": "File Name",
             "uri": "dm4.files.file_name",
-            "data_type_uri": "dm4.core.text",
+            "dataTypeUri": "dm4.core.text",
             "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
             "value": "Path",
             "uri": "dm4.files.path",
-            "data_type_uri": "dm4.core.text",
+            "dataTypeUri": "dm4.core.text",
             "index_mode_uris": ["dm4.core.key"]
         },
         {
             "value": "Media Type",
             "uri": "dm4.files.media_type",
-            "data_type_uri": "dm4.core.text",
+            "dataTypeUri": "dm4.core.text",
             "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
             "value": "Size",
             "uri": "dm4.files.size",
-            "data_type_uri": "dm4.core.number",
+            "dataTypeUri": "dm4.core.number",
             "view_config_topics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
@@ -51,7 +51,7 @@
         {
             "value": "File",
             "uri": "dm4.files.file",
-            "data_type_uri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.files.file_content",
@@ -96,13 +96,13 @@
         {
             "value": "Folder Name",
             "uri": "dm4.files.folder_name",
-            "data_type_uri": "dm4.core.text",
+            "dataTypeUri": "dm4.core.text",
             "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
             "value": "Folder Content",
             "uri": "dm4.files.folder_content",
-            "data_type_uri": "dm4.core.html",
+            "dataTypeUri": "dm4.core.html",
             "index_mode_uris": ["dm4.core.fulltext"],
             "view_config_topics": [
                 {
@@ -116,7 +116,7 @@
         {
             "value": "Folder",
             "uri": "dm4.files.folder",
-            "data_type_uri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.files.folder_name",

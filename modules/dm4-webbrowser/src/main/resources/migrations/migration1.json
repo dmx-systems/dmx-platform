@@ -3,19 +3,19 @@
         {
             "value": "URL",
             "uri": "dm4.webbrowser.url",
-            "data_type_uri": "dm4.core.text",
+            "dataTypeUri": "dm4.core.text",
             "index_mode_uris": ["dm4.core.fulltext", "dm4.core.key"]
         },
         {
             "value": "Description",
             "uri": "dm4.webbrowser.web_resource_description",
-            "data_type_uri": "dm4.core.html",
+            "dataTypeUri": "dm4.core.html",
             "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
             "value": "Web Resource",
             "uri": "dm4.webbrowser.web_resource",
-            "data_type_uri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.webbrowser.url",

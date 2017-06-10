@@ -2,21 +2,21 @@
     {
         "topic_types": [
             {
-                "value": "Phone Label",
-                "uri": "dm4.contacts.phone_label",
-                "data_type_uri": "dm4.core.text"
+                "value":       "Phone Label",
+                "uri":         "dm4.contacts.phone_label",
+                "dataTypeUri": "dm4.core.text"
             },
             {
-                "value": "Address Label",
-                "uri": "dm4.contacts.address_label",
-                "data_type_uri": "dm4.core.text"
+                "value":       "Address Label",
+                "uri":         "dm4.contacts.address_label",
+                "dataTypeUri": "dm4.core.text"
             }
         ],
         "assoc_types": [
             {
-                "value": "Phone Entry",
-                "uri": "dm4.contacts.phone_entry",
-                "data_type_uri": "dm4.core.composite",
+                "value":       "Phone Entry",
+                "uri":         "dm4.contacts.phone_entry",
+                "dataTypeUri": "dm4.core.composite",
                 "assoc_defs": [
                     {
                         "child_type_uri":         "dm4.contacts.phone_label",
@@ -27,9 +27,9 @@
                 ]
             },
             {
-                "value": "Address Entry",
-                "uri": "dm4.contacts.address_entry",
-                "data_type_uri": "dm4.core.composite",
+                "value":       "Address Entry",
+                "uri":         "dm4.contacts.address_entry",
+                "dataTypeUri": "dm4.core.composite",
                 "assoc_defs": [
                     {
                         "child_type_uri":         "dm4.contacts.address_label",
@@ -47,21 +47,21 @@
             ### Person Name ###
 
             {
-                "value": "First Name",
-                "uri": "dm4.contacts.first_name",
-                "data_type_uri": "dm4.core.text",
+                "value":            "First Name",
+                "uri":              "dm4.contacts.first_name",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "Last Name",
-                "uri": "dm4.contacts.last_name",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Last Name",
+                "uri":              "dm4.contacts.last_name",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "Person Name",
-                "uri": "dm4.contacts.person_name",
-                "data_type_uri": "dm4.core.composite",
+                "value":            "Person Name",
+                "uri":              "dm4.contacts.person_name",
+                "dataTypeUri":      "dm4.core.composite",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assoc_defs": [
                     {
@@ -82,60 +82,60 @@
             ### Institution Name ###
 
             {
-                "value": "Institution Name",
-                "uri": "dm4.contacts.institution_name",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Institution Name",
+                "uri":              "dm4.contacts.institution_name",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Phone ###
 
             {
-                "value": "Phone",
-                "uri": "dm4.contacts.phone_number",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Phone",
+                "uri":              "dm4.contacts.phone_number",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Email Address ###
 
             {
-                "value": "Email Address",
-                "uri": "dm4.contacts.email_address",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Email Address",
+                "uri":              "dm4.contacts.email_address",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
             ### Address ###
 
             {
-                "value": "Street",
-                "uri": "dm4.contacts.street",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Street",
+                "uri":              "dm4.contacts.street",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "Postal Code",
-                "uri": "dm4.contacts.postal_code",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Postal Code",
+                "uri":              "dm4.contacts.postal_code",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "City",
-                "uri": "dm4.contacts.city",
-                "data_type_uri": "dm4.core.text",
+                "value":            "City",
+                "uri":              "dm4.contacts.city",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "Country",
-                "uri": "dm4.contacts.country",
-                "data_type_uri": "dm4.core.text",
+                "value":            "Country",
+                "uri":              "dm4.contacts.country",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value": "Address",
-                "uri": "dm4.contacts.address",
-                "data_type_uri": "dm4.core.composite",
+                "value":            "Address",
+                "uri":              "dm4.contacts.address",
+                "dataTypeUri":      "dm4.core.composite",
                 "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assoc_defs": [
                     {
@@ -172,18 +172,18 @@
             ### Notes ###
 
             {
-                "value": "Notes",
-                "uri": "dm4.contacts.notes",
-                "data_type_uri": "dm4.core.html",
+                "value":            "Notes",
+                "uri":              "dm4.contacts.notes",
+                "dataTypeUri":      "dm4.core.html",
                 "index_mode_uris": ["dm4.core.fulltext"]
             },
 
             ### Person ###
 
             {
-                "value": "Person",
-                "uri": "dm4.contacts.person",
-                "data_type_uri": "dm4.core.composite",
+                "value":       "Person",
+                "uri":         "dm4.contacts.person",
+                "dataTypeUri": "dm4.core.composite",
                 "assoc_defs": [
                     {
                         "child_type_uri":        "dm4.contacts.person_name",
@@ -233,9 +233,9 @@
             ### Institution ###
 
             {
-                "value": "Institution",
-                "uri": "dm4.contacts.institution",
-                "data_type_uri": "dm4.core.composite",
+                "value":       "Institution",
+                "uri":         "dm4.contacts.institution",
+                "dataTypeUri": "dm4.core.composite",
                 "assoc_defs": [
                     {
                         "child_type_uri":        "dm4.contacts.institution_name",
@@ -288,41 +288,41 @@
             ### Phone Labels ###
 
             {
-                "value": "work",
-                "uri": "dm4.contacts.work_phone",
+                "value":   "work",
+                "uri":     "dm4.contacts.work_phone",
                 "typeUri": "dm4.contacts.phone_label"
             },
             {
-                "value": "home",
-                "uri": "dm4.contacts.home_phone",
+                "value":   "home",
+                "uri":     "dm4.contacts.home_phone",
                 "typeUri": "dm4.contacts.phone_label"
             },
             {
-                "value": "mobile",
-                "uri": "dm4.contacts.mobile",
+                "value":   "mobile",
+                "uri":     "dm4.contacts.mobile",
                 "typeUri": "dm4.contacts.phone_label"
             },
             {
-                "value": "work fax",
-                "uri": "dm4.contacts.work_fax",
+                "value":   "work fax",
+                "uri":     "dm4.contacts.work_fax",
                 "typeUri": "dm4.contacts.phone_label"
             },
             {
-                "value": "home fax",
-                "uri": "dm4.contacts.home_fax",
+                "value":   "home fax",
+                "uri":     "dm4.contacts.home_fax",
                 "typeUri": "dm4.contacts.phone_label"
             },
 
             ### Address Labels ###
 
             {
-                "value": "work",
-                "uri": "dm4.contacts.work_address",
+                "value":   "work",
+                "uri":     "dm4.contacts.work_address",
                 "typeUri": "dm4.contacts.address_label"
             },
             {
-                "value": "home",
-                "uri": "dm4.contacts.home_address",
+                "value":   "home",
+                "uri":     "dm4.contacts.home_address",
                 "typeUri": "dm4.contacts.address_label"
             }
         ]

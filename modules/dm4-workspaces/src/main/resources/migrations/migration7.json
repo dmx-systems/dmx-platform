@@ -7,34 +7,34 @@
         ### Enabled Sharing Modes ###
 
         {
-            "value":         "Private",
-            "uri":           "dm4.workspaces.private.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Private",
+            "uri":         "dm4.workspaces.private.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Confidential",
-            "uri":           "dm4.workspaces.confidential.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Confidential",
+            "uri":         "dm4.workspaces.confidential.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Collaborative",
-            "uri":           "dm4.workspaces.collaborative.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Collaborative",
+            "uri":         "dm4.workspaces.collaborative.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Public",
-            "uri":           "dm4.workspaces.public.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Public",
+            "uri":         "dm4.workspaces.public.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Common",
-            "uri":           "dm4.workspaces.common.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Common",
+            "uri":         "dm4.workspaces.common.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Enabled Sharing Modes",
-            "uri":           "dm4.workspaces.enabled_sharing_modes",
-            "data_type_uri": "dm4.core.composite",
+            "value":       "Enabled Sharing Modes",
+            "uri":         "dm4.workspaces.enabled_sharing_modes",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.workspaces.private.enabled",

@@ -3,9 +3,9 @@
 {
     "assoc_types": [
         {
-            "value":         "Custom Association Type",
-            "uri":           "dm4.core.custom_assoc_type",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Custom Association Type",
+            "uri":         "dm4.core.custom_assoc_type",
+            "dataTypeUri": "dm4.core.text"
         }
     ]
 }

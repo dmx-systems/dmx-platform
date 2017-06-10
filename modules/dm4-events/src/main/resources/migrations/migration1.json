@@ -2,19 +2,19 @@
     {
         "assoc_types": [
             {
-                "value": "From",
-                "uri": "dm4.events.from",
-                "data_type_uri": "dm4.core.text"
+                "value":       "From",
+                "uri":         "dm4.events.from",
+                "dataTypeUri": "dm4.core.text"
             },
             {
-                "value": "To",
-                "uri": "dm4.events.to",
-                "data_type_uri": "dm4.core.text"
+                "value":       "To",
+                "uri":         "dm4.events.to",
+                "dataTypeUri": "dm4.core.text"
             },
             {
-                "value": "Participant",
-                "uri": "dm4.events.participant",
-                "data_type_uri": "dm4.core.text",
+                "value":       "Participant",
+                "uri":         "dm4.events.participant",
+                "dataTypeUri": "dm4.core.text",
                 "view_config_topics": [
                     {
                         "typeUri": "dm4.webclient.view_config",
@@ -32,19 +32,19 @@
             {
                 "value":            "Title",
                 "uri":              "dm4.events.title",
-                "data_type_uri":    "dm4.core.text",
+                "dataTypeUri":      "dm4.core.text",
                 "index_mode_uris": ["dm4.core.fulltext"]
             },
             {
                 "value":            "Notes",
                 "uri":              "dm4.events.notes",
-                "data_type_uri":    "dm4.core.html",
+                "dataTypeUri":      "dm4.core.html",
                 "index_mode_uris": ["dm4.core.fulltext"]
             },
             {
-                "value":            "Event",
-                "uri":              "dm4.events.event",
-                "data_type_uri":    "dm4.core.composite",
+                "value":       "Event",
+                "uri":         "dm4.events.event",
+                "dataTypeUri": "dm4.core.composite",
                 "assoc_defs": [
                     {
                         "child_type_uri":         "dm4.events.title",

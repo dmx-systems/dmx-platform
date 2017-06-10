@@ -6,19 +6,19 @@
         {
             "value":            "Name",
             "uri":              "dm4.workspaces.name",
-            "data_type_uri":    "dm4.core.text",
+            "dataTypeUri":      "dm4.core.text",
             "index_mode_uris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             "value":            "Description",
             "uri":              "dm4.workspaces.description",
-            "data_type_uri":    "dm4.core.html",
+            "dataTypeUri":      "dm4.core.html",
             "index_mode_uris": ["dm4.core.fulltext"]
         },
         {
-            "value":           "Workspace",
-            "uri":             "dm4.workspaces.workspace",
-            "data_type_uri":   "dm4.core.composite",
+            "value":       "Workspace",
+            "uri":         "dm4.workspaces.workspace",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":        "dm4.workspaces.name",
@@ -42,9 +42,9 @@
             ]
         },
         {
-            "value":         "Workspace Facet",
-            "uri":           "dm4.workspaces.workspace_facet",
-            "data_type_uri": "dm4.core.composite",
+            "value":       "Workspace Facet",
+            "uri":         "dm4.workspaces.workspace_facet",
+            "dataTypeUri": "dm4.core.composite",
             "assoc_defs": [
                 {
                     "child_type_uri":         "dm4.workspaces.workspace",

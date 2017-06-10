@@ -6,7 +6,7 @@
         {
             "value":            "Username",
             "uri":              "dm4.accesscontrol.username",
-            "data_type_uri":    "dm4.core.text",
+            "dataTypeUri":      "dm4.core.text",
             "index_mode_uris": ["dm4.core.key", "dm4.core.fulltext"],
             "view_config_topics": [
                 {
@@ -18,9 +18,9 @@
             ]
         },
         {
-            "value":         "Password",
-            "uri":           "dm4.accesscontrol.password",
-            "data_type_uri": "dm4.core.text",
+            "value":       "Password",
+            "uri":         "dm4.accesscontrol.password",
+            "dataTypeUri": "dm4.core.text",
             "view_config_topics": [
                 {
                     "typeUri": "dm4.webclient.view_config",
@@ -34,7 +34,7 @@
         {
             "value":            "User Account",
             "uri":              "dm4.accesscontrol.user_account",
-            "data_type_uri":    "dm4.core.composite",
+            "dataTypeUri":      "dm4.core.composite",
             "index_mode_uris": ["dm4.core.key"],
             "assoc_defs": [
                 {

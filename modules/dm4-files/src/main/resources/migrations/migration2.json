@@ -6,7 +6,7 @@
         {
             "value": "Disk Quota (MB)",
             "uri": "dm4.files.disk_quota",
-            "data_type_uri": "dm4.core.number"
+            "dataTypeUri": "dm4.core.number"
         }
     ]
 }

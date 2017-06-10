@@ -601,7 +601,7 @@ public class ModelFactoryImpl implements ModelFactory {
     TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
-            typeModel.optString("data_type_uri", null),
+            typeModel.optString("dataTypeUri", null),
             parseIndexModes(typeModel.optJSONArray("index_mode_uris")),                 // optJSONArray may return null
             parseAssocDefs(typeModel.optJSONArray("assoc_defs"), typeTopic.getUri()),   // optJSONArray may return null
             newViewConfigurationModel(typeModel.optJSONArray("view_config_topics")));   // optJSONArray may return null

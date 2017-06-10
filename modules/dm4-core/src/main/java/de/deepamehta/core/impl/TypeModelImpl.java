@@ -192,7 +192,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("data_type_uri", getDataTypeUri())
+                .put("dataTypeUri", getDataTypeUri())
                 .put("index_mode_uris", toJSONArray(indexModes))
                 .put("assoc_defs", toJSONArray(assocDefs.values()))
                 .put("view_config_topics", getViewConfig().toJSONArray());

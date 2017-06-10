@@ -6,24 +6,24 @@
         # See CoreServiceImpl.setupBootstrapContent()
 
         /*{
-            "value":         "Data Type",
-            "uri":           "dm4.core.data_type",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Data Type",
+            "uri":         "dm4.core.data_type",
+            "dataTypeUri": "dm4.core.text"
         },*/
         /*{
-            "value":         "Role Type",
-            "uri":           "dm4.core.role_type",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Role Type",
+            "uri":         "dm4.core.role_type",
+            "dataTypeUri": "dm4.core.text"
         },*/
         {
-            "value":         "Cardinality",
-            "uri":           "dm4.core.cardinality",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Cardinality",
+            "uri":         "dm4.core.cardinality",
+            "dataTypeUri": "dm4.core.text"
         },
         {
-            "value":         "Index Mode",
-            "uri":           "dm4.core.index_mode",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Index Mode",
+            "uri":         "dm4.core.index_mode",
+            "dataTypeUri": "dm4.core.text"
         }
     ],
 
@@ -34,29 +34,29 @@
         # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
 
         {
-            "value":         "Association",
-            "uri":           "dm4.core.association",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Association",
+            "uri":         "dm4.core.association",
+            "dataTypeUri": "dm4.core.text"
         },
         /*{
-            "value":         "Aggregation",
-            "uri":           "dm4.core.aggregation",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Aggregation",
+            "uri":         "dm4.core.aggregation",
+            "dataTypeUri": "dm4.core.text"
         },*/
         {
-            "value":         "Composition",
-            "uri":           "dm4.core.composition",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Composition",
+            "uri":         "dm4.core.composition",
+            "dataTypeUri": "dm4.core.text"
         },
         /*{
-            "value":         "Instantiation",
-            "uri":           "dm4.core.instantiation",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Instantiation",
+            "uri":         "dm4.core.instantiation",
+            "dataTypeUri": "dm4.core.text"
         },*/
         {
-            "value":         "Sequence",
-            "uri":           "dm4.core.sequence",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Sequence",
+            "uri":         "dm4.core.sequence",
+            "dataTypeUri": "dm4.core.text"
         }
     ],
 
