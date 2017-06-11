@@ -17,8 +17,8 @@ export default {
   },
 
   watch: {
-    workspaceId: function (workspaceId) {
-      console.log('select workspace', workspaceId)
+    workspaceId: function () {
+      this.$store.dispatch('selectWorkspace', this.workspaceId)
     }
   },
 
