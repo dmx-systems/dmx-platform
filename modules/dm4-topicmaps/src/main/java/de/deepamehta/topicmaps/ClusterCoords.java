@@ -25,7 +25,7 @@ public class ClusterCoords implements Iterable<ClusterCoords.Entry> {
             for (int i = 0; i < entries.length(); i++) {
                 JSONObject entry = entries.getJSONObject(i);
                 this.entries.add(new Entry(
-                    entry.getLong("topic_id"),
+                    entry.getLong("topicId"),
                     entry.getInt("x"),
                     entry.getInt("y")
                 ));

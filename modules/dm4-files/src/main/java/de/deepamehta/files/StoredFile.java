@@ -36,8 +36,8 @@ public class StoredFile implements JSONEnabled {
     public JSONObject toJSON() {
         try {
             JSONObject storedFile = new JSONObject();
-            storedFile.put("file_name", fileName);
-            storedFile.put("topic_id", fileTopicId);
+            storedFile.put("fileName", fileName);
+            storedFile.put("topicId", fileTopicId);
             return storedFile;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

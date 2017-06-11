@@ -6,7 +6,7 @@ import de.deepamehta.core.Topic;
 
 public enum ConfigTarget {
 
-    SINGLETON("topic_uri") {
+    SINGLETON("topicUri") {
         @Override
         String hashKey(Topic topic) {
             return hashKey(topic.getUri());

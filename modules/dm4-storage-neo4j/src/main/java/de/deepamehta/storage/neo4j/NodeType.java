@@ -41,7 +41,7 @@ enum NodeType {
     // ---
 
     static NodeType of(Node node) {
-        String type = (String) node.getProperty("node_type");
+        String type = (String) node.getProperty("nodeType");
         return valueOf(type.toUpperCase());
     }
 
@@ -52,8 +52,8 @@ enum NodeType {
      * Non-DM nodes are those created by 3rd-party Neo4j components, e.g. Neo4j Spatial.
      */
     boolean isTypeOf(Node node) {
-        // a node is regarded "non-DM" if it has no "node_type" property.
-        return node.getProperty("node_type", "").equals(stringify());
+        // a node is regarded "non-DM" if it has no "nodeType" property.
+        return node.getProperty("nodeType", "").equals(stringify());
     }
 
     String stringify() {

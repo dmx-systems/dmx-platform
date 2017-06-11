@@ -131,8 +131,8 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("role_1", roleModel1.toJSON())
-                .put("role_2", roleModel2.toJSON());
+                .put("role1", roleModel1.toJSON())
+                .put("role2", roleModel2.toJSON());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

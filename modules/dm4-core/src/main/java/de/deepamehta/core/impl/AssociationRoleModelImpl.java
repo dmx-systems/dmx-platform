@@ -36,8 +36,8 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("assoc_id", playerId)
-                .put("role_type_uri", roleTypeUri);
+                .put("assocId", playerId)
+                .put("roleTypeUri", roleTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

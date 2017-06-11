@@ -171,8 +171,8 @@ public class ModelFactoryImpl implements ModelFactory {
     public AssociationModelImpl newAssociationModel(JSONObject assoc) {
         try {
             return new AssociationModelImpl(newDeepaMehtaObjectModel(assoc),
-                assoc.has("role_1") ? parseRole(assoc.getJSONObject("role_1")) : null,
-                assoc.has("role_2") ? parseRole(assoc.getJSONObject("role_2")) : null
+                assoc.has("role1") ? parseRole(assoc.getJSONObject("role1")) : null,
+                assoc.has("role2") ? parseRole(assoc.getJSONObject("role2")) : null
             );
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
@@ -182,9 +182,9 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private RoleModelImpl parseRole(JSONObject roleModel) {
-        if (roleModel.has("topic_id") || roleModel.has("topic_uri")) {
+        if (roleModel.has("topicId") || roleModel.has("topicUri")) {
             return newTopicRoleModel(roleModel);
-        } else if (roleModel.has("assoc_id")) {
+        } else if (roleModel.has("assocId")) {
             return newAssociationRoleModel(roleModel);
         } else {
             throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed (JSONObject=" +
@@ -382,15 +382,15 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicRoleModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
         try {
-            long topicId       = topicRoleModel.optLong("topic_id", -1);
-            String topicUri    = topicRoleModel.optString("topic_uri", null);
-            String roleTypeUri = topicRoleModel.getString("role_type_uri");
+            long topicId       = topicRoleModel.optLong("topicId", -1);
+            String topicUri    = topicRoleModel.optString("topicUri", null);
+            String roleTypeUri = topicRoleModel.getString("roleTypeUri");
             //
             if (topicId == -1 && topicUri == null) {
-                throw new IllegalArgumentException("Neiter \"topic_id\" nor \"topic_uri\" is set");
+                throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
             if (topicId != -1 && topicUri != null) {
-                throw new IllegalArgumentException("\"topic_id\" and \"topic_uri\" must not be set at the same time");
+                throw new IllegalArgumentException("\"topicId\" and \"topicUri\" must not be set at the same time");
             }
             //
             if (topicId != -1) {
@@ -415,8 +415,8 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationRoleModelImpl newAssociationRoleModel(JSONObject assocRoleModel) {
         try {
-            long assocId       = assocRoleModel.getLong("assoc_id");
-            String roleTypeUri = assocRoleModel.getString("role_type_uri");
+            long assocId       = assocRoleModel.getLong("assocId");
+            String roleTypeUri = assocRoleModel.getString("roleTypeUri");
             return newAssociationRoleModel(assocId, roleTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);

@@ -43,7 +43,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     /**
-     * Key: the "configurable URI" as a config target's hash key, that is either "topic_uri:{uri}" or "typeUri:{uri}".
+     * Key: the "configurable URI" as a config target's hash key, that is either "topicUri:{uri}" or "typeUri:{uri}".
      */
     private Map<String, List<ConfigDefinition>> registry = new HashMap();
 
