@@ -21,19 +21,19 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.core.plugin_name",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.core.plugin_name",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.core.plugin_symbolic_name",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.core.plugin_symbolic_name",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.core.plugin_migration_nr",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.core.plugin_migration_nr",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
         }

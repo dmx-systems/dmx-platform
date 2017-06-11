@@ -16,16 +16,16 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation_x",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation_x",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation_y",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation_y",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ]
         },
@@ -40,16 +40,16 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.topicmaps.zoom_level",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.zoom_level",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ],
             "viewConfigTopics": [

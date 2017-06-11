@@ -21,14 +21,14 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.workspaces.name",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.workspaces.name",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.workspaces.description",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.workspaces.description",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ],
             "viewConfigTopics": [
@@ -47,10 +47,10 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":         "dm4.workspaces.workspace",
-                    "child_cardinality_uri":  "dm4.core.one",
-                    "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dm4.workspaces.workspace",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
                 }
             ]
         }

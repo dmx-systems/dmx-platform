@@ -15,10 +15,10 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":         "dm4.contacts.organizational_role",
-                    "child_cardinality_uri":  "dm4.core.one",
-                    "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dm4.contacts.organizational_role",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
                 }
             ],
             "viewConfigTopics": [

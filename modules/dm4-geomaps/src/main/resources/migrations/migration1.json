@@ -16,16 +16,16 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.geomaps.longitude",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.geomaps.longitude",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.geomaps.latitude",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.geomaps.latitude",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ]
         },
@@ -35,9 +35,9 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.geomaps.geo_coordinate",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.geomaps.geo_coordinate",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
         }

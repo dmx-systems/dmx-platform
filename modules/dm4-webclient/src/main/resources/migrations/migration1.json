@@ -59,55 +59,55 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":         "dm4.webclient.icon",
-                    "child_cardinality_uri":  "dm4.core.one",
-                    "parent_cardinality_uri": "dm4.core.many",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dm4.webclient.icon",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.color",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.color",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.show_in_create_menu",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.show_in_create_menu",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.input_field_rows",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.input_field_rows",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.hidden",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.hidden",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.locked",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.locked",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.page_renderer_uri",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.page_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.simple_renderer_uri",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.simple_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.multi_renderer_uri",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.multi_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.searchable_as_unit",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.searchable_as_unit",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
             ### Note: don't try to add view config topics to the view config type -> endless recursion!
@@ -141,14 +141,14 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.webclient.search_term",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.search_term",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.webclient.search_result",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.webclient.search_result",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ],
             "viewConfigTopics": [

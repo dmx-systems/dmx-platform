@@ -47,37 +47,37 @@
                 "dataTypeUri": "dm4.core.composite",
                 "assocDefs": [
                     {
-                        "child_type_uri":         "dm4.events.title",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.events.title",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.datetime",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def",
-                        "custom_assoc_type_uri":  "dm4.events.from"
+                        "childTypeUri":         "dm4.datetime",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def",
+                        "customAssocTypeUri":   "dm4.events.from"
                     },
                     {
-                        "child_type_uri":         "dm4.datetime",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def",
-                        "custom_assoc_type_uri":  "dm4.events.to"
+                        "childTypeUri":         "dm4.datetime",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def",
+                        "customAssocTypeUri":   "dm4.events.to"
                     },
                     {
-                        "child_type_uri":         "dm4.contacts.address",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                        "childTypeUri":         "dm4.contacts.address",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def"
                     },
                     {
-                        "child_type_uri":         "dm4.events.notes",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.events.notes",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.webbrowser.url",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.webbrowser.url",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     }
                 ],
                 "viewConfigTopics": [

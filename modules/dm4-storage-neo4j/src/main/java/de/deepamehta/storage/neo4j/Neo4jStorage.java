@@ -57,7 +57,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // --- Association Metadata Index Keys ---
     private static final String KEY_ASSOC_ID       = "assoc_id";
-    private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
+    private static final String KEY_ASSOC_TPYE_URI = "assocTypeUri";
     // role 1 & 2
     private static final String KEY_ROLE_TPYE_URI   = "role_type_uri_";     // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TPYE     = "player_type_";       // "1" or "2" is appended programatically

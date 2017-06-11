@@ -6,10 +6,10 @@
             "dataTypeUri": "dm4.core.composite",
             "assocDefs": [
                 {
-                    "child_type_uri":         "dm4.webbrowser.url",
-                    "child_cardinality_uri":  "dm4.core.one",
-                    "parent_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dm4.webbrowser.url",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
                 }
             ],
             "viewConfigTopics": [

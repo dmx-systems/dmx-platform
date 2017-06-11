@@ -19,10 +19,10 @@
                 "dataTypeUri": "dm4.core.composite",
                 "assocDefs": [
                     {
-                        "child_type_uri":         "dm4.contacts.phone_label",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                        "childTypeUri":         "dm4.contacts.phone_label",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def"
                     }
                 ]
             },
@@ -32,10 +32,10 @@
                 "dataTypeUri": "dm4.core.composite",
                 "assocDefs": [
                     {
-                        "child_type_uri":         "dm4.contacts.address_label",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                        "childTypeUri":         "dm4.contacts.address_label",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def"
                     }
                 ]
             }
@@ -65,16 +65,16 @@
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
                     {
-                        "child_type_uri":        "dm4.contacts.first_name",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "include_in_label":      true
+                        "childTypeUri":        "dm4.contacts.first_name",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "includeInLabel":      true
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.last_name",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "include_in_label":      true
+                        "childTypeUri":        "dm4.contacts.last_name",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "includeInLabel":      true
                     }
                 ]
             },
@@ -139,32 +139,32 @@
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
                     {
-                        "child_type_uri":         "dm4.contacts.street",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def",
-                        "include_in_label":       true
+                        "childTypeUri":         "dm4.contacts.street",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "includeInLabel":       true
                     },
                     {
-                        "child_type_uri":         "dm4.contacts.postal_code",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def",
-                        "include_in_label":       true
+                        "childTypeUri":         "dm4.contacts.postal_code",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "includeInLabel":       true
                     },
                     {
-                        "child_type_uri":         "dm4.contacts.city",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def",
-                        "include_in_label":       true
+                        "childTypeUri":         "dm4.contacts.city",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "includeInLabel":       true
                     },
                     {
-                        "child_type_uri":         "dm4.contacts.country",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def",
-                        "include_in_label":       true
+                        "childTypeUri":         "dm4.contacts.country",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "includeInLabel":       true
                     }
                 ]
             },
@@ -186,36 +186,36 @@
                 "dataTypeUri": "dm4.core.composite",
                 "assocDefs": [
                     {
-                        "child_type_uri":        "dm4.contacts.person_name",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.person_name",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.phone_number",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "custom_assoc_type_uri": "dm4.contacts.phone_entry"
+                        "childTypeUri":        "dm4.contacts.phone_number",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "customAssocTypeUri":  "dm4.contacts.phone_entry"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.email_address",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.email_address",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.webbrowser.url",
-                        "child_cardinality_uri":  "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.webbrowser.url",
+                        "childCardinalityUri":  "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.address",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "custom_assoc_type_uri": "dm4.contacts.address_entry"
+                        "childTypeUri":        "dm4.contacts.address",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "customAssocTypeUri":  "dm4.contacts.address_entry"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.notes",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.notes",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     }
                 ],
                 "viewConfigTopics": [
@@ -238,36 +238,36 @@
                 "dataTypeUri": "dm4.core.composite",
                 "assocDefs": [
                     {
-                        "child_type_uri":        "dm4.contacts.institution_name",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.institution_name",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.phone_number",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "custom_assoc_type_uri": "dm4.contacts.phone_entry"
+                        "childTypeUri":        "dm4.contacts.phone_number",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "customAssocTypeUri":  "dm4.contacts.phone_entry"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.email_address",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.email_address",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.webbrowser.url",
-                        "child_cardinality_uri":  "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.webbrowser.url",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.address",
-                        "child_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":        "dm4.core.composition_def",
-                        "custom_assoc_type_uri": "dm4.contacts.address_entry"
+                        "childTypeUri":        "dm4.contacts.address",
+                        "childCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "customAssocTypeUri":  "dm4.contacts.address_entry"
                     },
                     {
-                        "child_type_uri":        "dm4.contacts.notes",
-                        "child_cardinality_uri": "dm4.core.one",
-                        "assoc_type_uri":        "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.contacts.notes",
+                        "childCardinalityUri": "dm4.core.one",
+                        "assocTypeUri":        "dm4.core.composition_def"
                     }
                 ],
                 "viewConfigTopics": [

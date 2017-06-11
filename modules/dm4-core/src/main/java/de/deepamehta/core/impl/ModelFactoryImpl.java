@@ -629,7 +629,7 @@ public class ModelFactoryImpl implements ModelFactory {
         if (assocDefs != null) {
             for (int i = 0; i < assocDefs.length(); i++) {
                 JSONObject assocDef = assocDefs.getJSONObject(i)
-                    .put("parent_type_uri", parentTypeUri);
+                    .put("parentTypeUri", parentTypeUri);
                 _assocDefs.add(newAssociationDefinitionModel(assocDef));
             }
         }
@@ -673,19 +673,19 @@ public class ModelFactoryImpl implements ModelFactory {
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(JSONObject assocDef) {
         try {
             AssociationModelImpl assoc = newAssociationModel(assocDef.optLong("id", -1), null,
-                assocDef.getString("assoc_type_uri"),
-                parentRole(assocDef.getString("parent_type_uri")),
-                childRole(assocDef.getString("child_type_uri")),
+                assocDef.getString("assocTypeUri"),
+                parentRole(assocDef.getString("parentTypeUri")),
+                childRole(assocDef.getString("childTypeUri")),
                 null, childTopics(assocDef)
             );
             //
-            if (!assocDef.has("parent_cardinality_uri") && !assoc.getTypeUri().equals("dm4.core.composition_def")) {
-                throw new RuntimeException("\"parent_cardinality_uri\" is missing");
+            if (!assocDef.has("parentCardinalityUri") && !assoc.getTypeUri().equals("dm4.core.composition_def")) {
+                throw new RuntimeException("\"parentCardinalityUri\" is missing");
             }
             //
             return new AssociationDefinitionModelImpl(assoc,
-                assocDef.optString("parent_cardinality_uri", "dm4.core.one"),
-                assocDef.getString("child_cardinality_uri"),
+                assocDef.optString("parentCardinalityUri", "dm4.core.one"),
+                assocDef.getString("childCardinalityUri"),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
         } catch (Exception e) {
@@ -730,9 +730,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
         // Note: getString()/optString() on a key with JSON null value would return the string "null"
-        String customAssocTypeUri = assocDef.isNull("custom_assoc_type_uri") ? null :
-            assocDef.getString("custom_assoc_type_uri");
-        boolean includeInLabel = assocDef.optBoolean("include_in_label");
+        String customAssocTypeUri = assocDef.isNull("customAssocTypeUri") ? null :
+            assocDef.getString("customAssocTypeUri");
+        boolean includeInLabel = assocDef.optBoolean("includeInLabel");
         //
         return childTopics(customAssocTypeUri, includeInLabel);
     }

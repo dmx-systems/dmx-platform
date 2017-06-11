@@ -38,9 +38,9 @@
             "indexModeUris": ["dm4.core.key"],
             "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.accesscontrol.username",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dm4.accesscontrol.username",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
@@ -51,9 +51,9 @@
                     ]
                 },
                 {
-                    "child_type_uri":        "dm4.accesscontrol.password",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dm4.accesscontrol.password",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dm4.webclient.view_config",
