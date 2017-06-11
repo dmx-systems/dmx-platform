@@ -34,6 +34,7 @@ const actions = {
   },
 
   submit () {
+    dm5.restClient.updateTopic(state.selectedObject)
     state.detailPanel.mode = 'info'
   },
 
