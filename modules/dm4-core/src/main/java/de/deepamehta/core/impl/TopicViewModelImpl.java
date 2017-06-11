@@ -47,7 +47,7 @@ class TopicViewModelImpl extends TopicModelImpl implements TopicViewModel {
     public JSONObject toJSON() {
         try {
             JSONObject o = super.toJSON();
-            o.put("view_props", viewProps.toJSON());
+            o.put("viewProps", viewProps.toJSON());
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
