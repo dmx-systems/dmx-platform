@@ -19,7 +19,7 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import de.deepamehta.websockets.WebSocketsService;
+import de.deepamehta.websockets.WebSocketsService;      // ### TODO: use core
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;

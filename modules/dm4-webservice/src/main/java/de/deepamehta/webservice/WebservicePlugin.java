@@ -13,7 +13,6 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.Transactional;
@@ -35,6 +34,9 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * REST API for {@link de.deepamehta.core.service.CoreService}.
+ */
 @Path("/core")
 @Consumes("application/json")
 @Produces("application/json")

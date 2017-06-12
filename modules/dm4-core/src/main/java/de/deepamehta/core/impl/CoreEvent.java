@@ -325,4 +325,17 @@ class CoreEvent {
             );
         }
     };
+
+
+
+    // === WebSockets Events ===
+
+    static DeepaMehtaEvent WEBSOCKET_TEXT_MESSAGE = new DeepaMehtaEvent(WebsocketTextMessageListener.class) {
+        @Override
+        public void dispatch(EventListener listener, Object... params) {
+            ((WebsocketTextMessageListener) listener).websocketTextMessage(
+                (String) params[0]
+            );
+        }
+    };
 }

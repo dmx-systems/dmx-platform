@@ -304,5 +304,7 @@ public interface CoreService {
 
     AccessControl getAccessControl();   // ### TODO: drop this
 
+    WebSocketsService getWebSocketsService();
+
     Object getDatabaseVendorObject();
 }

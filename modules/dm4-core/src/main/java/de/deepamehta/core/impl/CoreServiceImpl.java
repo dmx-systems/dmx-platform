@@ -17,6 +17,7 @@ import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.service.WebSocketsService;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -43,6 +44,7 @@ public class CoreServiceImpl implements CoreService {
     PluginManager pluginManager;
     AccessControl accessControl;
     WebPublishingService wpService;
+    WebSocketsService wsService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -60,6 +62,7 @@ public class CoreServiceImpl implements CoreService {
         this.pluginManager = new PluginManager(this);
         this.accessControl = new AccessControlImpl(pl);
         this.wpService = new WebPublishingService(pl);
+        this.wsService = new WebSocketsServiceImpl(this);
         //
         setupDB();
     }
@@ -419,6 +422,11 @@ public class CoreServiceImpl implements CoreService {
     @Override
     public AccessControl getAccessControl() {
         return accessControl;
+    }
+
+    @Override
+    public WebSocketsService getWebSocketsService() {
+        return wsService;
     }
 
     @Override

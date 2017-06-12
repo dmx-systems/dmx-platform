@@ -21,6 +21,24 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Response post-processing.
+ * Post-processing takes place <i>after</i> a request is processed, <i>before</i> the response is sent to the client.
+ * <p>
+ * Post-processing includes 4 steps:
+ * <ol>
+ * <li>Fire the <code>CoreEvent.SERVICE_RESPONSE_FILTER</code> event to let plugins operate on the response, e.g.
+ *     - the Caching plugin sets the <code>Cache-Control</code> response header
+ *     - the Time plugin sets the <code>Last-Modified</code> response header
+ * <li>Load child topics of the response object(s) if requested with the <code>include_childs</code> and
+ *     <code>include_assoc_childs</code> query parameters.
+ * <li>Fire the <code>CoreEvent.PRE_SEND_XXX</code> events for all response object(s) and objects contained in response
+ *     directives. This let plugins operate on the response on a per-object basis, e.g.
+ *     - the Geomaps plugin enriches an Address topic with its geo coordinate
+ *     - the Time plugin enriches topics/associations with creation/modification timestamps
+ * <li>Remove the (thread-local) directives assembled while request processing.
+ * </ol>
+ */
 class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -43,12 +61,11 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             em.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
-            boolean includeChilds = getIncludeChilds(request);
-            boolean includeAssocChilds = getIncludeAssocChilds(request);
             if (entity != null) {
                 //
                 // 1) Loading child topics
-                // ### TODO: move to Webservice module?
+                boolean includeChilds = getIncludeChilds(request);
+                boolean includeAssocChilds = getIncludeAssocChilds(request);
                 if (entity instanceof DeepaMehtaObject) {
                     loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -56,7 +73,6 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 }
                 //
                 // 2) Firing PRE_SEND events
-                // ### TODO: move to Webservice module?
                 if (entity instanceof DeepaMehtaObject) {
                     firePreSend((DeepaMehtaObject) entity);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -83,6 +99,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Loading child topics ===
 
@@ -123,6 +141,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
         }
     }
+
+
 
     // === Firing PRE_SEND events ===
 
