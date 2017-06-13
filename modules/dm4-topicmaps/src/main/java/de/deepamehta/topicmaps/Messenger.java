@@ -1,7 +1,7 @@
 package de.deepamehta.topicmaps;
 
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
-import de.deepamehta.websockets.WebSocketsService;      // ### TODO: use core
+import de.deepamehta.core.service.WebSocketsService;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;

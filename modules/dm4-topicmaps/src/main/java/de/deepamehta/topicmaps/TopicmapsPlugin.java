@@ -15,11 +15,8 @@ import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
-
-import de.deepamehta.websockets.WebSocketsService;      // ### TODO: use core
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -64,8 +61,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
 
-    @Inject
-    private WebSocketsService webSocketsService;
     private Messenger me;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -338,7 +333,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void init() {
         // ### TODO: repurpose WebSocketsService's "pluginUri" as "frontendUri"
-        me = new Messenger("de.deepamehta.webclient", webSocketsService);
+        me = new Messenger("de.deepamehta.webclient", dm4.getWebSocketsService());
     }
 
 
