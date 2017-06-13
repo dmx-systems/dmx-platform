@@ -13,8 +13,6 @@ import org.eclipse.jetty.websocket.WebSocketHandler;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import javax.ws.rs.core.Context;    // ### FIXME
-
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,9 +34,6 @@ class WebSocketsServiceImpl implements WebSocketsService {
     private WebSocketConnectionPool pool = new WebSocketConnectionPool();
     private CoreService dm4;
 
-    @Context
-    private HttpServletRequest request;
-
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ----------------------------------------------------------------------------------------------------- Constructor
@@ -59,13 +54,13 @@ class WebSocketsServiceImpl implements WebSocketsService {
     }
 
     @Override
-    public void messageToAllButOne(String pluginUri, String message) {
-        broadcast(pluginUri, message, getConnection(pluginUri));
+    public void messageToAllButOne(HttpServletRequest request, String pluginUri, String message) {
+        broadcast(pluginUri, message, getConnection(request, pluginUri));
     }
 
     @Override
-    public void messageToOne(String pluginUri, String message) {
-        getConnection(pluginUri).sendMessage(message);
+    public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
+        getConnection(request, pluginUri).sendMessage(message);
     }
 
     // ---
@@ -105,15 +100,15 @@ class WebSocketsServiceImpl implements WebSocketsService {
     // ---
 
     /**
-     * Returns the WebSocket connection that is associated to the current request, based on the request's session ID.
+     * Returns the WebSocket connection that is associated to the current session ID, based on the given request.
      */
-    private WebSocketConnection getConnection(String pluginUri) {
+    private WebSocketConnection getConnection(HttpServletRequest request, String pluginUri) {
         if (request == null) {
-            throw new RuntimeException("No request is injected");
+            throw new RuntimeException("No request is given");
         }
         HttpSession session = request.getSession(false);
         if (session == null) {
-            throw new RuntimeException("No valid session is associated with this request");
+            throw new RuntimeException("No valid session is associated with the request");
         }
         return pool.getConnection(pluginUri, session.getId());
     }

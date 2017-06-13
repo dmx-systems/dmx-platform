@@ -18,6 +18,9 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -27,6 +30,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.core.Context;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -60,8 +66,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
+    private Messenger me = new Messenger("de.deepamehta.webclient");
 
-    private Messenger me;
+    @Context
+    private HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -324,20 +332,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // *************
-    // *** Hooks ***
-    // *************
-
-
-
-    @Override
-    public void init() {
-        // ### TODO: repurpose WebSocketsService's "pluginUri" as "frontendUri"
-        me = new Messenger("de.deepamehta.webclient", dm4.getWebSocketsService());
-    }
-
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // --- Fetch ---
@@ -452,5 +446,44 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private InputStream invokeWebclient() {
         return dm4.getPlugin("de.deepamehta.webclient").getStaticResource("/web/index.html");
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class Messenger {
+
+        private String pluginUri;
+
+        private Messenger(String pluginUri) {
+            this.pluginUri = pluginUri;
+        }
+
+        private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) throws JSONException {
+            messageToAllButOne(new JSONObject()
+                .put("type", "addTopicToTopicmap")
+                .put("args", new JSONObject()
+                    .put("topicmapId", topicmapId)
+                    .put("viewTopic", topic.toJSON())
+                )
+            );
+        }
+
+        private void setTopicPosition(long topicmapId, long topicId, int x, int y) throws JSONException {
+            messageToAllButOne(new JSONObject()
+                .put("type", "setTopicPosition")
+                .put("args", new JSONObject()
+                    .put("topicmapId", topicmapId)
+                    .put("topicId", topicId)
+                    .put("pos", new JSONObject()
+                        .put("x", x)
+                        .put("y", y)
+                    )
+                )
+            );
+        }
+
+        private void messageToAllButOne(JSONObject message) {
+            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+        }
     }
 }
