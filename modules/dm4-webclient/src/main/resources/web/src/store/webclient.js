@@ -29,7 +29,6 @@ const actions = {
 
   edit () {
     state.selectedObject.fillChilds()
-    console.log('edit', state.selectedObject)
     state.detailPanel.mode = 'form'
   },
 
@@ -43,6 +42,13 @@ const actions = {
    */
   onBackgroundTap ({dispatch}, pos) {
     dispatch('openSearchWidget', pos)
+  },
+
+  // WebSocket messages
+
+  _processDirectives (_, directives) {
+    console.log(`Processing ${directives.length} directives ...`)
+    // TODO
   }
 }
 

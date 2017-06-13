@@ -13,6 +13,10 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Note: Directives is not {@link de.deepamehta.core.JSONEnabled} as the underlying structure is a list, not an object.
+ * There is a {@link #toJSONArray} method though.
+ */
 public class Directives implements Iterable<Directives.Entry> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

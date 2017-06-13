@@ -42,8 +42,8 @@ public class CoreServiceImpl implements CoreService {
     MigrationManager migrationManager;
     PluginManager pluginManager;
     AccessControl accessControl;
-    WebPublishingService wpService;
     WebSocketsServiceImpl wsService;
+    WebPublishingService wpService;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -60,8 +60,8 @@ public class CoreServiceImpl implements CoreService {
         this.migrationManager = new MigrationManager(this);
         this.pluginManager = new PluginManager(this);
         this.accessControl = new AccessControlImpl(pl);
-        this.wpService = new WebPublishingService(pl);
         this.wsService = new WebSocketsServiceImpl(this);
+        this.wpService = new WebPublishingService(pl, wsService);
         //
         setupDB();
     }
