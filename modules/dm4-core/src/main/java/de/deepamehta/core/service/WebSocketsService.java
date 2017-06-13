@@ -9,4 +9,8 @@ public interface WebSocketsService {
     void messageToAllButOne(String pluginUri, String message);
 
     void messageToOne(String pluginUri, String message);
+
+    // ---
+
+    String getWebSocketsURL();
 }

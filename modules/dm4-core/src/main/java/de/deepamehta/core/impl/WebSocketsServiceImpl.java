@@ -1,6 +1,5 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.WebSocketsService;
 import de.deepamehta.core.util.JavaUtils;
@@ -11,16 +10,10 @@ import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketHandler;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Context;    // ### FIXME
 
 import java.util.Collection;
 import java.util.logging.Level;
@@ -28,13 +21,11 @@ import java.util.logging.Logger;
 
 
 
-@Path("/websockets")
-@Produces("application/json")
 class WebSocketsServiceImpl implements WebSocketsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final int WEBSOCKETS_PORT = Integer.getInteger("dm4.websockets.port", 8081);
+    private static final int    WEBSOCKETS_PORT = Integer.getInteger("dm4.websockets.port", 8081);
     private static final String WEBSOCKETS_URL = System.getProperty("dm4.websockets.url", "ws://localhost:8081");
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
@@ -77,23 +68,14 @@ class WebSocketsServiceImpl implements WebSocketsService {
         getConnection(pluginUri).sendMessage(message);
     }
 
-    // *** REST Resource (not part of OSGi service) ***
+    // ---
 
-    @GET
-    public JSONEnabled getConfig() {
-        return new JSONEnabled() {
-            @Override
-            public JSONObject toJSON() {
-                try {
-                    return new JSONObject().put("dm4.websockets.url", WEBSOCKETS_URL);
-                } catch (JSONException e) {
-                    throw new RuntimeException("Serializing the WebSockets configuration failed", e);
-                }
-            }
-        };
+    @Override
+    public String getWebSocketsURL() {
+        return WEBSOCKETS_URL;
     }
 
-    // ---
+    // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void init() {
         try {
@@ -120,7 +102,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
         }
     }
 
-    // ------------------------------------------------------------------------------------------------- Private Methods
+    // ---
 
     /**
      * Returns the WebSocket connection that is associated to the current request, based on the request's session ID.
