@@ -32,9 +32,11 @@ const actions = {
     state.detailPanel.mode = 'form'
   },
 
-  submit () {
-    dm5.restClient.updateTopic(state.selectedObject)
+  submit ({dispatch}) {
     state.detailPanel.mode = 'info'
+    dm5.restClient.updateTopic(state.selectedObject).then(topic => {
+      dispatch('_processDirectives', topic.directives)
+    })
   },
 
   /**
@@ -47,8 +49,37 @@ const actions = {
   // WebSocket messages
 
   _processDirectives (_, directives) {
-    console.log(`Processing ${directives.length} directives ...`)
-    // TODO
+    console.log(`Webclient: processing ${directives.length} directives ...`)
+    directives.forEach(dir => {
+      switch (dir.type) {
+      case "UPDATE_TOPIC":
+        updateTopic(new dm5.Topic(dir.arg))
+        break
+      case "DELETE_TOPIC":
+        // TODO
+        break
+      case "UPDATE_ASSOCIATION":
+        // TODO
+        break
+      case "DELETE_ASSOCIATION":
+        // TODO
+        break
+      case "UPDATE_TOPIC_TYPE":
+        // TODO
+        break
+      case "DELETE_TOPIC_TYPE":
+        // TODO
+        break
+      case "UPDATE_ASSOCIATION_TYPE":
+        // TODO
+        break
+      case "DELETE_ASSOCIATION_TYPE":
+        // TODO
+        break
+      default:
+        throw Error(`"${dir.type}" is an unsupported directive`)
+      }
+    })
   }
 }
 
@@ -63,3 +94,11 @@ const store = new Vuex.Store({
 dm5.typeCache.init(store)
 
 export default store
+
+// ---
+
+function updateTopic (topic) {
+  if (state.selectedObject && state.selectedObject.id === topic.id) {
+    state.selectedObject = topic
+  }
+}

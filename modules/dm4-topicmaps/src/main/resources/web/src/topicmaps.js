@@ -11,8 +11,8 @@ const actions = {
     dm5.restClient.getTopicmap(id).then(topicmap => {
       // update view model
       state.topicmap = topicmap
-      // notify renderer
-      dispatch('renderTopicmap', topicmap)
+      // sync renderer
+      dispatch('syncTopicmap', topicmap)
     }).catch(error => {
       console.error(error)
     })
@@ -21,7 +21,7 @@ const actions = {
   onTopicDragged (_, {id, pos}) {
     // update view model
     state.topicmap.getTopic(id).setPosition(pos)
-    // notify renderer (Note: the view is up-to-date already)
+    // sync renderer (Note: the renderer is up-to-date already)
     // sync clients
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
@@ -34,9 +34,9 @@ const actions = {
     }
     // update view model
     state.topicmap.addTopic(topic.newViewTopic(viewProps))
-    // notify renderer
-    dispatch('addTopic', topic.id)
-    dispatch('select', topic.id)
+    // sync renderer
+    dispatch('syncShowTopic', topic.id)
+    dispatch('syncSelection', topic.id)
     // sync clients
     dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
   },
@@ -47,8 +47,8 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       // update view model
       state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))
-      // notify renderer
-      dispatch('addTopic', viewTopic.id)
+      // sync renderer
+      dispatch('syncShowTopic', viewTopic.id)
     }
   },
 
@@ -56,9 +56,43 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       // update view model
       state.topicmap.getTopic(topicId).setPosition(pos)
-      // notify renderer
-      dispatch('setTopicPosition', topicId)
+      // sync renderer
+      dispatch('syncTopicPosition', topicId)
     }
+  },
+
+  _processDirectives ({dispatch}, directives) {
+    console.log(`Topicmaps: processing ${directives.length} directives ...`)
+    directives.forEach(dir => {
+      switch (dir.type) {
+      case "UPDATE_TOPIC":
+        updateTopic(dir.arg, dispatch)
+        break
+      case "DELETE_TOPIC":
+        // TODO
+        break
+      case "UPDATE_ASSOCIATION":
+        // TODO
+        break
+      case "DELETE_ASSOCIATION":
+        // TODO
+        break
+      case "UPDATE_TOPIC_TYPE":
+        // TODO
+        break
+      case "DELETE_TOPIC_TYPE":
+        // TODO
+        break
+      case "UPDATE_ASSOCIATION_TYPE":
+        // TODO
+        break
+      case "DELETE_ASSOCIATION_TYPE":
+        // TODO
+        break
+      default:
+        throw Error(`"${dir.type}" is an unsupported directive`)
+      }
+    })
   }
 }
 
@@ -70,4 +104,16 @@ dm5.restClient.getTopicsByType('dm4.topicmaps.topicmap').then(topics => {
 export default {
   state,
   actions
+}
+
+// ---
+
+function updateTopic (topic, dispatch) {
+  const _topic = state.topicmap.getTopicIfExists(topic.id)
+  if (_topic) {
+    // update view model
+    _topic.value = topic.value
+    // sync renderer
+    dispatch('syncTopicLabel', topic.id)
+  }
 }
