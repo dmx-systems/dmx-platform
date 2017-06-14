@@ -11,8 +11,8 @@
 :root {
   --main-font-family: "Lucida Grande", Verdana, sans-serif;
   --main-font-size: 14px;
-  --label-font-size: 12px;      /* TODO: should match .el-dialog__body style? */
-  --label-color: #48576a;       /* TODO: should match .el-dialog__body style? */
+  --label-font-size: 12px;
+  --label-color: #8391a5;
   --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
 }
 
