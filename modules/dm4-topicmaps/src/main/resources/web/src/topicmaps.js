@@ -1,7 +1,7 @@
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // selected topicmap (a Topicmap object)
+  topicmap: undefined,      // view model: the topicmap to render (a Topicmap object)
   topicmapTopics: []
 }
 
@@ -39,6 +39,16 @@ const actions = {
     dispatch('syncSelection', topic.id)
     // sync clients
     dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
+  },
+
+  revealRelatedTopic ({dispatch}, {topic, pos}) {
+    dispatch('revealTopic', {topic, pos})
+    // update view model
+    state.topicmap.addAssoc(topic.assoc)
+    // sync renderer
+    dispatch('syncShowAssoc', topic.assoc.id)
+    // sync clients
+    dm5.restClient.addAssocToTopicmap(state.topicmap.id, topic.assoc.id)
   },
 
   // WebSocket messages
@@ -107,6 +117,8 @@ export default {
 }
 
 // ---
+
+// Process Directives
 
 function updateTopic (topic, dispatch) {
   const _topic = state.topicmap.getTopicIfExists(topic.id)
