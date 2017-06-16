@@ -49,7 +49,7 @@ const actions = {
   /**
    * @param   pos   `model` and `render` positions
    */
-  onBackgroundTap ({dispatch}, pos) {
+  onBackgroundRightClick ({dispatch}, pos) {
     dispatch('openSearchWidget', pos)
   },
 
