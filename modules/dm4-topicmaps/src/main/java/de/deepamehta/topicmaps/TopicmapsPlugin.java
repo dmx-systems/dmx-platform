@@ -18,7 +18,6 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
@@ -40,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -151,19 +151,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 @Override
                 public Void call() {
                     if (isTopicInTopicmap(topicmapId, topicId)) {
-                        throw new RuntimeException("The topic is already added");
+                        throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                     }
-                    //
                     Association assoc = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
                         mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
                         mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
                     ));
                     storeViewProperties(assoc, viewProps);
+                    //
+                    TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
+                    me.addTopicToTopicmap(topicmapId, topic);
+                    //
                     return null;
                 }
             });
-            TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
-            me.addTopicToTopicmap(topicmapId, topic);
         } catch (Exception e) {
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
@@ -187,13 +188,17 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 @Override
                 public Void call() {
                     if (isAssociationInTopicmap(topicmapId, assocId)) {
-                        throw new RuntimeException("The association is already added");
+                        throw new RuntimeException("Association " + assocId + " already added to topicmap " +
+                            topicmapId);
                     }
-                    //
                     dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
                         mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
                         mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
                     ));
+                    //
+                    AssociationModel assoc = dm4.getAssociation(assocId).getModel();
+                    me.addAssociationToTopicmap(topicmapId, assoc);
+                    //
                     return null;
                 }
             });
@@ -458,28 +463,50 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             this.pluginUri = pluginUri;
         }
 
-        private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) throws JSONException {
-            messageToAllButOne(new JSONObject()
-                .put("type", "addTopicToTopicmap")
-                .put("args", new JSONObject()
-                    .put("topicmapId", topicmapId)
-                    .put("viewTopic", topic.toJSON())
-                )
-            );
+        private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "addTopicToTopicmap")
+                    .put("args", new JSONObject()
+                        .put("topicmapId", topicmapId)
+                        .put("viewTopic", topic.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"addTopicToTopicmap\" message:", e);
+            }
         }
 
-        private void setTopicPosition(long topicmapId, long topicId, int x, int y) throws JSONException {
-            messageToAllButOne(new JSONObject()
-                .put("type", "setTopicPosition")
-                .put("args", new JSONObject()
-                    .put("topicmapId", topicmapId)
-                    .put("topicId", topicId)
-                    .put("pos", new JSONObject()
-                        .put("x", x)
-                        .put("y", y)
+        private void addAssociationToTopicmap(long topicmapId, AssociationModel assoc) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "addAssocToTopicmap")
+                    .put("args", new JSONObject()
+                        .put("topicmapId", topicmapId)
+                        .put("assoc", assoc.toJSON())
                     )
-                )
-            );
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"addAssocToTopicmap\" message:", e);
+            }
+        }
+
+        private void setTopicPosition(long topicmapId, long topicId, int x, int y) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "setTopicPosition")
+                    .put("args", new JSONObject()
+                        .put("topicmapId", topicmapId)
+                        .put("topicId", topicId)
+                        .put("pos", new JSONObject()
+                            .put("x", x)
+                            .put("y", y)
+                        )
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"setTopicPosition\" message:", e);
+            }
         }
 
         private void messageToAllButOne(JSONObject message) {

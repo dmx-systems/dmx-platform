@@ -1,13 +1,13 @@
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // view model: the topicmap to render (a Topicmap object)
+  topicmap: undefined,      // view model: the rendered topicmap (a Topicmap object)
   topicmapTopics: []
 }
 
 const actions = {
 
-  selectTopicmap ({dispatch}, id) {
+  renderTopicmap ({dispatch}, id) {
     dm5.restClient.getTopicmap(id).then(topicmap => {
       // update view model
       state.topicmap = topicmap
@@ -33,22 +33,23 @@ const actions = {
       'dm4.topicmaps.visibility': true,
     }
     // update view model
-    state.topicmap.addTopic(topic.newViewTopic(viewProps))
+    const added = state.topicmap.addTopic(topic.newViewTopic(viewProps))
     // sync renderer
-    dispatch('syncShowTopic', topic.id)
-    dispatch('syncSelection', topic.id)
+    added && dispatch('syncAddTopic', topic.id)
+    dispatch('syncSelect', topic.id)
     // sync clients
-    dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
+    added && dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
   },
 
-  revealRelatedTopic ({dispatch}, {topic, pos}) {
-    dispatch('revealTopic', {topic, pos})
+  revealRelatedTopic ({dispatch}, {relTopic, pos}) {
+    dispatch('revealTopic', {topic: relTopic, pos})
+    //
     // update view model
-    state.topicmap.addAssoc(topic.assoc)
+    const added = state.topicmap.addAssoc(relTopic.assoc)
     // sync renderer
-    dispatch('syncShowAssoc', topic.assoc.id)
+    added && dispatch('syncAddAssoc', relTopic.assoc.id)
     // sync clients
-    dm5.restClient.addAssocToTopicmap(state.topicmap.id, topic.assoc.id)
+    added && dm5.restClient.addAssocToTopicmap(state.topicmap.id, relTopic.assoc.id)
   },
 
   // WebSocket messages
@@ -56,9 +57,24 @@ const actions = {
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
       // update view model
-      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))
+      const added = state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))
+      if (!added) {
+        throw Error(`Topic ${viewTopic.id} already added to topimap ${topicmapId}`)
+      }
       // sync renderer
-      dispatch('syncShowTopic', viewTopic.id)
+      dispatch('syncAddTopic', viewTopic.id)
+    }
+  },
+
+  _addAssocToTopicmap ({dispatch}, {topicmapId, assoc}) {
+    if (topicmapId === state.topicmap.id) {
+      // update view model
+      const added = state.topicmap.addAssoc(new dm5.Assoc(assoc))
+      if (!added) {
+        throw Error(`Assoc ${assoc.id} already added to topimap ${topicmapId}`)
+      }
+      // sync renderer
+      dispatch('syncAddAssoc', assoc.id)
     }
   },
 
