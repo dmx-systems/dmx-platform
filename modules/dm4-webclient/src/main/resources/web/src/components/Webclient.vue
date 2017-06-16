@@ -60,6 +60,6 @@ export default {
   overflow: auto;
   box-sizing: border-box;
   padding: 0 12px 12px 12px;
-  background-color: #f4f4f4;
+  background-color: var(--background-color);
 }
 </style>

@@ -14,6 +14,7 @@
   --label-font-size: 12px;
   --label-color: #8391a5;
   --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
+  --background-color: #f6f8fb;  /* brigher version of Element UI's table headers (#eef1f6) */
 }
 
 html {
@@ -30,11 +31,32 @@ body {
 
 input {
   font-family: var(--main-font-family);
-  font-size:   var(--main-font-size) !important;   /* fixed absolute size for all el-input sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-input sizes */
 }
 
 button {
   font-family: var(--main-font-family);
-  font-size:   var(--main-font-size) !important;   /* fixed absolute size for all el-button sizes */
+  font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes */
+}
+
+/* Element UI */
+
+.el-dialog__title {
+  font-size: var(--main-font-size);     /* was 16px */
+}
+
+.el-tabs__item {
+  font-size: var(--label-font-size);    /* was 14px */
+  height: 40px;                         /* was 42px */
+  padding: 0 14px;                      /* was 0 16px */
+}
+
+.el-table th {
+  height: 30px;                         /* was 40px */
+}
+
+.el-table th > .cell {
+  font-size: var(--label-font-size);    /* was 14px */
+  font-weight: normal;                  /* was bold */
 }
 </style>
