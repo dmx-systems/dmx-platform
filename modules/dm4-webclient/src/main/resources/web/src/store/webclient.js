@@ -27,6 +27,13 @@ const actions = {
     })
   },
 
+  unselect (_, id) {
+    // Note: selectedObject might be undefined if there was a multiple selection
+    if (state.selectedObject && state.selectedObject.id === id) {
+      state.selectedObject = undefined
+    }
+  },
+
   edit () {
     state.selectedObject.fillChilds()
     state.detailPanel.mode = 'form'
