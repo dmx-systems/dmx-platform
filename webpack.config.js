@@ -52,10 +52,12 @@ module.exports = (env = {}) => {
     webpackConfig.devServer = {
       port: 8082,
       proxy: [{
+        // TODO: have only 2 root resources: "/api" and "/static"
         context: [
           '/core', '/topicmap', '/accesscontrol', '/websocket',
+          // TODO: remove these as soons as SVG icon rendering works
           '/de.deepamehta.webclient', '/de.deepamehta.topicmaps', '/de.deepamehta.accesscontrol',
-          '/de.deepamehta.workspaces', '/de.deepamehta.contacts'
+          '/de.deepamehta.workspaces', '/de.deepamehta.notes', '/de.deepamehta.contacts'
         ],
         target: 'http://localhost:8080'
       }],
