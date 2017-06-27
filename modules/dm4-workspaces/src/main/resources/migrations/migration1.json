@@ -35,7 +35,7 @@
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.workspaces/images/star.png",
+                        "dm4.webclient.icon": "\uf005",
                         "dm4.webclient.searchable_as_unit": true
                     }
                 }

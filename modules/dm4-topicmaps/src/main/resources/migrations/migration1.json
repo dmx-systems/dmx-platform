@@ -65,7 +65,7 @@
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.topicmaps/images/network.png"
+                        "dm4.webclient.icon": "\uf069"
                     }
                 }
             ]

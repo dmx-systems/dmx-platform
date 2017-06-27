@@ -68,7 +68,7 @@
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.accesscontrol/images/top-hat.png"
+                        "dm4.webclient.icon": "\uf21b"
                     }
                 }
             ]

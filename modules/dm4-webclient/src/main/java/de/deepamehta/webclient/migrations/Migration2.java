@@ -16,13 +16,13 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dm4.core.meta_type",   "box-gray.png");
-        addIconToTopicType("dm4.core.topic_type",  "box-blue.png");
-        addIconToTopicType("dm4.core.assoc_type",  "box-red.png");
-        addIconToTopicType("dm4.core.data_type",   "box-green.png");
-        addIconToTopicType("dm4.core.cardinality", "box-yellow.png");
-        addIconToTopicType("dm4.core.index_mode",  "box-orange.png");
-        addIconToTopicType("dm4.core.plugin",      "puzzle.png");
+        addIconToTopicType("dm4.core.meta_type",   "\uf111");
+        addIconToTopicType("dm4.core.topic_type",  "\uf111");
+        addIconToTopicType("dm4.core.assoc_type",  "\uf111");
+        addIconToTopicType("dm4.core.data_type",   "\uf111");
+        addIconToTopicType("dm4.core.cardinality", "\uf111");
+        addIconToTopicType("dm4.core.index_mode",  "\uf111");
+        addIconToTopicType("dm4.core.plugin",      "\uf12e");
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
         // Update: this is because HSB is not same as HSL. The values here are actually HSB, but CSS expects HSL.
@@ -37,8 +37,8 @@ public class Migration2 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void addIconToTopicType(String topicTypeUri, String iconfile) {
-        setTopicTypeViewConfigValue(topicTypeUri, "icon", "/de.deepamehta.webclient/images/" + iconfile);
+    private void addIconToTopicType(String topicTypeUri, String icon) {
+        setTopicTypeViewConfigValue(topicTypeUri, "icon", icon);
     }
 
     private void addColorToAssociationType(String assocTypeUri, String color) {

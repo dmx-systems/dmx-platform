@@ -35,7 +35,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
-                    <exclude>web/src/</exclude>
+                    <exclude>web/</exclude>
                 </excludes>
             </resource>
         </resources>

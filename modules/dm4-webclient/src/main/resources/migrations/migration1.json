@@ -169,46 +169,5 @@
             "uri":         "dm4.webclient.search_result_item",
             "dataTypeUri": "dm4.core.text"
         }
-    ],
-
-    "topics": [
-
-        ### Icons ###
-
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-blue.png",
-            "uri":     "dm4.webclient.icons.ball_blue",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-gray.png",
-            "uri":     "dm4.webclient.icons.ball_gray",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-green.png",
-            "uri":     "dm4.webclient.icons.ball_green",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-orange.png",
-            "uri":     "dm4.webclient.icons.ball_orange",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-purple.png",
-            "uri":     "dm4.webclient.icons.ball_purple",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-red.png",
-            "uri":     "dm4.webclient.icons.ball_red",
-            "typeUri": "dm4.webclient.icon"
-        },
-        {
-            "value":   "/de.deepamehta.webclient/images/ball-yellow.png",
-            "uri":     "dm4.webclient.icons.ball_yellow",
-            "typeUri": "dm4.webclient.icon"
-        }
     ]
 }

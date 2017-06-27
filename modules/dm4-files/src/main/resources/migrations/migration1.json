@@ -84,7 +84,7 @@
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.files/images/sheet.png",
+                        "dm4.webclient.icon": "\uf15b",
                         "dm4.webclient.locked": true
                     }
                 }
@@ -138,7 +138,7 @@
                 {
                     "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.files/images/folder.png",
+                        "dm4.webclient.icon": "\uf07b",
                         "dm4.webclient.locked": true
                     }
                 }
