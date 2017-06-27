@@ -4,10 +4,10 @@ runner/
 target/
 bundle-deploy/
 bundle-disabled/
+modules/dm4-webclient/src/main/resources/web/
 modules-external/
 modules-nodejs/
 node_modules/
-dist/
 
 *~
 .project

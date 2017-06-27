@@ -7,9 +7,9 @@ export default {
       console.info('You are running DM5 in development mode.\n' +
         'The standard plugins are loaded from file system and are hot replaced.')
     }
-    initPlugin(require('modules/dm4-workspaces/src/main/resources/web/src/main.js'))
-    initPlugin(require('modules/dm4-topicmaps/src/main/resources/web/src/main.js'))
-    initPlugin(require('modules/dm4-accesscontrol/src/main/resources/web/src/main.js'))
+    initPlugin(require('modules/dm4-workspaces/src/main/js/main.js'))
+    initPlugin(require('modules/dm4-topicmaps/src/main/js/main.js'))
+    initPlugin(require('modules/dm4-accesscontrol/src/main/js/main.js'))
     //
     loadPluginsFromServer()
   }

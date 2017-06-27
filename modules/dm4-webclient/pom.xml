@@ -18,14 +18,6 @@
     </parent>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>web/</exclude>
-                </excludes>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -35,10 +27,6 @@
                         <Bundle-Activator>
                             de.deepamehta.webclient.WebclientPlugin
                         </Bundle-Activator>
-                        <Include-Resource>
-                            {maven-resources},
-                            web=src/main/resources/web/dist
-                        </Include-Resource>
                     </instructions>
                 </configuration>
             </plugin>

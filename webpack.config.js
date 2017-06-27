@@ -5,10 +5,10 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = (env = {}) => {
 
   var webpackConfig = {
-    entry: './modules/dm4-webclient/src/main/resources/web/src/main.js',
+    entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
       filename: 'webclient.js',
-      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist/')
+      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/')
     },
     resolve: {
       extensions: [".js", ".vue"],
@@ -43,7 +43,7 @@ module.exports = (env = {}) => {
         DEV: env.dev,
       }),
       new HtmlWebpackPlugin({
-        template: 'modules/dm4-webclient/src/main/resources/web/index.html'
+        template: 'modules/dm4-webclient/src/main/js/index.html'
       })
     ]
   }
@@ -54,10 +54,7 @@ module.exports = (env = {}) => {
       proxy: [{
         // TODO: have only 2 root resources: "/api" and "/static"
         context: [
-          '/core', '/topicmap', '/accesscontrol', '/websocket',
-          // TODO: remove these as soons as SVG icon rendering works
-          '/de.deepamehta.webclient', '/de.deepamehta.topicmaps', '/de.deepamehta.accesscontrol',
-          '/de.deepamehta.workspaces', '/de.deepamehta.notes', '/de.deepamehta.contacts'
+          '/core', '/topicmap', '/accesscontrol', '/websocket'
         ],
         target: 'http://localhost:8080'
       }],
