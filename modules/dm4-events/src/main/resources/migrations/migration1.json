@@ -2,22 +2,22 @@
     {
         "assoc_types": [
             {
-                "value": "From",
-                "uri": "dm4.events.from",
-                "data_type_uri": "dm4.core.text"
+                "value":       "From",
+                "uri":         "dm4.events.from",
+                "dataTypeUri": "dm4.core.text"
             },
             {
-                "value": "To",
-                "uri": "dm4.events.to",
-                "data_type_uri": "dm4.core.text"
+                "value":       "To",
+                "uri":         "dm4.events.to",
+                "dataTypeUri": "dm4.core.text"
             },
             {
-                "value": "Participant",
-                "uri": "dm4.events.participant",
-                "data_type_uri": "dm4.core.text",
-                "view_config_topics": [
+                "value":       "Participant",
+                "uri":         "dm4.events.participant",
+                "dataTypeUri": "dm4.core.text",
+                "viewConfigTopics": [
                     {
-                        "type_uri": "dm4.webclient.view_config",
+                        "typeUri": "dm4.webclient.view_config",
                         "childs": {
                             "dm4.webclient.color": "hsl(340, 80%, 60%)"
                         }
@@ -30,61 +30,61 @@
         "topic_types": [
             # Event
             {
-                "value":            "Title",
-                "uri":              "dm4.events.title",
-                "data_type_uri":    "dm4.core.text",
-                "index_mode_uris": ["dm4.core.fulltext"]
+                "value":          "Title",
+                "uri":            "dm4.events.title",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.fulltext"]
             },
             {
-                "value":            "Notes",
-                "uri":              "dm4.events.notes",
-                "data_type_uri":    "dm4.core.html",
-                "index_mode_uris": ["dm4.core.fulltext"]
+                "value":          "Notes",
+                "uri":            "dm4.events.notes",
+                "dataTypeUri":    "dm4.core.html",
+                "indexModeUris": ["dm4.core.fulltext"]
             },
             {
-                "value":            "Event",
-                "uri":              "dm4.events.event",
-                "data_type_uri":    "dm4.core.composite",
-                "assoc_defs": [
+                "value":       "Event",
+                "uri":         "dm4.events.event",
+                "dataTypeUri": "dm4.core.composite",
+                "assocDefs": [
                     {
-                        "child_type_uri":         "dm4.events.title",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.events.title",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.datetime",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def",
-                        "custom_assoc_type_uri":  "dm4.events.from"
+                        "childTypeUri":         "dm4.datetime",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def",
+                        "customAssocTypeUri":   "dm4.events.from"
                     },
                     {
-                        "child_type_uri":         "dm4.datetime",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def",
-                        "custom_assoc_type_uri":  "dm4.events.to"
+                        "childTypeUri":         "dm4.datetime",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def",
+                        "customAssocTypeUri":   "dm4.events.to"
                     },
                     {
-                        "child_type_uri":         "dm4.contacts.address",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "parent_cardinality_uri": "dm4.core.many",
-                        "assoc_type_uri":         "dm4.core.aggregation_def"
+                        "childTypeUri":         "dm4.contacts.address",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "parentCardinalityUri": "dm4.core.many",
+                        "assocTypeUri":         "dm4.core.aggregation_def"
                     },
                     {
-                        "child_type_uri":         "dm4.events.notes",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.events.notes",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     },
                     {
-                        "child_type_uri":         "dm4.webbrowser.url",
-                        "child_cardinality_uri":  "dm4.core.one",
-                        "assoc_type_uri":         "dm4.core.composition_def"
+                        "childTypeUri":         "dm4.webbrowser.url",
+                        "childCardinalityUri":  "dm4.core.one",
+                        "assocTypeUri":         "dm4.core.composition_def"
                     }
                 ],
-                "view_config_topics": [
+                "viewConfigTopics": [
                     {
-                        "type_uri": "dm4.webclient.view_config",
+                        "typeUri": "dm4.webclient.view_config",
                         "childs": {
-                            "dm4.webclient.icon": "/de.deepamehta.events/images/calendar.png",
+                            "dm4.webclient.icon": "\uf133",
                             "dm4.webclient.show_in_create_menu": true
                         }
                     }

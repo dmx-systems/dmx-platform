@@ -31,6 +31,9 @@ public class CoreActivator implements BundleActivator {
     private ServiceTracker storageServiceTracker;
     private ServiceTracker httpServiceTracker;
 
+    // provided service
+    private CoreServiceImpl dm4;
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -68,6 +71,9 @@ public class CoreActivator implements BundleActivator {
             storageServiceTracker.close();
             httpServiceTracker.close();
             //
+            if (dm4 != null) {
+                dm4.shutdown();
+            }
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.
         } catch (Throwable e) {
@@ -174,11 +180,10 @@ public class CoreActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
+            dm4 = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
+            //
             logger.info("Registering DeepaMehta 4 core service at OSGi framework");
-            bundleContext.registerService(CoreService.class.getName(),
-                new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext),
-                null
-            );
+            bundleContext.registerService(CoreService.class.getName(), dm4, null);
         }
     }
 }

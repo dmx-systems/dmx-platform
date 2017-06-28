@@ -9,10 +9,17 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.DirectivesResponse;
+import de.deepamehta.core.service.WebSocketsService;
 
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
@@ -21,18 +28,42 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Response post-processing.
+ * Post-processing takes place <i>after</i> a request is processed, <i>before</i> the response is sent to the client.
+ * <p>
+ * Post-processing includes 5 steps:
+ * <ol>
+ * <li>Fire the <code>CoreEvent.SERVICE_RESPONSE_FILTER</code> event to let plugins operate on the response, e.g.
+ *     - the Caching plugin sets the <code>Cache-Control</code> response header
+ *     - the Time plugin sets the <code>Last-Modified</code> response header
+ * <li>Load child topics of the response object(s) if requested with the <code>include_childs</code> and
+ *     <code>include_assoc_childs</code> query parameters.
+ * <li>Fire the <code>CoreEvent.PRE_SEND_XXX</code> events for all response object(s) and objects contained in response
+ *     directives. This let plugins operate on the response on a per-object basis, e.g.
+ *     - the Geomaps plugin enriches an Address topic with its geo coordinate
+ *     - the Time plugin enriches topics/associations with creation/modification timestamps
+ * <li>Broadcast directives.
+ * <li>Remove the (thread-local) directives assembled while request processing.
+ * </ol>
+ */
 class JerseyResponseFilter implements ContainerResponseFilter {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private EventManager em;
+    private WebSocketsService ws;
+
+    @Context
+    private HttpServletRequest request;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    JerseyResponseFilter(EventManager em) {
+    JerseyResponseFilter(EventManager em, WebSocketsService ws) {
         this.em = em;
+        this.ws = ws;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -43,12 +74,11 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             em.fireEvent(CoreEvent.SERVICE_RESPONSE_FILTER, response);
             //
             Object entity = response.getEntity();
-            boolean includeChilds = getIncludeChilds(request);
-            boolean includeAssocChilds = getIncludeAssocChilds(request);
             if (entity != null) {
                 //
                 // 1) Loading child topics
-                // ### TODO: move to Webservice module?
+                boolean includeChilds = getIncludeChilds(request);
+                boolean includeAssocChilds = getIncludeAssocChilds(request);
                 if (entity instanceof DeepaMehtaObject) {
                     loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -56,7 +86,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 }
                 //
                 // 2) Firing PRE_SEND events
-                // ### TODO: move to Webservice module?
+                Directives directives = null;
                 if (entity instanceof DeepaMehtaObject) {
                     firePreSend((DeepaMehtaObject) entity);
                 } else if (isIterable(response, DeepaMehtaObject.class)) {
@@ -66,11 +96,17 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     //
                     // Note: some plugins rely on the PRE_SEND event to be fired for the individual DeepaMehta
                     // objects contained in the set of directives. E.g. the Time plugin enriches updated objects
-                    // with  timestamps. The timestamps in turn are needed at client-side by the Caching plugin
+                    // with timestamps. The timestamps in turn are needed at client-side by the Caching plugin
                     // in order to issue conditional PUT requests.
                     // ### TODO: don't fire PRE_SEND events for the individual directives but only for the wrapped
                     // DeepaMehtaObject? Let the update() Core Service calls return the updated object?
-                    firePreSend(((DirectivesResponse) entity).getDirectives());
+                    directives = ((DirectivesResponse) entity).getDirectives();
+                    firePreSend(directives);
+                }
+                //
+                // 3) Broadcast directives
+                if (directives != null) {
+                    broadcast(directives);
                 }
             }
             //
@@ -83,6 +119,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+
 
     // === Loading child topics ===
 
@@ -124,6 +162,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
+
+
     // === Firing PRE_SEND events ===
 
     private void firePreSend(DeepaMehtaObject object) {
@@ -156,6 +196,19 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             }
         }
     }
+
+
+
+    // === Broadcast ===
+
+    private void broadcast(Directives directives) throws JSONException {
+        JSONObject message = new JSONObject()
+            .put("type", "processDirectives")
+            .put("args", directives.toJSONArray());
+        ws.messageToAllButOne(request, "de.deepamehta.webclient", message.toString());
+    }
+
+
 
     // === Helper ===
 

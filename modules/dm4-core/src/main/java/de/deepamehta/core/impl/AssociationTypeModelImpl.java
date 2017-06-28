@@ -68,7 +68,7 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     @Override
     List<AssociationModelImpl> getAllInstances() {
-        return pl.fetchAssociations("type_uri", new SimpleValue(uri));
+        return pl.fetchAssociations("typeUri", new SimpleValue(uri));
     }
 
     // ---

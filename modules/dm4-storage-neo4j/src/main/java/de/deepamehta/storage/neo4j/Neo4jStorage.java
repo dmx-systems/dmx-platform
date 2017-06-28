@@ -47,22 +47,22 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // --- DB Property Keys ---
-    private static final String KEY_NODE_TYPE = "node_type";
+    private static final String KEY_NODE_TYPE = "nodeType";
     private static final String KEY_VALUE     = "value";
 
     // --- Content Index Keys ---
     private static final String KEY_URI      = "uri";                       // used as property key as well
-    private static final String KEY_TPYE_URI = "type_uri";                  // used as property key as well
-    private static final String KEY_FULLTEXT = "_fulltext_";
+    private static final String KEY_TPYE_URI = "typeUri";                   // used as property key as well
+    private static final String KEY_FULLTEXT = "fulltext";
 
     // --- Association Metadata Index Keys ---
-    private static final String KEY_ASSOC_ID       = "assoc_id";
-    private static final String KEY_ASSOC_TPYE_URI = "assoc_type_uri";
+    private static final String KEY_ASSOC_ID       = "assocId";
+    private static final String KEY_ASSOC_TPYE_URI = "assocTypeUri";
     // role 1 & 2
-    private static final String KEY_ROLE_TPYE_URI   = "role_type_uri_";     // "1" or "2" is appended programatically
-    private static final String KEY_PLAYER_TPYE     = "player_type_";       // "1" or "2" is appended programatically
-    private static final String KEY_PLAYER_ID       = "player_id_";         // "1" or "2" is appended programatically
-    private static final String KEY_PLAYER_TYPE_URI = "player_type_uri_";   // "1" or "2" is appended programatically
+    private static final String KEY_ROLE_TPYE_URI   = "roleTypeUri";        // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_TPYE     = "playerType";         // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_ID       = "playerId";           // "1" or "2" is appended programatically
+    private static final String KEY_PLAYER_TYPE_URI = "playerTypeUri";      // "1" or "2" is appended programatically
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

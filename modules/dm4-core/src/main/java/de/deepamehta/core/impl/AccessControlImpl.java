@@ -573,7 +573,7 @@ class AccessControlImpl implements AccessControl {
 
     private String getTypeUri(long objectId) {
         // Note: direct storage access is required here
-        return (String) pl.fetchProperty(objectId, "type_uri");
+        return (String) pl.fetchProperty(objectId, "typeUri");
     }
 
     // ---

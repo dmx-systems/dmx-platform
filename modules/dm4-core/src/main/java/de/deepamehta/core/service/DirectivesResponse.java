@@ -7,6 +7,12 @@ import org.codehaus.jettison.json.JSONObject;
 
 
 
+/**
+ * A {@link de.deepamehta.core.DeepaMehtaObject}/{@link Directives} pair to be sent as response.
+ * <p>
+ * The DeepaMehtaObject is injected via constructor. It is optional.
+ * The Directives are the thread-local ones assembled while request processing.
+ */
 public class DirectivesResponse implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables

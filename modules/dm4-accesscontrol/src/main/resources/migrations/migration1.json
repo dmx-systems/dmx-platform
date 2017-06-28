@@ -4,13 +4,13 @@
         ### User Account ###
 
         {
-            "value":            "Username",
-            "uri":              "dm4.accesscontrol.username",
-            "data_type_uri":    "dm4.core.text",
-            "index_mode_uris": ["dm4.core.key", "dm4.core.fulltext"],
-            "view_config_topics": [
+            "value":          "Username",
+            "uri":            "dm4.accesscontrol.username",
+            "dataTypeUri":    "dm4.core.text",
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.locked": true
                     }
@@ -18,12 +18,12 @@
             ]
         },
         {
-            "value":         "Password",
-            "uri":           "dm4.accesscontrol.password",
-            "data_type_uri": "dm4.core.text",
-            "view_config_topics": [
+            "value":       "Password",
+            "uri":         "dm4.accesscontrol.password",
+            "dataTypeUri": "dm4.core.text",
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.hidden": true,
                         "dm4.webclient.locked": true
@@ -32,18 +32,18 @@
             ]
         },
         {
-            "value":            "User Account",
-            "uri":              "dm4.accesscontrol.user_account",
-            "data_type_uri":    "dm4.core.composite",
-            "index_mode_uris": ["dm4.core.key"],
-            "assoc_defs": [
+            "value":          "User Account",
+            "uri":            "dm4.accesscontrol.user_account",
+            "dataTypeUri":    "dm4.core.composite",
+            "indexModeUris": ["dm4.core.key"],
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.accesscontrol.username",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "childTypeUri":        "dm4.accesscontrol.username",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "viewConfigTopics": [
                         {
-                            "type_uri": "dm4.webclient.view_config",
+                            "typeUri": "dm4.webclient.view_config",
                             "childs": {
                                 "dm4.webclient.locked": false
                             }
@@ -51,12 +51,12 @@
                     ]
                 },
                 {
-                    "child_type_uri":        "dm4.accesscontrol.password",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "view_config_topics": [
+                    "childTypeUri":        "dm4.accesscontrol.password",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "viewConfigTopics": [
                         {
-                            "type_uri": "dm4.webclient.view_config",
+                            "typeUri": "dm4.webclient.view_config",
                             "childs": {
                                 "dm4.webclient.locked": false
                             }
@@ -64,11 +64,11 @@
                     ]
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.accesscontrol/images/top-hat.png"
+                        "dm4.webclient.icon": "\uf21b"
                     }
                 }
             ]

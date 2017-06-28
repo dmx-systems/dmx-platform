@@ -1283,7 +1283,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private List<Topic> getTopicInstances(String topicTypeUri) {
-        return dm4.getTopicsByValue("type_uri", new SimpleValue(topicTypeUri));
+        return dm4.getTopicsByValue("typeUri", new SimpleValue(topicTypeUri));
     }
 
     private List<RelatedTopic> getTopicInstancesByTraversal(Topic type) {

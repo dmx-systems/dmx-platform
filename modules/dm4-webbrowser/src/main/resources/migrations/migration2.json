@@ -1,23 +1,23 @@
 {
-    topic_types: [
+    "topic_types": [
         {
-            value: "Webpage",
-            uri: "dm4.webbrowser.webpage",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
+            "value": "Webpage",
+            "uri": "dm4.webbrowser.webpage",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    child_type_uri:         "dm4.webbrowser.url",
-                    child_cardinality_uri:  "dm4.core.one",
-                    parent_cardinality_uri: "dm4.core.one",
-                    assoc_type_uri:         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dm4.webbrowser.url",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
                 }
             ],
-            view_config_topics: [
+            "viewConfigTopics": [
                 {
-                    type_uri: "dm4.webclient.view_config",
-                    childs: {
-                        dm4.webclient.locked: true,
-                        dm4.webclient.page_renderer_uri: "dm4.webbrowser.webpage_renderer"
+                    "typeUri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.locked": true,
+                        "dm4.webclient.page_renderer_uri": "dm4.webbrowser.webpage_renderer"
                     }
                 }
             ]

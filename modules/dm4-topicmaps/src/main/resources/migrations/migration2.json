@@ -1,60 +1,60 @@
 {
     "topic_types": [
         {
-            "value":         "X",
-            "uri":           "dm4.topicmaps.translation_x",
-            "data_type_uri": "dm4.core.number"
+            "value":       "X",
+            "uri":         "dm4.topicmaps.translation_x",
+            "dataTypeUri": "dm4.core.number"
         },
         {
-            "value":         "Y",
-            "uri":           "dm4.topicmaps.translation_y",
-            "data_type_uri": "dm4.core.number"
+            "value":       "Y",
+            "uri":         "dm4.topicmaps.translation_y",
+            "dataTypeUri": "dm4.core.number"
         },
         {
-            "value":         "Translation",
-            "uri":           "dm4.topicmaps.translation",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "value":       "Translation",
+            "uri":         "dm4.topicmaps.translation",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation_x",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation_x",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation_y",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation_y",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ]
         },
         {
-            "value":         "Zoom Level",
-            "uri":           "dm4.topicmaps.zoom_level",
-            "data_type_uri": "dm4.core.number"
+            "value":       "Zoom Level",
+            "uri":         "dm4.topicmaps.zoom_level",
+            "dataTypeUri": "dm4.core.number"
         },
         {
-            "value":         "Topicmap State",
-            "uri":           "dm4.topicmaps.state",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "value":       "Topicmap State",
+            "uri":         "dm4.topicmaps.state",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.topicmaps.translation",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.translation",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.topicmaps.zoom_level",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.topicmaps.zoom_level",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.hidden": true,
                         "dm4.webclient.locked": true

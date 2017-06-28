@@ -6,11 +6,11 @@
         {
             "value": "File Content",
             "uri": "dm4.files.file_content",
-            "data_type_uri": "dm4.core.html",
-            "index_mode_uris": ["dm4.core.fulltext"],
-            "view_config_topics": [
+            "dataTypeUri": "dm4.core.html",
+            "indexModeUris": ["dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.file_content_renderer"
                     }
@@ -20,28 +20,28 @@
         {
             "value": "File Name",
             "uri": "dm4.files.file_name",
-            "data_type_uri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Path",
             "uri": "dm4.files.path",
-            "data_type_uri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.key"]
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Media Type",
             "uri": "dm4.files.media_type",
-            "data_type_uri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Size",
             "uri": "dm4.files.size",
-            "data_type_uri": "dm4.core.number",
-            "view_config_topics": [
+            "dataTypeUri": "dm4.core.number",
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.file_size_renderer",
                     }
@@ -51,40 +51,40 @@
         {
             "value": "File",
             "uri": "dm4.files.file",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.files.file_content",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.file_content",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.files.file_name",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.files.file_name",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.files.path",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.path",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.files.media_type",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.media_type",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.files.size",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.size",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.files/images/sheet.png",
+                        "dm4.webclient.icon": "\uf15b",
                         "dm4.webclient.locked": true
                     }
                 }
@@ -96,17 +96,17 @@
         {
             "value": "Folder Name",
             "uri": "dm4.files.folder_name",
-            "data_type_uri": "dm4.core.text",
-            "index_mode_uris": ["dm4.core.fulltext"]
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.fulltext"]
         },
         {
             "value": "Folder Content",
             "uri": "dm4.files.folder_content",
-            "data_type_uri": "dm4.core.html",
-            "index_mode_uris": ["dm4.core.fulltext"],
-            "view_config_topics": [
+            "dataTypeUri": "dm4.core.html",
+            "indexModeUris": ["dm4.core.fulltext"],
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.simple_renderer_uri": "dm4.files.folder_content_renderer"
                     }
@@ -116,29 +116,29 @@
         {
             "value": "Folder",
             "uri": "dm4.files.folder",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.files.folder_name",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.folder_name",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.files.path",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.path",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 },
                 {
-                    "child_type_uri":        "dm4.files.folder_content",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.files.folder_content",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ],
-            "view_config_topics": [
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "/de.deepamehta.files/images/folder.png",
+                        "dm4.webclient.icon": "\uf07b",
                         "dm4.webclient.locked": true
                     }
                 }

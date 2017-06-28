@@ -192,10 +192,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("data_type_uri", getDataTypeUri())
-                .put("index_mode_uris", toJSONArray(indexModes))
-                .put("assoc_defs", toJSONArray(assocDefs.values()))
-                .put("view_config_topics", getViewConfig().toJSONArray());
+                .put("dataTypeUri", getDataTypeUri())
+                .put("indexModeUris", toJSONArray(indexModes))
+                .put("assocDefs", toJSONArray(assocDefs.values()))
+                .put("viewConfigTopics", getViewConfig().toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

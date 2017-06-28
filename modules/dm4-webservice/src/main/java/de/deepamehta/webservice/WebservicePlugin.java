@@ -3,6 +3,7 @@ package de.deepamehta.webservice;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -13,10 +14,12 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.Transactional;
+
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,6 +38,9 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * REST API for {@link de.deepamehta.core.service.CoreService}.
+ */
 @Path("/core")
 @Consumes("application/json")
 @Produces("application/json")
@@ -378,6 +384,29 @@ public class WebservicePlugin extends PluginActivator {
         Association assoc = dm4.getAssociation(assocId);
         return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
+    }
+
+
+
+    // ***************************
+    // *** WebSockets REST API ***
+    // ***************************
+
+
+
+    @GET
+    @Path("/websockets")
+    public JSONEnabled getWebSocketsConfig() {
+        return new JSONEnabled() {
+            @Override
+            public JSONObject toJSON() {
+                try {
+                    return new JSONObject().put("dm4.websockets.url", dm4.getWebSocketsService().getWebSocketsURL());
+                } catch (JSONException e) {
+                    throw new RuntimeException("Serializing the WebSockets configuration failed", e);
+                }
+            }
+        };
     }
 
 

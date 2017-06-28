@@ -28,10 +28,10 @@ public class Neo4jStorageActivator implements BundleActivator {
     // consumed service
     ModelFactory mf;
 
+    private ServiceTracker modelFactoryTracker;
+
     // provided service
     private DeepaMehtaStorage storage;
-
-    private ServiceTracker modelFactoryTracker;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 

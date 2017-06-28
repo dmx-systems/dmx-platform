@@ -89,7 +89,7 @@ public interface CoreService {
      * <code>dm4.core.fulltext</code> or <code>dm4.core.fulltext_key</code>. ### FIXDOC
      *
      * @param   fieldUri    The URI of the data field to search. If null is provided all fields are searched. ### FIXDOC
-     *                      ### TODO: rename parameter to "key"?
+     *                      ### TODO: rename parameter to "key"/"typeUri"?
      */
     List<Topic> searchTopics(String searchTerm, String fieldUri);
 
@@ -303,6 +303,8 @@ public interface CoreService {
     ModelFactory getModelFactory();
 
     AccessControl getAccessControl();   // ### TODO: drop this
+
+    WebSocketsService getWebSocketsService();
 
     Object getDatabaseVendorObject();
 }

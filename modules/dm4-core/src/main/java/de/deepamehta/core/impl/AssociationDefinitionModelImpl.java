@@ -116,9 +116,9 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("parent_cardinality_uri", parentCardinalityUri)
-                .put("child_cardinality_uri", childCardinalityUri)
-                .put("view_config_topics", viewConfig.toJSONArray());
+                .put("parentCardinalityUri", parentCardinalityUri)
+                .put("childCardinalityUri", childCardinalityUri)
+                .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }

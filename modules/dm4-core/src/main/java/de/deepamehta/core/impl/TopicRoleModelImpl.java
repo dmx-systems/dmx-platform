@@ -78,11 +78,11 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
         try {
             JSONObject o = new JSONObject();
             if (topicIdentifiedByUri) {
-                o.put("topic_uri", topicUri);
+                o.put("topicUri", topicUri);
             } else {
-                o.put("topic_id", playerId);
+                o.put("topicId", playerId);
             }
-            o.put("role_type_uri", roleTypeUri);
+            o.put("roleTypeUri", roleTypeUri);
             return o;
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);

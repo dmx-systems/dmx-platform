@@ -7,64 +7,64 @@
         ### Enabled Sharing Modes ###
 
         {
-            "value":         "Private",
-            "uri":           "dm4.workspaces.private.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Private",
+            "uri":         "dm4.workspaces.private.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Confidential",
-            "uri":           "dm4.workspaces.confidential.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Confidential",
+            "uri":         "dm4.workspaces.confidential.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Collaborative",
-            "uri":           "dm4.workspaces.collaborative.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Collaborative",
+            "uri":         "dm4.workspaces.collaborative.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Public",
-            "uri":           "dm4.workspaces.public.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Public",
+            "uri":         "dm4.workspaces.public.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Common",
-            "uri":           "dm4.workspaces.common.enabled",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Common",
+            "uri":         "dm4.workspaces.common.enabled",
+            "dataTypeUri": "dm4.core.boolean"
         },
         {
-            "value":         "Enabled Sharing Modes",
-            "uri":           "dm4.workspaces.enabled_sharing_modes",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "value":       "Enabled Sharing Modes",
+            "uri":         "dm4.workspaces.enabled_sharing_modes",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.workspaces.private.enabled",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.workspaces.private.enabled",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.workspaces.confidential.enabled",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.workspaces.confidential.enabled",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.workspaces.collaborative.enabled",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.workspaces.collaborative.enabled",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.workspaces.public.enabled",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.workspaces.public.enabled",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 },
                 {
-                    "child_type_uri":        "dm4.workspaces.common.enabled",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def",
-                    "include_in_label":      true
+                    "childTypeUri":        "dm4.workspaces.common.enabled",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def",
+                    "includeInLabel":      true
                 }
             ]
         }

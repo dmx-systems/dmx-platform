@@ -3,9 +3,9 @@
     # Otherwise the data type "Boolean" does not exist.
     "topic_types": [
         {
-            "value":         "Include in Label",
-            "uri":           "dm4.core.include_in_label",
-            "data_type_uri": "dm4.core.boolean"
+            "value":       "Include in Label",
+            "uri":         "dm4.core.include_in_label",
+            "dataTypeUri": "dm4.core.boolean"
         }
     ],
 
@@ -13,26 +13,26 @@
     # It must be defined first. See also CoreServiceImpl.createAssociationType().
     "assoc_types": [
         {
-            "value":         "Composition Definition",
-            "uri":           "dm4.core.composition_def",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "value":       "Composition Definition",
+            "uri":         "dm4.core.composition_def",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.core.include_in_label",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.core.include_in_label",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
         },
         {
-            "value":         "Aggregation Definition",
-            "uri":           "dm4.core.aggregation_def",
-            "data_type_uri": "dm4.core.composite",
-            "assoc_defs": [
+            "value":       "Aggregation Definition",
+            "uri":         "dm4.core.aggregation_def",
+            "dataTypeUri": "dm4.core.composite",
+            "assocDefs": [
                 {
-                    "child_type_uri":        "dm4.core.include_in_label",
-                    "child_cardinality_uri": "dm4.core.one",
-                    "assoc_type_uri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dm4.core.include_in_label",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
         }

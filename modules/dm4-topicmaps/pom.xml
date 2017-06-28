@@ -24,9 +24,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>
-                            de.deepamehta.topicmaps.TopicmapsPlugin
-                        </Bundle-Activator>
+                        <Bundle-Activator>de.deepamehta.topicmaps.TopicmapsPlugin</Bundle-Activator>
                     </instructions>
                 </configuration>
             </plugin>

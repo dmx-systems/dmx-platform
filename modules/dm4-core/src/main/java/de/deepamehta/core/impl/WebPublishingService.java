@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.CoreActivator;
 import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.WebSocketsService;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.UniversalExceptionMapper;
 
@@ -59,7 +60,7 @@ class WebPublishingService {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    WebPublishingService(PersistenceLayer pl) {
+    WebPublishingService(PersistenceLayer pl, WebSocketsService ws) {
         try {
             logger.info("Setting up the WebPublishingService");
             this.pl = pl;
@@ -70,7 +71,7 @@ class WebPublishingService {
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
             properties.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, new JerseyRequestFilter(pl.em));
-            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(pl.em));
+            properties.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, new JerseyResponseFilter(pl.em, ws));
             properties.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, new TransactionFactory(pl));
             //
             // deploy Jersey application in container

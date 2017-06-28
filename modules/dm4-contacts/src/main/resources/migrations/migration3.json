@@ -3,9 +3,9 @@
 {
     "assoc_types": [
         {
-            "value": "Date of Birth",
-            "uri": "dm4.contacts.date_of_birth",
-            "data_type_uri": "dm4.core.text"
+            "value":       "Date of Birth",
+            "uri":         "dm4.contacts.date_of_birth",
+            "dataTypeUri": "dm4.core.text"
         }
     ]
 }

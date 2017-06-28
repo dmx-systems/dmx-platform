@@ -1,12 +1,12 @@
 {
     "assoc_types": [
         {
-            "value":         "Membership",
-            "uri":           "dm4.accesscontrol.membership",
-            "data_type_uri": "dm4.core.text",
-            "view_config_topics": [
+            "value":       "Membership",
+            "uri":         "dm4.accesscontrol.membership",
+            "dataTypeUri": "dm4.core.text",
+            "viewConfigTopics": [
                 {
-                    "type_uri": "dm4.webclient.view_config",
+                    "typeUri": "dm4.webclient.view_config",
                     "childs": {
                         "dm4.webclient.color": "#f69949"
                     }

@@ -42,6 +42,19 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
         </dependency>
+        <!-- Jetty WebSocket -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>8.1.14.v20131031</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-websocket</artifactId>
+            <version>8.1.14.v20131031</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -51,22 +64,8 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>
-                            de.deepamehta.core,
-                            de.deepamehta.core.model,
-                            de.deepamehta.core.model.facets,
-                            de.deepamehta.core.model.topicmaps,
-                            de.deepamehta.core.osgi,
-                            de.deepamehta.core.service,
-                            de.deepamehta.core.service.accesscontrol,
-                            de.deepamehta.core.service.event,
-                            de.deepamehta.core.storage.spi,
-                            de.deepamehta.core.util,
-                            org.osgi.service.log    <!-- required when running without Gogo Shell ### TODO: check -->
-                        </Export-Package>
-                        <Bundle-Activator>
-                            de.deepamehta.core.osgi.CoreActivator
-                        </Bundle-Activator>
+                        <Bundle-Activator>de.deepamehta.core.osgi.CoreActivator</Bundle-Activator>
+                        <Embed-Dependency>jetty-websocket</Embed-Dependency>
                     </instructions>
                 </configuration>
             </plugin>
