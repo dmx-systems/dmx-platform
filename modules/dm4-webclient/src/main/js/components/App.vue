@@ -9,7 +9,22 @@
 
 <style>
 :root {
-  --main-font-family: "Lucida Grande", Verdana, sans-serif;
+  /*
+    Note: font name "Lucida Grande" is not quoted.
+    In various browsers DOM style.getPropertyValue() works differently (see https://jsfiddle.net/jri_/tt8o97yu/2/):
+      Safari: converts " -> '
+      Chrome: converts ' -> "
+      Firefox: no conversion
+    This affects at least 2 situations:
+      1) When styling Cytoscape nodes/edges (style: {'font-family': ...}) Cytoscape expects " to be used when quoting
+         multiple word font names. Otherwise an error is reported along with stacktrace (but rendering works anyways).
+      2) When rendering a SVG <text> element the font-family attribute value must be enclosed in the opposite quoting
+         style (e.g. <text font-family='"Lucida Grande", sans-serif'>). Otherwise the SVG would be malformed.
+    So, the different style.getPropertyValue() browser behavior creates quite a mess.
+    All the mess vanish if multiple word font names are not quoted at all in CSS. There are some debates whether this
+    is valid CSS or not. Fact is multiple word font names without quotes do work in all major browsers.
+  */
+  --main-font-family: Lucida Grande, Verdana, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
   --label-color: #8391a5;
