@@ -47,6 +47,7 @@ public class CoreServiceTestEnvironment {
         if (storage != null) {
             storage.shutdown();
         }
+        dm4.shutdown();
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
