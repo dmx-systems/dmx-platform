@@ -26,7 +26,12 @@ module.exports = (env = {}) => {
         {
           test: /\.js$/,
           loader: 'babel-loader',
-          exclude: /node_modules/
+          exclude: /node_modules\/(?!dm5)/
+          // Note: at the moment the dm5 modules are distributed not in pre-compiled form.
+          // For the production build we must include them in babel processing as UglifyJs accpets no ES6.
+          // Note: regex x(?!y) matches x only if x is not followed by y. Only x is part of the match results.
+          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+          // TODO: distribute the dm5 modules in pre-compiled form.
         },
         {
           test: /\.css$/,
