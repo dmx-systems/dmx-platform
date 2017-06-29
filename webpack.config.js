@@ -63,7 +63,10 @@ module.exports = (env = {}) => {
         ],
         target: 'http://localhost:8080'
       }],
-      open: true
+      open: true,
+      openPage: ''
+      // "openPage" is needed due to a bug in webpack-dev-server 2.5.0 (did not occur in 2.4.5)
+      // https://github.com/webpack/webpack-dev-server/issues/960
     }
   }
 
