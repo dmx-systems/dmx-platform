@@ -74,4 +74,8 @@ button {
   font-size: var(--label-font-size);    /* was 14px */
   font-weight: normal;                  /* was bold */
 }
+
+.el-table .cell {
+  word-break: normal;                   /* was break-all which breaks words instead of line wrap */
+}
 </style>
