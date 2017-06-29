@@ -18,14 +18,6 @@ const actions = {
     })
   },
 
-  onTopicDragged (_, {id, pos}) {
-    // update view model
-    state.topicmap.getTopic(id).setPosition(pos)
-    // sync renderer (Note: the renderer is up-to-date already)
-    // sync clients
-    dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
-  },
-
   revealTopic ({dispatch}, {topic, pos}) {
     const viewProps = {
       'dm4.topicmaps.x': pos.x,
@@ -50,6 +42,19 @@ const actions = {
     added && dispatch('syncAddAssoc', relTopic.assoc.id)
     // sync clients
     added && dm5.restClient.addAssocToTopicmap(state.topicmap.id, relTopic.assoc.id)
+  },
+
+  onTopicDragged (_, {id, pos}) {
+    // update view model
+    state.topicmap.getTopic(id).setPosition(pos)
+    // sync renderer (Note: the renderer is up-to-date already)
+    // sync clients
+    dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
+  },
+
+  onTopicDroppedOntoTopic (_, {topicId, droppedOntoTopicId}) {
+    console.log(`Node ${topicId} dropped onto node ${droppedOntoTopicId}`)
+    // TODO
   },
 
   // WebSocket messages
