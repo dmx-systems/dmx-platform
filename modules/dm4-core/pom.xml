@@ -62,6 +62,10 @@
                     <instructions>
                         <Bundle-Activator>de.deepamehta.core.osgi.CoreActivator</Bundle-Activator>
                         <Embed-Dependency>jetty-websocket</Embed-Dependency>
+                        <Export-Package>
+                            de.deepamehta.core.*,
+                            org.osgi.service.log    <!-- required when running headless (without Gogo Shell) -->
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
