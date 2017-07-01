@@ -11,50 +11,69 @@ const actions = {
     dm5.restClient.getTopicmap(id).then(topicmap => {
       // update view model
       state.topicmap = topicmap
-      // sync renderer
+      // sync view
       dispatch('syncTopicmap', topicmap)
     }).catch(error => {
       console.error(error)
     })
   },
 
-  revealTopic ({dispatch}, {topic, pos}) {
+  revealTopic ({dispatch}, {topic, pos, select}) {
     const viewProps = {
       'dm4.topicmaps.x': pos.x,
       'dm4.topicmaps.y': pos.y,
       'dm4.topicmaps.visibility': true,
     }
-    // update view model
-    const added = state.topicmap.addTopic(topic.newViewTopic(viewProps))
-    // sync renderer
-    added && dispatch('syncAddTopic', topic.id)
-    dispatch('syncSelect', topic.id)
-    // sync clients
-    added && dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)
+    const added = state.topicmap.addTopic(topic.newViewTopic(viewProps))          // update view model
+    if (added) {
+      dispatch('syncAddTopic', topic.id)                                          // sync view
+      dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)   // sync clients
+    }
+    select && dispatch('syncSelect', topic.id)
+  },
+
+  revealAssoc ({dispatch}, {assoc, select}) {
+    const added = state.topicmap.addAssoc(assoc)                                  // update view model
+    if (added) {
+      dispatch('syncAddAssoc', assoc.id)                                          // sync view
+      dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)              // sync clients
+    }
+    select && dispatch('syncSelect', assoc.id)
   },
 
   revealRelatedTopic ({dispatch}, {relTopic, pos}) {
-    dispatch('revealTopic', {topic: relTopic, pos})
-    //
-    // update view model
-    const added = state.topicmap.addAssoc(relTopic.assoc)
-    // sync renderer
-    added && dispatch('syncAddAssoc', relTopic.assoc.id)
-    // sync clients
-    added && dm5.restClient.addAssocToTopicmap(state.topicmap.id, relTopic.assoc.id)
+    dispatch('revealTopic', {topic: relTopic, pos, select: true})
+    dispatch('revealAssoc', {assoc: relTopic.assoc})
   },
 
   onTopicDragged (_, {id, pos}) {
     // update view model
     state.topicmap.getTopic(id).setPosition(pos)
-    // sync renderer (Note: the renderer is up-to-date already)
+    // sync view (Note: the view is up-to-date already)
     // sync clients
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
   },
 
-  onTopicDroppedOntoTopic (_, {topicId, droppedOntoTopicId}) {
-    console.log(`Node ${topicId} dropped onto node ${droppedOntoTopicId}`)
-    // TODO
+  onTopicDroppedOntoTopic ({dispatch}, {topicId, droppedOntoTopicId}) {
+    // TODO: display search/create widget; initiate assoc creation there
+    const assocModel = {
+      typeUri: 'dm4.core.association',
+      role1: {
+        roleTypeUri: 'dm4.core.default',
+        topicId
+      },
+      role2: {
+        roleTypeUri: 'dm4.core.default',
+        topicId: droppedOntoTopicId
+      }
+    }
+    console.log('createAssoc', assocModel)
+    dm5.restClient.createAssoc(assocModel).then(assoc => {
+      console.log(assoc)
+      dispatch('revealAssoc', {assoc, select: true})
+    }).catch(error => {
+      console.error(error)
+    })
   },
 
   // WebSocket messages
@@ -66,7 +85,7 @@ const actions = {
       if (!added) {
         throw Error(`Topic ${viewTopic.id} already added to topimap ${topicmapId}`)
       }
-      // sync renderer
+      // sync view
       dispatch('syncAddTopic', viewTopic.id)
     }
   },
@@ -78,7 +97,7 @@ const actions = {
       if (!added) {
         throw Error(`Assoc ${assoc.id} already added to topimap ${topicmapId}`)
       }
-      // sync renderer
+      // sync view
       dispatch('syncAddAssoc', assoc.id)
     }
   },
@@ -87,7 +106,7 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       // update view model
       state.topicmap.getTopic(topicId).setPosition(pos)
-      // sync renderer
+      // sync view
       dispatch('syncTopicPosition', topicId)
     }
   },
@@ -146,7 +165,7 @@ function updateTopic (topic, dispatch) {
   if (_topic) {
     // update view model
     _topic.value = topic.value
-    // sync renderer
+    // sync view
     dispatch('syncTopicLabel', topic.id)
   }
 }

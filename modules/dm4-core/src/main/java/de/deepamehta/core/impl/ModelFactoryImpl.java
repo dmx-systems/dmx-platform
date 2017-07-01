@@ -187,8 +187,8 @@ public class ModelFactoryImpl implements ModelFactory {
         } else if (roleModel.has("assocId")) {
             return newAssociationRoleModel(roleModel);
         } else {
-            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed (JSONObject=" +
-                roleModel + ")");
+            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed: one of " +
+                "\"topicId\"/\"topicUri\"/\"assocId\" is expected (JSONObject=" + roleModel + ")");
         }
     }
 
