@@ -306,5 +306,7 @@ public interface CoreService {
 
     WebSocketsService getWebSocketsService();
 
+    RequestContext getRequestContext();
+
     Object getDatabaseVendorObject();
 }

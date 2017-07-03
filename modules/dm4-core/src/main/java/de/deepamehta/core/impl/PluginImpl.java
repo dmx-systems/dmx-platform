@@ -778,11 +778,21 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // === REST Resources ===
 
+    private void publishRestResources() {
+        String uriNamespace = dm4.wpService.getUriNamespace(pluginContext);
+        if (uriNamespace != null) {
+            logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
+            /* restResources = */ dm4.wpService.registerPlugin(uriNamespace, pluginContext);
+        } else {
+            logger.info("Publishing REST resources of " + this + " SKIPPED -- no REST resources provided");
+        }
+    }
+
     /**
      * Publishes this plugin's REST resources (via WebPublishingService).
      * If the plugin doesn't provide REST resources nothing is performed.
      */
-    private void publishRestResources() {
+    /* private void publishRestResources() {
         try {
             // root resources
             List<Object> rootResources = getRootResources();
@@ -808,7 +818,7 @@ public class PluginImpl implements Plugin, EventHandler {
             throw new RuntimeException("Publishing REST resources (including provider classes) of " + this +
                 " failed", e);
         }
-    }
+    } */
 
     private void unpublishRestResources() {
         if (restResources != null) {

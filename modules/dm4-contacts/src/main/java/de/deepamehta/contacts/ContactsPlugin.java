@@ -15,7 +15,7 @@ import java.util.List;
 
 
 
-@Path("/contact")
+@Path("contact")
 @Produces("application/json")
 public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssociationListener {
 

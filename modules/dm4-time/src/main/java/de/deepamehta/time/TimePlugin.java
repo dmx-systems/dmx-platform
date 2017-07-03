@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/time")
+@Path("time")
 @Consumes("application/json")
 @Produces("application/json")
 public class TimePlugin extends PluginActivator implements TimeService, PostCreateTopicListener,

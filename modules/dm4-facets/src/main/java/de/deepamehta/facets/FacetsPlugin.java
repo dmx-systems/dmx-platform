@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 // ### TODO: support custom assoc types also for facets.
 // Some assocDef.getChildTypeUri() calls must be replaced by assocDef.getAssocDefUri().
-@Path("/facet")
+@Path("facet")
 @Consumes("application/json")
 @Produces("application/json")
 public class FacetsPlugin extends PluginActivator implements FacetsService {

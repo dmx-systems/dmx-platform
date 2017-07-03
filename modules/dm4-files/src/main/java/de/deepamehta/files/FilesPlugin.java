@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
 
 
 
-@Path("/files")
+@Path("files")
 @Produces("application/json")
 public class FilesPlugin extends PluginActivator implements FilesService, StaticResourceFilterListener, PathMapper {
 

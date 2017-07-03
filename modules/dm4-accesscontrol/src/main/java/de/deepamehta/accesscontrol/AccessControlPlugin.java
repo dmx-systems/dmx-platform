@@ -63,7 +63,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -74,7 +73,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/accesscontrol")
+@Path("accesscontrol")
 @Consumes("application/json")
 @Produces("application/json")
 public class AccessControlPlugin extends PluginActivator implements AccessControlService, ConfigCustomizer,
@@ -148,9 +147,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Inject
     private ConfigService configService;
 
-    @Context
-    private HttpServletRequest request;
-
     private static Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
 
     static {
@@ -184,7 +180,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/logout")
     @Override
     public void logout() {
-        _logout(request);
+        _logout(request());
         //
         // For a "private" DeepaMehta installation: emulate a HTTP logout by forcing the webbrowser to bring up its
         // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
@@ -201,14 +197,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getUsername() {
-        return dm4.getAccessControl().getUsername(request);
+        return dm4.getAccessControl().getUsername(request());
     }
 
     @GET
     @Path("/username")
     @Override
     public Topic getUsernameTopic() {
-        return dm4.getAccessControl().getUsernameTopic(request);
+        return dm4.getAccessControl().getUsernameTopic(request());
     }
 
     // ---
@@ -555,7 +551,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void serviceRequestFilter(ContainerRequest containerRequest) {
         // Note: we pass the injected HttpServletRequest
-        requestFilter(request);
+        requestFilter(request());
     }
 
     @Override
@@ -756,6 +752,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             .build());
     }
 
+    // ---
+
+    private HttpServletRequest request() {
+        return dm4.getRequestContext().getRequest();
+    }
+
 
 
     // === Setup Access Control ===
@@ -894,7 +896,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private boolean inRequestScope() {
         try {
-            request.getMethod();
+            request().getMethod();
             return true;
         } catch (IllegalStateException e) {
             // Note: this happens if a request method is called outside request scope.

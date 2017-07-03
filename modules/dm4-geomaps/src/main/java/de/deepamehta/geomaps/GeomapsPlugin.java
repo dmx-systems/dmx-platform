@@ -43,7 +43,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/geomap")
+@Path("geomap")
 @Consumes("application/json")
 @Produces("application/json")
 public class GeomapsPlugin extends PluginActivator implements GeomapsService, PostCreateTopicListener,

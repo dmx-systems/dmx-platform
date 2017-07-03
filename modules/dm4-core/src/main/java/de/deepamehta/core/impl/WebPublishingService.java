@@ -1,7 +1,9 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.CoreActivator;
+import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.RequestContext;
 import de.deepamehta.core.service.WebSocketsService;
 import de.deepamehta.core.util.JavaUtils;
 import de.deepamehta.core.util.UniversalExceptionMapper;
@@ -18,14 +20,19 @@ import org.osgi.service.http.NamespaceException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,9 +61,12 @@ class WebPublishingService {
     private ServletContainer jerseyServlet;
     private boolean isJerseyServletRegistered = false;
 
+    private Map<String, PluginContext> pluginRegistry = new HashMap();
+    private RequestDispatcher requestDispatcher;
+
     private PersistenceLayer pl;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private static Logger logger = Logger.getLogger(WebPublishingService.class.getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -67,6 +77,8 @@ class WebPublishingService {
             //
             // create Jersey application
             this.jerseyApplication = new DefaultResourceConfig();
+            this.requestDispatcher = new RequestDispatcher();
+            getSingletons().add(requestDispatcher);
             //
             // setup container filters
             Map<String, Object> properties = jerseyApplication.getProperties();
@@ -76,6 +88,8 @@ class WebPublishingService {
             //
             // deploy Jersey application in container
             this.jerseyServlet = new ServletContainer(jerseyApplication);
+            //
+            registerJerseyServlet();
         } catch (Exception e) {
             // unregister...();     // ### TODO?
             throw new RuntimeException("Setting up the WebPublishingService failed", e);
@@ -120,6 +134,11 @@ class WebPublishingService {
 
     // === REST Resources ===
 
+    void registerPlugin(String uriNamespace, PluginContext plugin) {
+        logger.info("### Registering " + plugin + " at \"" + uriNamespace + "\"");
+        pluginRegistry.put(uriNamespace, plugin);
+    }
+
     /**
      * Publishes REST resources. This is done by adding JAX-RS root resource and provider classes/singletons
      * to the Jersey application and reloading the Jersey servlet.
@@ -129,7 +148,7 @@ class WebPublishingService {
      * @param   singletons  the set of root resource and provider singletons, may be empty.
      * @param   classes     the set of root resource and provider classes, may be empty.
      */
-    synchronized RestResourcesPublication publishRestResources(List<Object> singletons, List<Class<?>> classes) {
+    /* synchronized RestResourcesPublication publishRestResources(List<Object> singletons, List<Class<?>> classes) {
         try {
             addToApplication(singletons, classes);
             //
@@ -151,7 +170,7 @@ class WebPublishingService {
             unpublishRestResources(singletons, classes);
             throw new RuntimeException("Adding classes/singletons to Jersey application failed", e);
         }
-    }
+    } */
 
     synchronized void unpublishRestResources(List<Object> singletons, List<Class<?>> classes) {
         removeFromApplication(singletons, classes);
@@ -179,6 +198,10 @@ class WebPublishingService {
 
     boolean isProviderClass(Class clazz) {
         return clazz.isAnnotationPresent(Provider.class);
+    }
+
+    RequestContext getRequestContext() {
+        return new RequestContextImpl(requestDispatcher.request);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -290,6 +313,25 @@ class WebPublishingService {
 
 
     // ------------------------------------------------------------------------------------------------- Private Classes
+
+    @Path("api")
+    public class RequestDispatcher {
+
+        @Context
+        private HttpServletRequest request;
+
+        @Path("{pluginUriNamespace}")
+        public PluginContext dispatch(@PathParam("pluginUriNamespace") String pluginUriNamespace) {
+            PluginContext plugin = pluginRegistry.get(pluginUriNamespace);
+            if (plugin == null) {
+                throw new RuntimeException("No plugin registered for URI namespace \"" + pluginUriNamespace + "\"");
+            }
+            logger.info("### RequestDispatcher \"" + request.getRequestURI() + "\" => " + plugin.getClass().getName());
+            return plugin;
+        }
+    }
+
+    // ---
 
     private class BundleResourcesHTTPContext implements HttpContext {
 

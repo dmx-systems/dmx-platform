@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 /**
  * REST API for {@link de.deepamehta.core.service.CoreService}.
  */
-@Path("/core")
+@Path("core")
 @Consumes("application/json")
 @Produces("application/json")
 public class WebservicePlugin extends PluginActivator {

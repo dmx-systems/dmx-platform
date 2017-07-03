@@ -30,7 +30,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/config")
+@Path("config")
 @Produces("application/json")
 public class ConfigPlugin extends PluginActivator implements ConfigService, PostCreateTopicListener {
 

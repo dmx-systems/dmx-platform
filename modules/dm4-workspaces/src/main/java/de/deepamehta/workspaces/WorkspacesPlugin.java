@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/workspace")
+@Path("workspace")
 @Consumes("application/json")
 @Produces("application/json")
 public class WorkspacesPlugin extends PluginActivator implements WorkspacesService, IntroduceTopicTypeListener,

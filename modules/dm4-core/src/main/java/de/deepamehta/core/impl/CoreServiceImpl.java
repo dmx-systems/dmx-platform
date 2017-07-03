@@ -17,6 +17,7 @@ import de.deepamehta.core.service.DeepaMehtaEvent;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
+import de.deepamehta.core.service.RequestContext;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 
@@ -426,6 +427,11 @@ public class CoreServiceImpl implements CoreService {
     @Override
     public WebSocketsServiceImpl getWebSocketsService() {
         return wsService;
+    }
+
+    @Override
+    public RequestContext getRequestContext() {
+        return wpService.getRequestContext();
     }
 
     @Override

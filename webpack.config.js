@@ -57,9 +57,9 @@ module.exports = (env = {}) => {
     webpackConfig.devServer = {
       port: 8082,
       proxy: [{
-        // TODO: have only 2 root resources: "/api" and "/static"
+        // TODO: have only 2 root resources: "/api" and "/assets"
         context: [
-          '/core', '/topicmap', '/accesscontrol', '/websocket'
+          '/api'
         ],
         target: 'http://localhost:8080'
       }],

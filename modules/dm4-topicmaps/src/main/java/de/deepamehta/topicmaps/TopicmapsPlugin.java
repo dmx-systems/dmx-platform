@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/topicmap")
+@Path("topicmap")
 @Consumes("application/json")
 @Produces("application/json")
 public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {

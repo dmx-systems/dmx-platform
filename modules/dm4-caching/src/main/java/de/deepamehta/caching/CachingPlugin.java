@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 
 
 
-@Path("/cache")
+@Path("cache")
 public class CachingPlugin extends PluginActivator implements ServiceRequestFilterListener,
                                                               ServiceResponseFilterListener {
 

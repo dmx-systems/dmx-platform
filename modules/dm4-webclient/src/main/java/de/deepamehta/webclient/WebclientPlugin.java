@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/webclient")
+@Path("webclient")
 @Consumes("application/json")
 @Produces("application/json")
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
