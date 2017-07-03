@@ -41,6 +41,7 @@ const actions = {
     select && dispatch('syncSelect', assoc.id)
   },
 
+  // TODO: add "select" param?
   revealRelatedTopic ({dispatch}, {relTopic, pos}) {
     dispatch('revealTopic', {topic: relTopic, pos, select: true})
     dispatch('revealAssoc', {assoc: relTopic.assoc})

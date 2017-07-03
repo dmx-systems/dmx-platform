@@ -56,13 +56,9 @@ module.exports = (env = {}) => {
   if (env.dev) {
     webpackConfig.devServer = {
       port: 8082,
-      proxy: [{
-        // TODO: have only 2 root resources: "/api" and "/static"
-        context: [
-          '/core', '/topicmap', '/accesscontrol', '/websocket'
-        ],
-        target: 'http://localhost:8080'
-      }],
+      proxy: {
+        '/': 'http://localhost:8080'
+      },
       open: true,
       openPage: ''
       // "openPage" is needed due to a bug in webpack-dev-server 2.5.0 (did not occur in 2.4.5)
