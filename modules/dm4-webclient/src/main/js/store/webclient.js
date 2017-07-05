@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-  selectedObject: undefined,  // Topic or Association or undefined if nothing is selected
+  selectedObject: undefined,  // Topic or Assoc or undefined if nothing is selected
   detailPanel: {
     mode: undefined           // 'info' or 'form'
   }
@@ -60,15 +60,14 @@ const actions = {
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateTopic(new dm5.Topic(dir.arg))
+        updateSelectedObject(new dm5.Topic(dir.arg))
         break
       case "DELETE_TOPIC":
         // TODO
         console.warn('Directive DELETE_TOPIC not yet implemented')
         break
       case "UPDATE_ASSOCIATION":
-        // TODO
-        console.warn('Directive UPDATE_ASSOCIATION not yet implemented')
+        updateSelectedObject(new dm5.Assoc(dir.arg))
         break
       case "DELETE_ASSOCIATION":
         // TODO
@@ -111,7 +110,7 @@ export default store
 
 // ---
 
-function updateTopic (topic) {
+function updateSelectedObject (topic) {
   if (state.selectedObject && state.selectedObject.id === topic.id) {
     state.selectedObject = topic
   }

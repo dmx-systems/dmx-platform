@@ -124,8 +124,7 @@ const actions = {
         console.warn('Directive DELETE_TOPIC not yet implemented')
         break
       case "UPDATE_ASSOCIATION":
-        // TODO
-        console.warn('Directive UPDATE_ASSOCIATION not yet implemented')
+        updateAssoc(dir.arg, dispatch)
         break
       case "DELETE_ASSOCIATION":
         // TODO
@@ -173,5 +172,13 @@ function updateTopic (topic, dispatch) {
   if (_topic) {
     _topic.value = topic.value              // update view model
     dispatch('syncTopicLabel', topic.id)    // sync view
+  }
+}
+
+function updateAssoc (assoc, dispatch) {
+  const _assoc = state.topicmap.getAssocIfExists(assoc.id)
+  if (_assoc) {
+    _assoc.value = assoc.value              // update view model
+    dispatch('syncAssocLabel', assoc.id)    // sync view
   }
 }
