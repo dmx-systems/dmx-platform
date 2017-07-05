@@ -121,24 +121,31 @@ const actions = {
         break
       case "DELETE_TOPIC":
         // TODO
+        console.warn('Directive DELETE_TOPIC not yet implemented')
         break
       case "UPDATE_ASSOCIATION":
         // TODO
+        console.warn('Directive UPDATE_ASSOCIATION not yet implemented')
         break
       case "DELETE_ASSOCIATION":
         // TODO
+        console.warn('Directive DELETE_ASSOCIATION not yet implemented')
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
+        console.warn('Directive UPDATE_TOPIC_TYPE not yet implemented')
         break
       case "DELETE_TOPIC_TYPE":
         // TODO
+        console.warn('Directive DELETE_TOPIC_TYPE not yet implemented')
         break
       case "UPDATE_ASSOCIATION_TYPE":
         // TODO
+        console.warn('Directive UPDATE_ASSOCIATION_TYPE not yet implemented')
         break
       case "DELETE_ASSOCIATION_TYPE":
         // TODO
+        console.warn('Directive DELETE_ASSOCIATION_TYPE not yet implemented')
         break
       default:
         throw Error(`"${dir.type}" is an unsupported directive`)
@@ -164,9 +171,7 @@ export default {
 function updateTopic (topic, dispatch) {
   const _topic = state.topicmap.getTopicIfExists(topic.id)
   if (_topic) {
-    // update view model
-    _topic.value = topic.value
-    // sync view
-    dispatch('syncTopicLabel', topic.id)
+    _topic.value = topic.value              // update view model
+    dispatch('syncTopicLabel', topic.id)    // sync view
   }
 }

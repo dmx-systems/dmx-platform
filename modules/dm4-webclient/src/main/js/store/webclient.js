@@ -41,8 +41,8 @@ const actions = {
 
   submit ({dispatch}) {
     state.detailPanel.mode = 'info'
-    dm5.restClient.updateTopic(state.selectedObject).then(topic => {
-      dispatch('_processDirectives', topic.directives)
+    state.selectedObject.update().then(object => {
+      dispatch('_processDirectives', object.directives)
     })
   },
 
@@ -64,24 +64,31 @@ const actions = {
         break
       case "DELETE_TOPIC":
         // TODO
+        console.warn('Directive DELETE_TOPIC not yet implemented')
         break
       case "UPDATE_ASSOCIATION":
         // TODO
+        console.warn('Directive UPDATE_ASSOCIATION not yet implemented')
         break
       case "DELETE_ASSOCIATION":
         // TODO
+        console.warn('Directive DELETE_ASSOCIATION not yet implemented')
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
+        console.warn('Directive UPDATE_TOPIC_TYPE not yet implemented')
         break
       case "DELETE_TOPIC_TYPE":
         // TODO
+        console.warn('Directive DELETE_TOPIC_TYPE not yet implemented')
         break
       case "UPDATE_ASSOCIATION_TYPE":
         // TODO
+        console.warn('Directive UPDATE_ASSOCIATION_TYPE not yet implemented')
         break
       case "DELETE_ASSOCIATION_TYPE":
         // TODO
+        console.warn('Directive DELETE_ASSOCIATION_TYPE not yet implemented')
         break
       default:
         throw Error(`"${dir.type}" is an unsupported directive`)
