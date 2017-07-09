@@ -183,6 +183,12 @@ public interface AccessControl {
 
 
 
+    // === Topicmaps ===
+
+    void deleteAssociationMapcontext(Association assoc);
+
+
+
     // === Config Service ===
 
     /**

@@ -253,7 +253,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             if (assoc == null) {
                 throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
             }
-            assoc.delete();
+            // Note: a mapcontext association belongs to the system (it has no workspace assignment).
+            // Deletion is possible only via privileged operation.
+            dm4.getAccessControl().deleteAssociationMapcontext(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
                 e);
