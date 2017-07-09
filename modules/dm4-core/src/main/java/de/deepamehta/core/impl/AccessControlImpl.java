@@ -33,6 +33,8 @@ class AccessControlImpl implements AccessControl {
     // ### TODO: copy in AccessControlPlugin.java
     private static final String TYPE_MEMBERSHIP    = "dm4.accesscontrol.membership";
     private static final String TYPE_USERNAME      = "dm4.accesscontrol.username";
+    // ### TODO: copy in TopicmapsPlugin.java
+    private static final String ASSOCIATION_MAPCONTEXT = "dm4.topicmaps.association_mapcontext";
     //
     private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
@@ -367,6 +369,19 @@ class AccessControlImpl implements AccessControl {
     @Override
     public boolean workspaceAssignmentIsSuppressed() {
         return contextTracker.runsInTrackedContext();
+    }
+
+
+
+    // === Topicmaps ===
+
+    @Override
+    public void deleteAssociationMapcontext(Association assoc) {
+        if (!assoc.getTypeUri().equals(ASSOCIATION_MAPCONTEXT)) {
+            throw new RuntimeException("Association " + assoc.getId() + " not eligible for privileged deletion (" +
+                assoc + ")");
+        }
+        ((AssociationImpl) assoc).getModel().delete();
     }
 
 
