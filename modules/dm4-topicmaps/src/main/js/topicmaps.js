@@ -19,22 +19,30 @@ const actions = {
   },
 
   revealTopic ({dispatch}, {topic, pos, select}) {
-    const viewProps = {
-      'dm4.topicmaps.x': pos.x,
-      'dm4.topicmaps.y': pos.y,
-      'dm4.topicmaps.visibility': true,
-    }
-    const added = state.topicmap.addTopic(topic.newViewTopic(viewProps))          // update view model
-    if (added) {
+    const viewTopic = state.topicmap.getTopicIfExists(topic.id)
+    if (!viewTopic) {
+      const viewProps = {
+        'dm4.topicmaps.x': pos.x,
+        'dm4.topicmaps.y': pos.y,
+        'dm4.topicmaps.visibility': true,
+      }
+      state.topicmap.addTopic(topic.newViewTopic(viewProps))                      // update view model
       dispatch('syncAddTopic', topic.id)                                          // sync view
       dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)   // sync clients
+    } else {
+      if (!viewTopic.isVisible()) {
+        viewTopic.setVisibility(true)                                             // update view model
+        dispatch('syncAddTopic', topic.id)                                        // sync view
+        dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)      // sync clients
+      }
     }
     select && dispatch('syncSelect', topic.id)
   },
 
   revealAssoc ({dispatch}, {assoc, select}) {
-    const added = state.topicmap.addAssoc(assoc)                                  // update view model
-    if (added) {
+    const viewAssoc = state.topicmap.getAssocIfExists(assoc.id)
+    if (!viewAssoc) {
+      state.topicmap.addAssoc(assoc)                                              // update view model
       dispatch('syncAddAssoc', assoc.id)                                          // sync view
       dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)              // sync clients
     }
@@ -77,38 +85,40 @@ const actions = {
     })
   },
 
+  onHideTopic (_, id) {
+    console.log('onHideTopic', id)
+    state.topicmap.getTopic(id).setVisibility(false)                      // update view model
+    // sync view (Note: the view is up-to-date already)
+    dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
+  },
+
+  onHideAssoc (_, id) {
+    console.log('onHideAssoc', id)
+    state.topicmap.removeAssoc(id)                                        // update view model
+    // sync view (Note: the view is up-to-date already)
+    dm5.restClient.removeAssociationFromTopicmap(state.topicmap.id, id)   // sync clients
+  },
+
   // WebSocket messages
 
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
-      // update view model
-      const added = state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))
-      if (!added) {
-        throw Error(`Topic ${viewTopic.id} already added to topimap ${topicmapId}`)
-      }
-      // sync view
-      dispatch('syncAddTopic', viewTopic.id)
+      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))               // update view model
+      dispatch('syncAddTopic', viewTopic.id)                              // sync view
     }
   },
 
   _addAssocToTopicmap ({dispatch}, {topicmapId, assoc}) {
     if (topicmapId === state.topicmap.id) {
-      // update view model
-      const added = state.topicmap.addAssoc(new dm5.Assoc(assoc))
-      if (!added) {
-        throw Error(`Assoc ${assoc.id} already added to topimap ${topicmapId}`)
-      }
-      // sync view
-      dispatch('syncAddAssoc', assoc.id)
+      state.topicmap.addAssoc(new dm5.Assoc(assoc))                       // update view model
+      dispatch('syncAddAssoc', assoc.id)                                  // sync view
     }
   },
 
   _setTopicPosition ({dispatch}, {topicmapId, topicId, pos}) {
     if (topicmapId === state.topicmap.id) {
-      // update view model
-      state.topicmap.getTopic(topicId).setPosition(pos)
-      // sync view
-      dispatch('syncTopicPosition', topicId)
+      state.topicmap.getTopic(topicId).setPosition(pos)                   // update view model
+      dispatch('syncTopicPosition', topicId)                              // sync view
     }
   },
 
