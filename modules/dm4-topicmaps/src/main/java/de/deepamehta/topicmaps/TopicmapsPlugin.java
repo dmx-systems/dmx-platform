@@ -240,7 +240,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
-        storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+        try {
+            storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+            me.setTopicVisibility(topicmapId, topicId, visibility);
+        } catch (Exception e) {
+            throw new RuntimeException("Setting visibility of topic " + topicId + " in topicmap " + topicmapId +
+                " failed ", e);
+        }
     }
 
     @DELETE
@@ -256,6 +262,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             // Note: a mapcontext association belongs to the system (it has no workspace assignment).
             // Deletion is possible only via privileged operation.
             dm4.getAccessControl().deleteAssociationMapcontext(assoc);
+            me.removeAssociationFromTopicmap(topicmapId, assocId);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
                 e);
@@ -465,6 +472,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             this.pluginUri = pluginUri;
         }
 
+        // ---
+
         private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) {
             try {
                 messageToAllButOne(new JSONObject()
@@ -510,6 +519,37 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 logger.log(Level.WARNING, "Error while sending a \"setTopicPosition\" message:", e);
             }
         }
+
+        private void setTopicVisibility(long topicmapId, long topicId, boolean visibility) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "setTopicVisibility")
+                    .put("args", new JSONObject()
+                        .put("topicmapId", topicmapId)
+                        .put("topicId", topicId)
+                        .put("visibility", visibility)
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"setTopicVisibility\" message:", e);
+            }
+        }
+
+        private void removeAssociationFromTopicmap(long topicmapId, long assocId) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "removeAssociationFromTopicmap")
+                    .put("args", new JSONObject()
+                        .put("topicmapId", topicmapId)
+                        .put("assocId", assocId)
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"removeAssociationFromTopicmap\" message:", e);
+            }
+        }
+
+        // ---
 
         private void messageToAllButOne(JSONObject message) {
             dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());

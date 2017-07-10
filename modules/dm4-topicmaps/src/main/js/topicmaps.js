@@ -56,11 +56,9 @@ const actions = {
   },
 
   onTopicDragged (_, {id, pos}) {
-    // update view model
-    state.topicmap.getTopic(id).setPosition(pos)
-    // sync view (Note: the view is up-to-date already)
-    // sync clients
-    dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
+    state.topicmap.getTopic(id).setPosition(pos)                                  // update view model
+    // Note: the view is up-to-date already                                       // sync view
+    dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)                   // sync clients
   },
 
   onTopicDroppedOntoTopic ({dispatch}, {topicId, droppedOntoTopicId}) {
@@ -88,14 +86,14 @@ const actions = {
   onHideTopic (_, id) {
     console.log('onHideTopic', id)
     state.topicmap.getTopic(id).setVisibility(false)                      // update view model
-    // sync view (Note: the view is up-to-date already)
+    // Note: the view is up-to-date already                               // sync view
     dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
   },
 
   onHideAssoc (_, id) {
     console.log('onHideAssoc', id)
     state.topicmap.removeAssoc(id)                                        // update view model
-    // sync view (Note: the view is up-to-date already)
+    // Note: the view is up-to-date already                               // sync view
     dm5.restClient.removeAssociationFromTopicmap(state.topicmap.id, id)   // sync clients
   },
 
@@ -119,6 +117,20 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       state.topicmap.getTopic(topicId).setPosition(pos)                   // update view model
       dispatch('syncTopicPosition', topicId)                              // sync view
+    }
+  },
+
+  _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
+    if (topicmapId === state.topicmap.id) {
+      state.topicmap.getTopic(topicId).setVisibility(visibility)          // update view model
+      dispatch('syncTopicVisibility', topicId)                            // sync view
+    }
+  },
+
+  _removeAssociationFromTopicmap ({dispatch}, {topicmapId, assocId}) {
+    if (topicmapId === state.topicmap.id) {
+      state.topicmap.removeAssoc(assocId)                                 // update view model
+      dispatch('syncRemoveAssoc', assocId)                                // sync view
     }
   },
 
