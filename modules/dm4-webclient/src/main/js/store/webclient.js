@@ -53,7 +53,7 @@ const actions = {
     dispatch('openSearchWidget', pos)
   },
 
-  // WebSocket messages
+  // WebSocket message processing
 
   _processDirectives (_, directives) {
     console.log(`Webclient: processing ${directives.length} directives ...`)

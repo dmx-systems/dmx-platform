@@ -152,12 +152,12 @@ public interface CoreService {
     List<Association> getAssociationsByType(String assocTypeUri);
 
     /**
-     * Returns all associations between two topics. If no such association exists an empty set is returned.
+     * Returns all associations between two topics. If no such association exists an empty list is returned.
      */
     List<Association> getAssociations(long topic1Id, long topic2Id);
 
     /**
-     * Returns the associations between two topics. If no such association exists an empty set is returned.
+     * Returns the associations between two topics. If no such association exists an empty list is returned.
      *
      * @param   assocTypeUri    Association type filter. Pass <code>null</code> to switch filter off.
      */

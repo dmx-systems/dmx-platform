@@ -147,6 +147,9 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, long othersTopicId);
 
+    /**
+     * Fetches all associations this object is a player in.
+     */
     List<Association> getAssociations();
 
 

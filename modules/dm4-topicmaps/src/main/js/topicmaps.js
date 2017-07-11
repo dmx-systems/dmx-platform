@@ -97,7 +97,7 @@ const actions = {
     dm5.restClient.removeAssociationFromTopicmap(state.topicmap.id, id)   // sync clients
   },
 
-  // WebSocket messages
+  // WebSocket message processing
 
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
@@ -122,8 +122,15 @@ const actions = {
 
   _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.getTopic(topicId).setVisibility(visibility)          // update view model
-      dispatch('syncTopicVisibility', topicId)                            // sync view
+      // update view model
+      if (!visibility) {
+        state.topicmap.getAssocs(topicId).forEach(assoc => {
+          state.topicmap.removeAssoc(assoc.id)
+        })
+      }
+      state.topicmap.getTopic(topicId).setVisibility(visibility)
+      // sync view
+      dispatch('syncTopicVisibility', topicId)
     }
   },
 

@@ -129,12 +129,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public boolean isTopicInTopicmap(long topicmapId, long topicId) {
-        return fetchTopicRefAssociation(topicmapId, topicId) != null;
+        return fetchTopicMapcontext(topicmapId, topicId) != null;
     }
 
     @Override
     public boolean isAssociationInTopicmap(long topicmapId, long assocId) {
-        return fetchAssociationRefAssociation(topicmapId, assocId) != null;
+        return fetchAssociationMapcontext(topicmapId, assocId) != null;
     }
 
     // ---
@@ -153,11 +153,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     if (isTopicInTopicmap(topicmapId, topicId)) {
                         throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                     }
-                    Association assoc = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+                    Association topicMapcontext = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
                         mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
                         mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
                     ));
-                    storeViewProperties(assoc, viewProps);
+                    storeViewProperties(topicMapcontext, viewProps);
                     //
                     TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
                     me.addTopicToTopicmap(topicmapId, topic);
@@ -241,7 +241,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
+            // remove associations
+            if (!visibility) {
+                for (Association assoc : dm4.getTopic(topicId).getAssociations()) {
+                    Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assoc.getId());
+                    if (assocMapcontext != null) {
+                        deleteAssociationMapcontext(assocMapcontext);
+                    }
+                }
+            }
+            // remove topic
             storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+            // send message
             me.setTopicVisibility(topicmapId, topicId, visibility);
         } catch (Exception e) {
             throw new RuntimeException("Setting visibility of topic " + topicId + " in topicmap " + topicmapId +
@@ -255,13 +266,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         try {
-            Association assoc = fetchAssociationRefAssociation(topicmapId, assocId);
-            if (assoc == null) {
+            Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
+            if (assocMapcontext == null) {
                 throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
             }
-            // Note: a mapcontext association belongs to the system (it has no workspace assignment).
-            // Deletion is possible only via privileged operation.
-            dm4.getAccessControl().deleteAssociationMapcontext(assoc);
+            deleteAssociationMapcontext(assocMapcontext);
             me.removeAssociationFromTopicmap(topicmapId, assocId);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
@@ -387,42 +396,53 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
-    private Association fetchTopicRefAssociation(long topicmapId, long topicId) {
+    private Association fetchTopicMapcontext(long topicmapId, long topicId) {
         return dm4.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
     }
 
-    private Association fetchAssociationRefAssociation(long topicmapId, long assocId) {
+    private Association fetchAssociationMapcontext(long topicmapId, long assocId) {
         return dm4.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION);
     }
 
     // ---
 
-    private ViewProperties fetchViewProperties(Association mapcontextAssoc) {
-        int x = (Integer) mapcontextAssoc.getProperty(PROP_X);
-        int y = (Integer) mapcontextAssoc.getProperty(PROP_Y);
-        boolean visibility = (Boolean) mapcontextAssoc.getProperty(PROP_VISIBILITY);
+    private void deleteAssociationMapcontext(Association assocMapcontext) {
+        // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
+        // Deletion is possible only via privileged operation.
+        dm4.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
+    }
+
+    // ---
+
+    private ViewProperties fetchViewProperties(Association topicMapcontext) {
+        int x = (Integer) topicMapcontext.getProperty(PROP_X);
+        int y = (Integer) topicMapcontext.getProperty(PROP_Y);
+        boolean visibility = (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
         return new ViewProperties(x, y, visibility);
     }
 
     // --- Store ---
 
+    /**
+     * Convenience.
+     */
     private void storeViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
         try {
-            Association assoc = fetchTopicRefAssociation(topicmapId, topicId);
-            if (assoc == null) {
+            Association topicMapcontext = fetchTopicMapcontext(topicmapId, topicId);
+            if (topicMapcontext == null) {
                 throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
             }
-            storeViewProperties(assoc, viewProps);
+            storeViewProperties(topicMapcontext, viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
         }
     }
 
-    private void storeViewProperties(Association mapcontextAssoc, ViewProperties viewProps) {
+    private void storeViewProperties(Association topicMapcontext, ViewProperties viewProps) {
         for (String propUri : viewProps) {
-            mapcontextAssoc.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
+            topicMapcontext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
         }
     }
 
