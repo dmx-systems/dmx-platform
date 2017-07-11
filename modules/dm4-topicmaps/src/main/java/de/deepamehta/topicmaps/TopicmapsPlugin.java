@@ -558,14 +558,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         private void removeAssociationFromTopicmap(long topicmapId, long assocId) {
             try {
                 messageToAllButOne(new JSONObject()
-                    .put("type", "removeAssociationFromTopicmap")
+                    .put("type", "removeAssocFromTopicmap")
                     .put("args", new JSONObject()
                         .put("topicmapId", topicmapId)
                         .put("assocId", assocId)
                     )
                 );
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"removeAssociationFromTopicmap\" message:", e);
+                logger.log(Level.WARNING, "Error while sending a \"removeAssocFromTopicmap\" message:", e);
             }
         }
 

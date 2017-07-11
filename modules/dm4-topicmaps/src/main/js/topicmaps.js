@@ -84,17 +84,16 @@ const actions = {
   },
 
   onHideTopic (_, id) {
-    console.log('onHideTopic', id)
-    state.topicmap.getTopic(id).setVisibility(false)                      // update view model
+    state.topicmap.removeAssocs(id)                                       // update view model
+    state.topicmap.getTopic(id).setVisibility(false)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
   },
 
   onHideAssoc (_, id) {
-    console.log('onHideAssoc', id)
     state.topicmap.removeAssoc(id)                                        // update view model
     // Note: the view is up-to-date already                               // sync view
-    dm5.restClient.removeAssociationFromTopicmap(state.topicmap.id, id)   // sync clients
+    dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
   },
 
   // WebSocket message processing
@@ -124,9 +123,7 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       // update view model
       if (!visibility) {
-        state.topicmap.getAssocs(topicId).forEach(assoc => {
-          state.topicmap.removeAssoc(assoc.id)
-        })
+        state.topicmap.removeAssocs(topicId)
       }
       state.topicmap.getTopic(topicId).setVisibility(visibility)
       // sync view
@@ -134,7 +131,7 @@ const actions = {
     }
   },
 
-  _removeAssociationFromTopicmap ({dispatch}, {topicmapId, assocId}) {
+  _removeAssocFromTopicmap ({dispatch}, {topicmapId, assocId}) {
     if (topicmapId === state.topicmap.id) {
       state.topicmap.removeAssoc(assocId)                                 // update view model
       dispatch('syncRemoveAssoc', assocId)                                // sync view
