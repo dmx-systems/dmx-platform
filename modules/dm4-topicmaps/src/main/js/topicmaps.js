@@ -96,6 +96,23 @@ const actions = {
     dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
   },
 
+  onDeleteTopic ({dispatch}, id) {
+    state.topicmap.removeAssocs(id)                                       // update view model
+    state.topicmap.removeTopic(id)
+    // Note: the view is up-to-date already                               // sync view
+    dm5.restClient.deleteTopic(id).then(object => {                       // sync clients
+      dispatch('_processDirectives', object.directives)
+    })
+  },
+
+  onDeleteAssoc ({dispatch}, id) {
+    state.topicmap.removeAssoc(id)                                        // update view model
+    // Note: the view is up-to-date already                               // sync view
+    dm5.restClient.deleteAssoc(id).then(object => {                       // sync clients
+      dispatch('_processDirectives', object.directives)
+    })
+  },
+
   // WebSocket message processing
 
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
