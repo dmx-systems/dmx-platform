@@ -19,40 +19,34 @@ const actions = {
   },
 
   revealTopic ({dispatch}, {topic, pos, select}) {
-    const viewTopic = state.topicmap.getTopicIfExists(topic.id)
-    if (!viewTopic) {
-      const viewProps = {
-        'dm4.topicmaps.x': pos.x,
-        'dm4.topicmaps.y': pos.y,
-        'dm4.topicmaps.visibility': true,
-      }
-      state.topicmap.addTopic(topic.newViewTopic(viewProps))                      // update view model
-      dispatch('syncAddTopic', topic.id)                                          // sync view
-      dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, viewProps)   // sync clients
-    } else {
-      if (!viewTopic.isVisible()) {
-        viewTopic.setVisibility(true)                                             // update view model
-        dispatch('syncAddTopic', topic.id)                                        // sync view
-        dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)      // sync clients
-      }
+    // update view model + sync view
+    const op = _revealTopic(topic, pos, select, dispatch)
+    // sync clients
+    if (op.type === 'add') {
+      dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, op.viewProps)
+    } else if (op.type === 'show') {
+      dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)
     }
-    select && dispatch('syncSelect', topic.id)
   },
 
   revealAssoc ({dispatch}, {assoc, select}) {
-    const viewAssoc = state.topicmap.getAssocIfExists(assoc.id)
-    if (!viewAssoc) {
-      state.topicmap.addAssoc(assoc)                                              // update view model
-      dispatch('syncAddAssoc', assoc.id)                                          // sync view
-      dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)              // sync clients
+    // update view model + sync view
+    const op = _revealAssoc(assoc, select, dispatch)
+    // sync clients
+    if (op.type === 'add') {
+      dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)
     }
-    select && dispatch('syncSelect', assoc.id)
   },
 
   // TODO: add "select" param?
   revealRelatedTopic ({dispatch}, {relTopic, pos}) {
-    dispatch('revealTopic', {topic: relTopic, pos, select: true})
-    dispatch('revealAssoc', {assoc: relTopic.assoc})
+    // update view model + sync view
+    const topicOp = _revealTopic(relTopic, pos, true, dispatch)      // select=true
+    const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)    // select=false
+    // sync clients
+    if (topicOp.type || assocOp.type) {
+      dm5.restClient.addRelatedTopicToTopicmap(state.topicmap.id, relTopic.id, relTopic.assoc.id, topicOp.viewProps)
+    }
   },
 
   onTopicDragged (_, {id, pos}) {
@@ -207,6 +201,44 @@ export default {
 }
 
 // ---
+
+// update view model + sync view
+
+function _revealTopic (topic, pos, select, dispatch) {
+  const op = {}
+  const viewTopic = state.topicmap.getTopicIfExists(topic.id)
+  if (!viewTopic) {
+    const viewProps = {
+      'dm4.topicmaps.x': pos.x,
+      'dm4.topicmaps.y': pos.y,
+      'dm4.topicmaps.visibility': true,
+    }
+    state.topicmap.addTopic(topic.newViewTopic(viewProps))                      // update view model
+    dispatch('syncAddTopic', topic.id)                                          // sync view
+    op.type = 'add'
+    op.viewProps = viewProps
+  } else {
+    if (!viewTopic.isVisible()) {
+      viewTopic.setVisibility(true)                                             // update view model
+      dispatch('syncAddTopic', topic.id)                                        // sync view
+      op.type = 'show'
+    }
+  }
+  select && dispatch('syncSelect', topic.id)
+  return op
+}
+
+function _revealAssoc (assoc, select, dispatch) {
+  const op = {}
+  const viewAssoc = state.topicmap.getAssocIfExists(assoc.id)
+  if (!viewAssoc) {
+    state.topicmap.addAssoc(assoc)                                              // update view model
+    dispatch('syncAddAssoc', assoc.id)                                          // sync view
+    op.type = 'add'
+  }
+  select && dispatch('syncSelect', assoc.id)
+  return op
+}
 
 // Process Directives
 
