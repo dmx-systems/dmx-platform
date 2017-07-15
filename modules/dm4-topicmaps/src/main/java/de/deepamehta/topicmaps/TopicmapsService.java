@@ -46,6 +46,10 @@ public interface TopicmapsService {
      */
     void addAssociationToTopicmap(long topicmapId, long assocId);
 
+    // Note: this is needed in order to reveal a related topic in a *single* request. Otherwise client-sync might fail
+    // due to asynchronicity. A client might receive the "addAssoc" WebSocket message *before* the "addTopic" message.
+    void addRelatedTopicToTopicmap(long topicmapId, long topicId, long assocId, ViewProperties viewProps);
+
     // ---
 
     void setViewProperties(long topicmapId, long topicId, ViewProperties viewProps);
@@ -66,7 +70,7 @@ public interface TopicmapsService {
 
     void setClusterPosition(long topicmapId, ClusterCoords coords);
 
-    void setTopicmapTranslation(long topicmapId, int trans_x, int trans_y);
+    void setTopicmapTranslation(long topicmapId, int transX, int transY);
 
     // ---
 

@@ -153,15 +153,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     if (isTopicInTopicmap(topicmapId, topicId)) {
                         throw new RuntimeException("Topic " + topicId + " already added to topicmap" + topicmapId);
                     }
-                    Association topicMapcontext = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
-                        mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-                        mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
-                    ));
-                    storeViewProperties(topicMapcontext, viewProps);
-                    //
-                    TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
-                    me.addTopicToTopicmap(topicmapId, topic);
-                    //
+                    createTopicMapcontext(topicmapId, topicId, viewProps);
                     return null;
                 }
             });
@@ -191,19 +183,47 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                         throw new RuntimeException("Association " + assocId + " already added to topicmap " +
                             topicmapId);
                     }
-                    dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
-                        mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-                        mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
-                    ));
-                    //
-                    AssociationModel assoc = dm4.getAssociation(assocId).getModel();
-                    me.addAssociationToTopicmap(topicmapId, assoc);
-                    //
+                    createAssociationMapcontext(topicmapId, assocId);
                     return null;
                 }
             });
         } catch (Exception e) {
             throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed", e);
+        }
+    }
+
+    @POST
+    @Path("/{id}/topic/{topic_id}/association/{assoc_id}")
+    @Transactional
+    @Override
+    public void addRelatedTopicToTopicmap(@PathParam("id") final long topicmapId,
+                                          @PathParam("topic_id") final long topicId,
+                                          @PathParam("assoc_id") final long assocId, final ViewProperties viewProps) {
+        try {
+            // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
+            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+                @Override
+                public Void call() {
+                    // 1) add topic
+                    Association topicMapcontext = fetchTopicMapcontext(topicmapId, topicId);
+                    if (topicMapcontext == null) {
+                        createTopicMapcontext(topicmapId, topicId, viewProps);
+                    } else {
+                        if (!visibility(topicMapcontext)) {
+                            setTopicVisibility(topicmapId, topicId, true);
+                        }
+                    }
+                    // 2) add association
+                    // Note: it is an error if the association is already in the topicmap. In this case the topic is
+                    // already in the topicmap too, and the Webclient would not send the request in the first place.
+                    // ### TODO: rethink method contract. Do it analoguous to "add topic"?
+                    addAssociationToTopicmap(topicmapId, assocId);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            throw new RuntimeException("Adding related topic " + topicId + " (assocId=" + assocId + ") to topicmap " +
+                topicmapId + " failed (viewProps=" + viewProps + ")", e);
         }
     }
 
@@ -250,7 +270,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     }
                 }
             }
-            // remove topic
+            // show/hide topic
             storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
             // send message
             me.setTopicVisibility(topicmapId, topicId, visibility);
@@ -407,6 +427,29 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
+    private void createTopicMapcontext(long topicmapId, long topicId, ViewProperties viewProps) {
+        Association topicMapcontext = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+            mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
+            mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
+        ));
+        storeViewProperties(topicMapcontext, viewProps);
+        //
+        TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
+        me.addTopicToTopicmap(topicmapId, topic);
+    }
+
+    private void createAssociationMapcontext(long topicmapId, long assocId) {
+        dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+            mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
+            mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+        ));
+        //
+        AssociationModel assoc = dm4.getAssociation(assocId).getModel();
+        me.addAssociationToTopicmap(topicmapId, assoc);
+    }
+
+    // ---
+
     private void deleteAssociationMapcontext(Association assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deletion is possible only via privileged operation.
@@ -418,8 +461,12 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private ViewProperties fetchViewProperties(Association topicMapcontext) {
         int x = (Integer) topicMapcontext.getProperty(PROP_X);
         int y = (Integer) topicMapcontext.getProperty(PROP_Y);
-        boolean visibility = (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
+        boolean visibility = visibility(topicMapcontext);
         return new ViewProperties(x, y, visibility);
+    }
+
+    private boolean visibility(Association topicMapcontext) {
+        return (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
     }
 
     // --- Store ---
