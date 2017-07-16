@@ -77,15 +77,17 @@ const actions = {
     })
   },
 
-  onHideTopic (_, id) {
+  onHideTopic ({rootState}, id) {
     state.topicmap.removeAssocs(id)                                       // update view model
     state.topicmap.getTopic(id).setVisibility(false)
+    unsetSelectedObject(id, rootState)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
   },
 
-  onHideAssoc (_, id) {
+  onHideAssoc ({rootState}, id) {
     state.topicmap.removeAssoc(id)                                        // update view model
+    unsetSelectedObject(id, rootState)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
   },

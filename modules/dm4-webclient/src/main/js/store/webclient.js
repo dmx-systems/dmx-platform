@@ -43,14 +43,6 @@ const actions = {
     })
   },
 
-  onHideTopic (_, id) {
-    unsetSelectedObject(id)
-  },
-
-  onHideAssoc (_, id) {
-    unsetSelectedObject(id)
-  },
-
   /**
    * @param   pos   `model` and `render` positions
    */
