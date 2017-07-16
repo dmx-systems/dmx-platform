@@ -28,10 +28,7 @@ const actions = {
   },
 
   unselect (_, id) {
-    // Note: selectedObject might be undefined if there was a multiple selection
-    if (state.selectedObject && state.selectedObject.id === id) {
-      state.selectedObject = undefined
-    }
+    unsetSelectedObject(id)
   },
 
   edit () {
@@ -44,6 +41,14 @@ const actions = {
     state.selectedObject.update().then(object => {
       dispatch('_processDirectives', object.directives)
     })
+  },
+
+  onHideTopic (_, id) {
+    unsetSelectedObject(id)
+  },
+
+  onHideAssoc (_, id) {
+    unsetSelectedObject(id)
   },
 
   /**
@@ -63,13 +68,13 @@ const actions = {
         setSelectedObject(new dm5.Topic(dir.arg))
         break
       case "DELETE_TOPIC":
-        unsetSelectedObject(dir.arg)
+        unsetSelectedObject(dir.arg.id)
         break
       case "UPDATE_ASSOCIATION":
         setSelectedObject(new dm5.Assoc(dir.arg))
         break
       case "DELETE_ASSOCIATION":
-        unsetSelectedObject(dir.arg)
+        unsetSelectedObject(dir.arg.id)
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
@@ -114,8 +119,8 @@ function setSelectedObject (object) {
   }
 }
 
-function unsetSelectedObject (object) {
-  if (state.selectedObject && state.selectedObject.id === object.id) {
+function unsetSelectedObject (id) {
+  if (state.selectedObject && state.selectedObject.id === id) {
     state.selectedObject = undefined
   }
 }

@@ -130,11 +130,12 @@ const actions = {
     }
   },
 
-  _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
+  _setTopicVisibility ({dispatch, rootState}, {topicmapId, topicId, visibility}) {
     if (topicmapId === state.topicmap.id) {
       // update view model
       if (!visibility) {
         state.topicmap.removeAssocs(topicId)
+        unsetSelectedObject(topicId, rootState)
       }
       state.topicmap.getTopic(topicId).setVisibility(visibility)
       // sync view
@@ -142,10 +143,13 @@ const actions = {
     }
   },
 
-  _removeAssocFromTopicmap ({dispatch}, {topicmapId, assocId}) {
+  _removeAssocFromTopicmap ({dispatch, rootState}, {topicmapId, assocId}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.removeAssoc(assocId)                                 // update view model
-      dispatch('syncRemoveAssoc', assocId)                                // sync view
+      // update view model
+      state.topicmap.removeAssoc(assocId)
+      unsetSelectedObject(assocId, rootState)
+      // sync view
+      dispatch('syncRemoveAssoc', assocId)
     }
   },
 
@@ -199,6 +203,14 @@ export default {
 }
 
 // ---
+
+// update view model
+
+function unsetSelectedObject (id, rootState) {
+  if (rootState.selectedObject && rootState.selectedObject.id === id) {
+    rootState.selectedObject = undefined
+  }
+}
 
 // update view model + sync view
 // ### TODO: factor out view sync and move remainder to model.js?
