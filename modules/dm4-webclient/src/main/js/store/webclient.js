@@ -60,18 +60,16 @@ const actions = {
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateSelectedObject(new dm5.Topic(dir.arg))
+        setSelectedObject(new dm5.Topic(dir.arg))
         break
       case "DELETE_TOPIC":
-        // TODO
-        console.warn('Directive DELETE_TOPIC not yet implemented')
+        unsetSelectedObject(dir.arg)
         break
       case "UPDATE_ASSOCIATION":
-        updateSelectedObject(new dm5.Assoc(dir.arg))
+        setSelectedObject(new dm5.Assoc(dir.arg))
         break
       case "DELETE_ASSOCIATION":
-        // TODO
-        console.warn('Directive DELETE_ASSOCIATION not yet implemented')
+        unsetSelectedObject(dir.arg)
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
@@ -110,8 +108,14 @@ export default store
 
 // ---
 
-function updateSelectedObject (topic) {
-  if (state.selectedObject && state.selectedObject.id === topic.id) {
-    state.selectedObject = topic
+function setSelectedObject (object) {
+  if (state.selectedObject && state.selectedObject.id === object.id) {
+    state.selectedObject = object
+  }
+}
+
+function unsetSelectedObject (object) {
+  if (state.selectedObject && state.selectedObject.id === object.id) {
+    state.selectedObject = undefined
   }
 }

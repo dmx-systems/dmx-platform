@@ -157,15 +157,13 @@ const actions = {
         updateTopic(dir.arg, dispatch)
         break
       case "DELETE_TOPIC":
-        // TODO
-        console.warn('Directive DELETE_TOPIC not yet implemented')
+        deleteTopic(dir.arg, dispatch)
         break
       case "UPDATE_ASSOCIATION":
         updateAssoc(dir.arg, dispatch)
         break
       case "DELETE_ASSOCIATION":
-        // TODO
-        console.warn('Directive DELETE_ASSOCIATION not yet implemented')
+        deleteAssoc(dir.arg, dispatch)
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
@@ -203,6 +201,7 @@ export default {
 // ---
 
 // update view model + sync view
+// ### TODO: factor out view sync and move remainder to model.js?
 
 function _revealTopic (topic, pos, select, dispatch) {
   const op = {}
@@ -255,5 +254,21 @@ function updateAssoc (assoc, dispatch) {
   if (_assoc) {
     _assoc.value = assoc.value              // update view model
     dispatch('syncAssocLabel', assoc.id)    // sync view
+  }
+}
+
+function deleteTopic (topic, dispatch) {
+  const _topic = state.topicmap.getTopicIfExists(topic.id)
+  if (_topic) {
+    state.topicmap.removeTopic(topic.id)    // update view model
+    dispatch('syncRemoveTopic', topic.id)   // sync view
+  }
+}
+
+function deleteAssoc (assoc, dispatch) {
+  const _assoc = state.topicmap.getAssocIfExists(assoc.id)
+  if (_assoc) {
+    state.topicmap.removeAssoc(assoc.id)    // update view model
+    dispatch('syncRemoveAssoc', assoc.id)   // sync view
   }
 }
