@@ -12,11 +12,11 @@
     "build": "webpack -p --progress --hide-modules"
   },
   "dependencies": {
-    "dm5": "https://github.com/jri/dm5.git",
-    "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
-    "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
-    "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
-    "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
+    "dm5": "^0.4.0",
+    "dm5-detail-panel": "^0.3.0",
+    "dm5-search-widget": "^0.3.0",
+    "dm5-topicmap-panel": "^0.4.0",
+    "dm5-websocket": "^0.1.0",
     "element-ui": "^1.3.7",
     "font-awesome": "^4.7.0",
     "vue": "^2.3.4",
