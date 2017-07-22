@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Test</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-test</artifactId>
-    <version>4.8.7</version>
+    <version>4.8.8</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-project</artifactId>
-        <version>4.8.7</version>
+        <version>4.8.8</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -21,12 +21,12 @@
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-core</artifactId>
-            <version>4.8.7</version>
+            <version>4.8.8</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.8.7</version>
+            <version>4.8.8</version>
         </dependency>
     </dependencies>
 </project>
