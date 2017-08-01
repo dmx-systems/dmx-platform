@@ -2,16 +2,15 @@ import dm5 from 'dm5'
 
 const state = {
   username: undefined,    // the logged in user (string); falsish if no user is logged in
-  loginDialog: false      // true if the Login dialog is visible
+  visible: false          // Login dialog visibility
 }
 
 const actions = {
 
-  login ({dispatch}, credentials) {
+  login (_, credentials) {
     return dm5.restClient.login(credentials).then(response => {
       const username = credentials.username
       console.log('Login', username)
-      dispatch('closeLoginDialog')
       setUsername(username)
       return true
     }).catch(error => {
@@ -27,11 +26,11 @@ const actions = {
   },
 
   openLoginDialog () {
-    state.loginDialog = true
+    state.visible = true
   },
 
   closeLoginDialog () {
-    state.loginDialog = false
+    state.visible = false
   },
 }
 
