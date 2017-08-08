@@ -13,6 +13,9 @@ const state = {
 
 const actions = {
 
+  // TODO: we need a general approach to unify both situations: when we have the real object at hand,
+  // and when we only have its ID. The same object must not be retrieved twice.
+
   selectTopic (_, id) {
     dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic

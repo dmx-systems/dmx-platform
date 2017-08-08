@@ -58,8 +58,12 @@ button {
 
 /* Element UI */
 
+.el-button--small {
+  padding: 6px 8px;                     /* was 7px 9px */
+}
+
 .el-input__inner {
-  padding: 3px 8px;                     /* was 3px 10px */
+  padding: 5px 8px;                     /* was 3px 10px */
 }
 
 .el-input--small .el-input__inner {

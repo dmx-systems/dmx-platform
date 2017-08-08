@@ -18,6 +18,19 @@ const actions = {
     })
   },
 
+  // TODO: we need a general approach to unify both situations: when we have the real object at hand,
+  // and when we only have its ID. There should be only one "revealTopic" action.
+
+  revealTopicById ({dispatch}, topicId) {
+    dm5.restClient.getTopic(topicId).then(topic => {
+      dispatch('revealTopic', {
+        topic,
+        pos: {x: 100, y: 100},   // TODO
+        select: true
+      })
+    })
+  },
+
   revealTopic ({dispatch}, {topic, pos, select}) {
     // update view model + sync view
     const op = _revealTopic(topic, pos, select, dispatch)
