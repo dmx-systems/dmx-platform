@@ -28,10 +28,10 @@ export default {
 
   computed: {
     visible: {
-      get: function () {
+      get () {
         return this.$store.state.accesscontrol.visible
       },
-      set: function (visible) {
+      set (visible) {
         // console.log('visible setter', visible)   // FIXME: called twice on close
         if (!visible) {
           this.close()

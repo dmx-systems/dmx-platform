@@ -28,6 +28,8 @@
   --main-font-size: 14px;
   --label-font-size: 12px;
   --label-color: #8391a5;
+  --line-height: 1.5em;
+  --paragraph-spacing: 1em;
   --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
   --background-color: #f6f8fb;  /* brigher version of Element UI's table headers (#eef1f6) */
 }
@@ -55,6 +57,14 @@ button {
 }
 
 /* Element UI */
+
+.el-input__inner {
+  padding: 3px 8px;                     /* was 3px 10px */
+}
+
+.el-input--small .el-input__inner {
+  height: 28px;                         /* was 30px */
+}
 
 .el-dialog__title {
   font-size: var(--main-font-size);     /* was 16px */
