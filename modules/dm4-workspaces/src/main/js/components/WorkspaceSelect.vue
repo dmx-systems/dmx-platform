@@ -1,6 +1,6 @@
 <template>
   <div class="workspace-select">
-    <div class="label">Workspace</div>
+    <div class="field-label">Workspace</div>
     <el-select v-model="workspaceId" size="small">
       <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
     </el-select>
@@ -31,8 +31,4 @@ export default {
 </script>
 
 <style>
-.workspace-select .label {
-  font-size: var(--label-font-size);
-  color:     var(--label-color);
-}
 </style>

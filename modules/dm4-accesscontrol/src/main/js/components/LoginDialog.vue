@@ -1,14 +1,16 @@
 <template>
-  <el-dialog :visible.sync="visible" title="Login">
+  <el-dialog custom-class="login-dialog" :visible.sync="visible" size="tiny" title="Login">
     <div>
-      Username
+      <div class="field-label">Username</div>
       <el-input v-model="credentials.username" size="small"></el-input>
-      Password
-      <el-input v-model="credentials.password" size="small"></el-input>
-      <div>{{message}}</div>
     </div>
+    <div class="password-field">
+      <div class="field-label">Password</div>
+      <el-input v-model="credentials.password" size="small"></el-input>
+    </div>
+    <div class="message">{{message}}</div>
     <div slot="footer">
-      <el-button type="primary" @click="login">OK</el-button>
+      <el-button type="primary" size="small" @click="login">OK</el-button>
     </div>
   </el-dialog>
 </template>
@@ -61,4 +63,11 @@ export default {
 </script>
 
 <style>
+.login-dialog .password-field {
+  margin-top: 1em;
+}
+
+.login-dialog .message {
+  margin-top: 1em;
+}
 </style>

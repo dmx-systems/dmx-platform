@@ -56,6 +56,14 @@ button {
   font-size:   var(--main-font-size) !important;   /* fixed size for all el-button sizes */
 }
 
+/* Reusable classes */
+
+.field-label {
+  font-size: var(--label-font-size);
+  color:     var(--label-color);
+  margin-bottom: 0.2em;
+}
+
 /* Element UI */
 
 .el-button--small {

@@ -1,6 +1,6 @@
 <template>
   <div class="topicmap-select">
-    <div class="label">Topicmap</div>
+    <div class="field-label">Topicmap</div>
     <el-select v-model="topicmapId" size="small">
       <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
     </el-select>
@@ -31,8 +31,4 @@ export default {
 </script>
 
 <style>
-.topicmap-select .label {
-  font-size: var(--label-font-size);
-  color:     var(--label-color);
-}
 </style>

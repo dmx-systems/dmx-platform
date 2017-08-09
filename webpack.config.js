@@ -59,6 +59,7 @@ module.exports = (env = {}) => {
       proxy: {
         '/': 'http://localhost:8080'
       },
+      noInfo: true,
       open: true,
       openPage: ''
       // "openPage" is needed due to a bug in webpack-dev-server 2.5.0 (did not occur in 2.4.5)
