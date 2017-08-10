@@ -50,7 +50,7 @@ const actions = {
    * @param   pos   `model` and `render` positions
    */
   onBackgroundRightClick ({dispatch}, pos) {
-    dispatch('openSearchWidget', pos)
+    dispatch('openSearchWidget', {pos})
   },
 
   // WebSocket message processing
