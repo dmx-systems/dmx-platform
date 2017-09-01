@@ -1,5 +1,7 @@
 package de.deepamehta.accesscontrol;
 
+import de.deepamehta.accesscontrol.AuthorizationMethod;
+
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.accesscontrol.Credentials;
@@ -185,4 +187,11 @@ public interface AccessControlService {
     Collection<Association> getAssociationsByCreator(String username);
 
     Collection<Association> getAssociationsByOwner(String username);
+
+
+
+    // === Misc ===
+
+    void registerAuthorizationMethod(String name, AuthorizationMethod am);
+
 }

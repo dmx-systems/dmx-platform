@@ -2,6 +2,8 @@ package de.deepamehta.accesscontrol;
 
 import de.deepamehta.accesscontrol.event.PostLoginUserListener;
 import de.deepamehta.accesscontrol.event.PostLogoutUserListener;
+import de.deepamehta.accesscontrol.AuthorizationMethod;
+
 import de.deepamehta.config.ConfigCustomizer;
 import de.deepamehta.config.ConfigDefinition;
 import de.deepamehta.config.ConfigModificationRole;
@@ -69,6 +71,8 @@ import javax.ws.rs.core.Response.Status;
 
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -150,6 +154,8 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Context
     private HttpServletRequest request;
+
+    private Map<String, AuthorizationMethod> authorizationMethodMap = new HashMap();
 
     private static Logger logger = Logger.getLogger(AccessControlPlugin.class.getName());
 
@@ -407,6 +413,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
+    // === Misc ===
+
+    @Override
+    public void registerAuthorizationMethod(String name, AuthorizationMethod am) {
+        authorizationMethodMap.put(name, am);
+    }
+
+
+
     // ****************************
     // *** Hook Implementations ***
     // ****************************
@@ -585,8 +600,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-
-
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private Topic getUsernameTopicOrThrow(String username) {
@@ -666,9 +679,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         boolean authorized;
         String authHeader = request.getHeader("Authorization");
+        String authMethodName = ""; // TODO
+        AuthorizationMethod acm = null;
+
+        if (authMethodName != "") {
+            acm = authorizationMethodMap.get(authMethodName);
+        }
+
         if (authHeader != null) {
             // Note: if login fails we are NOT authorized, even if no login is required
-            authorized = tryLogin(new Credentials(authHeader), request);
+            authorized = tryLogin(new Credentials(authHeader), request, acm);
         } else {
             authorized = accessFilter.isAnonymousAccessAllowed(request);
         }
@@ -688,9 +708,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      *
      * @return  true if the user has logged in.
      */
-    private boolean tryLogin(Credentials cred, HttpServletRequest request) {
+    private boolean tryLogin(Credentials cred, HttpServletRequest request, AuthorizationMethod acm) {
         String username = cred.username;
-        Topic usernameTopic = checkCredentials(cred);
+        Topic usernameTopic = checkCredentials(cred, acm);
         if (usernameTopic != null && getLoginEnabled(usernameTopic)) {
             logger.info("##### Logging in as \"" + username + "\" => SUCCESSFUL!");
             _login(username, request);
@@ -701,8 +721,12 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         }
     }
 
-    private Topic checkCredentials(Credentials cred) {
-        return dm4.getAccessControl().checkCredentials(cred);
+    private Topic checkCredentials(Credentials cred, AuthorizationMethod acm) {
+        if (acm == null) {
+            return dm4.getAccessControl().checkCredentials(cred);
+        } else {
+            return acm.checkCredentials(cred);
+        }
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
