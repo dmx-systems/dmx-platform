@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "dm5": "^0.4.0",
-    "dm5-detail-panel": "^0.3.0",
-    "dm5-search-widget": "^0.3.0",
+    "dm5-detail-panel": "^0.4.0",
+    "dm5-search-widget": "^0.4.0",
     "dm5-topicmap-panel": "^0.4.0",
     "dm5-websocket": "^0.1.0",
     "element-ui": "^1.4.2",
