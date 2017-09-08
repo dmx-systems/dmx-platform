@@ -17,8 +17,14 @@ export default {
   },
 
   watch: {
-    topicmapId: function (topicmapId) {
-      this.$store.dispatch('renderTopicmap', topicmapId)
+    topicmapId () {
+      this.$router.push({
+        name: 'webclient',
+        params: {
+          topicmapId: this.topicmapId,
+          topicId: 0    // FIXME
+        }
+      })
     }
   },
 

@@ -36,6 +36,18 @@ export default {
     }
   },
 
+  beforeRouteUpdate (to, from, next) {
+    const topicmapId = to.params.topicmapId
+    const oldTopicmapId = from.params.topicmapId
+    console.log('beforeRouteUpdate topicmapId', topicmapId, oldTopicmapId, topicmapId != oldTopicmapId)
+    // Note: path param values read from URL are strings. Path param values set by push() are numbers.
+    // So we do *not* use exact equality (!==) here.
+    if (topicmapId != oldTopicmapId) {
+      this.$store.dispatch('renderTopicmap', topicmapId)
+    }
+    next()
+  },
+
   components: {
     'toolbar':           require('./Toolbar'),
     'dm5-detail-panel':  require('dm5-detail-panel'),
