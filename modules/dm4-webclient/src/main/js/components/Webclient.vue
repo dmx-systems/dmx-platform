@@ -36,16 +36,17 @@ export default {
     }
   },
 
-  beforeRouteUpdate (to, from, next) {
-    const topicmapId = to.params.topicmapId
-    const oldTopicmapId = from.params.topicmapId
-    console.log('beforeRouteUpdate topicmapId', topicmapId, oldTopicmapId, topicmapId != oldTopicmapId)
-    // Note: path param values read from URL are strings. Path param values set by push() are numbers.
-    // So we do *not* use exact equality (!==) here.
-    if (topicmapId != oldTopicmapId) {
-      this.$store.dispatch('renderTopicmap', topicmapId)
+  watch: {
+    $route (to, from) {
+      const topicmapId = to.params.topicmapId
+      const oldTopicmapId = from.params.topicmapId
+      console.log('$route watcher topicmapId', topicmapId, oldTopicmapId, topicmapId != oldTopicmapId)
+      // Note: path param values read from URL are strings. Path param values set by push() are numbers.
+      // So we do *not* use exact equality (!==) here.
+      if (topicmapId != oldTopicmapId) {
+        this.$store.dispatch('renderTopicmap', topicmapId)
+      }
     }
-    next()
   },
 
   components: {
