@@ -10,12 +10,10 @@
 
 <script>
 import dm5 from 'dm5'
-import pluginManager from '../plugin-manager'
 
 export default {
 
   created () {
-    pluginManager.loadPlugins()
     dm5.init(this.$store, this.initWebclientState)
   },
 
