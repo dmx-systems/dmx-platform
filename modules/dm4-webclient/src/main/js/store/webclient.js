@@ -118,13 +118,20 @@ const actions = {
   }
 }
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state,
   actions,
   modules: {
     componentRegistry: require('./modules/component-registry').default
   }
 })
+
+// Note: the dm5 library must be inited *before* the SearchWidget component is created.
+// The SearchWidget relies on dm5's "menuTopicTypes" store getter.
+
+dm5.init(store)
+
+export default store
 
 // ---
 

@@ -18,7 +18,7 @@ export default {
     // 1) the dm5 library is ready (type cache is populated)
     // 2) the topicmap renderer is ready (SVG data is loaded)
     Promise.all([
-      dm5.init(this.$store),
+      dm5.getPromise(),
       // Note: the "initTopicmapRenderer" action is registered by the CytoscapeRenderer's mounted() hook (see comment
       // there). So we must do the dispatching here in the mounted() hook too. (created() would be too early.)
       // CytoscapeRenderer is a child component of Webclient, so the CytoscapeRenderer component is guaranteed to be
