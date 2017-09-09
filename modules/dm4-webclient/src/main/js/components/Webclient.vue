@@ -9,12 +9,14 @@
 </template>
 
 <script>
+import dm5 from 'dm5'
 import pluginManager from '../plugin-manager'
 
 export default {
 
-  mounted () {
+  created () {
     pluginManager.loadPlugins()
+    dm5.init(this.$store, this.initWebclientState)
   },
 
   computed: {
@@ -44,6 +46,16 @@ export default {
       // Note: path param values read from URL are strings. Path param values set by push() are numbers.
       // So we do *not* use exact equality (!==) here.
       if (topicmapId != oldTopicmapId) {
+        this.$store.dispatch('renderTopicmap', topicmapId)
+      }
+    }
+  },
+
+  methods: {
+    initWebclientState () {
+      const topicmapId = this.$route.params.topicmapId
+      console.log('Initial route topicmapId', topicmapId)
+      if (topicmapId) {
         this.$store.dispatch('renderTopicmap', topicmapId)
       }
     }

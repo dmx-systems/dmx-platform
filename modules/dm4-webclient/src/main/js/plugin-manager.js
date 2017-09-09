@@ -10,11 +10,15 @@ export default {
     initPlugin(require('modules/dm4-workspaces/src/main/js/main.js'))
     initPlugin(require('modules/dm4-topicmaps/src/main/js/main.js'))
     initPlugin(require('modules/dm4-accesscontrol/src/main/js/main.js'))
-    //
+    // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
+    // So, they are not init'ed again. ### TODO: explain better
     loadPluginsFromServer()
   }
 }
 
+/**
+ * Registers a plugin's store module (if any) and components (if any).
+ */
 function initPlugin (plugin) {
   // register store modules
   const storeModule = plugin.default.storeModule

@@ -94,17 +94,13 @@ const actions = {
   }
 }
 
-const store = new Vuex.Store({
+export default new Vuex.Store({
   state,
   actions,
   modules: {
     componentRegistry: require('./modules/component-registry').default
   }
 })
-
-dm5.typeCache.init(store)
-
-export default store
 
 // ---
 
