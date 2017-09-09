@@ -5,7 +5,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-  selectedObject: undefined,  // Topic or Assoc or undefined if nothing is selected
+  selectedObject: undefined,  // the Topic/Assoc to display in the detail panel; if undefined the detail panel is empty
   detailPanel: {
     mode: undefined           // 'info' or 'form'
   }
@@ -31,6 +31,7 @@ const actions = {
   },
 
   unselect (_, id) {
+    console.log('unselect', id)
     unsetSelectedObject(id)
   },
 

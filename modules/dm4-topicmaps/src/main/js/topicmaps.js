@@ -1,7 +1,7 @@
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // view model: the rendered topicmap (a Topicmap object)
+  topicmap: undefined,      // the rendered Topicmap
   topicmapTopics: []
 }
 
@@ -9,7 +9,7 @@ const actions = {
 
   renderTopicmap ({dispatch}, id) {
     dm5.restClient.getTopicmap(id).then(topicmap => {
-      // update view model
+      // update state
       state.topicmap = topicmap
       // sync view
       dispatch('syncTopicmap', topicmap)
@@ -32,7 +32,7 @@ const actions = {
   },
 
   revealTopic ({dispatch}, {topic, pos, select}) {
-    // update view model + sync view
+    // update state + sync view
     const op = _revealTopic(topic, pos, select, dispatch)
     // sync clients
     if (op.type === 'add') {
@@ -43,7 +43,7 @@ const actions = {
   },
 
   revealAssoc ({dispatch}, {assoc, select}) {
-    // update view model + sync view
+    // update state + sync view
     const op = _revealAssoc(assoc, select, dispatch)
     // sync clients
     if (op.type === 'add') {
@@ -53,7 +53,7 @@ const actions = {
 
   // TODO: add "select" param?
   revealRelatedTopic ({dispatch}, {relTopic, pos}) {
-    // update view model + sync view
+    // update state + sync view
     const topicOp = _revealTopic(relTopic, pos, true, dispatch)      // select=true
     const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)    // select=false
     // sync clients
@@ -63,7 +63,7 @@ const actions = {
   },
 
   onTopicDragged (_, {id, pos}) {
-    state.topicmap.getTopic(id).setPosition(pos)                                  // update view model
+    state.topicmap.getTopic(id).setPosition(pos)                                  // update state
     // Note: the view is up-to-date already                                       // sync view
     dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)                   // sync clients
   },
@@ -90,23 +90,23 @@ const actions = {
     })
   },
 
-  onHideTopic ({rootState}, id) {
-    state.topicmap.removeAssocs(id)                                       // update view model
+  hideTopic ({dispatch}, id) {
+    state.topicmap.removeAssocs(id)                                       // update state
     state.topicmap.getTopic(id).setVisibility(false)
-    unsetSelectedObject(id, rootState)
+    dispatch('unselect', id)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
   },
 
-  onHideAssoc ({rootState}, id) {
-    state.topicmap.removeAssoc(id)                                        // update view model
-    unsetSelectedObject(id, rootState)
+  hideAssoc ({dispatch}, id) {
+    state.topicmap.removeAssoc(id)                                        // update state
+    dispatch('unselect', id)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
   },
 
-  onDeleteTopic ({dispatch}, id) {
-    state.topicmap.removeAssocs(id)                                       // update view model
+  deleteTopic ({dispatch}, id) {
+    state.topicmap.removeAssocs(id)                                       // update state
     state.topicmap.removeTopic(id)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.deleteTopic(id).then(object => {                       // sync clients
@@ -114,8 +114,8 @@ const actions = {
     })
   },
 
-  onDeleteAssoc ({dispatch}, id) {
-    state.topicmap.removeAssoc(id)                                        // update view model
+  deleteAssoc ({dispatch}, id) {
+    state.topicmap.removeAssoc(id)                                        // update state
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.deleteAssoc(id).then(object => {                       // sync clients
       dispatch('_processDirectives', object.directives)
@@ -126,31 +126,31 @@ const actions = {
 
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))               // update view model
+      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))               // update state
       dispatch('syncAddTopic', viewTopic.id)                              // sync view
     }
   },
 
   _addAssocToTopicmap ({dispatch}, {topicmapId, assoc}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.addAssoc(new dm5.Assoc(assoc))                       // update view model
+      state.topicmap.addAssoc(new dm5.Assoc(assoc))                       // update state
       dispatch('syncAddAssoc', assoc.id)                                  // sync view
     }
   },
 
   _setTopicPosition ({dispatch}, {topicmapId, topicId, pos}) {
     if (topicmapId === state.topicmap.id) {
-      state.topicmap.getTopic(topicId).setPosition(pos)                   // update view model
+      state.topicmap.getTopic(topicId).setPosition(pos)                   // update state
       dispatch('syncTopicPosition', topicId)                              // sync view
     }
   },
 
-  _setTopicVisibility ({dispatch, rootState}, {topicmapId, topicId, visibility}) {
+  _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
     if (topicmapId === state.topicmap.id) {
-      // update view model
+      // update state
       if (!visibility) {
         state.topicmap.removeAssocs(topicId)
-        unsetSelectedObject(topicId, rootState)
+        dispatch('unselect', topicId)
       }
       state.topicmap.getTopic(topicId).setVisibility(visibility)
       // sync view
@@ -158,11 +158,11 @@ const actions = {
     }
   },
 
-  _removeAssocFromTopicmap ({dispatch, rootState}, {topicmapId, assocId}) {
+  _removeAssocFromTopicmap ({dispatch}, {topicmapId, assocId}) {
     if (topicmapId === state.topicmap.id) {
-      // update view model
+      // update state
       state.topicmap.removeAssoc(assocId)
-      unsetSelectedObject(assocId, rootState)
+      dispatch('unselect', assocId)
       // sync view
       dispatch('syncRemoveAssoc', assocId)
     }
@@ -219,15 +219,7 @@ export default {
 
 // ---
 
-// update view model
-
-function unsetSelectedObject (id, rootState) {
-  if (rootState.selectedObject && rootState.selectedObject.id === id) {
-    rootState.selectedObject = undefined
-  }
-}
-
-// update view model + sync view
+// update state + sync view
 // ### TODO: factor out view sync and move remainder to model.js?
 
 function _revealTopic (topic, pos, select, dispatch) {
@@ -239,14 +231,14 @@ function _revealTopic (topic, pos, select, dispatch) {
       'dm4.topicmaps.y': pos.y,
       'dm4.topicmaps.visibility': true,
     }
-    state.topicmap.addTopic(topic.newViewTopic(viewProps))                      // update view model
-    dispatch('syncAddTopic', topic.id)                                          // sync view
+    state.topicmap.addTopic(topic.newViewTopic(viewProps))    // update state
+    dispatch('syncAddTopic', topic.id)                        // sync view
     op.type = 'add'
     op.viewProps = viewProps
   } else {
     if (!viewTopic.isVisible()) {
-      viewTopic.setVisibility(true)                                             // update view model
-      dispatch('syncAddTopic', topic.id)                                        // sync view
+      viewTopic.setVisibility(true)                           // update state
+      dispatch('syncAddTopic', topic.id)                      // sync view
       op.type = 'show'
     }
   }
@@ -258,8 +250,8 @@ function _revealAssoc (assoc, select, dispatch) {
   const op = {}
   const viewAssoc = state.topicmap.getAssocIfExists(assoc.id)
   if (!viewAssoc) {
-    state.topicmap.addAssoc(assoc)                                              // update view model
-    dispatch('syncAddAssoc', assoc.id)                                          // sync view
+    state.topicmap.addAssoc(assoc)                            // update state
+    dispatch('syncAddAssoc', assoc.id)                        // sync view
     op.type = 'add'
   }
   select && dispatch('syncSelect', assoc.id)
@@ -271,7 +263,7 @@ function _revealAssoc (assoc, select, dispatch) {
 function updateTopic (topic, dispatch) {
   const _topic = state.topicmap.getTopicIfExists(topic.id)
   if (_topic) {
-    _topic.value = topic.value              // update view model
+    _topic.value = topic.value              // update state
     dispatch('syncTopicLabel', topic.id)    // sync view
   }
 }
@@ -279,7 +271,7 @@ function updateTopic (topic, dispatch) {
 function updateAssoc (assoc, dispatch) {
   const _assoc = state.topicmap.getAssocIfExists(assoc.id)
   if (_assoc) {
-    _assoc.value = assoc.value              // update view model
+    _assoc.value = assoc.value              // update state
     dispatch('syncAssocLabel', assoc.id)    // sync view
   }
 }
@@ -287,7 +279,7 @@ function updateAssoc (assoc, dispatch) {
 function deleteTopic (topic, dispatch) {
   const _topic = state.topicmap.getTopicIfExists(topic.id)
   if (_topic) {
-    state.topicmap.removeTopic(topic.id)    // update view model
+    state.topicmap.removeTopic(topic.id)    // update state
     dispatch('syncRemoveTopic', topic.id)   // sync view
   }
 }
@@ -295,7 +287,7 @@ function deleteTopic (topic, dispatch) {
 function deleteAssoc (assoc, dispatch) {
   const _assoc = state.topicmap.getAssocIfExists(assoc.id)
   if (_assoc) {
-    state.topicmap.removeAssoc(assoc.id)    // update view model
+    state.topicmap.removeAssoc(assoc.id)    // update state
     dispatch('syncRemoveAssoc', assoc.id)   // sync view
   }
 }
