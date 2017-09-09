@@ -19,10 +19,9 @@ export default {
   watch: {
     topicmapId () {
       this.$router.push({
-        name: 'webclient',
+        name: 'topicmap',
         params: {
-          topicmapId: this.topicmapId,
-          topicId: 0    // FIXME
+          topicmapId: this.topicmapId
         }
       })
     }

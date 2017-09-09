@@ -55,6 +55,13 @@ export default {
       // So we do *not* use exact equality (!==) here.
       if (topicmapId != oldTopicmapId) {
         this.$store.dispatch('renderTopicmap', topicmapId)
+      } else {
+        const topicId = to.params.topicId
+        const oldTopicId = from.params.topicId
+        console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
+        if (topicId != oldTopicId) {
+          this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+        }
       }
     }
   },
@@ -62,9 +69,13 @@ export default {
   methods: {
     initWebclientState () {
       const topicmapId = this.$route.params.topicmapId
-      console.log('Initial route topicmapId', topicmapId)
+      const topicId    = this.$route.params.topicId
+      console.log('Initial route (topicmapId, topicId)', topicmapId, topicId)
       if (topicmapId) {
         this.$store.dispatch('renderTopicmap', topicmapId)
+      }
+      if (topicId) {  // FIXME: 0 is a valid topic ID
+        this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
       }
     }
   },

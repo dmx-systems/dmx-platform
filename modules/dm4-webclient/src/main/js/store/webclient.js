@@ -1,4 +1,5 @@
 import dm5 from 'dm5'
+import router from '../router'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -17,13 +18,26 @@ const actions = {
   // and when we only have its ID. The same object must not be retrieved twice.
 
   selectTopic (_, id) {
+    router.push({
+      name: 'topic',
+      params: {
+        topicId: id
+      }
+    })
+  },
+
+  selectAssoc ({dispatch}, id) {
+    dispatch('fetchAssocAndDisplayInDetailPanel', id)   // TODO: assoc route
+  },
+
+  fetchTopicAndDisplayInDetailPanel (_, id) {
     dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
       state.selectedObject = topic
       state.detailPanel.mode = 'info'
     })
   },
 
-  selectAssoc (_, id) {
+  fetchAssocAndDisplayInDetailPanel (_, id) {
     dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
       state.selectedObject = assoc
       state.detailPanel.mode = 'info'
