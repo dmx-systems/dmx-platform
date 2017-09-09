@@ -60,7 +60,11 @@ export default {
         const oldTopicId = from.params.topicId
         console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
         if (topicId != oldTopicId) {
-          this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+          if (topicId) {  // FIXME: 0 is a valid topic ID
+            this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+          } else {
+            this.$store.dispatch('_unselect')
+          }
         }
       }
     }

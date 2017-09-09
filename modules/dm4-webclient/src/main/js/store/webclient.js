@@ -45,8 +45,17 @@ const actions = {
   },
 
   unselect (_, id) {
-    console.log('unselect', id)
-    unsetSelectedObject(id)
+    console.log('unselect', id, isSelected(id))
+    if (isSelected(id)) {
+      router.push({
+        name: 'topicmap'
+      })
+    }
+  },
+
+  _unselect () {
+    console.log('_unselect')
+    state.selectedObject = undefined
   },
 
   edit () {
@@ -70,21 +79,21 @@ const actions = {
 
   // WebSocket message processing
 
-  _processDirectives (_, directives) {
-    console.log(`Webclient: processing ${directives.length} directives ...`)
+  _processDirectives ({dispatch}, directives) {
+    console.log(`Webclient: processing ${directives.length} directives`)
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
         setSelectedObject(new dm5.Topic(dir.arg))
         break
       case "DELETE_TOPIC":
-        unsetSelectedObject(dir.arg.id)
+        dispatch('unselect', dir.arg.id)
         break
       case "UPDATE_ASSOCIATION":
         setSelectedObject(new dm5.Assoc(dir.arg))
         break
       case "DELETE_ASSOCIATION":
-        unsetSelectedObject(dir.arg.id)
+        dispatch('unselect', dir.arg.id)
         break
       case "UPDATE_TOPIC_TYPE":
         // TODO
@@ -120,13 +129,11 @@ export default new Vuex.Store({
 // ---
 
 function setSelectedObject (object) {
-  if (state.selectedObject && state.selectedObject.id === object.id) {
+  if (isSelected(object.id)) {
     state.selectedObject = object
   }
 }
 
-function unsetSelectedObject (id) {
-  if (state.selectedObject && state.selectedObject.id === id) {
-    state.selectedObject = undefined
-  }
+function isSelected (id) {
+  return state.selectedObject && state.selectedObject.id === id
 }
