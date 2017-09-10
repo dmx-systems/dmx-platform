@@ -19,6 +19,11 @@ export default new VueRouter({
       path: '/topicmap/:topicmapId/topic/:topicId',
       name: 'topic',
       component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId',
+      name: 'assoc',
+      component: Webclient
     }
   ]
 })

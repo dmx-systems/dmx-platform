@@ -55,17 +55,32 @@ export default {
       // So we do *not* use exact equality (!==) here.
       if (topicmapId != oldTopicmapId) {
         this.$store.dispatch('renderTopicmap', topicmapId)
-      } else {
-        const topicId = to.params.topicId
-        const oldTopicId = from.params.topicId
-        console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
-        if (topicId != oldTopicId) {
-          if (topicId) {  // FIXME: 0 is a valid topic ID
-            this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
-          } else {
-            this.$store.dispatch('_unselect')
-          }
+      }
+      //
+      var selected
+      //
+      const topicId = to.params.topicId
+      const oldTopicId = from.params.topicId
+      console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
+      if (topicId != oldTopicId) {
+        if (topicId) {  // FIXME: 0 is a valid topic ID
+          this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+          selected = true
         }
+      }
+      //
+      const assocId = to.params.assocId
+      const oldAssocId = from.params.assocId
+      console.log('$route watcher assocId', assocId, oldAssocId, assocId != oldAssocId)
+      if (assocId != oldAssocId) {
+        if (assocId) {
+          this.$store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
+          selected = true
+        }
+      }
+      //
+      if (!selected) {
+        this.$store.dispatch('_unselect')
       }
     }
   },
@@ -74,12 +89,16 @@ export default {
     initWebclientState () {
       const topicmapId = this.$route.params.topicmapId
       const topicId    = this.$route.params.topicId
-      console.log('Initial route (topicmapId, topicId)', topicmapId, topicId)
+      const assocId    = this.$route.params.assocId
+      console.log('Initial route (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
       if (topicmapId) {
         this.$store.dispatch('renderTopicmap', topicmapId)
       }
       if (topicId) {  // FIXME: 0 is a valid topic ID
         this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+      }
+      if (assocId) {
+        this.$store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
       }
     }
   },
