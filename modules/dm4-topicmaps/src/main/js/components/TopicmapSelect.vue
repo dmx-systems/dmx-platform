@@ -18,12 +18,7 @@ export default {
 
   watch: {
     topicmapId () {
-      this.$router.push({
-        name: 'topicmap',
-        params: {
-          topicmapId: this.topicmapId
-        }
-      })
+      this.$store.dispatch('callTopicmapRoute', this.topicmapId)
     }
   },
 

@@ -21,7 +21,7 @@
     "font-awesome": "^4.7.0",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0",
-    "vuex": "^2.3.1"
+    "vuex": "^2.4.0"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",

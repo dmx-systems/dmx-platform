@@ -1,5 +1,4 @@
 import dm5 from 'dm5'
-import router from '../router'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -14,22 +13,12 @@ const state = {
 
 const actions = {
 
-  selectTopic (_, id) {
-    router.push({
-      name: 'topic',
-      params: {
-        topicId: id
-      }
-    })
+  selectTopic ({dispatch}, id) {
+    dispatch('callTopicRoute', id)
   },
 
-  selectAssoc (_, id) {
-    router.push({
-      name: 'assoc',
-      params: {
-        assocId: id
-      }
-    })
+  selectAssoc ({dispatch}, id) {
+    dispatch('callAssocRoute', id)
   },
 
   // TODO: we need a general approach to unify both situations: when we have the real object at hand,
@@ -49,12 +38,10 @@ const actions = {
     })
   },
 
-  unselect (_, id) {
+  unselect ({dispatch}, id) {
     console.log('unselect', id, isSelected(id))
     if (isSelected(id)) {
-      router.push({
-        name: 'topicmap'
-      })
+      dispatch('stripTopicOrAssocFromRoute')
     }
   },
 
@@ -133,7 +120,6 @@ const store = new Vuex.Store({
 
 // Note: the dm5 library must be inited *before* the SearchWidget component is created.
 // The SearchWidget relies on dm5's "menuTopicTypes" store getter.
-
 dm5.init(store)
 
 export default store

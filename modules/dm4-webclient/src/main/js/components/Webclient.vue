@@ -24,7 +24,9 @@ export default {
       // CytoscapeRenderer is a child component of Webclient, so the CytoscapeRenderer component is guaranteed to be
       // mounted *before* Webclient.
       this.$store.dispatch('initTopicmapRenderer')
-    ]).then(this.initWebclientState)
+    ]).then(() => {
+      this.$store.dispatch('initialNavigation')
+    })
   },
 
   computed: {
@@ -43,63 +45,6 @@ export default {
 
     menuTopicTypes () {
       return this.$store.getters.menuTopicTypes
-    }
-  },
-
-  watch: {
-    $route (to, from) {
-      const topicmapId = to.params.topicmapId
-      const oldTopicmapId = from.params.topicmapId
-      console.log('$route watcher topicmapId', topicmapId, oldTopicmapId, topicmapId != oldTopicmapId)
-      // Note: path param values read from URL are strings. Path param values set by push() are numbers.
-      // So we do *not* use exact equality (!==) here.
-      if (topicmapId != oldTopicmapId) {
-        this.$store.dispatch('renderTopicmap', topicmapId)
-      }
-      //
-      var selected
-      //
-      const topicId = to.params.topicId
-      const oldTopicId = from.params.topicId
-      console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
-      if (topicId != oldTopicId) {
-        if (topicId) {  // FIXME: 0 is a valid topic ID
-          this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
-          selected = true
-        }
-      }
-      //
-      const assocId = to.params.assocId
-      const oldAssocId = from.params.assocId
-      console.log('$route watcher assocId', assocId, oldAssocId, assocId != oldAssocId)
-      if (assocId != oldAssocId) {
-        if (assocId) {
-          this.$store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
-          selected = true
-        }
-      }
-      //
-      if (!selected) {
-        this.$store.dispatch('_unselect')
-      }
-    }
-  },
-
-  methods: {
-    initWebclientState () {
-      const topicmapId = this.$route.params.topicmapId
-      const topicId    = this.$route.params.topicId
-      const assocId    = this.$route.params.assocId
-      console.log('Initial route (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
-      if (topicmapId) {
-        this.$store.dispatch('renderTopicmap', topicmapId)
-      }
-      if (topicId) {  // FIXME: 0 is a valid topic ID
-        this.$store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
-      }
-      if (assocId) {
-        this.$store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
-      }
     }
   },
 
