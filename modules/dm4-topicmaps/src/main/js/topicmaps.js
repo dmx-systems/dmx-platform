@@ -31,6 +31,12 @@ const actions = {
     })
   },
 
+  /**
+   * Reveals a topic on the topicmap panel.
+   *
+   * @param   topic   the topic to reveal (a dm5.Topic object).
+   * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
+   */
   revealTopic ({dispatch}, {topic, pos, select}) {
     // update state + sync view
     const op = _revealTopic(topic, pos, select, dispatch)
@@ -220,39 +226,28 @@ export default {
 // ---
 
 // update state + sync view
-// ### TODO: factor out view sync and move remainder to model.js?
 
+/**
+ * @param   topic   the topic to reveal (a dm5.Topic object).
+ * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
+ */
 function _revealTopic (topic, pos, select, dispatch) {
-  const op = {}
-  const viewTopic = state.topicmap.getTopicIfExists(topic.id)
-  if (!viewTopic) {
-    const viewProps = {
-      'dm4.topicmaps.x': pos.x,
-      'dm4.topicmaps.y': pos.y,
-      'dm4.topicmaps.visibility': true,
-    }
-    state.topicmap.addTopic(topic.newViewTopic(viewProps))    // update state
-    dispatch('syncAddTopic', topic.id)                        // sync view
-    op.type = 'add'
-    op.viewProps = viewProps
-  } else {
-    if (!viewTopic.isVisible()) {
-      viewTopic.setVisibility(true)                           // update state
-      dispatch('syncAddTopic', topic.id)                      // sync view
-      op.type = 'show'
-    }
+  // update state
+  const op = state.topicmap.revealTopic(topic, pos)
+  // sync view
+  if (op.type === 'add' || op.type === 'show') {
+    dispatch('syncAddTopic', topic.id)
   }
   select && dispatch('syncSelect', topic.id)
   return op
 }
 
 function _revealAssoc (assoc, select, dispatch) {
-  const op = {}
-  const viewAssoc = state.topicmap.getAssocIfExists(assoc.id)
-  if (!viewAssoc) {
-    state.topicmap.addAssoc(assoc)                            // update state
-    dispatch('syncAddAssoc', assoc.id)                        // sync view
-    op.type = 'add'
+  // update state
+  const op = state.topicmap.revealAssoc(assoc)
+  // sync view
+  if (op.type === 'add') {
+    dispatch('syncAddAssoc', assoc.id)
   }
   select && dispatch('syncSelect', assoc.id)
   return op

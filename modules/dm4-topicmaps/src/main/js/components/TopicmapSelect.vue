@@ -3,7 +3,7 @@
     <div class="field-label">Topicmap</div>
     <el-select v-model="topicmapId" size="small">
       <el-option v-for="topic in topicmapTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
-    </el-select>
+    </el-select><el-button size="small" @click="revealTopicmap">T</el-button>
   </div>
 </template>
 
@@ -25,6 +25,12 @@ export default {
   computed: {
     topicmapTopics () {
       return this.$store.state.topicmaps.topicmapTopics
+    }
+  },
+
+  methods: {
+    revealTopicmap () {
+      this.$store.dispatch('revealTopicById', this.topicmapId)
     }
   }
 }
