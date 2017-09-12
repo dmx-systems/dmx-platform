@@ -3,6 +3,7 @@ import App from './components/App'
 import store from './store/webclient'
 import router from './router'
 import pluginManager from './plugin-manager'
+import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
