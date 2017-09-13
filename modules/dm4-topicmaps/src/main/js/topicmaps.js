@@ -1,18 +1,22 @@
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // the rendered Topicmap
+  topicmap: undefined,      // the displayed topicmap (a dm5.Topicmap object)
   topicmapTopics: []
 }
 
 const actions = {
 
   renderTopicmap ({dispatch}, id) {
-    dm5.restClient.getTopicmap(id).then(topicmap => {
-      // update state
+    dispatch('fetchTopicmap', id).then(topicmap => {    // update state
+      dispatch('syncTopicmap', topicmap)                // sync view
+    })
+  },
+
+  fetchTopicmap ({dispatch}, id) {
+    return dm5.restClient.getTopicmap(id).then(topicmap => {
       state.topicmap = topicmap
-      // sync view
-      dispatch('syncTopicmap', topicmap)
+      return topicmap
     }).catch(error => {
       console.error(error)
     })
