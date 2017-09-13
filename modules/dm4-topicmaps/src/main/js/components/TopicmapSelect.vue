@@ -10,19 +10,22 @@
 <script>
 export default {
 
-  data () {
-    return {
-      topicmapId: undefined
-    }
-  },
-
-  watch: {
-    topicmapId () {
-      this.$store.dispatch('callTopicmapRoute', this.topicmapId)
-    }
-  },
-
   computed: {
+
+    topicmap () {
+      return this.$store.state.topicmaps.topicmap
+    },
+
+    topicmapId: {
+      get () {
+        // Note: in the moment the Webclient components are mounted no topicmap is loaded yet
+        return this.topicmap && this.topicmap.id
+      },
+      set (topicmapId) {
+        this.$store.dispatch('callTopicmapRoute', topicmapId)
+      }
+    },
+
     topicmapTopics () {
       return this.$store.state.topicmaps.topicmapTopics
     }
