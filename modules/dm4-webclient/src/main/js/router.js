@@ -85,10 +85,10 @@ store.registerModule('routerModule', {
 store.watch(
   state => state.routerModule.router.currentRoute,
   (to, from) => {
-    console.log('### Store route watcher', to, from, isInitialNavigation)
     if (isInitialNavigation) {
       isInitialNavigation = false
     } else {
+      console.log('### Route watcher', to, from)
       navigate(to, from)
     }
   }
@@ -98,15 +98,15 @@ function initialNavigation (route) {
   const topicmapId = route.params.topicmapId
   const topicId    = route.params.topicId
   const assocId    = route.params.assocId
-  console.log('Initial route (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
+  console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
   if (topicmapId) {
     store.dispatch('renderTopicmap', topicmapId)
   }
   if (topicId) {  // FIXME: 0 is a valid topic ID
-    store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+    store.dispatch('fetchTopic', topicId)
   }
   if (assocId) {
-    store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
+    store.dispatch('fetchAssoc', assocId)
   }
 }
 
@@ -127,7 +127,7 @@ function navigate (to, from) {
   console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
   if (topicId != oldTopicId) {
     if (topicId) {  // FIXME: 0 is a valid topic ID
-      store.dispatch('fetchTopicAndDisplayInDetailPanel', topicId)
+      store.dispatch('fetchTopic', topicId)
       selected = true
     }
   }
@@ -137,7 +137,7 @@ function navigate (to, from) {
   console.log('$route watcher assocId', assocId, oldAssocId, assocId != oldAssocId)
   if (assocId != oldAssocId) {
     if (assocId) {
-      store.dispatch('fetchAssocAndDisplayInDetailPanel', assocId)
+      store.dispatch('fetchAssoc', assocId)
       selected = true
     }
   }

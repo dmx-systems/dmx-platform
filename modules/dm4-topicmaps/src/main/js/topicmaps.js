@@ -1,7 +1,7 @@
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // the rendered Topicmap
+  topicmap: undefined,      // the displayed topicmap (a dm5.Topicmap object)
   topicmapTopics: []
 }
 

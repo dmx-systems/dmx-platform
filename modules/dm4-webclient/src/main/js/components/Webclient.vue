@@ -14,17 +14,14 @@ import dm5 from 'dm5'
 export default {
 
   mounted () {
-    // Before the initial topicmap can be rendered 2 promises must be fullfilled:
-    // 1) the dm5 library is ready (type cache is populated)
-    // 2) the topicmap renderer is ready (SVG data is loaded)
-    Promise.all([
-      dm5.getPromise(),
-      // Note: the "initTopicmapRenderer" action is registered by the CytoscapeRenderer's mounted() hook (see comment
-      // there). So we must do the dispatching here in the mounted() hook too. (created() would be too early.)
-      // CytoscapeRenderer is a child component of Webclient, so the CytoscapeRenderer component is guaranteed to be
-      // mounted *before* Webclient.
-      this.$store.dispatch('initTopicmapRenderer')
-    ]).then(() => {
+    // Note 1: both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
+    // The type cache must be ready *before* "initialNavigation" is dispatched.
+    //
+    // Note 2: "initialNavigation" dispatches "renderTopicmap" which dispatches "syncTopicmap".
+    // The "syncTopicmap" action is registered by the CytoscapeRenderer's mounted() hook (see comment there).
+    // So we must do the dispatching here in the mounted() hook too. (created() might be too early.)
+    // As CytoscapeRenderer is a child component of Webclient it is guaranteed to be mounted *before* Webclient.
+    dm5.ready().then(() => {
       this.$store.dispatch('initialNavigation')
     })
   },
