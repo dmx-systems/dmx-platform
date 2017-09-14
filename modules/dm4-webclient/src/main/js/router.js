@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Webclient from './components/Webclient'
 import store from './store/webclient'
+import dm5 from 'dm5'
 
 Vue.use(VueRouter)
 
@@ -95,15 +96,24 @@ store.watch(
 )
 
 function initialNavigation (route) {
-  const topicmapId = route.params.topicmapId
-  const topicId    = route.params.topicId
-  const assocId    = route.params.assocId
+  var topicmapId = route.params.topicmapId
+  const topicId  = route.params.topicId
+  const assocId  = route.params.assocId
   console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
   if (topicmapId) {
-    store.dispatch('renderTopicmap', topicmapId)
-  }
-  if (topicId) {  // FIXME: 0 is a valid topic ID
-    store.dispatch('fetchTopic', topicId)
+    store.dispatch('fetchTopicmap', topicmapId)
+    if (topicId) {  // FIXME: 0 is a valid topic ID
+      store.dispatch('fetchTopic', topicId)
+    }
+    if (assocId) {
+      store.dispatch('fetchAssoc', assocId)
+    }
+  } else {
+    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')
+    if (topicmapId) {
+      console.log(`Selecting topicmap ${topicmapId} (ID obtained from cookie)`)
+      store.dispatch('callTopicmapRoute', topicmapId)
+    }
   }
   if (assocId) {
     store.dispatch('fetchAssoc', assocId)
@@ -117,7 +127,7 @@ function navigate (to, from) {
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
-    store.dispatch('renderTopicmap', topicmapId)
+    store.dispatch('fetchTopicmap', topicmapId)
   }
   //
   var selected

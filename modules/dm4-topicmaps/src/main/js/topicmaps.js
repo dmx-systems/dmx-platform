@@ -7,10 +7,11 @@ const state = {
 
 const actions = {
 
-  renderTopicmap ({dispatch}, id) {
+  fetchTopicmap ({dispatch}, id) {
     dm5.restClient.getTopicmap(id).then(topicmap => {
       // update state
       state.topicmap = topicmap
+      dm5.utils.setCookie('dm4_topicmap_id', topicmap.id)
       // sync view
       dispatch('syncTopicmap', topicmap)
     }).catch(error => {

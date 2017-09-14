@@ -12,10 +12,6 @@ export default {
 
   computed: {
 
-    topicmap () {
-      return this.$store.state.topicmaps.topicmap
-    },
-
     topicmapId: {
       get () {
         // Note: in the moment the Webclient components are mounted no topicmap is loaded yet
@@ -24,6 +20,10 @@ export default {
       set (topicmapId) {
         this.$store.dispatch('callTopicmapRoute', topicmapId)
       }
+    },
+
+    topicmap () {
+      return this.$store.state.topicmaps.topicmap
     },
 
     topicmapTopics () {
