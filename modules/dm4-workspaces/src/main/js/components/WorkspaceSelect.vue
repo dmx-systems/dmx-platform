@@ -10,19 +10,17 @@
 <script>
 export default {
 
-  data () {
-    return {
-      workspaceId: undefined
-    }
-  },
-
-  watch: {
-    workspaceId: function () {
-      this.$store.dispatch('selectWorkspace', this.workspaceId)
-    }
-  },
-
   computed: {
+
+    workspaceId: {
+      get () {
+        return this.$store.state.workspaces.workspaceId
+      },
+      set (workspaceId) {
+        this.$store.dispatch('selectWorkspace', workspaceId)
+      }
+    },
+
     workspaceTopics () {
       return this.$store.state.workspaces.workspaceTopics
     }

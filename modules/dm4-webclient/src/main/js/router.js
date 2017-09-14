@@ -115,8 +115,12 @@ function initialNavigation (route) {
       store.dispatch('callTopicmapRoute', topicmapId)
     }
   }
-  if (assocId) {
-    store.dispatch('fetchAssoc', assocId)
+  // select workspace
+  if (topicmapId) {
+    dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
+      console.log(`Topicmap ${topicmapId} is assigned to workspace`, workspace.id)
+      store.dispatch('selectWorkspace', workspace.id)
+    })
   }
 }
 
