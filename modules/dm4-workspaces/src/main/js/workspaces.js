@@ -1,5 +1,7 @@
 import dm5 from 'dm5'
 
+console.log('### Loading Workspaces store module')
+
 const state = {
   workspaceId: undefined,       // ID of selected workspace (number)
   workspaceTopics: undefined    // all readable workspace topics (array of dm5.Topic)
@@ -16,6 +18,7 @@ const actions = {
 
 // init state
 dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
+  console.log('### Workspace topics ready!')
   state.workspaceTopics = topics
 })
 

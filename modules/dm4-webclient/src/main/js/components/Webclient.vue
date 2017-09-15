@@ -21,6 +21,8 @@ export default {
     // The "syncTopicmap" action is registered by the CytoscapeRenderer's mounted() hook (see comment there).
     // So we must do the dispatching here in the mounted() hook too. (created() might be too early.)
     // As CytoscapeRenderer is a child component of Webclient it is guaranteed to be mounted *before* Webclient.
+    //
+    // TODO: wait for workspaces topics to be loaded (see workspaces.js)
     dm5.ready().then(() => {
       this.$store.dispatch('initialNavigation')
     })

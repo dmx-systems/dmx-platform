@@ -138,8 +138,11 @@ const actions = {
 
   //
 
+  /**
+   * When a workspace is selected an appropriate topicmap must be selected as well.
+   */
   workspaceSelected ({dispatch}, workspaceId) {
-    var p
+    var p   // the topicmap to select (a Promise for a topicmapId)
     const topicmapTopics = state.topicmapTopics[workspaceId]
     if (!topicmapTopics) {
       console.log('Loading topicmap topics for workspace', workspaceId)

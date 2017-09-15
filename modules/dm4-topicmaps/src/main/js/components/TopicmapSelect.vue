@@ -12,11 +12,11 @@ import dm5 from 'dm5'
 
 export default {
 
+  // TODO: let the Workspaces module register this watcher
   created () {
     this.$store.watch(
       state => state.workspaces.workspaceId,
       workspaceId => {
-        console.log('workspaceSelected', workspaceId, dm5.utils.getCookie('dm4_workspace_id'))
         this.$store.dispatch('workspaceSelected', workspaceId)
       }
     )

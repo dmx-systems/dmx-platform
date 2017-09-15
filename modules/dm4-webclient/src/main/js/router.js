@@ -103,7 +103,7 @@ function initialNavigation (route) {
   // select topicmap
   if (topicmapId) {
     store.dispatch('fetchTopicmap', topicmapId)
-    if (topicId) {  // FIXME: 0 is a valid topic ID
+    if (topicId) {                                          // FIXME: 0 is a valid topic ID
       store.dispatch('fetchTopic', topicId)
     }
     if (assocId) {
@@ -115,16 +115,23 @@ function initialNavigation (route) {
       console.log('Selecting topicmap', topicmapId, '(ID obtained from cookie)')
       store.dispatch('callTopicmapRoute', topicmapId)
     } else {
-      console.log('TODO')
+      console.log('No topicmap cookie present')
     }
   }
   // select workspace
+  var p
   if (topicmapId) {
-    dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
+    p = dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      store.dispatch('selectWorkspace', workspace.id)
+      return workspace.id
     })
+  } else {
+    const workspaceId = store.state.workspaces.workspaceTopics[0].id
+    p = Promise.resolve(workspaceId)
   }
+  p.then(workspaceId => {
+    store.dispatch('selectWorkspace', workspaceId)
+  })
 }
 
 function navigate (to, from) {
