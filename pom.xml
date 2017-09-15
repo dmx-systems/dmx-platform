@@ -351,6 +351,24 @@
                 <module>modules/dm4-distribution</module>
                 <module>modules/dm4-features</module>
             </modules>
+            <build>
+                <plugins>
+                    <!-- Before building the distro (with "mvn clean install -P all,dist") we remove the node_modules
+                         directory in order to force the nightly build to include the "dm5" node module snapshots. -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.4.1</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>node_modules</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
         <profile>
