@@ -1,8 +1,15 @@
+import Vue from 'vue'
 import dm5 from 'dm5'
 
 const state = {
-  topicmap: undefined,      // the displayed topicmap (a dm5.Topicmap object)
-  topicmapTopics: []
+  topicmap: undefined,        // the displayed topicmap (a dm5.Topicmap object)
+  topicmapTopics: {}          // Loaded topicmap topics, grouped by workspace, an object:
+                              //   {
+                              //     workspaceId: {
+                              //       topics: [topicmapTopic]     # array of dm5.Topic
+                              //       selectedId: topicmapId
+                              //     }
+                              //   }
 }
 
 const actions = {
@@ -129,6 +136,31 @@ const actions = {
     })
   },
 
+  //
+
+  workspaceSelected ({dispatch}, workspaceId) {
+    var p
+    const topicmapTopics = state.topicmapTopics[workspaceId]
+    if (!topicmapTopics) {
+      console.log('Loading topicmap topics for workspace', workspaceId)
+      p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
+        console.log('### Topicmap topics ready!', topics.length)              // includeChilds=true
+        const topicmapId = topics[0].id
+        Vue.set(state.topicmapTopics, workspaceId, {
+          topics,
+          selectedId: topicmapId
+        })
+        return topicmapId
+      })
+    } else {
+      const topicmapId = topicmapTopics.selectedId
+      p = Promise.resolve(topicmapId)
+    }
+    p.then(topicmapId => {
+      dispatch('callTopicmapRoute', topicmapId)
+    })
+  },
+
   // WebSocket message processing
 
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
@@ -213,11 +245,6 @@ const actions = {
     })
   }
 }
-
-// init state
-dm5.restClient.getTopicsByType('dm4.topicmaps.topicmap').then(topics => {
-  state.topicmapTopics = topics
-})
 
 export default {
   state,

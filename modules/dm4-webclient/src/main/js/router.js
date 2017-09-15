@@ -96,10 +96,11 @@ store.watch(
 )
 
 function initialNavigation (route) {
-  var topicmapId = route.params.topicmapId
+  var topicmapId = route.params.topicmapId                  // FIXME: convert to number?
   const topicId  = route.params.topicId
   const assocId  = route.params.assocId
   console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
+  // select topicmap
   if (topicmapId) {
     store.dispatch('fetchTopicmap', topicmapId)
     if (topicId) {  // FIXME: 0 is a valid topic ID
@@ -109,16 +110,18 @@ function initialNavigation (route) {
       store.dispatch('fetchAssoc', assocId)
     }
   } else {
-    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')
+    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
     if (topicmapId) {
-      console.log(`Selecting topicmap ${topicmapId} (ID obtained from cookie)`)
+      console.log('Selecting topicmap', topicmapId, '(ID obtained from cookie)')
       store.dispatch('callTopicmapRoute', topicmapId)
+    } else {
+      console.log('TODO')
     }
   }
   // select workspace
   if (topicmapId) {
     dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
-      console.log(`Topicmap ${topicmapId} is assigned to workspace`, workspace.id)
+      console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       store.dispatch('selectWorkspace', workspace.id)
     })
   }
