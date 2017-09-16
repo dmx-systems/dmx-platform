@@ -3,26 +3,33 @@ import dm5 from 'dm5'
 
 const state = {
   topicmap: undefined,        // the displayed topicmap (a dm5.Topicmap object)
-  topicmapTopics: {}          // Loaded topicmap topics, grouped by workspace, an object:
+
+  topicmapTopics: {},         // Loaded topicmap topics, grouped by workspace ID:
                               //   {
                               //     workspaceId: {
-                              //       topics: [topicmapTopic]     # array of dm5.Topic
+                              //       topics: [topicmapTopic]    # array of dm5.Topic
                               //       selectedId: topicmapId
                               //     }
                               //   }
+
+  topicmapCache: {}           // Loaded topicmaps, hashed by ID:
+                              //   {
+                              //     topicmapId: Topicmap         # a dm5.Topicmap
+                              //   }
+                              // Note: the topicmap cache is not actually reactive state.
+                              // TODO: move it to a local variable?
 }
 
 const actions = {
 
-  fetchTopicmap ({dispatch}, id) {
-    dm5.restClient.getTopicmap(id).then(topicmap => {
+  displayTopicmap ({dispatch}, id) {
+    console.log('Displaying topicmap', id)
+    getTopicmap(id).then(topicmap => {
       // update state
       state.topicmap = topicmap
       dm5.utils.setCookie('dm4_topicmap_id', topicmap.id)
       // sync view
       dispatch('syncTopicmap', topicmap)
-    }).catch(error => {
-      console.error(error)
     })
   },
 
@@ -255,6 +262,25 @@ export default {
 }
 
 // ---
+
+// Topicmap Cache
+
+function getTopicmap (id) {
+  const topicmap = state.topicmapCache[id]
+  var p   // a promise for a topicmap
+  if (topicmap) {
+    p = Promise.resolve(topicmap)
+  } else {
+    console.log('Fetching topicmap', id)
+    p = dm5.restClient.getTopicmap(id).then(topicmap => {
+      state.topicmapCache[id] = topicmap
+      return topicmap
+    }).catch(error => {
+      console.error(error)
+    })
+  }
+  return p
+}
 
 // update state + sync view
 

@@ -102,7 +102,7 @@ function initialNavigation (route) {
   console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
   // select topicmap
   if (topicmapId) {
-    store.dispatch('fetchTopicmap', topicmapId)
+    store.dispatch('displayTopicmap', topicmapId)
     if (topicId) {                                          // FIXME: 0 is a valid topic ID
       store.dispatch('fetchTopic', topicId)
     }
@@ -141,7 +141,7 @@ function navigate (to, from) {
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
-    store.dispatch('fetchTopicmap', topicmapId)
+    store.dispatch('displayTopicmap', topicmapId)
   }
   //
   var selected
