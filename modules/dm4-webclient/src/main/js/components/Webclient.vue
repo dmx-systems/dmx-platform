@@ -3,7 +3,7 @@
     <component v-for="comp in components" :is="comp" :key="comp._dm5_id">
       <toolbar slot="dm5-topicmap-panel"></toolbar>
     </component>
-    <dm5-detail-panel :object="object" :mode="mode"></dm5-detail-panel>
+    <dm5-detail-panel></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -30,16 +30,8 @@ export default {
 
   computed: {
 
-    object () {
-      return this.$store.state.selectedObject
-    },
-
-    mode () {
-      return this.$store.state.detailPanel.mode
-    },
-
     components () {
-      return this.$store.state.componentRegistry.components['dm5.webclient']
+      return this.$store.state.components['dm5.webclient']
     },
 
     menuTopicTypes () {

@@ -8,7 +8,7 @@
 export default {
   computed: {
     components () {
-      return this.$store.state.componentRegistry.components['dm5.webclient.toolbar']
+      return this.$store.state.components['dm5.webclient.toolbar']
     }
   }
 }

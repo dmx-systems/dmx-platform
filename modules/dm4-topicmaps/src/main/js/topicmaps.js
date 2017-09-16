@@ -2,6 +2,7 @@ import Vue from 'vue'
 import dm5 from 'dm5'
 
 const state = {
+
   topicmap: undefined,        // the displayed topicmap (a dm5.Topicmap object)
 
   topicmapTopics: {},         // Loaded topicmap topics, grouped by workspace ID:
@@ -31,6 +32,14 @@ const actions = {
       // sync view
       dispatch('syncTopicmap', topicmap)
     })
+  },
+
+  selectTopic ({dispatch}, id) {
+    dispatch('callTopicRoute', id)
+  },
+
+  selectAssoc ({dispatch}, id) {
+    dispatch('callAssocRoute', id)
   },
 
   // TODO: we need a general approach to unify both situations: when we have the real object at hand,
@@ -109,6 +118,13 @@ const actions = {
     }).catch(error => {
       console.error(error)
     })
+  },
+
+  /**
+   * @param   pos   `model` and `render` positions
+   */
+  onBackgroundRightClick ({dispatch}, pos) {
+    dispatch('openSearchWidget', {pos})
   },
 
   hideTopic ({dispatch}, id) {

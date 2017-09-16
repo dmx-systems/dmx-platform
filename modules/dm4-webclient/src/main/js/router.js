@@ -104,10 +104,10 @@ function initialNavigation (route) {
   if (topicmapId) {
     store.dispatch('displayTopicmap', topicmapId)
     if (topicId) {                                          // FIXME: 0 is a valid topic ID
-      store.dispatch('fetchTopic', topicId)
+      fetchTopic(topicId)
     }
     if (assocId) {
-      store.dispatch('fetchAssoc', assocId)
+      fetchAssoc(assocId)
     }
   } else {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
@@ -151,7 +151,7 @@ function navigate (to, from) {
   console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
   if (topicId != oldTopicId) {
     if (topicId) {  // FIXME: 0 is a valid topic ID
-      store.dispatch('fetchTopic', topicId)
+      fetchTopic(topicId)
       selected = true
     }
   }
@@ -161,12 +161,26 @@ function navigate (to, from) {
   console.log('$route watcher assocId', assocId, oldAssocId, assocId != oldAssocId)
   if (assocId != oldAssocId) {
     if (assocId) {
-      store.dispatch('fetchAssoc', assocId)
+      fetchAssoc(assocId)
       selected = true
     }
   }
   //
   if (!selected) {
-    store.dispatch('_unselect')
+    store.dispatch('emptyDisplay')
   }
+}
+
+// ---
+
+function fetchTopic (id) {
+  dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
+    store.dispatch('displayTopic', topic)
+  })
+}
+
+function fetchAssoc (id) {
+  dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
+    store.dispatch('displayAssoc', assoc)
+  })
 }
