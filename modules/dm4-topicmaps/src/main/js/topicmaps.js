@@ -167,10 +167,10 @@ const actions = {
   workspaceSelected ({dispatch}, workspaceId) {
     var p   // the topicmap to select (a Promise for a topicmapId)
     const topicmapTopics = state.topicmapTopics[workspaceId]
-    if (!topicmapTopics) {
-      p = dispatch('fetchTopicmapTopics', workspaceId)
-    } else {
+    if (topicmapTopics) {
       p = Promise.resolve(topicmapTopics.selectedId)
+    } else {
+      p = dispatch('fetchTopicmapTopics', workspaceId)
     }
     p.then(topicmapId => {
       dispatch('callTopicmapRoute', topicmapId)

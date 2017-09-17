@@ -132,6 +132,7 @@ function initialNavigation (route) {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       // Note: the workspace watcher is registered *after* workspace selection.
       // Otherwise the topicmaps module would react and do an unwanted route push.
+      // In this case we must fetch the topicmap topics ourselves.
       store.dispatch('selectWorkspace', workspace.id)
       store.dispatch('fetchTopicmapTopics', workspace.id)
       registerWorkspaceWatcher()
@@ -140,7 +141,7 @@ function initialNavigation (route) {
   } else {
     const workspace = store.state.workspaces.workspaceTopics[0]
     // Note: the workspace watcher is registered *before* workspace selection.
-    // The topicmaps module reacts and pushes the initial route.
+    // The topicmaps module reacts, fetches the topicmap topics, and pushes the initial route.
     registerWorkspaceWatcher()
     store.dispatch('selectWorkspace', workspace.id)
     console.log('### Initial navigation complete!')
