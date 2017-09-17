@@ -12,16 +12,6 @@ import dm5 from 'dm5'
 
 export default {
 
-  // TODO: let the Workspaces module register this watcher
-  created () {
-    this.$store.watch(
-      state => state.workspaces.workspaceId,
-      workspaceId => {
-        this.$store.dispatch('workspaceSelected', workspaceId)
-      }
-    )
-  },
-
   computed: {
 
     topicmapId: {

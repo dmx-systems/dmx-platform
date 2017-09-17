@@ -98,14 +98,17 @@ store.watch(
   }
 )
 
+/**
+ * Selects the intial topicmap and workspace, and pushes the initial route if needed.
+ */
 function initialNavigation (route) {
   var topicmapId = route.params.topicmapId                  // FIXME: convert to number?
   const topicId  = route.params.topicId
   const assocId  = route.params.assocId
   console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
-  // select topicmap
+  // 1) select topicmap
   if (topicmapId) {
-    store.dispatch('displayTopicmap', topicmapId)
+    store.dispatch('displayTopicmap', topicmapId)           // just display topicmap, no route push
     if (topicId) {                                          // FIXME: 0 is a valid topic ID
       fetchTopic(topicId)
     }
@@ -116,31 +119,37 @@ function initialNavigation (route) {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
     if (topicmapId) {
       console.log('Selecting topicmap', topicmapId, '(ID obtained from cookie)')
-      store.dispatch('callTopicmapRoute', topicmapId)
+      store.dispatch('callTopicmapRoute', topicmapId)       // push initial route
     } else {
       console.log('No topicmap cookie present')
     }
   }
-  // select workspace
-  var p
+  // 2) select workspace
+  // Note: at this stage a topicmap ID might or might not known. If *known* (either obtained from URL or from cookie)
+  // the route is already up-to-date, no (further) push required. If *not* known the route still needs to be pushed.
   if (topicmapId) {
-    p = dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
+    dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      return workspace.id
+      // Note: the workspace watcher is registered *after* workspace selection.
+      // Otherwise the topicmaps module would react and do an unwanted route push.
+      store.dispatch('selectWorkspace', workspace.id)
+      store.dispatch('fetchTopicmapTopics', workspace.id)
+      registerWorkspaceWatcher()
+      console.log('### Initial navigation complete!')
     })
   } else {
-    const workspaceId = store.state.workspaces.workspaceTopics[0].id
-    p = Promise.resolve(workspaceId)
+    const workspace = store.state.workspaces.workspaceTopics[0]
+    // Note: the workspace watcher is registered *before* workspace selection.
+    // The topicmaps module reacts and pushes the initial route.
+    registerWorkspaceWatcher()
+    store.dispatch('selectWorkspace', workspace.id)
+    console.log('### Initial navigation complete!')
   }
-  p.then(workspaceId => {
-    store.dispatch('selectWorkspace', workspaceId)
-  })
 }
 
 function navigate (to, from) {
   const topicmapId = to.params.topicmapId
   const oldTopicmapId = from.params.topicmapId
-  console.log('$route watcher topicmapId', topicmapId, oldTopicmapId, topicmapId != oldTopicmapId)
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
@@ -151,7 +160,6 @@ function navigate (to, from) {
   //
   const topicId = to.params.topicId
   const oldTopicId = from.params.topicId
-  console.log('$route watcher topicId', topicId, oldTopicId, topicId != oldTopicId)
   if (topicId != oldTopicId) {
     if (topicId) {  // FIXME: 0 is a valid topic ID
       fetchTopic(topicId)
@@ -161,7 +169,6 @@ function navigate (to, from) {
   //
   const assocId = to.params.assocId
   const oldAssocId = from.params.assocId
-  console.log('$route watcher assocId', assocId, oldAssocId, assocId != oldAssocId)
   if (assocId != oldAssocId) {
     if (assocId) {
       fetchAssoc(assocId)
@@ -172,6 +179,18 @@ function navigate (to, from) {
   if (!selected) {
     store.dispatch('emptyDisplay')
   }
+}
+
+// ---
+
+function registerWorkspaceWatcher () {
+  store.watch(
+    state => state.workspaces.workspaceId,
+    workspaceId => {
+      console.log('### Workspace ID watcher', workspaceId)
+      store.dispatch('workspaceSelected', workspaceId)
+    }
+  )
 }
 
 // ---

@@ -162,28 +162,31 @@ const actions = {
   //
 
   /**
-   * When a workspace is selected an appropriate topicmap must be selected as well.
+   * Selects a topicmap once a workspace is selected.
    */
   workspaceSelected ({dispatch}, workspaceId) {
     var p   // the topicmap to select (a Promise for a topicmapId)
     const topicmapTopics = state.topicmapTopics[workspaceId]
     if (!topicmapTopics) {
-      console.log('Loading topicmap topics for workspace', workspaceId)
-      p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
-        console.log('### Topicmap topics ready!', topics.length)              // includeChilds=true
-        const topicmapId = topics[0].id
-        Vue.set(state.topicmapTopics, workspaceId, {
-          topics,
-          selectedId: topicmapId
-        })
-        return topicmapId
-      })
+      p = dispatch('fetchTopicmapTopics', workspaceId)
     } else {
-      const topicmapId = topicmapTopics.selectedId
-      p = Promise.resolve(topicmapId)
+      p = Promise.resolve(topicmapTopics.selectedId)
     }
     p.then(topicmapId => {
       dispatch('callTopicmapRoute', topicmapId)
+    })
+  },
+
+  fetchTopicmapTopics (_, workspaceId) {
+    console.log('Fetching topicmap topics for workspace', workspaceId)
+    return dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
+      // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
+      const topicmapId = topics[0].id
+      Vue.set(state.topicmapTopics, workspaceId, {
+        topics,
+        selectedId: topicmapId
+      })
+      return topicmapId
     })
   },
 
