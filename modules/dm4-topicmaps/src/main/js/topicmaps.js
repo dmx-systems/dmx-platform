@@ -130,14 +130,14 @@ const actions = {
   hideTopic ({dispatch}, id) {
     state.topicmap.removeAssocs(id)                                       // update state
     state.topicmap.getTopic(id).setVisibility(false)
-    dispatch('unselect', id)
+    dispatch('unselectIf', id)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
   },
 
   hideAssoc ({dispatch}, id) {
     state.topicmap.removeAssoc(id)                                        // update state
-    dispatch('unselect', id)
+    dispatch('unselectIf', id)
     // Note: the view is up-to-date already                               // sync view
     dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
   },
@@ -215,7 +215,7 @@ const actions = {
       // update state
       if (!visibility) {
         state.topicmap.removeAssocs(topicId)
-        dispatch('unselect', topicId)
+        dispatch('unselectIf', topicId)
       }
       state.topicmap.getTopic(topicId).setVisibility(visibility)
       // sync view
@@ -227,7 +227,7 @@ const actions = {
     if (topicmapId === state.topicmap.id) {
       // update state
       state.topicmap.removeAssoc(assocId)
-      dispatch('unselect', assocId)
+      dispatch('unselectIf', assocId)
       // sync view
       dispatch('syncRemoveAssoc', assocId)
     }

@@ -75,10 +75,13 @@ store.registerModule('routerModule', {
       })
     },
 
-    stripTopicOrAssocFromRoute () {
-      router.push({
-        name: 'topicmap'
-      })
+    unselectIf (_, id) {
+      console.log('unselectIf', id, isSelected(id))
+      if (isSelected(id)) {
+        router.push({
+          name: 'topicmap'
+        })
+      }
     }
   }
 })
@@ -183,4 +186,11 @@ function fetchAssoc (id) {
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
     store.dispatch('displayAssoc', assoc)
   })
+}
+
+// ---
+
+function isSelected (id) {
+  const object = store.state.detailPanel.object
+  return object && object.id === id
 }
