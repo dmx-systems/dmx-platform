@@ -75,13 +75,10 @@ store.registerModule('routerModule', {
       })
     },
 
-    unselectIf (_, id) {
-      console.log('unselectIf', id, isSelected(id))
-      if (isSelected(id)) {
-        router.push({
-          name: 'topicmap'
-        })
-      }
+    stripSelectionFromRoute () {
+      router.push({
+        name: 'topicmap'
+      })
     }
   }
 })
@@ -198,19 +195,12 @@ function registerWorkspaceWatcher () {
 
 function fetchTopic (id) {
   dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
-    store.dispatch('displayTopic', topic)
+    store.dispatch('displayObject', topic)
   })
 }
 
 function fetchAssoc (id) {
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
-    store.dispatch('displayAssoc', assoc)
+    store.dispatch('displayObject', assoc)
   })
-}
-
-// ---
-
-function isSelected (id) {
-  const object = store.state.detailPanel.object
-  return object && object.id === id
 }
