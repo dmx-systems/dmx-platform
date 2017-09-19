@@ -4,7 +4,7 @@
       <toolbar slot="dm5-topicmap-panel"></toolbar>
     </component>
     <dm5-detail-panel></dm5-detail-panel>
-    <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
+    <dm5-search-widget :menu-topic-types="menuTopicTypes" :extra-menu-items="extraMenuItems"></dm5-search-widget>
   </div>
 </template>
 
@@ -28,6 +28,24 @@ export default {
     Promise.all([p1, p2]).then(() => {
       this.$store.dispatch('initialNavigation')
     })
+  },
+
+  data () {
+    return {
+      extraMenuItems: [
+        {
+          uri: 'dm4.topicmaps.topicmap',
+          label: 'Topicmap',
+          create: name => {
+            this.$store.dispatch('createTopicmap', name)
+          }
+        },
+        {
+          uri: 'dm4.workspaces.workspace',
+          label: 'Workspace'
+        }
+      ]
+    }
   },
 
   computed: {

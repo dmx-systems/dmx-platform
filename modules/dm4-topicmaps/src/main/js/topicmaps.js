@@ -23,6 +23,18 @@ const state = {
 
 const actions = {
 
+  createTopicmap ({rootState, dispatch}, name) {
+    console.log('Creating topicmap', name)
+    dm5.restClient.createTopicmap(name,
+      'dm4.webclient.default_topicmap_renderer',  // TODO
+      false                                       // TODO
+    ).then(topic => {
+      console.log('Topicmap topic', topic)
+      state.topicmapTopics[rootState.workspaces.workspaceId].topics.push(topic)
+      dispatch('callTopicmapRoute', topic.id)
+    })
+  },
+
   displayTopicmap ({dispatch}, id) {
     console.log('Displaying topicmap', id)
     getTopicmap(id).then(topicmap => {
