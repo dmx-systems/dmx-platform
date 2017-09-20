@@ -3,15 +3,26 @@ import dm5 from 'dm5'
 
 const state = {
 
-  topicmap: undefined,        // the displayed topicmap (a dm5.Topicmap object)
+  topicmapId: undefined,      // ID of the displayed topicmap (master state).
 
-  topicmapTopics: {},         // Loaded topicmap topics, grouped by workspace ID:
+  topicmap: undefined,        // The displayed topicmap (derived state) (a dm5.Topicmap object)
+
+  topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
                               //     workspaceId: {
                               //       topics: [topicmapTopic]    # array of dm5.Topic
                               //       selectedId: topicmapId
                               //     }
                               //   }
+
+  selections: {},             // Per-topicmap selection entries, hashed by topicmap ID:
+                              //   {
+                              //     topicmapId: {
+                              //       type: "topic"|"assoc"
+                              //       id: topicId|assocId
+                              //     }
+                              //   }
+                              // Topicmaps with no selection have no selection entry.
 
   topicmapCache: {}           // Loaded topicmaps, hashed by ID:
                               //   {
@@ -31,19 +42,40 @@ const actions = {
     ).then(topic => {
       console.log('Topicmap topic', topic)
       state.topicmapTopics[rootState.workspaces.workspaceId].topics.push(topic)
-      dispatch('callTopicmapRoute', topic.id)
+      dispatch('selectTopicmap', topic.id)
     })
   },
 
-  displayTopicmap ({dispatch}, id) {
+  displayTopicmap (_, id) {
     console.log('Displaying topicmap', id)
+    // update state
+    state.topicmapId = id
+    dm5.utils.setCookie('dm4_topicmap_id', id)
+  },
+
+  getTopicmap ({dispatch}, id) {
     getTopicmap(id).then(topicmap => {
       // update state
       state.topicmap = topicmap
-      dm5.utils.setCookie('dm4_topicmap_id', topicmap.id)
       // sync view
       dispatch('syncTopicmap', topicmap)
     })
+  },
+
+  selectTopicmap ({dispatch}, id) {
+    const selection = state.selections[id]
+    if (selection) {
+      const type = selection.type
+      dispatch('callRoute', {
+        name: type,
+        params: {
+          topicmapId: id,
+          [`${type}Id`]: selection.id
+        }
+      })
+    } else {
+      dispatch('callTopicmapRoute', id)
+    }
   },
 
   selectTopic ({dispatch}, id) {
@@ -52,6 +84,34 @@ const actions = {
 
   selectAssoc ({dispatch}, id) {
     dispatch('callAssocRoute', id)
+  },
+
+  setTopicSelection (_, id) {
+    if (!state.topicmapId) {
+      throw Error('state.topicmapId is not set')
+    }
+    state.selections[state.topicmapId] = {
+      type: 'topic',
+      id
+    }
+  },
+
+  setAssocSelection (_, id) {
+    if (!state.topicmapId) {
+      throw Error('state.topicmapId is not set')
+    }
+    state.selections[state.topicmapId] = {
+      type: 'assoc',
+      id
+    }
+  },
+
+  unsetSelection () {
+    if (!state.topicmapId) {
+      throw Error('state.topicmapId is not set')
+    }
+    console.log('Unsetting selection of topicmap', state.topicmapId)
+    delete state.selections[state.topicmapId]
   },
 
   // TODO: we need a general approach to unify both situations: when we have the real object at hand,
@@ -185,7 +245,7 @@ const actions = {
       p = dispatch('fetchTopicmapTopics', workspaceId)
     }
     p.then(topicmapId => {
-      dispatch('callTopicmapRoute', topicmapId)
+      dispatch('selectTopicmap', topicmapId)
     })
   },
 
@@ -297,20 +357,28 @@ export default {
 // Topicmap Cache
 
 function getTopicmap (id) {
-  const topicmap = state.topicmapCache[id]
-  var p   // a promise for a topicmap
+  var p   // a promise for a dm5.Topicmap
+  const topicmap = getCachedTopicmap(id)
   if (topicmap) {
     p = Promise.resolve(topicmap)
   } else {
     console.log('Fetching topicmap', id)
     p = dm5.restClient.getTopicmap(id).then(topicmap => {
-      state.topicmapCache[id] = topicmap
+      cacheTopicmap(topicmap)
       return topicmap
     }).catch(error => {
       console.error(error)
     })
   }
   return p
+}
+
+function getCachedTopicmap (id) {
+  return state.topicmapCache[id]
+}
+
+function cacheTopicmap (topicmap) {
+  state.topicmapCache[topicmap.id] = topicmap
 }
 
 // update state + sync view

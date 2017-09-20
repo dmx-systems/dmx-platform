@@ -1,3 +1,6 @@
+/**
+ * Syncs the route with the store.
+ */
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Webclient from './components/Webclient'
@@ -46,6 +49,10 @@ store.registerModule('routerModule', {
 
     initialNavigation () {
       initialNavigation(router.currentRoute)
+    },
+
+    callRoute (_, location) {
+      router.push(location)
     },
 
     callTopicmapRoute (_, id) {
@@ -116,7 +123,7 @@ function initialNavigation (route) {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
     if (topicmapId) {
       console.log('Selecting topicmap', topicmapId, '(ID obtained from cookie)')
-      store.dispatch('callTopicmapRoute', topicmapId)       // push initial route
+      store.dispatch('selectTopicmap', topicmapId)          // push initial route
     } else {
       console.log('No topicmap cookie present')
     }
@@ -176,6 +183,7 @@ function navigate (to, from) {
   //
   if (!selected) {
     store.dispatch('emptyDisplay')
+    store.dispatch('unsetSelection')
   }
 }
 
@@ -196,11 +204,13 @@ function registerWorkspaceWatcher () {
 function fetchTopic (id) {
   dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
     store.dispatch('displayObject', topic)
+    store.dispatch('setTopicSelection', id)
   })
 }
 
 function fetchAssoc (id) {
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
     store.dispatch('displayObject', assoc)
+    store.dispatch('setAssocSelection', id)
   })
 }

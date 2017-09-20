@@ -12,6 +12,16 @@ import dm5 from 'dm5'
 
 export default {
 
+  created () {
+    this.$store.watch(
+      state => state.topicmaps.topicmapId,
+      id => {
+        console.log('### Topicmap ID watcher', id)
+        this.$store.dispatch('getTopicmap', id)
+      }
+    )
+  },
+
   computed: {
 
     topicmapId: {
@@ -19,8 +29,8 @@ export default {
         // Note: in the moment the Webclient components are mounted no topicmap is loaded yet
         return this.topicmap && this.topicmap.id
       },
-      set (topicmapId) {
-        this.$store.dispatch('callTopicmapRoute', topicmapId)
+      set (id) {
+        this.$store.dispatch('selectTopicmap', id)
       }
     },
 
