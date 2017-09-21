@@ -1,16 +1,18 @@
 package de.deepamehta.ldap;
 
+
 import de.deepamehta.accesscontrol.AuthorizationMethod;
 import de.deepamehta.accesscontrol.AccessControlService;
 
 import de.deepamehta.core.service.accesscontrol.Credentials;
-import de.deepamehta.core.Topic;
+import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
+import de.deepamehta.core.Topic;
 
-import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -21,10 +23,14 @@ import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 import javax.naming.ldap.Control;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.Hashtable;
 
-import de.deepamehta.core.service.CoreService;
 
 public class LDAP extends PluginActivator implements AuthorizationMethod {
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -51,19 +57,13 @@ public class LDAP extends PluginActivator implements AuthorizationMethod {
 
 
     public Topic checkCredentials(Credentials cred) {
-        System.out.println("------ LDAP.checkCredentials ------");
-        System.out.println(cred.username);
-        System.out.println(cred.plaintextPassword);
         if (checkLdapCredentials(cred.username, cred.plaintextPassword)) {
-            System.out.println("LDAP login: OK");
+            logger.info("LDAP login: OK");
             Topic usernameTopic = acs.getUsernameTopic(cred.username);
-            System.out.println("Got Topic");
             if (usernameTopic != null) {
-                System.out.println("return existing Topic");
                 return usernameTopic;
             } else {
-                System.out.println("create Topic");
-                return acs.createUserAccount(cred);
+                return createUserAccount(cred);
             }
         } else {
             return null;
@@ -71,6 +71,20 @@ public class LDAP extends PluginActivator implements AuthorizationMethod {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private Topic createUserAccount (Credentials cred) {
+        DeepaMehtaTransaction tx = dm4.beginTx();
+        try {
+            Topic usernameTopic = acs.createUserAccount(cred);
+            tx.success();
+            return usernameTopic;
+        } catch (Exception e) {
+            logger.warning("ROLLBACK! (" + this + ")");
+            throw new RuntimeException("Creating user account failed", e);
+        } finally {
+            tx.finish();
+        }
+    }
 
     private boolean checkLdapCredentials (String username, String password) {
         try {
