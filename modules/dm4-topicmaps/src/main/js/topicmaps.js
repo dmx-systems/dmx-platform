@@ -58,10 +58,10 @@ const actions = {
       // update state
       state.topicmap = topicmap
       // sync view
-      const ready = dispatch('syncTopicmap', topicmap)
+      const renderTopicmap = dispatch('syncTopicmap', topicmap)
       const selection = state.selections[id]
       if (selection) {
-        ready.then(() => {
+        renderTopicmap.then(() => {
           dispatch('syncSelect', selection.id)
         })
       }
@@ -102,10 +102,7 @@ const actions = {
     }
     console.log('Setting topic selection of topicmap', state.topicmapId, 'to', id)
     // update state
-    state.selections[state.topicmapId] = {
-      type: 'topic',
-      id
-    }
+    state.selections[state.topicmapId] = {type: 'topic', id}
     // sync view
     dispatch('syncSelect', id)
   },
@@ -116,21 +113,20 @@ const actions = {
     }
     console.log('Setting assoc selection of topicmap', state.topicmapId, 'to', id)
     // update state
-    state.selections[state.topicmapId] = {
-      type: 'assoc',
-      id
-    }
+    state.selections[state.topicmapId] = {type: 'assoc', id}
     // sync view
     dispatch('syncSelect', id)
   },
 
-  unsetSelection () {
+  unsetSelection ({dispatch}) {
     if (!state.topicmapId) {
       throw Error('state.topicmapId is not set')
     }
     console.log('Unsetting selection of topicmap', state.topicmapId)
     // update state
     delete state.selections[state.topicmapId]
+    // sync view
+    dispatch('syncUnselect')
   },
 
   // TODO: we need a general approach to unify both situations: when we have the real object at hand,
