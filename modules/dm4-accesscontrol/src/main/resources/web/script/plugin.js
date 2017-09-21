@@ -62,6 +62,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/object/" + object_id + "/modifier",
             undefined, undefined, undefined, "text")
     }
+    dm4c.restc.get_methods = function() {
+        return this.request("GET", "/accesscontrol/methods")
+    }
 
 
 
@@ -70,7 +73,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.add_listener("init", function() {
 
         var login_widget
-
+        var authmethods = dm4c.restc.get_methods();
+        console.log(authmethods);
+        
         create_login_widget()
 
         function create_login_widget() {
@@ -129,10 +134,20 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
 
         function do_open_login_dialog() {
+            var authmethod_dropdown = dm4c.ui.menu(do_select_topicmap)
+            var authmethod_value = "Basic";
+            if (authmethods.length > 0) {
+                authmethod_dropdown.add_item({label:"Basic"})
+                authmethods.map(function(item){
+                    authmethod_dropdown.add_item({label:item})
+                })
+            }
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
-            var dialog_content = dm4c.render.label("Username").add(username_input)
+            var dialog_content = dm4c.render.label("Username")
+                .add(authmethod_dropdown.dom)
+                .add(username_input)
                 .add(dm4c.render.label("Password")).add(password_input)
                 .add(message_div)
             // Note: as of jQuery 1.9 you can't add objects to a disconnected (not in a document)
@@ -149,6 +164,11 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 password_input.focus()
                 return false    // stop propagation to prevent the dialog from invoking the button handler
             })
+
+            function do_select_topicmap(e) {
+                authmethod_value = e.label;
+                console.log ("do_select_topicmap", e)
+            }
 
             function do_try_login() {
                 try {
@@ -167,7 +187,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                  * Returns value for the "Authorization" header.
                  */
                 function authorization() {
-                    return "Basic " + btoa(username + ":" + password)   // ### FIXME: btoa() might not work in IE
+                    return authmethod_value + " " + btoa(username + ":" + password)   // ### FIXME: btoa() might not work in IE
                 }
             }
 
