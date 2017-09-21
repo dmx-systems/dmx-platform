@@ -21,6 +21,8 @@ public class Credentials {
 
     public String username;
     public String password;     // encoded
+    public String plaintextPassword;
+    public String methodName;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -30,6 +32,8 @@ public class Credentials {
     public Credentials(String username, String password) {
         this.username = username;
         this.password = encodePassword(password);
+        this.plaintextPassword = password;
+        this.methodName = "";
     }
 
     /**
@@ -42,19 +46,28 @@ public class Credentials {
         try {
             this.username = cred.getString("username");
             this.password = cred.getString("password");
+            this.plaintextPassword = ""; // TODO
+            this.methodName = "";
         } catch (Exception e) {
             throw new IllegalArgumentException("Illegal JSON argument " + cred, e);
         }
     }
 
     public Credentials(String authHeader) {
-        authHeader = authHeader.substring("Basic ".length());
-        String[] values = new String(Base64.base64Decode(authHeader)).split(":");
-        // Note: values.length is 0 if neither a username nor a password is entered
-        //       values.length is 1 if no password is entered
-        this.username = values.length > 0 ? values[0] : "";
-        this.password = encodePassword(values.length > 1 ? values[1] : "");
-        // Note: credentials obtained through Basic authorization are always plain text
+        String[] splitted = authHeader.split("\\s+");
+        if (splitted.length < 2) { // != 2 ?
+            throw new IllegalArgumentException("Illegal AuthHeader argument " + authHeader);
+        }
+        String method = splitted[0];
+
+        String userAndPasswordString = splitted[1];
+        String[] userAndPasswordArray = new String(Base64.base64Decode(userAndPasswordString)).split(":");
+        String username = userAndPasswordArray.length > 0 ? userAndPasswordArray[0] : "";
+        String password = (userAndPasswordArray.length > 1 ? userAndPasswordArray[1] : "");
+        this.username = username;
+        this.password = encodePassword(password);
+        this.plaintextPassword = password;
+        this.methodName = method;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

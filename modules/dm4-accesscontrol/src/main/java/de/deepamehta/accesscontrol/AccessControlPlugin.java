@@ -51,6 +51,7 @@ import de.deepamehta.core.util.JavaUtils;
 
 // ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.core.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,6 +74,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -413,11 +415,18 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // === Misc ===
+    // === Authorization Methods ===
 
     @Override
     public void registerAuthorizationMethod(String name, AuthorizationMethod am) {
         authorizationMethodMap.put(name, am);
+    }
+
+    @GET
+    @Path("/methods")
+    @Override
+    public Set<String> getAuthorizationMethods() {
+        return authorizationMethodMap.keySet();
     }
 
 
@@ -679,16 +688,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         //
         boolean authorized;
         String authHeader = request.getHeader("Authorization");
-        String authMethodName = ""; // TODO
-        AuthorizationMethod acm = null;
-
-        if (authMethodName != "") {
-            acm = authorizationMethodMap.get(authMethodName);
-        }
 
         if (authHeader != null) {
+            Credentials cred = new Credentials(authHeader);
+            AuthorizationMethod acm = null;
+            if (cred.methodName != "Basic") {
+                acm = authorizationMethodMap.get(cred.methodName);
+                System.out.println("authMethodName != Basic");
+            }
             // Note: if login fails we are NOT authorized, even if no login is required
-            authorized = tryLogin(new Credentials(authHeader), request, acm);
+            authorized = tryLogin(cred, request, acm);
         } else {
             authorized = accessFilter.isAnonymousAccessAllowed(request);
         }

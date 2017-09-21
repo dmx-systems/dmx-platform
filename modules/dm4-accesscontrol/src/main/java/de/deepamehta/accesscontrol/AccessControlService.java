@@ -9,6 +9,7 @@ import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 
@@ -190,8 +191,10 @@ public interface AccessControlService {
 
 
 
-    // === Misc ===
+    // === Access Control Methods ===
 
     void registerAuthorizationMethod(String name, AuthorizationMethod am);
 
+    Set<String> getAuthorizationMethods();
+    
 }
