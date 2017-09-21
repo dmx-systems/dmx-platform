@@ -145,8 +145,8 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
-            var dialog_content = dm4c.render.label("Username")
-                .add(authmethod_dropdown.dom)
+            var dialog_content = authmethod_dropdown.dom
+                .add(dm4c.render.label("Username"))
                 .add(username_input)
                 .add(dm4c.render.label("Password")).add(password_input)
                 .add(message_div)
