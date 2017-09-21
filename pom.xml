@@ -87,6 +87,14 @@
         <dm4.workspaces.public.enabled>true</dm4.workspaces.public.enabled>
         <dm4.workspaces.common.enabled>true</dm4.workspaces.common.enabled>
 
+        <dm4.ldap.server>127.0.0.1</dm4.ldap.server>
+        <dm4.ldap.port>10389</dm4.ldap.port>
+        <dm4.ldap.manager>uid=admin,ou=system</dm4.ldap.manager>
+        <dm4.ldap.password>secret</dm4.ldap.password>
+        <dm4.ldap.user_base>ou=users,o=mojo</dm4.ldap.user_base>
+        <dm4.ldap.user_attribute>uid</dm4.ldap.user_attribute>
+        <dm4.ldap.filter></dm4.ldap.filter>
+
         <!-- File Repository -->
         <dm4.filerepo.path>/</dm4.filerepo.path>
         <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>

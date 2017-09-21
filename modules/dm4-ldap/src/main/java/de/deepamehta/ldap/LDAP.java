@@ -31,6 +31,13 @@ import java.util.Hashtable;
 public class LDAP extends PluginActivator implements AuthorizationMethod {
 
     private Logger logger = Logger.getLogger(getClass().getName());
+    private static final String LDAP_SERVER = System.getProperty("dm4.ldap.server", "127.0.0.1");
+    private static final String LDAP_PORT = System.getProperty("dm4.ldap.port", "389");
+    private static final String LDAP_MANAGER = System.getProperty("dm4.ldap.manager", "");
+    private static final String LDAP_PASSWORD = System.getProperty("dm4.ldap.password", "");
+    private static final String LDAP_USER_BASE = System.getProperty("dm4.ldap.user_base", "");
+    private static final String LDAP_USER_ATTRIBUTE = System.getProperty("dm4.ldap.user_attribute", "");
+    private static final String LDAP_FILTER = System.getProperty("dm4.ldap.filter", "");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -88,15 +95,11 @@ public class LDAP extends PluginActivator implements AuthorizationMethod {
 
     private boolean checkLdapCredentials (String username, String password) {
         try {
-            final String server = "ldap://127.0.0.1:10389";
-            final String adminUsername = "uid=admin,ou=system";
-            final String adminPassword = "secret";
-            final String searchBase = "ou=users,o=mojo";
-            LdapContext ctx = connect(server, adminUsername, adminPassword);
-            String cn = lookupUserCn(ctx, searchBase, username);
+            final String server = "ldap://" + LDAP_SERVER + ":" + LDAP_PORT;
+            LdapContext ctx = connect(server, LDAP_MANAGER, LDAP_PASSWORD);
+            String cn = lookupUserCn(ctx, LDAP_USER_BASE, username);
             LdapContext ctx2 = connect(server, cn, password);
             return ctx2 != null;
-
         } catch (Exception e) {
 
         }
