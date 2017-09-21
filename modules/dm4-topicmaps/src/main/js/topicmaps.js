@@ -58,7 +58,13 @@ const actions = {
       // update state
       state.topicmap = topicmap
       // sync view
-      dispatch('syncTopicmap', topicmap)
+      const ready = dispatch('syncTopicmap', topicmap)
+      const selection = state.selections[id]
+      if (selection) {
+        ready.then(() => {
+          dispatch('syncSelect', selection.id)
+        })
+      }
     })
   },
 
@@ -86,24 +92,36 @@ const actions = {
     dispatch('callAssocRoute', id)
   },
 
-  setTopicSelection (_, id) {
+  onBackgroundClick ({dispatch}) {
+    dispatch('stripSelectionFromRoute')
+  },
+
+  setTopicSelection ({dispatch}, id) {
     if (!state.topicmapId) {
       throw Error('state.topicmapId is not set')
     }
+    console.log('Setting topic selection of topicmap', state.topicmapId, 'to', id)
+    // update state
     state.selections[state.topicmapId] = {
       type: 'topic',
       id
     }
+    // sync view
+    dispatch('syncSelect', id)
   },
 
-  setAssocSelection (_, id) {
+  setAssocSelection ({dispatch}, id) {
     if (!state.topicmapId) {
       throw Error('state.topicmapId is not set')
     }
+    console.log('Setting assoc selection of topicmap', state.topicmapId, 'to', id)
+    // update state
     state.selections[state.topicmapId] = {
       type: 'assoc',
       id
     }
+    // sync view
+    dispatch('syncSelect', id)
   },
 
   unsetSelection () {
@@ -111,6 +129,7 @@ const actions = {
       throw Error('state.topicmapId is not set')
     }
     console.log('Unsetting selection of topicmap', state.topicmapId)
+    // update state
     delete state.selections[state.topicmapId]
   },
 
@@ -386,6 +405,7 @@ function cacheTopicmap (topicmap) {
 /**
  * @param   topic   the topic to reveal (a dm5.Topic object).
  * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
+ * @paran   select  if true the revealed topic is selected programmatically.
  */
 function _revealTopic (topic, pos, select, dispatch) {
   // update state
@@ -394,7 +414,7 @@ function _revealTopic (topic, pos, select, dispatch) {
   if (op.type === 'add' || op.type === 'show') {
     dispatch('syncAddTopic', topic.id)
   }
-  select && dispatch('syncSelect', topic.id)
+  select && dispatch('selectTopic', topic.id)
   return op
 }
 
@@ -405,7 +425,7 @@ function _revealAssoc (assoc, select, dispatch) {
   if (op.type === 'add') {
     dispatch('syncAddAssoc', assoc.id)
   }
-  select && dispatch('syncSelect', assoc.id)
+  select && dispatch('selectAssoc', assoc.id)
   return op
 }
 
