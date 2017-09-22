@@ -195,6 +195,8 @@ public interface AccessControlService {
 
     void registerAuthorizationMethod(String name, AuthorizationMethod am);
 
+    void unregisterAuthorizationMethod(String name);
+
     Set<String> getAuthorizationMethods();
     
 }

@@ -419,7 +419,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void registerAuthorizationMethod(String name, AuthorizationMethod am) {
+        if (authorizationMethodMap.containsKey(name)) {
+            throw new RuntimeException("AuthorizationMethod \"" + name + "\" already exists");
+        }
         authorizationMethodMap.put(name, am);
+    }
+
+    @Override
+    public void unregisterAuthorizationMethod(String name) {
+        authorizationMethodMap.remove(name);
     }
 
     @GET
