@@ -132,22 +132,15 @@ function initialNavigation (route) {
   // Note: at this stage a topicmap ID might or might not known. If *known* (either obtained from URL or from cookie)
   // the route is already up-to-date, no (further) push required. If *not* known the route still needs to be pushed.
   if (topicmapId) {
-    dm5.restClient.getAssignedWorkspace(topicmapId).then(workspace => {
+    getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      // Note: the workspace watcher is registered *after* workspace selection.
-      // Otherwise the topicmaps module would react and do an unwanted route push.
-      // In this case we must fetch the topicmap topics ourselves.
-      store.dispatch('selectWorkspace', workspace.id)
-      store.dispatch('fetchTopicmapTopics', workspace.id)
-      registerWorkspaceWatcher()
+      store.dispatch('setWorkspaceId', workspace.id)        // no route push
+      store.dispatch('fetchTopicmapTopics', workspace.id)   // fetch data for topicmap selector
       console.log('### Initial navigation complete!')
     })
   } else {
     const workspace = store.state.workspaces.workspaceTopics[0]
-    // Note: the workspace watcher is registered *before* workspace selection.
-    // The topicmaps module reacts, fetches the topicmap topics, and pushes the initial route.
-    registerWorkspaceWatcher()
-    store.dispatch('selectWorkspace', workspace.id)
+    store.dispatch('selectWorkspace', workspace.id)         // push initial route (indirectly)
     console.log('### Initial navigation complete!')
   }
 }
@@ -159,6 +152,10 @@ function navigate (to, from) {
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
     store.dispatch('displayTopicmap', topicmapId)
+    //
+    getAssignedWorkspace(topicmapId).then(workspace => {
+      store.dispatch('setWorkspaceId', workspace.id)
+    })
   }
   //
   var selected
@@ -189,15 +186,7 @@ function navigate (to, from) {
 
 // ---
 
-function registerWorkspaceWatcher () {
-  store.watch(
-    state => state.workspaces.workspaceId,
-    workspaceId => {
-      console.log('### Workspace ID watcher', workspaceId)
-      store.dispatch('workspaceSelected', workspaceId)
-    }
-  )
-}
+const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
 
 // ---
 

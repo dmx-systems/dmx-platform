@@ -9,8 +9,14 @@ const state = {
 
 const actions = {
 
-  selectWorkspace (_, id) {
+  selectWorkspace ({dispatch}, id) {
     console.log('Selecting workspace', id)
+    dispatch('setWorkspaceId', id)
+    dispatch('selectTopicmapForWorkspace', id)
+  },
+
+  setWorkspaceId (_, id) {
+    console.log('setWorkspaceId', id)
     // update state
     state.workspaceId = id
     dm5.utils.setCookie('dm4_workspace_id', id)

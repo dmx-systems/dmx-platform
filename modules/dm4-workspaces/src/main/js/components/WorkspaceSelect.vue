@@ -16,8 +16,8 @@ export default {
       get () {
         return this.$store.state.workspaces.workspaceId
       },
-      set (workspaceId) {
-        this.$store.dispatch('selectWorkspace', workspaceId)
+      set (id) {
+        this.$store.dispatch('selectWorkspace', id)
       }
     },
 
