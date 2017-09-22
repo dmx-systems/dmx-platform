@@ -301,7 +301,7 @@
                 <module>modules/dm4-config</module>
                 <module>modules/dm4-storage-neo4j</module>
                 <module>modules/dm4-box-renderer-dom</module>
-                <module>modules/dm4-ldap</module>
+                <module>modules-external/dm4-ldap</module>
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
