@@ -329,7 +329,7 @@ const actions = {
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateTopic(dir.arg, dispatch)
+        updateTopic(dir.arg, dispatch)    // FIXME: construct dm5.Topic?
         break
       case "DELETE_TOPIC":
         deleteTopic(dir.arg, dispatch)
@@ -429,11 +429,17 @@ function _revealAssoc (assoc, select, dispatch) {
 // Process Directives
 
 function updateTopic (topic, dispatch) {
+  // console.log('updateTopic', topic)
+  // update topicmap
   const _topic = state.topicmap.getTopicIfExists(topic.id)
   if (_topic) {
     _topic.value = topic.value              // update state
     dispatch('syncTopicLabel', topic.id)    // sync view
   }
+  // update topicmap topics
+  findTopicmapTopic(topic.id, (topics, i) => {
+    Vue.set(topics, i, topic)
+  })
 }
 
 function updateAssoc (assoc, dispatch) {
@@ -457,5 +463,17 @@ function deleteAssoc (assoc, dispatch) {
   if (_assoc) {
     state.topicmap.removeAssoc(assoc.id)    // update state
     dispatch('syncRemoveAssoc', assoc.id)   // sync view
+  }
+}
+
+// Helper
+
+function findTopicmapTopic (id, callback) {
+  for (const {topics} of Object.values(state.topicmapTopics)) {
+    let i = topics.findIndex(topic => topic.id === id)
+    if (i !== -1) {
+      callback(topics, i)
+      break
+    }
   }
 }
