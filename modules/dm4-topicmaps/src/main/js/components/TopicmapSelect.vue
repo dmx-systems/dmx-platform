@@ -45,8 +45,7 @@ export default {
     topics () {
       // Note 1: while initial rendering no workspace is selected yet
       // Note 2: when the workspace is switched its topicmap topics might not yet loaded
-      const topicmapTopics = this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
-      return topicmapTopics && topicmapTopics.topics
+      return this.$store.state.topicmaps.topicmapTopics[this.workspaceId]
     }
   },
 

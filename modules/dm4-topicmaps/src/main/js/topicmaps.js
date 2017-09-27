@@ -9,10 +9,12 @@ const state = {
 
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
-                              //     workspaceId: {
-                              //       topics: [topicmapTopic]    # array of dm5.Topic
-                              //       selectedId: topicmapId
-                              //     }
+                              //     workspaceId: [topicmapTopic]    # array of dm5.Topic
+                              //   }
+
+  topicmapSelection: {},      // Per-workspace selected topicmap:
+                              //   {
+                              //     workspaceId: topicmapId
                               //   }
 
   selections: {},             // Per-topicmap selection entries, hashed by topicmap ID:
@@ -41,8 +43,8 @@ const actions = {
       false                                       // TODO
     ).then(topic => {
       console.log('Topicmap topic', topic)
-      state.topicmapTopics[rootState.workspaces.workspaceId].topics.push(topic)
-      dispatch('selectTopicmap', topic.id)
+      state.topicmapTopics[rootState.workspaces.workspaceId].push(topic)
+      dispatch('callTopicmapRoute', topic.id)
     })
   },
 
@@ -68,7 +70,17 @@ const actions = {
     })
   },
 
-  selectTopicmap ({dispatch}, id) {
+  /**
+   * Calls the "topicmap" route with the given ID.
+   * If a topic/assoc selection is known for that topicmap, the "topic" or "assoc" route is called instead.
+   */
+  selectTopicmap ({rootState, dispatch}, id) {
+    console.log('----- selectTopicmap', id, 'workspace', rootState.workspaces.workspaceId)
+    dispatch('setTopicmapIdForWorkspace', {   // FIXME: history, move to displayTopicmap
+      workspaceId: rootState.workspaces.workspaceId,
+      topicmapId: id
+    })
+    //
     const selection = state.selections[id]
     if (selection) {
       const type = selection.type
@@ -249,16 +261,21 @@ const actions = {
   //
 
   /**
-   * Selects a topicmap once a workspace is selected.
+   * Selects the topicmap last used in the given workspace.
+   * Calls the "topicmap" (or "topic"/"assoc") route.
    */
   selectTopicmapForWorkspace ({dispatch}, workspaceId) {
     console.log('selectTopicmapForWorkspace', workspaceId)
-    var p   // the topicmap to select (a Promise for a topicmapId)
+    let p   // the topicmap to select (a Promise for a topicmapId)
     const topicmapTopics = state.topicmapTopics[workspaceId]
     if (topicmapTopics) {
-      p = Promise.resolve(topicmapTopics.selectedId)
+      p = Promise.resolve(state.topicmapSelection[workspaceId])
     } else {
-      p = dispatch('fetchTopicmapTopics', workspaceId)
+      p = new Promise(resolve => {
+        dispatch('fetchTopicmapTopics', workspaceId).then(() => {
+          resolve(state.topicmapTopics[workspaceId][0].id)
+        })
+      })
     }
     p.then(topicmapId => {
       dispatch('selectTopicmap', topicmapId)
@@ -269,13 +286,12 @@ const actions = {
     console.log('Fetching topicmap topics for workspace', workspaceId)
     return dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
       // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
-      const topicmapId = topics[0].id
-      Vue.set(state.topicmapTopics, workspaceId, {
-        topics,
-        selectedId: topicmapId
-      })
-      return topicmapId
+      Vue.set(state.topicmapTopics, workspaceId, topics)
     })
+  },
+
+  setTopicmapIdForWorkspace (_, {workspaceId, topicmapId}) {
+    state.topicmapSelection[workspaceId] = topicmapId
   },
 
   // WebSocket message processing
@@ -469,7 +485,7 @@ function deleteAssoc (assoc, dispatch) {
 // Helper
 
 function findTopicmapTopic (id, callback) {
-  for (const {topics} of Object.values(state.topicmapTopics)) {
+  for (const topics of Object.values(state.topicmapTopics)) {
     let i = topics.findIndex(topic => topic.id === id)
     if (i !== -1) {
       callback(topics, i)

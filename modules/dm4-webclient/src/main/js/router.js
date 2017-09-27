@@ -106,26 +106,22 @@ store.watch(
  * Selects the intial topicmap and workspace, and pushes the initial route if needed.
  */
 function initialNavigation (route) {
-  var topicmapId = route.params.topicmapId                  // FIXME: convert to number?
-  const topicId  = route.params.topicId
-  const assocId  = route.params.assocId
-  console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
   // 1) select topicmap
+  let topicmapId = route.params.topicmapId                  // FIXME: convert to number?
   if (topicmapId) {
+    const topicId  = route.params.topicId
+    const assocId  = route.params.assocId
+    console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
     store.dispatch('displayTopicmap', topicmapId)           // just display topicmap, no route push
-    if (topicId) {                                          // FIXME: 0 is a valid topic ID
-      fetchTopic(topicId)
-    }
-    if (assocId) {
-      fetchAssoc(assocId)
-    }
+    topicId && fetchTopic(topicId)                          // FIXME: 0 is a valid topic ID
+    assocId && fetchAssoc(assocId)
   } else {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
     if (topicmapId) {
-      console.log('Selecting topicmap', topicmapId, '(ID obtained from cookie)')
-      store.dispatch('selectTopicmap', topicmapId)          // push initial route
+      console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
+      store.dispatch('callTopicmapRoute', topicmapId)       // push initial route
     } else {
-      console.log('No topicmap cookie present')
+      console.log('### Initial navigation (no topicmap cookie present)')
     }
   }
   // 2) select workspace
@@ -136,6 +132,10 @@ function initialNavigation (route) {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       store.dispatch('setWorkspaceId', workspace.id)        // no route push
       store.dispatch('fetchTopicmapTopics', workspace.id)   // fetch data for topicmap selector
+      store.dispatch('setTopicmapIdForWorkspace', {
+        workspaceId: workspace.id,
+        topicmapId
+      })
       console.log('### Initial navigation complete!')
     })
   } else {
