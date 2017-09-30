@@ -149,16 +149,20 @@ function initialNavigation (route) {
 function navigate (to, from) {
   const topicmapId = to.params.topicmapId
   const oldTopicmapId = from.params.topicmapId
+  var p   // a promise resolved once the topicmap rendering is complete
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
-    getAssignedWorkspace(topicmapId).then(workspace => {
-      store.dispatch('setWorkspaceId', workspace.id)
-    }).then(() => {
-      store.dispatch('displayTopicmap', topicmapId)
+    p = new Promise(resolve => {
+      getAssignedWorkspace(topicmapId).then(workspace => {
+        store.dispatch('setWorkspaceId', workspace.id)
+        store.dispatch('displayTopicmap', topicmapId).then(resolve)
+      })
     })
+  } else {
+    p = Promise.resolve()
   }
   //
   var selected
@@ -167,23 +171,20 @@ function navigate (to, from) {
   const oldTopicId = from.params.topicId
   if (topicId != oldTopicId) {
     if (topicId) {  // FIXME: 0 is a valid topic ID
-      fetchTopic(topicId, Promise.resolve())    // FIXME: wait for "displayTopicmap"
+      fetchTopic(topicId, p)
       selected = true
     }
   }
-  //
   const assocId = to.params.assocId
   const oldAssocId = from.params.assocId
   if (assocId != oldAssocId) {
     if (assocId) {
-      fetchAssoc(assocId, Promise.resolve())    // FIXME: wait for "displayTopicmap"
+      fetchAssoc(assocId, p)
       selected = true
     }
   }
-  //
   if (!selected) {
-    store.dispatch('unsetSelection')            // FIXME: wait for "displayTopicmap"
-    store.dispatch('emptyDisplay')
+    unsetSelection(p)
   }
 }
 
@@ -197,7 +198,7 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  * Fetches the topic with the given ID, displays it in the detail panel, and render it as selected in the topicmap
  * panel.
  *
- * @param   p   a promise that is resolved once the topicmap rendering is complete.
+ * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchTopic (id, p) {
   p.then(() => {
@@ -212,7 +213,7 @@ function fetchTopic (id, p) {
  * Fetches the assoc with the given ID, displays it in the detail panel, and render it as selected in the topicmap
  * panel.
  *
- * @param   p   a promise that is resolved once the topicmap rendering is complete.
+ * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchAssoc (id, p) {
   p.then(() => {
@@ -221,4 +222,11 @@ function fetchAssoc (id, p) {
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
     store.dispatch('displayObject', assoc)
   })
+}
+
+function unsetSelection(p) {
+  p.then(() => {
+    store.dispatch('unsetSelection')
+  })
+  store.dispatch('emptyDisplay')
 }

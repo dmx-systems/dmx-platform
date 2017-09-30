@@ -3,8 +3,6 @@ import dm5 from 'dm5'
 
 const state = {
 
-  topicmapId: undefined,      // ID of the displayed topicmap (master state).
-
   topicmap: undefined,        // The displayed topicmap (derived state) (a dm5.Topicmap object)
 
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
@@ -57,15 +55,14 @@ const actions = {
    * - the topicmap belongs to the selected workspace ("workspaceId" state is up-to-date, see workspaces module)
    *
    * Postcondition:
-   * - state is up-to-date ("topicmapId", "selectedTopicmapId", and topicmap cookie)
-   *   Note: the "topicmap" state is *not* yet up-to-date (it is updated only once the topicmap is retrieved).
+   * - state is up-to-date ("selectedTopicmapId", and topicmap cookie)
+   *   Note: the "topicmap" state is *not* yet up-to-date (updated only once topicmap retrieval is complete).
    *
-   * @returns   a promise that is resolved once the topicmap rendering is complete.
+   * @returns   a promise resolved once the topicmap rendering is complete.
    */
   displayTopicmap ({rootState, dispatch}, id) {
     console.log('displayTopicmap', id)
     // update state
-    state.topicmapId = id
     state.selectedTopicmapId[workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
     //
@@ -117,7 +114,7 @@ const actions = {
    *
    * Preconditions:
    * - the route is set
-   * - the topic belongs to the selected topicmap ("topicmapId" state is up-to-date)
+   * - the topic belongs to the selected topicmap ("topicmap" state is up-to-date)
    *
    * Postcondition:
    * - "selections" state is up-to-date
@@ -135,7 +132,7 @@ const actions = {
    *
    * Preconditions:
    * - the route is set
-   * - the assoc belongs to the selected topicmap ("topicmapId" state is up-to-date)
+   * - the assoc belongs to the selected topicmap ("topicmap" state is up-to-date)
    *
    * Postcondition:
    * - "selections" state is up-to-date
@@ -153,7 +150,7 @@ const actions = {
    *
    * Preconditions:
    * - the route is set
-   * - the "topicmapId" state is up-to-date
+   * - the "topicmap" state is up-to-date
    *
    * Postcondition:
    * - "selections" state is up-to-date
@@ -519,11 +516,11 @@ function findTopicmapTopic (id, callback) {
 // ---
 
 function topicmapId () {
-  const topicmapId = state.topicmapId
-  if (!topicmapId) {
+  const topicmap = state.topicmap
+  if (!topicmap) {
     throw Error('No selected topicmap known')
   }
-  return topicmapId
+  return topicmap.id
 }
 
 function workspaceId (rootState) {
