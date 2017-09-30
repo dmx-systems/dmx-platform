@@ -8,19 +8,7 @@
 </template>
 
 <script>
-import dm5 from 'dm5'
-
 export default {
-
-  created () {
-    this.$store.watch(
-      state => state.topicmaps.topicmapId,
-      id => {
-        console.log('### Topicmap ID watcher', id)
-        this.$store.dispatch('getTopicmap', id)
-      }
-    )
-  },
 
   computed: {
 

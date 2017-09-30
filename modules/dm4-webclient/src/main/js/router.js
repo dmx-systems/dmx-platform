@@ -106,20 +106,18 @@ store.watch(
  * Selects the intial topicmap and workspace, and pushes the initial route if needed.
  */
 function initialNavigation (route) {
+  let urlPresent
   // 1) select topicmap
-  let topicmapId = route.params.topicmapId                  // FIXME: convert to number?
+  let topicmapId = route.params.topicmapId                        // FIXME: convert to number?
+  const topicId  = route.params.topicId
+  const assocId  = route.params.assocId
   if (topicmapId) {
-    const topicId  = route.params.topicId
-    const assocId  = route.params.assocId
-    console.log('### Initial navigation (topicmapId, topicId, assocId)', topicmapId, topicId, assocId)
-    store.dispatch('displayTopicmap', topicmapId)           // just display topicmap, no route push
-    topicId && fetchTopic(topicId)                          // FIXME: 0 is a valid topic ID
-    assocId && fetchAssoc(assocId)
+    console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId, assocId)
+    urlPresent = true
   } else {
-    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')     // FIXME: convert to number?
+    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')           // FIXME: convert to number?
     if (topicmapId) {
       console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
-      store.dispatch('callTopicmapRoute', topicmapId)       // push initial route
     } else {
       console.log('### Initial navigation (no topicmap cookie present)')
     }
@@ -130,17 +128,20 @@ function initialNavigation (route) {
   if (topicmapId) {
     getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      store.dispatch('setWorkspaceId', workspace.id)        // no route push
-      store.dispatch('fetchTopicmapTopics', workspace.id)   // fetch data for topicmap selector
-      store.dispatch('setTopicmapIdForWorkspace', {
-        workspaceId: workspace.id,
-        topicmapId
-      })
+      store.dispatch('setWorkspaceId', workspace.id)              // no route push
+      store.dispatch('fetchTopicmapTopics', workspace.id)         // data for topicmap selector
+      if (urlPresent) {
+        const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
+        topicId && fetchTopic(topicId, p)                         // FIXME: 0 is a valid topic ID
+        assocId && fetchAssoc(assocId, p)
+      } else {
+        store.dispatch('callTopicmapRoute', topicmapId)           // push initial route
+      }
       console.log('### Initial navigation complete!')
     })
   } else {
     const workspace = store.state.workspaces.workspaceTopics[0]
-    store.dispatch('selectWorkspace', workspace.id)         // push initial route (indirectly)
+    store.dispatch('selectWorkspace', workspace.id)               // push initial route (indirectly)
     console.log('### Initial navigation complete!')
   }
 }
@@ -151,10 +152,12 @@ function navigate (to, from) {
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
   if (topicmapId != oldTopicmapId) {
-    store.dispatch('displayTopicmap', topicmapId)
-    //
+    // Note: the workspace must be set *before* the topicmap is displayed.
+    // See preconditions at "displayTopicmap".
     getAssignedWorkspace(topicmapId).then(workspace => {
       store.dispatch('setWorkspaceId', workspace.id)
+    }).then(() => {
+      store.dispatch('displayTopicmap', topicmapId)
     })
   }
   //
@@ -164,7 +167,7 @@ function navigate (to, from) {
   const oldTopicId = from.params.topicId
   if (topicId != oldTopicId) {
     if (topicId) {  // FIXME: 0 is a valid topic ID
-      fetchTopic(topicId)
+      fetchTopic(topicId, Promise.resolve())    // FIXME: wait for "displayTopicmap"
       selected = true
     }
   }
@@ -173,14 +176,14 @@ function navigate (to, from) {
   const oldAssocId = from.params.assocId
   if (assocId != oldAssocId) {
     if (assocId) {
-      fetchAssoc(assocId)
+      fetchAssoc(assocId, Promise.resolve())    // FIXME: wait for "displayTopicmap"
       selected = true
     }
   }
   //
   if (!selected) {
+    store.dispatch('unsetSelection')            // FIXME: wait for "displayTopicmap"
     store.dispatch('emptyDisplay')
-    store.dispatch('unsetSelection')
   }
 }
 
@@ -190,16 +193,32 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
 
 // ---
 
-function fetchTopic (id) {
+/**
+ * Fetches the topic with the given ID, displays it in the detail panel, and render it as selected in the topicmap
+ * panel.
+ *
+ * @param   p   a promise that is resolved once the topicmap rendering is complete.
+ */
+function fetchTopic (id, p) {
+  p.then(() => {
+    store.dispatch('setTopicSelection', id)
+  })
   dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
     store.dispatch('displayObject', topic)
-    store.dispatch('setTopicSelection', id)
   })
 }
 
-function fetchAssoc (id) {
+/**
+ * Fetches the assoc with the given ID, displays it in the detail panel, and render it as selected in the topicmap
+ * panel.
+ *
+ * @param   p   a promise that is resolved once the topicmap rendering is complete.
+ */
+function fetchAssoc (id, p) {
+  p.then(() => {
+    store.dispatch('setAssocSelection', id)
+  })
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
     store.dispatch('displayObject', assoc)
-    store.dispatch('setAssocSelection', id)
   })
 }

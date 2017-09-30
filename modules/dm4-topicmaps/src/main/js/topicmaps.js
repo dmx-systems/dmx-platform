@@ -12,7 +12,7 @@ const state = {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
                               //   }
 
-  topicmapSelection: {},      // Per-workspace selected topicmap:
+  selectedTopicmapId: {},     // Per-workspace selected topicmap:
                               //   {
                               //     workspaceId: topicmapId
                               //   }
@@ -43,30 +43,39 @@ const actions = {
       false                                       // TODO
     ).then(topic => {
       console.log('Topicmap topic', topic)
-      state.topicmapTopics[rootState.workspaces.workspaceId].push(topic)
+      state.topicmapTopics[workspaceId(rootState)].push(topic)
       dispatch('callTopicmapRoute', topic.id)
     })
   },
 
-  displayTopicmap (_, id) {
-    console.log('Displaying topicmap', id)
+  /**
+   * Displays the topicmap with the given ID.
+   * The topicmap is retrieved either from cache or from server (asynchronously).
+   *
+   * Preconditions:
+   * - the route is set
+   * - the topicmap belongs to the selected workspace ("workspaceId" state is up-to-date, see workspaces module)
+   *
+   * Postcondition:
+   * - state is up-to-date ("topicmapId", "selectedTopicmapId", and topicmap cookie)
+   *   Note: the "topicmap" state is *not* yet up-to-date (it is updated only once the topicmap is retrieved).
+   *
+   * @returns   a promise that is resolved once the topicmap rendering is complete.
+   */
+  displayTopicmap ({rootState, dispatch}, id) {
+    console.log('displayTopicmap', id)
     // update state
     state.topicmapId = id
+    state.selectedTopicmapId[workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
-  },
-
-  getTopicmap ({dispatch}, id) {
-    getTopicmap(id).then(topicmap => {
-      // update state
-      state.topicmap = topicmap
-      // sync view
-      const renderTopicmap = dispatch('syncTopicmap', topicmap)
-      const selection = state.selections[id]
-      if (selection) {
-        renderTopicmap.then(() => {
-          dispatch('syncSelect', selection.id)
-        })
-      }
+    //
+    return new Promise(resolve => {
+      getTopicmap(id).then(topicmap => {
+        // update state
+        state.topicmap = topicmap
+        // sync view
+        dispatch('syncTopicmap', topicmap).then(resolve)
+      })
     })
   },
 
@@ -74,14 +83,9 @@ const actions = {
    * Calls the "topicmap" route with the given ID.
    * If a topic/assoc selection is known for that topicmap, the "topic" or "assoc" route is called instead.
    */
-  selectTopicmap ({rootState, dispatch}, id) {
-    console.log('----- selectTopicmap', id, 'workspace', rootState.workspaces.workspaceId)
-    dispatch('setTopicmapIdForWorkspace', {   // FIXME: history, move to displayTopicmap
-      workspaceId: rootState.workspaces.workspaceId,
-      topicmapId: id
-    })
-    //
+  selectTopicmap ({dispatch}, id) {
     const selection = state.selections[id]
+    console.log('selectTopicmap', id, selection)
     if (selection) {
       const type = selection.type
       dispatch('callRoute', {
@@ -108,35 +112,56 @@ const actions = {
     dispatch('stripSelectionFromRoute')
   },
 
+  /**
+   * Renders the topic with the given ID as selected in the topicmap panel.
+   *
+   * Preconditions:
+   * - the route is set
+   * - the topic belongs to the selected topicmap ("topicmapId" state is up-to-date)
+   *
+   * Postcondition:
+   * - "selections" state is up-to-date
+   */
   setTopicSelection ({dispatch}, id) {
-    if (!state.topicmapId) {
-      throw Error('state.topicmapId is not set')
-    }
-    console.log('Setting topic selection of topicmap', state.topicmapId, 'to', id)
+    console.log('Setting topic selection of topicmap', topicmapId(), 'to', id)
     // update state
-    state.selections[state.topicmapId] = {type: 'topic', id}
+    state.selections[topicmapId()] = {type: 'topic', id}
     // sync view
     dispatch('syncSelect', id)
   },
 
+  /**
+   * Renders the assoc with the given ID as selected in the topicmap panel.
+   *
+   * Preconditions:
+   * - the route is set
+   * - the assoc belongs to the selected topicmap ("topicmapId" state is up-to-date)
+   *
+   * Postcondition:
+   * - "selections" state is up-to-date
+   */
   setAssocSelection ({dispatch}, id) {
-    if (!state.topicmapId) {
-      throw Error('state.topicmapId is not set')
-    }
-    console.log('Setting assoc selection of topicmap', state.topicmapId, 'to', id)
+    console.log('Setting assoc selection of topicmap', topicmapId(), 'to', id)
     // update state
-    state.selections[state.topicmapId] = {type: 'assoc', id}
+    state.selections[topicmapId()] = {type: 'assoc', id}
     // sync view
     dispatch('syncSelect', id)
   },
 
+  /**
+   * Removes the selection in the topicmap panel.
+   *
+   * Preconditions:
+   * - the route is set
+   * - the "topicmapId" state is up-to-date
+   *
+   * Postcondition:
+   * - "selections" state is up-to-date
+   */
   unsetSelection ({dispatch}) {
-    if (!state.topicmapId) {
-      throw Error('state.topicmapId is not set')
-    }
-    console.log('Unsetting selection of topicmap', state.topicmapId)
+    console.log('Unsetting selection of topicmap', topicmapId())
     // update state
-    delete state.selections[state.topicmapId]
+    delete state.selections[topicmapId()]
     // sync view
     dispatch('syncUnselect')
   },
@@ -269,7 +294,7 @@ const actions = {
     let p   // the topicmap to select (a Promise for a topicmapId)
     const topicmapTopics = state.topicmapTopics[workspaceId]
     if (topicmapTopics) {
-      p = Promise.resolve(state.topicmapSelection[workspaceId])
+      p = Promise.resolve(state.selectedTopicmapId[workspaceId])
     } else {
       p = new Promise(resolve => {
         dispatch('fetchTopicmapTopics', workspaceId).then(() => {
@@ -282,16 +307,13 @@ const actions = {
     })
   },
 
+  // TODO: drop arg. Map topics are always retrieved for the current workspace.
   fetchTopicmapTopics (_, workspaceId) {
     console.log('Fetching topicmap topics for workspace', workspaceId)
     return dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
       // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
       Vue.set(state.topicmapTopics, workspaceId, topics)
     })
-  },
-
-  setTopicmapIdForWorkspace (_, {workspaceId, topicmapId}) {
-    state.topicmapSelection[workspaceId] = topicmapId
   },
 
   // WebSocket message processing
@@ -492,4 +514,22 @@ function findTopicmapTopic (id, callback) {
       break
     }
   }
+}
+
+// ---
+
+function topicmapId () {
+  const topicmapId = state.topicmapId
+  if (!topicmapId) {
+    throw Error('No selected topicmap known')
+  }
+  return topicmapId
+}
+
+function workspaceId (rootState) {
+  const workspaceId = rootState.workspaces.workspaceId
+  if (!workspaceId) {
+    throw Error(`No selected workspace known`)
+  }
+  return workspaceId
 }
