@@ -129,7 +129,7 @@ function initialNavigation (route) {
     getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       store.dispatch('setWorkspaceId', workspace.id)              // no route push
-      store.dispatch('fetchTopicmapTopics', workspace.id)         // data for topicmap selector
+      store.dispatch('fetchTopicmapTopics')                       // data for topicmap selector
       if (urlPresent) {
         const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
         topicId && fetchTopic(topicId, p)                         // FIXME: 0 is a valid topic ID
@@ -137,13 +137,12 @@ function initialNavigation (route) {
       } else {
         store.dispatch('callTopicmapRoute', topicmapId)           // push initial route
       }
-      console.log('### Initial navigation complete!')
     })
   } else {
     const workspace = store.state.workspaces.workspaceTopics[0]
     store.dispatch('selectWorkspace', workspace.id)               // push initial route (indirectly)
-    console.log('### Initial navigation complete!')
   }
+  console.log('### Initial navigation complete!')
 }
 
 function navigate (to, from) {

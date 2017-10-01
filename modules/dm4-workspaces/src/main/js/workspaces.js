@@ -10,9 +10,9 @@ const state = {
 const actions = {
 
   selectWorkspace ({dispatch}, id) {
-    console.log('Selecting workspace', id)
+    console.log('selectWorkspace', id)
     dispatch('setWorkspaceId', id)
-    dispatch('selectTopicmapForWorkspace', id)
+    dispatch('selectTopicmapForWorkspace')
   },
 
   setWorkspaceId (_, id) {
