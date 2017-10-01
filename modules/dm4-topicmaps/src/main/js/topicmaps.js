@@ -336,6 +336,22 @@ const actions = {
 
   // WebSocket message processing
 
+  _newTopicmap (_, args) {
+    const topicmapTopic = new dm5.Topic(args.topicmapTopic)
+    const workspace = topicmapTopic.getChildTopic('dm4.workspaces.workspace')
+    if (!workspace) {
+      console.warn('No workspace found in childs of topic', topicmapTopic)
+      return
+    }
+    const topics = state.topicmapTopics[workspace.id]
+    if (topics) {
+      console.log('Adding topicmap topic', topicmapTopic, 'to workspace', workspace.id)
+      topics.push(topicmapTopic)
+    } else {
+      console.log('Ignoring topicmap topic', topicmapTopic, 'for workspace', workspace.id)
+    }
+  },
+
   _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
     if (topicmapId === state.topicmap.id) {
       state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))               // update state

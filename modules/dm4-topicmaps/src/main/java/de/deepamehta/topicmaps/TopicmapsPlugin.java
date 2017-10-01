@@ -99,11 +99,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                 @QueryParam("private") boolean isPrivate) {
         logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
             "\", isPrivate=" + isPrivate +")");
-        return dm4.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
+        Topic topicmapTopic = dm4.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
             .put("dm4.topicmaps.name", name)
             .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
             .put("dm4.topicmaps.private", isPrivate)
             .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
+        me.newTopicmap(topicmapTopic);
+        return topicmapTopic;
     }
 
     // ---
@@ -540,6 +542,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
 
         // ---
+
+        private void newTopicmap(Topic topicmapTopic) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "newTopicmap")
+                    .put("args", new JSONObject()
+                        .put("topicmapTopic", topicmapTopic.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"newTopicmap\" message:", e);
+            }
+        }
 
         private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) {
             try {
