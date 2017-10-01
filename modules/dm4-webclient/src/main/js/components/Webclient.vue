@@ -32,6 +32,7 @@ export default {
 
   data () {
     return {
+      // TODO: let the respective module inject the extra items
       extraMenuItems: [
         {
           uri: 'dm4.topicmaps.topicmap',
@@ -42,7 +43,10 @@ export default {
         },
         {
           uri: 'dm4.workspaces.workspace',
-          label: 'Workspace'
+          label: 'Workspace',
+          create: name => {
+            this.$store.dispatch('createWorkspace', name)
+          }
         }
       ]
     }
