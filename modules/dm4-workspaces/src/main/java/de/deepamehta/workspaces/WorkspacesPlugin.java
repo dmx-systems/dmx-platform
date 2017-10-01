@@ -33,6 +33,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import java.util.Iterator;
@@ -90,11 +91,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     @POST
-    @Path("/{name}/{uri:[^/]*?}/{sharing_mode_uri}")    // Note: default is [^/]+?     // +? is a "reluctant" quantifier
     @Transactional
     @Override
-    public Topic createWorkspace(@PathParam("name") final String name, @PathParam("uri") final String uri,
-                                 @PathParam("sharing_mode_uri") final SharingMode sharingMode) {
+    public Topic createWorkspace(@QueryParam("name") final String name, @QueryParam("uri") final String uri,
+                                 @QueryParam("sharing_mode_uri") final SharingMode sharingMode) {
         final String operation = "Creating workspace \"" + name + "\" ";
         final String info = "(uri=\"" + uri + "\", sharingMode=" + sharingMode + ")";
         try {
