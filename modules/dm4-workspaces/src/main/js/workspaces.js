@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import dm5 from 'dm5'
 
 const state = {
@@ -37,6 +38,17 @@ const actions = {
 
   _newWorkspace (_, {workspace}) {
     state.workspaceTopics.push(workspace)
+  },
+
+  _processDirectives (_, directives) {
+    console.log(`Workspaces: processing ${directives.length} directives`)
+    directives.forEach(dir => {
+      switch (dir.type) {
+      case "UPDATE_TOPIC":
+        updateTopic(dir.arg)    // FIXME: construct dm5.Topic?
+        break
+      }
+    })
   }
 }
 
@@ -49,4 +61,13 @@ const ready = dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(to
 export default {
   state,
   actions
+}
+
+// Process Directives
+
+function updateTopic (topic) {
+  const i = state.workspaceTopics.findIndex(_topic => _topic.id === topic.id)
+  if (i !== -1) {
+    Vue.set(state.workspaceTopics, i, topic)
+  }
 }

@@ -441,8 +441,6 @@ export default {
   actions
 }
 
-// ---
-
 // Topicmap Cache
 
 function getTopicmap (id) {
@@ -543,7 +541,7 @@ function deleteAssoc (assoc, dispatch) {
 
 function findTopicmapTopic (id, callback) {
   for (const topics of Object.values(state.topicmapTopics)) {
-    let i = topics.findIndex(topic => topic.id === id)
+    const i = topics.findIndex(topic => topic.id === id)
     if (i !== -1) {
       callback(topics, i)
       break
