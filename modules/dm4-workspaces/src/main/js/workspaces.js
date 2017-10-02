@@ -3,7 +3,8 @@ import dm5 from 'dm5'
 
 const state = {
   workspaceId: undefined,       // ID of selected workspace (number)
-  workspaceTopics: undefined    // all workspace topics readable by current user (array of dm5.Topic)
+  workspaceTopics: undefined,   // all workspace topics readable by current user (array of dm5.Topic)
+  ready: undefined              // a promise resolved once this store module is ready
 }
 
 const actions = {
@@ -30,10 +31,6 @@ const actions = {
     dm5.utils.setCookie('dm4_workspace_id', id)
   },
 
-  workspacesReady () {
-    return ready
-  },
-
   // WebSocket message processing
 
   _newWorkspace (_, {workspace}) {
@@ -52,8 +49,8 @@ const actions = {
   }
 }
 
-// init state
-const ready = dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
+// Init state
+state.ready = dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
   console.log('### Workspaces ready!')
   state.workspaceTopics = topics
 })
@@ -63,7 +60,7 @@ export default {
   actions
 }
 
-// Process Directives
+// Process directives
 
 function updateTopic (topic) {
   const i = state.workspaceTopics.findIndex(_topic => _topic.id === topic.id)

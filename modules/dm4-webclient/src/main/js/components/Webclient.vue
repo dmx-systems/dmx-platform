@@ -23,7 +23,7 @@ export default {
     // As CytoscapeRenderer is a child component of Webclient it is guaranteed to be mounted *before* Webclient.
     //
     const p1 = dm5.ready()
-    const p2 = this.$store.dispatch('workspacesReady')
+    const p2 = this.$store.state.workspaces.ready
     console.log('### Webclient mounted!', p1, p2)
     Promise.all([p1, p2]).then(() => {
       this.$store.dispatch('initialNavigation')

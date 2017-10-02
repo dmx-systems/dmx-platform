@@ -468,7 +468,7 @@ function cacheTopicmap (topicmap) {
   state.topicmapCache[topicmap.id] = topicmap
 }
 
-// update state + sync view
+// Update state + sync view
 
 /**
  * @param   topic   the topic to reveal (a dm5.Topic object).
@@ -497,7 +497,7 @@ function _revealAssoc (assoc, select, dispatch) {
   return op
 }
 
-// Process Directives
+// Process directives
 
 function updateTopic (topic, dispatch) {
   // console.log('updateTopic', topic)
