@@ -339,8 +339,9 @@ const actions = {
   _newTopicmap (_, args) {
     const topicmapTopic = new dm5.Topic(args.topicmapTopic)
     const workspace = topicmapTopic.getChildTopic('dm4.workspaces.workspace')
+    // Note: the default topicmap created for new workspaces have no workspace assignment yet
     if (!workspace) {
-      console.warn('No workspace found in childs of topic', topicmapTopic)
+      console.warn('No workspace found in topicmap', topicmapTopic)
       return
     }
     const topics = state.topicmapTopics[workspace.id]

@@ -26,6 +26,8 @@ import de.deepamehta.core.service.event.PostCreateAssociationListener;
 import de.deepamehta.core.service.event.PostCreateTopicListener;
 import de.deepamehta.core.service.event.PreDeleteTopicListener;
 
+import org.codehaus.jettison.json.JSONObject;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,9 +38,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -78,6 +83,11 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Inject
     private ConfigService configService;
 
+    @Context
+    private HttpServletRequest request;
+
+    private Messenger me = new Messenger("de.deepamehta.webclient");
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -100,7 +110,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
-            return dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            Topic workspace = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     logger.info(operation + info);
@@ -112,8 +122,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                             .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
-                    Topic topicmap = topicmapsService.createTopicmap(TopicmapsService.DEFAULT_TOPICMAP_NAME,
-                        TopicmapsService.DEFAULT_TOPICMAP_RENDERER, false);     // isPrivate=false
+                    Topic topicmap = topicmapsService.createTopicmap(
+                        TopicmapsService.DEFAULT_TOPICMAP_NAME,
+                        TopicmapsService.DEFAULT_TOPICMAP_RENDERER, false       // isPrivate=false
+                    );
                     // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
                     // So we must use the privileged assignToWorkspace() call here. This is to support the
                     // "DM4 Sign-up" 3rd-party plugin.
@@ -122,6 +134,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     return workspace;
                 }
             });
+            me.newWorkspace(workspace);     // FIXME: broadcast to eligible users only
+            return workspace;
         } catch (Exception e) {
             throw new RuntimeException(operation + "failed " + info, e);
         }
@@ -538,6 +552,40 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
             return "association " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\")";
         } else {
             throw new RuntimeException("Unexpected object: " + object);
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class Messenger {
+
+        private String pluginUri;
+
+        private Messenger(String pluginUri) {
+            this.pluginUri = pluginUri;
+        }
+
+        // ---
+
+        private void newWorkspace(Topic workspace) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "newWorkspace")
+                    .put("args", new JSONObject()
+                        .put("workspace", workspace.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"newWorkspace\" message:", e);
+            }
+        }
+
+        // ---
+
+        private void messageToAllButOne(JSONObject message) {
+            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

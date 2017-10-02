@@ -31,6 +31,12 @@ const actions = {
 
   workspacesReady () {
     return ready
+  },
+
+  // WebSocket message processing
+
+  _newWorkspace (_, {workspace}) {
+    state.workspaceTopics.push(workspace)
   }
 }
 
