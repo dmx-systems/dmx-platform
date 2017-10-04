@@ -114,6 +114,12 @@ const actions = {
     dispatch('stripSelectionFromRoute')
   },
 
+  onTopicDoubleClick ({dispatch}, viewTopic) {
+    if (viewTopic.typeUri === 'dm4.topicmaps.topicmap') {
+      dispatch('selectTopicmap', viewTopic.id)
+    }
+  },
+
   /**
    * Renders the topic with the given ID as selected in the topicmap panel.
    *
