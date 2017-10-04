@@ -20,15 +20,25 @@ const actions = {
 
   selectWorkspace ({dispatch}, id) {
     console.log('selectWorkspace', id)
-    dispatch('setWorkspaceId', id)
-    dispatch('selectTopicmapForWorkspace')
+    dispatch('setWorkspaceId', id).then(() => {
+      dispatch('selectTopicmapForWorkspace')
+    })
   },
 
-  setWorkspaceId (_, id) {
+  /**
+   * Displays the given workspace in the workspace selector.
+   * Displays the given workspace's topicmaps in the topicmap selector.
+   *
+   * Sets the "workspaceId" state and the "dm4_workspace_id" cookie.
+   * Fetches the topicmap topics for the workspace if not yet done.
+   *
+   * @return  a promise resolved once the topicmap topics are fetched.
+   */
+  setWorkspaceId ({dispatch}, id) {
     console.log('setWorkspaceId', id)
-    // update state
     state.workspaceId = id
     dm5.utils.setCookie('dm4_workspace_id', id)
+    return dispatch('fetchTopicmapTopics')     // data for topicmap selector
   },
 
   // WebSocket message processing

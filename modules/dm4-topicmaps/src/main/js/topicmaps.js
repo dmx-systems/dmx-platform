@@ -79,6 +79,11 @@ const actions = {
   /**
    * Calls the "topicmap" route with the given ID.
    * If a topic/assoc selection is known for that topicmap, the "topic" or "assoc" route is called instead.
+   *
+   * Preconditions:
+   * - the route is *not* yet set.
+   *
+   * Note: the topicmap is *not* required to belong to the selected workspace.
    */
   selectTopicmap ({dispatch}, id) {
     const selection = state.selections[id]
@@ -288,50 +293,46 @@ const actions = {
    *
    * Preconditions:
    * - the workspace is selected already ("workspaceId" state is up-to-date, see workspaces module).
+   * - the topicmap topics for the selected workspace are loaded already ("topicmapTopics" state is up-to-date).
    * - the route is *not* yet set.
    */
   selectTopicmapForWorkspace ({rootState, dispatch}) {
     const workspaceId = _workspaceId(rootState)
-    const topicmapTopics = state.topicmapTopics[workspaceId]
     console.log('selectTopicmapForWorkspace', workspaceId)
-    let p   // the topicmap to select (a Promise for a topicmapId)
-    if (topicmapTopics) {
-      p = Promise.resolve(state.selectedTopicmapId[workspaceId])
-    } else {
-      p = new Promise(resolve => {
-        dispatch('fetchTopicmapTopics').then(topics => {
-          if (!topics.length) {
-            throw Error(`Workspace ${workspaceId} has no topicmaps`)
-          }
-          resolve(topics[0].id)
-        })
-      })
+    let topicmapId = state.selectedTopicmapId[workspaceId]
+    if (!topicmapId) {
+      topicmapId = state.topicmapTopics[workspaceId][0].id
     }
-    p.then(topicmapId => {
-      dispatch('selectTopicmap', topicmapId)
-    })
+    dispatch('selectTopicmap', topicmapId)
   },
 
   /**
    * Fetches the topicmap topics for the selected workspace.
+   * Updates the "topicmapTopics" state.
+   * If the topicmap topics for the selected workspace are fetched already nothing is performed.
+   * (In this case the returned promise is resolved already.)
    *
    * Precondition:
    * - the workspace is selected already ("workspaceId" state is up-to-date, see workspaces module).
    *
-   * Postcondition: none.
-   * Note: the "topicmapTopics" state is *not* yet up-to-date.
-   *
-   * @return  a promise for the topicmap topics.
-   *          At the moment the promise is resolved the "topicmapTopics" state is up-to-date.
+   * @return  a promise resolved once the "topicmapTopics" state is up-to-date.
    */
   fetchTopicmapTopics ({rootState}) {
     const workspaceId = _workspaceId(rootState)
-    console.log('fetchTopicmapTopics', workspaceId)
-    return dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
-      // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
-      Vue.set(state.topicmapTopics, workspaceId, topics)
-      return topics
-    })
+    let p
+    if (state.topicmapTopics[workspaceId]) {
+      p = Promise.resolve()
+    } else {
+      console.log('fetchTopicmapTopics', workspaceId)
+      p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
+        // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
+        if (!topics.length) {
+          throw Error(`Workspace ${workspaceId} has no topicmap`)
+        }
+        Vue.set(state.topicmapTopics, workspaceId, topics)
+      })
+    }
+    return p
   },
 
   // WebSocket message processing

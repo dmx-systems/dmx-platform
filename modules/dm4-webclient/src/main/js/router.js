@@ -129,7 +129,6 @@ function initialNavigation (route) {
     getAssignedWorkspace(topicmapId).then(workspace => {
       console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       store.dispatch('setWorkspaceId', workspace.id)              // no route push
-      store.dispatch('fetchTopicmapTopics')                       // data for topicmap selector
       if (urlPresent) {
         const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
         topicId && fetchTopic(topicId, p)                         // FIXME: 0 is a valid topic ID
