@@ -35,10 +35,6 @@ const router = new VueRouter({
 
 export default router
 
-// Track initial navigation as it needs to be treated special.
-// Note: the route store watcher is fired for the initial navigation too.
-var isInitialNavigation = true
-
 store.registerModule('routerModule', {
 
   state: {
@@ -90,22 +86,23 @@ store.registerModule('routerModule', {
   }
 })
 
-store.watch(
-  state => state.routerModule.router.currentRoute,
-  (to, from) => {
-    if (isInitialNavigation) {
-      isInitialNavigation = false
-    } else {
+function registerWatcher () {
+  store.watch(
+    state => state.routerModule.router.currentRoute,
+    (to, from) => {
       console.log('### Route watcher', to, from)
       navigate(to, from)
     }
-  }
-)
+  )
+}
 
 /**
  * Selects the intial topicmap and workspace, and pushes the initial route if needed.
  */
 function initialNavigation (route) {
+  //
+  registerWatcher()
+  //
   let urlPresent
   // 1) select topicmap
   let topicmapId = route.params.topicmapId                        // FIXME: convert to number?

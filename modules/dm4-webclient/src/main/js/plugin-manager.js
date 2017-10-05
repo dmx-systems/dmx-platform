@@ -21,7 +21,7 @@ export default {
  */
 function initPlugin (plugin) {
   // register store modules
-  const storeModule = plugin.default.storeModule
+  const storeModule = plugin.storeModule
   if (storeModule) {
     console.log('Registering store module', storeModule.name)
     store.registerModule(
@@ -30,14 +30,23 @@ function initPlugin (plugin) {
     )
   }
   // register components
-  const components = plugin.default.components
+  const components = plugin.components
   if (components) {
     ['webclient', 'toolbar'].forEach(ext => {
       components[ext] && store.dispatch('registerComponent', {
         extensionPoint: ext,
-        component:      components[ext]
+        component: components[ext]
       })
     })
+    const renderers = components.detailPanel
+    if (renderers) {
+      for (let typeUri in renderers) {
+        store.dispatch('registerObjectRenderer', {
+          typeUri,
+          component: renderers[typeUri]
+        })
+      }
+    }
   }
 }
 
@@ -48,7 +57,7 @@ function loadPluginsFromServer () {
     plugins.forEach(pluginInfo => {
       if (pluginInfo.hasPluginFile) {
         loadPlugin(pluginInfo.pluginUri, function (plugin) {
-          initPlugin(plugin)
+          initPlugin(plugin.default)
         })
       }
     })

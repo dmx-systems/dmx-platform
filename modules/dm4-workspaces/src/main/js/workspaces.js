@@ -4,7 +4,7 @@ import dm5 from 'dm5'
 const state = {
   workspaceId: undefined,       // ID of selected workspace (number)
   workspaceTopics: undefined,   // all workspace topics readable by current user (array of dm5.Topic)
-  ready: undefined              // a promise resolved once this store module is ready
+  ready: undefined              // a promise resolved once the workspace topics are loaded
 }
 
 const actions = {
