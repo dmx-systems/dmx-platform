@@ -5,10 +5,7 @@ export default {
     module: require('./workspaces')
   },
 
-  components: [
-    {
-      extensionPoint: 'dm5.webclient.toolbar',
-      component: require('./components/WorkspaceSelect')
-    }
-  ]
+  components: {
+    toolbar: require('./components/WorkspaceSelect')
+  }
 }

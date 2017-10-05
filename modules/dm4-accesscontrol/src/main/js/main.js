@@ -5,14 +5,8 @@ export default {
     module: require('./accesscontrol')
   },
 
-  components: [
-    {
-      extensionPoint: 'dm5.webclient.toolbar',
-      component: require('./components/LoginState')
-    },
-    {
-      extensionPoint: 'dm5.webclient',
-      component: require('./components/LoginDialog')
-    }
-  ]
+  components: {
+    webclient: require('./components/LoginDialog'),
+    toolbar: require('./components/LoginState')
+  }
 }

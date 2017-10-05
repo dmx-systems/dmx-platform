@@ -5,14 +5,8 @@ export default {
     module: require('./topicmaps')
   },
 
-  components: [
-    {
-      extensionPoint: 'dm5.webclient.toolbar',
-      component: require('./components/TopicmapSelect')
-    },
-    {
-      extensionPoint: 'dm5.webclient',
-      component: require('dm5-topicmap-panel')
-    }
-  ]
+  components: {
+    webclient: require('dm5-topicmap-panel'),
+    toolbar: require('./components/TopicmapSelect')
+  }
 }

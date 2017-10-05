@@ -55,7 +55,7 @@ export default {
   computed: {
 
     components () {
-      return this.$store.state.components['dm5.webclient']
+      return this.$store.state.components.webclient
     },
 
     menuTopicTypes () {

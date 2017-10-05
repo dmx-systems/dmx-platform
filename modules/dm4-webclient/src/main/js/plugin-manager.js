@@ -32,10 +32,10 @@ function initPlugin (plugin) {
   // register components
   const components = plugin.default.components
   if (components) {
-    components.forEach(comp => {
-      store.dispatch('registerComponent', {
-        extensionPoint: comp.extensionPoint,
-        component:      comp.component
+    ['webclient', 'toolbar'].forEach(ext => {
+      components[ext] && store.dispatch('registerComponent', {
+        extensionPoint: ext,
+        component:      components[ext]
       })
     })
   }
