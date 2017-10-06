@@ -18,10 +18,13 @@ export default {
 }
 
 /**
- * Registers a plugin's store module (if any) and components (if any).
+ * Registers a plugin's resources (store module, components, ...).
+ *
+ * @param   expo    The plugin main.js export. Either an object or a function that returns an object.
  */
-function initPlugin (plugin) {
-  // register store modules
+function initPlugin (expo) {
+  const plugin = typeof expo === 'function' ? expo(store) : expo
+  // store module
   const storeModule = plugin.storeModule
   if (storeModule) {
     console.log('Registering store module', storeModule.name)
@@ -30,7 +33,7 @@ function initPlugin (plugin) {
       storeModule.module.default
     )
   }
-  // register components
+  // components
   const components = plugin.components
   if (components) {
     ['webclient', 'toolbar'].forEach(ext => {
@@ -49,6 +52,8 @@ function initPlugin (plugin) {
       }
     }
   }
+  // extra menu items
+  // TODO
 }
 
 // --- Load from server ---
