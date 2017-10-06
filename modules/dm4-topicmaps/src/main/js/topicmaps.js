@@ -192,6 +192,7 @@ const actions = {
    *
    * @param   topic   the topic to reveal (a dm5.Topic object).
    * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
+   * @param   select  Optional: if trueish the revealed topic is selected programmatically.
    */
   revealTopic ({dispatch}, {topic, pos, select}) {
     // update state + sync view
@@ -480,7 +481,7 @@ function cacheTopicmap (topicmap) {
 /**
  * @param   topic   the topic to reveal (a dm5.Topic object).
  * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
- * @paran   select  if true the revealed topic is selected programmatically.
+ * @param   select  if trueish the revealed topic is selected programmatically.
  */
 function _revealTopic (topic, pos, select, dispatch) {
   // update state

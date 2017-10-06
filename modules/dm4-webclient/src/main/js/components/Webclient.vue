@@ -30,6 +30,20 @@ export default {
           create: name => {
             this.$store.dispatch('createWorkspace', name)
           }
+        },
+        {
+          uri: 'dm4.typeeditor.topic_type',
+          label: 'Topic Type',
+          create: name => {
+            this.$store.dispatch('createTopicType', name)
+          }
+        },
+        {
+          uri: 'dm4.typeeditor.assoc_type',
+          label: 'Association Type',
+          create: name => {
+            this.$store.dispatch('createAssocType', name)
+          }
         }
       ]
     }

@@ -602,9 +602,9 @@ public class ModelFactoryImpl implements ModelFactory {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
-            parseIndexModes(typeModel.optJSONArray("indexModeUris")),                 // optJSONArray may return null
-            parseAssocDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),   // optJSONArray may return null
-            newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));   // optJSONArray may return null
+            parseIndexModes(typeModel.optJSONArray("indexModeUris")),                   // optJSONArray may return null
+            parseAssocDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),    // optJSONArray may return null
+            newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null
     }
 
     // ---

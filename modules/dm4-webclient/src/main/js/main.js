@@ -36,7 +36,7 @@ Promise.all([
   // The type cache must be ready *before* "initialNavigation" is dispatched.
   dm5.ready(),
   // Initial navigation might involve "select the 1st workspace", so the workspace
-  // topics must be already loaded
+  // topics must be already loaded.
   store.state.workspaces.ready
 ]).then(() => {
   store.dispatch('initialNavigation')

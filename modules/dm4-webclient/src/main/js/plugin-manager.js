@@ -7,9 +7,10 @@ export default {
       console.info('You are running DM5 in development mode.\n' +
         'The standard plugins are loaded from file system and are hot replaced.')
     }
-    initPlugin(require('modules/dm4-workspaces/src/main/js/main.js'))
-    initPlugin(require('modules/dm4-topicmaps/src/main/js/main.js'))
-    initPlugin(require('modules/dm4-accesscontrol/src/main/js/main.js'))
+    initPlugin(require('modules/dm4-workspaces/src/main/js/main.js').default)
+    initPlugin(require('modules/dm4-topicmaps/src/main/js/main.js').default)
+    initPlugin(require('modules/dm4-accesscontrol/src/main/js/main.js').default)
+    initPlugin(require('modules/dm4-typeeditor/src/main/js/main.js').default)
     // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
     // So, they are not init'ed again. ### TODO: explain better
     loadPluginsFromServer()
