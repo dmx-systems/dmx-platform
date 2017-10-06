@@ -4,7 +4,7 @@
       <toolbar slot="dm5-topicmap-panel"></toolbar>
     </component>
     <dm5-detail-panel></dm5-detail-panel>
-    <dm5-search-widget :menu-topic-types="menuTopicTypes" :extra-menu-items="extraMenuItems"></dm5-search-widget>
+    <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
 
@@ -12,42 +12,6 @@
 import dm5 from 'dm5'
 
 export default {
-
-  data () {
-    return {
-      // TODO: let the respective module inject the extra items
-      extraMenuItems: [
-        {
-          uri: 'dm4.topicmaps.topicmap',
-          label: 'Topicmap',
-          create: name => {
-            this.$store.dispatch('createTopicmap', name)
-          }
-        },
-        {
-          uri: 'dm4.workspaces.workspace',
-          label: 'Workspace',
-          create: name => {
-            this.$store.dispatch('createWorkspace', name)
-          }
-        },
-        {
-          uri: 'dm4.typeeditor.topic_type',
-          label: 'Topic Type',
-          create: name => {
-            this.$store.dispatch('createTopicType', name)
-          }
-        },
-        {
-          uri: 'dm4.typeeditor.assoc_type',
-          label: 'Association Type',
-          create: name => {
-            this.$store.dispatch('createAssocType', name)
-          }
-        }
-      ]
-    }
-  },
 
   computed: {
 

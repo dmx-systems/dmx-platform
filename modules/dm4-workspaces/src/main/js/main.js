@@ -1,4 +1,4 @@
-export default {
+export default (store) => ({
 
   storeModule: {
     name: 'workspaces',
@@ -7,5 +7,13 @@ export default {
 
   components: {
     toolbar: require('./components/WorkspaceSelect')
-  }
-}
+  },
+
+  extraMenuItems: [{
+    uri: 'dm4.workspaces.workspace',
+    label: 'Workspace',
+    create: name => {
+      store.dispatch('createWorkspace', name)
+    }
+  }]
+})

@@ -53,7 +53,10 @@ function initPlugin (expo) {
     }
   }
   // extra menu items
-  // TODO
+  const extraMenuItems = plugin.extraMenuItems
+  if (extraMenuItems) {
+    store.dispatch('registerExtraMenuItems', extraMenuItems)
+  }
 }
 
 // --- Load from server ---
