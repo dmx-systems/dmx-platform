@@ -26,14 +26,16 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
+import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -47,6 +49,11 @@ import java.util.logging.Logger;
 public class WebservicePlugin extends PluginActivator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    @Context
+    private HttpServletRequest request;
+
+    private Messenger me = new Messenger("de.deepamehta.webclient");
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -234,7 +241,9 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topictype")
     @Transactional
     public TopicType createTopicType(TopicTypeModel model) {
-        return dm4.createTopicType(model);
+        TopicType topicType = dm4.createTopicType(model);
+        me.newTopicType(topicType);
+        return topicType;
     }
 
     @PUT
@@ -436,6 +445,40 @@ public class WebservicePlugin extends PluginActivator {
             return object.getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
+        }
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Classes
+
+    private class Messenger {
+
+        private String pluginUri;
+
+        private Messenger(String pluginUri) {
+            this.pluginUri = pluginUri;
+        }
+
+        // ---
+
+        private void newTopicType(TopicType topicType) {
+            try {
+                messageToAllButOne(new JSONObject()
+                    .put("type", "newTopicType")
+                    .put("args", new JSONObject()
+                        .put("topicType", topicType.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"newTopicType\" message:", e);
+            }
+        }
+
+        // ---
+
+        private void messageToAllButOne(JSONObject message) {
+            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

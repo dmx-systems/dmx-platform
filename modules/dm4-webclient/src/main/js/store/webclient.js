@@ -28,7 +28,7 @@ const actions = {
     }
   },
 
-  // WebSocket message processing
+  // WebSocket messages
 
   _processDirectives ({dispatch}, directives) {
     console.log(`DetailPanel: processing ${directives.length} directives`)

@@ -342,7 +342,7 @@ const actions = {
     return p
   },
 
-  // WebSocket message processing
+  // WebSocket messages
 
   _newTopicmap (_, args) {
     const topicmapTopic = new dm5.Topic(args.topicmapTopic)

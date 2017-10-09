@@ -41,7 +41,7 @@ const actions = {
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
   },
 
-  // WebSocket message processing
+  // WebSocket messages
 
   _newWorkspace (_, {workspace}) {
     state.workspaceTopics.push(workspace)
