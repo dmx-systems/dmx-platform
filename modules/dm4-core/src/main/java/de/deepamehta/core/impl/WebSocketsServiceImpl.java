@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     private WebSocketsServer server;
     private WebSocketConnectionPool pool = new WebSocketConnectionPool();
+    private SendMessageWorker worker = new SendMessageWorker();
     private CoreService dm4;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -60,7 +63,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     @Override
     public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
-        getConnection(request, pluginUri).sendMessage(message);
+        queueMessage(getConnection(request, pluginUri), message);
     }
 
     // ---
@@ -77,6 +80,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
             logger.info("##### Starting Jetty WebSocket server #####");
             server = new WebSocketsServer(WEBSOCKETS_PORT);
             server.start();
+            worker.start();
             // ### server.join();
             logger.info("### Jetty WebSocket server started successfully");
         } catch (Exception e) {
@@ -89,8 +93,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
             if (server != null) {
                 logger.info("##### Stopping Jetty WebSocket server #####");
                 server.stop();
+                // TODO: stop the worker thread
             } else {
-                logger.info("Stopping Jetty WebSocket server ABORTED -- not yet started");
+                logger.info("Stopping Jetty WebSocket server SKIPPED -- not yet started");
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Stopping Jetty WebSocket server failed", e);
@@ -118,11 +123,17 @@ class WebSocketsServiceImpl implements WebSocketsService {
         if (connections != null) {
             for (WebSocketConnection connection : connections) {
                 if (connection != exclude) {
-                    connection.sendMessage(message);
+                    queueMessage(connection, message);
                 }
             }
         }
     }
+
+    private void queueMessage(WebSocketConnection connection, String message) {
+        worker.queueMessage(connection, message);
+    }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
@@ -163,6 +174,49 @@ class WebSocketsServiceImpl implements WebSocketsService {
         private String sessionId(HttpServletRequest request) {
             String sessionId = JavaUtils.cookieValue(request, "JSESSIONID");
             return sessionId != null ? sessionId : "anonymous-" + counter++;
+        }
+    }
+
+    private class SendMessageWorker extends Thread {
+
+        private BlockingQueue<QueuedMessage> messages = new LinkedBlockingQueue();
+
+        private SendMessageWorker() {
+            setPriority(Thread.MIN_PRIORITY);
+        }
+
+        @Override
+        public void run() {
+            while (true) {  // TODO: termination
+                try {
+                    QueuedMessage message = messages.take();
+                    yield();
+                    // logger.info("----- sending message " + Thread.currentThread().getName());
+                    message.connection.sendMessage(message.message);
+                } catch (InterruptedException e) {
+                    logger.log(Level.WARNING, "WebSocketsWorker was interrupted:", e);
+                }
+            }
+        }
+
+        private void queueMessage(WebSocketConnection connection, String message) {
+            try {
+                // logger.info("----- queueing message " + Thread.currentThread().getName());
+                messages.put(new QueuedMessage(connection, message));
+            } catch (InterruptedException e) {
+                logger.log(Level.WARNING, "WebSocketsWorker was interrupted:", e);
+            }
+        }
+    }
+
+    private static class QueuedMessage {
+
+        private WebSocketConnection connection;
+        private String message;
+
+        private QueuedMessage(WebSocketConnection connection, String message) {
+            this.connection = connection;
+            this.message = message;
         }
     }
 }
