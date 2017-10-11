@@ -92,8 +92,8 @@ class WebSocketsServiceImpl implements WebSocketsService {
         try {
             if (server != null) {
                 logger.info("##### Stopping Jetty WebSocket server #####");
+                worker.interrupt();
                 server.stop();
-                // TODO: stop the worker thread
             } else {
                 logger.info("Stopping Jetty WebSocket server SKIPPED -- not yet started");
             }
@@ -187,15 +187,17 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
         @Override
         public void run() {
-            while (true) {  // TODO: termination
-                try {
+            try {
+                while (true) {
                     QueuedMessage message = messages.take();
                     yield();
                     // logger.info("----- sending message " + Thread.currentThread().getName());
                     message.connection.sendMessage(message.message);
-                } catch (InterruptedException e) {
-                    logger.log(Level.WARNING, "WebSocketsWorker was interrupted:", e);
                 }
+            } catch (InterruptedException e) {
+                logger.info("### SendMessageWorker thread received an InterruptedException");
+            } finally {
+                logger.info("### Terminating SendMessageWorker thread");
             }
         }
 
