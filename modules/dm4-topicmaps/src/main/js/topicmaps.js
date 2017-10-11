@@ -513,7 +513,7 @@ function updateTopic (topic, dispatch) {
   const _topic = state.topicmap.getTopicIfExists(topic.id)
   if (_topic) {
     _topic.value = topic.value              // update state
-    dispatch('syncTopicLabel', topic.id)    // sync view
+    dispatch('syncTopic', topic.id)         // sync view
   }
   // update topicmap topics
   findTopicmapTopic(topic.id, (topics, i) => {
@@ -525,7 +525,8 @@ function updateAssoc (assoc, dispatch) {
   const _assoc = state.topicmap.getAssocIfExists(assoc.id)
   if (_assoc) {
     _assoc.value = assoc.value              // update state
-    dispatch('syncAssocLabel', assoc.id)    // sync view
+    _assoc.typeUri = assoc.typeUri          // update state
+    dispatch('syncAssoc', assoc.id)         // sync view
   }
 }
 
