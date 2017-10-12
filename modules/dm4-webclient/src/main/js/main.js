@@ -10,7 +10,7 @@ import './websocket'
 
 // The dm5 library must be inited *before* the SearchWidget component is created.
 // The SearchWidget relies on dm5's "menuTopicTypes" store getter.
-dm5.init(store)
+const ready = dm5.init(store)
 
 new Vue({
   el: '#app',
@@ -34,7 +34,7 @@ console.log('### Plugins loaded!')
 Promise.all([
   // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.
   // The type cache must be ready *before* "initialNavigation" is dispatched.
-  dm5.ready(),
+  ready,
   // Initial navigation might involve "select the 1st workspace", so the workspace
   // topics must be already loaded.
   store.state.workspaces.ready
