@@ -1,6 +1,6 @@
 <template>
   <div>
-    <field-renderer :object="object" :mode="mode"></field-renderer>
+    <object-renderer :object="object" :mode="mode"></object-renderer>
     <!-- Data Type -->
     <div class="field-label">Data Type</div>
     <div v-if="infoMode">{{dataType.value}}</div>
@@ -41,7 +41,7 @@ export default {
   ],
 
   components: {
-    'field-renderer': require('modules-nodejs/dm5-detail-panel/src/components/FieldRenderer')
+    'object-renderer': require('modules-nodejs/dm5-detail-panel/src/components/ObjectRenderer')
   }
 }
 </script>
