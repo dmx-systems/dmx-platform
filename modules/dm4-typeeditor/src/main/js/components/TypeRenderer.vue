@@ -37,11 +37,11 @@ export default {
   },
 
   mixins: [
-    require('modules-nodejs/dm5-detail-panel/src/components/mixins/infoMode').default
+    require('dm5-detail-panel/src/components/mixins/infoMode').default
   ],
 
   components: {
-    'object-renderer': require('modules-nodejs/dm5-detail-panel/src/components/ObjectRenderer')
+    'object-renderer': require('dm5-detail-panel/src/components/ObjectRenderer')
   }
 }
 </script>

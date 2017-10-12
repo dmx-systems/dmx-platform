@@ -13,8 +13,7 @@ module.exports = (env = {}) => {
     resolve: {
       extensions: [".js", ".vue"],
       alias: {
-        'modules':        path.resolve(__dirname, 'modules'),
-        'modules-nodejs': path.resolve(__dirname, 'modules-nodejs')
+        'modules': path.resolve(__dirname, 'modules')
       }
     },
     module: {
