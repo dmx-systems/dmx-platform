@@ -31,7 +31,7 @@ const actions = {
   // WebSocket messages
 
   _processDirectives ({dispatch}, directives) {
-    console.log(`DetailPanel: processing ${directives.length} directives`)
+    console.log(`Webclient: processing ${directives.length} directives`, directives)
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":

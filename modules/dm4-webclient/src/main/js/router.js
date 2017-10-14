@@ -196,9 +196,11 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchTopic (id, p) {
+  // topicmap panel
   p.then(() => {
     store.dispatch('setTopicSelection', id)
   })
+  // detail panel
   dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
     store.dispatch('displayObject', topic)
   })
@@ -211,17 +213,21 @@ function fetchTopic (id, p) {
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchAssoc (id, p) {
+  // topicmap panel
   p.then(() => {
     store.dispatch('setAssocSelection', id)
   })
+  // detail panel
   dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
     store.dispatch('displayObject', assoc)
   })
 }
 
 function unsetSelection(p) {
+  // topicmap panel
   p.then(() => {
     store.dispatch('unsetSelection')
   })
+  // detail panel
   store.dispatch('emptyDisplay')
 }

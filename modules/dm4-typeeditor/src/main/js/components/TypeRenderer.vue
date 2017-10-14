@@ -4,7 +4,7 @@
     <!-- Data Type -->
     <div class="field-label">Data Type</div>
     <div v-if="infoMode">{{dataType.value}}</div>
-    <el-select v-else v-model="type.dataType" size="small">
+    <el-select v-else v-model="object.dataTypeUri" size="small">
       <el-option v-for="dataType in dataTypes" :label="dataType.value" :value="dataType.uri" :key="dataType.uri">
       </el-option>
     </el-select>
@@ -17,18 +17,14 @@ import dm5 from 'dm5'
 export default {
 
   props: [
-    'object',   // the type to render (a dm5.Topic)
+    'object',   // the type to render (a dm5.TopicType/dm5.AssocType)
     'mode'      // 'info' or 'form'
   ],
 
   computed: {
 
-    type () {
-      return this.object.asType()
-    },
-
     dataType () {
-      return this.type.getDataType()
+      return this.object.getDataType()
     },
 
     dataTypes () {
