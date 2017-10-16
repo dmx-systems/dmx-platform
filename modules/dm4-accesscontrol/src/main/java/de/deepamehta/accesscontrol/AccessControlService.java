@@ -1,7 +1,5 @@
 package de.deepamehta.accesscontrol;
 
-import de.deepamehta.accesscontrol.AuthorizationMethod;
-
 import de.deepamehta.core.Association;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.accesscontrol.Credentials;
@@ -191,12 +189,11 @@ public interface AccessControlService {
 
 
 
-    // === Access Control Methods ===
+    // === Authorization Methods ===
 
     void registerAuthorizationMethod(String name, AuthorizationMethod am);
 
     void unregisterAuthorizationMethod(String name);
 
     Set<String> getAuthorizationMethods();
-    
 }
