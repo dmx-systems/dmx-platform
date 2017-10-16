@@ -7,7 +7,8 @@ export default (store) => ({
 
   components: {
     detailPanel: {
-      'dm4.core.topic_type': require('./components/TypeRenderer')
+      'dm4.core.topic_type': require('./components/TypeRenderer'),
+      'dm4.core.assoc_type': require('./components/TypeRenderer')
     }
   },
 
