@@ -30,8 +30,9 @@
   --label-color: #8391a5;
   --line-height: 1.5em;
   --paragraph-spacing: 1em;
-  --highlight-color: #20a0ff;   /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
-  --background-color: #f6f8fb;  /* brigher version of Element UI's table headers (#eef1f6) */
+  --highlight-color: #20a0ff;         /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
+  --background-color: #f6f8fb;        /* brigher version of Element UI's table headers (#eef1f6) */
+  --background-dark-color: #eef1f6;
 }
 
 html {

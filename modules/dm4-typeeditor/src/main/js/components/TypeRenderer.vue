@@ -1,13 +1,16 @@
 <template>
   <div>
+    <!-- Generic Object -->
     <object-renderer :object="object" :mode="mode"></object-renderer>
     <!-- Data Type -->
-    <div class="field-label">Data Type</div>
-    <div v-if="infoMode">{{dataType.value}}</div>
-    <el-select v-else v-model="object.dataTypeUri" size="small">
-      <el-option v-for="dataType in dataTypes" :label="dataType.value" :value="dataType.uri" :key="dataType.uri">
-      </el-option>
-    </el-select>
+    <div class="field">
+      <div class="field-label">Data Type</div>
+      <div v-if="infoMode">{{dataType.value}}</div>
+      <el-select v-else v-model="object.dataTypeUri" size="small">
+        <el-option v-for="dataType in dataTypes" :label="dataType.value" :value="dataType.uri" :key="dataType.uri">
+        </el-option>
+      </el-select>
+    </div>
   </div>
 </template>
 
