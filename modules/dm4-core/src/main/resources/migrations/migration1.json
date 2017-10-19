@@ -79,11 +79,6 @@
 
         # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
 
-        {
-            "value":       "Association",
-            "uri":         "dm4.core.association",
-            "dataTypeUri": "dm4.core.text"
-        },
         /*{
             "value":       "Aggregation",
             "uri":         "dm4.core.aggregation",
@@ -99,6 +94,11 @@
             "uri":         "dm4.core.instantiation",
             "dataTypeUri": "dm4.core.text"
         },*/
+        {
+            "value":       "Association",
+            "uri":         "dm4.core.association",
+            "dataTypeUri": "dm4.core.text"
+        },
         {
             "value":       "Sequence",
             "uri":         "dm4.core.sequence",
