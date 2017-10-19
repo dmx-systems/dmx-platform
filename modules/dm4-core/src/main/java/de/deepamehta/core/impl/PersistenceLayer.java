@@ -28,7 +28,11 @@ import java.util.logging.Logger;
 
 
 /**
- * Adds access control on top of vendor specific storage.
+ * Storage vendor agnostic access control on top of vendor specific storage.
+ *
+ * 2 kinds of methods:
+ *   - access controlled: get/create/update
+ *   - direct DB access: fetch/store (as derived from storage impl)
  */
 public final class PersistenceLayer extends StorageDecorator {
 

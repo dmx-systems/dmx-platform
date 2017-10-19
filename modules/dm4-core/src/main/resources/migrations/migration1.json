@@ -1,68 +1,10 @@
-{
-    "topic_types": [
-
-        # Note: The meta types "Topic Type" and "Association Type", and the
-        # topic types "Data Type" and "Role Type" are created programmatically.
-        # See CoreServiceImpl.setupBootstrapContent()
-
-        /*{
-            "value":       "Data Type",
-            "uri":         "dm4.core.data_type",
-            "dataTypeUri": "dm4.core.text"
-        },*/
-        /*{
-            "value":       "Role Type",
-            "uri":         "dm4.core.role_type",
-            "dataTypeUri": "dm4.core.text"
-        },*/
-        {
-            "value":       "Cardinality",
-            "uri":         "dm4.core.cardinality",
-            "dataTypeUri": "dm4.core.text"
-        },
-        {
-            "value":       "Index Mode",
-            "uri":         "dm4.core.index_mode",
-            "dataTypeUri": "dm4.core.text"
-        }
-    ],
-
-    "assoc_types": [
-
-        # Note: The association types "Aggregation" and "Instantiation" are created programmatically.
-        # See CoreServiceImpl.setupBootstrapContent()
-        # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
-
-        {
-            "value":       "Association",
-            "uri":         "dm4.core.association",
-            "dataTypeUri": "dm4.core.text"
-        },
-        /*{
-            "value":       "Aggregation",
-            "uri":         "dm4.core.aggregation",
-            "dataTypeUri": "dm4.core.text"
-        },*/
-        {
-            "value":       "Composition",
-            "uri":         "dm4.core.composition",
-            "dataTypeUri": "dm4.core.text"
-        },
-        /*{
-            "value":       "Instantiation",
-            "uri":         "dm4.core.instantiation",
-            "dataTypeUri": "dm4.core.text"
-        },*/
-        {
-            "value":       "Sequence",
-            "uri":         "dm4.core.sequence",
-            "dataTypeUri": "dm4.core.text"
-        }
-    ],
-
+[{
     "topics": [
 
         ### Data Types ###
+
+        # Note: The data types must be created *before* the topic types.
+        # Topic type "Identity Type" needs the "Boolean" data type.
 
         # Note: The data type "Text" is created programmatically.
         # See CoreServiceImpl.setupBootstrapContent()
@@ -91,7 +33,77 @@
             "value":   "Composite",
             "uri":     "dm4.core.composite",
             "typeUri": "dm4.core.data_type"
+        }
+    ]
+},
+{
+    "topic_types": [
+
+        # Note: The meta types "Topic Type" and "Association Type", and the
+        # topic types "Data Type" and "Role Type" are created programmatically.
+        # See CoreServiceImpl.setupBootstrapContent()
+
+        /*{
+            "value":       "Data Type",
+            "uri":         "dm4.core.data_type",
+            "dataTypeUri": "dm4.core.text"
+        },*/
+        /*{
+            "value":       "Role Type",
+            "uri":         "dm4.core.role_type",
+            "dataTypeUri": "dm4.core.text"
+        },*/
+        {
+            "value":       "Identity Type",
+            "uri":         "dm4.core.identity_type",
+            "dataTypeUri": "dm4.core.boolean"
         },
+        {
+            "value":       "Cardinality",
+            "uri":         "dm4.core.cardinality",
+            "dataTypeUri": "dm4.core.text"
+        },
+        {
+            "value":       "Index Mode",
+            "uri":         "dm4.core.index_mode",
+            "dataTypeUri": "dm4.core.text"
+        }
+    ],
+
+    "assoc_types": [
+
+        # Note: The association types "Aggregation", "Composition", and "Instantiation" are created programmatically.
+        # See CoreServiceImpl.setupBootstrapContent()
+        # Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
+
+        {
+            "value":       "Association",
+            "uri":         "dm4.core.association",
+            "dataTypeUri": "dm4.core.text"
+        },
+        /*{
+            "value":       "Aggregation",
+            "uri":         "dm4.core.aggregation",
+            "dataTypeUri": "dm4.core.text"
+        },*/
+        /*{
+            "value":       "Composition",
+            "uri":         "dm4.core.composition",
+            "dataTypeUri": "dm4.core.text"
+        },*/
+        /*{
+            "value":       "Instantiation",
+            "uri":         "dm4.core.instantiation",
+            "dataTypeUri": "dm4.core.text"
+        },*/
+        {
+            "value":       "Sequence",
+            "uri":         "dm4.core.sequence",
+            "dataTypeUri": "dm4.core.text"
+        }
+    ],
+
+    "topics": [
 
         ### Role Types ###
 
@@ -209,4 +221,4 @@
             "typeUri": "dm4.core.index_mode"
         }
     ]
-}
+}]

@@ -537,9 +537,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                ViewConfigurationModel viewConfig) {
-        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+                                        boolean isIdentityType, List<IndexMode> indexModes,
+                                        List<AssociationDefinitionModel> assocDefs, ViewConfigurationModel viewConfig) {
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, isIdentityType, indexModes, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -563,9 +563,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                 ViewConfigurationModel viewConfig) {
-        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+                                        boolean isIdentityType, List<IndexMode> indexModes,
+                                        List<AssociationDefinitionModel> assocDefs, ViewConfigurationModel viewConfig) {
+        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, isIdentityType, indexModes, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -588,20 +588,23 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // === TypeModel ===
 
-    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                               List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
-        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, viewConfig);
+    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, boolean isIdentityType,
+                               List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                               ViewConfigurationModelImpl viewConfig) {
+        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, isIdentityType, indexModes, assocDefs,
+            viewConfig);
     }
 
     TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
-        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, new ArrayList(), new ArrayList(),
-            newViewConfigurationModel());
+        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, false, new ArrayList(),
+            new ArrayList(), newViewConfigurationModel());                        // isIdentityType=false ### TODO?
     }
 
     TypeModelImpl newTypeModel(JSONObject typeModel) throws JSONException {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
+            typeModel.optBoolean("isIdentityType"),                                     // default is false
             parseIndexModes(typeModel.optJSONArray("indexModeUris")),                   // optJSONArray may return null
             parseAssocDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),    // optJSONArray may return null
             newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null

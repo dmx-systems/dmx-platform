@@ -17,6 +17,14 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
 
 
+    // === Identity Type ===
+
+    boolean isIdentityType();
+
+    void setIdentityType(boolean isIdentityType);
+
+
+
     // === Index Modes ===
 
     List<IndexMode> getIndexModes();

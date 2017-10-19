@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Storage-impl agnostic support for fetching/storing type models.
+ * Storage vendor agnostic support for fetching/storing type models.
  */
 class TypeStorage {
 
@@ -37,7 +37,7 @@ class TypeStorage {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TypeModelImpl> typeCache = new HashMap();   // type model cache
+    private Map<String, TypeModelImpl> typeCache = new HashMap();
 
     private EndlessRecursionDetection endlessRecursionDetection = new EndlessRecursionDetection();
 
@@ -103,16 +103,18 @@ class TypeStorage {
             // fetch generic topic
             TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(topicTypeUri));
             checkTopicType(topicTypeUri, typeTopic);
+            long typeId = typeTopic.getId();
             //
             // fetch type-specific parts
-            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), topicTypeUri, "topic type").getUri();
-            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
+            boolean isIdentityType = fetchIdentityType(typeId, topicTypeUri, "topic type");
+            List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
-            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, viewConfig);
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, isIdentityType,
+                indexModes, assocDefs, viewConfig);
             putInTypeCache(topicType);
             return topicType;
         } catch (Exception e) {
@@ -130,16 +132,18 @@ class TypeStorage {
             // fetch generic topic
             TopicModelImpl typeTopic = pl.fetchTopic("uri", new SimpleValue(assocTypeUri));
             checkAssociationType(assocTypeUri, typeTopic);
+            long typeId = typeTopic.getId();
             //
             // fetch type-specific parts
-            String dataTypeUri = fetchDataTypeTopic(typeTopic.getId(), assocTypeUri, "association type").getUri();
-            List<IndexMode> indexModes = fetchIndexModes(typeTopic.getId());
+            String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
+            boolean isIdentityType = fetchIdentityType(typeId, assocTypeUri, "association type");
+            List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, viewConfig);
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, isIdentityType,
+                indexModes, assocDefs, viewConfig);
             putInTypeCache(assocType);
             return assocType;
         } catch (Exception e) {
@@ -187,6 +191,7 @@ class TypeStorage {
         //
         // 2) store type-specific parts
         storeDataType(type.getUri(), type.getDataTypeUri());
+        storeIdentityType(type.getUri(), type.isIdentityType());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
@@ -225,6 +230,30 @@ class TypeStorage {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
                 dataTypeUri + "\" failed", e);
         }
+    }
+
+
+
+    // === Identity Type ===
+
+    // --- Fetch ---
+
+    private boolean fetchIdentityType(long typeId, String typeUri, String className) {
+        RelatedTopicModel identityType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent",
+            "dm4.core.child", "dm4.core.identity_type");
+        // TODO: should *every* type have the identity flag? At the moment the bootstrap types have no one.
+        return identityType != null ? identityType.getSimpleValue().booleanValue() : false;
+    }
+
+    // --- Store ---
+
+    private void storeIdentityType(String typeUri, boolean isIdentityType) {
+        Topic identityType = pl.createTopic(mf.newTopicModel("dm4.core.identity_type",
+            new SimpleValue(isIdentityType)));
+        pl.createAssociation("dm4.core.composition",
+            mf.newTopicRoleModel(typeUri, "dm4.core.parent"),
+            mf.newTopicRoleModel(identityType.getId(), "dm4.core.child")
+        );
     }
 
 

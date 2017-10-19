@@ -26,7 +26,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;                         // may be null in models used for an update operation
+    private String dataTypeUri;                 // may be null in models used for an update operation
+    private boolean isIdentityType;             // true for identity types, false for value types
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
@@ -35,21 +36,23 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, boolean isIdentityType, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
-        this.dataTypeUri = dataTypeUri;
-        this.indexModes  = indexModes;
-        this.assocDefs   = toMap(assocDefs);
-        this.viewConfig  = viewConfig;
+        this.dataTypeUri    = dataTypeUri;
+        this.isIdentityType = isIdentityType;
+        this.indexModes     = indexModes;
+        this.assocDefs      = toMap(assocDefs);
+        this.viewConfig     = viewConfig;
     }
 
     TypeModelImpl(TypeModelImpl type) {
         super(type);
-        this.dataTypeUri = type.getDataTypeUri();
-        this.indexModes  = type.getIndexModes();
-        this.assocDefs   = toMap(type.getAssocDefs());
-        this.viewConfig  = type.getViewConfig();
+        this.dataTypeUri    = type.getDataTypeUri();
+        this.isIdentityType = type.isIdentityType();
+        this.indexModes     = type.getIndexModes();
+        this.assocDefs      = toMap(type.getAssocDefs());
+        this.viewConfig     = type.getViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -66,6 +69,20 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public void setDataTypeUri(String dataTypeUri) {
         this.dataTypeUri = dataTypeUri;
+    }
+
+
+
+    // === Identity Type ===
+
+    @Override
+    public boolean isIdentityType() {
+        return isIdentityType;
+    }
+
+    @Override
+    public void setIdentityType(boolean isIdentityType) {
+        this.isIdentityType = isIdentityType;
     }
 
 
@@ -192,10 +209,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("dataTypeUri", getDataTypeUri())
+                .put("dataTypeUri", dataTypeUri)
+                .put("isIdentityType", isIdentityType)
                 .put("indexModeUris", toJSONArray(indexModes))
                 .put("assocDefs", toJSONArray(assocDefs.values()))
-                .put("viewConfigTopics", getViewConfig().toJSONArray());
+                .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed (" + this + ")", e);
         }
@@ -223,8 +241,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + getDataTypeUri() + "\", indexModes=" + getIndexModes() + ", assocDefs=" +
-            getAssocDefs() + ", " + getViewConfig();
+            "\", dataTypeUri=\"" + getDataTypeUri() + "\", isIdentityType=" + isIdentityType +
+            ", indexModes=" + getIndexModes() + ", assocDefs=" + getAssocDefs() + ", " + getViewConfig();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
