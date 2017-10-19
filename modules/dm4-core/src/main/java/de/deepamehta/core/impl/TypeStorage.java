@@ -107,7 +107,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            boolean isIdentityType = fetchIdentityType(typeId, topicTypeUri, "topic type");
+            boolean isIdentityType = fetchIdentityType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
@@ -136,7 +136,7 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            boolean isIdentityType = fetchIdentityType(typeId, assocTypeUri, "association type");
+            boolean isIdentityType = fetchIdentityType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
@@ -238,7 +238,7 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private boolean fetchIdentityType(long typeId, String typeUri, String className) {
+    private boolean fetchIdentityType(long typeId) {
         RelatedTopicModel identityType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent",
             "dm4.core.child", "dm4.core.identity_type");
         // TODO: should *every* type have the identity flag? At the moment the bootstrap types have no one.

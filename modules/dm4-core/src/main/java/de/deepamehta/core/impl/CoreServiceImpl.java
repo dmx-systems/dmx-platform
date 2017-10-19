@@ -498,24 +498,15 @@ public class CoreServiceImpl implements CoreService {
                 new SimpleValue("Association Type"));
             _createTopic(t);
             _createTopic(a);
-            // Create topic types "Data Type" and "Role Type"
+            // Create topic type "Data Type"
             // ### Note: the topic type "Data Type" depends on the data type "Text" and the data type "Text" in turn
             // depends on the topic type "Data Type". To resolve this circle we use a low-level (storage) call here
             // and postpone the data type association.
             TopicModel dataType = mf.newTopicTypeModel("dm4.core.data_type", "Data Type", "dm4.core.text");
-            TopicModel roleType = mf.newTopicTypeModel("dm4.core.role_type", "Role Type", "dm4.core.text");
             _createTopic(dataType);
-            _createTopic(roleType);
             // Create data type "Text"
             TopicModel text = mf.newTopicModel("dm4.core.text", "dm4.core.data_type", new SimpleValue("Text"));
             _createTopic(text);
-            // Create role types "Default", "Type", and "Instance"
-            TopicModel deflt = mf.newTopicModel("dm4.core.default",  "dm4.core.role_type", new SimpleValue("Default"));
-            TopicModel type  = mf.newTopicModel("dm4.core.type",     "dm4.core.role_type", new SimpleValue("Type"));
-            TopicModel inst  = mf.newTopicModel("dm4.core.instance", "dm4.core.role_type", new SimpleValue("Instance"));
-            _createTopic(deflt);
-            _createTopic(type);
-            _createTopic(inst);
             // Create association type "Aggregation" -- needed to associate topic/association types with data types
             TopicModel aggregation = mf.newAssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
             _createTopic(aggregation);
@@ -534,11 +525,7 @@ public class CoreServiceImpl implements CoreService {
             pl.createTopicInstantiation(t.getId(), t.getTypeUri());
             pl.createTopicInstantiation(a.getId(), a.getTypeUri());
             pl.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
-            pl.createTopicInstantiation(roleType.getId(), roleType.getTypeUri());
             pl.createTopicInstantiation(text.getId(), text.getTypeUri());
-            pl.createTopicInstantiation(deflt.getId(), deflt.getTypeUri());
-            pl.createTopicInstantiation(type.getId(), type.getTypeUri());
-            pl.createTopicInstantiation(inst.getId(), inst.getTypeUri());
             pl.createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
             pl.createTopicInstantiation(composition.getId(), composition.getTypeUri());
             pl.createTopicInstantiation(instn.getId(), instn.getTypeUri());
@@ -569,7 +556,6 @@ public class CoreServiceImpl implements CoreService {
             _associateDataType("dm4.core.topic_type", "dm4.core.text");
             _associateDataType("dm4.core.assoc_type", "dm4.core.text");
             _associateDataType("dm4.core.data_type",  "dm4.core.text");
-            _associateDataType("dm4.core.role_type",  "dm4.core.text");
             //
             _associateDataType("dm4.core.aggregation",   "dm4.core.text");
             _associateDataType("dm4.core.composition",   "dm4.core.text");
