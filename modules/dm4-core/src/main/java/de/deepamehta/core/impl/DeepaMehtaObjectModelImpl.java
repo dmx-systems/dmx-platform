@@ -408,11 +408,15 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
+            unifyValues(updateModel);
+            // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face
+            // of DM5 update logic (= unification). Note that update() is not called recursively anmore.
+            /* TODO: drop it!
             if (isSimple()) {
                 _updateSimpleValue(updateModel.getSimpleValue());
             } else {
                 _updateChildTopics(updateModel.getChildTopicsModel());
-            }
+            } */
             //
             postUpdate(updateModel, oldObject);
             //
@@ -514,6 +518,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Update Child Topics (memory + DB) ===
 
     // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
+    // ### TODO: drop it!
     final void _updateChildTopics(ChildTopicsModelImpl updateModel) {
         try {
             for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
@@ -551,6 +556,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // It may originate from a facet definition as well.
     // Called from DeepaMehtaObjectImpl.updateChildTopic() and DeepaMehtaObjectImpl.updateChildTopics().
     // ### TODO: make this private? See comments in DeepaMehtaObjectImpl.
+    // ### TODO: drop it!
     final void updateChildTopics(RelatedTopicModelImpl newChildTopic, List<RelatedTopicModelImpl> newChildTopics,
                                                                       AssociationDefinitionModel assocDef) {
         // Note: updating the child topics requires them to be loaded
@@ -685,6 +691,75 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
 
 
+    // === Update Values (memory + DB) ===
+
+    long unifyValues(DeepaMehtaObjectModelImpl updateModel) {
+        if (isSimple()) {
+            return unifySimple(updateModel.getSimpleValue());
+        } else {
+            return unifyComposite(updateModel.getChildTopicsModel());
+        }
+    }
+
+    private long unifySimple(SimpleValue newValue) {
+        if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
+            logger.info("### Changing simple value of " + objectInfo() + " from \"" + value + "\" -> \"" + newValue +
+                "\"");
+            return getOrCreateTopic(newValue).getId();
+        } else {
+            return id;
+        }
+    }
+
+    private long unifyComposite(ChildTopicsModelImpl updateModel) {
+        try {
+            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
+                String assocDefUri = assocDef.getAssocDefUri();
+                if (assocDef.getChildCardinalityUri().equals("dm4.core.many")) {
+                    throw new RuntimeException("many cardinality not yet implemented");
+                }
+                RelatedTopicModelImpl childUpdateModel = updateModel.getTopicOrNull(assocDefUri);
+                // skip if not contained in update request
+                if (childUpdateModel == null) {
+                    continue;
+                }
+                //
+                unifyComposite(childUpdateModel, assocDef);      // TODO: collect returned ids
+            }
+            //
+            _calculateLabelAndUpdate();
+            //
+            return -1;
+            // TODO: unify composite based on collected child ids, and return its id.
+            // The unified composite is either an existing one, or newly created.
+        } catch (Exception e) {
+            throw new RuntimeException("Unifying " + objectInfo() + " failed", e);
+        }
+    }
+
+    private long unifyComposite(RelatedTopicModelImpl childUpdateModel, AssociationDefinitionModel assocDef) {
+        // Note: updating the child topics requires them to be loaded
+        loadChildTopics(assocDef);
+        //
+        RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
+        // update topic
+        long id = childTopic.unifyValues(childUpdateModel);
+        // update association
+        // updateRelatingAssociation(childTopic, childUpdateModel);    // TODO
+        return id;
+    }
+
+    private TopicImpl getOrCreateTopic(SimpleValue value) {
+        TopicImpl topic = pl.getTopicByValue(typeUri, value);
+        if (topic == null) {
+            topic = pl.createTopic(mf.newTopicModel(typeUri, value));
+        }
+        return topic;
+    }
+
+
+
+    // ### TODO: drop it!
     // === Update Child Topics (memory + DB) ===
 
     // --- Composition ---
