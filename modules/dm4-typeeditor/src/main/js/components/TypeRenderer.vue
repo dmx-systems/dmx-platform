@@ -11,6 +11,12 @@
         </el-option>
       </el-select>
     </div>
+    <!-- Identity Type -->
+    <div class="field">
+      <div class="field-label">Identity Type</div>
+      <div v-if="infoMode">{{object.isIdentityType}}</div>
+      <boolean-field v-else v-model="object.isIdentityType" :mode="mode"></boolean-field>
+    </div>
   </div>
 </template>
 
@@ -40,7 +46,8 @@ export default {
   ],
 
   components: {
-    'object-renderer': require('dm5-detail-panel/src/components/ObjectRenderer')
+    'object-renderer': require('dm5-detail-panel/src/components/ObjectRenderer'),
+    'boolean-field':   require('dm5-detail-panel/src/components/BooleanField')
   }
 }
 </script>
