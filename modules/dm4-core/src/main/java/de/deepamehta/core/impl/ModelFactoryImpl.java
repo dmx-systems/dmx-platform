@@ -63,6 +63,7 @@ public class ModelFactoryImpl implements ModelFactory {
         return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
     }
 
+    // TODO: needed?
     @Override
     public TopicModelImpl newTopicModel(ChildTopicsModel childTopics) {
         return newTopicModel(-1, null, null, null, childTopics);

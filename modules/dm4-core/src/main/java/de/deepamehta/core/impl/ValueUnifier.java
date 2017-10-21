@@ -31,6 +31,9 @@ class ValueUnifier {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     ValueUnifier(DeepaMehtaObjectModelImpl updateModel, PersistenceLayer pl) {
+        if (updateModel.typeUri == null) {
+            throw new RuntimeException("Tried to build a ValueUnifier for an updateModel whose typeUri is not set");
+        }
         this.updateModel = updateModel;
         this.pl = pl;
         this.mf = pl.mf;
@@ -45,36 +48,45 @@ class ValueUnifier {
     long unify(DeepaMehtaObjectModelImpl refObj) {
         this.refObj = refObj;
         if (updateModel.isSimple()) {
-            return unifySimple(updateModel.getSimpleValue());
+            return unifySimple(updateModel);
         } else {
-            return unifyComposite(updateModel.getType(), updateModel.getChildTopicsModel());
+            return unifyComposite(updateModel);
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private long unifySimple(SimpleValue newValue) {
+    private long unifySimple(DeepaMehtaObjectModelImpl updateModel) {
+        TypeModelImpl type = updateModel.getType();
+        SimpleValue newValue = updateModel.getSimpleValue();
         if (refObj != null) {
             if (newValue != null && !newValue.equals(refObj.value)) {          // abort if no update is requested
                 logger.info("### Changing simple value of " + refObj.objectInfo() + " from \"" + refObj.value +
                     "\" -> \"" + newValue + "\"");
-                return getOrCreateSimpleTopic(newValue).getId();
-            } else {
-                return refObj.id;
+                if (type.isValueType()) {
+                    return getOrCreateSimpleTopic(type.uri, newValue).getId();
+                } else {
+                    refObj.updateSimpleValue(newValue);
+                }
             }
+            return refObj.id;
         } else {
-            return -1;  // TODO
+            if (type.isValueType()) {
+                return getOrCreateSimpleTopic(type.uri, newValue).getId();
+            } else {
+                return createSimpleTopic(type.uri, newValue).getId();
+            }
         }
     }
 
-    private long unifyComposite(TypeModelImpl type, ChildTopicsModelImpl updateModel) {
+    private long unifyComposite(DeepaMehtaObjectModelImpl updateModel) {
         try {
-            for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
+            for (AssociationDefinitionModel assocDef : updateModel.getType().getAssocDefs()) {
                 String assocDefUri = assocDef.getAssocDefUri();
                 if (assocDef.getChildCardinalityUri().equals("dm4.core.many")) {
                     throw new RuntimeException("many cardinality not yet implemented");
                 }
-                RelatedTopicModelImpl childUpdateModel = updateModel.getTopicOrNull(assocDefUri);
+                RelatedTopicModelImpl childUpdateModel = updateModel.getChildTopicsModel().getTopicOrNull(assocDefUri);
                 // skip if not contained in update request
                 if (childUpdateModel == null) {
                     continue;
@@ -106,11 +118,15 @@ class ValueUnifier {
         // updateRelatingAssociation(childTopic, childUpdateModel);    // TODO
     }
 
-    private TopicImpl getOrCreateSimpleTopic(SimpleValue value) {
-        TopicImpl topic = pl.getTopicByValue(refObj.typeUri, value);
+    private TopicImpl getOrCreateSimpleTopic(String typeUri, SimpleValue value) {
+        TopicImpl topic = pl.getTopicByValue(typeUri, value);
         if (topic == null) {
-            topic = pl.createTopic(mf.newTopicModel(refObj.typeUri, value));
+            topic = createSimpleTopic(typeUri, value);
         }
         return topic;
+    }
+
+    private TopicImpl createSimpleTopic(String typeUri, SimpleValue value) {
+        return pl.createTopic(mf.newTopicModel(typeUri, value));
     }
 }

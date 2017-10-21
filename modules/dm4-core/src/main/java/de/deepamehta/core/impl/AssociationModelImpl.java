@@ -175,7 +175,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     AssociationModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newAssociationModel(childTopics);
+        return mf.newAssociationModel(childTopics);     // FIXME: must pass typeUri?
     }
 
     // ---

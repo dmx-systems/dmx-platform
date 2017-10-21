@@ -68,7 +68,7 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
 
     @Override
     final TopicModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newTopicModel(childTopics);
+        return mf.newTopicModel(typeUri, childTopics);
     }
 
     // ---
