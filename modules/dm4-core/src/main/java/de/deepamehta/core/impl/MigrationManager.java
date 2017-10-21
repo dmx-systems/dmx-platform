@@ -46,7 +46,7 @@ class MigrationManager {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Determines the migrations to be run for the specified plugin and runs them.
+     * Determines the migrations to be run for the specified plugin, and runs them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
         int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
@@ -63,12 +63,12 @@ class MigrationManager {
         logger.info("Running " + migrationsToRun + " migrations for " + plugin + " (installed model: version " +
             installedModelVersion + ", required model: version " + requiredModelVersion + ")");
         for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
-            runPluginMigration(plugin, i, isCleanInstall);
+            runMigration(i, plugin, isCleanInstall);
         }
     }
 
     /**
-     * Determines the core migrations to be run and runs them.
+     * Determines the core migrations to be run, and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
         int installedModelVersion = dm4.pl.fetchMigrationNr();
@@ -84,26 +84,14 @@ class MigrationManager {
         logger.info("Running " + migrationsToRun + " core migrations (installed model: version " +
             installedModelVersion + ", required model: version " + requiredModelVersion + ")");
         for (int i = installedModelVersion + 1; i <= requiredModelVersion; i++) {
-            runCoreMigration(i, isCleanInstall);
+            runMigration(i, null, isCleanInstall);      // plugin=null
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void runCoreMigration(int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, null, isCleanInstall);
-        dm4.pl.storeMigrationNr(migrationNr);
-    }
-
-    private void runPluginMigration(PluginImpl plugin, int migrationNr, boolean isCleanInstall) {
-        runMigration(migrationNr, plugin, isCleanInstall);
-        plugin.setMigrationNr(migrationNr);
-    }
-
-    // ---
-
     /**
-     * Runs a core migration or a plugin migration.
+     * Collects the info needed to run a migration, runs it, and then updates the version number in the DB.
      *
      * @param   migrationNr     Number of the migration to run.
      * @param   plugin          The plugin that provides the migration to run.
@@ -117,30 +105,51 @@ class MigrationManager {
             // collect info
             mi = new MigrationInfo(migrationNr, plugin);
             if (!mi.success) {
-                throw mi.exception;
+                throw mi.exception;     // is not a runtime exception
             }
             mi.checkValidity();
             //
-            // run migration
-            String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
-            if (mi.runMode.equals(MigrationRunMode.CLEAN_INSTALL.name()) == isCleanInstall ||
-                mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
-                logger.info("Running " + mi.migrationInfo + runInfo);
-                if (mi.isDeclarative) {
-                    readMigrationFile(mi.migrationIn, mi.migrationFile);
-                } else {
-                    Migration migration = (Migration) mi.migrationClass.newInstance();
-                    injectServices(migration, mi.migrationInfo, plugin);
-                    migration.setCoreService(dm4);
-                    logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
-                    migration.run();
-                }
-            } else {
-                logger.info("Running " + mi.migrationInfo + " SKIPPED" + runInfo);
-            }
-            logger.info("Updating installed model: version " + migrationNr);
+            _runMigration(mi, isCleanInstall);
+            //
+            updateVersionNumber(mi);
         } catch (Exception e) {
+            // Note: mi is instantiated for sure
             throw new RuntimeException("Running " + mi.migrationInfo + " failed", e);
+        }
+    }
+
+    /**
+     * Runs a migration.
+     */
+    private void _runMigration(MigrationInfo mi, boolean isCleanInstall) throws Exception {
+        String runInfo = " (runMode=" + mi.runMode + ", isCleanInstall=" + isCleanInstall + ")";
+        if (mi.runMode.equals(MigrationRunMode.CLEAN_INSTALL.name()) == isCleanInstall ||
+            mi.runMode.equals(MigrationRunMode.ALWAYS.name())) {
+            logger.info("Running " + mi.migrationInfo + runInfo);
+            if (mi.isDeclarative) {
+                readMigrationFile(mi.migrationIn, mi.migrationFile);
+            } else {
+                Migration migration = (Migration) mi.migrationClass.newInstance(); // throws InstantiationException, ...
+                injectServices(migration, mi.migrationInfo, mi.plugin);
+                migration.setCoreService(dm4);
+                logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
+                migration.run();
+            }
+        } else {
+            logger.info("Running " + mi.migrationInfo + " SKIPPED" + runInfo);
+        }
+    }
+
+    private void updateVersionNumber(MigrationInfo mi) {
+        try {
+            logger.info("Updating installed model: version " + mi.migrationNr);
+            if (mi.migrationType.equals("core")) {
+                dm4.pl.storeMigrationNr(mi.migrationNr);
+            } else {
+                mi.plugin.setMigrationNr(mi.migrationNr);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating the model version number to " + mi.migrationNr + " failed", e);
         }
     }
 
@@ -248,6 +257,9 @@ class MigrationManager {
      */
     private class MigrationInfo {
 
+        int migrationNr;
+        PluginImpl plugin;
+        //
         String migrationType;       // "core", "plugin"
         String migrationInfo;       // for logging
         String runMode;             // "CLEAN_INSTALL", "UPDATE", "ALWAYS"
@@ -266,21 +278,23 @@ class MigrationManager {
 
         MigrationInfo(int migrationNr, PluginImpl plugin) {
             try {
-                String configFile = migrationConfigFile(migrationNr);
+                this.migrationNr = migrationNr;
+                this.plugin = plugin;
+                String configFile = migrationConfigFile();
                 InputStream configIn;
-                migrationFile = migrationFile(migrationNr);
+                migrationFile = migrationFile();
                 migrationType = plugin != null ? "plugin" : "core";
                 //
                 if (migrationType.equals("core")) {
                     migrationInfo = "core migration " + migrationNr;
                     configIn     = getClass().getResourceAsStream(configFile);
                     migrationIn  = getClass().getResourceAsStream(migrationFile);
-                    migrationClassName = coreMigrationClassName(migrationNr);
+                    migrationClassName = coreMigrationClassName();
                     migrationClass = loadClass(migrationClassName);
                 } else {
                     migrationInfo = "migration " + migrationNr + " of " + plugin;
-                    configIn     = getStaticResourceOrNull(plugin, configFile);
-                    migrationIn  = getStaticResourceOrNull(plugin, migrationFile);
+                    configIn     = getStaticResourceOrNull(configFile);
+                    migrationIn  = getStaticResourceOrNull(migrationFile);
                     migrationClassName = plugin.getMigrationClassName(migrationNr);
                     if (migrationClassName != null) {
                         migrationClass = plugin.loadClass(migrationClassName);
@@ -339,21 +353,21 @@ class MigrationManager {
 
         // ---
 
-        private String migrationFile(int migrationNr) {
+        private String migrationFile() {
             return "/migrations/migration" + migrationNr + ".json";
         }
 
-        private String migrationConfigFile(int migrationNr) {
+        private String migrationConfigFile() {
             return "/migrations/migration" + migrationNr + ".properties";
         }
 
-        private String coreMigrationClassName(int migrationNr) {
+        private String coreMigrationClassName() {
             return CORE_MIGRATIONS_PACKAGE + ".Migration" + migrationNr;
         }
 
         // --- Helper ---
 
-        private InputStream getStaticResourceOrNull(Plugin plugin, String resourceName) {
+        private InputStream getStaticResourceOrNull(String resourceName) {
             if (plugin.hasStaticResource(resourceName)) {
                 return plugin.getStaticResource(resourceName);
             } else {
