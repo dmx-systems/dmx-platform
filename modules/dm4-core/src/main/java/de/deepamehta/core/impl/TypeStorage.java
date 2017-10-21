@@ -107,13 +107,13 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            boolean isIdentityType = fetchIdentityType(typeId);
+            boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
-            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, isIdentityType,
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, isValueType,
                 indexModes, assocDefs, viewConfig);
             putInTypeCache(topicType);
             return topicType;
@@ -136,13 +136,13 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            boolean isIdentityType = fetchIdentityType(typeId);
+            boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, isIdentityType,
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, isValueType,
                 indexModes, assocDefs, viewConfig);
             putInTypeCache(assocType);
             return assocType;
@@ -191,7 +191,7 @@ class TypeStorage {
         //
         // 2) store type-specific parts
         storeDataType(type.getUri(), type.getDataTypeUri());
-        storeIdentityType(type.getUri(), type.isIdentityType());
+        storeValueType(type.getUri(), type.isValueType());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
@@ -234,25 +234,25 @@ class TypeStorage {
 
 
 
-    // === Identity Type ===
+    // === Value Type ===
 
     // --- Fetch ---
 
-    private boolean fetchIdentityType(long typeId) {
-        RelatedTopicModel identityType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent",
-            "dm4.core.child", "dm4.core.identity_type");
-        // TODO: should *every* type have the identity flag? At the moment the bootstrap types have no one.
-        return identityType != null ? identityType.getSimpleValue().booleanValue() : false;
+    private boolean fetchValueType(long typeId) {
+        RelatedTopicModel valueType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent",
+            "dm4.core.child", "dm4.core.value_type");
+        // TODO: should *every* type have the value flag? At the moment the bootstrap types have no one.
+        return valueType != null ? valueType.getSimpleValue().booleanValue() : false;
     }
 
     // --- Store ---
 
-    private void storeIdentityType(String typeUri, boolean isIdentityType) {
-        Topic identityType = pl.createTopic(mf.newTopicModel("dm4.core.identity_type",
-            new SimpleValue(isIdentityType)));
+    private void storeValueType(String typeUri, boolean isValueType) {
+        Topic valueType = pl.createTopic(mf.newTopicModel("dm4.core.value_type",
+            new SimpleValue(isValueType)));
         pl.createAssociation("dm4.core.composition",
             mf.newTopicRoleModel(typeUri, "dm4.core.parent"),
-            mf.newTopicRoleModel(identityType.getId(), "dm4.core.child")
+            mf.newTopicRoleModel(valueType.getId(), "dm4.core.child")
         );
     }
 

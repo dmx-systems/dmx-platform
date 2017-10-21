@@ -7,7 +7,7 @@
         # See CoreServiceImpl.setupBootstrapContent()
 
         # Note: The data types must be created *before* the topic types.
-        # Topic type "Identity Type" needs the "Boolean" data type.
+        # Topic type "Value Type" needs the "Boolean" data type.
 
         /*{
             "value":   "Text",
@@ -43,7 +43,7 @@
         # and the topic type "Data Type" are created programmatically.
         # See CoreServiceImpl.setupBootstrapContent()
 
-        # Note: "Identity Type" must be created first as all topic/assoc types need it.
+        # Note: "Value Type" must be created first as all topic/assoc types need it.
 
         /*{
             "value":       "Data Type",
@@ -51,8 +51,8 @@
             "dataTypeUri": "dm4.core.text"
         },*/
         {
-            "value":       "Identity Type",
-            "uri":         "dm4.core.identity_type",
+            "value":       "Value Type",
+            "uri":         "dm4.core.value_type",
             "dataTypeUri": "dm4.core.boolean"
         },
         {

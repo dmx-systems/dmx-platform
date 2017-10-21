@@ -26,8 +26,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;                 // may be null in models used for an update operation
-    private boolean isIdentityType;             // true for identity types, false for value types
+    private String dataTypeUri;     // may be null in models used for an update operation
+    private boolean isValueType;    // true for value types, false for identity types
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
@@ -36,23 +36,23 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, boolean isIdentityType, List<IndexMode> indexModes,
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, boolean isValueType, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
-        this.dataTypeUri    = dataTypeUri;
-        this.isIdentityType = isIdentityType;
-        this.indexModes     = indexModes;
-        this.assocDefs      = toMap(assocDefs);
-        this.viewConfig     = viewConfig;
+        this.dataTypeUri  = dataTypeUri;
+        this.isValueType  = isValueType;
+        this.indexModes   = indexModes;
+        this.assocDefs    = toMap(assocDefs);
+        this.viewConfig   = viewConfig;
     }
 
     TypeModelImpl(TypeModelImpl type) {
         super(type);
-        this.dataTypeUri    = type.getDataTypeUri();
-        this.isIdentityType = type.isIdentityType();
-        this.indexModes     = type.getIndexModes();
-        this.assocDefs      = toMap(type.getAssocDefs());
-        this.viewConfig     = type.getViewConfig();
+        this.dataTypeUri  = type.getDataTypeUri();
+        this.isValueType  = type.isValueType();
+        this.indexModes   = type.getIndexModes();
+        this.assocDefs    = toMap(type.getAssocDefs());
+        this.viewConfig   = type.getViewConfig();
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -73,16 +73,16 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
-    // === Identity Type ===
+    // === Value Type ===
 
     @Override
-    public boolean isIdentityType() {
-        return isIdentityType;
+    public boolean isValueType() {
+        return isValueType;
     }
 
     @Override
-    public void setIdentityType(boolean isIdentityType) {
-        this.isIdentityType = isIdentityType;
+    public void setValueType(boolean isValueType) {
+        this.isValueType = isValueType;
     }
 
 
@@ -210,7 +210,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             return super.toJSON()
                 .put("dataTypeUri", dataTypeUri)
-                .put("isIdentityType", isIdentityType)
+                .put("isValueType", isValueType)
                 .put("indexModeUris", toJSONArray(indexModes))
                 .put("assocDefs", toJSONArray(assocDefs.values()))
                 .put("viewConfigTopics", viewConfig.toJSONArray());
@@ -241,7 +241,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public String toString() {
         return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + getDataTypeUri() + "\", isIdentityType=" + isIdentityType +
+            "\", dataTypeUri=\"" + getDataTypeUri() + "\", isValueType=" + isValueType +
             ", indexModes=" + getIndexModes() + ", assocDefs=" + getAssocDefs() + ", " + getViewConfig();
     }
 

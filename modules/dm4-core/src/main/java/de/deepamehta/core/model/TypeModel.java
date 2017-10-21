@@ -17,11 +17,11 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
 
 
-    // === Identity Type ===
+    // === Value Type ===
 
-    boolean isIdentityType();
+    boolean isValueType();
 
-    void setIdentityType(boolean isIdentityType);
+    void setValueType(boolean isValueType);
 
 
 

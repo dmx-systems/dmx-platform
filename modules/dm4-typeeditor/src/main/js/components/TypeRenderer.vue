@@ -11,11 +11,11 @@
         </el-option>
       </el-select>
     </div>
-    <!-- Identity Type -->
+    <!-- Value Type -->
     <div class="field">
-      <div class="field-label">Identity Type</div>
-      <div v-if="infoMode">{{object.isIdentityType}}</div>
-      <boolean-field v-else v-model="object.isIdentityType" :mode="mode"></boolean-field>
+      <div class="field-label">Value Type</div>
+      <div v-if="infoMode">{{object.isValueType}}</div>
+      <boolean-field v-else v-model="object.isValueType" :mode="mode"></boolean-field>
     </div>
   </div>
 </template>

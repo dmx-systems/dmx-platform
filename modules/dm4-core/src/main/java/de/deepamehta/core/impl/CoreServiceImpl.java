@@ -510,7 +510,7 @@ public class CoreServiceImpl implements CoreService {
             // Create association type "Aggregation" -- needed to associate topic/association types with data types
             TopicModel aggregation = mf.newAssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
             _createTopic(aggregation);
-            // Create association type "Composition" -- needed to associate topic/association types with identity type
+            // Create association type "Composition" -- needed to associate topic/association types with value type
             TopicModel composition = mf.newAssociationTypeModel("dm4.core.composition", "Composition", "dm4.core.text");
             _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types

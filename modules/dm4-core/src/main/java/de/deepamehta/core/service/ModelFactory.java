@@ -173,7 +173,7 @@ public interface ModelFactory {
 
     // === TopicTypeModel ===
 
-    TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, boolean isIdentityType,
+    TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri, boolean isValueType,
                                      List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                      ViewConfigurationModel viewConfig);
 
@@ -185,7 +185,7 @@ public interface ModelFactory {
 
     // === AssociationTypeModel ===
 
-    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, boolean isIdentityType,
+    AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri, boolean isValueType,
                                                  List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
                                                  ViewConfigurationModel viewConfig);
 
