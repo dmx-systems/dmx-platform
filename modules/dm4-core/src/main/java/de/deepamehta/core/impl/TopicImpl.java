@@ -86,16 +86,15 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // === Traversal ===
 
-    // ### TODO: move logic to model
+    // ### TODO: consider adding model convenience, would require model renamings (get -> fetch)
 
     // --- Topic Retrieval ---
 
     @Override
     public final List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> topics = pl.fetchTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri,
-            othersRoleTypeUri, othersTopicTypeUri);
-        return pl.checkReadAccessAndInstantiate(topics);
+        return pl.instantiate(pl.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri));
     }
 
     // --- Association Retrieval ---
@@ -103,17 +102,16 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public final RelatedAssociation getRelatedAssociation(String assocTypeUri, String myRoleTypeUri,
                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
-        RelatedAssociationModelImpl assoc = pl.fetchTopicRelatedAssociation(getId(),
-            assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return assoc != null ? pl.<RelatedAssociation>checkReadAccessAndInstantiate(assoc) : null;
+        RelatedAssociationModelImpl assoc = pl.getTopicRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? assoc.instantiate() : null;
     }
 
     @Override
     public final List<RelatedAssociation> getRelatedAssociations(String assocTypeUri, String myRoleTypeUri,
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
-        List<RelatedAssociationModelImpl> assocs = pl.fetchTopicRelatedAssociations(getId(), assocTypeUri,
-            myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
-        return pl.checkReadAccessAndInstantiate(assocs);
+        return pl.instantiate(pl.getTopicRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri));
     }
 
     // ---
@@ -121,13 +119,11 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
     @Override
     public final Association getAssociation(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                                                                        long othersTopicId) {
-        AssociationModelImpl assoc = pl.fetchAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri,
-            othersRoleTypeUri);
-        return assoc != null ? pl.<Association>checkReadAccessAndInstantiate(assoc) : null;
+        return pl.getAssociation(assocTypeUri, getId(), othersTopicId, myRoleTypeUri, othersRoleTypeUri);
     }
 
     @Override
     public final List<Association> getAssociations() {
-        return pl.checkReadAccessAndInstantiate(pl.fetchTopicAssociations(getId()));
+        return pl.instantiate(pl.getTopicAssociations(getId()));
     }
 }

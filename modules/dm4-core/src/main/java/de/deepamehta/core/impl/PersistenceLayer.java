@@ -33,6 +33,9 @@ import java.util.logging.Logger;
  * 2 kinds of methods:
  *   - access controlled: get/create/update
  *   - direct DB access: fetch/store (as derived from storage impl)
+ *
+ * ### TODO: no instatiations here
+ * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
  */
 public final class PersistenceLayer extends StorageDecorator {
 
@@ -294,6 +297,8 @@ public final class PersistenceLayer extends StorageDecorator {
 
     /**
      * Fetches from DB and filters READables. No instantiation.
+     *
+     * ### TODO: drop this. Use the new traversal methods instead.
      */
     Iterable<AssociationModelImpl> _getAssociations(String assocTypeUri, long topic1Id, long topic2Id,
                                                     String roleTypeUri1, String roleTypeUri2) {
@@ -585,6 +590,60 @@ public final class PersistenceLayer extends StorageDecorator {
 
 
 
+    // === Traversal ===
+
+    // --- Topic Source ---
+
+    List<RelatedTopicModelImpl> getTopicRelatedTopics(long topicId, List<String> assocTypeUris, String myRoleTypeUri,
+                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
+        return filterReadables(fetchTopicRelatedTopics(topicId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri));
+    }
+
+    RelatedAssociationModelImpl getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
+                                                           String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssociationModelImpl assoc = fetchTopicRelatedAssociation(topicId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? checkReadAccess(assoc) : null;
+    }
+
+    List<RelatedAssociationModelImpl> getTopicRelatedAssociations(long topicId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        return filterReadables(fetchTopicRelatedAssociations(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
+            othersAssocTypeUri));
+    }
+
+    List<AssociationModelImpl> getTopicAssociations(long topicId) {
+        return filterReadables(fetchTopicAssociations(topicId));
+    }
+
+    // --- Association Source ---
+
+    List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
+        return filterReadables(fetchAssociationRelatedTopics(assocId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
+            othersTopicTypeUri));
+    }
+
+    RelatedAssociationModelImpl getAssociationRelatedAssociation(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        RelatedAssociationModelImpl assoc = fetchAssociationRelatedAssociation(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri);
+        return assoc != null ? checkReadAccess(assoc) : null;
+    }
+
+    List<RelatedAssociationModelImpl> getAssociationRelatedAssociations(long assocId, String assocTypeUri,
+                                            String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
+        return filterReadables(fetchAssociationRelatedAssociations(assocId, assocTypeUri, myRoleTypeUri,
+            othersRoleTypeUri, othersAssocTypeUri));
+    }
+
+    List<AssociationModelImpl> getAssociationAssociations(long assocId) {
+        return filterReadables(fetchAssociationAssociations(assocId));
+    }
+
+
+
     // === Properties ===
 
     List<Topic> getTopicsByProperty(String propUri, Object propValue) {
@@ -611,20 +670,20 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // These methods 1) instantiate objects from models, and 2) check the READ permission for each model.
     // Call these methods when passing objects fetched from the DB to the user.
-    // ### TODO: make these private?
 
+    // ### TODO: drop this. No instatiations in this class.
     <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
-        model.checkReadAccess();
-        return (O) model.instantiate();
+        return (O) checkReadAccess(model).instantiate();
     }
 
-    <O> List<O> checkReadAccessAndInstantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+    // ### TODO: drop this. No instatiations in this class.
+    <O> List<O> checkReadAccessAndInstantiate(List<? extends DeepaMehtaObjectModelImpl> models) {
         return instantiate(filterReadables(models));
     }
 
     // ---
 
-    private <M extends DeepaMehtaObjectModelImpl> Iterable<M> filterReadables(Iterable<M> models) {
+    private <M extends DeepaMehtaObjectModelImpl> List<M> filterReadables(List<M> models) {
         Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
             if (!hasReadAccess(i.next())) {
@@ -636,11 +695,18 @@ public final class PersistenceLayer extends StorageDecorator {
 
     boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
         try {
-            model.checkReadAccess();
+            checkReadAccess(model);
             return true;
         } catch (AccessControlException e) {
             return false;
         }
+    }
+
+    // ---
+
+    <M extends DeepaMehtaObjectModelImpl> M checkReadAccess(M model) {
+        model.checkReadAccess();
+        return model;
     }
 
     // ---
@@ -667,6 +733,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Instantiation ===
 
+    // ### TODO: move to kernel utils
     <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
         List<O> objects = new ArrayList();
         for (DeepaMehtaObjectModelImpl model : models) {
