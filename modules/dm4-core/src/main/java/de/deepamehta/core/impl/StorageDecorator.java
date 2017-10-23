@@ -311,19 +311,7 @@ class StorageDecorator {
 
     // === Traversal ===
 
-    /**
-     * @return  The fetched associations.
-     *          Note: their child topics are not fetched.
-     */
-    final List<AssociationModelImpl> fetchTopicAssociations(long topicId) {
-        return (List<AssociationModelImpl>) storage.fetchTopicAssociations(topicId);
-    }
-
-    final List<AssociationModelImpl> fetchAssociationAssociations(long assocId) {
-        return (List<AssociationModelImpl>) storage.fetchAssociationAssociations(assocId);
-    }
-
-    // ---
+    // --- Topic Source ---
 
     /**
      * Convenience method (checks singularity).
@@ -430,6 +418,16 @@ class StorageDecorator {
     // ---
 
     /**
+     * @return  The fetched associations.
+     *          Note: their child topics are not fetched.
+     */
+    final List<AssociationModelImpl> fetchTopicAssociations(long topicId) {
+        return (List<AssociationModelImpl>) storage.fetchTopicAssociations(topicId);
+    }
+
+    // --- Association Source ---
+
+    /**
      * Convenience method (checks singularity).
      *
      * @return  The fetched topic.
@@ -523,6 +521,12 @@ class StorageDecorator {
     }
 
     // ---
+
+    final List<AssociationModelImpl> fetchAssociationAssociations(long assocId) {
+        return (List<AssociationModelImpl>) storage.fetchAssociationAssociations(assocId);
+    }
+
+    // --- Object Source ---
 
     /**
      * Convenience method (checks singularity).
