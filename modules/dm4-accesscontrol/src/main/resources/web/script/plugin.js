@@ -14,6 +14,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     var permissions_cache = {}
 
     var ENCODED_PASSWORD_PREFIX = "-SHA256-"
+    var AUTHMETHOD_COOKIE_NAME = "am"
     var system_workspace_id                     // constant
     var self = this
 
@@ -136,12 +137,17 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         function do_open_login_dialog() {
             var authmethod_menu
             var authmethod_name = "Basic";
+            var cookie_authmenthod = js.get_cookie(AUTHMETHOD_COOKIE_NAME);
             if (authmethods.length) {
+            	authmethods.unshift("Basic")
                 authmethod_menu = dm4c.ui.menu(do_select_authmethod)
-                authmethod_menu.add_item({label: "Basic"})
                 authmethods.forEach(function(item) {
-                    authmethod_menu.add_item({label: item})
+                    authmethod_menu.add_item({label: item, value:item})
                 })
+				if (authmethods.indexOf(cookie_authmenthod) >= 0) {
+					authmethod_name = cookie_authmenthod;
+					authmethod_menu.select(authmethod_name)
+				}
             }
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
@@ -168,6 +174,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             function do_select_authmethod(e) {
                 console.log ("do_select_authmethod", e)
                 authmethod_name = e.label;
+                js.set_cookie(AUTHMETHOD_COOKIE_NAME, authmethod_name)
             }
 
             function do_try_login() {
