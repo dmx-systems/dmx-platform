@@ -149,6 +149,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
 					authmethod_menu.select(authmethod_name)
 				}
             }
+            js.set_cookie(AUTHMETHOD_COOKIE_NAME, authmethod_name)
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
