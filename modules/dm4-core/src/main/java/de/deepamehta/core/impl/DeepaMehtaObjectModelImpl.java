@@ -408,7 +408,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
-            new ValueUnifier(pl).unify(updateModel, this);  // TODO: handle return value
+            new ValueIntegrator(pl).integrate(updateModel, this);   // TODO: handle return value
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face
             // of DM5 update logic (= unification). Note that update() is not called recursively anmore.
             /* TODO: drop it!

@@ -1,5 +1,6 @@
 package de.deepamehta.core.impl;
 
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -15,12 +16,12 @@ import java.util.logging.Logger;
 
 
 
-class ValueUnifier {
+class ValueIntegrator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModelImpl updateModel;
-    private DeepaMehtaObjectModelImpl refObj;       // may null
+    private DeepaMehtaObjectModelImpl newValues;
+    private DeepaMehtaObjectModelImpl refValues;    // may null
     private TypeModel type;
 
     private PersistenceLayer pl;
@@ -30,52 +31,52 @@ class ValueUnifier {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ValueUnifier(PersistenceLayer pl) {
+    ValueIntegrator(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    DeepaMehtaObjectModel unify(DeepaMehtaObjectModelImpl updateModel, DeepaMehtaObjectModelImpl refObj) {
-        if (updateModel.getTypeUri() == null) {
-            throw new RuntimeException("Tried to unify an updateModel whose typeUri is not set");
+    DeepaMehtaObjectModel integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl refValues) {
+        if (newValues.getTypeUri() == null) {
+            throw new RuntimeException("Tried to integrate newValues whose typeUri is not set");
         }
-        this.updateModel = updateModel;
-        this.refObj = refObj;
-        this.type = updateModel.getType();
-        if (updateModel.isSimple()) {
-            return unifySimple();
+        this.newValues = newValues;
+        this.refValues = refValues;
+        this.type = newValues.getType();
+        if (newValues.isSimple()) {
+            return integrateSimple();
         } else {
-            return unifyComposite();
+            return integrateComposite();
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private DeepaMehtaObjectModel unifySimple() {
-        SimpleValue newValue = updateModel.getSimpleValue();
-        if (refObj != null) {
-            if (newValue != null && !newValue.equals(refObj.getSimpleValue())) {    // abort if no update is requested
-                logger.info("### Changing simple value of " + refObj.objectInfo() + " from \"" +
-                    refObj.getSimpleValue() + "\" -> \"" + newValue + "\"");
+    private DeepaMehtaObjectModel integrateSimple() {
+        SimpleValue newVal = newValues.getSimpleValue();
+        if (refValues != null) {
+            if (newVal != null && !newVal.equals(refValues.getSimpleValue())) {    // abort if no update is requested
+                logger.info("### Changing simple value of " + refValues.objectInfo() + " from \"" +
+                    refValues.getSimpleValue() + "\" -> \"" + newVal + "\"");
                 if (type.isValueType()) {
-                    return getOrCreateSimpleTopic(type.getUri(), newValue);
+                    return getOrCreateSimpleTopic(type.getUri(), newVal);
                 } else {
-                    refObj.updateSimpleValue(newValue);
+                    refValues.updateSimpleValue(newVal);
                 }
             }
-            return refObj;
+            return refValues;
         } else {
             if (type.isValueType()) {
-                return getOrCreateSimpleTopic(type.getUri(), newValue);
+                return getOrCreateSimpleTopic(type.getUri(), newVal);
             } else {
-                return createSimpleTopic(type.getUri(), newValue);
+                return createSimpleTopic(type.getUri(), newVal);
             }
         }
     }
 
-    private DeepaMehtaObjectModel unifyComposite() {
+    private DeepaMehtaObjectModel integrateComposite() {
         try {
             Map<AssociationDefinitionModel, TopicModel> childTopics = new HashMap();
             for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
@@ -83,42 +84,41 @@ class ValueUnifier {
                 if (assocDef.getChildCardinalityUri().equals("dm4.core.many")) {
                     throw new RuntimeException("many cardinality not yet implemented");
                 }
-                RelatedTopicModelImpl childUpdateModel = updateModel.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
                 // skip if not contained in update request
-                if (childUpdateModel == null) {
+                if (newChildValue == null) {
                     continue;
                 }
                 //
-                TopicModel childTopic = unifyChild(childUpdateModel, assocDef);
+                TopicModel childTopic = integrateChildValue(newChildValue, assocDef);
                 childTopics.put(assocDef, childTopic);
             }
             // _calculateLabelAndUpdate();  // TODO
-            return updateParentRefs(childTopics);
+            return unifyComposite(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Unifying composite failed", e);
+            throw new RuntimeException("Integrating a composite failed (typeUri=\"" + type.getUri() + "\")", e);
         }
     }
 
-    private TopicModel unifyChild(RelatedTopicModelImpl childUpdateModel, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = null;
-        if (refObj != null) {
+    private TopicModel integrateChildValue(RelatedTopicModelImpl newChildValue, AssociationDefinitionModel assocDef) {
+        RelatedTopicModelImpl refChildValue = null;
+        if (refValues != null) {
             // Note: updating the child topics requires them to be loaded
             // TODO: load only one level deep?
-            refObj.loadChildTopics(assocDef);
-            childTopic = refObj.getChildTopicsModel().getTopicOrNull(assocDef.getAssocDefUri());
+            refValues.loadChildTopics(assocDef);
+            refChildValue = refValues.getChildTopicsModel().getTopicOrNull(assocDef.getAssocDefUri());
         }
-        return (TopicModel) new ValueUnifier(pl).unify(childUpdateModel, childTopic);
-        // updateRelatingAssociation(childTopic, childUpdateModel);    // TODO
+        return (TopicModel) new ValueIntegrator(pl).integrate(newChildValue, refChildValue);
+        // updateRelatingAssociation(refChildValue, newChildValue);    // TODO
     }
 
-    private DeepaMehtaObjectModelImpl updateParentRefs(Map<AssociationDefinitionModel, TopicModel> childTopics) {
+    private DeepaMehtaObjectModelImpl unifyComposite(Map<AssociationDefinitionModel, TopicModel> childTopics) {
         DeepaMehtaObjectModelImpl parent = null;
         if (type.isValueType()) {
-            unifyChildTopics(childTopics);
-            throw new RuntimeException("Not yet implemented: update value types");
+            return unifyChildTopics(childTopics);
         } else {
-            if (refObj != null) {
-                parent = refObj;
+            if (refValues != null) {
+                parent = refValues;
                 for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
                     RelatedTopicModelImpl childTopic = parent.getChildTopicsModel().getTopicOrNull(
                         assocDef.getAssocDefUri());
@@ -128,7 +128,7 @@ class ValueUnifier {
                     associateChildTopic(parent, childTopics.get(assocDef), assocDef);
                 }
             } else {
-                throw new RuntimeException("Not yet implemented: unify parent by identifying attributes");
+                throw new RuntimeException("Not yet implemented: get parent by identifying attributes");
             }
         }
         return parent;
@@ -153,13 +153,19 @@ class ValueUnifier {
             }
             i++;
         }
+        DeepaMehtaObjectModelImpl comp;
         switch (candidates.size()) {
         case 0:
-            return createCompositeTopic(parentTypeUri, childTopics);
+            comp = createCompositeTopic(parentTypeUri, childTopics);
+            logger.info("Creating composite " + comp.getId() + " (typeUri=\"" + parentTypeUri + "\")");
+            return comp;
         case 1:
-            return candidates.get(0);
+            comp = candidates.get(0);
+            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + parentTypeUri + "\")");
+            return comp;
         default:
-            throw new RuntimeException("Ambiguity: there are " + candidates.size() + " topics with the same values");
+            throw new RuntimeException("Ambiguity: there are " + candidates.size() +
+                " composites with the same values (typeUri=\"" + parentTypeUri + "\")");
         }
     }
 
@@ -185,7 +191,8 @@ class ValueUnifier {
     // ---
 
     private TopicModel getOrCreateSimpleTopic(String typeUri, SimpleValue value) {
-        TopicModel topic = pl.getTopicByValue(typeUri, value).getModel();
+        Topic _topic = pl.getTopicByValue(typeUri, value);              // TODO: pl returns models, no objects
+        TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic == null) {
             topic = createSimpleTopic(typeUri, value);
         }
