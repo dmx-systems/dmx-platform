@@ -55,25 +55,25 @@ class ValueIntegrator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private DeepaMehtaObjectModel integrateSimple() {
-        SimpleValue newVal = newValues.getSimpleValue();
-        if (refValues != null) {
-            if (newVal != null && !newVal.equals(refValues.getSimpleValue())) {    // abort if no update is requested
-                logger.info("### Changing simple value of " + refValues.objectInfo() + " from \"" +
-                    refValues.getSimpleValue() + "\" -> \"" + newVal + "\"");
-                if (type.isValueType()) {
-                    return getOrCreateSimpleTopic(type.getUri(), newVal);
-                } else {
-                    refValues.updateSimpleValue(newVal);
-                }
-            }
-            return refValues;
+        if (type.isValueType()) {
+            return unifySimple();
         } else {
-            if (type.isValueType()) {
-                return getOrCreateSimpleTopic(type.getUri(), newVal);
+            if (refValues != null) {
+                refValues._updateSimpleValue(newValues.getSimpleValue());    // update memory + DB
+                return refValues;
             } else {
-                return createSimpleTopic(type.getUri(), newVal);
+                return createSimpleTopic();
             }
         }
+    }
+
+    private TopicModel unifySimple() {
+        Topic _topic = pl.getTopicByValue(type.getUri(), newValues.getSimpleValue());   // TODO: let pl return models
+        TopicModel topic = _topic != null ? _topic.getModel() : null;                   // TODO: drop
+        if (topic == null) {
+            topic = createSimpleTopic();
+        }
+        return topic;
     }
 
     private DeepaMehtaObjectModel integrateComposite() {
@@ -113,40 +113,64 @@ class ValueIntegrator {
     }
 
     private DeepaMehtaObjectModelImpl unifyComposite(Map<AssociationDefinitionModel, TopicModel> childTopics) {
-        DeepaMehtaObjectModelImpl parent = null;
         if (type.isValueType()) {
             return unifyChildTopics(childTopics);
         } else {
+            // for identity parents the child assignments are updated in-place
+            DeepaMehtaObjectModelImpl parent = null;
             if (refValues != null) {
                 parent = refValues;
-                for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
-                    RelatedTopicModelImpl childTopic = parent.getChildTopicsModel().getTopicOrNull(
-                        assocDef.getAssocDefUri());
-                    if (childTopic != null) {
-                        childTopic.getRelatingAssociation().delete();
-                    }
-                    associateChildTopic(parent, childTopics.get(assocDef), assocDef);
-                }
             } else {
-                throw new RuntimeException("Not yet implemented: get parent by identifying attributes");
+                // TODO: identify parent: call unifyChildTopics with only the identifying childTopics
+                throw new RuntimeException("Not yet implemented: get parent (typeUri=\"" + type.getUri() +
+                    "\") by identifying attributes");
             }
+            updateChildRefs(parent, childTopics);
+            return parent;
         }
-        return parent;
+    }
+
+    /**
+     * Updates a parent's child assignments in-place.
+     */
+    private void updateChildRefs(DeepaMehtaObjectModelImpl parent,
+                                 Map<AssociationDefinitionModel, TopicModel> childTopics) {
+        if (!parent.getTypeUri().equals(type.getUri())) {
+            throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
+                parent.getTypeUri() + "\"");
+        }
+        for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
+            RelatedTopicModelImpl childTopic = parent.getChildTopicsModel().getTopicOrNull(
+                assocDef.getAssocDefUri());
+            TopicModel newChildTopic = childTopics.get(assocDef);
+            // delete assignment if exists already and child has changed
+            boolean deleted = false;
+            if (childTopic != null && !childTopic.equals(newChildTopic)) {
+                childTopic.getRelatingAssociation().delete();
+                deleted = true;
+            }
+            // create assignment if not yet exists or child has changed
+            if (childTopic == null || !childTopic.equals(newChildTopic)) {
+                associateChildTopic(parent, newChildTopic, assocDef);
+                logger.info("### Child " + newChildTopic.getId() + " (assocDefUri=\"" + assocDef.getAssocDefUri() +
+                    "\") " + (deleted ? "re" : "") + "assigned to composite " + parent.getId() + " (typeUri=\"" +
+                    parent.getTypeUri() + "\")");
+            }
+            // FIXME: memory update needed
+        }
     }
 
     // ---
 
     private DeepaMehtaObjectModelImpl unifyChildTopics(Map<AssociationDefinitionModel, TopicModel> childTopics) {
         List<RelatedTopicModelImpl> candidates = null;
-        String parentTypeUri = null;
         int i = 0;
         for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
             TopicModel childTopic = childTopics.get(assocDef);
             if (i == 0) {
                 candidates = candidates(childTopic, assocDef);
-                parentTypeUri = assocDef.getParentTypeUri();
             } else {
-                elimianteCandidates(candidates, childTopic);
+                eliminateCandidates(candidates, childTopic);
             }
             if (candidates.isEmpty()) {
                 break;
@@ -154,18 +178,19 @@ class ValueIntegrator {
             i++;
         }
         DeepaMehtaObjectModelImpl comp;
+        String typeUri = type.getUri();
         switch (candidates.size()) {
         case 0:
-            comp = createCompositeTopic(parentTypeUri, childTopics);
-            logger.info("Creating composite " + comp.getId() + " (typeUri=\"" + parentTypeUri + "\")");
+            comp = createCompositeTopic(childTopics);
+            logger.info("Creating composite " + comp.getId() + " (typeUri=\"" + typeUri + "\")");
             return comp;
         case 1:
             comp = candidates.get(0);
-            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + parentTypeUri + "\")");
+            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + typeUri + "\")");
             return comp;
         default:
             throw new RuntimeException("Ambiguity: there are " + candidates.size() +
-                " composites with the same values (typeUri=\"" + parentTypeUri + "\")");
+                " composites with the same values (typeUri=\"" + typeUri + "\")");
         }
     }
 
@@ -175,7 +200,7 @@ class ValueIntegrator {
             "dm4.core.parent", assocDef.getParentTypeUri());
     }
 
-    private void elimianteCandidates(List<RelatedTopicModelImpl> candidates, TopicModel childTopic) {
+    private void eliminateCandidates(List<RelatedTopicModelImpl> candidates, TopicModel childTopic) {
         Iterator<RelatedTopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
             RelatedTopicModel parent = i.next();
@@ -190,35 +215,19 @@ class ValueIntegrator {
 
     // ---
 
-    private TopicModel getOrCreateSimpleTopic(String typeUri, SimpleValue value) {
-        Topic _topic = pl.getTopicByValue(typeUri, value);              // TODO: pl returns models, no objects
-        TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
-        if (topic == null) {
-            topic = createSimpleTopic(typeUri, value);
-        }
-        return topic;
+    private TopicModelImpl createSimpleTopic() {
+        return pl.createTopic(mf.newTopicModel(type.getUri(), newValues.getSimpleValue())).getModel();
     }
 
-    private TopicModelImpl createSimpleTopic(String typeUri) {
-        return createSimpleTopic(typeUri, null);
-    }
-
-    private TopicModelImpl createSimpleTopic(String typeUri, SimpleValue value) {
-        return pl.createTopic(mf.newTopicModel(typeUri, value)).getModel();
-    }
-
-    // ---
-
-    private TopicModelImpl createCompositeTopic(String typeUri,
-                                                Map<AssociationDefinitionModel, TopicModel> childTopics) {
-        TopicModelImpl topic = createSimpleTopic(typeUri);
+    private TopicModelImpl createCompositeTopic(Map<AssociationDefinitionModel, TopicModel> childTopics) {
+        TopicModelImpl topic = createSimpleTopic();
         for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
             associateChildTopic(topic, childTopics.get(assocDef), assocDef);
         }
         return topic;
     }
 
-    private void associateChildTopic(DeepaMehtaObjectModelImpl parent, TopicModel child,
+    private void associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child,
                                      AssociationDefinitionModel assocDef) {
         pl.createAssociation(assocDef.getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),

@@ -681,7 +681,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         }
     }
 
-    private void _updateSimpleValue(SimpleValue newValue) {
+    void _updateSimpleValue(SimpleValue newValue) {
         if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
             logger.info("### Changing simple value of " + objectInfo() + " from \"" + value + "\" -> \"" + newValue +
                 "\"");
