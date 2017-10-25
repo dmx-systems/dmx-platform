@@ -49,7 +49,9 @@ class ValueIntegrator {
         if (newValues.isSimple()) {
             return integrateSimple();
         } else {
-            return integrateComposite();
+            DeepaMehtaObjectModelImpl comp = integrateComposite();
+            new LabelCalculation(comp).calculate();
+            return comp;
         }
     }
 
@@ -94,7 +96,6 @@ class ValueIntegrator {
                 TopicModel childTopic = integrateChildValue(newChildValue, assocDef);
                 childTopics.put(assocDef, childTopic);
             }
-            // _calculateLabelAndUpdate();  // TODO
             return unifyComposite(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Integrating a composite failed (typeUri=\"" + type.getUri() + "\")", e);
