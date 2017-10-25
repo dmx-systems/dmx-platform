@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
@@ -40,7 +41,7 @@ class ValueIntegrator {
 
     DeepaMehtaObjectModel integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl refValues) {
         if (newValues.getTypeUri() == null) {
-            throw new RuntimeException("Tried to integrate newValues whose typeUri is not set");
+            throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set");
         }
         this.newValues = newValues;
         this.refValues = refValues;
@@ -76,7 +77,7 @@ class ValueIntegrator {
         return topic;
     }
 
-    private DeepaMehtaObjectModel integrateComposite() {
+    private DeepaMehtaObjectModelImpl integrateComposite() {
         try {
             Map<AssociationDefinitionModel, TopicModel> childTopics = new HashMap();
             for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
@@ -100,6 +101,9 @@ class ValueIntegrator {
         }
     }
 
+    /**
+     * Invokes a ValueIntegrator for a child value.
+     */
     private TopicModel integrateChildValue(RelatedTopicModelImpl newChildValue, AssociationDefinitionModel assocDef) {
         RelatedTopicModelImpl refChildValue = null;
         if (refValues != null) {
@@ -134,15 +138,16 @@ class ValueIntegrator {
      * Updates a parent's child assignments in-place.
      */
     private void updateChildRefs(DeepaMehtaObjectModelImpl parent,
-                                 Map<AssociationDefinitionModel, TopicModel> childTopics) {
+                                 Map<AssociationDefinitionModel, TopicModel> newChildTopics) {
         if (!parent.getTypeUri().equals(type.getUri())) {
             throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
                 parent.getTypeUri() + "\"");
         }
-        for (AssociationDefinitionModel assocDef : childTopics.keySet()) {
-            RelatedTopicModelImpl childTopic = parent.getChildTopicsModel().getTopicOrNull(
-                assocDef.getAssocDefUri());
-            TopicModel newChildTopic = childTopics.get(assocDef);
+        for (AssociationDefinitionModel assocDef : newChildTopics.keySet()) {
+            String assocDefUri = assocDef.getAssocDefUri();
+            ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
+            RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDefUri);     // current one
+            TopicModel newChildTopic = newChildTopics.get(assocDef);                        // new one
             // delete assignment if exists already and child has changed
             boolean deleted = false;
             if (childTopic != null && !childTopic.equals(newChildTopic)) {
@@ -151,12 +156,14 @@ class ValueIntegrator {
             }
             // create assignment if not yet exists or child has changed
             if (childTopic == null || !childTopic.equals(newChildTopic)) {
+                // update DB
                 associateChildTopic(parent, newChildTopic, assocDef);
-                logger.info("### Child " + newChildTopic.getId() + " (assocDefUri=\"" + assocDef.getAssocDefUri() +
-                    "\") " + (deleted ? "re" : "") + "assigned to composite " + parent.getId() + " (typeUri=\"" +
+                logger.info("### Child " + newChildTopic.getId() + " (assocDefUri=\"" + assocDefUri + "\") " +
+                    (deleted ? "re" : "") + "assigned to composite " + parent.getId() + " (typeUri=\"" +
                     parent.getTypeUri() + "\")");
+                // update memory
+                childTopics.put(assocDefUri, newChildTopic);    // FIXME: pass RelatedTopicModel
             }
-            // FIXME: memory update needed
         }
     }
 
