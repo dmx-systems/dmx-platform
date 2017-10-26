@@ -20,11 +20,15 @@ public class Credentials {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     public String username;
-    public String password;     // encoded
+    public String password;             // SHA256 encoded
+    public String plaintextPassword;    // possibly uninitialized
+    public String methodName;           // possibly uninitialized
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
+     * Used to create an user account programmatically (via migration).
+     *
      * @param   password    as plain text
      */
     public Credentials(String username, String password) {
@@ -33,6 +37,8 @@ public class Credentials {
     }
 
     /**
+     * Used to create an user account programmatically (via Webclient).
+     *
      * Note: invoked from JAX-RS message body reader (see Webservice's ObjectProvider.java).
      *
      * @param   cred    A JSON object with 2 properties: "username" and "password".
@@ -47,14 +53,26 @@ public class Credentials {
         }
     }
 
+    /**
+     * Used to authorize a request.
+     */
     public Credentials(String authHeader) {
-        authHeader = authHeader.substring("Basic ".length());
-        String[] values = new String(Base64.base64Decode(authHeader)).split(":");
-        // Note: values.length is 0 if neither a username nor a password is entered
-        //       values.length is 1 if no password is entered
-        this.username = values.length > 0 ? values[0] : "";
-        this.password = encodePassword(values.length > 1 ? values[1] : "");
-        // Note: credentials obtained through Basic authorization are always plain text
+        String[] splitted = authHeader.split("\\s+");
+        if (splitted.length != 2) {
+            throw new IllegalArgumentException("Illegal Authorization header: \"" + authHeader + "\"");
+        }
+        String method = splitted[0];
+        String userAndPassword = splitted[1];
+        String[] values = new String(Base64.base64Decode(userAndPassword)).split(":");
+        // Note: for the browser's own login dialog:
+        //   values.length is 0 if neither a username nor a password is entered
+        //   values.length is 1 if no password is entered
+        String username = values.length > 0 ? values[0] : "";
+        String password = values.length > 1 ? values[1] : "";
+        this.username = username;
+        this.password = encodePassword(password);
+        this.plaintextPassword = password;
+        this.methodName = method;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

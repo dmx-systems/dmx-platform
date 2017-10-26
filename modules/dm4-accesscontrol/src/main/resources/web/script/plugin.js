@@ -14,6 +14,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     var permissions_cache = {}
 
     var ENCODED_PASSWORD_PREFIX = "-SHA256-"
+    var AUTHMETHOD_COOKIE_NAME = "dm4_auth_method"
     var system_workspace_id                     // constant
     var self = this
 
@@ -62,6 +63,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         return this.request("GET", "/accesscontrol/object/" + object_id + "/modifier",
             undefined, undefined, undefined, "text")
     }
+    dm4c.restc.get_authorization_methods = function() {
+        return this.request("GET", "/accesscontrol/methods")
+    }
 
 
 
@@ -70,7 +74,9 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     dm4c.add_listener("init", function() {
 
         var login_widget
-
+        var authmethods = dm4c.restc.get_authorization_methods();
+        console.log('Authorization methods', authmethods);
+        
         create_login_widget()
 
         function create_login_widget() {
@@ -129,10 +135,26 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
         }
 
         function do_open_login_dialog() {
+            var authmethod_menu
+            var authmethod_name = "Basic";
+            var cookie_authmenthod = js.get_cookie(AUTHMETHOD_COOKIE_NAME);
+            if (authmethods.length) {
+                authmethods.unshift("Basic")
+                authmethod_menu = dm4c.ui.menu(do_select_authmethod)
+                authmethods.forEach(function(item) {
+                    authmethod_menu.add_item({label: item, value: item})
+                })
+                if (authmethods.indexOf(cookie_authmenthod) >= 0) {
+                    authmethod_name = cookie_authmenthod;
+                    authmethod_menu.select(authmethod_name)
+                }
+            }
+            js.set_cookie(AUTHMETHOD_COOKIE_NAME, authmethod_name)
             var username_input = $("<input>")
             var password_input = $("<input>").attr("type", "password")
             var message_div = $("<div>").attr("id", "login-message")
-            var dialog_content = dm4c.render.label("Username").add(username_input)
+            var dialog_content = (authmethod_menu ? authmethod_menu.dom : $())
+                .add(dm4c.render.label("Username")).add(username_input)
                 .add(dm4c.render.label("Password")).add(password_input)
                 .add(message_div)
             // Note: as of jQuery 1.9 you can't add objects to a disconnected (not in a document)
@@ -149,6 +171,12 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 password_input.focus()
                 return false    // stop propagation to prevent the dialog from invoking the button handler
             })
+
+            function do_select_authmethod(e) {
+                console.log ("do_select_authmethod", e)
+                authmethod_name = e.label;
+                js.set_cookie(AUTHMETHOD_COOKIE_NAME, authmethod_name)
+            }
 
             function do_try_login() {
                 try {
@@ -167,7 +195,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                  * Returns value for the "Authorization" header.
                  */
                 function authorization() {
-                    return "Basic " + btoa(username + ":" + password)   // ### FIXME: btoa() might not work in IE
+                    return authmethod_name + " " + btoa(username + ":" + password)   // ### FIXME: btoa() might not work in IE
                 }
             }
 

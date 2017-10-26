@@ -7,6 +7,7 @@ import de.deepamehta.core.service.accesscontrol.Permissions;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 
@@ -185,4 +186,14 @@ public interface AccessControlService {
     Collection<Association> getAssociationsByCreator(String username);
 
     Collection<Association> getAssociationsByOwner(String username);
+
+
+
+    // === Authorization Methods ===
+
+    void registerAuthorizationMethod(String name, AuthorizationMethod am);
+
+    void unregisterAuthorizationMethod(String name);
+
+    Set<String> getAuthorizationMethods();
 }
