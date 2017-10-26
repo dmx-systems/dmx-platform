@@ -79,7 +79,15 @@
         <!-- User Accounts -->
         <dm4.security.initial_admin_password></dm4.security.initial_admin_password>
         <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
-        <dm4.filerepo.disk_quota>-1</dm4.filerepo.disk_quota>
+        <!-- LDAP -->
+        <dm4.ldap.server>127.0.0.1</dm4.ldap.server>
+        <dm4.ldap.port>389</dm4.ldap.port>
+        <dm4.ldap.manager></dm4.ldap.manager>
+        <dm4.ldap.password></dm4.ldap.password>
+        <dm4.ldap.user_base></dm4.ldap.user_base>
+        <dm4.ldap.user_attribute></dm4.ldap.user_attribute>
+        <dm4.ldap.filter></dm4.ldap.filter>
+
         <!-- Workspace Sharing Modes -->
         <dm4.workspaces.private.enabled>true</dm4.workspaces.private.enabled>
         <dm4.workspaces.confidential.enabled>true</dm4.workspaces.confidential.enabled>
@@ -90,6 +98,7 @@
         <!-- File Repository -->
         <dm4.filerepo.path>/</dm4.filerepo.path>
         <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
+        <dm4.filerepo.disk_quota>-1</dm4.filerepo.disk_quota>
 
         <!-- Hot Deployment -->
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->

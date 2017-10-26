@@ -1,6 +1,7 @@
 package de.deepamehta.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -36,6 +37,24 @@ public class JavaAPITest {
     public void asListWithNoArguments() {
         List l = Arrays.asList();
         assertSame(0, l.size());
+    }
+
+    // ---
+
+    @Test
+    public void stringEquality() {
+        String a = "Hallo";
+        String b = "Hallo";
+        assertTrue(a == b);
+        String c = a;
+        assertTrue(a == c);
+        String d = "Hal" + "lo";
+        assertTrue(a == d);
+        String e = "Hall" + ((char) 111);
+        assertTrue(a == e);
+        int o = 111;
+        String f = "Hall" + ((char) o);
+        assertFalse(a == f);
     }
 
     // ---
