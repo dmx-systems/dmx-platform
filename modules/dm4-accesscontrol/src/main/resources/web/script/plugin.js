@@ -14,7 +14,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
     var permissions_cache = {}
 
     var ENCODED_PASSWORD_PREFIX = "-SHA256-"
-    var AUTHMETHOD_COOKIE_NAME = "am"
+    var AUTHMETHOD_COOKIE_NAME = "dm4_auth_method"
     var system_workspace_id                     // constant
     var self = this
 
