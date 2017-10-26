@@ -80,8 +80,6 @@
         <dm4.security.initial_admin_password></dm4.security.initial_admin_password>
         <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
         <!-- LDAP -->
-        <!-- TODO: reasonable defaults -->
-        <!-- TODO: add to config.properties as well (see dm4-disttribution) -->
         <dm4.ldap.server>127.0.0.1</dm4.ldap.server>
         <dm4.ldap.port>389</dm4.ldap.port>
         <dm4.ldap.manager></dm4.ldap.manager>

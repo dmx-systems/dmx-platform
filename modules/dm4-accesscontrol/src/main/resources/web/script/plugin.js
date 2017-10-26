@@ -142,7 +142,7 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
                 authmethods.unshift("Basic")
                 authmethod_menu = dm4c.ui.menu(do_select_authmethod)
                 authmethods.forEach(function(item) {
-                    authmethod_menu.add_item({label: item, value:item})
+                    authmethod_menu.add_item({label: item, value: item})
                 })
                 if (authmethods.indexOf(cookie_authmenthod) >= 0) {
                     authmethod_name = cookie_authmenthod;
