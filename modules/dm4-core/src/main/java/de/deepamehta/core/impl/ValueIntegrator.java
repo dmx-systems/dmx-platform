@@ -50,7 +50,9 @@ class ValueIntegrator {
             return integrateSimple();
         } else {
             DeepaMehtaObjectModelImpl comp = integrateComposite();
-            new LabelCalculation(comp).calculate();
+            if (comp != null) {
+                new LabelCalculation(comp).calculate();
+            }
             return comp;
         }
     }
@@ -58,11 +60,16 @@ class ValueIntegrator {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private DeepaMehtaObjectModel integrateSimple() {
+        SimpleValue newValue = newValues.getSimpleValue();
         if (type.isValueType()) {
-            return unifySimple();
+            if (!newValue.toString().isEmpty()) {
+                return unifySimple();
+            } else {
+                return null;
+            }
         } else {
             if (refValues != null) {
-                refValues._updateSimpleValue(newValues.getSimpleValue());    // update memory + DB
+                refValues._updateSimpleValue(newValue);     // update memory + DB
                 return refValues;
             } else {
                 return createSimpleTopic();
@@ -94,9 +101,11 @@ class ValueIntegrator {
                 }
                 //
                 TopicModel childTopic = integrateChildValue(newChildValue, assocDef);
-                childTopics.put(assocDef, childTopic);
+                if (childTopic != null) {
+                    childTopics.put(assocDef, childTopic);
+                }
             }
-            return unifyComposite(childTopics);
+            return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
         } catch (Exception e) {
             throw new RuntimeException("Integrating a composite failed (typeUri=\"" + type.getUri() + "\")", e);
         }
@@ -198,7 +207,8 @@ class ValueIntegrator {
             return comp;
         default:
             throw new RuntimeException("Ambiguity: there are " + candidates.size() +
-                " composites with the same values (typeUri=\"" + typeUri + "\")");
+                " composites with the same values (typeUri=\"" + typeUri + "\") (" + childTopics.values().size() +
+                " values: " + childTopics.values() + ")");
         }
     }
 
