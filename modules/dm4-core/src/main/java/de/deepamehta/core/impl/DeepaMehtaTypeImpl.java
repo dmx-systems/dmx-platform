@@ -40,7 +40,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     @Override
     public final DeepaMehtaType setDataTypeUri(String dataTypeUri) {
-        _getModel().updateDataTypeUri(dataTypeUri);
+        _getModel().updateDataTypeUri(dataTypeUri);     // TODO: should call _updateDataTypeUri()
         return this;
     }
 

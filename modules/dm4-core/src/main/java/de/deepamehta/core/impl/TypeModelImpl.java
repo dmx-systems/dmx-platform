@@ -5,6 +5,8 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 import de.deepamehta.core.service.Directive;
@@ -322,8 +324,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     void postDelete() {
-        super.postDelete();                     // ### TODO: needed?
-        //
+        super.postDelete();     // ### TODO: needed?
         removeFromTypeCache();
     }
 
@@ -334,6 +335,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
         storeDataTypeUri();             // update DB
+    }
+
+    final void updateIsValueType(boolean isValueType) {
+        setValueType(isValueType);      // update memory
+        storeValueType();               // update DB
     }
 
     final void _addIndexMode(IndexMode indexMode) {
@@ -489,11 +495,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void updateType(TypeModelImpl updateModel) {
         _updateDataTypeUri(updateModel.getDataTypeUri());
+        _updateIsValueType(updateModel.isValueType());
         _updateAssocDefs(updateModel.getAssocDefs());
         _updateSequence(updateModel.getAssocDefs());
     }
 
     // ---
+
+    // TODO: the public object API setters should call these _update() methods (instead update())
 
     private void _updateDataTypeUri(String newDataTypeUri) {
         if (newDataTypeUri != null) {
@@ -502,6 +511,14 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
                 updateDataTypeUri(newDataTypeUri);
             }
+        }
+    }
+
+    private void _updateIsValueType(boolean newIsValueType) {
+        boolean isValueType = isValueType();
+        if (isValueType != newIsValueType) {
+            logger.info("### Changing value type from " + isValueType + " -> " + newIsValueType);
+            updateIsValueType(newIsValueType);
         }
     }
 
@@ -540,6 +557,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             .getRelatingAssociation().delete();
         // create new assignment
         pl.typeStorage.storeDataType(uri, dataTypeUri);
+    }
+
+    private void storeValueType() {
+        TopicModel valueType = pl.typeStorage.fetchValueTypeTopic(id);
+        pl.storeTopicValue(valueType.getId(), new SimpleValue(isValueType));
     }
 
     private void indexAllInstances(IndexMode indexMode) {

@@ -78,9 +78,9 @@ class ValueIntegrator {
 
     private TopicModel unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
+        String typeUri = type.getUri();
         Topic _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
-        String typeUri = type.getUri();
         if (topic != null) {
             logger.info("Reusing simple value \"" + newValue + "\" (typeUri=\"" + typeUri + "\")");
         } else {

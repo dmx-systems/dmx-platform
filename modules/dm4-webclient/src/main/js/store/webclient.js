@@ -46,24 +46,6 @@ const actions = {
       case "DELETE_ASSOCIATION":
         dispatch('unselectIf', dir.arg.id)
         break
-      case "UPDATE_TOPIC_TYPE":
-        // TODO
-        console.warn('Directive UPDATE_TOPIC_TYPE not yet implemented')
-        break
-      case "DELETE_TOPIC_TYPE":
-        // TODO
-        console.warn('Directive DELETE_TOPIC_TYPE not yet implemented')
-        break
-      case "UPDATE_ASSOCIATION_TYPE":
-        // TODO
-        console.warn('Directive UPDATE_ASSOCIATION_TYPE not yet implemented')
-        break
-      case "DELETE_ASSOCIATION_TYPE":
-        // TODO
-        console.warn('Directive DELETE_ASSOCIATION_TYPE not yet implemented')
-        break
-      default:
-        throw Error(`"${dir.type}" is an unsupported directive`)
       }
     })
   }

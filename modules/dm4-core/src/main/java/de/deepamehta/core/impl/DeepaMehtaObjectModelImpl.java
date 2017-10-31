@@ -291,7 +291,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     /**
-     * Stores and indexes the simple value of the specified topic or association model.
+     * Stores and indexes the simple value of this object model.
      * Determines the index key and index modes.
      */
     void storeSimpleValue() {

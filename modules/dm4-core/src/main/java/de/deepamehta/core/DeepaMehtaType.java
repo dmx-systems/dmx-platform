@@ -22,6 +22,10 @@ public interface DeepaMehtaType extends Topic {
 
 
 
+    // ### TODO: value type
+
+
+
     // === Index Modes ===
 
     List<IndexMode> getIndexModes();

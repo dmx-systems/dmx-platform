@@ -238,9 +238,13 @@ class TypeStorage {
 
     // --- Fetch ---
 
+    RelatedTopicModel fetchValueTypeTopic(long typeId) {
+        return pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent", "dm4.core.child",
+            "dm4.core.value_type");
+    }
+
     private boolean fetchValueType(long typeId) {
-        RelatedTopicModel valueType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent",
-            "dm4.core.child", "dm4.core.value_type");
+        RelatedTopicModel valueType = fetchValueTypeTopic(typeId);
         // TODO: should *every* type have the value flag? At the moment the bootstrap types have no one.
         return valueType != null ? valueType.getSimpleValue().booleanValue() : false;
     }
