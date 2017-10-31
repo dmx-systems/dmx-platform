@@ -61,12 +61,11 @@ class ValueIntegrator {
 
     private DeepaMehtaObjectModel integrateSimple() {
         SimpleValue newValue = newValues.getSimpleValue();
+        if (newValue.toString().isEmpty()) {
+            return null;
+        }
         if (type.isValueType()) {
-            if (!newValue.toString().isEmpty()) {
-                return unifySimple();
-            } else {
-                return null;
-            }
+            return unifySimple();
         } else {
             if (refValues != null) {
                 refValues._updateSimpleValue(newValue);     // update memory + DB
@@ -78,10 +77,15 @@ class ValueIntegrator {
     }
 
     private TopicModel unifySimple() {
-        Topic _topic = pl.getTopicByValue(type.getUri(), newValues.getSimpleValue());   // TODO: let pl return models
-        TopicModel topic = _topic != null ? _topic.getModel() : null;                   // TODO: drop
-        if (topic == null) {
+        SimpleValue newValue = newValues.getSimpleValue();
+        Topic _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
+        TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
+        String typeUri = type.getUri();
+        if (topic != null) {
+            logger.info("Reusing simple value \"" + newValue + "\" (typeUri=\"" + typeUri + "\")");
+        } else {
             topic = createSimpleTopic();
+            logger.info("Creating simple value \"" + newValue + "\" (typeUri=\"" + typeUri + "\")");
         }
         return topic;
     }

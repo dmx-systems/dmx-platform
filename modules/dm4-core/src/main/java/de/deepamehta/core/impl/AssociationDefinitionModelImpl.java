@@ -212,7 +212,9 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     final boolean includeInLabel() {
         TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dm4.core.include_in_label");
         if (includeInLabel == null) {
-            throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
+            // ### FIXME: a includeInLabel topic should always exist
+            // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
+            return false;
         }
         return includeInLabel.getSimpleValue().booleanValue();
     }
