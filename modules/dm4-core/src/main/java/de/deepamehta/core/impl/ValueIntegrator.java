@@ -2,6 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
+import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -78,10 +79,12 @@ class ValueIntegrator {
         Topic _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic != null) {
-            logger.info("Reusing simple value \"" + newValue + "\" (typeUri=\"" + typeUri + "\")");
+            logger.info("Reusing simple value " + topic.getId() + " \"" + newValue + "\" (typeUri=\"" + typeUri +
+                "\")");
         } else {
             topic = createSimpleTopic();
-            logger.info("### Creating simple value \"" + newValue + "\" (typeUri=\"" + typeUri + "\")");
+            logger.info("### Creating simple value " + topic.getId() + " \"" + newValue + "\" (typeUri=\"" + typeUri +
+                "\")");
         }
         return topic;
     }
@@ -177,7 +180,6 @@ class ValueIntegrator {
             TopicModel newChildTopic = newChildTopics.get(assocDefUri);                     // new one
             // delete assignment if exists already and child has changed
             boolean deleted = false;
-            logger.info("### childTopic=" + childTopic + " ### newChildTopic=" + newChildTopic);
             if (childTopic != null && !childTopic.equals(newChildTopic)) {
                 childTopic.getRelatingAssociation().delete();
                 deleted = true;
@@ -185,12 +187,12 @@ class ValueIntegrator {
             // create assignment if not yet exists or child has changed
             if (childTopic == null || !childTopic.equals(newChildTopic)) {
                 // update DB
-                associateChildTopic(parent, newChildTopic, assocDefUri);
+                AssociationModel assoc = associateChildTopic(parent, newChildTopic, assocDefUri);
                 logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newChildTopic.getId() +
                     " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
                     parent.getTypeUri() + "\")");
                 // update memory
-                childTopics.put(assocDefUri, newChildTopic);    // FIXME: pass RelatedTopicModel
+                childTopics.put(assocDefUri, mf.newRelatedTopicModel(newChildTopic, assoc));
             }
         }
     }
@@ -279,11 +281,11 @@ class ValueIntegrator {
         return topic;
     }
 
-    private void associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child, String assocDefUri) {
-        pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
+    private AssociationModel associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child, String assocDefUri) {
+        return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),
             child.createRoleModel("dm4.core.child")
-        );
+        ).getModel();
     }
 
     // ---
