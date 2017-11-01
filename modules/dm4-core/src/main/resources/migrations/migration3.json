@@ -1,24 +1,25 @@
 {
     "topic_types": [
         {
-            "value":       "Plugin Name",
-            "uri":         "dm4.core.plugin_name",
-            "dataTypeUri": "dm4.core.text"
+            "value":          "Plugin Name",
+            "uri":            "dm4.core.plugin_name",
+            "dataTypeUri":    "dm4.core.text"
         },
         {
-            "value":       "Symbolic Name",
-            "uri":         "dm4.core.plugin_symbolic_name",
-            "dataTypeUri": "dm4.core.text"
+            "value":          "Symbolic Name",
+            "uri":            "dm4.core.plugin_symbolic_name",
+            "dataTypeUri":    "dm4.core.text"
         },
         {
-            "value":       "Migration Nr.",
-            "uri":         "dm4.core.plugin_migration_nr",
-            "dataTypeUri": "dm4.core.number"
+            "value":          "Migration Nr.",
+            "uri":            "dm4.core.plugin_migration_nr",
+            "dataTypeUri":    "dm4.core.number",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
-            "value":       "Plugin",
-            "uri":         "dm4.core.plugin",
-            "dataTypeUri": "dm4.core.composite",
+            "value":          "Plugin",
+            "uri":            "dm4.core.plugin",
+            "dataTypeUri":    "dm4.core.composite",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.core.plugin_name",
