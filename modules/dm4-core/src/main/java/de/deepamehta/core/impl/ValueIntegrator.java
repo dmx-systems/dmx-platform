@@ -68,6 +68,7 @@ class ValueIntegrator {
     private DeepaMehtaObjectModel integrateSimple() {
         SimpleValue newValue = newValues.getSimpleValue();
         if (newValue.toString().isEmpty()) {
+            // TODO: remove parent assignment if exists
             return null;
         }
         return unifySimple();
@@ -76,6 +77,7 @@ class ValueIntegrator {
     private TopicModel unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
         String typeUri = type.getUri();
+        // FIXME: HTML values must be tag-stripped before lookup, complementary to indexing
         Topic _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModel topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic != null) {
@@ -274,6 +276,8 @@ class ValueIntegrator {
     }
 
     private TopicModelImpl createCompositeTopic(Map<String, TopicModel> childTopics) {
+        // FIXME: construct the composite model first, then create topic as a whole.
+        // Otherwise the POST_CREATE_TOPIC event is fired too early, and e.g. Address topics get no geo coordinates.
         TopicModelImpl topic = createSimpleTopic();
         for (String assocDefUri : childTopics.keySet()) {
             associateChildTopic(topic, childTopics.get(assocDefUri), assocDefUri);

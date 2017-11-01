@@ -1,21 +1,22 @@
 {
     "topic_types": [
         {
-            "value": "Title",
-            "uri": "dm4.notes.title",
-            "dataTypeUri": "dm4.core.text",
-            "indexModeUris": ["dm4.core.fulltext"]
+            "value":          "Title",
+            "uri":            "dm4.notes.title",
+            "dataTypeUri":    "dm4.core.text",
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
         },
         {
-            "value": "Text",
-            "uri": "dm4.notes.text",
-            "dataTypeUri": "dm4.core.html",
-            "indexModeUris": ["dm4.core.fulltext"]
+            "value":          "Text",
+            "uri":            "dm4.notes.text",
+            "dataTypeUri":    "dm4.core.html",
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
         },
         {
-            "value": "Note",
-            "uri": "dm4.notes.note",
-            "dataTypeUri": "dm4.core.composite",
+            "value":          "Note",
+            "uri":            "dm4.notes.note",
+            "dataTypeUri":    "dm4.core.composite",
+            "indexModeUris": ["dm4.core.fulltext"],
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.notes.title",
