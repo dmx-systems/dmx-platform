@@ -668,14 +668,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     private void _updateUri(String newUri) {
         if (uriChange(newUri, uri)) {                               // abort if no update is requested
-            logger.info("### Changing URI of " + objectInfo() + " from \"" + uri + "\" -> \"" + newUri + "\"");
+            logger.info("### Changing URI of " + objectInfo() + ": \"" + uri + "\" -> \"" + newUri + "\"");
             updateUri(newUri);
         }
     }
 
     private void _updateTypeUri(String newTypeUri) {
         if (newTypeUri != null && !newTypeUri.equals(typeUri)) {    // abort if no update is requested
-            logger.info("### Changing type URI of " + objectInfo() + " from \"" + typeUri + "\" -> \"" + newTypeUri +
+            logger.info("### Changing type URI of " + objectInfo() + ": \"" + typeUri + "\" -> \"" + newTypeUri +
                 "\"");
             updateTypeUri(newTypeUri);
         }
@@ -683,7 +683,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     void _updateSimpleValue(SimpleValue newValue) {
         if (newValue != null && !newValue.equals(value)) {          // abort if no update is requested
-            logger.info("### Changing simple value of " + objectInfo() + " from \"" + value + "\" -> \"" + newValue +
+            logger.info("### Changing simple value of " + objectInfo() + ": \"" + value + "\" -> \"" + newValue +
                 "\"");
             updateSimpleValue(newValue);
         }

@@ -32,7 +32,7 @@ class LabelCalculation {
      */
     LabelCalculation(DeepaMehtaObjectModelImpl comp) {
         this.comp = comp;
-        this.labelAssocDefUris = getLabelAssocDefUris();
+        this.labelAssocDefUris = comp.getType().getLabelAssocDefUris();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -83,24 +83,5 @@ class LabelCalculation {
         }
         //
         builder.append(label);
-    }
-
-    /**
-     * Prerequisite: this is a composite model.
-     */
-    private List<String> getLabelAssocDefUris() {
-        TypeModelImpl type = comp.getType();
-        List<String> labelConfig = type.getLabelConfig();
-        if (labelConfig.size() > 0) {
-            return labelConfig;
-        } else {
-            List<String> assocDefUris = new ArrayList();
-            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
-            // Note: types just created might have no child types yet
-            if (i.hasNext()) {
-                assocDefUris.add(i.next().getAssocDefUri());
-            }
-            return assocDefUris;
-        }
     }
 }

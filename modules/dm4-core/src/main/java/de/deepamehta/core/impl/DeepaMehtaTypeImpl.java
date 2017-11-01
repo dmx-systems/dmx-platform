@@ -142,6 +142,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
     // --- Label Configuration ---
 
+    // TODO: drop it?
     final List<String> getLabelConfig() {
         return getModel().getLabelConfig();
     }

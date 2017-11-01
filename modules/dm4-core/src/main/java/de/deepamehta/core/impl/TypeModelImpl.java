@@ -448,6 +448,24 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Label Configuration ===
 
+    /**
+     * Prerequisite: this is a composite type.
+     */
+    final List<String> getLabelAssocDefUris() {
+        List<String> labelConfig = getLabelConfig();
+        if (labelConfig.size() > 0) {
+            return labelConfig;
+        } else {
+            List<String> assocDefUris = new ArrayList();
+            Iterator<? extends AssociationDefinitionModel> i = getAssocDefs().iterator();
+            // Note: types just created might have no child types yet
+            if (i.hasNext()) {
+                assocDefUris.add(i.next().getAssocDefUri());
+            }
+            return assocDefUris;
+        }
+    }
+
     final List<String> getLabelConfig() {
         try {
             List<String> labelConfig = new ArrayList();
