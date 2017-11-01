@@ -206,9 +206,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
                     message.connection.sendMessage(message.message);
                 }
             } catch (InterruptedException e) {
-                logger.info("### SendMessageWorker thread received an InterruptedException");
-            } finally {
-                logger.info("### Terminating SendMessageWorker thread");
+                logger.info("### SendMessageWorker thread received an InterruptedException -- terminating");
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "An exception occurred in the SendMessageWorker thread -- terminating:", e);
             }
         }
 
@@ -217,7 +217,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
                 // logger.info("----- queueing message " + Thread.currentThread().getName());
                 messages.put(new QueuedMessage(connection, message));
             } catch (InterruptedException e) {
-                logger.log(Level.WARNING, "WebSocketsWorker was interrupted:", e);
+                logger.log(Level.WARNING, "Queueing a message failed:", e);
             }
         }
     }

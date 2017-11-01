@@ -41,7 +41,8 @@ class ValueIntegrator {
 
     DeepaMehtaObjectModel integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl refValues) {
         if (newValues.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set");
+            throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set (newValues=" +
+                newValues + ")");
         }
         this.newValues = newValues;
         this.refValues = refValues;
@@ -148,18 +149,35 @@ class ValueIntegrator {
         if (type.isValueType()) {
             return unifyChildTopics(childTopics);
         } else {
-            // for identity parents the child assignments are updated in-place
             DeepaMehtaObjectModelImpl parent = null;
+            // FIXME: don't use refValue for in-place updates. Parent must be identified solely by identity attributes.
+            // TODO: drop refValue completely
+            // TODO: drop concept "simple identity type". Simple types are ALWAYS value types.
             if (refValues != null) {
                 parent = refValues;
             } else {
-                // TODO: identify parent: call unifyChildTopics with only the identifying childTopics
-                throw new RuntimeException("Not yet implemented: get parent (typeUri=\"" + type.getUri() +
-                    "\") by identifying attributes");
+                parent = identifyParent(childTopics);
             }
             updateChildRefs(parent, childTopics);
             return parent;
         }
+    }
+
+    private DeepaMehtaObjectModelImpl identifyParent(Map<String, TopicModel> childTopics) {
+        return unifyChildTopics(identityChildTopics(childTopics));
+    }
+
+    private Map<String, TopicModel> identityChildTopics(Map<String, TopicModel> childTopics) {
+        Map<String, TopicModel> identityChildTopics = new HashMap();
+        for (String assocDefUri : type.getLabelAssocDefUris()) {   // TODO: repurpose label config as "Part of identity"
+            TopicModel childTopic = childTopics.get(assocDefUri);
+            if (childTopic == null) {
+                throw new RuntimeException("Identity child topic \"" + assocDefUri + "\" is missing in " +
+                    childTopics.keySet());
+            }
+            identityChildTopics.put(assocDefUri, childTopic);
+        }
+        return identityChildTopics;
     }
 
     /**
@@ -178,6 +196,7 @@ class ValueIntegrator {
         }
         for (String assocDefUri : newChildTopics.keySet()) {
             ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
+            parent.loadChildTopics(assocDefUri);
             RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDefUri);     // current one
             TopicModel newChildTopic = newChildTopics.get(assocDefUri);                     // new one
             // delete assignment if exists already and child has changed
