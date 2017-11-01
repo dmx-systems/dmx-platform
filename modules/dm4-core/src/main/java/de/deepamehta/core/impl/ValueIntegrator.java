@@ -22,7 +22,7 @@ class ValueIntegrator {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModelImpl newValues;
-    private DeepaMehtaObjectModelImpl refValues;    // may null
+    private DeepaMehtaObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
 
     private PersistenceLayer pl;
@@ -39,13 +39,13 @@ class ValueIntegrator {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    DeepaMehtaObjectModel integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl refValues) {
+    DeepaMehtaObjectModel integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
         if (newValues.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set (newValues=" +
                 newValues + ")");
         }
         this.newValues = newValues;
-        this.refValues = refValues;
+        this.targetObject = targetObject;
         this.type = newValues.getType();
         if (newValues.isSimple()) {
             return integrateSimple();
@@ -69,16 +69,7 @@ class ValueIntegrator {
         if (newValue.toString().isEmpty()) {
             return null;
         }
-        if (type.isValueType()) {
-            return unifySimple();
-        } else {
-            if (refValues != null) {
-                refValues._updateSimpleValue(newValue);     // update memory + DB
-                return refValues;
-            } else {
-                return createSimpleTopic();
-            }
-        }
+        return unifySimple();
     }
 
     private TopicModel unifySimple() {
@@ -112,7 +103,7 @@ class ValueIntegrator {
                     continue;
                 }
                 //
-                TopicModel childTopic = integrateChildValue(newChildValue, assocDefUri);
+                TopicModel childTopic = integrateChildValue(newChildValue);
                 if (childTopic != null) {
                     childTopics.put(assocDefUri, childTopic);
                 }
@@ -126,15 +117,8 @@ class ValueIntegrator {
     /**
      * Invokes a ValueIntegrator for a child value.
      */
-    private TopicModel integrateChildValue(RelatedTopicModelImpl newChildValue, String assocDefUri) {
-        RelatedTopicModelImpl refChildValue = null;
-        if (refValues != null) {
-            // Note: updating the child topics requires them to be loaded
-            // TODO: load only one level deep?
-            refValues.loadChildTopics(assocDefUri);
-            refChildValue = refValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
-        }
-        return (TopicModel) new ValueIntegrator(pl).integrate(newChildValue, refChildValue);
+    private TopicModel integrateChildValue(RelatedTopicModelImpl newChildValue) {
+        return (TopicModel) new ValueIntegrator(pl).integrate(newChildValue, null);     // targetObject=null
         // updateRelatingAssociation(refChildValue, newChildValue);    // TODO
     }
 
@@ -149,15 +133,7 @@ class ValueIntegrator {
         if (type.isValueType()) {
             return unifyChildTopics(childTopics);
         } else {
-            DeepaMehtaObjectModelImpl parent = null;
-            // FIXME: don't use refValue for in-place updates. Parent must be identified solely by identity attributes.
-            // TODO: drop refValue completely
-            // TODO: drop concept "simple identity type". Simple types are ALWAYS value types.
-            if (refValues != null) {
-                parent = refValues;
-            } else {
-                parent = identifyParent(childTopics);
-            }
+            DeepaMehtaObjectModelImpl parent = targetObject != null ? targetObject : identifyParent(childTopics);
             updateChildRefs(parent, childTopics);
             return parent;
         }
@@ -196,11 +172,12 @@ class ValueIntegrator {
         }
         for (String assocDefUri : newChildTopics.keySet()) {
             ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
-            parent.loadChildTopics(assocDefUri);
+            parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
             RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDefUri);     // current one
             TopicModel newChildTopic = newChildTopics.get(assocDefUri);                     // new one
             // delete assignment if exists already and child has changed
             boolean deleted = false;
+            logger.info("### childTopic=" + childTopic + " ### newChildTopic=" + newChildTopic);
             if (childTopic != null && !childTopic.equals(newChildTopic)) {
                 childTopic.getRelatingAssociation().delete();
                 deleted = true;
