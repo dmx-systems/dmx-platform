@@ -119,7 +119,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     Topic workspace = dm4.createTopic(
                         mf.newTopicModel(uri, "dm4.workspaces.workspace", mf.newChildTopicsModel()
                             .put("dm4.workspaces.name", name)
-                            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
+                            .put("dm4.workspaces.sharing_mode", sharingMode.getValue())));
+                            // ### TODO: think about refs
+                            // .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
                     Topic topicmap = topicmapsService.createTopicmap(

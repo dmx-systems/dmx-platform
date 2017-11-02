@@ -69,7 +69,7 @@ class PluginManager {
                 dm4.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
             }
         } else {
-            logger.info("Activation of " + plugin + " SKIPPED -- already activated");
+            logger.info("Activating " + plugin + " SKIPPED -- already activated");
         }
     }
 

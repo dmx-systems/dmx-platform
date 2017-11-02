@@ -132,17 +132,29 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    /**
-     * Convenience.
-     */
     TopicImpl createTopic(TopicModelImpl model) {
-        return createTopic(model, null);    // uriPrefix=null
+        try {
+            TopicModelImpl topic = (TopicModelImpl) integrateValues(model, null);
+            if (topic == null) {
+                throw new RuntimeException("Value integration yields no result");
+            }
+            return topic.instantiate();
+        } catch (Exception e) {
+            throw new RuntimeException("Creating topic failed (model=" + model + ")", e);
+        }
+    }
+
+    // ---
+
+    TopicImpl _createTopic(TopicModelImpl model) {
+        return _createTopic(model, null);   // uriPrefix=null
     }
 
     /**
      * Creates a new topic in the DB.
+     * No child topics are created.
      */
-    TopicImpl createTopic(TopicModelImpl model, String uriPrefix) {
+    private TopicImpl _createTopic(TopicModelImpl model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
@@ -150,7 +162,9 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeTopic(model);
-            valueStorage.storeValue(model);
+            if (model.getType().isSimple()) {
+                model.storeSimpleValue();
+            }
             createTopicInstantiation(model.getId(), model.getTypeUri());
             // 2) set default URI
             // If no URI is given the topic gets a default URI based on its ID, if requested.
@@ -567,7 +581,7 @@ public final class PersistenceLayer extends StorageDecorator {
             }
         }
         //
-        return createTopic(model, URI_PREFIX_ROLE_TYPE);
+        return _createTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---
@@ -814,7 +828,7 @@ public final class PersistenceLayer extends StorageDecorator {
         // assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
-        createTopic(typeTopic, uriPrefix);      // create generic topic
+        _createTopic(typeTopic, uriPrefix);     // create generic topic
         //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;
@@ -831,5 +845,15 @@ public final class PersistenceLayer extends StorageDecorator {
             "dm4.core.text");
         metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
         typeStorage.putInTypeCache(metaMetaType);
+    }
+
+    // ---
+
+    private DeepaMehtaObjectModelImpl integrateValues(DeepaMehtaObjectModelImpl newValues,
+                                                      DeepaMehtaObjectModelImpl targetObject) {
+        // logger.info("### newValues=" + newValues + " ### targetObject=" + targetObject);
+        DeepaMehtaObjectModelImpl o = new ValueIntegrator(this).integrate(newValues, targetObject);
+        // logger.info("### => " + o);
+        return o;
     }
 }

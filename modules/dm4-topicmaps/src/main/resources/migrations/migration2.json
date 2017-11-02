@@ -18,14 +18,14 @@
                 {
                     "childTypeUri":        "dm4.topicmaps.translation_x",
                     "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
-                    "includeInLabel":      true
+                    "assocTypeUri":        "dm4.core.composition_def"
+                    // "includeInLabel":      true      // TODO: identity attributes
                 },
                 {
                     "childTypeUri":        "dm4.topicmaps.translation_y",
                     "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
-                    "includeInLabel":      true
+                    "assocTypeUri":        "dm4.core.composition_def"
+                    // "includeInLabel":      true      // TODO: identity attributes
                 }
             ]
         },
@@ -42,14 +42,14 @@
                 {
                     "childTypeUri":        "dm4.topicmaps.translation",
                     "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
-                    "includeInLabel":      true
+                    "assocTypeUri":        "dm4.core.composition_def"
+                    // "includeInLabel":      true      // TODO: identity attributes
                 },
                 {
                     "childTypeUri":        "dm4.topicmaps.zoom_level",
                     "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
-                    "includeInLabel":      true
+                    "assocTypeUri":        "dm4.core.composition_def"
+                    // "includeInLabel":      true      // TODO: identity attributes
                 }
             ],
             "viewConfigTopics": [

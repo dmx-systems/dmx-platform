@@ -30,6 +30,11 @@ public class Migration3 extends Migration {
 
     @Override
     public void run() {
+        // This migration creates View Config topics without any child topics.
+        // Now with the ValueIntegrator we can't create empty composites.
+        // See also addDefaultViewConfig() in WebclientPlugin.java
+        // ### TODO: rethink about this.
+        /*
         initDeepaMehtaWorkspaceId();
         //
         logger.info("########## Repairing types with missing \"View Config\" topic (" +
@@ -41,6 +46,7 @@ public class Migration3 extends Migration {
         logger.info("########## Repairing types with missing \"View Config\" topic complete\n    " +
             "Topic types repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +
             "Association types repaired: " + count[1][1] + "/" + count[1][0]);
+        */
     }
 
     private void repair(List<? extends DeepaMehtaType> types, int i) {

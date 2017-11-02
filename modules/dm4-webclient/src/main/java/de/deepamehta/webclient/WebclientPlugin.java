@@ -357,11 +357,17 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * have a view config in any case, for being edited interactively afterwards.
      */
     private void addDefaultViewConfig(TypeModel typeModel) {
+        // This would create View Config topics without any child topics.
+        // Now with the ValueIntegrator we can't create empty composites.
+        // See also WebclientPlugin Migration3.java
+        // ### TODO: rethink about this.
+        /*
         ViewConfigurationModel viewConfig = typeModel.getViewConfig();
         TopicModel configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
         if (configTopic == null) {
             viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
         }
+        */
     }
 
 

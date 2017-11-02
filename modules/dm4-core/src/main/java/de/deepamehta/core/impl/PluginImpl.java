@@ -497,7 +497,7 @@ public class PluginImpl implements Plugin, EventHandler {
             postPluginActivatedEvent();
             //
         } catch (Throwable e) {
-            throw new RuntimeException("Activation of " + this + " failed", e);
+            throw new RuntimeException("Activating " + this + " failed", e);
         }
     }
 
