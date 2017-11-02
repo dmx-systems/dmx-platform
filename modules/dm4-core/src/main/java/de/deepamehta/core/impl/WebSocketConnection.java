@@ -48,14 +48,14 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
 
     @Override
     public void onOpen(Connection connection) {
-        logger.info("### Opening a WebSocket connection for plugin \"" + pluginUri + "\" (session " + sessionId + ")");
+        logger.info("Opening a WebSocket connection for plugin \"" + pluginUri + "\" (session " + sessionId + ")");
         this.connection = connection;
         pool.add(this);
     }
 
     @Override
     public void onClose(int code, String message) {
-        logger.info("### Closing a WebSocket connection of plugin \"" + pluginUri + "\" (session " + sessionId + ")");
+        logger.info("Closing a WebSocket connection of plugin \"" + pluginUri + "\" (session " + sessionId + ")");
         pool.remove(this);
     }
 

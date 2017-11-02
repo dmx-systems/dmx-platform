@@ -417,8 +417,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
             String roleTypeUri = role.getRoleTypeUri();             // current value
             if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
-                logger.info("### Changing role type " + nr + " from \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri +
-                    "\"");
+                logger.info("### Changing role type " + nr + ": \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
                 updateRoleTypeUri(role, newRoleTypeUri);
             }
         }

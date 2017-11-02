@@ -267,7 +267,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         //
         String parentCardinalityUri = getParentCardinalityUri();
         if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
-            logger.info("### Changing parent cardinality URI from \"" + parentCardinalityUri + "\" -> \"" +
+            logger.info("### Changing parent cardinality URI: \"" + parentCardinalityUri + "\" -> \"" +
                 newParentCardinalityUri + "\"");
             updateParentCardinalityUri(newParentCardinalityUri);
         }
@@ -281,7 +281,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         //
         String childCardinalityUri = getChildCardinalityUri();
         if (!childCardinalityUri.equals(newChildCardinalityUri)) {
-            logger.info("### Changing child cardinality URI from \"" + childCardinalityUri + "\" -> \"" +
+            logger.info("### Changing child cardinality URI: \"" + childCardinalityUri + "\" -> \"" +
                 newChildCardinalityUri + "\"");
             updateChildCardinalityUri(newChildCardinalityUri);
         }

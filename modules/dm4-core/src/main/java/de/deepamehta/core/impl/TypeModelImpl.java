@@ -526,7 +526,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         if (newDataTypeUri != null) {
             String dataTypeUri = getDataTypeUri();
             if (!dataTypeUri.equals(newDataTypeUri)) {
-                logger.info("### Changing data type URI from \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
+                logger.info("### Changing data type URI: \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
                 updateDataTypeUri(newDataTypeUri);
             }
         }
@@ -535,7 +535,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     private void _updateIsValueType(boolean newIsValueType) {
         boolean isValueType = isValueType();
         if (isValueType != newIsValueType) {
-            logger.info("### Changing value type from " + isValueType + " -> " + newIsValueType);
+            logger.info("### Changing value type: " + isValueType + " -> " + newIsValueType);
             updateIsValueType(newIsValueType);
         }
     }

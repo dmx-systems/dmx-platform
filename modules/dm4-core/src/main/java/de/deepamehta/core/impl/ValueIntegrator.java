@@ -158,7 +158,10 @@ class ValueIntegrator {
             if (identityAssocDefUris.size() > 0) {
                 return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris));
             } else {
-                return createSimpleTopic();
+                DeepaMehtaObjectModelImpl parent = createSimpleTopic();
+                logger.info("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
+                    "\")");
+                return parent;
             }
         }
     }
