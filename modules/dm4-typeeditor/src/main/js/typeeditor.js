@@ -6,7 +6,7 @@ function defaultType (name) {
     // Also the "typeUri" is provided at server-side (see ModelFactoryImpl).
     value: name,
     dataTypeUri: 'dm4.core.text',
-    indexModeUris: ['dm4.core.fulltext'],
+    indexModeUris: ['dm4.core.key', 'dm4.core.fulltext'],
     viewConfigTopics: [{
       typeUri: 'dm4.webclient.view_config',
       childs: {
