@@ -200,7 +200,8 @@
                     {
                         "childTypeUri":        "dm4.contacts.person_name",
                         "childCardinalityUri": "dm4.core.one",
-                        "assocTypeUri":        "dm4.core.composition_def"
+                        "assocTypeUri":        "dm4.core.composition_def",
+                        "includeInLabel":      true      // TODO: introduce "identity attrs", then drop it, it's default
                     },
                     {
                         "childTypeUri":        "dm4.contacts.phone_number",
