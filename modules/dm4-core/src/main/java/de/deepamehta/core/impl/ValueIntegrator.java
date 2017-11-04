@@ -9,6 +9,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
+import de.deepamehta.core.util.DeepaMehtaUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -151,10 +152,11 @@ class ValueIntegrator {
     }
 
     private DeepaMehtaObjectModelImpl identifyParent(Map<String, TopicModel> childTopics) {
+        // TODO: 1st check identity attrs THEN target object??
         if (targetObject != null) {
             return targetObject;
         } else {
-            List<String> identityAssocDefUris = type.getLabelConfig(); // TODO: introduce real "identity attributes"
+            List<String> identityAssocDefUris = type.getLabelConfig();     // TODO: introduce real "identity attributes"
             if (identityAssocDefUris.size() > 0) {
                 return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris));
             } else {
@@ -232,19 +234,12 @@ class ValueIntegrator {
      *   - childTopics map is not empty
      */
     private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, TopicModel> childTopics) {
-        List<RelatedTopicModelImpl> candidates = null;
-        int i = 0;
-        for (String assocDefUri : childTopics.keySet()) {
-            TopicModel childTopic = childTopics.get(assocDefUri);
-            if (i == 0) {
-                candidates = candidates(childTopic, assocDefUri);
-            } else {
-                eliminateCandidates(candidates, childTopic);
-            }
+        List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
+        for (String assocDefUri : type) {
+            eliminateParentCandidates(candidates, childTopics.get(assocDefUri), assocDefUri);
             if (candidates.isEmpty()) {
                 break;
             }
-            i++;
         }
         DeepaMehtaObjectModelImpl comp;
         String typeUri = type.getUri();
@@ -258,9 +253,9 @@ class ValueIntegrator {
             logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + typeUri + "\")");
             return comp;
         default:
-            throw new RuntimeException("Ambiguity: there are " + candidates.size() +
-                " composites with the same values (typeUri=\"" + typeUri + "\") (" + childTopics.values().size() +
-                " values: " + childTopics.values() + ")");
+            throw new RuntimeException("Value Integrator Ambiguity: there are " + candidates.size() +
+                " parents (typeUri=\"" + typeUri + "\", " + DeepaMehtaUtils.idList(candidates) +
+                ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
         }
     }
 
@@ -269,25 +264,43 @@ class ValueIntegrator {
      *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
+     *   - childTopics map is not empty
      */
-    private List<RelatedTopicModelImpl> candidates(TopicModel childTopic, String assocDefUri) {
+    private List<RelatedTopicModelImpl> parentCandidates(Map<String, TopicModel> childTopics) {
+        String assocDefUri = childTopics.keySet().iterator().next();
+        // sanity check
         if (!type.getUri().equals(assocDef(assocDefUri).getParentTypeUri())) {
             throw new RuntimeException("Type mismatch");
         }
+        //
+        TopicModel childTopic = childTopics.get(assocDefUri);
         // TODO: assoc parents
         return pl.getTopicRelatedTopics(childTopic.getId(), assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             "dm4.core.child", "dm4.core.parent", type.getUri());
     }
 
-    private void eliminateCandidates(List<RelatedTopicModelImpl> candidates, TopicModel childTopic) {
+    /**
+     * @param   childTopic      may be null
+     */
+    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, TopicModel childTopic,
+                                                                                   String assocDefUri) {
+        AssociationDefinitionModel assocDef = assocDef(assocDefUri);
         Iterator<RelatedTopicModelImpl> i = candidates.iterator();
         while (i.hasNext()) {
-            RelatedTopicModel parent = i.next();
-            String assocTypeUri = parent.getRelatingAssociation().getTypeUri();
-            // TODO: assoc parents
-            if (pl.getAssociation(assocTypeUri, parent.getId(), childTopic.getId(), "dm4.core.parent", "dm4.core.child")
-                    == null) {
-                i.remove();
+            long parentId = i.next().getId();
+            String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
+            if (childTopic != null) {
+                // TODO: assoc parents
+                if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dm4.core.parent", "dm4.core.child")
+                        == null) {
+                    i.remove();
+                }
+            } else {
+                // TODO: assoc parents
+                if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dm4.core.parent", "dm4.core.child",
+                        assocDef.getChildTypeUri()).isEmpty()) {
+                    i.remove();
+                }
             }
         }
     }
