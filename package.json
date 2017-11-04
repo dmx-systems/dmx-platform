@@ -3,6 +3,7 @@
   "version": "5.0.0-SNAPSHOT",
   "description": "",
   "author": "Jörg Richter",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/jri/deepamehta.git"
