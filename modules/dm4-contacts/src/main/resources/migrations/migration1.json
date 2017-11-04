@@ -192,16 +192,16 @@
             ### Person ###
 
             {
-                "value":       "Person",
-                "uri":         "dm4.contacts.person",
-                "dataTypeUri": "dm4.core.composite",
+                "value":          "Person",
+                "uri":            "dm4.contacts.person",
+                "dataTypeUri":    "dm4.core.composite",
                 "indexModeUris": ["dm4.core.fulltext"],
                 "assocDefs": [
                     {
                         "childTypeUri":        "dm4.contacts.person_name",
                         "childCardinalityUri": "dm4.core.one",
                         "assocTypeUri":        "dm4.core.composition_def",
-                        "includeInLabel":      true      // TODO: introduce "identity attrs", then drop it, it's default
+                        "isIdentityAttr":      true
                     },
                     {
                         "childTypeUri":        "dm4.contacts.phone_number",
@@ -215,9 +215,9 @@
                         "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
-                        "childTypeUri":         "dm4.webbrowser.url",
-                        "childCardinalityUri":  "dm4.core.one",                 // TODO: many
-                        "assocTypeUri":         "dm4.core.composition_def"
+                        "childTypeUri":        "dm4.webbrowser.url",
+                        "childCardinalityUri": "dm4.core.one",                  // TODO: many
+                        "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
                         "childTypeUri":        "dm4.contacts.address",

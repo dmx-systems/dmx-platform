@@ -306,10 +306,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, false, true,
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, false, true,
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
             );
@@ -351,10 +351,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.last_name",  "Last Name",  "dm4.core.text"));
             // "Person Name" (composite)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.person_name", "Person Name", "dm4.core.composite")
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, false, true,
                     "dm4.test.person_name", "dm4.test.first_name", "dm4.core.one", "dm4.core.one"
                 ))
-                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, true,
+                .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.composition_def", null, false, true,
                     "dm4.test.person_name", "dm4.test.last_name", "dm4.core.one", "dm4.core.one"
                 ))
             );
@@ -448,7 +448,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dm4.createAssociationType(mf.newAssociationTypeModel("dm4.test.birthday", "Birthday", "dm4.core.text"));
             TopicTypeImpl tt = dm4.createTopicType(
                 mf.newTopicTypeModel("dm4.test.person", "Person", "dm4.core.composite").addAssocDef(
-                    mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.test.birthday", false,
+                    mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.test.birthday", false, false,
                         "dm4.test.person", "dm4.test.date", "dm4.core.one", "dm4.core.one")));
             // test assoc def childs *before* set
             ChildTopics ct = tt.getAssocDef("dm4.test.date#dm4.test.birthday").getChildTopics();

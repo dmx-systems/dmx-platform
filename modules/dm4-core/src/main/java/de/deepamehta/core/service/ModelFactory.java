@@ -202,7 +202,8 @@ public interface ModelFactory {
                                                     String parentCardinalityUri, String childCardinalityUri);
 
     AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                    String customAssocTypeUri, boolean includeInLabel,
+                                                    String customAssocTypeUri,
+                                                    boolean isIdentityAttr, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
                                                     String parentCardinalityUri, String childCardinalityUri);
 
