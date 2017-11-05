@@ -85,16 +85,14 @@ class ValueIntegrator {
 
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
-        String typeUri = type.getUri();
         // FIXME: HTML values must be tag-stripped before lookup, complementary to indexing
         TopicImpl _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModelImpl topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic != null) {
-            logger.info("Reusing simple value " + topic.getId() + " \"" + newValue + "\" (typeUri=\"" + typeUri +
-                "\")");
+            logger.info("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
             topic = createSimpleTopic();
-            logger.info("### Creating simple value " + topic.getId() + " \"" + newValue + "\" (typeUri=\"" + typeUri +
+            logger.info("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
         }
         return topic;
@@ -152,11 +150,11 @@ class ValueIntegrator {
     }
 
     private DeepaMehtaObjectModelImpl identifyParent(Map<String, TopicModel> childTopics) {
-        // TODO: 1st check identity attrs THEN target object??
+        // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
         } else {
-            List<String> identityAssocDefUris = type.getLabelConfig();     // TODO: introduce real "identity attributes"
+            List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
                 return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris));
             } else {
@@ -213,10 +211,10 @@ class ValueIntegrator {
             // create assignment if not yet exists or child has changed
             if (childTopic == null || !childTopic.equals(newChildTopic)) {
                 // update DB
-                AssociationModel assoc = associateChildTopic(parent, newChildTopic, assocDefUri);
                 logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newChildTopic.getId() +
                     " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
                     parent.getTypeUri() + "\")");
+                AssociationModel assoc = associateChildTopic(parent, newChildTopic, assocDefUri);
                 // update memory
                 childTopics.put(assocDefUri, mf.newRelatedTopicModel(newChildTopic, assoc));
             }
@@ -242,19 +240,16 @@ class ValueIntegrator {
             }
         }
         DeepaMehtaObjectModelImpl comp;
-        String typeUri = type.getUri();
         switch (candidates.size()) {
         case 0:
-            comp = createCompositeTopic(childTopics);
-            logger.info("### Creating composite " + comp.getId() + " (typeUri=\"" + typeUri + "\")");
-            return comp;
+            return createCompositeTopic(childTopics);
         case 1:
             comp = candidates.get(0);
-            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + typeUri + "\")");
+            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
             throw new RuntimeException("Value Integrator Ambiguity: there are " + candidates.size() +
-                " parents (typeUri=\"" + typeUri + "\", " + DeepaMehtaUtils.idList(candidates) +
+                " parents (typeUri=\"" + type.uri + "\", " + DeepaMehtaUtils.idList(candidates) +
                 ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
         }
     }
@@ -324,8 +319,12 @@ class ValueIntegrator {
         // Otherwise the POST_CREATE_TOPIC event is fired too early, and e.g. Address topics get no geo coordinates.
         // logger.info("### childTopics=" + childTopics);
         TopicModelImpl topic = createSimpleTopic();
+        logger.info("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childTopics.keySet()) {
-            associateChildTopic(topic, childTopics.get(assocDefUri), assocDefUri);
+            TopicModel childTopic = childTopics.get(assocDefUri);
+            logger.info("### Assigning child " + childTopic.getId() + " (assocDefUri=\"" + assocDefUri +
+                "\") to composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
+            associateChildTopic(topic, childTopic, assocDefUri);
         }
         return topic;
     }

@@ -207,12 +207,26 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
 
 
+    // === Identity Configuration ===
+
+    final boolean isIdentityAttr() {
+        TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dm4.core.identity_attr");
+        if (isIdentityAttr == null) {
+            // ### TODO: should a isIdentityAttr topic always exist?
+            // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Identity Attribute\" topic");
+            return false;
+        }
+        return isIdentityAttr.getSimpleValue().booleanValue();
+    }
+
+
+
     // === Label Configuration ===
 
     final boolean includeInLabel() {
         TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dm4.core.include_in_label");
         if (includeInLabel == null) {
-            // ### FIXME: a includeInLabel topic should always exist
+            // ### TODO: should a includeInLabel topic always exist?
             // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
             return false;
         }

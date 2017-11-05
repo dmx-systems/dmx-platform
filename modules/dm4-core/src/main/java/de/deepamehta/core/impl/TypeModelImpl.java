@@ -446,6 +446,24 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
 
+    // === Identity Configuration ===
+
+    final List<String> getIdentityAttrs() {
+        try {
+            List<String> identityAttrs = new ArrayList();
+            for (String assocDefUri : this) {
+                if (getAssocDef(assocDefUri).isIdentityAttr()) {
+                    identityAttrs.add(assocDefUri);
+                }
+            }
+            return identityAttrs;
+        } catch (Exception e) {
+            throw new RuntimeException("Calculating the identity configuration for type \"" + uri + "\" failed", e);
+        }
+    }
+
+
+
     // === Label Configuration ===
 
     /**

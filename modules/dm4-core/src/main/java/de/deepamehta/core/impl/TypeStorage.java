@@ -390,20 +390,32 @@ class TypeStorage {
         if (customAssocType != null) {
             childTopics.put("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocType);
         }
+        RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assocDefId);
+        if (isIdentityAttr != null) {   // ### TODO: should a isIdentityAttr topic always exist?
+            childTopics.put("dm4.core.identity_attr", isIdentityAttr);
+        }
         RelatedTopicModel includeInLabel = fetchIncludeInLabel(assocDefId);
-        if (includeInLabel != null) {   // ### TODO: a includeInLabel topic should always exist
+        if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
             childTopics.put("dm4.core.include_in_label", includeInLabel);
         }
     }
 
     private RelatedTopicModel fetchCustomAssocType(long assocDefId) {
-        // ### TODO: can we use model-driven retrieval?
+        // ### TODO: can we use model-driven retrieval? => NO!
+        // Fetching assoc type "Aggregation Definition" would run into an endless recursion while fetching
+        // its "Custom Association Type" assoc def.
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.custom_assoc_type", "dm4.core.parent",
             "dm4.core.child", "dm4.core.assoc_type");
     }
 
+    private RelatedTopicModel fetchIsIdentityAttr(long assocDefId) {
+        // ### TODO: can we use model-driven retrieval? => NO! See above.
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition", "dm4.core.parent",
+            "dm4.core.child", "dm4.core.identity_attr");
+    }
+
     private RelatedTopicModel fetchIncludeInLabel(long assocDefId) {
-        // ### TODO: can we use model-driven retrieval?
+        // ### TODO: can we use model-driven retrieval?  => NO! See above.
         return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition", "dm4.core.parent",
             "dm4.core.child", "dm4.core.include_in_label");
     }
