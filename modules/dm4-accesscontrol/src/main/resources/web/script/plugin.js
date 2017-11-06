@@ -140,15 +140,15 @@ dm4c.add_plugin("de.deepamehta.accesscontrol", function() {
             var authmethodlist = authmethods.slice();
             var cookie_authmenthod = js.get_cookie(AUTHMETHOD_COOKIE_NAME);
             if (authmethodlist.length) {
-            	authmethodlist.unshift("Basic")
+                authmethodlist.unshift("Basic")
                 authmethod_menu = dm4c.ui.menu(do_select_authmethod)
                 authmethodlist.forEach(function(item) {
                     authmethod_menu.add_item({label: item, value:item})
                 })
-				if (authmethodlist.indexOf(cookie_authmenthod) >= 0) {
-					authmethod_name = cookie_authmenthod;
-					authmethod_menu.select(authmethod_name)
-				}
+                if (authmethodlist.indexOf(cookie_authmenthod) >= 0) {
+                    authmethod_name = cookie_authmenthod;
+                    authmethod_menu.select(authmethod_name)
+                }
             }
             js.set_cookie(AUTHMETHOD_COOKIE_NAME, authmethod_name)
             var username_input = $("<input>")
