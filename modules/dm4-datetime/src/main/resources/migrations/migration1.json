@@ -25,7 +25,7 @@
         {
             "value":          "Date",
             "uri":            "dm4.datetime.date",
-            "dataTypeUri":    "dm4.core.composite",
+            "dataTypeUri":    "dm4.core.value",
             "isValueType":    true,
             "assocDefs": [
                 {
@@ -69,7 +69,7 @@
         {
             "value":          "Time",
             "uri":            "dm4.datetime.time",
-            "dataTypeUri":    "dm4.core.composite",
+            "dataTypeUri":    "dm4.core.value",
             "isValueType":    true,
             "assocDefs": [
                 {
@@ -92,7 +92,7 @@
         {
             "value":       "Date/Time",
             "uri":         "dm4.datetime",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.value",
             "isValueType": true,
             "assocDefs": [
                 {

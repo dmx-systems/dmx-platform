@@ -89,13 +89,15 @@ class ValueStorage {
      * Depending on the model type's data type dispatches either to storeSimpleValue() or to storeChildTopics().
      * <p>
      * Called to store the initial value of a newly created topic/association.
+     *
+     * ### TODO: drop it
      */
     void storeValue(DeepaMehtaObjectModelImpl model) {
-        if (model.getType().getDataTypeUri().equals("dm4.core.composite")) {
+        if (model.isSimple()) {
+            model.storeSimpleValue();
+        } else {
             storeChildTopics(model);
             model.calculateLabelAndUpdate();
-        } else {
-            model.storeSimpleValue();
         }
     }
 

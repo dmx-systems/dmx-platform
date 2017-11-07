@@ -5,6 +5,7 @@
             "uri": "dm4.webbrowser.url",
             "dataTypeUri": "dm4.core.text",
             "indexModeUris": ["dm4.core.fulltext", "dm4.core.key"]
+            // TODO: index
         },
         {
             "value": "Description",
@@ -15,7 +16,7 @@
         {
             "value": "Web Resource",
             "uri": "dm4.webbrowser.web_resource",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.webbrowser.url",

@@ -56,7 +56,7 @@
         {
             "value": "View Configuration",
             "uri": "dm4.webclient.view_config",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":         "dm4.webclient.icon",
@@ -138,7 +138,7 @@
         {
             "value": "Search",
             "uri": "dm4.webclient.search",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.webclient.search_term",

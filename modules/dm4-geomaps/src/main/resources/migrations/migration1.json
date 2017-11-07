@@ -13,7 +13,7 @@
         {
             "value":       "Geo Coordinate",
             "uri":         "dm4.geomaps.geo_coordinate",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.value",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.geomaps.longitude",
@@ -32,7 +32,7 @@
         {
             "value":       "Geo Coordinate Facet",
             "uri":         "dm4.geomaps.geo_coordinate_facet",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.geomaps.geo_coordinate",

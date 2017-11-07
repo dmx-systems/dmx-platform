@@ -15,7 +15,7 @@
         {
             "value":          "Note",
             "uri":            "dm4.notes.note",
-            "dataTypeUri":    "dm4.core.composite",
+            "dataTypeUri":    "dm4.core.identity",
             "indexModeUris": ["dm4.core.fulltext"],
             "assocDefs": [
                 {

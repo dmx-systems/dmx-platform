@@ -29,7 +29,7 @@
         {
             "value":       "Topicmap",
             "uri":         "dm4.topicmaps.topicmap",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.topicmaps.name",

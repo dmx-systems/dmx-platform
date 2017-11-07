@@ -44,7 +44,7 @@
             {
                 "value":       "Event",
                 "uri":         "dm4.events.event",
-                "dataTypeUri": "dm4.core.composite",
+                "dataTypeUri": "dm4.core.identity",
                 "assocDefs": [
                     {
                         "childTypeUri":         "dm4.events.title",

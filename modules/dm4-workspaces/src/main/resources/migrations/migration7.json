@@ -10,31 +10,36 @@
             "value":       "Private",
             "uri":         "dm4.workspaces.private.enabled",
             "dataTypeUri": "dm4.core.boolean"
+            // TODO: index
         },
         {
             "value":       "Confidential",
             "uri":         "dm4.workspaces.confidential.enabled",
             "dataTypeUri": "dm4.core.boolean"
+            // TODO: index
         },
         {
             "value":       "Collaborative",
             "uri":         "dm4.workspaces.collaborative.enabled",
             "dataTypeUri": "dm4.core.boolean"
+            // TODO: index
         },
         {
             "value":       "Public",
             "uri":         "dm4.workspaces.public.enabled",
             "dataTypeUri": "dm4.core.boolean"
+            // TODO: index
         },
         {
             "value":       "Common",
             "uri":         "dm4.workspaces.common.enabled",
             "dataTypeUri": "dm4.core.boolean"
+            // TODO: index
         },
         {
             "value":       "Enabled Sharing Modes",
             "uri":         "dm4.workspaces.enabled_sharing_modes",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.value",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.workspaces.private.enabled",

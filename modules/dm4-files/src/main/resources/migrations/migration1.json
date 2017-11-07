@@ -51,7 +51,7 @@
         {
             "value": "File",
             "uri": "dm4.files.file",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.files.file_content",
@@ -116,7 +116,7 @@
         {
             "value": "Folder",
             "uri": "dm4.files.folder",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.files.folder_name",

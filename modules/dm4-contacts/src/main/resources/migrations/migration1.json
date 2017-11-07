@@ -16,7 +16,7 @@
             {
                 "value":       "Phone Entry",
                 "uri":         "dm4.contacts.phone_entry",
-                "dataTypeUri": "dm4.core.composite",
+                "dataTypeUri": "dm4.core.identity",
                 "assocDefs": [
                     {
                         "childTypeUri":         "dm4.contacts.phone_label",
@@ -29,7 +29,7 @@
             {
                 "value":       "Address Entry",
                 "uri":         "dm4.contacts.address_entry",
-                "dataTypeUri": "dm4.core.composite",
+                "dataTypeUri": "dm4.core.identity",
                 "assocDefs": [
                     {
                         "childTypeUri":         "dm4.contacts.address_label",
@@ -63,7 +63,7 @@
             {
                 "value":          "Person Name",
                 "uri":            "dm4.contacts.person_name",
-                "dataTypeUri":    "dm4.core.composite",
+                "dataTypeUri":    "dm4.core.value",
                 "isValueType":    true,
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
@@ -145,7 +145,7 @@
             {
                 "value":          "Address",
                 "uri":            "dm4.contacts.address",
-                "dataTypeUri":    "dm4.core.composite",
+                "dataTypeUri":    "dm4.core.value",
                 "isValueType":    true,
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
@@ -194,7 +194,7 @@
             {
                 "value":          "Person",
                 "uri":            "dm4.contacts.person",
-                "dataTypeUri":    "dm4.core.composite",
+                "dataTypeUri":    "dm4.core.identity",
                 "indexModeUris": ["dm4.core.fulltext"],
                 "assocDefs": [
                     {
@@ -248,7 +248,7 @@
             {
                 "value":       "Institution",
                 "uri":         "dm4.contacts.institution",
-                "dataTypeUri": "dm4.core.composite",
+                "dataTypeUri": "dm4.core.identity",
                 "indexModeUris": ["dm4.core.fulltext"],
                 "assocDefs": [
                     {

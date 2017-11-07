@@ -30,8 +30,13 @@
             "typeUri": "dm4.core.data_type"
         },
         {
-            "value":   "Composite",
-            "uri":     "dm4.core.composite",
+            "value":   "Value",
+            "uri":     "dm4.core.value",
+            "typeUri": "dm4.core.data_type"
+        },
+        {
+            "value":   "Identity",
+            "uri":     "dm4.core.identity",
             "typeUri": "dm4.core.data_type"
         }
     ]

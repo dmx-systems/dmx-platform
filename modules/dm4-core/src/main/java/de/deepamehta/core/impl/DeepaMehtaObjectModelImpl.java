@@ -626,7 +626,12 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     }
 
     boolean isSimple() {
-        return !getType().getDataTypeUri().equals("dm4.core.composite");
+        // TODO: add isSimple() to type model
+        String dataTypeUri = getType().getDataTypeUri();
+        return dataTypeUri.equals("dm4.core.text")
+            || dataTypeUri.equals("dm4.core.html")
+            || dataTypeUri.equals("dm4.core.number")
+            || dataTypeUri.equals("dm4.core.boolean");
     }
 
 
@@ -960,17 +965,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      * Calculates the label for this object model recursively. Recursion ends at a simple object model.
      * <p>
      * Note: called from this class only but can't be private as called on a different object.
+     *
+     * ### TODO: drop it
      */
     String calculateLabel() {
-        TypeModel type = getType();
-        if (type.getDataTypeUri().equals("dm4.core.composite")) {
+        if (isSimple()) {
+            return getSimpleValue().toString();
+        } else {
             StringBuilder builder = new StringBuilder();
             for (String assocDefUri : getLabelAssocDefUris()) {
                 appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
             }
             return builder.toString();
-        } else {
-            return getSimpleValue().toString();
         }
     }
 

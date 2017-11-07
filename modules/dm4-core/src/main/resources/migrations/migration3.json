@@ -19,7 +19,7 @@
         {
             "value":          "Plugin",
             "uri":            "dm4.core.plugin",
-            "dataTypeUri":    "dm4.core.composite",
+            "dataTypeUri":    "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.core.plugin_name",

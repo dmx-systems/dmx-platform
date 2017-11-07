@@ -34,7 +34,7 @@
         {
             "value":          "User Account",
             "uri":            "dm4.accesscontrol.user_account",
-            "dataTypeUri":    "dm4.core.composite",
+            "dataTypeUri":    "dm4.core.identity",
             "indexModeUris": ["dm4.core.key"],
             "assocDefs": [
                 {

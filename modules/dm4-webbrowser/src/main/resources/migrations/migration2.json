@@ -3,7 +3,7 @@
         {
             "value": "Webpage",
             "uri": "dm4.webbrowser.webpage",
-            "dataTypeUri": "dm4.core.composite",
+            "dataTypeUri": "dm4.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":         "dm4.webbrowser.url",
