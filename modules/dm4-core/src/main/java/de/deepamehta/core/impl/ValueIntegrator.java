@@ -143,7 +143,7 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, TopicModel> childTopics) {
         if (type.isValueType()) {
-            return unifyChildTopics(childTopics);
+            return unifyChildTopics(childTopics, type);
         } else {
             return updateChildRefs(identifyParent(childTopics), childTopics);
         }
@@ -156,7 +156,7 @@ class ValueIntegrator {
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
-                return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris));
+                return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris), identityAssocDefUris);
             } else {
                 DeepaMehtaObjectModelImpl parent = createSimpleTopic();
                 logger.info("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
@@ -231,9 +231,10 @@ class ValueIntegrator {
      *   - childTopic's type is assocDef's child type
      *   - childTopics map is not empty
      */
-    private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, TopicModel> childTopics) {
+    private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, TopicModel> childTopics,
+                                                       Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
-        for (String assocDefUri : type) {
+        for (String assocDefUri : assocDefUris) {
             eliminateParentCandidates(candidates, childTopics.get(assocDefUri), assocDefUri);
             if (candidates.isEmpty()) {
                 break;
