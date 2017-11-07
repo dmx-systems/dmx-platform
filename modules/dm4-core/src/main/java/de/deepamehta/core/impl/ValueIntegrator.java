@@ -11,6 +11,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +22,19 @@ import java.util.logging.Logger;
 
 class ValueIntegrator {
 
+    // ------------------------------------------------------------------------------------------------------- Constants
+
+    private static TopicModelImpl EMPTY_VALUE;
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModelImpl newValues;
     private DeepaMehtaObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
+
+    // For composites: assoc def URIs of empty child topics.
+    // Evaluated when deleting child-assignments, see updateChildRefs().
+    private List<String> emptyValues = new ArrayList();
 
     private PersistenceLayer pl;
     private ModelFactoryImpl mf;
@@ -37,10 +46,16 @@ class ValueIntegrator {
     ValueIntegrator(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
+        EMPTY_VALUE = mf.newTopicModel(-1);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
+    /**
+     * Integrates new values into the DB and returns the unified value.
+     *
+     * @return  the unified value. May be EMPTY. Is never null.
+     */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
         if (newValues.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set (newValues=" +
@@ -49,21 +64,27 @@ class ValueIntegrator {
         this.newValues = newValues;
         this.targetObject = targetObject;
         this.type = newValues.getType();
+        //
         DeepaMehtaObjectModelImpl object;
         if (newValues.isSimple()) {
             object = integrateSimple();
         } else {
             DeepaMehtaObjectModelImpl comp = integrateComposite();
-            if (comp != null) {
+            if (comp != EMPTY_VALUE) {
                 new LabelCalculation(comp).calculate();
             }
             object = comp;
         }
-        if (object != null) {
+        //
+        if (object != EMPTY_VALUE) {
             if (object.id == -1) {
                 throw new RuntimeException("Value integration result object has no ID set");
             }
             newValues.id = object.id;
+        }
+        // sanity check
+        if (object == null) {
+            throw new RuntimeException("Value integration yields null");
         }
         return object;
     }
@@ -73,16 +94,22 @@ class ValueIntegrator {
     /**
      * Preconditions:
      *   - this.newValues is simple
+     *
+     * @return  the unified value. May be EMPTY. Is never null.
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
-        SimpleValue newValue = newValues.getSimpleValue();
-        if (newValue.toString().isEmpty()) {
-            // TODO: remove parent assignment if exists
-            return null;
+        if (newValues.getSimpleValue().toString().isEmpty()) {
+            return EMPTY_VALUE;
+        } else {
+            return unifySimple();
         }
-        return unifySimple();
     }
 
+    /**
+     * Preconditions:
+     *   - this.newValues is simple
+     *   - this.newValues is not empty
+     */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
         // FIXME: HTML values must be tag-stripped before lookup, complementary to indexing
@@ -101,6 +128,8 @@ class ValueIntegrator {
     /**
      * Preconditions:
      *   - this.newValues is composite
+     *
+     * @return  the unified value. May be EMPTY. Is never null.
      */
     private DeepaMehtaObjectModelImpl integrateComposite() {
         try {
@@ -116,11 +145,13 @@ class ValueIntegrator {
                 }
                 //
                 TopicModel childTopic = integrateChildValue(newChildValue);
-                if (childTopic != null) {
+                if (childTopic == EMPTY_VALUE) {
+                    emptyValues.add(assocDefUri);
+                } else {
                     childTopics.put(assocDefUri, childTopic);
                 }
             }
-            return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
+            return !childTopics.isEmpty() ? unifyComposite(childTopics) : EMPTY_VALUE;
         } catch (Exception e) {
             throw new RuntimeException("Integrating a composite failed (typeUri=\"" + type.getUri() + "\")", e);
         }
@@ -171,12 +202,15 @@ class ValueIntegrator {
         Map<String, TopicModel> identityChildTopics = new HashMap();
         for (String assocDefUri : identityAssocDefUris) {
             TopicModel childTopic = childTopics.get(assocDefUri);
+            // FIXME: only throw if NO identity child topic is given.
+            // If at least ONE is given it is sufficient.
             if (childTopic == null) {
                 throw new RuntimeException("Identity child topic \"" + assocDefUri + "\" is missing in " +
                     childTopics.keySet());
             }
             identityChildTopics.put(assocDefUri, childTopic);
         }
+        // logger.info("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
         return identityChildTopics;
     }
 
@@ -196,27 +230,42 @@ class ValueIntegrator {
                 parent.getTypeUri() + "\"");
         }
         // logger.info("### parent=" + parent + " ### targetObject=" + targetObject);
-        for (String assocDefUri : newChildTopics.keySet()) {
+        for (String assocDefUri : type) {
             ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
-            RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDefUri);     // current one
-            TopicModel newChildTopic = newChildTopics.get(assocDefUri);                     // new one
-            // delete assignment if exists already and child has changed
-            // logger.info("### childTopic=" + childTopic + " ### newChildTopic=" + newChildTopic);
+            //
+            RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
+            TopicModel newValue = newChildTopics.get(assocDefUri);                      // may be null
+            boolean newValueIsEmpty = isEmptyValue(assocDefUri);
+            //
+            // logger.info("### assocDefUri=\"" + assocDefUri + "\" ### oldValue=" + oldValue + " ### newValue=" +
+            //     newValue + " ### emptyValues=" + emptyValues);
             boolean deleted = false;
-            if (childTopic != null && !childTopic.equals(newChildTopic)) {
-                childTopic.getRelatingAssociation().delete();
+            //
+            // 1) delete assignment if exists AND value has changed or emptied
+            //
+            if (oldValue != null && (newValueIsEmpty || newValue != null && !oldValue.equals(newValue))) {
+                // update DB
+                oldValue.getRelatingAssociation().delete();
+                // update memory
+                if (newValueIsEmpty) {
+                    logger.info("### Delete assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                        parent.getId() + " (typeUri=\"" + type.uri + "\")");
+                    childTopics.remove(assocDefUri);
+                }
                 deleted = true;
             }
-            // create assignment if not yet exists or child has changed
-            if (childTopic == null || !childTopic.equals(newChildTopic)) {
-                // update DB
-                logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newChildTopic.getId() +
+            // 2) create assignment if not exists OR value has changed
+            // a new value must be present
+            //
+            if (newValue != null && (oldValue == null || !oldValue.equals(newValue))) {
+                logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newValue.getId() +
                     " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
-                    parent.getTypeUri() + "\")");
-                AssociationModel assoc = associateChildTopic(parent, newChildTopic, assocDefUri);
+                    type.uri + "\")");
+                // update DB
+                AssociationModel assoc = associateChildTopic(parent, newValue, assocDefUri);
                 // update memory
-                childTopics.put(assocDefUri, mf.newRelatedTopicModel(newChildTopic, assoc));
+                childTopics.put(assocDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
         }
         return parent;
@@ -234,6 +283,7 @@ class ValueIntegrator {
     private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, TopicModel> childTopics,
                                                        Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
+        // logger.info("### candidates (" + candidates.size() + "): " + DeepaMehtaUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
             eliminateParentCandidates(candidates, childTopics.get(assocDefUri), assocDefUri);
             if (candidates.isEmpty()) {
@@ -243,6 +293,7 @@ class ValueIntegrator {
         DeepaMehtaObjectModelImpl comp;
         switch (candidates.size()) {
         case 0:
+            // logger.info("### no composite found, childTopics=" + childTopics);
             return createCompositeTopic(childTopics);
         case 1:
             comp = candidates.get(0);
@@ -289,12 +340,14 @@ class ValueIntegrator {
                 // TODO: assoc parents
                 if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dm4.core.parent", "dm4.core.child")
                         == null) {
+                    // logger.info("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
                 // TODO: assoc parents
                 if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dm4.core.parent", "dm4.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
+                    // logger.info("### eliminate (childs exist)");
                     i.remove();
                 }
             }
@@ -302,12 +355,6 @@ class ValueIntegrator {
     }
 
     // ---
-
-    /* private TopicModelImpl _createSimpleTopic() {
-        // return pl.createSimpleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
-        // TODO: can we do this instead?
-        return pl._createTopic((TopicModelImpl) newValues).getModel();
-    } */
 
     private TopicModelImpl createSimpleTopic() {
         return pl._createTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
@@ -341,5 +388,9 @@ class ValueIntegrator {
 
     private AssociationDefinitionModel assocDef(String assocDefUri) {
         return type.getAssocDef(assocDefUri);
+    }
+
+    private boolean isEmptyValue(String assocDefUri) {
+        return emptyValues.contains(assocDefUri);
     }
 }
