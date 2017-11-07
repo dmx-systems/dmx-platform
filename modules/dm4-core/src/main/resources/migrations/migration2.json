@@ -1,17 +1,19 @@
 // TODO: replace "Composition Definition" and "Aggregation Definition" by "Composite"
 {
     // Note: Boolean topic types must be created *after* migration 1 has run.
-    // Otherwise the data type "Boolean" does not exist.
+    // Otherwise the data type "Boolean" does not exist. ### TODO: not true anymore
     "topic_types": [
         {
-            "value":       "Identity Attribute",
-            "uri":         "dm4.core.identity_attr",
-            "dataTypeUri": "dm4.core.boolean"
+            "value":          "Identity Attribute",
+            "uri":            "dm4.core.identity_attr",
+            "dataTypeUri":    "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
-            "value":       "Include in Label",
-            "uri":         "dm4.core.include_in_label",
-            "dataTypeUri": "dm4.core.boolean"
+            "value":          "Include in Label",
+            "uri":            "dm4.core.include_in_label",
+            "dataTypeUri":    "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         }
     ],
 
