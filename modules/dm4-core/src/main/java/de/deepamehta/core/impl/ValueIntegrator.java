@@ -57,9 +57,12 @@ class ValueIntegrator {
      * @return  the unified value. May be EMPTY. Is never null.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
+        if (newValues instanceof TopicReferenceModelImpl) {
+            return ((TopicReferenceModelImpl) newValues).resolve();
+        }
         if (newValues.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to integrate newValues whose typeUri is not set (newValues=" +
-                newValues + ")");
+            throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set (" + newValues +
+                ")");
         }
         this.newValues = newValues;
         this.targetObject = targetObject;
@@ -86,6 +89,7 @@ class ValueIntegrator {
         if (object == null) {
             throw new RuntimeException("Value integration yields null");
         }
+        //
         return object;
     }
 
@@ -153,7 +157,7 @@ class ValueIntegrator {
             }
             return !childTopics.isEmpty() ? unifyComposite(childTopics) : EMPTY_VALUE;
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a composite failed (typeUri=\"" + type.getUri() + "\")", e);
+            throw new RuntimeException("Integrating a composite value failed (typeUri=\"" + type.getUri() + "\")", e);
         }
     }
 
