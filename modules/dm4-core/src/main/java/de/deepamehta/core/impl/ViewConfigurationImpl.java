@@ -65,14 +65,14 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     @Override
     public void setConfigValue(String configTypeUri, String childTypeUri, Object value) {
-        ChildTopicsModel childs = mf.newChildTopicsModel().put(childTypeUri, value);
-        TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
-        if (configTopic == null) {
-            configTopic = mf.newTopicModel(configTypeUri, childs);
-            _addConfigTopic(configTopic);                   // update memory + DB
-        } else {
-            configTopic.updateWithChildTopics(childs);      // update memory + DB
-        }
+        _setConfigValue(configTypeUri, mf.newChildTopicsModel()
+            .put(childTypeUri, value));
+    }
+
+    @Override
+    public void setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
+        _setConfigValue(configTypeUri, mf.newChildTopicsModel()
+            .put(childTypeUri, mf.newTopicReferenceModel(topicIdOrUri)));
     }
 
     // ---
@@ -84,7 +84,17 @@ class ViewConfigurationImpl implements ViewConfiguration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    public void _addConfigTopic(TopicModelImpl configTopic) {
+    private void _setConfigValue(String configTypeUri, ChildTopicsModel childs) {
+        TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
+        if (configTopic == null) {
+            configTopic = mf.newTopicModel(configTypeUri, childs);
+            _addConfigTopic(configTopic);                   // update memory + DB
+        } else {
+            configTopic.updateWithChildTopics(childs);      // update memory + DB
+        }
+    }
+
+    private void _addConfigTopic(TopicModelImpl configTopic) {
         model.addConfigTopic(configTopic);                                  // update memory
         pl.typeStorage.storeViewConfigTopic(configurable, configTopic);     // update DB
     }

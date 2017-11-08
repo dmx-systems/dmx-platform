@@ -1,7 +1,7 @@
 {
     "topic_types": [
 
-        ### User Account ###
+        // User Account
 
         {
             "value":          "Username",

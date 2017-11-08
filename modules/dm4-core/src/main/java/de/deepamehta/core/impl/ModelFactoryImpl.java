@@ -518,6 +518,20 @@ public class ModelFactoryImpl implements ModelFactory {
         );
     }
 
+    @Override
+    public TopicReferenceModel newTopicReferenceModel(Object topicIdOrUri) {
+        RelatedTopicModelImpl relTopic;
+        if (topicIdOrUri instanceof Long) {
+            relTopic = newRelatedTopicModel((Long) topicIdOrUri);
+        } else if (topicIdOrUri instanceof String) {
+            relTopic = newRelatedTopicModel((String) topicIdOrUri);
+        } else {
+            throw new IllegalArgumentException("Tried to build a TopicReferenceModel from a " +
+                topicIdOrUri.getClass().getName() + " (expected are String or Long)");
+        }
+        return new TopicReferenceModelImpl(relTopic);
+    }
+
 
 
     // === TopicDeletionModel ===

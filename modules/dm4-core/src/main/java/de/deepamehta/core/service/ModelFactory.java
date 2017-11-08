@@ -159,6 +159,8 @@ public interface ModelFactory {
 
     TopicReferenceModel newTopicReferenceModel(String topicUri, ChildTopicsModel relatingAssocChildTopics);
 
+    TopicReferenceModel newTopicReferenceModel(Object topicIdOrUri);
+
 
 
     // === TopicDeletionModel ===

@@ -227,8 +227,8 @@ class TypeStorage {
                 mf.newTopicRoleModel(dataTypeUri, "dm4.core.default")
             );
         } catch (Exception e) {
-            throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" +
-                dataTypeUri + "\" failed", e);
+            throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
+                "\" failed", e);
         }
     }
 
@@ -373,8 +373,8 @@ class TypeStorage {
                 fetchAssocDefViewConfig(assoc)
             );
         } catch (Exception e) {
-            throw new RuntimeException("Fetching association definition failed (parentTypeUri=\"" + parentTypeUri +
-                "\", childTypeUri=" + childTypeUri + ", " + assoc + ")", e);
+            throw new RuntimeException("Fetching assoc def failed (parent type \"" + parentTypeUri +
+                "\", child type \"" + childTypeUri + "\", " + assoc + ")", e);
         }
     }
 
@@ -468,8 +468,8 @@ class TypeStorage {
             // 3) view config
             storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfigModel());
         } catch (Exception e) {
-            throw new RuntimeException("Storing association definition \"" + assocDef.getAssocDefUri() +
-                "\" of type \"" + assocDef.getParentTypeUri() + "\" failed", e);
+            throw new RuntimeException("Storing assoc def \"" + assocDef.getAssocDefUri() +
+                "\" failed (parent type \"" + assocDef.getParentTypeUri() + "\")", e);
         }
     }
 
@@ -541,8 +541,8 @@ class TypeStorage {
         RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
         // error check
         if (cardinality == null) {
-            throw new RuntimeException("DB inconsistency: association definition " + assocDefId +
-                " is missing a cardinality (\"" + cardinalityRoleTypeUri + "\")");
+            throw new RuntimeException("DB inconsistency: assoc def " + assocDefId + " is missing a cardinality (\"" +
+                cardinalityRoleTypeUri + "\")");
         }
         //
         return cardinality;

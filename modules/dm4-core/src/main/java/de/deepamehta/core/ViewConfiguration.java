@@ -41,6 +41,8 @@ public interface ViewConfiguration {
      */
     void setConfigValue(String configTypeUri, String childTypeUri, Object value);
 
+    void setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
+
     // ---
 
     ViewConfigurationModel getModel();
