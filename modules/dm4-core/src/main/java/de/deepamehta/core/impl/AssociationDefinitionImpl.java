@@ -86,7 +86,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
     @Override
     public ViewConfiguration getViewConfig() {
         RoleModel configurable = pl.typeStorage.newAssocDefRole(getId());   // ### ID is uninitialized
-        return new ViewConfigurationImpl(configurable, getModel().getViewConfigModel(), pl);
+        return new ViewConfigurationImpl(configurable, getModel().getViewConfig(), pl);
     }
 
     // ---

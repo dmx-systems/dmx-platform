@@ -89,7 +89,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public ViewConfigurationModelImpl getViewConfigModel() {
+    public ViewConfigurationModelImpl getViewConfig() {
         return viewConfig;
     }
 
@@ -106,7 +106,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public void setViewConfigModel(ViewConfigurationModel viewConfig) {
+    public void setViewConfig(ViewConfigurationModel viewConfig) {
         this.viewConfig = (ViewConfigurationModelImpl) viewConfig;
     }
 

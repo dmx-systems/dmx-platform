@@ -211,7 +211,7 @@ public interface ModelFactory {
 
     AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc,
                                                     String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfigModel);
+                                                    ViewConfigurationModel viewConfig);
 
     AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
 

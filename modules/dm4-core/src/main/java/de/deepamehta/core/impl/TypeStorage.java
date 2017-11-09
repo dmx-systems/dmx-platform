@@ -368,7 +368,7 @@ class TypeStorage {
         return mf.newAssociationDefinitionModel(model,
             defaultCardinalityUri(assoc, PARENT_CARDINALITY),
             defaultCardinalityUri(assoc, CHILD_CARDINALITY),
-            null   // viewConfigModel=null
+            null    // viewConfig=null
         );
     }
 
@@ -380,11 +380,11 @@ class TypeStorage {
             return mf.newAssociationDefinitionModel(assoc,
                 fetchCardinalityOrThrow(assoc.getId(), PARENT_CARDINALITY).getUri(),
                 fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri(),
-                null    // viewConfig
+                null    // viewConfig=null
             );
         } catch (Exception e) {
-            throw new RuntimeException("Fetching assoc def failed (parent type \"" + parentTypeUri +
-                "\", child type \"" + childTypeUri + "\", " + assoc + ")", e);
+            throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
+                "\", childTypeUri=\"" + childTypeUri + "\", " + assoc + ")", e);
         }
     }
 
@@ -476,7 +476,7 @@ class TypeStorage {
             associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
-            storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfigModel());
+            storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfig());
         } catch (Exception e) {
             throw new RuntimeException("Storing assoc def \"" + assocDef.getAssocDefUri() +
                 "\" failed (parent type \"" + assocDef.getParentTypeUri() + "\")", e);
@@ -742,7 +742,7 @@ class TypeStorage {
 
     private void fetchAssocDefsViewConfig(List<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            assocDef.setViewConfigModel(fetchAssocDefViewConfig(assocDef));
+            assocDef.setViewConfig(fetchAssocDefViewConfig(assocDef));
         }
     }
 

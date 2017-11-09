@@ -5,7 +5,7 @@ import de.deepamehta.core.service.Migration;
 
 
 /**
- * Adding icons and colors to the Core types.
+ * Adds icons and colors to the Core types.
  * Runs ALWAYS.
  * <p>
  * Part of DM 4.0
@@ -25,7 +25,7 @@ public class Migration2 extends Migration {
         addIconToTopicType("dm4.core.plugin",      "\uf12e");
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
-        // Update: this is because HSB is not same as HSL. The values here are actually HSB, but CSS expects HSL.
+        // Update: this is because HSB is not the same as HSL. The values here are actually HSB, but CSS expects HSL.
         addColorToAssociationType("dm4.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);
         addColorToAssociationType("dm4.core.aggregation",     "rgb(53, 223, 59)"   /*"hsl(120, 65%, 90%)"*/);
         addColorToAssociationType("dm4.core.composition",     "rgb(231, 62, 60)"   /*"hsl(  0, 65%, 90%)"*/);

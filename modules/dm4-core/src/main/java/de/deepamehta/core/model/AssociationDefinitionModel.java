@@ -33,7 +33,7 @@ public interface AssociationDefinitionModel extends AssociationModel {
 
     String getChildCardinalityUri();
 
-    ViewConfigurationModel getViewConfigModel();
+    ViewConfigurationModel getViewConfig();
 
     // ---
 
@@ -41,5 +41,5 @@ public interface AssociationDefinitionModel extends AssociationModel {
 
     void setChildCardinalityUri(String childCardinalityUri);
 
-    void setViewConfigModel(ViewConfigurationModel viewConfigModel);
+    void setViewConfig(ViewConfigurationModel viewConfig);
 }

@@ -1,8 +1,7 @@
-{
+[{
+    // View Configuration
+
     "topic_types": [
-
-        ### View Configuration ###
-
         {
             "value": "Icon",
             "uri": "dm4.webclient.icon",
@@ -17,6 +16,11 @@
             "value": "Show in Create Menu",
             "uri": "dm4.webclient.show_in_create_menu",
             "dataTypeUri": "dm4.core.boolean"
+        },
+        {
+            "value": "Widget",
+            "uri": "dm4.webclient.widget",
+            "dataTypeUri": "dm4.core.text"
         },
         {
             "value": "Input Field Rows",
@@ -52,7 +56,27 @@
             "value": "Searchable as Unit",
             "uri": "dm4.webclient.searchable_as_unit",
             "dataTypeUri": "dm4.core.boolean"
+        }
+    ],
+
+    "topics": [
+        // Widgets
+        {
+            "value":   "Select",
+            "uri":     "dm4.webclient.select",
+            "typeUri": "dm4.webclient.widget"
         },
+        {
+            "value":   "Select + Empty",
+            "uri":     "dm4.webclient.select_empty",
+            "typeUri": "dm4.webclient.widget"
+        }
+    ]
+},
+{
+    "topic_types": [
+        // Note: the "View Configuration" composite must be created *after* the Widget instances are created.
+        // The Widget assoc def refers to a Widget instance.
         {
             "value": "View Configuration",
             "uri": "dm4.webclient.view_config",
@@ -65,14 +89,28 @@
                     "assocTypeUri":         "dm4.core.aggregation_def"
                 },
                 {
-                    "childTypeUri":        "dm4.webclient.color",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":         "dm4.webclient.color",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
                 },
                 {
-                    "childTypeUri":        "dm4.webclient.show_in_create_menu",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":         "dm4.webclient.show_in_create_menu",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.widget",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def",
+                    "viewConfigTopics": [
+                        {
+                            "typeUri": "dm4.webclient.view_config",
+                            "childs": {
+                                "dm4.webclient.widget": "ref_uri:dm4.webclient.select_empty"
+                            }
+                        }
+                    ]
                 },
                 {
                     "childTypeUri":        "dm4.webclient.input_field_rows",
@@ -110,12 +148,9 @@
                     "assocTypeUri":        "dm4.core.composition_def"
                 }
             ]
-            ### Note: don't try to add view config topics to the view config type -> endless recursion!
-            ### FIXME: Still true? At least view config's child types can have a view config meanwhile.
-            ### See comment in TypeCache.loadTopicType()
         },
 
-        ### Search ###
+        // Search
 
         {
             "value": "Search Term",
@@ -170,4 +205,4 @@
             "dataTypeUri": "dm4.core.text"
         }
     ]
-}
+}]
