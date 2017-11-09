@@ -12,10 +12,6 @@ public interface TopicReferenceModel extends RelatedTopicModel {
 
     // ---
 
-    TopicModel resolve();
-
-    // ---
-
     /**
      * Checks weather this reference refers to the given topic.
      */

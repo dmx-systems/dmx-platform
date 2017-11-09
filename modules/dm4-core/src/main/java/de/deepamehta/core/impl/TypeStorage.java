@@ -110,12 +110,17 @@ class TypeStorage {
             boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
             TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, isValueType,
-                indexModes, assocDefs, viewConfig);
+                indexModes, assocDefs, null);   // viewConfig=null
             putInTypeCache(topicType);
+            //
+            // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
+            // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
+            topicType.setViewConfig(fetchTypeViewConfig(typeTopic));
+            fetchAssocDefsViewConfig(assocDefs);
+            //
             return topicType;
         } catch (Exception e) {
             throw new RuntimeException("Fetching topic type \"" + topicTypeUri + "\" failed", e);
@@ -139,12 +144,17 @@ class TypeStorage {
             boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
-            ViewConfigurationModel viewConfig = fetchTypeViewConfig(typeTopic);
             //
             // create and cache type model
             AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, isValueType,
-                indexModes, assocDefs, viewConfig);
+                indexModes, assocDefs, null);   // viewConfig=null
             putInTypeCache(assocType);
+            //
+            // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
+            // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
+            assocType.setViewConfig(fetchTypeViewConfig(typeTopic));
+            fetchAssocDefsViewConfig(assocDefs);
+            //
             return assocType;
         } catch (Exception e) {
             throw new RuntimeException("Fetching association type \"" + assocTypeUri + "\" failed", e);
@@ -370,7 +380,7 @@ class TypeStorage {
             return mf.newAssociationDefinitionModel(assoc,
                 fetchCardinalityOrThrow(assoc.getId(), PARENT_CARDINALITY).getUri(),
                 fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri(),
-                fetchAssocDefViewConfig(assoc)
+                null    // viewConfig
             );
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc def failed (parent type \"" + parentTypeUri +
@@ -729,6 +739,14 @@ class TypeStorage {
     // === View Configurations ===
 
     // --- Fetch ---
+
+    private void fetchAssocDefsViewConfig(List<AssociationDefinitionModel> assocDefs) {
+        for (AssociationDefinitionModel assocDef : assocDefs) {
+            assocDef.setViewConfigModel(fetchAssocDefViewConfig(assocDef));
+        }
+    }
+
+    // ---
 
     private ViewConfigurationModel fetchTypeViewConfig(TopicModel typeTopic) {
         try {
