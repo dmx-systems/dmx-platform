@@ -128,10 +128,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String toString() {
-        return "\n    association definition (" + super.toString() +
-            ",\n        parent cardinality=\"" + parentCardinalityUri +
-            "\",\n        child cardinality=\"" + childCardinalityUri +
-            "\",\n        " + viewConfig + ")\n";
+        // TODO
+        return super.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

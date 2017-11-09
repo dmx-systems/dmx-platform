@@ -156,7 +156,8 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     public String toString() {
-        return "association (" + super.toString() + ", " + roleModel1 + ", " + roleModel2 + ")";
+        // TODO
+        return super.toString();
     }
 
 

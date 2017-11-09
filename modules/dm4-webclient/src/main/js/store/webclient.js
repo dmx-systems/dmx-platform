@@ -22,7 +22,7 @@ const actions = {
   },
 
   unselectIf ({dispatch}, id) {
-    console.log('unselectIf', id, isSelected(id))
+    // console.log('unselectIf', id, isSelected(id))
     if (isSelected(id)) {
       dispatch('stripSelectionFromRoute')
     }

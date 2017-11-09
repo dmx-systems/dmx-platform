@@ -5,17 +5,20 @@
         {
             "value": "Icon",
             "uri": "dm4.webclient.icon",
-            "dataTypeUri": "dm4.core.text"
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Color",
             "uri": "dm4.webclient.color",
-            "dataTypeUri": "dm4.core.text"
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Show in Create Menu",
             "uri": "dm4.webclient.show_in_create_menu",
-            "dataTypeUri": "dm4.core.boolean"
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Widget",
@@ -25,17 +28,20 @@
         {
             "value": "Input Field Rows",
             "uri": "dm4.webclient.input_field_rows",
-            "dataTypeUri": "dm4.core.number"
+            "dataTypeUri": "dm4.core.number",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Hidden",
             "uri": "dm4.webclient.hidden",
-            "dataTypeUri": "dm4.core.boolean"
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Locked",
             "uri": "dm4.webclient.locked",
-            "dataTypeUri": "dm4.core.boolean"
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Page Renderer URI",
@@ -55,7 +61,8 @@
         {
             "value": "Searchable as Unit",
             "uri": "dm4.webclient.searchable_as_unit",
-            "dataTypeUri": "dm4.core.boolean"
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
         }
     ],
 
@@ -75,7 +82,7 @@
 },
 {
     "topic_types": [
-        // Note: the "View Configuration" composite must be created *after* the Widget instances are created.
+        // Note: the "View Configuration" composite must be created *after* the Widget instances.
         // The Widget assoc def refers to a Widget instance.
         {
             "value": "View Configuration",

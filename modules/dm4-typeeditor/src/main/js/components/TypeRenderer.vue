@@ -15,7 +15,7 @@
     <div class="field">
       <div class="field-label">Value Type</div>
       <div v-if="infoMode">{{object.isValueType}}</div>
-      <boolean-field v-else v-model="object.isValueType" :mode="mode"></boolean-field>
+      <boolean-field v-else :object="object" prop="isValueType" :mode="mode"></boolean-field>
     </div>
   </div>
 </template>
@@ -25,10 +25,12 @@ import dm5 from 'dm5'
 
 export default {
 
-  props: [
-    'object',   // the type to render (a dm5.TopicType/dm5.AssocType)
-    'mode'      // 'info' or 'form'
-  ],
+  props: {
+    object: {   // the type to render
+      type: [dm5.TopicType, dm5.AssocType],   // TODO: export dm5.Type?
+      required: true
+    }
+  },
 
   computed: {
 
@@ -42,6 +44,7 @@ export default {
   },
 
   mixins: [
+    require('dm5-detail-panel/src/components/mixins/mode').default,
     require('dm5-detail-panel/src/components/mixins/infoMode').default
   ],
 

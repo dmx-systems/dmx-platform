@@ -49,7 +49,8 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
     @Override
     public String toString() {
-        return "\n        association role (roleTypeUri=\"" + roleTypeUri + "\", playerId=" + playerId + ")";
+        // TODO
+        return super.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

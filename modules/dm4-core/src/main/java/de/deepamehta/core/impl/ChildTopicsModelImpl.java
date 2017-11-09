@@ -529,7 +529,9 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public String toString() {
-        return childTopics.toString();
+        // TODO
+        return super.toString();
+        // return childTopics.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

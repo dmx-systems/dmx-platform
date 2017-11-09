@@ -49,7 +49,8 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
 
     @Override
     public String toString() {
-        return "topic (" + super.toString() + ")";
+        // TODO
+        return super.toString();
     }
 
 

@@ -315,16 +315,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private void updateTopicType(Topic type, Topic viewConfig) {
-        logger.info("### Updating view configuration of topic type \"" + type.getUri() + "\" (viewConfig=" +
-            viewConfig + ")");
+        logger.info("### Updating view config of topic type \"" + type.getUri() + "\" (viewConfig=" + viewConfig + ")");
         TopicType topicType = dm4.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
         Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);           // ### TODO: should be implicit
     }
 
     private void updateAssociationType(Topic type, Topic viewConfig) {
-        logger.info("### Updating view configuration of association type \"" + type.getUri() + "\" (viewConfig=" +
-            viewConfig + ")");
+        logger.info("### Updating view config of assoc type \"" + type.getUri() + "\" (viewConfig=" + viewConfig + ")");
         AssociationType assocType = dm4.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
         Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);     // ### TODO: should be implicit
