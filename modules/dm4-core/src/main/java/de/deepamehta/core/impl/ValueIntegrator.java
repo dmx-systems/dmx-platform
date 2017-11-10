@@ -22,10 +22,6 @@ import java.util.logging.Logger;
 
 class ValueIntegrator {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static TopicModelImpl EMPTY_VALUE;
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DeepaMehtaObjectModelImpl newValues;
@@ -46,7 +42,6 @@ class ValueIntegrator {
     ValueIntegrator(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
-        EMPTY_VALUE = mf.newTopicModel(-1);
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -54,16 +49,20 @@ class ValueIntegrator {
     /**
      * Integrates new values into the DB and returns the unified value.
      *
-     * @return  the unified value. May be EMPTY. Is never null.
+     * @return  the unified value, or null if there was nothing to unify.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
+        // a ref can be unified immediately
         if (newValues instanceof TopicReferenceModelImpl) {
-            return ((TopicReferenceModelImpl) newValues).resolve();
+            TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
+            return !ref.isEmptyRef() ? ref.resolve() : null;
         }
+        // argument check
         if (newValues.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set (" + newValues +
                 ")");
         }
+        //
         this.newValues = newValues;
         this.targetObject = targetObject;
         this.type = newValues.getType();
@@ -73,21 +72,17 @@ class ValueIntegrator {
             object = integrateSimple();
         } else {
             DeepaMehtaObjectModelImpl comp = integrateComposite();
-            if (comp != EMPTY_VALUE) {
+            if (comp != null) {
                 new LabelCalculation(comp).calculate();
             }
             object = comp;
         }
         //
-        if (object != EMPTY_VALUE) {
+        if (object != null) {
             if (object.id == -1) {
                 throw new RuntimeException("Value integration result object has no ID set");
             }
             newValues.id = object.id;
-        }
-        // sanity check
-        if (object == null) {
-            throw new RuntimeException("Value integration yields null");
         }
         //
         return object;
@@ -99,11 +94,11 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is simple
      *
-     * @return  the unified value. May be EMPTY. Is never null.
+     * @return  the unified value, or null if there was nothing to unify.
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
         if (newValues.getSimpleValue().toString().isEmpty()) {
-            return EMPTY_VALUE;
+            return null;
         } else {
             return unifySimple();
         }
@@ -113,6 +108,8 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is simple
      *   - this.newValues is not empty
+     *
+     * @return  the unified value. Is never null.
      */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
@@ -133,7 +130,7 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is composite
      *
-     * @return  the unified value. May be EMPTY. Is never null.
+     * @return  the unified value, or null if there was nothing to unify.
      */
     private DeepaMehtaObjectModelImpl integrateComposite() {
         try {
@@ -149,13 +146,13 @@ class ValueIntegrator {
                 }
                 //
                 TopicModel childTopic = integrateChildValue(newChildValue);
-                if (childTopic == EMPTY_VALUE) {
+                if (childTopic == null) {
                     emptyValues.add(assocDefUri);
                 } else {
                     childTopics.put(assocDefUri, childTopic);
                 }
             }
-            return !childTopics.isEmpty() ? unifyComposite(childTopics) : EMPTY_VALUE;
+            return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
         } catch (Exception e) {
             throw new RuntimeException("Integrating a composite value failed (typeUri=\"" + type.getUri() + "\")", e);
         }

@@ -228,7 +228,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return className() + " " + id + " (typeUri=\"" + typeUri + "\")";
+        return className() + " " + id + " (typeUri=\"" + typeUri + "\", value=" + value + ", uri=\"" + uri + "\")";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

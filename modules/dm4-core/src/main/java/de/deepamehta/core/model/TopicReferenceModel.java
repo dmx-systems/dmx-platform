@@ -10,6 +10,11 @@ public interface TopicReferenceModel extends RelatedTopicModel {
 
     boolean isReferenceByUri();
 
+    /**
+     * Returns true if this reference refers to nothing.
+     */
+    boolean isEmptyRef();
+
     // ---
 
     /**

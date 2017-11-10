@@ -46,17 +46,20 @@
         {
             "value": "Page Renderer URI",
             "uri": "dm4.webclient.page_renderer_uri",
-            "dataTypeUri": "dm4.core.text"
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Simple Renderer URI",
             "uri": "dm4.webclient.simple_renderer_uri",
-            "dataTypeUri": "dm4.core.text"
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Multi Renderer URI",
             "uri": "dm4.webclient.multi_renderer_uri",
-            "dataTypeUri": "dm4.core.text"
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
         },
         {
             "value": "Searchable as Unit",

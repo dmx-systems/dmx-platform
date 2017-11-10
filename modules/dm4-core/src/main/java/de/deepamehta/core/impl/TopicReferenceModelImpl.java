@@ -29,6 +29,11 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
         return getUri() != null && !getUri().equals("");
     }
 
+    @Override
+    public boolean isEmptyRef() {
+        return !isReferenceById() && !isReferenceByUri();
+    }
+
     // ---
 
     @Override
@@ -38,7 +43,7 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
         } else if (isReferenceByUri()) {
             return getUri().equals(topic.getUri());
         } else {
-            throw new RuntimeException("Invalid topic reference (" + this + ")");
+            throw new RuntimeException("Invalid " + this);
         }
     }
 
@@ -56,10 +61,18 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
 
     @Override
     public String toString() {
-        return "reference " + super.toString();
+        // TODO
+        return super.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
+
+    @Override
+    String className() {
+        return "topic reference";
+    }
+
+    // ---
 
     TopicModelImpl resolve() {
         try {
@@ -74,7 +87,7 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
                 }
                 return topic;   // .loadChildTopics();  // TODO?
             } else {
-                throw new RuntimeException("Invalid topic reference (" + this + ")");
+                throw new RuntimeException("Invalid " + this);
             }
         } catch (Exception e) {
             throw new RuntimeException("Resolving a topic reference failed (" + this + ")", e);

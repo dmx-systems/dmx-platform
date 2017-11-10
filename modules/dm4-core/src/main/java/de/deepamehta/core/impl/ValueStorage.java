@@ -170,7 +170,7 @@ class ValueStorage {
             }
             return topic.loadChildTopics();
         } else {
-            throw new RuntimeException("Invalid topic reference (" + topicRef + ")");
+            throw new RuntimeException("Invalid " + topicRef);
         }
     }
 
