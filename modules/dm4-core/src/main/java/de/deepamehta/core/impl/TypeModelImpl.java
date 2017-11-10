@@ -29,7 +29,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;     // may be null in models used for an update operation
-    private boolean isValueType;    // true for value types, false for identity types
     private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
@@ -38,11 +37,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, boolean isValueType, List<IndexMode> indexModes,
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri  = dataTypeUri;
-        this.isValueType  = isValueType;
         this.indexModes   = indexModes;
         this.assocDefs    = toMap(assocDefs);
         this.viewConfig   = viewConfig;
@@ -51,7 +49,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     TypeModelImpl(TypeModelImpl type) {
         super(type);
         this.dataTypeUri  = type.getDataTypeUri();
-        this.isValueType  = type.isValueType();
         this.indexModes   = type.getIndexModes();
         this.assocDefs    = toMap(type.getAssocDefs());
         this.viewConfig   = type.getViewConfig();
@@ -71,20 +68,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public void setDataTypeUri(String dataTypeUri) {
         this.dataTypeUri = dataTypeUri;
-    }
-
-
-
-    // === Value Type ===
-
-    @Override
-    public boolean isValueType() {
-        return isValueType;
-    }
-
-    @Override
-    public void setValueType(boolean isValueType) {
-        this.isValueType = isValueType;
     }
 
 
@@ -212,7 +195,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             return super.toJSON()
                 .put("dataTypeUri", dataTypeUri)
-                .put("isValueType", isValueType)
                 .put("indexModeUris", toJSONArray(indexModes))
                 .put("assocDefs", toJSONArray(assocDefs.values()))
                 .put("viewConfigTopics", viewConfig.toJSONArray());
@@ -242,9 +224,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     @Override
     public String toString() {
-        return "id=" + id + ", uri=\"" + uri + "\", value=\"" + value + "\", typeUri=\"" + typeUri +
-            "\", dataTypeUri=\"" + getDataTypeUri() + "\", isValueType=" + isValueType +
-            ", indexModes=" + getIndexModes() + ", assocDefs=" + getAssocDefs() + ", " + getViewConfig();
+        // TODO
+        return super.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -335,11 +316,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
         storeDataTypeUri();             // update DB
-    }
-
-    final void updateIsValueType(boolean isValueType) {
-        setValueType(isValueType);      // update memory
-        storeValueType();               // update DB
     }
 
     final void _addIndexMode(IndexMode indexMode) {
@@ -531,7 +507,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void updateType(TypeModelImpl updateModel) {
         _updateDataTypeUri(updateModel.getDataTypeUri());
-        _updateIsValueType(updateModel.isValueType());
         _updateAssocDefs(updateModel.getAssocDefs());
         _updateSequence(updateModel.getAssocDefs());
     }
@@ -547,14 +522,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 logger.info("### Changing data type URI: \"" + dataTypeUri + "\" -> \"" + newDataTypeUri + "\"");
                 updateDataTypeUri(newDataTypeUri);
             }
-        }
-    }
-
-    private void _updateIsValueType(boolean newIsValueType) {
-        boolean isValueType = isValueType();
-        if (isValueType != newIsValueType) {
-            logger.info("### Changing value type: " + isValueType + " -> " + newIsValueType);
-            updateIsValueType(newIsValueType);
         }
     }
 
@@ -593,11 +560,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             .getRelatingAssociation().delete();
         // create new assignment
         pl.typeStorage.storeDataType(uri, dataTypeUri);
-    }
-
-    private void storeValueType() {
-        TopicModel valueType = pl.typeStorage.fetchValueTypeTopic(id);
-        pl.storeTopicValue(valueType.getId(), new SimpleValue(isValueType));
     }
 
     private void indexAllInstances(IndexMode indexMode) {

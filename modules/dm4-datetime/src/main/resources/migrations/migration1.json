@@ -5,28 +5,24 @@
             "value":          "Month",
             "uri":            "dm4.datetime.month",
             "dataTypeUri":    "dm4.core.number",
-            "isValueType":    true,
             "indexModeUris": ["dm4.core.key"]
         },
         {
             "value":          "Day",
             "uri":            "dm4.datetime.day",
             "dataTypeUri":    "dm4.core.number",
-            "isValueType":    true,
             "indexModeUris": ["dm4.core.key"]
         },
         {
             "value":          "Year",
             "uri":            "dm4.datetime.year",
             "dataTypeUri":    "dm4.core.number",
-            "isValueType":    true,
             "indexModeUris": ["dm4.core.key"]
         },
         {
             "value":          "Date",
             "uri":            "dm4.datetime.date",
             "dataTypeUri":    "dm4.core.value",
-            "isValueType":    true,
             "assocDefs": [
                 {
                     "childTypeUri":         "dm4.datetime.month",
@@ -56,21 +52,18 @@
             "value":          "Hour",
             "uri":            "dm4.datetime.hour",
             "dataTypeUri":    "dm4.core.number",
-            "isValueType":    true,
             "indexModeUris": ["dm4.core.key"]
         },
         {
             "value":          "Minute",
             "uri":            "dm4.datetime.minute",
             "dataTypeUri":    "dm4.core.number",
-            "isValueType":    true,
             "indexModeUris": ["dm4.core.key"]
         },
         {
             "value":          "Time",
             "uri":            "dm4.datetime.time",
             "dataTypeUri":    "dm4.core.value",
-            "isValueType":    true,
             "assocDefs": [
                 {
                     "childTypeUri":         "dm4.datetime.hour",
@@ -93,7 +86,6 @@
             "value":       "Date/Time",
             "uri":         "dm4.datetime",
             "dataTypeUri": "dm4.core.value",
-            "isValueType": true,
             "assocDefs": [
                 {
                     "childTypeUri":        "dm4.datetime.date",

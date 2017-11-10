@@ -11,12 +11,6 @@
         </el-option>
       </el-select>
     </div>
-    <!-- Value Type -->
-    <div class="field">
-      <div class="field-label">Value Type</div>
-      <div v-if="infoMode">{{object.isValueType}}</div>
-      <boolean-field v-else :object="object" prop="isValueType" :mode="mode"></boolean-field>
-    </div>
   </div>
 </template>
 

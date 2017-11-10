@@ -17,14 +17,6 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
 
 
-    // === Value Type ===
-
-    boolean isValueType();
-
-    void setValueType(boolean isValueType);
-
-
-
     // === Index Modes ===
 
     List<IndexMode> getIndexModes();

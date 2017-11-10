@@ -177,7 +177,7 @@ class ValueIntegrator {
      *   - childTopics map is not empty
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, TopicModel> childTopics) {
-        if (type.isValueType()) {
+        if (isValueType()) {
             return unifyChildTopics(childTopics, type);
         } else {
             return updateChildRefs(identifyParent(childTopics), childTopics);
@@ -392,6 +392,10 @@ class ValueIntegrator {
 
     private AssociationDefinitionModel assocDef(String assocDefUri) {
         return type.getAssocDef(assocDefUri);
+    }
+
+    private boolean isValueType() {
+        return type.getDataTypeUri().equals("dm4.core.value");
     }
 
     private boolean isEmptyValue(String assocDefUri) {

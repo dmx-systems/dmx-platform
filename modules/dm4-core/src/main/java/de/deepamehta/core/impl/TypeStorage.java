@@ -107,13 +107,12 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
-            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, isValueType,
-                indexModes, assocDefs, null);   // viewConfig=null
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, null);   // viewConfig=null
             putInTypeCache(topicType);
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
@@ -141,13 +140,12 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            boolean isValueType = fetchValueType(typeId);
             List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, isValueType,
-                indexModes, assocDefs, null);   // viewConfig=null
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
+                assocDefs, null);   // viewConfig=null
             putInTypeCache(assocType);
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
@@ -201,7 +199,6 @@ class TypeStorage {
         //
         // 2) store type-specific parts
         storeDataType(type.getUri(), type.getDataTypeUri());
-        storeValueType(type.getUri(), type.isValueType());
         storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
@@ -240,34 +237,6 @@ class TypeStorage {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
                 "\" failed", e);
         }
-    }
-
-
-
-    // === Value Type ===
-
-    // --- Fetch ---
-
-    RelatedTopicModel fetchValueTypeTopic(long typeId) {
-        return pl.fetchTopicRelatedTopic(typeId, "dm4.core.composition", "dm4.core.parent", "dm4.core.child",
-            "dm4.core.value_type");
-    }
-
-    private boolean fetchValueType(long typeId) {
-        RelatedTopicModel valueType = fetchValueTypeTopic(typeId);
-        // TODO: should *every* type have the value flag? At the moment the bootstrap types have no one.
-        return valueType != null ? valueType.getSimpleValue().booleanValue() : false;
-    }
-
-    // --- Store ---
-
-    private void storeValueType(String typeUri, boolean isValueType) {
-        Topic valueType = pl.createTopic(mf.newTopicModel("dm4.core.value_type",
-            new SimpleValue(isValueType)));
-        pl.createAssociation("dm4.core.composition",
-            mf.newTopicRoleModel(typeUri, "dm4.core.parent"),
-            mf.newTopicRoleModel(valueType.getId(), "dm4.core.child")
-        );
     }
 
 

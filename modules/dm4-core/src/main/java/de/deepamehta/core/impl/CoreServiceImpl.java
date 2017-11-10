@@ -510,9 +510,6 @@ public class CoreServiceImpl implements CoreService {
             // Create association type "Aggregation" -- needed to associate topic/association types with data types
             TopicModel aggregation = mf.newAssociationTypeModel("dm4.core.aggregation", "Aggregation", "dm4.core.text");
             _createTopic(aggregation);
-            // Create association type "Composition" -- needed to associate topic/association types with value type
-            TopicModel composition = mf.newAssociationTypeModel("dm4.core.composition", "Composition", "dm4.core.text");
-            _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
             TopicModel instn = mf.newAssociationTypeModel("dm4.core.instantiation", "Instantiation", "dm4.core.text");
             _createTopic(instn);
@@ -527,7 +524,6 @@ public class CoreServiceImpl implements CoreService {
             pl.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
             pl.createTopicInstantiation(text.getId(), text.getTypeUri());
             pl.createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
-            pl.createTopicInstantiation(composition.getId(), composition.getTypeUri());
             pl.createTopicInstantiation(instn.getId(), instn.getTypeUri());
             //
             // 2) Postponed data type association
@@ -558,7 +554,6 @@ public class CoreServiceImpl implements CoreService {
             _associateDataType("dm4.core.data_type",  "dm4.core.text");
             //
             _associateDataType("dm4.core.aggregation",   "dm4.core.text");
-            _associateDataType("dm4.core.composition",   "dm4.core.text");
             _associateDataType("dm4.core.instantiation", "dm4.core.text");
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);

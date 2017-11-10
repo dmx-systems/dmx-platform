@@ -44,27 +44,24 @@
     {
         "topic_types": [
 
-            ### Person Name ###
+            // Person Name
 
             {
                 "value":          "First Name",
                 "uri":            "dm4.contacts.first_name",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "Last Name",
                 "uri":            "dm4.contacts.last_name",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "Person Name",
                 "uri":            "dm4.contacts.person_name",
                 "dataTypeUri":    "dm4.core.value",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
                     {
@@ -82,71 +79,63 @@
                 ]
             },
 
-            ### Institution Name ###
+            // Institution Name
 
             {
                 "value":          "Institution Name",
                 "uri":            "dm4.contacts.institution_name",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
-            ### Phone ###
+            // Phone
 
             {
                 "value":          "Phone",
                 "uri":            "dm4.contacts.phone_number",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
-            ### Email Address ###
+            // Email Address
 
             {
                 "value":          "Email Address",
                 "uri":            "dm4.contacts.email_address",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
 
-            ### Address ###
+            // Address
 
             {
                 "value":          "Street",
                 "uri":            "dm4.contacts.street",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "Postal Code",
                 "uri":            "dm4.contacts.postal_code",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "City",
                 "uri":            "dm4.contacts.city",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "Country",
                 "uri":            "dm4.contacts.country",
                 "dataTypeUri":    "dm4.core.text",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
                 "value":          "Address",
                 "uri":            "dm4.contacts.address",
                 "dataTypeUri":    "dm4.core.value",
-                "isValueType":    true,
                 "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"],
                 "assocDefs": [
                     {
@@ -180,7 +169,7 @@
                 ]
             },
 
-            ### Notes ###
+            // Notes
 
             {
                 "value":          "Notes",
@@ -189,7 +178,7 @@
                 "indexModeUris": ["dm4.core.fulltext"]
             },
 
-            ### Person ###
+            // Person
 
             {
                 "value":          "Person",
@@ -243,7 +232,7 @@
                 ]
             },
 
-            ### Institution ###
+            // Institution
 
             {
                 "value":       "Institution",
@@ -299,7 +288,7 @@
 
         "topics": [
 
-            ### Phone Labels ###
+            // Phone Labels
 
             {
                 "value":   "work",
@@ -327,7 +316,7 @@
                 "typeUri": "dm4.contacts.phone_label"
             },
 
-            ### Address Labels ###
+            // Address Labels
 
             {
                 "value":   "work",
