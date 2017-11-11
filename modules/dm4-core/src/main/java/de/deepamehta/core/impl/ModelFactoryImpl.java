@@ -141,17 +141,19 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationModelImpl newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
-                                                                                      ChildTopicsModel childTopics) {
+                                                                                         ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, typeUri, roleModel1, roleModel2, null, childTopics);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make package private?
     @Override
     public AssociationModelImpl newAssociationModel() {
         return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make package private?
     @Override
     public AssociationModelImpl newAssociationModel(ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, null, null, null, null, childTopics);
@@ -159,7 +161,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
-                                                                                     RoleModel roleModel2) {
+                                                                                         RoleModel roleModel2) {
         return newAssociationModel(id, uri, typeUri, roleModel1, roleModel2, null, null);
     }
 

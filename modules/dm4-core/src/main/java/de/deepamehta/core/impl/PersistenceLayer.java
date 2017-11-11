@@ -140,7 +140,7 @@ public final class PersistenceLayer extends StorageDecorator {
             }
             return topic.instantiate();
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic failed (model=" + model + ")", e);
+            throw new RuntimeException("Creating " + model + " failed", e);
         }
     }
 
@@ -181,8 +181,7 @@ public final class PersistenceLayer extends StorageDecorator {
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic " + model.getId() + " failed (typeUri=\"" + model.getTypeUri() +
-                "\")", e);
+            throw new RuntimeException("Creating " + model + " failed", e);
         }
     }
 
@@ -214,7 +213,11 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     void deleteTopic(long topicId) {
-        deleteTopic(fetchTopic(topicId));
+        try {
+            deleteTopic(fetchTopic(topicId));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching and deleting topic " + topicId + " failed", e);
+        }
     }
 
     void deleteTopic(TopicModelImpl topic) {
@@ -357,7 +360,7 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeAssociation(model);
-            valueStorage.storeValue(model);
+            integrateValues(model, null);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
             AssociationImpl assoc = model.instantiate();
@@ -367,7 +370,7 @@ public final class PersistenceLayer extends StorageDecorator {
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;
         } catch (Exception e) {
-            throw new RuntimeException("Creating association failed (" + model + ")", e);
+            throw new RuntimeException("Creating " + model + " failed", e);
         }
     }
 
@@ -398,7 +401,11 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     void deleteAssociation(long assocId) {
-        deleteAssociation(fetchAssociation(assocId));
+        try {
+            deleteAssociation(fetchAssociation(assocId));
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching and deleting association " + assocId + " failed", e);
+        }
     }
 
     void deleteAssociation(AssociationModelImpl assoc) {

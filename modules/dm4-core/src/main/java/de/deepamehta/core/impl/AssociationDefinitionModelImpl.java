@@ -128,8 +128,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String toString() {
-        // TODO
-        return super.toString();
+        return super.toString() + "\nparentTypeUri=\"" + getParentTypeUri() + "\"\nchildTypeUri=\"" +
+            getChildTypeUri() + "\"\nassocDefUri=\"" + getAssocDefUri() + "\"\ncustomAssocType=" + getCustomAssocType();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

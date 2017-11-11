@@ -49,7 +49,7 @@ class ValueIntegrator {
     /**
      * Integrates new values into the DB and returns the unified value.
      *
-     * @return  the unified value, or null if there was nothing to unify.
+     * @return  the unified value, or null if there was nothing to integrate.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
         // a ref can be unified immediately
@@ -94,9 +94,15 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is simple
      *
-     * @return  the unified value, or null if there was nothing to unify.
+     * @return  the unified value, or null if there was nothing to integrate.
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
+        if (newValues instanceof AssociationModel) {
+            // FIXME: assocs of custom assoc type have no value
+            // FIXME: new value does not appear in UPDATE_ASSOCIATION directive
+            newValues.storeSimpleValue();
+            return newValues;
+        }
         if (newValues.getSimpleValue().toString().isEmpty()) {
             return null;
         } else {
@@ -130,7 +136,7 @@ class ValueIntegrator {
      * Preconditions:
      *   - this.newValues is composite
      *
-     * @return  the unified value, or null if there was nothing to unify.
+     * @return  the unified value, or null if there was nothing to integrate.
      */
     private DeepaMehtaObjectModelImpl integrateComposite() {
         try {
@@ -154,7 +160,8 @@ class ValueIntegrator {
             }
             return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a composite value failed (typeUri=\"" + type.getUri() + "\")", e);
+            throw new RuntimeException("Integrating a composite value failed (typeUri=\"" + type.getUri() +
+                "\", childTopics=" + newValues.getChildTopicsModel() + ")", e);
         }
     }
 
@@ -185,6 +192,11 @@ class ValueIntegrator {
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
+        } else if (newValues instanceof AssociationModel) {
+            if (newValues.id == -1) {
+                throw new RuntimeException("newValues has no ID set");
+            }
+            return mf.newAssociationModel(newValues.id, null, newValues.typeUri, null, null);
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {

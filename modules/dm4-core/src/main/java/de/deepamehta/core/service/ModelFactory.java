@@ -39,6 +39,7 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModel childTopics);
 
+    // ### TODO: make internal?
     TopicModel newTopicModel(ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(String typeUri);
@@ -53,8 +54,10 @@ public interface ModelFactory {
 
     TopicModel newTopicModel(String uri, String typeUri, ChildTopicsModel childTopics);
 
+    // ### TODO: make internal?
     TopicModel newTopicModel(long id);
 
+    // ### TODO: make internal?
     TopicModel newTopicModel(long id, ChildTopicsModel childTopics);
 
     TopicModel newTopicModel(TopicModel topic);
@@ -73,8 +76,10 @@ public interface ModelFactory {
     AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
                                                                                ChildTopicsModel childTopics);
 
+    // ### TODO: make internal?
     AssociationModel newAssociationModel();
 
+    // ### TODO: make internal?
     AssociationModel newAssociationModel(ChildTopicsModel childTopics);
 
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
