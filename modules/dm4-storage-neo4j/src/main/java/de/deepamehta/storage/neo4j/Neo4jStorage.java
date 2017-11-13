@@ -895,13 +895,18 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // --- Neo4j -> DeepaMehta Bridge ---
 
     TopicModel buildTopic(Node topicNode) {
-        return mf.newTopicModel(
-            topicNode.getId(),
-            uri(topicNode),
-            typeUri(topicNode),
-            simpleValue(topicNode),
-            null    // childTopics=null
-        );
+        try {
+            return mf.newTopicModel(
+                topicNode.getId(),
+                uri(topicNode),
+                typeUri(topicNode),
+                simpleValue(topicNode),
+                null    // childTopics=null
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Building a TopicModel failed (id=" + topicNode.getId() + ", typeUri=" +
+                typeUri(topicNode) + ")");
+        }
     }
 
     private List<TopicModel> buildTopics(Iterable<Node> topicNodes) {
@@ -915,15 +920,20 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // ---
 
     AssociationModel buildAssociation(Node assocNode) {
-        List<RoleModel> roleModels = buildRoleModels(assocNode);
-        return mf.newAssociationModel(
-            assocNode.getId(),
-            uri(assocNode),
-            typeUri(assocNode),
-            roleModels.get(0), roleModels.get(1),
-            simpleValue(assocNode),
-            null    // childTopics=null
-        );
+        try {
+            List<RoleModel> roleModels = buildRoleModels(assocNode);
+            return mf.newAssociationModel(
+                assocNode.getId(),
+                uri(assocNode),
+                typeUri(assocNode),
+                roleModels.get(0), roleModels.get(1),
+                simpleValue(assocNode),
+                null    // childTopics=null
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Building an AssociationModel failed (id=" + assocNode.getId() + ", typeUri=" +
+                typeUri(assocNode) + ")");
+        }
     }
 
     private List<AssociationModel> buildAssociations(Iterable<Node> assocNodes) {

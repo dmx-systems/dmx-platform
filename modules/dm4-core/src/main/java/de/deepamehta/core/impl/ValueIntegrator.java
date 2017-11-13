@@ -20,6 +20,9 @@ import java.util.logging.Logger;
 
 
 
+/**
+ * Integrates new values into the DB.
+ */
 class ValueIntegrator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -27,6 +30,7 @@ class ValueIntegrator {
     private DeepaMehtaObjectModelImpl newValues;
     private DeepaMehtaObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
+    private boolean isAssoc;
 
     // For composites: assoc def URIs of empty child topics.
     // Evaluated when deleting child-assignments, see updateChildRefs().
@@ -66,6 +70,7 @@ class ValueIntegrator {
         this.newValues = newValues;
         this.targetObject = targetObject;
         this.type = newValues.getType();
+        this.isAssoc = newValues instanceof AssociationModel;
         //
         DeepaMehtaObjectModelImpl object;
         if (newValues.isSimple()) {
@@ -74,6 +79,8 @@ class ValueIntegrator {
             DeepaMehtaObjectModelImpl comp = integrateComposite();
             if (comp != null) {
                 new LabelCalculation(comp).calculate();
+            } else if (isAssoc) {
+                newValues.storeSimpleValue();
             }
             object = comp;
         }
@@ -97,13 +104,11 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
-        if (newValues instanceof AssociationModel) {
-            // FIXME: assocs of custom assoc type have no value
+        if (isAssoc) {
             // FIXME: new value does not appear in UPDATE_ASSOCIATION directive
             newValues.storeSimpleValue();
             return newValues;
-        }
-        if (newValues.getSimpleValue().toString().isEmpty()) {
+        } else if (newValues.getSimpleValue().toString().isEmpty()) {
             return null;
         } else {
             return unifySimple();
@@ -192,7 +197,7 @@ class ValueIntegrator {
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
-        } else if (newValues instanceof AssociationModel) {
+        } else if (isAssoc) {
             if (newValues.id == -1) {
                 throw new RuntimeException("newValues has no ID set");
             }
@@ -247,6 +252,8 @@ class ValueIntegrator {
             ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
             //
+            // TODO: better read the old value directly from DB?
+            // We could use the existing newValues model objects for creating new topics then
             RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
             TopicModel newValue = newChildTopics.get(assocDefUri);                      // may be null
             boolean newValueIsEmpty = isEmptyValue(assocDefUri);
