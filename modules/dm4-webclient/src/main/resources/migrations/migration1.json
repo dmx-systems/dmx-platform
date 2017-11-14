@@ -26,6 +26,12 @@
             "dataTypeUri": "dm4.core.text"
         },
         {
+            "value": "Clearable",
+            "uri": "dm4.webclient.clearable",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
             "value": "Input Field Rows",
             "uri": "dm4.webclient.input_field_rows",
             "dataTypeUri": "dm4.core.number",
@@ -69,24 +75,20 @@
         }
     ],
 
+    // Note: the Widget instances must be created *before* the "View Configuration" composite.
+    // The Widget assoc def refers to a Widget instance.
+
     "topics": [
         // Widgets
         {
             "value":   "Select",
             "uri":     "dm4.webclient.select",
             "typeUri": "dm4.webclient.widget"
-        },
-        {
-            "value":   "Select + Empty",
-            "uri":     "dm4.webclient.select_empty",
-            "typeUri": "dm4.webclient.widget"
         }
     ]
 },
 {
     "topic_types": [
-        // Note: the "View Configuration" composite must be created *after* the Widget instances.
-        // The Widget assoc def refers to a Widget instance.
         {
             "value": "View Configuration",
             "uri": "dm4.webclient.view_config",
@@ -117,10 +119,16 @@
                         {
                             "typeUri": "dm4.webclient.view_config",
                             "childs": {
-                                "dm4.webclient.widget": "ref_uri:dm4.webclient.select_empty"
+                                "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
+                                "dm4.webclient.clearable": true
                             }
                         }
                     ]
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.clearable",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
                 },
                 {
                     "childTypeUri":        "dm4.webclient.input_field_rows",

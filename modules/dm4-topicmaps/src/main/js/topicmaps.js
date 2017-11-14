@@ -61,7 +61,7 @@ const actions = {
    * @returns   a promise resolved once the topicmap rendering is complete.
    */
   displayTopicmap ({rootState, dispatch}, id) {
-    console.log('displayTopicmap', id)
+    // console.log('displayTopicmap', id)
     // update state
     state.selectedTopicmapId[_workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
@@ -330,7 +330,7 @@ const actions = {
     if (state.topicmapTopics[workspaceId]) {
       p = Promise.resolve()
     } else {
-      console.log('fetchTopicmapTopics', workspaceId)
+      // console.log('fetchTopicmapTopics', workspaceId)
       p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
         // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
         if (!topics.length) {
@@ -439,7 +439,7 @@ function getTopicmap (id) {
   if (topicmap) {
     p = Promise.resolve(topicmap)
   } else {
-    console.log('Fetching topicmap', id)
+    // console.log('Fetching topicmap', id)
     p = dm5.restClient.getTopicmap(id).then(topicmap => {
       cacheTopicmap(topicmap)
       return topicmap

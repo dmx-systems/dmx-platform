@@ -1,8 +1,8 @@
-### TODO: rethink weather "Sharing Mode" is a concept that should be defined in the Access Control module instead
+// TODO: rethink weather "Sharing Mode" should be defined in the Access Control module
 {
     "topic_types": [
 
-        ### Sharing Mode ###
+        // Sharing Mode
 
         {
             "value":          "Sharing Mode",

@@ -109,14 +109,14 @@ function initialNavigation (route) {
   const topicId  = route.params.topicId
   const assocId  = route.params.assocId
   if (topicmapId) {
-    console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId, assocId)
+    // console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId, assocId)
     urlPresent = true
   } else {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')           // FIXME: convert to number?
     if (topicmapId) {
-      console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
+      // console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
     } else {
-      console.log('### Initial navigation (no topicmap cookie present)')
+      // console.log('### Initial navigation (no topicmap cookie present)')
     }
   }
   // 2) select workspace
@@ -124,7 +124,7 @@ function initialNavigation (route) {
   // the route is already up-to-date, no (further) push required. If *not* known the route still needs to be pushed.
   if (topicmapId) {
     getAssignedWorkspace(topicmapId).then(workspace => {
-      console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
+      // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
       store.dispatch('setWorkspaceId', workspace.id)              // no route push
       if (urlPresent) {
         const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
@@ -138,7 +138,7 @@ function initialNavigation (route) {
     const workspace = store.state.workspaces.workspaceTopics[0]
     store.dispatch('selectWorkspace', workspace.id)               // push initial route (indirectly)
   }
-  console.log('### Initial navigation complete!')
+  // console.log('### Initial navigation complete!')
 }
 
 function navigate (to, from) {

@@ -34,12 +34,8 @@ public class Migration2 extends Migration {
         addColorToAssociationType("dm4.core.instantiation",   "rgb(41, 194, 225)"  /*"hsl(190, 65%, 90%)"*/);
         addColorToAssociationType("dm4.core.sequence",        "rgb(228, 223, 55)"  /*"hsl( 60, 65%, 90%)"*/);
         //
-        dm4.getAssociationType("dm4.core.composition_def").getAssocDef("dm4.core.assoc_type#dm4.core.custom_assoc_type")
-            .getViewConfig().setConfigValueRef("dm4.webclient.view_config", "dm4.webclient.widget",
-                "dm4.webclient.select_empty");
-        dm4.getAssociationType("dm4.core.aggregation_def").getAssocDef("dm4.core.assoc_type#dm4.core.custom_assoc_type")
-            .getViewConfig().setConfigValueRef("dm4.webclient.view_config", "dm4.webclient.widget",
-                "dm4.webclient.select_empty");
+        setSelectWidget("dm4.core.composition_def");
+        setSelectWidget("dm4.core.aggregation_def");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -50,5 +46,14 @@ public class Migration2 extends Migration {
 
     private void addColorToAssociationType(String assocTypeUri, String color) {
         setAssocTypeViewConfigValue(assocTypeUri, "color", color);
+    }
+
+    // ---
+
+    private void setSelectWidget(String assocTypeUri) {
+        dm4.getAssociationType(assocTypeUri).getAssocDef("dm4.core.assoc_type#dm4.core.custom_assoc_type")
+            .getViewConfig()
+                .setConfigValueRef("dm4.webclient.view_config", "dm4.webclient.widget", "dm4.webclient.select")
+                .setConfigValue("dm4.webclient.view_config", "dm4.webclient.clearable", true);
     }
 }

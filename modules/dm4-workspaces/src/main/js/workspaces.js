@@ -19,7 +19,7 @@ const actions = {
   },
 
   selectWorkspace ({dispatch}, id) {
-    console.log('selectWorkspace', id)
+    // console.log('selectWorkspace', id)
     dispatch('setWorkspaceId', id).then(() => {
       dispatch('selectTopicmapForWorkspace')
     })
@@ -35,7 +35,7 @@ const actions = {
    * @return  a promise resolved once the topicmap topics are fetched.
    */
   setWorkspaceId ({dispatch}, id) {
-    console.log('setWorkspaceId', id)
+    // console.log('setWorkspaceId', id)
     state.workspaceId = id
     dm5.utils.setCookie('dm4_workspace_id', id)
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
@@ -61,7 +61,7 @@ const actions = {
 
 // Init state
 state.ready = dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
-  console.log('### Workspaces ready!')
+  // console.log('### Workspaces ready!')
   state.workspaceTopics = topics
 })
 

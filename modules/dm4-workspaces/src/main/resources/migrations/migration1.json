@@ -1,19 +1,19 @@
 {
     "topic_types": [
 
-        ### Workspace ###
+        // Workspace ###
 
         {
             "value":          "Name",
             "uri":            "dm4.workspaces.name",
             "dataTypeUri":    "dm4.core.text",
-            "indexModeUris": ["dm4.core.fulltext", "dm4.core.fulltext_key"]
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
         },
         {
             "value":          "Description",
             "uri":            "dm4.workspaces.description",
             "dataTypeUri":    "dm4.core.html",
-            "indexModeUris": ["dm4.core.fulltext"]
+            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
         },
         {
             "value":       "Workspace",
