@@ -1,4 +1,4 @@
-// TODO: replace "Composition Definition" and "Aggregation Definition" by "Composite"
+// TODO: drop "Aggregation Definition"
 {
     // Note: Boolean topic types must be created *after* migration 1 has run.
     // Otherwise the data type "Boolean" does not exist. ### TODO: not true anymore

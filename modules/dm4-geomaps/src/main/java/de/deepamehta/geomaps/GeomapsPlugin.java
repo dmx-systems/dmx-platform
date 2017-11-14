@@ -207,7 +207,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     logger.info("### New " + address);
                     geocodeAndStoreFacet(address, topic);
                 } else {
-                    logger.info("### New empty address");
+                    logger.info("New empty address");
                 }
             }
         }
@@ -223,7 +223,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     logger.info("### Address changed:" + address.changeReport(oldAddress));
                     geocodeAndStoreFacet(address, topic);
                 } else {
-                    logger.info("### Address not changed");
+                    logger.info("Address not changed");
                 }
             }
         }
@@ -238,7 +238,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     public void preSendTopic(Topic topic) {
         Topic address = topic.findChildTopic("dm4.contacts.address");
         if (address != null) {
-            String operation = "### Enriching address " + address.getId() + " with its geo coordinate";
+            String operation = "Enriching address " + address.getId() + " with its geo coordinate";
             Topic geoCoordTopic = getGeoCoordinateTopic(address);
             if (geoCoordTopic != null) {
                 logger.info(operation);
@@ -356,7 +356,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 // perform request
                 String address = street + ", " + postalCode + " " + city + ", " + country;
                 url = new URL(String.format(GEOCODER_URL, JavaUtils.encodeURIComponent(address)));
-                logger.info("### Geocoding \"" + address + "\"\n    url=\"" + url + "\"");
+                logger.info("Geocoding \"" + address + "\"\n    url=\"" + url + "\"");
                 JSONObject response = new JSONObject(JavaUtils.readTextURL(url));
                 // check response status
                 String status = response.getString("status");
