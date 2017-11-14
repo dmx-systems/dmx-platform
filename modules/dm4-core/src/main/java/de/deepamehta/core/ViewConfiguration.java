@@ -39,9 +39,9 @@ public interface ViewConfiguration {
      * @param   childTypeUri    The child type URI of the config value to set, e.g. "dm4.webclient.icon"
      * @param   value           The config value (String, Integer, Long, Double, or Boolean)
      */
-    void setConfigValue(String configTypeUri, String childTypeUri, Object value);
+    ViewConfiguration setConfigValue(String configTypeUri, String childTypeUri, Object value);
 
-    void setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
+    ViewConfiguration setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
 
     // ---
 

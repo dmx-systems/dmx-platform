@@ -645,8 +645,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     private void rehashAssocDef(String assocDefUri, String beforeAssocDefUri) {
         AssociationDefinitionModel assocDef = removeAssocDef(assocDefUri);
-        logger.info("### Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() +
-            "\" (put " + (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
+        logger.info("Rehashing assoc def \"" + assocDefUri + "\" -> \"" + assocDef.getAssocDefUri() + "\" (put " +
+            (beforeAssocDefUri != null ? "before \"" + beforeAssocDefUri + "\"" : "at end") + ")");
         addAssocDefBefore(assocDef, beforeAssocDefUri);
     }
 

@@ -205,18 +205,23 @@ public interface ModelFactory {
     // === AssociationDefinitionModel ===
 
     AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri);
+                                                             String parentTypeUri, String childTypeUri,
+                                                             String parentCardinalityUri, String childCardinalityUri);
 
     AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                    String customAssocTypeUri,
-                                                    boolean isIdentityAttr, boolean includeInLabel,
-                                                    String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri);
+                                                             String parentTypeUri, String childTypeUri,
+                                                             String parentCardinalityUri, String childCardinalityUri,
+                                                             ViewConfigurationModel viewConfig);
+
+    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
+                                                             String customAssocTypeUri,
+                                                             boolean isIdentityAttr, boolean includeInLabel,
+                                                             String parentTypeUri, String childTypeUri,
+                                                             String parentCardinalityUri, String childCardinalityUri);
 
     AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc,
-                                                    String parentCardinalityUri, String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfig);
+                                                             String parentCardinalityUri, String childCardinalityUri,
+                                                             ViewConfigurationModel viewConfig);
 
     AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
 

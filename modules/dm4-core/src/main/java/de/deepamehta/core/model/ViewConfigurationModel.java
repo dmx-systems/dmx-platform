@@ -28,11 +28,26 @@ public interface ViewConfigurationModel {
      */
     void addConfigTopic(TopicModel configTopic);
 
+    /**
+     * Sets a single value of a certain config topic.
+     * If no such config topic exists in this view config it is created.
+     *
+     * @param   configTypeUri   The type URI of the config topic, e.g. "dm4.webclient.view_config"
+     * @param   childTypeUri    The child type URI of the config value to set, e.g. "dm4.webclient.icon"
+     * @param   value           The config value (String, Integer, Long, Double, or Boolean)
+     */
+    ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value);
+
+    ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
+
+    // ### TODO: drop method?
     void updateConfigTopic(TopicModel configTopic);
 
     // ---
 
     /**
+     * ### TODO: drop method?
+     *
      * Lookup a view config value.
      * <p>
      * Compare to client-side counterpart: function get_view_config() in webclient.js

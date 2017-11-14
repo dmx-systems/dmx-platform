@@ -1,15 +1,11 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.ChildTopicsModel;
+import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONArray;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -25,13 +21,16 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
      */
     private Map<String, TopicModelImpl> configTopics;
 
+    private ModelFactoryImpl mf;
+
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
      * @param   configTopics    must not be null
      */
-    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics) {
+    ViewConfigurationModelImpl(Map<String, TopicModelImpl> configTopics, PersistenceLayer pl) {
         this.configTopics = configTopics;
+        this.mf = pl.mf;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -55,6 +54,32 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         }
         //
         configTopics.put(configTypeUri, (TopicModelImpl) configTopic);
+    }
+
+    @Override
+    public ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value) {
+        TopicModel configTopic = getConfigTopic(configTypeUri);
+        if (configTopic == null) {
+            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, value)));
+        } else {
+            configTopic.getChildTopicsModel().put(childTypeUri, value);
+        }
+        return this;
+    }
+
+    @Override
+    public ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
+        TopicModel configTopic = getConfigTopic(configTypeUri);
+        RelatedTopicModel valueRef = mf.newTopicReferenceModel(topicIdOrUri);
+        if (configTopic == null) {
+            // Note: valueRef must be known to be of type RelatedTopicModel *at compile time*.
+            // Otherwise the wrong put() method would be invoked.
+            // In Java method overloading involves NO dynamic dispatch. See JavaAPITest in dm4-test.
+            addConfigTopic(mf.newTopicModel(configTypeUri, mf.newChildTopicsModel().put(childTypeUri, valueRef)));
+        } else {
+            configTopic.getChildTopicsModel().put(childTypeUri, valueRef);
+        }
+        return this;
     }
 
     @Override

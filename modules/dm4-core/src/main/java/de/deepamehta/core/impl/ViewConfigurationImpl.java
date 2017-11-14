@@ -64,15 +64,17 @@ class ViewConfigurationImpl implements ViewConfiguration {
     }
 
     @Override
-    public void setConfigValue(String configTypeUri, String childTypeUri, Object value) {
+    public ViewConfiguration setConfigValue(String configTypeUri, String childTypeUri, Object value) {
         _setConfigValue(configTypeUri, mf.newChildTopicsModel()
             .put(childTypeUri, value));
+        return this;
     }
 
     @Override
-    public void setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
+    public ViewConfiguration setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri) {
         _setConfigValue(configTypeUri, mf.newChildTopicsModel()
             .put(childTypeUri, mf.newTopicReferenceModel(topicIdOrUri)));
+        return this;
     }
 
     // ---

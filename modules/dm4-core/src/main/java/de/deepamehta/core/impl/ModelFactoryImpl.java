@@ -59,7 +59,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicModelImpl newTopicModel(long id, String uri, String typeUri, SimpleValue value,
-                                                                         ChildTopicsModel childTopics) {
+                                                                             ChildTopicsModel childTopics) {
         return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
     }
 
@@ -668,6 +668,15 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
+                                                    String parentTypeUri, String childTypeUri,
+                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    ViewConfigurationModel viewConfig) {
+        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, false, parentTypeUri, childTypeUri,
+            parentCardinalityUri, childCardinalityUri, viewConfig);
+    }
+
+    @Override
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
                                                     String customAssocTypeUri,
                                                     boolean isIdentityAttr, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
@@ -781,7 +790,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public ViewConfigurationModelImpl newViewConfigurationModel() {
-        return new ViewConfigurationModelImpl(new HashMap());
+        return new ViewConfigurationModelImpl(new HashMap(), pl());
     }    
 
     @Override
@@ -790,7 +799,7 @@ public class ModelFactoryImpl implements ModelFactory {
         for (TopicModel configTopic : configTopics) {
             _configTopics.put(configTopic.getTypeUri(), (TopicModelImpl) configTopic);
         }
-        return new ViewConfigurationModelImpl(_configTopics);
+        return new ViewConfigurationModelImpl(_configTopics, pl());
     }    
 
     /**
@@ -806,7 +815,7 @@ public class ModelFactoryImpl implements ModelFactory {
                     _configTopics.put(configTopic.getTypeUri(), configTopic);
                 }
             }
-            return new ViewConfigurationModelImpl(_configTopics);
+            return new ViewConfigurationModelImpl(_configTopics, pl());
         } catch (Exception e) {
             throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONArray=" + configTopics + ")", e);
         }
