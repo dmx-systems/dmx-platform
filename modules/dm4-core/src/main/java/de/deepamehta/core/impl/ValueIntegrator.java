@@ -105,9 +105,15 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
         if (isAssoc) {
-            // FIXME: new value does not appear in UPDATE_ASSOCIATION directive
-            newValues.storeSimpleValue();
-            return newValues;
+            if (targetObject != null) {
+                // update
+                targetObject._updateSimpleValue(newValues.getSimpleValue());
+                return targetObject;
+            } else {
+                // create
+                newValues.storeSimpleValue();
+                return newValues;
+            }
         } else if (newValues.getSimpleValue().toString().isEmpty()) {
             return null;
         } else {

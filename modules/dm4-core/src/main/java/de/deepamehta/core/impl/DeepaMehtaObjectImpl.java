@@ -118,7 +118,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public final void setSimpleValue(SimpleValue value) {
-        model.updateSimpleValue(value);
+        model.updateSimpleValue(value);     // TODO: call model._updateSimpleValue() instead?
     }
 
     // --- Child Topics ---
