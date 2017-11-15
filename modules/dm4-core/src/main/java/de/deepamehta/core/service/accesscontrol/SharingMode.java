@@ -8,11 +8,11 @@ import java.util.Map;
 public enum SharingMode {
 
     // ### TODO: move to dm4.core namespace?
-    PRIVATE("dm4.workspaces.private", "Private"),
-    CONFIDENTIAL("dm4.workspaces.confidential", "Confidential"),
-    COLLABORATIVE("dm4.workspaces.collaborative", "Collaborative"),
-    PUBLIC("dm4.workspaces.public", "Public"),
-    COMMON("dm4.workspaces.common", "Common");
+    PRIVATE("dm4.workspaces.private"),
+    CONFIDENTIAL("dm4.workspaces.confidential"),
+    COLLABORATIVE("dm4.workspaces.collaborative"),
+    PUBLIC("dm4.workspaces.public"),
+    COMMON("dm4.workspaces.common");
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
@@ -21,13 +21,11 @@ public enum SharingMode {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private final String uri;
-    private final String value;     // TODO: drop this. Think about uri-refs.
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    private SharingMode(String uri, String value) {
+    private SharingMode(String uri) {
         this.uri = uri;
-        this.value = value;
         put(uri, this);
         // sharingModes.put(uri, this);   // ### "illegal reference to static field from initializer"
     }
@@ -36,10 +34,6 @@ public enum SharingMode {
 
     public String getUri() {
         return uri;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     // Called also by JAX-RS container to get a SharingMode instance from a @PathParam or @QueryParam

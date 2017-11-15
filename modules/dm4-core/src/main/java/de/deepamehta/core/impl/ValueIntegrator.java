@@ -56,10 +56,16 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
-        // a ref can be unified immediately
+        // unify ref immediately
         if (newValues instanceof TopicReferenceModelImpl) {
             TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
-            return !ref.isEmptyRef() ? ref.resolve() : null;
+            if (!ref.isEmptyRef()) {
+                DeepaMehtaObjectModelImpl object = ref.resolve();
+                logger.info("Referencing " + object);
+                return object;
+            } else {
+                return null;
+            }
         }
         // argument check
         if (newValues.getTypeUri() == null) {

@@ -48,7 +48,7 @@ const actions = {
   },
 
   _processDirectives (_, directives) {
-    console.log(`Workspaces: processing ${directives.length} directives`)
+    // console.log(`Workspaces: processing ${directives.length} directives`)
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":

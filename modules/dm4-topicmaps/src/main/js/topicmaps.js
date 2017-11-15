@@ -406,7 +406,7 @@ const actions = {
   },
 
   _processDirectives ({dispatch}, directives) {
-    console.log(`Topicmaps: processing ${directives.length} directives`)
+    // console.log(`Topicmaps: processing ${directives.length} directives`)
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
