@@ -201,7 +201,7 @@ function fetchTopic (id, p) {
     store.dispatch('setTopicSelection', id)
   })
   // detail panel
-  dm5.restClient.getTopic(id, true).then(topic => {    // includeChilds=true
+  dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
     store.dispatch('displayObject', topic)
   })
 }
@@ -218,7 +218,7 @@ function fetchAssoc (id, p) {
     store.dispatch('setAssocSelection', id)
   })
   // detail panel
-  dm5.restClient.getAssoc(id, true).then(assoc => {    // includeChilds=true
+  dm5.restClient.getAssoc(id, true, true).then(assoc => {    // includeChilds=true, includeAssocChilds=true
     store.dispatch('displayObject', assoc)
   })
 }

@@ -198,6 +198,7 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, TopicModel> childTopics) {
         if (isValueType()) {
+            // TODO: update relating assoc values?
             return unifyChildTopics(childTopics, type);
         } else {
             return updateChildRefs(identifyParent(childTopics), childTopics);
