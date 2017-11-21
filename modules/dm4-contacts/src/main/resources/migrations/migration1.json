@@ -2,14 +2,16 @@
     {
         "topic_types": [
             {
-                "value":       "Phone Label",
-                "uri":         "dm4.contacts.phone_label",
-                "dataTypeUri": "dm4.core.text"
+                "value":          "Phone Label",
+                "uri":            "dm4.contacts.phone_label",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             },
             {
-                "value":       "Address Label",
-                "uri":         "dm4.contacts.address_label",
-                "dataTypeUri": "dm4.core.text"
+                "value":          "Address Label",
+                "uri":            "dm4.contacts.address_label",
+                "dataTypeUri":    "dm4.core.text",
+                "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
             }
         ],
         "assoc_types": [

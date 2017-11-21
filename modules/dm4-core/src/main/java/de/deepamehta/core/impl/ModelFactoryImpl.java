@@ -146,14 +146,12 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    // ### TODO: make package private?
     @Override
     public AssociationModelImpl newAssociationModel() {
         return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
-    // ### TODO: make package private?
     @Override
     public AssociationModelImpl newAssociationModel(ChildTopicsModel childTopics) {
         return newAssociationModel(-1, null, null, null, null, null, childTopics);

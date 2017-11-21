@@ -70,7 +70,7 @@ class ValueIntegrator {
         // argument check
         if (newValues.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set (" + newValues +
-                ")");
+                ", targetObject=" + targetObject + ")");
         }
         //
         this.newValues = newValues;
@@ -177,8 +177,7 @@ class ValueIntegrator {
             }
             return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a composite value failed (typeUri=\"" + type.getUri() +
-                "\", childTopics=" + newValues.getChildTopicsModel() + ")", e);
+            throw new RuntimeException("Integrating composite values failed (newValues=" + newValues + ")", e);
         }
     }
 
@@ -290,14 +289,32 @@ class ValueIntegrator {
             // 2) create assignment if not exists OR value has changed
             // a new value must be present
             //
+            AssociationModelImpl assoc = null;
             if (newValue != null && (oldValue == null || !oldValue.equals(newValue))) {
                 logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newValue.getId() +
                     " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
                     type.uri + "\")");
                 // update DB
-                AssociationModel assoc = associateChildTopic(parent, newValue, assocDefUri);
+                assoc = associateChildTopic(parent, newValue, assocDefUri);
                 // update memory
                 childTopics.put(assocDefUri, mf.newRelatedTopicModel(newValue, assoc));
+            }
+            // 3) update relating assoc
+            //
+            if (assoc == null && oldValue != null) {
+                assoc = oldValue.getRelatingAssociation();
+            }
+            if (assoc != null) {
+                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                // Note: for partial create/update requests newChildValue might be null
+                if (newChildValue != null) {
+                    AssociationModelImpl newAssocValue = newChildValue.getRelatingAssociation();
+                    // Note: if no relating assocs are contained in a create/update request the model factory
+                    // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
+                    if (newAssocValue.typeUri != null) {
+                        new ValueIntegrator(pl).integrate(newAssocValue, assoc);
+                    }
+                }
             }
         }
         return parent;
@@ -409,7 +426,8 @@ class ValueIntegrator {
         return topic;
     }
 
-    private AssociationModel associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child, String assocDefUri) {
+    private AssociationModelImpl associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child,
+                                                                                   String assocDefUri) {
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),
             child.createRoleModel("dm4.core.child")

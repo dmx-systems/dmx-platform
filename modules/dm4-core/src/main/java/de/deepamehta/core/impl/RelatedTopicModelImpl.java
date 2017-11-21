@@ -70,9 +70,7 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
 
     @Override
     public String toString() {
-        // TODO
-        // return super.toString() + ", relating " + relatingAssoc;
-        return super.toString();
+        return super.toString() + ",\n        relating " + relatingAssoc;
     }
 
 

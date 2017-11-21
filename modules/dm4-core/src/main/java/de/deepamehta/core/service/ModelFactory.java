@@ -76,10 +76,10 @@ public interface ModelFactory {
     AssociationModel newAssociationModel(String typeUri, RoleModel roleModel1, RoleModel roleModel2,
                                                                                ChildTopicsModel childTopics);
 
-    // ### TODO: make internal?
+    // ### TODO: Refactoring needed. See comments in impl.
     AssociationModel newAssociationModel();
 
-    // ### TODO: make internal?
+    // ### TODO: Refactoring needed. See comments in impl.
     AssociationModel newAssociationModel(ChildTopicsModel childTopics);
 
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,

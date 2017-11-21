@@ -529,7 +529,15 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     @Override
     public String toString() {
-        return childTopics.toString();
+        StringBuilder s = new StringBuilder("{");
+        for (String key : childTopics.keySet()) {
+            s.append("\n    ").append(key).append('=').append(childTopics.get(key));
+        }
+        if (childTopics.size() > 0) {
+            s.append('\n');
+        }
+        s.append('}');
+        return s.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
