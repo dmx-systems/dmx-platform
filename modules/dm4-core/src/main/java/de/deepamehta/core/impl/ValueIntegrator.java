@@ -255,6 +255,7 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl updateChildRefs(DeepaMehtaObjectModelImpl parent,
                                                       Map<String, TopicModel> newChildTopics) {
+        // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
             throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
                 parent.getTypeUri() + "\"");
@@ -302,18 +303,21 @@ class ValueIntegrator {
             }
             // 3) update relating assoc
             //
-            if (assoc == null && oldValue != null) {
-                assoc = oldValue.getRelatingAssociation();
-            }
-            if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
-                // Note: for partial create/update requests newChildValue might be null
-                if (newChildValue != null) {
-                    AssociationModelImpl newAssocValue = newChildValue.getRelatingAssociation();
-                    // Note: if no relating assocs are contained in a create/update request the model factory
-                    // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
-                    if (newAssocValue.typeUri != null) {
-                        new ValueIntegrator(pl).integrate(newAssocValue, assoc);
+            // Note: an assoc's relating assoc is not updated
+            if (!isAssoc) {
+                if (assoc == null && oldValue != null) {
+                    assoc = oldValue.getRelatingAssociation();
+                }
+                if (assoc != null) {
+                    RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                    // Note: for partial create/update requests newChildValue might be null
+                    if (newChildValue != null) {
+                        AssociationModelImpl updateModel = newChildValue.getRelatingAssociation();
+                        // Note: if no relating assocs are contained in a create/update request the model factory
+                        // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
+                        if (updateModel.typeUri != null) {
+                            pl.updateAssociation(assoc, updateModel);
+                        }
                     }
                 }
             }

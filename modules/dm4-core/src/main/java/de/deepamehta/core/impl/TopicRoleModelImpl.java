@@ -95,8 +95,8 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
 
     @Override
     public String toString() {
-        String player = topicIdentifiedByUri ? "topicUri=\"" + topicUri + "\"" : "playerId=" + playerId;
-        return "\n        topic role (roleTypeUri=\"" + roleTypeUri + "\", " + player + ")";
+        String player = topicIdentifiedByUri ? "topicUri=\"" + topicUri + "\"" : "topicId=" + playerId;
+        return "topic role (roleTypeUri=\"" + roleTypeUri + "\", " + player + ")";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

@@ -156,8 +156,9 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     @Override
     public String toString() {
-        // TODO
-        return super.toString();
+        // TODO: principle copy in DeepaMehtaObjectModelImpl (here childTopics are not dumped)
+        return className() + " " + id + " (typeUri=" + typeUri + ", value=" + value + ", uri=" + uri + ")\n" +
+            "    role1=" + roleModel1 + "\n    role2=" + roleModel2;
     }
 
 
@@ -441,7 +442,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         } else if (roleModel2.refsSameObject(roleModel)) {
             return roleModel2;
         }
-        throw new RuntimeException("Role is not part of association (role=" + roleModel + ", association=" + this);
+        throw new RuntimeException(roleModel + " is not part of " + this);
     }
 
     // ---
