@@ -56,7 +56,8 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
-        // unify ref immediately
+        logger.info("##### newValues=" + newValues + " ### targetObject=" + targetObject);
+        // resolve ref
         if (newValues instanceof TopicReferenceModelImpl) {
             TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
             if (!ref.isEmptyRef()) {
@@ -86,7 +87,7 @@ class ValueIntegrator {
             if (comp != null) {
                 new LabelCalculation(comp).calculate();
             } else if (isAssoc) {
-                newValues.storeSimpleValue();
+                storeAssocSimpleValue();
             }
             object = comp;
         }
@@ -111,19 +112,30 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
         if (isAssoc) {
-            if (targetObject != null) {
-                // update
-                targetObject._updateSimpleValue(newValues.getSimpleValue());
-                return targetObject;
-            } else {
-                // create
-                newValues.storeSimpleValue();
-                return newValues;
-            }
+            // Note: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
+            // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
+            // different players.) An assoc's simple value is updated in-place.
+            return storeAssocSimpleValue();
         } else if (newValues.getSimpleValue().toString().isEmpty()) {
             return null;
         } else {
             return unifySimple();
+        }
+    }
+
+    /**
+     * Preconditions:
+     *   - this.newValues is an assoc model.
+     */
+    private DeepaMehtaObjectModelImpl storeAssocSimpleValue() {
+        if (targetObject != null) {
+            // update
+            targetObject._updateSimpleValue(newValues.getSimpleValue());
+            return targetObject;
+        } else {
+            // create
+            newValues.storeSimpleValue();
+            return newValues;
         }
     }
 
@@ -297,7 +309,7 @@ class ValueIntegrator {
                     " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
                     type.uri + "\")");
                 // update DB
-                assoc = associateChildTopic(parent, newValue, assocDefUri);
+                assoc = createChildAssociation(parent, newValue, assocDefUri);
                 // update memory
                 childTopics.put(assocDefUri, mf.newRelatedTopicModel(newValue, assoc));
             }
@@ -432,13 +444,13 @@ class ValueIntegrator {
             TopicModel childTopic = childTopics.get(assocDefUri);
             logger.info("### Assigning child " + childTopic.getId() + " (assocDefUri=\"" + assocDefUri +
                 "\") to composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
-            associateChildTopic(topic, childTopic, assocDefUri);
+            createChildAssociation(topic, childTopic, assocDefUri);
         }
         return topic;
     }
 
-    private AssociationModelImpl associateChildTopic(DeepaMehtaObjectModel parent, TopicModel child,
-                                                                                   String assocDefUri) {
+    private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, TopicModel child,
+                                                                                      String assocDefUri) {
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),
             child.createRoleModel("dm4.core.child")
