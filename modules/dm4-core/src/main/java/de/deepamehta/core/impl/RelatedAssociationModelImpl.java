@@ -26,19 +26,6 @@ class RelatedAssociationModelImpl extends AssociationModelImpl implements Relate
         return relatingAssoc;
     }
 
-
-
-    // === Java API ===
-
-    @Override
-    public String toString() {
-        // TODO
-        // return super.toString() + ", relating " + relatingAssoc;
-        return super.toString();
-    }
-
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override

@@ -43,11 +43,6 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
         }
     }
 
-    @Override
-    public String toString() {
-        return "topic type (" + super.toString() + ")";
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override

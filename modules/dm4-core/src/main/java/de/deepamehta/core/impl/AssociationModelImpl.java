@@ -131,10 +131,10 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("role1", roleModel1.toJSON())
-                .put("role2", roleModel2.toJSON());
+                .put("role1", roleModel1 != null ? roleModel1.toJSON() : null)
+                .put("role2", roleModel2 != null ? roleModel2.toJSON() : null);
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 
@@ -153,15 +153,6 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
             throw new RuntimeException("Cloning an AssociationModel failed", e);
         }
     }
-
-    @Override
-    public String toString() {
-        // TODO: principle copy in DeepaMehtaObjectModelImpl (here childTopics are not dumped)
-        return className() + " " + id + " (typeUri=" + typeUri + ", value=" + value + ", uri=" + uri + ")\n" +
-            "    role1=" + roleModel1 + "\n    role2=" + roleModel2;
-    }
-
-
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 

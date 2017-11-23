@@ -394,7 +394,8 @@ public final class PersistenceLayer extends StorageDecorator {
             checkAssociationWriteAccess(assoc.getId());
             assoc.update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + assoc.getId() + " failed", e);
+            throw new RuntimeException("Updating association " + assoc.getId() + " failed (assoc=" + assoc +
+                " ### updateModel=" + updateModel + ")", e);
         }
     }
 

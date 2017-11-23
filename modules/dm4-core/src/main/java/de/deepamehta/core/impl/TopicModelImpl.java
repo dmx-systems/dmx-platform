@@ -47,14 +47,6 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         }
     }
 
-    @Override
-    public String toString() {
-        // TODO
-        return super.toString();
-    }
-
-
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override

@@ -127,7 +127,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
 
 
-    // ===
+    // === Java API ===
 
     @Override
     public String toString() {

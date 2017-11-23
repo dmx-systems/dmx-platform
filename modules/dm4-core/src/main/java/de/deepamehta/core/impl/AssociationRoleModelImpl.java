@@ -39,17 +39,8 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
                 .put("assocId", playerId)
                 .put("roleTypeUri", roleTypeUri);
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
-    }
-
-
-
-    // === Java API ===
-
-    @Override
-    public String toString() {
-        return "assoc role (roleTypeUri=\"" + roleTypeUri + "\", assocId=" + playerId + ")";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

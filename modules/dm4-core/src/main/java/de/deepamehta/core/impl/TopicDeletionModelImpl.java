@@ -12,11 +12,4 @@ class TopicDeletionModelImpl extends RelatedTopicModelImpl implements TopicDelet
     TopicDeletionModelImpl(RelatedTopicModelImpl relatedTopic) {
         super(relatedTopic);
     }
-
-    // -------------------------------------------------------------------------------------------------- Public Methods
-
-    @Override
-    public String toString() {
-        return "delete " + super.toString();
-    }
 }

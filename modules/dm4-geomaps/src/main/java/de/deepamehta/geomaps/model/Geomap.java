@@ -70,7 +70,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
                 .put("info", geomapTopic.toJSON())
                 .put("topics", DeepaMehtaUtils.toJSONArray(geoCoords.values()));
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

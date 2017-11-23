@@ -496,7 +496,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             }
             return json;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization of a ChildTopicsModel failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 
@@ -525,19 +525,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
             }
         }
         return clone;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder s = new StringBuilder("{");
-        for (String key : childTopics.keySet()) {
-            s.append("\n    ").append(key).append('=').append(childTopics.get(key));
-        }
-        if (childTopics.size() > 0) {
-            s.append('\n');
-        }
-        s.append('}');
-        return s.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

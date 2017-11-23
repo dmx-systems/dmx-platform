@@ -43,12 +43,6 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
         }
     }
 
-    @Override
-    public String toString() {
-        // TODO
-        return super.toString();
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override

@@ -51,7 +51,7 @@ public class DirectivesResponse implements JSONEnabled {
             json.put("directives", directives.toJSONArray());
             return json;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

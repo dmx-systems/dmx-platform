@@ -51,7 +51,7 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
             //
             return o;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 
@@ -67,13 +67,6 @@ class RelatedTopicModelImpl extends TopicModelImpl implements RelatedTopicModel 
             throw new RuntimeException("Cloning a RelatedTopicModel failed", e);
         }
     }
-
-    @Override
-    public String toString() {
-        return super.toString() + ",\n        relating " + relatingAssoc;
-    }
-
-
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 

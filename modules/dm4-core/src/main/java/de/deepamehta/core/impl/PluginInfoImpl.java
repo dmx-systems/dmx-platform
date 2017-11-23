@@ -25,7 +25,7 @@ class PluginInfoImpl implements PluginInfo {
             pluginInfo.put("pluginUri", pluginUri);
             pluginInfo.put("hasPluginFile", hasPluginFile());
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

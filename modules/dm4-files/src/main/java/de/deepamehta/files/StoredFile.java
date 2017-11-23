@@ -41,13 +41,12 @@ public class StoredFile implements JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject storedFile = new JSONObject();
-            storedFile.put("fileName", fileName);
-            storedFile.put("repoPath", repoPath);
-            storedFile.put("topicId", fileTopicId);
-            return storedFile;
+            return new JSONObject()
+                .put("fileName", fileName)
+                .put("repoPath", repoPath)
+                .put("topicId", fileTopicId);
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 }

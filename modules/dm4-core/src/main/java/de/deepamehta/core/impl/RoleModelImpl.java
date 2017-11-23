@@ -74,6 +74,17 @@ abstract class RoleModelImpl implements RoleModel {
         }
     }
 
+    // TODO: copy in DeepaMehtaObjectModelImpl
+    // Can we use Java 8 and put this in the JSONEnabled interface?
+    @Override
+    public String toString() {
+        try {
+            return getClass().getSimpleName() + " " + toJSON().toString(4);
+        } catch (Exception e) {
+            throw new RuntimeException("Prettyprinting failed", e);
+        }
+    }
+
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**

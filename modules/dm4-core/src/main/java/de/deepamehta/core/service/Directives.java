@@ -78,12 +78,11 @@ public class Directives implements Iterable<Directives.Entry> {
         @Override
         public JSONObject toJSON() {
             try {
-                JSONObject obj = new JSONObject();
-                obj.put("type", dir);
-                obj.put("arg", arg.toJSON());
-                return obj;
+                return new JSONObject()
+                    .put("type", dir)
+                    .put("arg", arg.toJSON());
             } catch (Exception e) {
-                throw new RuntimeException("Serialization failed (" + this + ")", e);
+                throw new RuntimeException("Serialization failed", e);
             }
         }
 

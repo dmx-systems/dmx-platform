@@ -284,7 +284,7 @@ class ValueIntegrator {
             boolean newValueIsEmpty = isEmptyValue(assocDefUri);
             //
             // logger.info("### assocDefUri=\"" + assocDefUri + "\" ### oldValue=" + oldValue + " ### newValue=" +
-            //     newValue + " ### emptyValues=" + emptyValues);
+            //     newValue + " ### newValueIsEmpty=" + newValueIsEmpty);
             boolean deleted = false;
             //
             // 1) delete assignment if exists AND value has changed or emptied

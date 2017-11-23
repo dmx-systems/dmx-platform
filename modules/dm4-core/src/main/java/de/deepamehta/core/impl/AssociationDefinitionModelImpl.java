@@ -120,16 +120,8 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
                 .put("childCardinalityUri", childCardinalityUri)
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
-    }
-
-    // ---
-
-    @Override
-    public String toString() {
-        return super.toString() + "\nparentTypeUri=\"" + getParentTypeUri() + "\"\nchildTypeUri=\"" +
-            getChildTypeUri() + "\"\nassocDefUri=\"" + getAssocDefUri() + "\"\ncustomAssocType=" + getCustomAssocType();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

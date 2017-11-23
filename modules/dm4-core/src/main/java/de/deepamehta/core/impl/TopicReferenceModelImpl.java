@@ -57,14 +57,6 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
         return null;
     }
 
-    // ---
-
-    @Override
-    public String toString() {
-        // TODO
-        return super.toString();
-    }
-
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     @Override

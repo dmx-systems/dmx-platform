@@ -32,11 +32,10 @@ public class ResourceInfo implements JSONEnabled {
     @Override
     public JSONObject toJSON() {
         try {
-            JSONObject info = new JSONObject();
-            info.put("kind", kind.stringify());
-            return info;
+            return new JSONObject()
+                .put("kind", kind.stringify());
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

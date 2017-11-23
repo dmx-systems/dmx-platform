@@ -76,7 +76,7 @@ public class TopicmapViewmodel implements JSONEnabled {
                 .put("topics", DeepaMehtaUtils.toJSONArray(topics.values()))
                 .put("assocs", DeepaMehtaUtils.toJSONArray(assocs.values()));
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

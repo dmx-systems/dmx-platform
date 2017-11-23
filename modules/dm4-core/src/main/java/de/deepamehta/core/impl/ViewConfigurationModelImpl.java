@@ -116,7 +116,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
             }
             return configTopics;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 

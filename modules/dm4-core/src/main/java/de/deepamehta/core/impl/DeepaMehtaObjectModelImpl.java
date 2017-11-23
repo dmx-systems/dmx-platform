@@ -189,15 +189,14 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             // default values must be set in case they are not fully initialized.
             setDefaults();
             //
-            JSONObject o = new JSONObject();
-            o.put("id", id);
-            o.put("uri", uri);
-            o.put("typeUri", typeUri);
-            o.put("value", value.value());
-            o.put("childs", childTopics.toJSON());
-            return o;
+            return new JSONObject()
+                .put("id", id)
+                .put("uri", uri)
+                .put("typeUri", typeUri)
+                .put("value", value.value())
+                .put("childs", childTopics.toJSON());
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 
@@ -228,8 +227,11 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     @Override
     public String toString() {
-        return className() + " " + id + " (typeUri=" + typeUri + ", value=" + value + ", uri=" + uri +
-            ", childTopics=" + childTopics + ")";
+        try {
+            return getClass().getSimpleName() + " " + toJSON().toString(4);
+        } catch (Exception e) {
+            throw new RuntimeException("Prettyprinting failed", e);
+        }
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

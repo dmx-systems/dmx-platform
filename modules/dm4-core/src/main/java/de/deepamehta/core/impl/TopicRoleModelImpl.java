@@ -85,18 +85,8 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
             o.put("roleTypeUri", roleTypeUri);
             return o;
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
-    }
-
-
-
-    // === Java API ===
-
-    @Override
-    public String toString() {
-        String player = topicIdentifiedByUri ? "topicUri=\"" + topicUri + "\"" : "topicId=" + playerId;
-        return "topic role (roleTypeUri=\"" + roleTypeUri + "\", " + player + ")";
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

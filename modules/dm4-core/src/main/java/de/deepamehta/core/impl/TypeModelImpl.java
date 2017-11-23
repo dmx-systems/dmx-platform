@@ -199,7 +199,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
                 .put("assocDefs", toJSONArray(assocDefs.values()))
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
-            throw new RuntimeException("Serialization failed (" + this + ")", e);
+            throw new RuntimeException("Serialization failed", e);
         }
     }
 
@@ -220,12 +220,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         } catch (Exception e) {
             throw new RuntimeException("Cloning a TypeModel failed", e);
         }
-    }
-
-    @Override
-    public String toString() {
-        // TODO
-        return super.toString();
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
