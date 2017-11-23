@@ -303,7 +303,7 @@ class ValueIntegrator {
             }
             // 3) update relating assoc
             //
-            // Note: an assoc's relating assoc is not updated
+            // Note: an assoc's relating assoc is not updated ### TODO: condition needed?
             if (!isAssoc) {
                 if (assoc == null && oldValue != null) {
                     assoc = oldValue.getRelatingAssociation();
@@ -313,8 +313,14 @@ class ValueIntegrator {
                     // Note: for partial create/update requests newChildValue might be null
                     if (newChildValue != null) {
                         AssociationModelImpl updateModel = newChildValue.getRelatingAssociation();
+                        // Note: the roles must be suppressed from being updated. Update would fail if a new child has
+                        // been assigned (step 2) because the player is another one then. Here we are only interested
+                        // in updating the assoc value.
+                        updateModel.setRoleModel1(null);
+                        updateModel.setRoleModel2(null);
                         // Note: if no relating assocs are contained in a create/update request the model factory
                         // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
+                        // TODO: is condition needed?
                         if (updateModel.typeUri != null) {
                             pl.updateAssociation(assoc, updateModel);
                         }
