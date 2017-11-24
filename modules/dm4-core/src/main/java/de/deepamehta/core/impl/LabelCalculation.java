@@ -28,6 +28,10 @@ class LabelCalculation {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
+     * Preconditions:
+     *   - comp is not null
+     *   - comp is composite
+     *
      * @param   comp    A composite.
      */
     LabelCalculation(DeepaMehtaObjectModelImpl comp) {

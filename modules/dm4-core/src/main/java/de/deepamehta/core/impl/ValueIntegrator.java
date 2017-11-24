@@ -56,7 +56,7 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
-        logger.info("##### newValues=" + newValues + " ### targetObject=" + targetObject);
+        // logger.info("##### newValues=" + newValues + " ### targetObject=" + targetObject);
         // resolve ref
         if (newValues instanceof TopicReferenceModelImpl) {
             TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
@@ -70,8 +70,8 @@ class ValueIntegrator {
         }
         // argument check
         if (newValues.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set (" + newValues +
-                ", targetObject=" + targetObject + ")");
+            throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
+                newValues + " ### targetObject=" + targetObject);
         }
         //
         this.newValues = newValues;
@@ -79,27 +79,30 @@ class ValueIntegrator {
         this.type = newValues.getType();
         this.isAssoc = newValues instanceof AssociationModel;
         //
-        DeepaMehtaObjectModelImpl object;
+        // value integration
+        //
+        DeepaMehtaObjectModelImpl unified;
         if (newValues.isSimple()) {
-            object = integrateSimple();
+            unified = integrateSimple();
         } else {
-            DeepaMehtaObjectModelImpl comp = integrateComposite();
-            if (comp != null) {
-                new LabelCalculation(comp).calculate();
+            unified = integrateComposite();
+            //
+            // label calculation
+            if (unified != null) {
+                new LabelCalculation(unified).calculate();
             } else if (isAssoc) {
                 storeAssocSimpleValue();
             }
-            object = comp;
         }
-        //
-        if (object != null) {
-            if (object.id == -1) {
-                throw new RuntimeException("Value integration result object has no ID set");
+        // TODO: drop ID transfer. Use newValues as create model directly.
+        if (unified != null) {
+            if (unified.id == -1) {
+                throw new RuntimeException("Unification result has no ID set");
             }
-            newValues.id = object.id;
+            newValues.id = unified.id;
         }
         //
-        return object;
+        return unified;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -187,7 +190,7 @@ class ValueIntegrator {
                     childTopics.put(assocDefUri, childTopic);
                 }
             }
-            return !childTopics.isEmpty() ? unifyComposite(childTopics) : null;
+            return unifyComposite(childTopics);
         } catch (Exception e) {
             throw new RuntimeException("Integrating composite values failed (newValues=" + newValues + ")", e);
         }
@@ -206,12 +209,11 @@ class ValueIntegrator {
      *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
-     *   - childTopics map is not empty
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, TopicModel> childTopics) {
         if (isValueType()) {
             // TODO: update relating assoc values?
-            return unifyChildTopics(childTopics, type);
+            return !childTopics.isEmpty() ? unifyChildTopics(childTopics, type) : null;
         } else {
             return updateChildRefs(identifyParent(childTopics), childTopics);
         }
@@ -315,7 +317,8 @@ class ValueIntegrator {
             }
             // 3) update relating assoc
             //
-            // Note: an assoc's relating assoc is not updated ### TODO: condition needed?
+            // Note: an assoc's relating assoc is not updated
+            // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
             if (!isAssoc) {
                 if (assoc == null && oldValue != null) {
                     assoc = oldValue.getRelatingAssociation();
@@ -332,7 +335,7 @@ class ValueIntegrator {
                         updateModel.setRoleModel2(null);
                         // Note: if no relating assocs are contained in a create/update request the model factory
                         // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
-                        // TODO: is condition needed?
+                        // TODO: is condition needed? => yes, try create new topic
                         if (updateModel.typeUri != null) {
                             pl.updateAssociation(assoc, updateModel);
                         }
@@ -428,7 +431,16 @@ class ValueIntegrator {
 
     // ---
 
+    /**
+     * Preconditions:
+     *   - this.newValues is a topic model.
+     */
     private TopicModelImpl createSimpleTopic() {
+        // sanity check
+        if (isAssoc) {
+            throw new RuntimeException("Tried to create a topic from an assoc model");
+        }
+        //
         return pl._createTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
         // TODO: can we do this instead? => NO!
         // return pl.createSimpleTopic((TopicModelImpl) newValues).getModel();
