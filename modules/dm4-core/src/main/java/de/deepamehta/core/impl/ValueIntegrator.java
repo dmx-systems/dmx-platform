@@ -317,10 +317,11 @@ class ValueIntegrator {
             }
             // 3) update relating assoc
             //
-            // Note: an assoc's relating assoc is not updated
+            // Note: don't update an assoc's relating assoc
             // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
             if (!isAssoc) {
-                if (assoc == null && oldValue != null) {
+                // take the old assoc if no new one is created, there is an old one, and it has not been deleted
+                if (assoc == null && oldValue != null && !deleted) {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
