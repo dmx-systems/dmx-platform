@@ -7,13 +7,13 @@
     <name>DeepaMehta 4 Config</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-config</artifactId>
-    <version>4.8.8</version>
+    <version>4.9</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-plugin</artifactId>
-        <version>4.8.8</version>
+        <version>4.9</version>
         <relativePath>../dm4-plugin/pom.xml</relativePath>
     </parent>
 
