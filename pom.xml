@@ -50,6 +50,11 @@
             <name>Constantin Jucovschi</name>
             <email>jucovschi@gmail.com</email>
         </developer>
+        <developer>
+            <id>aische</id>
+            <name>Daniel van den Eijkel</name>
+            <email>dvde@gmx.net</email>
+        </developer>
     </developers>
 
     <!-- For a description of the config properties see /dm4-distribution/conf/config.properties -->

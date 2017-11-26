@@ -53,10 +53,10 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                             'Enrico Schnepel<br>' +
                             'Thilo Schönnemann<br>' +
                             'Matthias Staps<br>' +
+                            'Daniel van den Eijkel<br>' +
                             'Jörn Weißenborn<br>' +
                             'Andreas Wichmann<br>' +
                             'Torsten Ziegler<br>' +
-                            '... <i>and many others</i>' +
                         '</div>' +
                     '</td>' +
                 '</tr>' +
