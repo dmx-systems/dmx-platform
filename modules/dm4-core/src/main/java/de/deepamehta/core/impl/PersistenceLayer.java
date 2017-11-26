@@ -140,7 +140,7 @@ public final class PersistenceLayer extends StorageDecorator {
             }
             return topic.instantiate();
         } catch (Exception e) {
-            throw new RuntimeException("Creating " + model + " failed", e);
+            throw new RuntimeException("Creating topic failed, model=" + model, e);
         }
     }
 
@@ -197,7 +197,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // (see ChildTopicsModelImpl).
             em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic " + updateModel.getId() + " failed", e);
+            throw new RuntimeException("Fetching and updating topic " + updateModel.getId() + " failed", e);
         }
     }
 
@@ -370,7 +370,7 @@ public final class PersistenceLayer extends StorageDecorator {
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
             return assoc;
         } catch (Exception e) {
-            throw new RuntimeException("Creating " + model + " failed", e);
+            throw new RuntimeException("Creating association failed, model=" + model, e);
         }
     }
 
@@ -385,7 +385,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // It would be equivalent to POST_UPDATE_ASSOCIATION. Per request exactly one association is updated.
             // Its childs are always topics (never associations).
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + updateModel.getId() + " failed", e);
+            throw new RuntimeException("Fetching and updating association " + updateModel.getId() + " failed", e);
         }
     }
 
@@ -394,8 +394,8 @@ public final class PersistenceLayer extends StorageDecorator {
             checkAssociationWriteAccess(assoc.getId());
             assoc.update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association " + assoc.getId() + " failed (assoc=" + assoc +
-                " ### updateModel=" + updateModel + ")", e);
+            throw new RuntimeException("Updating association " + assoc.getId() + " failed, assoc=" + assoc +
+                ", updateModel=" + updateModel, e);
         }
     }
 

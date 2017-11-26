@@ -94,7 +94,7 @@ class ValueIntegrator {
                 storeAssocSimpleValue();
             }
         }
-        // TODO: drop ID transfer. Use newValues as create model directly.
+        // ID transfer
         if (unified != null) {
             if (unified.id == -1) {
                 throw new RuntimeException("Unification result has no ID set");
@@ -192,7 +192,7 @@ class ValueIntegrator {
             }
             return unifyComposite(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Integrating composite values failed (newValues=" + newValues + ")", e);
+            throw new RuntimeException("Integrating composite values failed, newValues=" + newValues, e);
         }
     }
 
@@ -274,19 +274,13 @@ class ValueIntegrator {
             throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
                 parent.getTypeUri() + "\"");
         }
-        // logger.info("### parent=" + parent + " ### targetObject=" + targetObject);
+        //
+        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         for (String assocDefUri : type) {
-            ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
-            //
-            // TODO: better read the old value directly from DB?
-            // We could use the existing newValues model objects for creating new topics then
             RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
             TopicModel newValue = newChildTopics.get(assocDefUri);                      // may be null
             boolean newValueIsEmpty = isEmptyValue(assocDefUri);
-            //
-            // logger.info("### assocDefUri=\"" + assocDefUri + "\" ### oldValue=" + oldValue + " ### newValue=" +
-            //     newValue + " ### newValueIsEmpty=" + newValueIsEmpty);
             boolean deleted = false;
             //
             // 1) delete assignment if exists AND value has changed or emptied
@@ -443,8 +437,6 @@ class ValueIntegrator {
         }
         //
         return pl._createTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
-        // TODO: can we do this instead? => NO!
-        // return pl.createSimpleTopic((TopicModelImpl) newValues).getModel();
     }
 
     private TopicModelImpl createCompositeTopic(Map<String, TopicModel> childTopics) {
