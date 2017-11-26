@@ -15,7 +15,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                         '<div class="field-label">Version</div>' +
                         '<div>${project.version}</div>' +
                         '<div class="field-label">Release Date</div>' +
-                        '<div>Jul 22, 2017</div>' +
+                        '<div>Nov 26, 2017</div>' +
                         '<div class="field-label">Copyright</div>' +
                         '<div>2000-2017 Jörg Richter et al.</div>' +
                         '<div class="field-label">License</div>' +
@@ -53,10 +53,10 @@ dm4c.add_plugin("de.deepamehta.help", function() {
                             'Enrico Schnepel<br>' +
                             'Thilo Schönnemann<br>' +
                             'Matthias Staps<br>' +
+                            'Daniel van den Eijkel<br>' +
                             'Jörn Weißenborn<br>' +
                             'Andreas Wichmann<br>' +
                             'Torsten Ziegler<br>' +
-                            '... <i>and many others</i>' +
                         '</div>' +
                     '</td>' +
                 '</tr>' +
