@@ -32,6 +32,12 @@
             "indexModeUris": ["dm4.core.key"]
         },
         {
+            "value": "Customizable",
+            "uri": "dm4.webclient.customizable",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
             "value": "Input Field Rows",
             "uri": "dm4.webclient.input_field_rows",
             "dataTypeUri": "dm4.core.number",
@@ -127,6 +133,11 @@
                 },
                 {
                     "childTypeUri":         "dm4.webclient.clearable",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.customizable",
                     "childCardinalityUri":  "dm4.core.one",
                     "assocTypeUri":         "dm4.core.composition_def"
                 },

@@ -87,7 +87,7 @@ const actions = {
    */
   selectTopicmap ({dispatch}, id) {
     const selection = state.selections[id]
-    console.log('selectTopicmap', id, selection)
+    // console.log('selectTopicmap', id, selection)
     if (selection) {
       const type = selection.type
       dispatch('callRoute', {
@@ -305,7 +305,7 @@ const actions = {
    */
   selectTopicmapForWorkspace ({rootState, dispatch}) {
     const workspaceId = _workspaceId(rootState)
-    console.log('selectTopicmapForWorkspace', workspaceId)
+    // console.log('selectTopicmapForWorkspace', workspaceId)
     let topicmapId = state.selectedTopicmapId[workspaceId]
     if (!topicmapId) {
       topicmapId = state.topicmapTopics[workspaceId][0].id

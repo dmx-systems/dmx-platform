@@ -119,7 +119,7 @@ public class ModelFactoryImpl implements ModelFactory {
         try {
             return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicModel failed (JSONObject=" + topic + ")", e);
+            throw parsingFailed(topic, e, "TopicModelImpl");
         }
     }
 
@@ -176,20 +176,23 @@ public class ModelFactoryImpl implements ModelFactory {
                 assoc.has("role2") ? parseRole(assoc.getJSONObject("role2")) : null
             );
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationModel failed (JSONObject=" + assoc + ")", e);
+            throw parsingFailed(assoc, e, "AssociationModelImpl");
         }
     }
 
     // ---
 
     private RoleModelImpl parseRole(JSONObject roleModel) {
-        if (roleModel.has("topicId") || roleModel.has("topicUri")) {
-            return newTopicRoleModel(roleModel);
-        } else if (roleModel.has("assocId")) {
-            return newAssociationRoleModel(roleModel);
-        } else {
-            throw new RuntimeException("Parsing TopicRoleModel/AssociationRoleModel failed: one of " +
-                "\"topicId\"/\"topicUri\"/\"assocId\" is expected (JSONObject=" + roleModel + ")");
+        try {
+            if (roleModel.has("topicId") || roleModel.has("topicUri")) {
+                return newTopicRoleModel(roleModel);
+            } else if (roleModel.has("assocId")) {
+                return newAssociationRoleModel(roleModel);
+            } else {
+                throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
+            }
+        } catch (Exception e) {
+            throw parsingFailed(roleModel, e, "RoleModelImpl");
         }
     }
 
@@ -251,7 +254,7 @@ public class ModelFactoryImpl implements ModelFactory {
             }
             return new ChildTopicsModelImpl(childTopics, this);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing ChildTopicsModel failed (JSONObject=" + values + ")", e);
+            throw parsingFailed(values, e, "ChildTopicsModelImpl");
         }
     }
 
@@ -342,8 +345,8 @@ public class ModelFactoryImpl implements ModelFactory {
             // sanity check
             String typeUri = value.getString("typeUri");
             if (!typeUri.equals(childTypeUri)) {
-                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has typeUri=\"" +
-                    typeUri + "\"");
+                throw new IllegalArgumentException("A \"" + childTypeUri + "\" topic model has typeUri=\"" + typeUri +
+                    "\"");
             }
         }
     }
@@ -400,7 +403,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 return newTopicRoleModel(topicUri, roleTypeUri);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicRoleModel failed (JSONObject=" + topicRoleModel + ")", e);
+            throw parsingFailed(topicRoleModel, e, "TopicRoleModelImpl");
         }
     }
 
@@ -420,7 +423,7 @@ public class ModelFactoryImpl implements ModelFactory {
             String roleTypeUri = assocRoleModel.getString("roleTypeUri");
             return newAssociationRoleModel(assocId, roleTypeUri);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationRoleModel failed (JSONObject=" + assocRoleModel + ")", e);
+            throw parsingFailed(assocRoleModel, e, "AssociationRoleModelImpl");
         }
     }    
 
@@ -568,7 +571,7 @@ public class ModelFactoryImpl implements ModelFactory {
         try {
             return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", "dm4.core.topic_type")));
         } catch (Exception e) {
-            throw new RuntimeException("Parsing TopicTypeModel failed (JSONObject=" + topicType + ")", e);
+            throw parsingFailed(topicType, e, "TopicTypeModelImpl");
         }
     }
 
@@ -595,7 +598,7 @@ public class ModelFactoryImpl implements ModelFactory {
         try {
             return new AssociationTypeModelImpl(newTypeModel(assocType.put("typeUri", "dm4.core.assoc_type")));
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationTypeModel failed (JSONObject=" + assocType + ")", e);
+            throw parsingFailed(assocType, e, "AssociationTypeModelImpl");
         }
     }
 
@@ -635,7 +638,7 @@ public class ModelFactoryImpl implements ModelFactory {
             }
             return indexModes;
         } catch (Exception e) {
-            throw new RuntimeException("Parsing index modes failed (JSONArray=" + indexModeUris + ")", e);
+            throw parsingFailed(indexModeUris, e, "List<IndexMode>");
         }
     }
 
@@ -715,7 +718,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
         } catch (Exception e) {
-            throw new RuntimeException("Parsing AssociationDefinitionModel failed (JSONObject=" + assocDef + ")", e);
+            throw parsingFailed(assocDef, e, "AssociationDefinitionModelImpl");
         }
     }
 
@@ -815,7 +818,7 @@ public class ModelFactoryImpl implements ModelFactory {
             }
             return new ViewConfigurationModelImpl(_configTopics, pl());
         } catch (Exception e) {
-            throw new RuntimeException("Parsing ViewConfigurationModel failed (JSONArray=" + configTopics + ")", e);
+            throw parsingFailed(configTopics, e, "ViewConfigurationModelImpl");
         }
     }    
 
@@ -851,15 +854,35 @@ public class ModelFactoryImpl implements ModelFactory {
             }
             return new FacetValueModelImpl(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Parsing FacetValueModel failed (JSONObject=" + facetValue + ")", e);
+            throw parsingFailed(facetValue, e, "FacetValueModelImpl");
         }
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private RuntimeException parsingFailed(JSONObject o, Exception e, String className) {
+        try {
+            return new RuntimeException("JSON parsing failed, " + className + " " + o.toString(4), e);
+        } catch (JSONException je) {
+            // fallback: no prettyprinting
+            return new RuntimeException("JSON parsing failed, " + className + " " + o, e);
+        }
+    }
+
+    private RuntimeException parsingFailed(JSONArray a, Exception e, String className) {
+        try {
+            return new RuntimeException("JSON parsing failed, " + className + " " + a.toString(4), e);
+        } catch (JSONException je) {
+            // fallback: no prettyprinting
+            return new RuntimeException("JSON parsing failed, " + className + " " + a, e);
+        }
+    }
+
+    // ---
+
     private PersistenceLayer pl() {
         if (pl == null) {
-            throw new RuntimeException("before using the ModelFactory a PersistenceLayer must be set");
+            throw new RuntimeException("Before using the ModelFactory a PersistenceLayer must be set");
         }
         return pl;
     }

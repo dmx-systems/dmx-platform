@@ -192,7 +192,7 @@ class ValueIntegrator {
             }
             return unifyComposite(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Integrating composite values failed, newValues=" + newValues, e);
+            throw new RuntimeException("Integrating a composite value failed, newValues=" + newValues, e);
         }
     }
 
