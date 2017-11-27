@@ -24,7 +24,16 @@
                         "childTypeUri":         "dm4.contacts.phone_label",
                         "childCardinalityUri":  "dm4.core.one",
                         "parentCardinalityUri": "dm4.core.many",
-                        "assocTypeUri":         "dm4.core.aggregation_def"
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "viewConfigTopics": [
+                            {
+                                "typeUri": "dm4.webclient.view_config",
+                                "childs": {
+                                    "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
+                                    "dm4.webclient.clearable": true
+                                }
+                            }
+                        ]
                     }
                 ]
             },
@@ -37,7 +46,16 @@
                         "childTypeUri":         "dm4.contacts.address_label",
                         "childCardinalityUri":  "dm4.core.one",
                         "parentCardinalityUri": "dm4.core.many",
-                        "assocTypeUri":         "dm4.core.aggregation_def"
+                        "assocTypeUri":         "dm4.core.aggregation_def",
+                        "viewConfigTopics": [
+                            {
+                                "typeUri": "dm4.webclient.view_config",
+                                "childs": {
+                                    "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
+                                    "dm4.webclient.clearable": true
+                                }
+                            }
+                        ]
                     }
                 ]
             }
