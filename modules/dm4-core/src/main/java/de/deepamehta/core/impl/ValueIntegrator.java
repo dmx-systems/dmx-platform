@@ -201,7 +201,6 @@ class ValueIntegrator {
      */
     private TopicModel integrateChildValue(RelatedTopicModelImpl newChildValue) {
         return (TopicModel) new ValueIntegrator(pl).integrate(newChildValue, null);     // targetObject=null
-        // updateRelatingAssociation(refChildValue, newChildValue);    // TODO
     }
 
     /**
@@ -281,10 +280,10 @@ class ValueIntegrator {
             RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
             TopicModel newValue = newChildTopics.get(assocDefUri);                      // may be null
             boolean newValueIsEmpty = isEmptyValue(assocDefUri);
-            boolean deleted = false;
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
+            boolean deleted = false;
             if (oldValue != null && (newValueIsEmpty || newValue != null && !oldValue.equals(newValue))) {
                 // update DB
                 oldValue.getRelatingAssociation().delete();
@@ -319,26 +318,38 @@ class ValueIntegrator {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
-                    // Note: for partial create/update requests newChildValue might be null
-                    if (newChildValue != null) {
-                        AssociationModelImpl updateModel = newChildValue.getRelatingAssociation();
-                        // Note: the roles must be suppressed from being updated. Update would fail if a new child has
-                        // been assigned (step 2) because the player is another one then. Here we are only interested
-                        // in updating the assoc value.
-                        updateModel.setRoleModel1(null);
-                        updateModel.setRoleModel2(null);
-                        // Note: if no relating assocs are contained in a create/update request the model factory
-                        // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
-                        // TODO: is condition needed? => yes, try create new topic
-                        if (updateModel.typeUri != null) {
-                            pl.updateAssociation(assoc, updateModel);
-                        }
-                    }
+                    updateRelatingAssociation(assoc, assocDefUri);
                 }
             }
         }
         return parent;
+    }
+
+    private void updateRelatingAssociation(AssociationModelImpl assoc, String assocDefUri) {
+        try {
+            RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
+            // Note: for partial create/update requests newChildValue might be null
+            if (newChildValue != null) {
+                AssociationModelImpl updateModel = newChildValue.getRelatingAssociation();
+                // Note: the roles must be suppressed from being updated. Update would fail if a new child has
+                // been assigned (step 2) because the player is another one then. Here we are only interested
+                // in updating the assoc value.
+                updateModel.setRoleModel1(null);
+                updateModel.setRoleModel2(null);
+                // Note: if no relating assocs are contained in a create/update request the model factory
+                // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
+                // TODO: is condition needed? => yes, try create new topic
+                if (updateModel.typeUri != null) {
+                    assoc.update(updateModel);
+                    // TODO: access control? Note: currently the child assocs of a workspace have no workspace
+                    // assignments. With strict access control, updating a workspace topic would fail.
+                    // pl.updateAssociation(assoc, updateModel);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating relating assoc " + assoc.id + " (assocDefUri=\"" + assocDefUri +
+                "\") failed, assoc=" + assoc, e);
+        }
     }
 
     // ---
@@ -391,7 +402,7 @@ class ValueIntegrator {
         }
         //
         TopicModel childTopic = childTopics.get(assocDefUri);
-        // TODO: assoc parents
+        // TODO: assoc parents?
         return pl.getTopicRelatedTopics(childTopic.getId(), assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             "dm4.core.child", "dm4.core.parent", type.getUri());
     }
@@ -407,14 +418,14 @@ class ValueIntegrator {
             long parentId = i.next().getId();
             String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
-                // TODO: assoc parents
+                // TODO: assoc parents?
                 if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dm4.core.parent", "dm4.core.child")
                         == null) {
                     // logger.info("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
-                // TODO: assoc parents
+                // TODO: assoc parents?
                 if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dm4.core.parent", "dm4.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (childs exist)");
