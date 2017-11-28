@@ -30,7 +30,8 @@
                                 "typeUri": "dm4.webclient.view_config",
                                 "childs": {
                                     "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
-                                    "dm4.webclient.clearable": true
+                                    "dm4.webclient.clearable": true,
+                                    "dm4.webclient.customizable": true
                                 }
                             }
                         ]
@@ -52,7 +53,8 @@
                                 "typeUri": "dm4.webclient.view_config",
                                 "childs": {
                                     "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
-                                    "dm4.webclient.clearable": true
+                                    "dm4.webclient.clearable": true,
+                                    "dm4.webclient.customizable": true
                                 }
                             }
                         ]
