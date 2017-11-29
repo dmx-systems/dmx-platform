@@ -1,9 +1,9 @@
 <template>
   <div class="workspace-select">
     <div class="field-label">Workspace</div>
-    <el-select v-model="workspaceId" size="small">
+    <el-select v-model="workspaceId">
       <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
-    </el-select><el-button size="small" class="fa fa-info-circle" @click="revealWorkspace"></el-button>
+    </el-select><el-button class="fa fa-info-circle" @click="revealWorkspace"></el-button>
   </div>
 </template>
 

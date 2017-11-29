@@ -1,9 +1,9 @@
 <template>
   <div class="topicmap-select">
     <div class="field-label">Topicmap</div>
-    <el-select v-model="topicmapId" size="small">
+    <el-select v-model="topicmapId">
       <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
-    </el-select><el-button size="small" class="fa fa-info-circle" @click="revealTopicmap"></el-button>
+    </el-select><el-button class="fa fa-info-circle" @click="revealTopicmap"></el-button>
   </div>
 </template>
 

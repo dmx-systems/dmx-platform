@@ -1,16 +1,16 @@
 <template>
-  <el-dialog custom-class="login-dialog" :visible.sync="visible" size="tiny" title="Login">
+  <el-dialog custom-class="login-dialog" :visible.sync="visible" width="20em" title="Login">
     <div>
       <div class="field-label">Username</div>
-      <el-input v-model="credentials.username" size="small"></el-input>
+      <el-input v-model="credentials.username"></el-input>
     </div>
     <div class="password-field">
       <div class="field-label">Password</div>
-      <el-input v-model="credentials.password" size="small"></el-input>
+      <el-input v-model="credentials.password"></el-input>
     </div>
     <div class="message">{{message}}</div>
     <div slot="footer">
-      <el-button type="primary" size="small" @click="login">OK</el-button>
+      <el-button type="primary" @click="login">OK</el-button>
     </div>
   </el-dialog>
 </template>

@@ -5,6 +5,11 @@ import locale from 'element-ui/lib/locale'
 // set locale
 locale.use(require('element-ui/lib/locale/lang/en').default)
 
+// global config
+Vue.prototype.$ELEMENT = {
+  size: 'small'
+}
+
 // register components
 Vue.use(Button)
 Vue.use(Input)

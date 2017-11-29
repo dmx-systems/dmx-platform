@@ -65,40 +65,6 @@ button {
   margin-bottom: 0.2em;
 }
 
-/* Element UI */
+/* Element UI: TODO */
 
-.el-button--small {
-  padding: 6px 8px;                     /* was 7px 9px */
-}
-
-.el-input__inner {
-  padding: 5px 8px;                     /* was 3px 10px */
-}
-
-.el-input--small .el-input__inner {
-  height: 28px;                         /* was 30px */
-}
-
-.el-dialog__title {
-  font-size: var(--main-font-size);     /* was 16px */
-}
-
-.el-tabs__item {
-  font-size: var(--label-font-size);    /* was 14px */
-  height: 40px;                         /* was 42px */
-  padding: 0 14px;                      /* was 0 16px */
-}
-
-.el-table th {
-  height: 30px;                         /* was 40px */
-}
-
-.el-table th > .cell {
-  font-size: var(--label-font-size);    /* was 14px */
-  font-weight: normal;                  /* was bold */
-}
-
-.el-table .cell {
-  word-break: normal;                   /* was break-all which breaks words instead of line wrap */
-}
 </style>
