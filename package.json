@@ -18,7 +18,7 @@
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
-    "element-ui": "^2.0.5",
+    "element-ui": "^2.0.7",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.9",
     "vue-router": "^2.8.1",

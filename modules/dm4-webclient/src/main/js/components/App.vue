@@ -27,11 +27,11 @@
   --main-font-family: Lucida Grande, Verdana, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
-  --label-color: #8391a5;
+  --label-color: #878d99;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
   --line-height: 1.5em;
   --paragraph-spacing: 1em;
-  --highlight-color: #20a0ff;         /* see --color-primary in element-ui/packages/theme-default/src/common/var.css */
-  --background-color: #f6f8fb;        /* brigher version of Element UI's table headers (#eef1f6) */
+  --highlight-color: #409eff;   /* see --color-primary */
+  --background-color: #f5f7fa;  /* see --background-color-base */
   --background-dark-color: #eef1f6;
 }
 
@@ -65,6 +65,48 @@ button {
   margin-bottom: 0.2em;
 }
 
-/* Element UI: TODO */
+/* Element UI Overrides */
 
+/*
+  Element UI font sizes     Default   small     mini
+  el-input + el-select      14px      13px      12px
+  e-button                  14px      12px      12px
+*/
+
+.el-button--small {
+  padding: 8px 14px;                    /* was 9px 15px */
+}
+
+.el-button--mini {
+  padding: 6px 13px;                    /* was 7px 15px */
+}
+
+.el-input__inner {
+  padding: 0px 8px;                     /* was 0px 15px */
+}
+
+.el-dialog__title {
+  font-size: var(--main-font-size);     /* was 18px */
+}
+
+.el-tabs__item {
+  font-size: var(--label-font-size);    /* was 14px */
+  height: 36px;                         /* was 40px */
+  line-height: 36px;                    /* was 40px */
+  padding: 0 12px;                      /* was 0 20px */
+}
+
+.el-table {
+  font-size: var(--main-font-size);     /* was 12px (.el-table--mini) */
+}
+
+.el-table th {
+  font-size: var(--label-font-size);
+  font-weight: normal;                  /* User agent stylesheet sets bold */
+  padding: 0;                           /* was 12px 0 (.el-table th) or 6px 0 (.el-table--mini th) */
+}
+
+.el-table .cell {
+  word-break: normal;                   /* was break-all which breaks words instead of line wrap */
+}
 </style>

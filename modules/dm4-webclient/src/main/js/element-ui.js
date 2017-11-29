@@ -7,7 +7,7 @@ locale.use(require('element-ui/lib/locale/lang/en').default)
 
 // global config
 Vue.prototype.$ELEMENT = {
-  size: 'small'
+  size: 'mini'
 }
 
 // register components

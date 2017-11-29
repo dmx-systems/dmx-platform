@@ -47,4 +47,9 @@ export default {
 .login-state .info .username {
   color: black;
 }
+
+.login-state .el-button {
+  font-size: var(--label-font-size) !important;
+  padding: 0;
+}
 </style>
