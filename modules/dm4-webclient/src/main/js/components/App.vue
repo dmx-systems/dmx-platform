@@ -91,6 +91,7 @@ button {
 
 .el-tabs__item {
   font-size: var(--label-font-size);    /* was 14px */
+  color: var(--label-color);            /* was #2d2f33 (Element UI --color-text-primary) */
   height: 36px;                         /* was 40px */
   line-height: 36px;                    /* was 40px */
   padding: 0 12px;                      /* was 0 20px */

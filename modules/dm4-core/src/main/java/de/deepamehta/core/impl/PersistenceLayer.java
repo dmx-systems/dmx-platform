@@ -181,7 +181,7 @@ public final class PersistenceLayer extends StorageDecorator {
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating " + model + " failed", e);
+            throw new RuntimeException("Creating topic failed, model=" + model + ", uriPrefix=" + uriPrefix, e);
         }
     }
 
@@ -431,8 +431,8 @@ public final class PersistenceLayer extends StorageDecorator {
             storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
             createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
         } catch (Exception e) {
-            throw new RuntimeException("Associating topic " + topicId +
-                " with topic type \"" + topicTypeUri + "\" failed", e);
+            throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
+                topicTypeUri + "\" failed", e);
         }
     }
 
@@ -444,8 +444,8 @@ public final class PersistenceLayer extends StorageDecorator {
             storeAssociation(assoc);   // direct storage calls used here ### explain
             storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         } catch (Exception e) {
-            throw new RuntimeException("Associating association " + assocId +
-                " with association type \"" + assocTypeUri + "\" failed", e);
+            throw new RuntimeException("Associating association " + assocId + " with association type \"" +
+                assocTypeUri + "\" failed", e);
         }
     }
 
@@ -542,7 +542,7 @@ public final class PersistenceLayer extends StorageDecorator {
             String topicTypeUri = fetchTopic(updateModel.getId()).getUri();
             _getTopicType(topicTypeUri).update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating topic type failed (" + updateModel + ")", e);
+            throw new RuntimeException("Updating topic type failed, updateModel=" + updateModel, e);
         }
     }
 
@@ -553,7 +553,7 @@ public final class PersistenceLayer extends StorageDecorator {
             String assocTypeUri = fetchTopic(updateModel.getId()).getUri();
             _getAssociationType(assocTypeUri).update(updateModel);
         } catch (Exception e) {
-            throw new RuntimeException("Updating association type failed (" + updateModel + ")", e);
+            throw new RuntimeException("Updating association type failed, updateModel=" + updateModel, e);
         }
     }
 
