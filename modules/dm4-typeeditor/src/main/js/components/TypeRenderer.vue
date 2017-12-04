@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <object-renderer :object="object" :mode="mode"></object-renderer>
+    <object-renderer :object="object" :mode="mode" :level="0"></object-renderer>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>

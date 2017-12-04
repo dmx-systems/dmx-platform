@@ -3,7 +3,7 @@
     <div v-if="username" class="info">
       Logged in as <span class="username">{{username}}</span>
     </div>
-    <el-button type="text" size="mini" @click="dispatch">{{buttonLabel}}</el-button>
+    <el-button type="text" @click="dispatch">{{buttonLabel}}</el-button>
   </div>
 </template>
 
