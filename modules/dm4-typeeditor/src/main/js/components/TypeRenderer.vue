@@ -7,8 +7,22 @@
       <div class="field-label">Data Type</div>
       <div v-if="infoMode">{{dataType.value}}</div>
       <el-select v-else v-model="object.dataTypeUri">
-        <el-option v-for="dataType in dataTypes" :label="dataType.value" :value="dataType.uri" :key="dataType.uri">
-        </el-option>
+        <el-option-group label="Simple">
+          <el-option :label="dataTypes['dm4.core.text'].value"     :value="dataTypes['dm4.core.text'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dm4.core.html'].value"     :value="dataTypes['dm4.core.html'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dm4.core.number'].value"   :value="dataTypes['dm4.core.number'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dm4.core.boolean'].value"  :value="dataTypes['dm4.core.boolean'].uri">
+          </el-option>
+        </el-option-group>
+        <el-option-group label="Composite">
+          <el-option :label="dataTypes['dm4.core.value'].value"    :value="dataTypes['dm4.core.value'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dm4.core.identity'].value" :value="dataTypes['dm4.core.identity'].uri">
+          </el-option>
+        </el-option-group>
       </el-select>
     </div>
   </div>

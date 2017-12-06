@@ -71,7 +71,7 @@ class ValueIntegrator {
         // argument check
         if (newValues.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
-                newValues + " ### targetObject=" + targetObject);
+                newValues + ", targetObject=" + targetObject);
         }
         //
         this.newValues = newValues;
@@ -109,9 +109,11 @@ class ValueIntegrator {
 
     /**
      * Preconditions:
+     *   - this.newValues is not null
      *   - this.newValues is simple
      *
      * @return  the unified value, or null if there was nothing to integrate.
+     *          The latter is the case if this.newValues is the empty string.
      */
     private DeepaMehtaObjectModelImpl integrateSimple() {
         if (isAssoc) {
@@ -262,6 +264,7 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
+     *   - this.type is an identity type
      *   - parent's type is this.type
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
@@ -371,13 +374,12 @@ class ValueIntegrator {
                 break;
             }
         }
-        DeepaMehtaObjectModelImpl comp;
         switch (candidates.size()) {
         case 0:
             // logger.info("### no composite found, childTopics=" + childTopics);
             return createCompositeTopic(childTopics);
         case 1:
-            comp = candidates.get(0);
+            DeepaMehtaObjectModelImpl comp = candidates.get(0);
             logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
