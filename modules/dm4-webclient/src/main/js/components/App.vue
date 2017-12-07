@@ -87,6 +87,12 @@ button {
 
 .el-dialog__title {
   font-size: var(--main-font-size);     /* was 18px */
+  line-height: unset;                   /* was 24px */
+}
+
+.el-dialog__body {
+  padding: 15px;                        /* was 30px 20px */
+  line-height: unset;                   /* was 24px */
 }
 
 .el-tabs__item {
