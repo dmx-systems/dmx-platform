@@ -299,7 +299,7 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   newChildTopics     value: TopicModel or List<TopicModel>
      */
     private DeepaMehtaObjectModelImpl updateChildRefs(DeepaMehtaObjectModelImpl parent,
                                                       Map<String, Object> newChildTopics) {
@@ -309,61 +309,80 @@ class ValueIntegrator {
                 parent.getTypeUri() + "\"");
         }
         //
-        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         for (String assocDefUri : type) {
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
-            RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
-            TopicModel newValue;
+            Object newValue = newChildTopics.get(assocDefUri);
             if (isOne(assocDefUri)) {
-                newValue = (TopicModel) newChildTopics.get(assocDefUri);                // may be null
+                updateChildRefsOne(parent, (TopicModel) newValue, assocDefUri);
             } else {
-                throw new RuntimeException("Updating cardinality \"many\" childs (assocDefUri=\"" + assocDefUri +
-                    "\") not yet implemented");
-            }
-            boolean newValueIsEmpty = isEmptyValue(assocDefUri);
-            //
-            // 1) delete assignment if exists AND value has changed or emptied
-            //
-            boolean deleted = false;
-            if (oldValue != null && (newValueIsEmpty || newValue != null && !oldValue.equals(newValue))) {
-                // update DB
-                oldValue.getRelatingAssociation().delete();
-                // update memory
-                if (newValueIsEmpty) {
-                    logger.info("### Delete assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
-                        parent.getId() + " (typeUri=\"" + type.uri + "\")");
-                    childTopics.remove(assocDefUri);
-                }
-                deleted = true;
-            }
-            // 2) create assignment if not exists OR value has changed
-            // a new value must be present
-            //
-            AssociationModelImpl assoc = null;
-            if (newValue != null && (oldValue == null || !oldValue.equals(newValue))) {
-                logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newValue.getId() +
-                    " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
-                    type.uri + "\")");
-                // update DB
-                assoc = createChildAssociation(parent, newValue, assocDefUri);
-                // update memory
-                childTopics.put(assocDefUri, mf.newRelatedTopicModel(newValue, assoc));
-            }
-            // 3) update relating assoc
-            //
-            // Note: don't update an assoc's relating assoc
-            // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
-            if (!isAssoc) {
-                // take the old assoc if no new one is created, there is an old one, and it has not been deleted
-                if (assoc == null && oldValue != null && !deleted) {
-                    assoc = oldValue.getRelatingAssociation();
-                }
-                if (assoc != null) {
-                    updateRelatingAssociation(assoc, assocDefUri);
-                }
+                updateChildRefsMany(parent, (List<TopicModel>) newValue, assocDefUri);
             }
         }
         return parent;
+    }
+
+    /**
+     * @param   newValue    may be null
+     */
+    private void updateChildRefsOne(DeepaMehtaObjectModelImpl parent, TopicModel newValue, String assocDefUri) {
+        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
+        RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
+        boolean newValueIsEmpty = isEmptyValue(assocDefUri);
+        //
+        // 1) delete assignment if exists AND value has changed or emptied
+        //
+        boolean deleted = false;
+        if (oldValue != null && (newValueIsEmpty || newValue != null && !oldValue.equals(newValue))) {
+            // update DB
+            oldValue.getRelatingAssociation().delete();
+            // update memory
+            if (newValueIsEmpty) {
+                logger.info("### Delete assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                    parent.getId() + " (typeUri=\"" + type.uri + "\")");
+                childTopics.remove(assocDefUri);
+            }
+            deleted = true;
+        }
+        // 2) create assignment if not exists OR value has changed
+        // a new value must be present
+        //
+        AssociationModelImpl assoc = null;
+        if (newValue != null && (oldValue == null || !oldValue.equals(newValue))) {
+            logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + newValue.getId() +
+                " (assocDefUri=\"" + assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" +
+                type.uri + "\")");
+            // update DB
+            assoc = createChildAssociation(parent, newValue, assocDefUri);
+            // update memory
+            childTopics.put(assocDefUri, mf.newRelatedTopicModel(newValue, assoc));
+        }
+        // 3) update relating assoc
+        //
+        // Note: don't update an assoc's relating assoc
+        // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
+        if (!isAssoc) {
+            // take the old assoc if no new one is created, there is an old one, and it has not been deleted
+            if (assoc == null && oldValue != null && !deleted) {
+                assoc = oldValue.getRelatingAssociation();
+            }
+            if (assoc != null) {
+                updateRelatingAssociation(assoc, assocDefUri);
+            }
+        }
+    }
+
+    /**
+     * @param   newValues   may be null
+     */
+    private void updateChildRefsMany(DeepaMehtaObjectModelImpl parent, List<TopicModel> newValues, String assocDefUri) {
+        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
+        List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
+        for (TopicModel newValue : newValues) {
+            //
+            // 1) delete assignment if exists AND value has changed or emptied
+            //
+            // TODO
+        }
     }
 
     private void updateRelatingAssociation(AssociationModelImpl assoc, String assocDefUri) {
