@@ -859,9 +859,6 @@ public final class PersistenceLayer extends StorageDecorator {
 
     private DeepaMehtaObjectModelImpl integrateValues(DeepaMehtaObjectModelImpl newValues,
                                                       DeepaMehtaObjectModelImpl targetObject) {
-        // logger.info("### newValues=" + newValues + " ### targetObject=" + targetObject);
-        DeepaMehtaObjectModelImpl o = new ValueIntegrator(this).integrate(newValues, targetObject);
-        // logger.info("### => " + o);
-        return o;
+        return new ValueIntegrator(this).integrate(newValues, targetObject).value;
     }
 }

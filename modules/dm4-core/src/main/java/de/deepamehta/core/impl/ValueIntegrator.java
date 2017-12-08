@@ -34,6 +34,8 @@ class ValueIntegrator {
 
     // For composites: assoc def URIs of empty child topics.
     // Evaluated when deleting child-assignments, see updateChildRefs().
+    // Not having null entries in the unified child topics simplifies candidate determination.
+    // ### TODO: to be dropped?
     private List<String> emptyValues = new ArrayList();
 
     private PersistenceLayer pl;
@@ -53,19 +55,20 @@ class ValueIntegrator {
     /**
      * Integrates new values into the DB and returns the unified value.
      *
-     * @return  the unified value, or null if there was nothing to integrate.
+     * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
-    DeepaMehtaObjectModelImpl integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
+    UnifiedValue integrate(DeepaMehtaObjectModelImpl newValues, DeepaMehtaObjectModelImpl targetObject) {
         // logger.info("##### newValues=" + newValues + " ### targetObject=" + targetObject);
+        long originalId = newValues.id;
         // resolve ref
         if (newValues instanceof TopicReferenceModelImpl) {
             TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
             if (!ref.isEmptyRef()) {
                 DeepaMehtaObjectModelImpl object = ref.resolve();
                 logger.info("Referencing " + object);
-                return object;
+                return new UnifiedValue(object, originalId);
             } else {
-                return null;
+                return new UnifiedValue(null, originalId);
             }
         }
         // argument check
@@ -81,27 +84,27 @@ class ValueIntegrator {
         //
         // value integration
         //
-        DeepaMehtaObjectModelImpl unified;
+        DeepaMehtaObjectModelImpl value;
         if (newValues.isSimple()) {
-            unified = integrateSimple();
+            value = integrateSimple();
         } else {
-            unified = integrateComposite();
+            value = integrateComposite();
             // label calculation
-            if (unified != null) {
-                new LabelCalculation(unified).calculate();
+            if (value != null) {
+                new LabelCalculation(value).calculate();
             } else if (isAssoc) {
                 storeAssocSimpleValue();
             }
         }
-        // ID transfer
-        if (unified != null) {
-            if (unified.id == -1) {
+        // ID transfer ### TODO: drop it?
+        if (value != null) {
+            if (value.id == -1) {
                 throw new RuntimeException("Unification result has no ID set");
             }
-            newValues.id = unified.id;
+            newValues.id = value.id;
         }
         //
-        return unified;
+        return new UnifiedValue(value, originalId);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -175,14 +178,17 @@ class ValueIntegrator {
      */
     private DeepaMehtaObjectModelImpl integrateComposite() {
         try {
-            Map<String, Object> childTopics = new HashMap();    // value: TopicModel or List<TopicModel>
+            Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
+            ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
+            // Iterate through type, not through newValues.
+            // newValues might contain childs not contained in the type def, e.g. "dm4.time.modified".
             for (String assocDefUri : type) {
                 Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
                 if (isOne(assocDefUri)) {
-                    newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                    newChildValue = _childTopics.getTopicOrNull(assocDefUri);
                 } else {
                     // TODO: if empty?
-                    newChildValue = newValues.getChildTopicsModel().getTopicsOrNull(assocDefUri);
+                    newChildValue = _childTopics.getTopicsOrNull(assocDefUri);
                 }
                 // skip if not contained in update request
                 if (newChildValue == null) {
@@ -190,7 +196,7 @@ class ValueIntegrator {
                 }
                 //
                 Object childTopic = integrateChildValue(newChildValue, assocDefUri);
-                if (childTopic == null) {
+                if (isOne(assocDefUri) && ((UnifiedValue) childTopic).value == null) {
                     // TODO: many?
                     emptyValues.add(assocDefUri);
                 } else {
@@ -208,13 +214,13 @@ class ValueIntegrator {
      *
      * @param   childValue      RelatedTopicModelImpl or List<RelatedTopicModelImpl>
      *
-     * @return  TopicModel or List<TopicModel>
+     * @return  UnifiedValue or List<UnifiedValue>; never null;
      */
     private Object integrateChildValue(Object childValue, String assocDefUri) {
         if (isOne(assocDefUri)) {
             return new ValueIntegrator(pl).integrate((RelatedTopicModelImpl) childValue, null); // targetObject=null
         } else {
-            List values = new ArrayList();
+            List<UnifiedValue> values = new ArrayList();
             for (RelatedTopicModelImpl value : (List<RelatedTopicModelImpl>) childValue) {
                 values.add(new ValueIntegrator(pl).integrate(value, null));                     // targetObject=null
             }
@@ -228,7 +234,7 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
      *
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
         if (isValueType()) {
@@ -240,7 +246,7 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private DeepaMehtaObjectModelImpl identifyParent(Map<String, Object> childTopics) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
@@ -265,21 +271,23 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     *
+     * @return  value: UnifiedValue or List<UnifiedValue>
      */
     private Map<String, Object> identityChildTopics(Map<String, Object> childTopics,
                                                     List<String> identityAssocDefUris) {
         Map<String, Object> identityChildTopics = new HashMap();
         for (String assocDefUri : identityAssocDefUris) {
-            Object childTopic;
+            UnifiedValue childTopic;
             if (isOne(assocDefUri)) {
-                childTopic = childTopics.get(assocDefUri);
+                childTopic = (UnifiedValue) childTopics.get(assocDefUri);
             } else {
                 throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
             }
             // FIXME: only throw if NO identity child topic is given.
             // If at least ONE is given it is sufficient.
-            if (childTopic == null) {
+            if (childTopic.value == null) {
                 throw new RuntimeException("Identity child topic \"" + assocDefUri + "\" is missing in " +
                     childTopics.keySet());
             }
@@ -299,7 +307,7 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
-     * @param   newChildTopics     value: TopicModel or List<TopicModel>
+     * @param   newChildTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private DeepaMehtaObjectModelImpl updateChildRefs(DeepaMehtaObjectModelImpl parent,
                                                       Map<String, Object> newChildTopics) {
@@ -313,9 +321,10 @@ class ValueIntegrator {
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
             Object newValue = newChildTopics.get(assocDefUri);
             if (isOne(assocDefUri)) {
-                updateChildRefsOne(parent, (TopicModel) newValue, assocDefUri);
+                TopicModel _newValue = (TopicModel) (newValue != null ? ((UnifiedValue) newValue).value : null);
+                updateChildRefsOne(parent, _newValue, assocDefUri);
             } else {
-                updateChildRefsMany(parent, (List<TopicModel>) newValue, assocDefUri);
+                updateChildRefsMany(parent, (List<UnifiedValue>) newValue, assocDefUri);
             }
         }
         return parent;
@@ -374,10 +383,11 @@ class ValueIntegrator {
     /**
      * @param   newValues   may be null
      */
-    private void updateChildRefsMany(DeepaMehtaObjectModelImpl parent, List<TopicModel> newValues, String assocDefUri) {
+    private void updateChildRefsMany(DeepaMehtaObjectModelImpl parent, List<UnifiedValue> newValues,
+                                                                       String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
-        for (TopicModel newValue : newValues) {
+        for (UnifiedValue newValue : newValues) {
             //
             // 1) delete assignment if exists AND value has changed or emptied
             //
@@ -421,13 +431,14 @@ class ValueIntegrator {
      *   - childTopic's type is assocDef's child type
      *   - childTopics map is not empty
      *
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
         // logger.info("### candidates (" + candidates.size() + "): " + DeepaMehtaUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
-            eliminateParentCandidates(candidates, (TopicModel) childTopics.get(assocDefUri), assocDefUri);
+            UnifiedValue value = (UnifiedValue) childTopics.get(assocDefUri);
+            eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
             if (candidates.isEmpty()) {
                 break;
             }
@@ -454,18 +465,19 @@ class ValueIntegrator {
      *   - childTopic's type is assocDef's child type
      *   - childTopics map is not empty
      *
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private List<RelatedTopicModelImpl> parentCandidates(Map<String, Object> childTopics) {
         String assocDefUri = childTopics.keySet().iterator().next();
+        // logger.info("### assocDefUri=\"" + assocDefUri + "\", childTopics=" + childTopics);
         // sanity check
         if (!type.getUri().equals(assocDef(assocDefUri).getParentTypeUri())) {
             throw new RuntimeException("Type mismatch");
         }
         //
-        TopicModel childTopic;
+        DeepaMehtaObjectModel childTopic;
         if (isOne(assocDefUri)) {
-            childTopic = (TopicModel) childTopics.get(assocDefUri);
+            childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
         } else {
             throw new RuntimeException("Unification of cardinality \"many\" values not yet implemented");
         }
@@ -476,7 +488,7 @@ class ValueIntegrator {
     /**
      * @param   childTopic      may be null
      */
-    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, TopicModel childTopic,
+    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, DeepaMehtaObjectModel childTopic,
                                                                                    String assocDefUri) {
         AssociationDefinitionModel assocDef = assocDef(assocDefUri);
         Iterator<RelatedTopicModelImpl> i = candidates.iterator();
@@ -517,7 +529,7 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopics     value: TopicModel or List<TopicModel>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childTopics) {
         // FIXME: construct the composite model first, then create topic as a whole. => NO! Endless recursion?
@@ -527,22 +539,22 @@ class ValueIntegrator {
         logger.info("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childTopics.keySet()) {
             if (isOne(assocDefUri)) {
-                TopicModel childTopic = (TopicModel) childTopics.get(assocDefUri);
+                DeepaMehtaObjectModel childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
                 logger.info("### Assigning child " + childTopic.getId() + " (assocDefUri=\"" + assocDefUri +
                     "\") to composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
                 createChildAssociation(topic, childTopic, assocDefUri);
             } else {
-                for (TopicModel childTopic : (List<TopicModel>) childTopics.get(assocDefUri)) {
-                    logger.info("### Assigning child " + childTopic.getId() + " (assocDefUri=\"" + assocDefUri +
+                for (UnifiedValue value : (List<UnifiedValue>) childTopics.get(assocDefUri)) {
+                    logger.info("### Assigning child " + value.value.getId() + " (assocDefUri=\"" + assocDefUri +
                         "\") to composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
-                    createChildAssociation(topic, childTopic, assocDefUri);
+                    createChildAssociation(topic, value.value, assocDefUri);
                 }
             }
         }
         return topic;
     }
 
-    private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, TopicModel child,
+    private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, DeepaMehtaObjectModel child,
                                                                                       String assocDefUri) {
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),
@@ -566,5 +578,21 @@ class ValueIntegrator {
 
     private boolean isEmptyValue(String assocDefUri) {
         return emptyValues.contains(assocDefUri);
+    }
+
+    // -------------------------------------------------------------------------------------------------- Nested Classes
+
+    class UnifiedValue {
+
+        DeepaMehtaObjectModelImpl value;
+        long originalId;
+
+        /**
+         * @param   value   may be null
+         */
+        private UnifiedValue(DeepaMehtaObjectModelImpl value, long originalId) {
+            this.value = value;
+            this.originalId = originalId;
+        }
     }
 }
