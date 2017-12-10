@@ -96,7 +96,7 @@ class ValueUpdater {
                 storeAssocSimpleValue();
             }
         }
-        // ID transfer ### TODO: drop it?
+        // ID transfer ### TODO: drop it? => No! Needed by rel assoc update of multi-value (see updateAssignmentsMany())
         if (value != null) {
             if (value.id == -1) {
                 throw new RuntimeException("Unification result has no ID set");
@@ -169,7 +169,7 @@ class ValueUpdater {
     }
 
     /**
-     * Integrates a composite value into the DB and returns the unified composite value.
+     * Updates a composite value and returns the unified composite value.
      *
      * Preconditions:
      *   - this.updateModel is composite
@@ -204,7 +204,7 @@ class ValueUpdater {
             }
             return unifyComposite(childTopics);
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a composite value failed, updateModel=" + updateModel, e);
+            throw new RuntimeException("Updating a composite value failed, updateModel=" + updateModel, e);
         }
     }
 
@@ -320,7 +320,8 @@ class ValueUpdater {
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
             Object unifiedValue = unifiedValues.get(assocDefUri);
             if (isOne(assocDefUri)) {
-                TopicModel _unifiedValue = (TopicModel) (unifiedValue != null ? ((UnifiedValue) unifiedValue).value : null);
+                TopicModel _unifiedValue = (TopicModel) (unifiedValue != null ? ((UnifiedValue) unifiedValue).value :
+                    null);
                 updateAssignmentsOne(parent, _unifiedValue, assocDefUri);
             } else {
                 // Note: for partial create/update requests unifiedValue might be null
@@ -348,8 +349,8 @@ class ValueUpdater {
             oldValue.getRelatingAssociation().delete();
             // update memory
             if (newValueIsEmpty) {
-                logger.info("### Delete assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
-                    parent.getId() + " (typeUri=\"" + type.uri + "\")");
+                logger.info("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                    parent.id + " (typeUri=\"" + type.uri + "\")");
                 childTopics.remove(assocDefUri);
             }
             deleted = true;
@@ -360,7 +361,7 @@ class ValueUpdater {
         AssociationModelImpl assoc = null;
         if (unifiedValue != null && (oldValue == null || !oldValue.equals(unifiedValue))) {
             // update DB
-            assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted ? "Reassigning" : "Assigning");
+            assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted);
             // update memory
             childTopics.put(assocDefUri, mf.newRelatedTopicModel(unifiedValue, assoc));
         }
@@ -402,8 +403,8 @@ class ValueUpdater {
             boolean deleted = false;
             if (originalId != -1 && (newId == -1 || originalId != newId)) {
                 if (newId == -1) {
-                    logger.info("### Delete assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
-                        parent.getId() + " (typeUri=\"" + type.uri + "\")");
+                    logger.info("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                        parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
                 deleted = true;
                 // update DB
@@ -417,7 +418,7 @@ class ValueUpdater {
             AssociationModelImpl assoc = null;
             if (newId != -1 && (originalId == -1 || originalId != newId)) {
                 // update DB
-                assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted ? "Reassigning" : "Assigning");
+                assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted);
                 // update memory
                 childTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedValue, assoc));
             }
@@ -432,7 +433,8 @@ class ValueUpdater {
                 }
                 if (assoc != null) {
                     List<RelatedTopicModelImpl> topics = updateModel.getChildTopicsModel().getTopics(assocDefUri);
-                    updateRelatingAssociation(assoc, assocDefUri, findTopic(topics, originalId));
+                    // Note: the IDs in the updateModel are overwritten by the unified IDs (see update())
+                    updateRelatingAssociation(assoc, assocDefUri, findTopic(topics, newId));
                 }
             }
         }
@@ -595,13 +597,13 @@ class ValueUpdater {
 
     private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, DeepaMehtaObjectModel child,
                                                                                       String assocDefUri) {
-        return createChildAssociation(parent, child, assocDefUri, "Assigning");
+        return createChildAssociation(parent, child, assocDefUri, false);
     }
 
     private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, DeepaMehtaObjectModel child,
-                                                                                      String assocDefUri, String info) {
-        logger.info("### " + info + " child " + child.getId() + " (assocDefUri=\"" + assocDefUri +
-            "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
+                                                                                  String assocDefUri, boolean deleted) {
+        logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
+            assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dm4.core.parent"),
             child.createRoleModel("dm4.core.child")
