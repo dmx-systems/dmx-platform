@@ -306,10 +306,10 @@ class ValueUpdater {
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
-     * @param   unifiedValues     value: UnifiedValue or List<UnifiedValue>
+     * @param   unifiedChilds     value: UnifiedValue or List<UnifiedValue>
      */
     private DeepaMehtaObjectModelImpl updateAssignments(DeepaMehtaObjectModelImpl parent,
-                                                        Map<String, Object> unifiedValues) {
+                                                        Map<String, Object> unifiedChilds) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
             throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
@@ -318,15 +318,15 @@ class ValueUpdater {
         //
         for (String assocDefUri : type) {
             parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
-            Object unifiedValue = unifiedValues.get(assocDefUri);
+            Object unifiedChild = unifiedChilds.get(assocDefUri);
             if (isOne(assocDefUri)) {
-                TopicModel _unifiedValue = (TopicModel) (unifiedValue != null ? ((UnifiedValue) unifiedValue).value :
+                TopicModel _unifiedChild = (TopicModel) (unifiedChild != null ? ((UnifiedValue) unifiedChild).value :
                     null);
-                updateAssignmentsOne(parent, _unifiedValue, assocDefUri);
+                updateAssignmentsOne(parent, _unifiedChild, assocDefUri);
             } else {
-                // Note: for partial create/update requests unifiedValue might be null
-                if (unifiedValue != null) {
-                    updateAssignmentsMany(parent, (List<UnifiedValue>) unifiedValue, assocDefUri);
+                // Note: for partial create/update requests unifiedChild might be null
+                if (unifiedChild != null) {
+                    updateAssignmentsMany(parent, (List<UnifiedValue>) unifiedChild, assocDefUri);
                 }
             }
         }
@@ -334,9 +334,9 @@ class ValueUpdater {
     }
 
     /**
-     * @param   unifiedValue    may be null
+     * @param   unifiedChild    may be null
      */
-    private void updateAssignmentsOne(DeepaMehtaObjectModelImpl parent, TopicModel unifiedValue, String assocDefUri) {
+    private void updateAssignmentsOne(DeepaMehtaObjectModelImpl parent, TopicModel unifiedChild, String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
         boolean newValueIsEmpty = isEmptyValue(assocDefUri);
@@ -344,7 +344,7 @@ class ValueUpdater {
         // 1) delete assignment if exists AND value has changed or emptied
         //
         boolean deleted = false;
-        if (oldValue != null && (newValueIsEmpty || unifiedValue != null && !oldValue.equals(unifiedValue))) {
+        if (oldValue != null && (newValueIsEmpty || unifiedChild != null && !oldValue.equals(unifiedChild))) {
             // update DB
             oldValue.getRelatingAssociation().delete();
             // update memory
@@ -359,11 +359,11 @@ class ValueUpdater {
         // a new value must be present
         //
         AssociationModelImpl assoc = null;
-        if (unifiedValue != null && (oldValue == null || !oldValue.equals(unifiedValue))) {
+        if (unifiedChild != null && (oldValue == null || !oldValue.equals(unifiedChild))) {
             // update DB
-            assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted);
+            assoc = createChildAssociation(parent, unifiedChild, assocDefUri, deleted);
             // update memory
-            childTopics.put(assocDefUri, mf.newRelatedTopicModel(unifiedValue, assoc));
+            childTopics.put(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
         }
         // 3) update relating assoc
         //
@@ -382,17 +382,17 @@ class ValueUpdater {
     }
 
     /**
-     * @param   unifiedValues   never null; a UnifiedValue's "value" field may be null
+     * @param   unifiedChilds   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DeepaMehtaObjectModelImpl parent, List<UnifiedValue> unifiedValues,
+    private void updateAssignmentsMany(DeepaMehtaObjectModelImpl parent, List<UnifiedValue> unifiedChilds,
                                                                          String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
         // logger.info("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
-        for (UnifiedValue _unifiedValue : unifiedValues) {
-            TopicModel unifiedValue = (TopicModel) _unifiedValue.value;
-            long originalId = _unifiedValue.originalId;
-            long newId = unifiedValue != null ? unifiedValue.getId() : -1;
+        for (UnifiedValue _unifiedChild : unifiedChilds) {
+            TopicModel unifiedChild = (TopicModel) _unifiedChild.value;
+            long originalId = _unifiedChild.originalId;
+            long newId = unifiedChild != null ? unifiedChild.getId() : -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
                 oldValue = findTopic(oldValues, originalId);
@@ -418,9 +418,9 @@ class ValueUpdater {
             AssociationModelImpl assoc = null;
             if (newId != -1 && (originalId == -1 || originalId != newId)) {
                 // update DB
-                assoc = createChildAssociation(parent, unifiedValue, assocDefUri, deleted);
+                assoc = createChildAssociation(parent, unifiedChild, assocDefUri, deleted);
                 // update memory
-                childTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedValue, assoc));
+                childTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
             }
             // 3) update relating assoc
             //
@@ -433,7 +433,9 @@ class ValueUpdater {
                 }
                 if (assoc != null) {
                     List<RelatedTopicModelImpl> topics = updateModel.getChildTopicsModel().getTopics(assocDefUri);
-                    // Note: the IDs in the updateModel are overwritten by the unified IDs (see update())
+                    // Note: the IDs in the update model are overwritten with the unified IDs ("newId") (see update()).
+                    // Alternatively we could store the update model's relating assoc in the UnifiedValue object.
+                    // findTopic() would not be necessary then. ### TODO?
                     updateRelatingAssociation(assoc, assocDefUri, findTopic(topics, newId));
                 }
             }
