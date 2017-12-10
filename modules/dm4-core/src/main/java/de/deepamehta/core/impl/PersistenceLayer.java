@@ -134,11 +134,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     TopicImpl createTopic(TopicModelImpl model) {
         try {
-            TopicModelImpl topic = (TopicModelImpl) integrateValues(model, null);
-            if (topic == null) {
-                throw new RuntimeException("Value integration yields no result");
-            }
-            return topic.instantiate();
+            return updateValues(model, null).instantiate();
         } catch (Exception e) {
             throw new RuntimeException("Creating topic failed, model=" + model, e);
         }
@@ -360,7 +356,7 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             // 1) store in DB
             storeAssociation(model);
-            integrateValues(model, null);
+            updateValues(model, null);
             createAssociationInstantiation(model.getId(), model.getTypeUri());
             // 2) instantiate
             AssociationImpl assoc = model.instantiate();
@@ -857,8 +853,13 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    private DeepaMehtaObjectModelImpl integrateValues(DeepaMehtaObjectModelImpl newValues,
-                                                      DeepaMehtaObjectModelImpl targetObject) {
-        return new ValueUpdater(this).update(newValues, targetObject).value;
+    private <M extends DeepaMehtaObjectModelImpl> M updateValues(M updateModel, M targetObject) {
+        M value = new ValueUpdater(this).update(updateModel, targetObject).value;
+        // sanity check
+        if (value == null) {
+            throw new RuntimeException("ValueUpdater yields no result");
+        }
+        //
+        return value;
     }
 }

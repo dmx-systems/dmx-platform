@@ -57,7 +57,7 @@ class ValueUpdater {
      *
      * @return  the unified value; never null; its "value" field is null if there was nothing to update.
      */
-    UnifiedValue update(DeepaMehtaObjectModelImpl updateModel, DeepaMehtaObjectModelImpl targetObject) {
+    <M extends DeepaMehtaObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
         // logger.info("##### updateModel=" + updateModel + " ### targetObject=" + targetObject);
         long originalId = updateModel.id;
         // resolve ref
@@ -656,15 +656,15 @@ class ValueUpdater {
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    class UnifiedValue {
+    class UnifiedValue<M extends DeepaMehtaObjectModelImpl> {
 
-        DeepaMehtaObjectModelImpl value;
+        M value;
         long originalId;
 
         /**
          * @param   value   may be null
          */
-        private UnifiedValue(DeepaMehtaObjectModelImpl value, long originalId) {
+        private UnifiedValue(M value, long originalId) {
             this.value = value;
             this.originalId = originalId;
         }
