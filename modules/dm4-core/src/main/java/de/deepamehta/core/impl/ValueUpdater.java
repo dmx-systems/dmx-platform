@@ -59,16 +59,15 @@ class ValueUpdater {
      */
     <M extends DeepaMehtaObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
         // logger.info("##### updateModel=" + updateModel + " ### targetObject=" + targetObject);
-        long originalId = updateModel.id;
         // resolve ref
         if (updateModel instanceof TopicReferenceModelImpl) {
             TopicReferenceModelImpl ref = (TopicReferenceModelImpl) updateModel;
             if (!ref.isEmptyRef()) {
                 DeepaMehtaObjectModelImpl object = ref.resolve();
                 logger.info("Referencing " + object);
-                return new UnifiedValue(object, originalId);
+                return new UnifiedValue(object, updateModel);
             } else {
-                return new UnifiedValue(null, originalId);
+                return new UnifiedValue(null, updateModel);
             }
         }
         // argument check
@@ -82,29 +81,33 @@ class ValueUpdater {
         this.type = updateModel.getType();
         this.isAssoc = updateModel instanceof AssociationModel;
         //
-        // value integration
+        // value update
         //
-        DeepaMehtaObjectModelImpl value;
+        DeepaMehtaObjectModelImpl _value;
         if (updateModel.isSimple()) {
-            value = updateSimple();
+            _value = updateSimple();
         } else {
-            value = updateComposite();
+            _value = updateComposite();
             // label calculation
-            if (value != null) {
-                new LabelCalculation(value).calculate();
+            if (_value != null) {
+                new LabelCalculation(_value).calculate();
             } else if (isAssoc) {
                 storeAssocSimpleValue();
             }
         }
-        // ID transfer ### TODO: drop it? => No! Needed by rel assoc update of multi-value (see updateAssignmentsMany())
-        if (value != null) {
-            if (value.id == -1) {
+        // Note: UnifiedValue instantiation saves the update model's ID *before* it is overwritten
+        UnifiedValue value = new UnifiedValue(_value, updateModel);
+        //
+        // ID transfer
+        if (_value != null) {
+            if (_value.id == -1) {
                 throw new RuntimeException("Unification result has no ID set");
             }
-            updateModel.id = value.id;
+            // Note: this is an ugly side effect, but we keep it for pragmatic reasons
+            updateModel.id = _value.id;
         }
         //
-        return new UnifiedValue(value, originalId);
+        return value;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -312,7 +315,7 @@ class ValueUpdater {
                                                         Map<String, Object> unifiedChilds) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
-            throw new RuntimeException("Type mismatch: integrator type=\"" + type.getUri() + "\" vs. parent type=\"" +
+            throw new RuntimeException("Type mismatch: updateModel type=\"" + type.getUri() + "\" vs. parent type=\"" +
                 parent.getTypeUri() + "\"");
         }
         //
@@ -432,35 +435,32 @@ class ValueUpdater {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    List<RelatedTopicModelImpl> topics = updateModel.getChildTopicsModel().getTopics(assocDefUri);
-                    // Note: the IDs in the update model are overwritten with the unified IDs ("newId") (see update()).
-                    // Alternatively we could store the update model's relating assoc in the UnifiedValue object.
-                    // findTopic() would not be necessary then. ### TODO?
-                    updateRelatingAssociation(assoc, assocDefUri, findTopic(topics, newId));
+                    RelatedTopicModelImpl updateModel = (RelatedTopicModelImpl) _unifiedChild.updateModel;
+                    updateRelatingAssociation(assoc, assocDefUri, updateModel);
                 }
             }
         }
     }
 
     private void updateRelatingAssociation(AssociationModelImpl assoc, String assocDefUri,
-                                           RelatedTopicModelImpl newChildValue) {
+                                           RelatedTopicModelImpl updateModel) {
         try {
-            // Note: for partial create/update requests newChildValue might be null
-            if (newChildValue != null) {
-                AssociationModelImpl updateModel = newChildValue.getRelatingAssociation();
+            // Note: for partial create/update requests updateModel might be null
+            if (updateModel != null) {
+                AssociationModelImpl _updateModel = updateModel.getRelatingAssociation();
                 // Note: the roles must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
-                updateModel.setRoleModel1(null);
-                updateModel.setRoleModel2(null);
+                _updateModel.setRoleModel1(null);
+                _updateModel.setRoleModel2(null);
                 // Note: if no relating assocs are contained in a create/update request the model factory
                 // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
                 // TODO: is condition needed? => yes, try create new topic
-                if (updateModel.typeUri != null) {
-                    assoc.update(updateModel);
+                if (_updateModel.typeUri != null) {
+                    assoc.update(_updateModel);
                     // TODO: access control? Note: currently the child assocs of a workspace have no workspace
                     // assignments. With strict access control, updating a workspace topic would fail.
-                    // pl.updateAssociation(assoc, updateModel);
+                    // pl.updateAssociation(assoc, _updateModel);
                 }
             }
         } catch (Exception e) {
@@ -499,7 +499,7 @@ class ValueUpdater {
             logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
-            throw new RuntimeException("Value Integrator Ambiguity: there are " + candidates.size() +
+            throw new RuntimeException("ValueUpdater ambiguity: there are " + candidates.size() +
                 " parents (typeUri=\"" + type.uri + "\", " + DeepaMehtaUtils.idList(candidates) +
                 ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
         }
@@ -658,15 +658,17 @@ class ValueUpdater {
 
     class UnifiedValue<M extends DeepaMehtaObjectModelImpl> {
 
-        M value;
-        long originalId;
+        M value;            // the unified value
+        M updateModel;      // the original update model
+        long originalId;    // the original ID, saved here cause it is overwritten by update() afterwards
 
         /**
          * @param   value   may be null
          */
-        private UnifiedValue(M value, long originalId) {
+        private UnifiedValue(M value, M updateModel) {
             this.value = value;
-            this.originalId = originalId;
+            this.updateModel = updateModel;
+            this.originalId = updateModel.id;
         }
     }
 }
