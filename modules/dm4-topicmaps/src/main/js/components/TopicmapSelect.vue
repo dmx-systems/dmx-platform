@@ -3,7 +3,8 @@
     <div class="field-label">Topicmap</div>
     <el-select v-model="topicmapId">
       <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
-    </el-select><el-button class="fa fa-info-circle" @click="revealTopicmap"></el-button>
+    </el-select>
+    <el-button type="text" icon="el-icon-info" @click="revealTopicmap"></el-button>
   </div>
 </template>
 
@@ -46,4 +47,11 @@ export default {
 </script>
 
 <style>
+.topicmap-select {
+  margin-left: 6px;
+}
+
+.topicmap-select .el-button {
+  padding-left: 2px;
+}
 </style>

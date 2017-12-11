@@ -3,7 +3,8 @@
     <div class="field-label">Workspace</div>
     <el-select v-model="workspaceId">
       <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
-    </el-select><el-button class="fa fa-info-circle" @click="revealWorkspace"></el-button>
+    </el-select>
+    <el-button type="text" icon="el-icon-info" @click="revealWorkspace"></el-button>
   </div>
 </template>
 
@@ -35,4 +36,7 @@ export default {
 </script>
 
 <style>
+.workspace-select .el-button {
+  padding-left: 2px;
+}
 </style>
