@@ -7,7 +7,9 @@ import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
+import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
+import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.util.DeepaMehtaUtils;
 
@@ -58,45 +60,32 @@ class ValueUpdater {
      * @return  the unified value; never null; its "value" field is null if there was nothing to update.
      */
     <M extends DeepaMehtaObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
-        // logger.info("##### updateModel=" + updateModel + " ### targetObject=" + targetObject);
-        // resolve ref
-        if (updateModel instanceof TopicReferenceModelImpl) {
-            TopicReferenceModelImpl ref = (TopicReferenceModelImpl) updateModel;
-            if (!ref.isEmptyRef()) {
-                DeepaMehtaObjectModelImpl object = ref.resolve();
-                logger.info("Referencing " + object);
-                return new UnifiedValue(object, updateModel);
-            } else {
-                return new UnifiedValue(null, updateModel);
-            }
+        // Note: updateModel must be initialized *before* processing refs.
+        // UnifiedValue constructor operates on updateModel.
+        this.updateModel = updateModel;
+        this.targetObject = targetObject;
+        this.isAssoc = updateModel instanceof AssociationModel;
+        //
+        // process refs
+        if (updateModel instanceof TopicReferenceModel) {
+            return unifyRef();
+        }
+        if (updateModel instanceof TopicDeletionModel) {
+            return new UnifiedValue(null);
         }
         // argument check
         if (updateModel.getTypeUri() == null) {
             throw new IllegalArgumentException("Tried to update values whose typeUri is not set, updateModel=" +
                 updateModel + ", targetObject=" + targetObject);
         }
-        //
-        this.updateModel = updateModel;
-        this.targetObject = targetObject;
+        // Note: we must get type *after* processing refs. Refs might have no type set.
         this.type = updateModel.getType();
-        this.isAssoc = updateModel instanceof AssociationModel;
         //
         // value update
+        DeepaMehtaObjectModelImpl _value = updateModel.isSimple() ? updateSimple() : updateComposite();
         //
-        DeepaMehtaObjectModelImpl _value;
-        if (updateModel.isSimple()) {
-            _value = updateSimple();
-        } else {
-            _value = updateComposite();
-            // label calculation
-            if (_value != null) {
-                new LabelCalculation(_value).calculate();
-            } else if (isAssoc) {
-                storeAssocSimpleValue();
-            }
-        }
         // Note: UnifiedValue instantiation saves the update model's ID *before* it is overwritten
-        UnifiedValue value = new UnifiedValue(_value, updateModel);
+        UnifiedValue value = new UnifiedValue(_value);
         //
         // ID transfer
         if (_value != null) {
@@ -111,6 +100,17 @@ class ValueUpdater {
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private UnifiedValue unifyRef() {
+        TopicReferenceModelImpl ref = (TopicReferenceModelImpl) updateModel;
+        if (!ref.isEmptyRef()) {
+            DeepaMehtaObjectModelImpl object = ref.resolve();
+            logger.info("Referencing " + object);
+            return new UnifiedValue(object);
+        } else {
+            return new UnifiedValue(null);
+        }
+    }
 
     /**
      * Preconditions:
@@ -205,7 +205,16 @@ class ValueUpdater {
                     childTopics.put(assocDefUri, childTopic);
                 }
             }
-            return unifyComposite(childTopics);
+            DeepaMehtaObjectModelImpl value = unifyComposite(childTopics);
+            //
+            // label calculation
+            if (value != null) {
+                new LabelCalculation(value).calculate();
+            } else if (isAssoc) {
+                storeAssocSimpleValue();
+            }
+            //
+            return value;
         } catch (Exception e) {
             throw new RuntimeException("Updating a composite value failed, updateModel=" + updateModel, e);
         }
@@ -240,7 +249,6 @@ class ValueUpdater {
      */
     private DeepaMehtaObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
         if (isValueType()) {
-            // TODO: update relating assoc values?
             return !childTopics.isEmpty() ? unifyChildTopics(childTopics, type) : null;
         } else {
             return updateAssignments(identifyParent(childTopics), childTopics);
@@ -435,7 +443,7 @@ class ValueUpdater {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    RelatedTopicModelImpl updateModel = (RelatedTopicModelImpl) _unifiedChild.updateModel;
+                    RelatedTopicModelImpl updateModel = (RelatedTopicModelImpl) _unifiedChild._updateModel;
                     updateRelatingAssociation(assoc, assocDefUri, updateModel);
                 }
             }
@@ -658,16 +666,16 @@ class ValueUpdater {
 
     class UnifiedValue<M extends DeepaMehtaObjectModelImpl> {
 
-        M value;            // the unified value
-        M updateModel;      // the original update model
-        long originalId;    // the original ID, saved here cause it is overwritten by update() afterwards
+        M value;                                   // the resulting unified value
+        DeepaMehtaObjectModelImpl _updateModel;    // the original update model
+        long originalId;                           // the original ID, saved here cause it is overwritten (see update())
 
         /**
          * @param   value   may be null
          */
-        private UnifiedValue(M value, M updateModel) {
+        private UnifiedValue(M value) {
             this.value = value;
-            this.updateModel = updateModel;
+            this._updateModel = updateModel;
             this.originalId = updateModel.id;
         }
     }
