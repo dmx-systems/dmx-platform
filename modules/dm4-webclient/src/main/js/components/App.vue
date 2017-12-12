@@ -33,6 +33,8 @@
   --highlight-color: #409eff;   /* see --color-primary */
   --background-color: #f5f7fa;  /* see --background-color-base */
   --background-dark-color: #eef1f6;
+  --color-danger: #fa5555;      /* see --color-danger */
+  --shadow-hover: inset 0px 0px 0px 1px;
 }
 
 html {
