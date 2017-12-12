@@ -216,23 +216,23 @@
                     },
                     {
                         "childTypeUri":        "dm4.contacts.phone_number",
-                        "childCardinalityUri": "dm4.core.one",                  // TODO: many
+                        "childCardinalityUri": "dm4.core.many",
                         "assocTypeUri":        "dm4.core.composition_def",
                         "customAssocTypeUri":  "dm4.contacts.phone_entry"
                     },
                     {
                         "childTypeUri":        "dm4.contacts.email_address",
-                        "childCardinalityUri": "dm4.core.one",                  // TODO: many
+                        "childCardinalityUri": "dm4.core.many",
                         "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
                         "childTypeUri":        "dm4.webbrowser.url",
-                        "childCardinalityUri": "dm4.core.one",                  // TODO: many
+                        "childCardinalityUri": "dm4.core.many",
                         "assocTypeUri":        "dm4.core.composition_def"
                     },
                     {
                         "childTypeUri":        "dm4.contacts.address",
-                        "childCardinalityUri": "dm4.core.one",                  // TODO: many
+                        "childCardinalityUri": "dm4.core.many",
                         "assocTypeUri":        "dm4.core.composition_def",
                         "customAssocTypeUri":  "dm4.contacts.address_entry"
                     },
