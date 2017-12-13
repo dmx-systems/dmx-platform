@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <object-renderer :object="object" :mode="mode" :level="0"></object-renderer>
+    <dm5-object :object="object" :mode="mode" :level="0"></dm5-object>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -53,12 +53,12 @@ export default {
 
   mixins: [
     require('dm5-detail-panel/src/components/mixins/mode').default,
-    require('dm5-detail-panel/src/components/mixins/infoMode').default
+    require('dm5-detail-panel/src/components/mixins/info-mode').default
   ],
 
   components: {
-    'object-renderer': require('dm5-detail-panel/src/components/ObjectRenderer'),
-    'boolean-field':   require('dm5-detail-panel/src/components/BooleanField')
+    'dm5-object':        require('dm5-detail-panel/src/components/dm5-object'),
+    'dm5-boolean-field': require('dm5-detail-panel/src/components/dm5-boolean-field')
   }
 }
 </script>

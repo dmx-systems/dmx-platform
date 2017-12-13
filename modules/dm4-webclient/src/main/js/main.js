@@ -22,7 +22,7 @@ new Vue({
 
 // The vue component hierarchy must be instantiated *before* the Webclient plugins are
 // loaded. Plugins that customize the detail panel rely on the "registerObjectRenderer"
-// action, which is only registered in DetailPanel's created() hook (see comment there).
+// action, which is only registered in dm5-detail-panel's created() hook (see comment there).
 pluginManager.loadPlugins()
 // console.log('### Plugins loaded!')
 
