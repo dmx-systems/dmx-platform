@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <dm5-object :object="object" :mode="mode" :level="0"></dm5-object>
+    <dm5-object :object="object" :level="0"></dm5-object>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -33,9 +33,14 @@ import dm5 from 'dm5'
 
 export default {
 
+  mixins: [
+    require('dm5-detail-panel/src/components/mixins/mode').default,
+    require('dm5-detail-panel/src/components/mixins/info-mode').default
+  ],
+
   props: {
     object: {   // the type to render
-      type: [dm5.TopicType, dm5.AssocType],   // TODO: export dm5.Type?
+      type: dm5.Type,
       required: true
     }
   },
@@ -50,11 +55,6 @@ export default {
       return this.$store.state.typeCache.dataTypes
     }
   },
-
-  mixins: [
-    require('dm5-detail-panel/src/components/mixins/mode').default,
-    require('dm5-detail-panel/src/components/mixins/info-mode').default
-  ],
 
   components: {
     'dm5-object':        require('dm5-detail-panel/src/components/dm5-object'),
