@@ -28,6 +28,8 @@
   --main-font-size: 14px;
   --label-font-size: 12px;
   --label-color: #878d99;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
+  --color-topic-icon: #36a;     /* topicmap panel */
+  --color-topic-hover: #36a;    /* topicmap panel */
   --line-height: 1.5em;
   --paragraph-spacing: 1em;
   --highlight-color: #409eff;   /* see --color-primary */
