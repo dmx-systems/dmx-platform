@@ -34,8 +34,8 @@
   --paragraph-spacing: 1em;
   --highlight-color: #409eff;   /* see --color-primary */
   --background-color: #f5f7fa;  /* see --background-color-base */
-  --background-dark-color: #eef1f6;
   --color-danger: #fa5555;      /* see --color-danger */
+  --border-color: #ebeef5;      /* see --border-color-lighter */
   --shadow-hover: inset 0px 0px 0px 1px;
 }
 
@@ -62,6 +62,11 @@ button {
 }
 
 /* Reusable classes */
+
+.label {
+  font-size: var(--label-font-size);
+  color:     var(--label-color);
+}
 
 .field-label {
   font-size: var(--label-font-size);
