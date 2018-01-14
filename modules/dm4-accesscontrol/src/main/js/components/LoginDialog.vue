@@ -6,7 +6,7 @@
     </div>
     <div class="password-field">
       <div class="field-label">Password</div>
-      <el-input v-model="credentials.password" ref="password" @keyup.native.enter="login"></el-input>
+      <el-input v-model="credentials.password" ref="password" @keyup.native.enter="login" type="password"></el-input>
     </div>
     <div class="message">{{message}}</div>
     <div slot="footer">
