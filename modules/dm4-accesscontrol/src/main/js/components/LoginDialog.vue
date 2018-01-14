@@ -1,5 +1,5 @@
 <template>
-  <el-dialog custom-class="login-dialog" :visible.sync="visible" width="20em" title="Login">
+  <el-dialog custom-class="login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
     <div>
       <div class="field-label">Username</div>
       <el-input v-model="credentials.username"></el-input>
@@ -24,21 +24,13 @@ export default {
         username: '',
         password: ''
       },
-      message:  ''
+      message: ''
     }
   },
 
   computed: {
-    visible: {
-      get () {
-        return this.$store.state.accesscontrol.visible
-      },
-      set (visible) {
-        // console.log('visible setter', visible)   // FIXME: called twice on close
-        if (!visible) {
-          this.close()
-        }
-      }
+    visible () {
+      return this.$store.state.accesscontrol.visible
     }
   },
 
@@ -55,7 +47,13 @@ export default {
       })
     },
 
+    open () {
+      this.message = ''
+    },
+
     close () {
+      // FIXME: called twice when closing programmatically (through login())
+      // console.log('close login')
       this.$store.dispatch('closeLoginDialog')
     }
   }
