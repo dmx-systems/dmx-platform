@@ -2,11 +2,11 @@
   <el-dialog custom-class="login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
     <div>
       <div class="field-label">Username</div>
-      <el-input v-model="credentials.username"></el-input>
+      <el-input v-model="credentials.username" ref="username" @keyup.native.enter="advance"></el-input>
     </div>
     <div class="password-field">
       <div class="field-label">Password</div>
-      <el-input v-model="credentials.password"></el-input>
+      <el-input v-model="credentials.password" ref="password" @keyup.native.enter="login"></el-input>
     </div>
     <div class="message">{{message}}</div>
     <div slot="footer">
@@ -49,12 +49,18 @@ export default {
 
     open () {
       this.message = ''
+      // Note: on open the DOM is not yet ready
+      this.$nextTick(() => this.$refs.username.focus())
     },
 
     close () {
       // FIXME: called twice when closing programmatically (through login())
       // console.log('close login')
       this.$store.dispatch('closeLoginDialog')
+    },
+
+    advance () {
+      this.$refs.password.focus()
     }
   }
 }
