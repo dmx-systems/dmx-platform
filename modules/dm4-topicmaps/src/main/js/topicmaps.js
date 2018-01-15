@@ -3,7 +3,10 @@ import dm5 from 'dm5'
 
 const state = {
 
-  topicmap: undefined,        // The displayed topicmap (derived state) (a dm5.Topicmap object)
+  topicmap: undefined,        // The displayed topicmap (derived state) (a dm5.Topicmap object).
+                              // Updated by "displayTopicmap" action.
+
+  writable: undefined,        // True if the current user has WRITE permission for the displayed topicmap.
 
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
@@ -55,10 +58,15 @@ const actions = {
    * - the topicmap belongs to the selected workspace ("workspaceId" state is up-to-date, see workspaces module).
    *
    * Postcondition:
-   * - state is up-to-date ("selectedTopicmapId", and topicmap cookie).
-   *   Note: the "topicmap" state is *not* yet up-to-date (updated only once topicmap retrieval is complete).
+   * - "selectedTopicmapId" state is up-to-date
+   * - topicmap cookie is up-to-date.
    *
-   * @returns   a promise resolved once the topicmap rendering is complete.
+   * Note: these states are *not* yet up-to-date:
+   * - "topicmap" (updated only once topicmap retrieval is complete)
+   * - "writable" (updated only once permission retrieval is complete)
+   *
+   * @returns   a promise resolved once topicmap rendering is complete.
+   *            At this time the "topicmap" and "writable" states are up-to-date.
    */
   displayTopicmap ({rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
@@ -66,12 +74,17 @@ const actions = {
     state.selectedTopicmapId[_workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
     //
+    const p = dispatch('getTopicPermissions', id).then(permissions => {
+      state.writable = permissions['dm4.accesscontrol.operation.write']
+    })
     return new Promise(resolve => {
       getTopicmap(id).then(topicmap => {
         // update state
         state.topicmap = topicmap
         // sync view
-        dispatch('syncTopicmap', topicmap).then(resolve)
+        p.then(() => {
+          dispatch('syncTopicmap', topicmap).then(resolve)
+        })
       })
     })
   },

@@ -9,11 +9,13 @@ const state = {
   permissionCache: {}     // Key is a topic/association ID.
                           // Value is a promise for a permissions object:
                           //   {
-                          //     "dm4.accesscontrol.operation.write": true
+                          //     "dm4.accesscontrol.operation.write": true|false
                           //   }
+                          //
                           // Note 1: at client-side there is no explicit READ permission.
                           // The Webclient never gets hold of an object the user is not allowed to read.
                           // The server would not send it in the first place.
+                          //
                           // Note 2: the permission cache is not actually reactive state.
                           // TODO: move it to a local variable?
 }
