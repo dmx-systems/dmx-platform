@@ -147,6 +147,8 @@ public interface AccessControlService {
 
     // === Permissions ===
 
+    // TODO: unify both into "getPermissions()"
+
     /**
      * @return  A Permissions object with one entry: <code>dm4.accesscontrol.operation.write</code>.
      */
