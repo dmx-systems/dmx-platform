@@ -66,7 +66,7 @@ const actions = {
    * - "writable" (updated only once permission retrieval is complete)
    *
    * @returns   a promise resolved once topicmap rendering is complete.
-   *            At this time the "topicmap" and "writable" states are up-to-date.
+   *            At this time the "topicmap" and "writable" states are up-to-date as well.
    */
   displayTopicmap ({rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
@@ -187,9 +187,6 @@ const actions = {
     dispatch('syncUnselect')
   },
 
-  // TODO: we need a general approach to unify both situations: when we have the real object at hand,
-  // and when we only have its ID. There should be only one "revealTopic" action.
-
   revealTopicById ({dispatch}, topicId) {
     dm5.restClient.getTopic(topicId).then(topic => {
       dispatch('revealTopic', {
@@ -210,20 +207,24 @@ const actions = {
   revealTopic ({dispatch}, {topic, pos, select}) {
     // update state + sync view
     const op = _revealTopic(topic, pos, select, dispatch)
-    // sync clients
-    if (op.type === 'add') {
-      dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, op.viewProps)
-    } else if (op.type === 'show') {
-      dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)
+    // update server
+    if (state.writable) {
+      if (op.type === 'add') {
+        dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, op.viewProps)
+      } else if (op.type === 'show') {
+        dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)
+      }
     }
   },
 
   revealAssoc ({dispatch}, {assoc, select}) {
     // update state + sync view
     const op = _revealAssoc(assoc, select, dispatch)
-    // sync clients
-    if (op.type === 'add') {
-      dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)
+    // update server
+    if (state.writable) {
+      if (op.type === 'add') {
+        dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)
+      }
     }
   },
 
@@ -232,16 +233,22 @@ const actions = {
     // update state + sync view
     const topicOp = _revealTopic(relTopic, pos, true, dispatch)      // select=true
     const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)    // select=false
-    // sync clients
-    if (topicOp.type || assocOp.type) {
-      dm5.restClient.addRelatedTopicToTopicmap(state.topicmap.id, relTopic.id, relTopic.assoc.id, topicOp.viewProps)
+    // update server
+    if (state.writable) {
+      if (topicOp.type || assocOp.type) {
+        dm5.restClient.addRelatedTopicToTopicmap(state.topicmap.id, relTopic.id, relTopic.assoc.id, topicOp.viewProps)
+      }
     }
   },
 
   onTopicDragged (_, {id, pos}) {
-    state.topicmap.getTopic(id).setPosition(pos)                                  // update state
-    // Note: the view is up-to-date already                                       // sync view
-    dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)                   // sync clients
+    // update state
+    state.topicmap.getTopic(id).setPosition(pos)
+    // sync view (up-to-date already)
+    // update server
+    if (state.writable) {
+      dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
+    }
   },
 
   onTopicDroppedOntoTopic ({dispatch}, {topicId, droppedOntoTopicId}) {
@@ -274,33 +281,45 @@ const actions = {
   },
 
   hideTopic ({dispatch}, id) {
-    state.topicmap.removeAssocs(id)                                       // update state
+    // update state
+    state.topicmap.removeAssocs(id)
     state.topicmap.getTopic(id).setVisibility(false)
     dispatch('unselectIf', id)
-    // Note: the view is up-to-date already                               // sync view
-    dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)       // sync clients
+    // sync view (up-to-date already)
+    // update server
+    if (state.writable) {
+      dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)
+    }
   },
 
   hideAssoc ({dispatch}, id) {
-    state.topicmap.removeAssoc(id)                                        // update state
+    // update state
+    state.topicmap.removeAssoc(id)
     dispatch('unselectIf', id)
-    // Note: the view is up-to-date already                               // sync view
-    dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)         // sync clients
+    // sync view (up-to-date already)
+    // update server
+    if (state.writable) {
+      dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)
+    }
   },
 
   deleteTopic ({dispatch}, id) {
-    state.topicmap.removeAssocs(id)                                       // update state
+    // update state
+    state.topicmap.removeAssocs(id)
     state.topicmap.removeTopic(id)
-    // Note: the view is up-to-date already                               // sync view
-    dm5.restClient.deleteTopic(id).then(object => {                       // sync clients
+    // sync view (up-to-date already)
+    // update server
+    dm5.restClient.deleteTopic(id).then(object => {
       dispatch('_processDirectives', object.directives)
     })
   },
 
   deleteAssoc ({dispatch}, id) {
-    state.topicmap.removeAssoc(id)                                        // update state
-    // Note: the view is up-to-date already                               // sync view
-    dm5.restClient.deleteAssoc(id).then(object => {                       // sync clients
+    // update state
+    state.topicmap.removeAssoc(id)
+    // sync view (up-to-date already)
+    // update server
+    dm5.restClient.deleteAssoc(id).then(object => {
       dispatch('_processDirectives', object.directives)
     })
   },
@@ -446,6 +465,7 @@ export default {
 
 // Topicmap Cache
 
+// TODO: store promises in topicmap cache
 function getTopicmap (id) {
   var p   // a promise for a dm5.Topicmap
   const topicmap = getCachedTopicmap(id)
