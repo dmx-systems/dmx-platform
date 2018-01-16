@@ -371,6 +371,12 @@ const actions = {
     _displayTopicmap(rootState, dispatch)
   },
 
+  loggedOut ({rootState, dispatch}) {
+    console.log('Reloading topicmap')
+    clearTopicmapCache()
+    _displayTopicmap(rootState, dispatch)
+  },
+
   // WebSocket messages
 
   _newTopicmap (_, args) {

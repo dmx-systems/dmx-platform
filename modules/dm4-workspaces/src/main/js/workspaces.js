@@ -55,6 +55,10 @@ const actions = {
     fetchWorkspaceTopics()
   },
 
+  loggedOut () {
+    fetchWorkspaceTopics()
+  },
+
   // WebSocket messages
 
   _newWorkspace (_, {workspace}) {

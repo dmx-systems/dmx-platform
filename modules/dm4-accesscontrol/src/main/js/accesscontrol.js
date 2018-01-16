@@ -36,10 +36,12 @@ const actions = {
     })
   },
 
-  logout () {
+  logout ({dispatch}) {
     console.log('Logout', state.username)
     dm5.restClient.logout()
     setUsername()
+    clearPermissionCache()
+    dispatch('loggedOut')
   },
 
   openLoginDialog () {
