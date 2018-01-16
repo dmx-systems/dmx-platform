@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar">
+  <div class="dm5-toolbar">
     <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
   </div>
 </template>
@@ -15,7 +15,7 @@ export default {
 </script>
 
 <style>
-.toolbar {
+.dm5-toolbar {
   display: flex;
   flex: none;
   position: absolute;

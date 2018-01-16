@@ -22,11 +22,13 @@ const state = {
 
 const actions = {
 
-  login (_, credentials) {
+  login ({dispatch}, credentials) {
     return dm5.restClient.login(credentials).then(response => {
       const username = credentials.username
       console.log('Login', username)
       setUsername(username)
+      clearPermissionCache()
+      dispatch('loggedIn')
       return true
     }).catch(error => {
       console.log('Login failed', error)
@@ -79,6 +81,10 @@ function getPermissions (id, retrievalFunc) {
   return state.permissionCache[id] || (state.permissionCache[id] = retrievalFunc(id).catch(error => {
     console.error(error)
   }))
+}
+
+function clearPermissionCache () {
+  state.permissionCache = {}
 }
 
 //

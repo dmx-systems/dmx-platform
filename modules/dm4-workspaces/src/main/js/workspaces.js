@@ -2,9 +2,12 @@ import Vue from 'vue'
 import dm5 from 'dm5'
 
 const state = {
-  workspaceId: undefined,       // ID of selected workspace (number)
-  workspaceTopics: undefined,   // all workspace topics readable by current user (array of dm5.Topic)
-  ready: undefined              // a promise resolved once the workspace topics are loaded
+
+  workspaceId: undefined,         // ID of selected workspace (number)
+
+  workspaceTopics: undefined,     // all workspace topics readable by current user (array of dm5.Topic)
+
+  ready: fetchWorkspaceTopics()   // a promise resolved once the workspace topics are loaded
 }
 
 const actions = {
@@ -20,6 +23,7 @@ const actions = {
 
   selectWorkspace ({dispatch}, id) {
     // console.log('selectWorkspace', id)
+    // Note: the topicmap can be selected once the workspace's topicmap topics are available
     dispatch('setWorkspaceId', id).then(() => {
       dispatch('selectTopicmapForWorkspace')
     })
@@ -28,17 +32,27 @@ const actions = {
   /**
    * Displays the given workspace in the workspace selector.
    * Displays the given workspace's topicmaps in the topicmap selector.
-   *
-   * Sets the "workspaceId" state and the "dm4_workspace_id" cookie.
    * Fetches the topicmap topics for the workspace if not yet done.
    *
-   * @return  a promise resolved once the topicmap topics are fetched.
+   * Postconditions:
+   * - "workspaceId" state is up-to-date
+   * - "dm4_workspace_id" cookie is up-to-date.
+   *
+   * Low-level action as dispatched by router.
+   *
+   * @return  a promise resolved once the workspace's topicmap topics are available.
    */
   setWorkspaceId ({dispatch}, id) {
     // console.log('setWorkspaceId', id)
     state.workspaceId = id
     dm5.utils.setCookie('dm4_workspace_id', id)
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
+  },
+
+  //
+
+  loggedIn () {
+    fetchWorkspaceTopics()
   },
 
   // WebSocket messages
@@ -59,15 +73,18 @@ const actions = {
   }
 }
 
-// Init state
-state.ready = dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
-  // console.log('### Workspaces ready!')
-  state.workspaceTopics = topics
-})
-
 export default {
   state,
   actions
+}
+
+// State helper
+
+function fetchWorkspaceTopics () {
+  return dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
+    // console.log('### Workspaces ready!')
+    state.workspaceTopics = topics
+  })
 }
 
 // Process directives

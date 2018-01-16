@@ -7,6 +7,7 @@ const state = {
                               // Updated by "displayTopicmap" action.
 
   writable: undefined,        // True if the current user has WRITE permission for the displayed topicmap.
+                              // Updated by "displayTopicmap" action.
 
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
@@ -57,7 +58,7 @@ const actions = {
    * - the route is set.
    * - the topicmap belongs to the selected workspace ("workspaceId" state is up-to-date, see workspaces module).
    *
-   * Postcondition:
+   * Postconditions:
    * - "selectedTopicmapId" state is up-to-date
    * - topicmap cookie is up-to-date.
    *
@@ -73,20 +74,8 @@ const actions = {
     // update state
     state.selectedTopicmapId[_workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
-    //
-    const p = dispatch('getTopicPermissions', id).then(permissions => {
-      state.writable = permissions['dm4.accesscontrol.operation.write']
-    })
-    return new Promise(resolve => {
-      getTopicmap(id).then(topicmap => {
-        // update state
-        state.topicmap = topicmap
-        // sync view
-        p.then(() => {
-          dispatch('syncTopicmap', topicmap).then(resolve)
-        })
-      })
-    })
+    // update state + sync view
+    _displayTopicmap(rootState, dispatch)
   },
 
   /**
@@ -331,8 +320,8 @@ const actions = {
    * Calls the "topicmap" (or "topic"/"assoc") route.
    *
    * Preconditions:
-   * - the workspace is selected already ("workspaceId" state is up-to-date, see workspaces module).
-   * - the topicmap topics for the selected workspace are loaded already ("topicmapTopics" state is up-to-date).
+   * - the workspace is selected ("workspaceId" state is up-to-date, see workspaces module).
+   * - the topicmap topics for the selected workspace are loaded ("topicmapTopics" state is up-to-date).
    * - the route is *not* yet set.
    */
   selectTopicmapForWorkspace ({rootState, dispatch}) {
@@ -349,10 +338,10 @@ const actions = {
    * Fetches the topicmap topics for the selected workspace.
    * Updates the "topicmapTopics" state.
    * If the topicmap topics for the selected workspace are fetched already nothing is performed.
-   * (In this case the returned promise is resolved already.)
+   * (In this case the returned promise is already resolved.)
    *
    * Precondition:
-   * - the workspace is selected already ("workspaceId" state is up-to-date, see workspaces module).
+   * - the workspace is selected ("workspaceId" state is up-to-date, see workspaces module).
    *
    * @return  a promise resolved once the "topicmapTopics" state is up-to-date.
    */
@@ -372,6 +361,14 @@ const actions = {
       })
     }
     return p
+  },
+
+  //
+
+  loggedIn ({rootState, dispatch}) {
+    console.log('Reloading topicmap')
+    clearTopicmapCache()
+    _displayTopicmap(rootState, dispatch)
   },
 
   // WebSocket messages
@@ -491,7 +488,35 @@ function cacheTopicmap (topicmap) {
   state.topicmapCache[topicmap.id] = topicmap
 }
 
+function clearTopicmapCache () {
+  state.topicmapCache = {}
+}
+
 // Update state + sync view
+
+/**
+ * Preconditions:
+ * - "selectedTopicmapId" state is up-to-date
+ * - "workspaceId" state is up-to-date (see workspaces module)
+ */
+function _displayTopicmap (rootState, dispatch) {
+  const id = state.selectedTopicmapId[_workspaceId(rootState)]
+  //
+  const p = dispatch('getTopicPermissions', id).then(permissions => {
+    state.writable = permissions['dm4.accesscontrol.operation.write']
+  })
+  //
+  return new Promise(resolve => {
+    getTopicmap(id).then(topicmap => {
+      // update state
+      state.topicmap = topicmap
+      // sync view
+      p.then(() => {
+        dispatch('syncTopicmap', topicmap).then(resolve)
+      })
+    })
+  })
+}
 
 /**
  * @param   topic   the topic to reveal (a dm5.Topic object).
@@ -575,6 +600,10 @@ function findTopicmapTopic (id, callback) {
 
 // ---
 
+/**
+ * Preconditions:
+ * - the "topicmap" state is up-to-date.
+ */
 function _topicmapId () {
   const topicmap = state.topicmap
   if (!topicmap) {

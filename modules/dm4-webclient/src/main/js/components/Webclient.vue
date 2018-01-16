@@ -1,7 +1,7 @@
 <template>
-  <div class="webclient">
+  <div class="dm5-webclient">
     <component v-for="comp in components" :is="comp" :key="comp._dm5_id">
-      <toolbar slot="dm5-topicmap-panel"></toolbar>
+      <dm5-toolbar slot="dm5-topicmap-panel"></dm5-toolbar>
     </component>
     <dm5-detail-panel></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
@@ -9,8 +9,6 @@
 </template>
 
 <script>
-import dm5 from 'dm5'
-
 export default {
 
   computed: {
@@ -25,7 +23,7 @@ export default {
   },
 
   components: {
-    'toolbar':           require('./Toolbar'),
+    'dm5-toolbar': require('./Toolbar'),
     'dm5-detail-panel':  require('dm5-detail-panel'),
     'dm5-search-widget': require('dm5-search-widget')
   }
@@ -33,17 +31,17 @@ export default {
 </script>
 
 <style>
-.webclient {
+.dm5-webclient {
   height: 100%;
   display: flex;
 }
 
-.webclient .topicmap-panel {
+.dm5-webclient .dm5-topicmap-panel {
   flex-basis: 70%;
   position: relative;
 }
 
-.webclient .dm5-detail-panel {
+.dm5-webclient .dm5-detail-panel {
   flex-basis: 30%;
   overflow: auto;
   box-sizing: border-box;
