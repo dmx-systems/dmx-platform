@@ -334,6 +334,16 @@ const actions = {
     dispatch('selectTopicmap', topicmapId)
   },
 
+  reloadTopicmap ({rootState, dispatch}) {
+    console.log('Reloading topicmap', _topicmapId())
+    dispatch('clearTopicmapCache')
+    _displayTopicmap(rootState, dispatch)
+  },
+
+  clearTopicmapCache () {
+    state.topicmapCache = {}
+  },
+
   /**
    * Fetches the topicmap topics for the selected workspace.
    * Updates the "topicmapTopics" state.
@@ -365,17 +375,11 @@ const actions = {
 
   //
 
-  loggedIn ({rootState, dispatch}) {
-    console.log('Reloading topicmap')
-    clearTopicmapCache()
-    _displayTopicmap(rootState, dispatch)
+  loggedIn ({dispatch}) {
+    dispatch('reloadTopicmap')
   },
 
-  loggedOut ({rootState, dispatch}) {
-    console.log('Reloading topicmap')
-    clearTopicmapCache()
-    _displayTopicmap(rootState, dispatch)
-  },
+  // Note: loggedOut is handled by workspaces module
 
   // WebSocket messages
 
@@ -492,10 +496,6 @@ function getCachedTopicmap (id) {
 
 function cacheTopicmap (topicmap) {
   state.topicmapCache[topicmap.id] = topicmap
-}
-
-function clearTopicmapCache () {
-  state.topicmapCache = {}
 }
 
 // Update state + sync view

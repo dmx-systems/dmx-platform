@@ -109,7 +109,8 @@ function initialNavigation (route) {
   const topicId  = route.params.topicId
   const assocId  = route.params.assocId
   if (topicmapId) {
-    // console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId, assocId)
+    // console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId,
+    // assocId)
     urlPresent = true
   } else {
     topicmapId = dm5.utils.getCookie('dm4_topicmap_id')           // FIXME: convert to number?
@@ -125,7 +126,7 @@ function initialNavigation (route) {
   if (topicmapId) {
     getAssignedWorkspace(topicmapId).then(workspace => {
       // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      store.dispatch('setWorkspaceId', workspace.id)              // no route push
+      store.dispatch('_selectWorkspace', workspace.id)            // no route push
       if (urlPresent) {
         const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
         topicId && fetchTopic(topicId, p)                         // FIXME: 0 is a valid topic ID
@@ -135,8 +136,7 @@ function initialNavigation (route) {
       }
     })
   } else {
-    const workspace = store.state.workspaces.workspaceTopics[0]
-    store.dispatch('selectWorkspace', workspace.id)               // push initial route (indirectly)
+    store.dispatch('selectFirstWorkspace')                        // push initial route (indirectly)
   }
   // console.log('### Initial navigation complete!')
 }
@@ -152,7 +152,7 @@ function navigate (to, from) {
     // See preconditions at "displayTopicmap".
     p = new Promise(resolve => {
       getAssignedWorkspace(topicmapId).then(workspace => {
-        store.dispatch('setWorkspaceId', workspace.id)
+        store.dispatch('_selectWorkspace', workspace.id)
         store.dispatch('displayTopicmap', topicmapId).then(resolve)
       })
     })

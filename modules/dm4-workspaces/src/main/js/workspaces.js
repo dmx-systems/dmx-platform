@@ -24,12 +24,14 @@ const actions = {
   selectWorkspace ({dispatch}, id) {
     // console.log('selectWorkspace', id)
     // Note: the topicmap can be selected once the workspace's topicmap topics are available
-    dispatch('setWorkspaceId', id).then(() => {
+    dispatch('_selectWorkspace', id).then(() => {
       dispatch('selectTopicmapForWorkspace')
     })
   },
 
   /**
+   * Low-level action as dispatched by router.
+   *
    * Displays the given workspace in the workspace selector.
    * Displays the given workspace's topicmaps in the topicmap selector.
    * Fetches the topicmap topics for the workspace if not yet done.
@@ -38,15 +40,20 @@ const actions = {
    * - "workspaceId" state is up-to-date
    * - "dm4_workspace_id" cookie is up-to-date.
    *
-   * Low-level action as dispatched by router.
-   *
    * @return  a promise resolved once the workspace's topicmap topics are available.
    */
-  setWorkspaceId ({dispatch}, id) {
-    // console.log('setWorkspaceId', id)
+  _selectWorkspace ({dispatch}, id) {
+    // console.log('_selectWorkspace', id)
     state.workspaceId = id
     dm5.utils.setCookie('dm4_workspace_id', id)
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
+  },
+
+  /**
+   * Low-level action as dispatched by router.
+   */
+  selectFirstWorkspace ({dispatch}) {
+    dispatch('selectWorkspace', state.workspaceTopics[0].id)
   },
 
   //
@@ -55,8 +62,16 @@ const actions = {
     fetchWorkspaceTopics()
   },
 
-  loggedOut () {
-    fetchWorkspaceTopics()
+  loggedOut ({dispatch}) {
+    fetchWorkspaceTopics().then(() => {
+      if (isWorkspaceReadable()) {
+        dispatch('reloadTopicmap')
+      } else {
+        console.log('Workspace not readable anymore')
+        dispatch('clearTopicmapCache')
+        dispatch('selectFirstWorkspace')
+      }
+    })
   },
 
   // WebSocket messages
@@ -89,6 +104,10 @@ function fetchWorkspaceTopics () {
     // console.log('### Workspaces ready!')
     state.workspaceTopics = topics
   })
+}
+
+function isWorkspaceReadable () {
+  return state.workspaceTopics.find(workspace => workspace.id === state.workspaceId)
 }
 
 // Process directives
