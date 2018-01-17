@@ -75,7 +75,7 @@ const actions = {
     state.selectedTopicmapId[_workspaceId(rootState)] = id
     dm5.utils.setCookie('dm4_topicmap_id', id)
     // update state + sync view
-    _displayTopicmap(rootState, dispatch)
+    return _displayTopicmap(rootState, dispatch)
   },
 
   /**
@@ -337,11 +337,13 @@ const actions = {
   reloadTopicmap ({rootState, dispatch}) {
     console.log('Reloading topicmap', _topicmapId())
     dispatch('clearTopicmapCache')
-    _displayTopicmap(rootState, dispatch)
-  },
-
-  clearTopicmapCache () {
-    state.topicmapCache = {}
+    _displayTopicmap(rootState, dispatch).then(() => {
+      // sync view (selection)
+      const selection = state.selections[_topicmapId()]
+      if (selection) {
+        dispatch('syncSelect', selection.id)
+      }
+    })
   },
 
   /**
@@ -371,6 +373,10 @@ const actions = {
       })
     }
     return p
+  },
+
+  clearTopicmapCache () {
+    state.topicmapCache = {}
   },
 
   //
@@ -504,6 +510,8 @@ function cacheTopicmap (topicmap) {
  * Preconditions:
  * - "selectedTopicmapId" state is up-to-date
  * - "workspaceId" state is up-to-date (see workspaces module)
+ *
+ * @returns   a promise resolved once topicmap rendering is complete.
  */
 function _displayTopicmap (rootState, dispatch) {
   const id = state.selectedTopicmapId[_workspaceId(rootState)]
