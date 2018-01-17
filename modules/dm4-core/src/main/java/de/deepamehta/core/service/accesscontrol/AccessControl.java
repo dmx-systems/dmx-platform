@@ -107,6 +107,11 @@ public interface AccessControl {
      */
     Topic getUsernameTopic(HttpServletRequest request);
 
+    /**
+     * Returns the username that is associated with a session.
+     *
+     * @return  the username, or <code>null</code> if no user is associated with the session.
+     */
     String username(HttpSession session);
 
 

@@ -268,11 +268,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public String username(HttpSession session) {
-        String username = (String) session.getAttribute("username");
-        if (username == null) {
-            throw new RuntimeException("Session data inconsistency: \"username\" attribute is missing");
-        }
-        return username;
+        return (String) session.getAttribute("username");
     }
 
 

@@ -670,9 +670,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         logger.fine("##### " + request.getMethod() + " " + request.getRequestURL() +
             "\n      ##### \"Authorization\"=\"" + request.getHeader("Authorization") + "\"" +
             "\n      ##### " + info(request.getSession(false)));    // create=false
-        //
-        checkRequestOrigin(request);    // throws WebApplicationException 403 Forbidden
-        checkAuthorization(request);    // throws WebApplicationException 401 Unauthorized
+        // 1) apply subnet filter
+        checkRequestOrigin(request);        // throws WebApplicationException 403 Forbidden
+        // 2) create session (if not yet created)
+        HttpSession session = request.getSession();
+        // 3) check authorization (if not yet logged in)
+        if (username(session) == null) {
+            checkAuthorization(request);    // throws WebApplicationException 401 Unauthorized
+        }
     }
 
     // ---
@@ -690,10 +695,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void checkAuthorization(HttpServletRequest request) {
-        if (request.getSession(false) != null) {    // create=false
-            return;     // authorized already
-        }
-        //
         boolean authorized;
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null) {
@@ -766,20 +767,16 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     private void _login(String username, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        session.setAttribute("username", username);
-        logger.info("##### Creating new " + info(session));
-        //
+        request.getSession(false).setAttribute("username", username);   // create=false
         dm4.fireEvent(POST_LOGIN_USER, username);
     }
 
     private void _logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);    // create=false
-        String username = username(session);                // save username before invalidating
+        String username = username(session);                // save username before removing
         logger.info("##### Logging out from " + info(session));
-        //
-        session.invalidate();
-        //
+        // Note: the session is not invalidated. Just the "username" attribute is removed.
+        session.removeAttribute("username");
         dm4.fireEvent(POST_LOGOUT_USER, username);
     }
 

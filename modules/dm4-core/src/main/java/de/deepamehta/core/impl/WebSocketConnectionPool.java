@@ -39,7 +39,7 @@ class WebSocketConnectionPool {
         WebSocketConnection connection = connections.get(sessionId);
         if (connection == null) {
             throw new RuntimeException("No WebSocket connection open for session \"" + sessionId + "\" (plugin \"" +
-                pluginUri + "\"");
+                pluginUri + "\")");
         }
         return connection;
     }
