@@ -184,6 +184,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
         private String sessionId(HttpServletRequest request) {
             String sessionId = JavaUtils.cookieValue(request, "JSESSIONID");
+            // TODO: drop anonymous connections
             return sessionId != null ? sessionId : "anonymous-" + counter++;
         }
     }
