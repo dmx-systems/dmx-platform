@@ -515,11 +515,9 @@ function cacheTopicmap (topicmap) {
  */
 function _displayTopicmap (rootState, dispatch) {
   const id = state.selectedTopicmapId[_workspaceId(rootState)]
-  //
-  const p = dm5.permCache.getTopicPermissions(id).then(permissions => {
-    state.writable = permissions['dm4.accesscontrol.operation.write']
+  const p = dm5.permCache.isTopicWritable(id).then(writable => {
+    state.writable = writable
   })
-  //
   return new Promise(resolve => {
     getTopicmap(id).then(topicmap => {
       // update state

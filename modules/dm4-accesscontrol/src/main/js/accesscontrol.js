@@ -25,8 +25,8 @@ const actions = {
 
   logout ({dispatch}) {
     console.log('Logout', state.username)
-    dm5.restClient.logout()
     setUsername()
+    dm5.restClient.logout()
     dm5.permCache.clear()
     dispatch('loggedOut')
   },
