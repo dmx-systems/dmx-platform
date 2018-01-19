@@ -68,6 +68,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -243,21 +244,56 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             final String username = cred.username;
             logger.info("Creating user account \"" + username + "\"");
             //
-            // 1) create user account
+            // 1) create username topic
+            final Topic usernameTopic = createUsername(username);
+            //
+            // 2) create user account
             AccessControl ac = dm4.getAccessControl();
             // We suppress standard workspace assignment here as a User Account topic (and its child topics) require
-            // special assignments. See steps 3) and 4) below.
+            // special assignments. See step 3) below.
             Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     return dm4.createTopic(mf.newTopicModel("dm4.accesscontrol.user_account", mf.newChildTopicsModel()
-                        .put("dm4.accesscontrol.username", username)
+                        .putRef("dm4.accesscontrol.username", usernameTopic.getId())
                         .put("dm4.accesscontrol.password", cred.password)));
                 }
             });
             ChildTopics childTopics = userAccount.getChildTopics();
-            Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
             Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
+            //
+            // 3) assign user account and password to private workspace
+            // Note: the current user has no READ access to the private workspace just created.
+            // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
+            Topic privateWorkspaceTopic = ac.getPrivateWorkspace(username);
+            if (privateWorkspaceTopic == null) {
+                throw new RuntimeException("User " + username + " has no private workspace");
+            }   
+            long privateWorkspaceId = privateWorkspaceTopic.getId();
+            ac.assignToWorkspace(userAccount, privateWorkspaceId);
+            ac.assignToWorkspace(passwordTopic, privateWorkspaceId);
+            //
+            return usernameTopic;
+        } catch (Exception e) {
+            throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
+        }
+    }
+
+    @Override
+    public Topic createUsername(final String username) {
+        try {
+            logger.info("Creating username \"" + username + "\"");
+            //
+            // 1) create username
+            AccessControl ac = dm4.getAccessControl();
+            // We suppress standard workspace assignment here as a Username topic require
+            // special assignment. See steps 3) below.
+            Topic usernameTopic = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+                @Override
+                public Topic call() {
+                    return dm4.createTopic(mf.newTopicModel("dm4.accesscontrol.username", new SimpleValue(username)));
+                }
+            });
             //
             // 2) create private workspace
             Topic privateWorkspace = wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null,
@@ -268,14 +304,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // creator/modifier (via postCreateTopic() listener). In case of the "admin" user account the creator/
             // modifier remain undefined as it is actually created by the system itself.
             //
-            // 3) assign user account and password to private workspace
-            // Note: the current user has no READ access to the private workspace just created.
-            // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
-            long privateWorkspaceId = privateWorkspace.getId();
-            ac.assignToWorkspace(userAccount, privateWorkspaceId);
-            ac.assignToWorkspace(passwordTopic, privateWorkspaceId);
-            //
-            // 4) assign username to "System" workspace
+            // 3) assign username to "System" workspace
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
             // This is to support the "DM4 Sign-up" 3rd-party plugin.
             long systemWorkspaceId = ac.getSystemWorkspaceId();
@@ -283,7 +312,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             //
             return usernameTopic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating user account \"" + cred.username + "\" failed", e);
+            throw new RuntimeException("Creating user name \"" + username + "\" failed", e);
         }
     }
 

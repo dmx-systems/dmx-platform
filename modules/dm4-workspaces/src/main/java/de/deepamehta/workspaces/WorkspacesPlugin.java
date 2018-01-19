@@ -137,6 +137,12 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dm4.getAccessControl().getWorkspace(uri);
     }
 
+    @Override
+    public SharingMode getSharingMode(long workspaceId) {
+        Topic sharingModeTopic = dm4.getTopic(workspaceId).getRelatedTopic("dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", "dm4.workspaces.sharing_mode");
+        return SharingMode.fromString(sharingModeTopic.getUri());
+    }
+
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/object/{id}")

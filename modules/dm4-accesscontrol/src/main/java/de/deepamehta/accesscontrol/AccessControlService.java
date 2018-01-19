@@ -99,6 +99,13 @@ public interface AccessControlService {
     Topic createUserAccount(Credentials cred);
 
     /**
+     * Creates a Username Topic and a private workspace.
+     * 
+     * @return  created "Username" topic.
+     */
+    public Topic createUsername(String username);
+
+    /**
      * Returns the "Username" topic for the specified username.
      *
      * @param   username    a username. Must not be null.
@@ -182,7 +189,7 @@ public interface AccessControlService {
     Collection<Topic> getTopicsByCreator(String username);
 
     Collection<Topic> getTopicsByOwner(String username);
-
+    
     Collection<Association> getAssociationsByCreator(String username);
 
     Collection<Association> getAssociationsByOwner(String username);
