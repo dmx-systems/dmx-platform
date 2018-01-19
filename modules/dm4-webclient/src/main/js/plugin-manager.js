@@ -36,20 +36,18 @@ function initPlugin (expo) {
   // components
   const components = plugin.components
   if (components) {
-    ['webclient', 'toolbar'].forEach(ext => {
-      components[ext] && store.dispatch('registerComponent', {
-        extensionPoint: ext,
-        component: components[ext]
-      })
+    components.forEach(comp => {
+      store.dispatch('registerComponent', comp)
     })
-    const renderers = components.detailPanel
-    if (renderers) {
-      for (let typeUri in renderers) {
-        store.dispatch('registerObjectRenderer', {
-          typeUri,
-          component: renderers[typeUri]
-        })
-      }
+  }
+  // detail panel
+  const renderers = plugin.detailPanel
+  if (renderers) {
+    for (let typeUri in renderers) {
+      store.dispatch('registerObjectRenderer', {
+        typeUri,
+        component: renderers[typeUri]
+      })
     }
   }
   // extra menu items

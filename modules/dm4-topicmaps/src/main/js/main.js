@@ -15,10 +15,19 @@ export default (store) => {
       module: require('./topicmaps')
     },
 
-    components: {
-      webclient: require('dm5-topicmap-panel'),
-      toolbar: require('./components/TopicmapSelect')
-    },
+    components: [
+      {
+        comp: require('dm5-topicmap-panel'),
+        mount: 'webclient',
+        props: {
+          commands: 'Hallo 123'
+        }
+      },
+      {
+        comp: require('./components/TopicmapSelect'),
+        mount: 'toolbar'
+      }
+    ],
 
     extraMenuItems: [{
       uri: 'dm4.topicmaps.topicmap',

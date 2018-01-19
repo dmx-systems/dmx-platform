@@ -5,8 +5,14 @@ export default {
     module: require('./accesscontrol')
   },
 
-  components: {
-    webclient: require('./components/LoginDialog'),
-    toolbar: require('./components/LoginState')
-  }
+  components: [
+    {
+      comp: require('./components/LoginDialog'),
+      mount: 'webclient'
+    },
+    {
+      comp: require('./components/LoginState'),
+      mount: 'toolbar'
+    }
+  ]
 }

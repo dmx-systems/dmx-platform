@@ -1,8 +1,8 @@
 <template>
   <div class="dm5-webclient">
-    <component v-for="comp in components" :is="comp" :key="comp._dm5_id">
+    <div v-for="comp in components" :id="mountId(comp)" :key="comp.id">
       <dm5-toolbar slot="dm5-topicmap-panel"></dm5-toolbar>
-    </component>
+    </div>
     <dm5-detail-panel></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
@@ -19,6 +19,12 @@ export default {
 
     menuTopicTypes () {
       return this.$store.getters.menuTopicTypes
+    }
+  },
+
+  methods: {
+    mountId (comp) {
+      return `mount-${comp.id}`
     }
   },
 
