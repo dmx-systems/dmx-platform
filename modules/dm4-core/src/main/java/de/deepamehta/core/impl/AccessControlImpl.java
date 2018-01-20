@@ -18,6 +18,7 @@ import de.deepamehta.core.util.ContextTracker;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
@@ -209,12 +210,12 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getPrivateWorkspace(String username) {
-        TopicModel passwordTopic = getPasswordTopic(_getUsernameTopicOrThrow(username));
-        long workspaceId = getAssignedWorkspaceId(passwordTopic.getId());
-        if (workspaceId == -1) {
-            throw new RuntimeException("User \"" + username + "\" has no private workspace");
+        for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dm4.workspaces.workspace")) {
+            if (getSharingMode(workspace.getId()) == SharingMode.PRIVATE) {
+                return workspace.instantiate();
+            }
         }
-        return pl.fetchTopic(workspaceId).instantiate();
+        throw new RuntimeException("User \"" + username + "\" has no private workspace");
     }
 
     @Override
@@ -652,6 +653,19 @@ class AccessControlImpl implements AccessControl {
      */
     private List<TopicModelImpl> queryTopics(String key, Object value) {
         return pl.queryTopics(key, new SimpleValue(value));
+    }
+
+    /**
+     * Fetches topics by owner, and filter by type.
+     */
+    private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
+        List<TopicModelImpl> topics = new ArrayList();
+        for (TopicModelImpl topic : pl.fetchTopicsByProperty(PROP_OWNER, username)) {
+            if (topic.getTypeUri().equals(typeUri)) {
+                topics.add(topic);
+            }
+        }
+        return topics;
     }
 
 

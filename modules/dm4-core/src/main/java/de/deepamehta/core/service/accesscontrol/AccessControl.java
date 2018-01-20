@@ -67,10 +67,14 @@ public interface AccessControl {
     /**
      * Returns the private workspace of the given user.
      * <p>
-     * Note: a user can have more than one private workspace. The workspace returned
-     * by this method is the one that holds the user's password topic.
+     * Note: a user can have more than one private workspace.
+     * This method returns only the first one.
      * <p>
      * This is a privileged method, it bypasses the access control system.
+     *
+     * @throws  RuntimeException    if the user has no private workspace.
+     *
+     * @return  The user's private workspace (a topic of type "Workspace").
      */
     Topic getPrivateWorkspace(String username);
 
