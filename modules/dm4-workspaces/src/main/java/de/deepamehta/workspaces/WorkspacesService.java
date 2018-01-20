@@ -40,11 +40,6 @@ public interface WorkspacesService {
     Topic getWorkspace(String uri);
 
     /**
-     * TODO: documentation 
-     */
-    SharingMode getSharingMode(long workspaceId);
-
-    /**
      * Returns the workspace a topic or association is assigned to.
      *
      * @param   id      a topic ID, or an association ID

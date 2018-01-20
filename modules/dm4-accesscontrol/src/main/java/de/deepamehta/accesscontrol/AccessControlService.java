@@ -82,10 +82,14 @@ public interface AccessControlService {
 
     /**
      * Returns the private workspace of the logged in user.
-     * If no user is logged in an exception is thrown.
      * <p>
-     * Note: a user can have more than one private workspace. The workspace returned
-     * by this method is the one that holds the user's password topic.
+     * Note: a user can have more than one private workspace.
+     * This method returns only the first one.
+     *
+     * @return  IllegalStateException   if no user is logged in.
+     * @throws  RuntimeException        if the logged in user has no private workspace.
+     *
+     * @return  The logged in user's private workspace (a topic of type "Workspace").
      */
     Topic getPrivateWorkspace();
 
@@ -99,11 +103,11 @@ public interface AccessControlService {
     Topic createUserAccount(Credentials cred);
 
     /**
-     * Creates a Username Topic and a private workspace.
+     * Creates a Username topic and a private workspace.
      * 
      * @return  created "Username" topic.
      */
-    public Topic createUsername(String username);
+    Topic createUsername(String username);
 
     /**
      * Returns the "Username" topic for the specified username.
@@ -189,7 +193,7 @@ public interface AccessControlService {
     Collection<Topic> getTopicsByCreator(String username);
 
     Collection<Topic> getTopicsByOwner(String username);
-    
+
     Collection<Association> getAssociationsByCreator(String username);
 
     Collection<Association> getAssociationsByOwner(String username);

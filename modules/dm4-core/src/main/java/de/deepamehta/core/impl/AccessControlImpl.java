@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
@@ -211,11 +210,9 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getPrivateWorkspace(String username) {
-        Collection<TopicModelImpl> workspaceTopicModels = getTopicModelsByOwner(username, "dm4.workspaces.workspace");
-        for (TopicModelImpl workspaceTopicModel : workspaceTopicModels) {
-            SharingMode sm = getSharingMode(workspaceTopicModel.getId());
-            if (sm == SharingMode.PRIVATE) {
-                return workspaceTopicModel.instantiate();
+        for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dm4.workspaces.workspace")) {
+            if (getSharingMode(workspace.getId()) == SharingMode.PRIVATE) {
+                return workspace.instantiate();
             }
         }
         throw new RuntimeException("User \"" + username + "\" has no private workspace");
@@ -663,17 +660,16 @@ class AccessControlImpl implements AccessControl {
     }
 
     /**
-     * TODO: move and documentation
+     * Fetches topics by owner, and filter by type.
      */
-    private Collection<TopicModelImpl> getTopicModelsByOwner(String username, String typeUri) {
-        Collection<TopicModelImpl> topics = pl.fetchTopicsByProperty(PROP_OWNER, username); 
-        Collection<TopicModelImpl> result = new ArrayList<TopicModelImpl>();
-        for (TopicModelImpl topic : topics) {
+    private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
+        List<TopicModelImpl> topics = new ArrayList();
+        for (TopicModelImpl topic : pl.fetchTopicsByProperty(PROP_OWNER, username)) {
             if (topic.getTypeUri().equals(typeUri)) {
-                result.add(topic);
+                topics.add(topic);
             }
         }
-        return result;
+        return topics;
     }
 
 
