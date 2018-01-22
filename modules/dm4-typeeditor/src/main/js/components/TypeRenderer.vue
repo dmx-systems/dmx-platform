@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <dm5-object :object="object" :level="0"></dm5-object>
+    <dm5-object-renderer></dm5-object-renderer>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -57,8 +57,7 @@ export default {
   },
 
   components: {
-    'dm5-object':        require('dm5-detail-panel/src/components/dm5-object'),
-    'dm5-boolean-field': require('dm5-detail-panel/src/components/dm5-boolean-field')
+    'dm5-object-renderer': require('dm5-object-renderer')
   }
 }
 </script>
