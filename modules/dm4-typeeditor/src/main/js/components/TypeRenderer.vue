@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <dm5-object-renderer></dm5-object-renderer>
+    <dm5-object :object="object" :level="0"></dm5-object>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -57,7 +57,7 @@ export default {
   },
 
   components: {
-    'dm5-object-renderer': require('dm5-object-renderer')
+    'dm5-object': require('dm5-object-renderer/src/components/dm5-object')
   }
 }
 </script>
