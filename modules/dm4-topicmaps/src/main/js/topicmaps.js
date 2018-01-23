@@ -134,11 +134,10 @@ const actions = {
    */
   setTopicSelection ({dispatch}, id) {
     // console.log('Setting topic selection of topicmap', _topicmapId(), 'to', id)
-    const selection = {type: 'topic', id}
     // update state
-    state.selections[_topicmapId()] = selection
+    state.selections[_topicmapId()] = {type: 'topic', id}
     // sync view
-    dispatch('syncSelect', selection)
+    dispatch('syncSelect', id)
   },
 
   /**
@@ -153,11 +152,10 @@ const actions = {
    */
   setAssocSelection ({dispatch}, id) {
     // console.log('Setting assoc selection of topicmap', _topicmapId(), 'to', id)
-    const selection = {type: 'assoc', id}
     // update state
-    state.selections[_topicmapId()] = selection
+    state.selections[_topicmapId()] = {type: 'assoc', id}
     // sync view
-    dispatch('syncSelect', selection)
+    dispatch('syncSelect', id)
   },
 
   /**
@@ -343,7 +341,7 @@ const actions = {
       // sync view (selection)
       const selection = state.selections[_topicmapId()]
       if (selection) {
-        dispatch('syncSelect', selection)
+        dispatch('syncSelect', selection.id)
       }
     })
   },

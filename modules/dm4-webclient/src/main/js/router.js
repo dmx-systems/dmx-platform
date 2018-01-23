@@ -183,11 +183,11 @@ function navigate (to, from) {
   }
 }
 
-// ---
+//
 
 const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
 
-// ---
+//
 
 /**
  * Fetches the topic with the given ID, displays it in the detail panel, and render it as selected in the topicmap
