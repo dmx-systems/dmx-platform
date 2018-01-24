@@ -196,13 +196,15 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchTopic (id, p) {
-  // topicmap panel
-  p.then(() => {
-    store.dispatch('setTopicSelection', id)
-  })
   // detail panel
-  dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
-    store.dispatch('displayObject', topic)
+  Promise.all([
+    p,
+    dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
+      store.dispatch('displayObject', topic)
+    })
+  ]).then(() => {
+    // topicmap panel
+    store.dispatch('setTopicSelection', id)
   })
 }
 
