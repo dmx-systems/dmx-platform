@@ -57,8 +57,7 @@ export default {
   },
 
   components: {
-    'dm5-object':        require('dm5-detail-panel/src/components/dm5-object'),
-    'dm5-boolean-field': require('dm5-detail-panel/src/components/dm5-boolean-field')
+    'dm5-object': require('dm5-object-renderer/src/components/dm5-object')
   }
 }
 </script>

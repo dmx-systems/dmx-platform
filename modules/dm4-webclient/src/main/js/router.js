@@ -183,11 +183,11 @@ function navigate (to, from) {
   }
 }
 
-// ---
+//
 
 const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
 
-// ---
+//
 
 /**
  * Fetches the topic with the given ID, displays it in the detail panel, and render it as selected in the topicmap
@@ -196,13 +196,15 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchTopic (id, p) {
-  // topicmap panel
   p.then(() => {
-    store.dispatch('setTopicSelection', id)
-  })
-  // detail panel
-  dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
-    store.dispatch('displayObject', topic)
+    console.log('requesting topic', id)
+    store.dispatch('setTopicSelection', {         // topicmap panel
+      id,
+      p: dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
+        console.log('topic', id, 'arrived')
+        store.dispatch('displayObject', topic)    // detail panel
+      })
+    })
   })
 }
 
@@ -213,13 +215,13 @@ function fetchTopic (id, p) {
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchAssoc (id, p) {
-  // topicmap panel
   p.then(() => {
-    store.dispatch('setAssocSelection', id)
+    store.dispatch('setAssocSelection', id)       // topicmap panel
   })
-  // detail panel
+  // Note: in contrast to topic details assoc details are not displayed in-map.
+  // "setAssocSelection" requires no further synchronization.
   dm5.restClient.getAssoc(id, true, true).then(assoc => {    // includeChilds=true, includeAssocChilds=true
-    store.dispatch('displayObject', assoc)
+    store.dispatch('displayObject', assoc)        // detail panel
   })
 }
 
