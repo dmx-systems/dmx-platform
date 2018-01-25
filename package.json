@@ -17,6 +17,7 @@
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
+    "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.0.11",
     "font-awesome": "^4.7.0",
@@ -36,6 +37,6 @@
     "vue-loader": "^12.2.2",
     "vue-template-compiler": "^2.5.13",
     "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.11.0"
+    "webpack-dev-server": "^2.11.1"
   }
 }
