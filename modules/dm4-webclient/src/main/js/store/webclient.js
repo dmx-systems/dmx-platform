@@ -12,13 +12,21 @@ const state = {
 
 const actions = {
 
-  registerComponent (_, {extensionPoint, component}) {
-    var comps = state.components[extensionPoint]
-    if (!comps) {
-      state.components[extensionPoint] = comps = []
-    }
-    component._dm5_id = compCount++
-    comps.push(component)
+  registerComponent (_, comp) {
+    const comps = state.components[comp.mount] || (state.components[comp.mount] = [])
+    comp.id = compCount++
+    comps.push(comp)
+  },
+
+  mountComponents () {
+    Vue.nextTick(() => {
+      state.components.webclient.forEach(comp => {
+        const Component = Vue.extend(comp.comp)
+        // Note: to manually mounted components the store must be passed explicitly
+        // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
+        new Component({store, propsData: comp.props}).$mount(`#mount-${comp.id}`)
+      })
+    })
   },
 
   unselectIf ({dispatch}, id) {

@@ -5,9 +5,10 @@ export default (store) => ({
     module: require('./workspaces')
   },
 
-  components: {
-    toolbar: require('./components/WorkspaceSelect')
-  },
+  components: [{
+    comp: require('./components/WorkspaceSelect'),
+    mount: 'toolbar'
+  }],
 
   extraMenuItems: [{
     uri: 'dm4.workspaces.workspace',

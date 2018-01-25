@@ -1,6 +1,6 @@
 <template>
   <div class="dm5-toolbar">
-    <component v-for="comp in components" :is="comp" :key="comp._dm5_id"></component>
+    <component v-for="comp in components" :is="comp.comp" :key="comp.id"></component>
   </div>
 </template>
 

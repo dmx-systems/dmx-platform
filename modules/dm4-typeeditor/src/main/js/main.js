@@ -5,11 +5,9 @@ export default (store) => ({
     module: require('./typeeditor')
   },
 
-  components: {
-    detailPanel: {
-      'dm4.core.topic_type': require('./components/TypeRenderer'),
-      'dm4.core.assoc_type': require('./components/TypeRenderer')
-    }
+  detailPanel: {
+    'dm4.core.topic_type': require('./components/TypeRenderer'),
+    'dm4.core.assoc_type': require('./components/TypeRenderer')
   },
 
   extraMenuItems: [
