@@ -1,8 +1,6 @@
 <template>
   <div class="dm5-webclient">
-    <div v-for="comp in components" :id="mountId(comp)" :key="comp.id">
-      <dm5-toolbar slot="dm5-topicmap-panel"></dm5-toolbar>
-    </div>
+    <div v-for="comp in components" :id="mountId(comp)" :key="comp.id"></div>
     <dm5-detail-panel></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
@@ -29,7 +27,6 @@ export default {
   },
 
   components: {
-    'dm5-toolbar': require('./Toolbar'),
     'dm5-detail-panel':  require('dm5-detail-panel'),
     'dm5-search-widget': require('dm5-search-widget')
   }
