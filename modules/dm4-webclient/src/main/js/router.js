@@ -197,11 +197,11 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  */
 function fetchTopic (id, p) {
   p.then(() => {
-    console.log('requesting topic', id)
+    // console.log('requesting topic', id)
     store.dispatch('setTopicSelection', {         // topicmap panel
       id,
       p: dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
-        console.log('topic', id, 'arrived')
+        // console.log('topic', id, 'arrived')
         store.dispatch('displayObject', topic)    // detail panel
       })
     })

@@ -10,14 +10,14 @@
   },
   "scripts": {
     "dev": "webpack-dev-server -d --env.dev --hot",
-    "build": "webpack -p --progress --hide-modules"
+    "build": "webpack -p --hide-modules"
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
+    "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
-    "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.0.11",
     "font-awesome": "^4.7.0",

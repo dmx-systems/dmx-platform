@@ -8,10 +8,10 @@ var compCount = 0
 
 const state = {
 
-  object: undefined,        // The displayed Topic/Assoc/TopicType/AssocType.
-                            // If undefined nothing is displayed.
+  object: undefined,        // The selected Topic/Assoc/TopicType/AssocType.
+                            // Undefined if nothing is selected.
 
-  writable: undefined,      // True if the current user has WRITE permission for the displayed object.
+  writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
   mode: undefined,          // 'info' or 'form'
 

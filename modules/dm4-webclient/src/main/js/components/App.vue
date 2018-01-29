@@ -33,7 +33,7 @@
   --line-height: 1.5em;
   --paragraph-spacing: 1em;
   --highlight-color: #409eff;   /* see --color-primary */
-  --background-color: #f5f7fa;  /* see --background-color-base */
+  --background-color: #f5f7fa;  /* detail panel background, map topics background, see --background-color-base */
   --color-danger: #fa5555;      /* see --color-danger */
   --border-color: #ebeef5;      /* see --border-color-lighter */
   --shadow-hover: inset 0px 0px 0px 1px;

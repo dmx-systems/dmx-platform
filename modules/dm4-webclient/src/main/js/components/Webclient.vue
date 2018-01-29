@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-webclient">
     <div v-for="comp in components" :id="mountId(comp)" :key="comp.id"></div>
-    <dm5-detail-panel></dm5-detail-panel>
+    <dm5-detail-panel :object="object"></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -10,6 +10,10 @@
 export default {
 
   computed: {
+
+    object () {
+      return this.$store.state.object
+    },
 
     components () {
       return this.$store.state.components.webclient
