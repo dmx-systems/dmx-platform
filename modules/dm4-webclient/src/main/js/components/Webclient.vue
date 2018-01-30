@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-webclient">
-    <div v-for="comp in components" :id="mountId(comp)" :key="comp.id"></div>
-    <dm5-detail-panel :object="object"></dm5-detail-panel>
+    <component v-for="comp in components" :is="comp.comp" :key="comp.id"></component>
+    <dm5-detail-panel></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -24,9 +24,9 @@ export default {
     }
   },
 
-  methods: {
-    mountId (comp) {
-      return `mount-${comp.id}`
+  provide () {
+    return {
+      context: this
     }
   },
 

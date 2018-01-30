@@ -29,8 +29,6 @@ pluginManager.loadPlugins()
 // TODO: synchronize initial navigation with loading the external plugins?
 // (Note: the standard plugins are "loaded" synchronously anyways.)
 
-store.dispatch('mountComponents')
-
 // Initial navigation must take place *after* the Webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
