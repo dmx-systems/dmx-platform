@@ -19,8 +19,16 @@ export default (store) => {
       {
         comp: require('dm5-topicmap-panel'),
         mount: 'webclient',
-        props: {
-          commands: 'Hallo 123'
+        created: comp => {
+          console.log('comp created', comp.$props)
+          // Note: manually mounted components needs to be manually updated
+          store.watch(
+            state => state.object,
+            object => {
+              console.log('object changed', object)
+              comp.$props.object = object
+            }
+          )
         }
       },
       {

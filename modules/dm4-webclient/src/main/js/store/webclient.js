@@ -97,7 +97,8 @@ const actions = {
         const Component = Vue.extend(comp.comp)
         // Note: to manually mounted components the store must be passed explicitly
         // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
-        new Component({store, propsData: comp.props}).$mount(`#mount-${comp.id}`)
+        const c = new Component({store, propsData: comp.props}).$mount(`#mount-${comp.id}`)
+        comp.created && comp.created(c)
       })
     })
   },
