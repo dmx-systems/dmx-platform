@@ -11,9 +11,29 @@ export default {
 
   computed: {
 
+    // needed by injection targets
+
     object () {
       return this.$store.state.object
     },
+
+    writable () {
+      return this.$store.state.writable
+    },
+
+    mode () {
+      return this.$store.state.mode
+    },
+
+    inlineCompId () {
+      return this.$store.state.inlineCompId
+    },
+
+    objectRenderers () {
+      return this.$store.state.objectRenderers
+    },
+
+    //
 
     components () {
       return this.$store.state.components.webclient
@@ -25,6 +45,10 @@ export default {
   },
 
   provide () {
+    // Injection and Reactivity:
+    // Returning {object: this.object}: no reactivity.
+    // Returning a calculated property which returns {object: this.object}: no reactivity.
+    // Returning just "this": only the topicmap panel is reactive, not the detail panel. This feels strange!
     return {
       context: this
     }

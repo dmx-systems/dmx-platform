@@ -33,6 +33,7 @@ import dm5 from 'dm5'
 
 export default {
 
+  // TODO: remove dm5-detail-panel dependency?
   mixins: [
     require('dm5-detail-panel/src/components/mixins/mode').default,
     require('dm5-detail-panel/src/components/mixins/info-mode').default
