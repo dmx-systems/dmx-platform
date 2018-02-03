@@ -190,7 +190,7 @@ For more changes and details see the release notes:
 <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 
-**4.9.1** -- Feb 3, 2017
+**4.9.1** -- Feb 3, 2018
 
 * Bug fix:
     * Webclient starts properly if an "Include in Label" topic is missing
@@ -738,4 +738,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Feb 3, 2017
+Feb 3, 2018
