@@ -32,7 +32,13 @@ function Type(type) {
             assoc_def.assoc_def_uri = assoc_def.child_type_uri +
                 (assoc_def.custom_assoc_type_uri ? "#" + assoc_def.custom_assoc_type_uri : "")
             //
-            assoc_def.include_in_label = assoc_def.childs["dm4.core.include_in_label"].value
+            var include_in_label = assoc_def.childs["dm4.core.include_in_label"]
+            if (include_in_label) {
+                assoc_def.include_in_label = include_in_label.value
+            } else {
+                console.warn("Assoc def \"" + assoc_def.assoc_def_uri + "\" of type \"" + type.uri + "\" (" +
+                    type.value + ") has no \"Include in Label\" setting")
+            }
         }
         return assoc_defs
     }
