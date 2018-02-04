@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-webclient">
     <component v-for="comp in components" :is="comp.comp" :key="comp.id"></component>
-    <dm5-detail-panel></dm5-detail-panel>
+    <dm5-detail-panel v-if="detailPanel"></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -11,7 +11,7 @@ export default {
 
   computed: {
 
-    // needed by injection targets
+    // export context
 
     object () {
       return this.$store.state.object
@@ -34,6 +34,10 @@ export default {
     },
 
     //
+
+    detailPanel () {
+      return this.$store.state.detailPanel
+    },
 
     components () {
       return this.$store.state.components.webclient
@@ -68,11 +72,12 @@ export default {
 }
 
 .dm5-webclient .dm5-topicmap-panel {
-  flex-basis: 70%;
+  flex-grow: 1;
   position: relative;
 }
 
 .dm5-webclient .dm5-detail-panel {
+  flex-grow: 1;
   flex-basis: 30%;
   overflow: auto;
   box-sizing: border-box;

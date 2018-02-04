@@ -13,6 +13,8 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
+  detailPanel: false,       // True if the detail panel is visible
+
   mode: undefined,          // 'info' or 'form'
 
   inlineCompId: undefined,  // ID of the dm5-object component that is in inline edit mode
@@ -52,12 +54,19 @@ const actions = {
     state.inlineCompId = compId
   },
 
-  // TODO: move to webclient.js?
   submit ({dispatch}) {
     state.object.update().then(object => {
       dispatch('_processDirectives', object.directives)
     })
     cancelEdit()
+  },
+
+  pinTopic () {
+    state.detailPanel = true
+  },
+
+  closeDetailPanel () {
+    state.detailPanel = false
   },
 
   registerObjectRenderer (_, {typeUri, component}) {
@@ -129,6 +138,17 @@ const store = new Vuex.Store({
   state,
   actions
 })
+
+// Showing/hiding the detail panel changes the topicmap panel dimensions.
+// The Cytoscape renderer size needs to adapt.
+store.watch (
+  () => state.detailPanel,
+  () => {
+    Vue.nextTick(() => {
+      store.dispatch('resizeTopicmapRenderer')
+    })
+  }
+)
 
 export default store
 
