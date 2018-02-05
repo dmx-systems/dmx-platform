@@ -23,15 +23,32 @@ const router = new VueRouter({
     {
       path: '/topicmap/:topicmapId/topic/:topicId',
       name: 'topic',
-      component: Webclient
+      component: Webclient,
+      children: childRoutes('Topic')
     },
     {
       path: '/topicmap/:topicmapId/assoc/:assocId',
       name: 'assoc',
-      component: Webclient
+      component: Webclient,
+      children: childRoutes('Assoc')
     }
   ]
 })
+
+/**
+ * @param   entity  'Topic' or 'Assoc'
+ */
+function childRoutes (entity) {
+  const routes = {
+    Topic: ['edit', 'related'],
+    Assoc: ['edit'],
+  }
+  return routes[entity].map(segment => ({
+    path: segment,
+    name: segment + entity,
+    component: require(`dm5-detail-panel/src/components/dm5-tab-${segment}`)
+  }))
+}
 
 export default router
 
