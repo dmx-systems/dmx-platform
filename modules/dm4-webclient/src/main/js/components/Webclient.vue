@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-webclient">
     <component v-for="comp in components" :is="comp.comp" :key="comp.id"></component>
-    <dm5-detail-panel v-if="detailPanel"></dm5-detail-panel>
+    <dm5-detail-panel v-if="detailPanelVisibility"></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -21,6 +21,10 @@ export default {
       return this.$store.state.writable
     },
 
+    detail () {
+      return this.$store.state.detail
+    },
+
     mode () {
       return this.$store.state.mode
     },
@@ -35,8 +39,8 @@ export default {
 
     //
 
-    detailPanel () {
-      return this.$store.state.detailPanel
+    detailPanelVisibility () {
+      return this.detail !== undefined
     },
 
     components () {
@@ -45,6 +49,16 @@ export default {
 
     menuTopicTypes () {
       return this.$store.getters.menuTopicTypes
+    }
+  },
+
+  // Showing/hiding the detail panel changes the topicmap panel dimensions.
+  // The Cytoscape renderer size needs to adapt.
+  watch: {
+    detailPanelVisibility () {
+      this.$nextTick(() => {
+        this.$store.dispatch('resizeTopicmapRenderer')
+      })
     }
   },
 

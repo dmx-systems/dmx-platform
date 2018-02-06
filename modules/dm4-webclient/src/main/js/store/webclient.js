@@ -13,7 +13,9 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  detailPanel: false,       // True if the detail panel is visible
+  detail: undefined,        // The selected tab in the detail panel: 'edit', 'related', ...
+                            // If undefined the detail panel is not visible.
+                            // TODO: move to separate dm5-detail-panel standard plugin
 
   mode: undefined,          // 'info' or 'form'
 
@@ -62,22 +64,23 @@ const actions = {
   },
 
   editTopic ({dispatch}, id) {
-    state.detailPanel = true
     dispatch('callTopicDetailRoute', {id, detail: 'edit'})
   },
 
   editAssoc ({dispatch}, id) {
-    state.detailPanel = true
     dispatch('callAssocDetailRoute', {id, detail: 'edit'})
   },
 
   whatsRelated ({dispatch}, id) {
-    state.detailPanel = true
     dispatch('callTopicDetailRoute', {id, detail: 'related'})
   },
 
+  selectDetail (_, detail) {
+    state.detail = detail
+  },
+
   closeDetailPanel () {
-    state.detailPanel = false
+    state.detail = undefined
   },
 
   registerObjectRenderer (_, {typeUri, component}) {
@@ -149,17 +152,6 @@ const store = new Vuex.Store({
   state,
   actions
 })
-
-// Showing/hiding the detail panel changes the topicmap panel dimensions.
-// The Cytoscape renderer size needs to adapt.
-store.watch (
-  () => state.detailPanel,
-  () => {
-    Vue.nextTick(() => {
-      store.dispatch('resizeTopicmapRenderer')
-    })
-  }
-)
 
 export default store
 

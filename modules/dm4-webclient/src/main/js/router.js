@@ -82,6 +82,12 @@ store.registerModule('routerModule', {
       })
     },
 
+    stripSelectionFromRoute () {
+      router.push({
+        name: 'topicmap'
+      })
+    },
+
     callTopicDetailRoute (_, {id, detail}) {
       router.push({
         name: 'topicDetail',
@@ -96,9 +102,13 @@ store.registerModule('routerModule', {
       })
     },
 
-    stripSelectionFromRoute () {
+    stripDetailFromRoute () {
+      const object = store.state.object
+      if (!object) {
+        throw 'stripDetailFromRoute called when no object is selected'
+      }
       router.push({
-        name: 'topicmap'
+        name: object.isTopic() ? 'topic' : 'assoc'
       })
     }
   }
@@ -178,25 +188,28 @@ function navigate (to, from) {
     p = Promise.resolve()
   }
   //
-  var selected
-  //
   const topicId = to.params.topicId
   const oldTopicId = from.params.topicId
   if (topicId != oldTopicId) {
-    if (topicId) {  // FIXME: 0 is a valid topic ID
+    if (topicId) {                                // FIXME: 0 is a valid topic ID
       fetchTopic(topicId, p)
-      selected = true
     }
   }
   const assocId = to.params.assocId
   const oldAssocId = from.params.assocId
   if (assocId != oldAssocId) {
-    if (assocId) {
+    if (assocId) {                                // FIXME: 0 is a valid topic ID
       fetchAssoc(assocId, p)
-      selected = true
     }
   }
-  if (!selected) {
+  const detail = to.params.detail
+  const oldDetail = from.params.detail
+  if (detail != oldDetail) {
+    store.dispatch('selectDetail', detail)
+  }
+  const topicCleared = oldTopicId && !topicId     // FIXME: 0 is a valid topic ID
+  const assocCleared = oldAssocId && !assocId     // FIXME: 0 is a valid topic ID
+  if (topicCleared || assocCleared) {
     unsetSelection(p)
   }
 }
@@ -244,10 +257,8 @@ function fetchAssoc (id, p) {
 }
 
 function unsetSelection(p) {
-  // topicmap panel
   p.then(() => {
-    store.dispatch('unsetSelection')
+    store.dispatch('unsetSelection')              // topicmap panel
   })
-  // detail panel
-  store.dispatch('emptyDisplay')
+  store.dispatch('emptyDisplay')                  // detail panel
 }
