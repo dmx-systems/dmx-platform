@@ -23,32 +23,25 @@ const router = new VueRouter({
     {
       path: '/topicmap/:topicmapId/topic/:topicId',
       name: 'topic',
-      component: Webclient,
-      children: childRoutes('Topic')
+      component: Webclient
     },
     {
       path: '/topicmap/:topicmapId/assoc/:assocId',
       name: 'assoc',
-      component: Webclient,
-      children: childRoutes('Assoc')
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/topic/:topicId/:detail',
+      name: 'topicDetail',
+      component: Webclient
+    },
+    {
+      path: '/topicmap/:topicmapId/assoc/:assocId/:detail',
+      name: 'assocDetail',
+      component: Webclient
     }
   ]
 })
-
-/**
- * @param   entity  'Topic' or 'Assoc'
- */
-function childRoutes (entity) {
-  const routes = {
-    Topic: ['edit', 'related'],
-    Assoc: ['edit'],
-  }
-  return routes[entity].map(segment => ({
-    path: segment,
-    name: segment + entity,
-    component: require(`dm5-detail-panel/src/components/dm5-tab-${segment}`)
-  }))
-}
 
 export default router
 
@@ -71,27 +64,35 @@ store.registerModule('routerModule', {
     callTopicmapRoute (_, id) {
       router.push({
         name: 'topicmap',
-        params: {
-          topicmapId: id
-        }
+        params: {topicmapId: id}
       })
     },
 
     callTopicRoute (_, id) {
       router.push({
         name: 'topic',
-        params: {
-          topicId: id
-        }
+        params: {topicId: id}
       })
     },
 
     callAssocRoute (_, id) {
       router.push({
         name: 'assoc',
-        params: {
-          assocId: id
-        }
+        params: {assocId: id}
+      })
+    },
+
+    callTopicDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'topicDetail',
+        params: {topicId: id, detail}
+      })
+    },
+
+    callAssocDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'assocDetail',
+        params: {assocId: id, detail}
       })
     },
 
@@ -107,7 +108,7 @@ function registerWatcher () {
   store.watch(
     state => state.routerModule.router.currentRoute,
     (to, from) => {
-      // console.log('### Route watcher', to, from)
+      console.log('### Route watcher', to, from)
       navigate(to, from)
     }
   )

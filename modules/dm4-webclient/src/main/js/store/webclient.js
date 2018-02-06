@@ -63,32 +63,17 @@ const actions = {
 
   editTopic ({dispatch}, id) {
     state.detailPanel = true
-    dispatch('callRoute', {
-      name: 'editTopic',
-      params: {
-        topicId: id
-      }
-    })
+    dispatch('callTopicDetailRoute', {id, detail: 'edit'})
   },
 
   editAssoc ({dispatch}, id) {
     state.detailPanel = true
-    dispatch('callRoute', {
-      name: 'editAssoc',
-      params: {
-        assocId: id
-      }
-    })
+    dispatch('callAssocDetailRoute', {id, detail: 'edit'})
   },
 
   whatsRelated ({dispatch}, id) {
     state.detailPanel = true
-    dispatch('callRoute', {
-      name: 'relatedTopic',
-      params: {
-        topicId: id
-      }
-    })
+    dispatch('callTopicDetailRoute', {id, detail: 'related'})
   },
 
   closeDetailPanel () {
