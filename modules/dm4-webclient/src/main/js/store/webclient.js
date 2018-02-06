@@ -61,8 +61,19 @@ const actions = {
     cancelEdit()
   },
 
-  pinTopic () {
+  editTopic ({dispatch}, id) {
     state.detailPanel = true
+    dispatch('callTopicDetailRoute', {id, detail: 'edit'})
+  },
+
+  editAssoc ({dispatch}, id) {
+    state.detailPanel = true
+    dispatch('callAssocDetailRoute', {id, detail: 'edit'})
+  },
+
+  whatsRelated ({dispatch}, id) {
+    state.detailPanel = true
+    dispatch('callTopicDetailRoute', {id, detail: 'related'})
   },
 
   closeDetailPanel () {
