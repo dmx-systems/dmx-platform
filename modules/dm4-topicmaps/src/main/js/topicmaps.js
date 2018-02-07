@@ -171,7 +171,7 @@ const actions = {
    * - "selections" state is up-to-date.
    */
   unsetSelection ({dispatch}) {
-    console.log('unsetSelection', _topicmapId())
+    // console.log('unsetSelection', _topicmapId())
     // update state
     delete state.selections[_topicmapId()]
     // sync view

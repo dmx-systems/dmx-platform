@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Generic Object -->
-    <dm5-object :object="object" :level="0"></dm5-object>
+    <dm5-object :object="object" :mode="mode" :level="0"></dm5-object>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -33,10 +33,9 @@ import dm5 from 'dm5'
 
 export default {
 
-  // TODO: remove dm5-detail-panel dependency?
   mixins: [
-    require('dm5-detail-panel/src/components/mixins/mode').default,
-    require('dm5-detail-panel/src/components/mixins/info-mode').default
+    require('./mixins/mode-prop').default,
+    require('./mixins/info-mode').default
   ],
 
   props: {

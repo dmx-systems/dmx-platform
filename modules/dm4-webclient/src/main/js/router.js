@@ -118,7 +118,7 @@ function registerWatcher () {
   store.watch(
     state => state.routerModule.router.currentRoute,
     (to, from) => {
-      console.log('### Route watcher', to, from)
+      // console.log('### Route watcher', to, from)
       navigate(to, from)
     }
   )
@@ -170,6 +170,7 @@ function initialNavigation (route) {
 }
 
 function navigate (to, from) {
+  // topicmap
   const topicmapId = to.params.topicmapId
   const oldTopicmapId = from.params.topicmapId
   var p   // a promise resolved once the topicmap rendering is complete
@@ -187,7 +188,7 @@ function navigate (to, from) {
   } else {
     p = Promise.resolve()
   }
-  //
+  // selection
   const topicId = to.params.topicId
   const oldTopicId = from.params.topicId
   if (topicId != oldTopicId) {
@@ -202,15 +203,19 @@ function navigate (to, from) {
       fetchAssoc(assocId, p)
     }
   }
-  const detail = to.params.detail
-  const oldDetail = from.params.detail
-  if (detail != oldDetail) {
-    store.dispatch('selectDetail', detail)
-  }
   const topicCleared = oldTopicId && !topicId     // FIXME: 0 is a valid topic ID
   const assocCleared = oldAssocId && !assocId     // FIXME: 0 is a valid topic ID
   if (topicCleared || assocCleared) {
     unsetSelection(p)
+  }
+  // detail
+  const detail = to.params.detail
+  const oldDetail = from.params.detail
+  if (detail != oldDetail) {
+    store.dispatch('selectDetail', detail)
+    if (detail === 'edit') {
+      store.dispatch('edit')
+    }
   }
 }
 

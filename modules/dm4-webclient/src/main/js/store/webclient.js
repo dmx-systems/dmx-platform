@@ -76,11 +76,8 @@ const actions = {
   },
 
   selectDetail (_, detail) {
+    console.log('selectDetail', detail)
     state.detail = detail
-  },
-
-  closeDetailPanel () {
-    state.detail = undefined
   },
 
   registerObjectRenderer (_, {typeUri, component}) {
