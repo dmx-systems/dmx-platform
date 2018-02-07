@@ -46,6 +46,10 @@ const actions = {
     state.object = undefined
   },
 
+  /**
+   * Precondition:
+   * - topic/assoc data has arrived (global "object" state is up-to-date).
+   */
   edit () {
     console.log('edit', state.object)
     state.object.fillChilds()

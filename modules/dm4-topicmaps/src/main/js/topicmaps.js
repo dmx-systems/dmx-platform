@@ -51,7 +51,7 @@ const actions = {
   },
 
   /**
-   * Displays the topicmap with the given ID.
+   * Displays the given topicmap.
    * The topicmap is retrieved either from cache or from server (asynchronously).
    *
    * Preconditions:
@@ -123,16 +123,17 @@ const actions = {
   },
 
   /**
-   * Renders the topic with the given ID as selected in the topicmap panel.
+   * Renders the given topic as selected in the topicmap panel.
    *
    * Preconditions:
    * - the route is set.
    * - the topic belongs to the selected topicmap ("topicmap" state is up-to-date).
+   * - the topicmap rendering is complete.
    *
    * Postcondition:
    * - "selections" state is up-to-date.
    *
-   * @param   p   a promise resolved once topic data has arrived and global "object" state is up-to-date.
+   * @param   p   a promise resolved once topic data has arrived (global "object" state is up-to-date).
    */
   setTopicSelection ({dispatch}, {id, p}) {
     // console.log('Setting topic selection of topicmap', _topicmapId(), 'to', id)
@@ -143,11 +144,12 @@ const actions = {
   },
 
   /**
-   * Renders the assoc with the given ID as selected in the topicmap panel.
+   * Renders the given assoc as selected in the topicmap panel.
    *
    * Preconditions:
    * - the route is set.
    * - the assoc belongs to the selected topicmap ("topicmap" state is up-to-date).
+   * - the topicmap rendering is complete.
    *
    * Postcondition:
    * - "selections" state is up-to-date.
