@@ -52,7 +52,6 @@ const actions = {
    */
   edit () {
     console.log('edit', state.object)
-    state.object.fillChilds()
     state.mode = 'form'
   },
 
@@ -60,11 +59,13 @@ const actions = {
     state.inlineCompId = compId
   },
 
-  submit ({dispatch}) {
-    state.object.update().then(object => {
-      dispatch('_processDirectives', object.directives)
-    })
-    cancelEdit()
+  submit (_, object) {
+    _submit(object)
+  },
+
+  // TODO: introduce edit buffer also for inline editing?
+  submitInline () {
+    _submit(state.object)
   },
 
   editTopic ({dispatch}, id) {
@@ -80,7 +81,7 @@ const actions = {
   },
 
   selectDetail (_, detail) {
-    console.log('selectDetail', detail)
+    // console.log('selectDetail', detail)
     state.detail = detail
   },
 
@@ -167,6 +168,13 @@ function displayObjectIf (object) {
 function isSelected (id) {
   const object = state.object
   return object && object.id === id
+}
+
+function _submit (object) {
+  object.update().then(object => {
+    store.dispatch('_processDirectives', object.directives)
+  })
+  cancelEdit()
 }
 
 function cancelEdit () {

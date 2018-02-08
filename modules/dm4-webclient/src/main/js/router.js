@@ -1,6 +1,6 @@
 /**
  * Adapts app state to route changes.
- * Creates the initial app state.
+ * Creates the initial app state, based on start URL.
  */
 
 import Vue from 'vue'
