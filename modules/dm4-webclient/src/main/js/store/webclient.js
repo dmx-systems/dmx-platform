@@ -18,8 +18,7 @@ const state = {
                             // TODO: move to separate dm5-detail-panel standard plugin
 
   mode: undefined,          // 'info' or 'form'
-
-  inlineCompId: undefined,  // ID of the dm5-object component that is in inline edit mode
+                            // TODO: move to separate dm5-detail-panel standard plugin
 
   objectRenderers: {},      // Registered page renderers:
                             //   {
@@ -53,10 +52,6 @@ const actions = {
   edit () {
     console.log('edit', state.object)
     state.mode = 'form'
-  },
-
-  editInline (_, compId) {
-    state.inlineCompId = compId
   },
 
   submit (_, object) {
@@ -204,7 +199,7 @@ function _submit (object) {
 
 function cancelEdit () {
   state.mode = 'info'               // cancel form edit
-  state.inlineCompId = undefined    // cancel inline edit
+  // state.inlineCompId = undefined ### TODO: cancel inline edit?
 }
 
 //

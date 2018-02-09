@@ -11,7 +11,7 @@ export default {
 
   computed: {
 
-    // export context
+    // export context ### TODO: drop
 
     object () {
       return this.$store.state.object
@@ -27,10 +27,6 @@ export default {
 
     mode () {
       return this.$store.state.mode
-    },
-
-    inlineCompId () {
-      return this.$store.state.inlineCompId
     },
 
     objectRenderers () {
