@@ -29,7 +29,7 @@ const state = {
   quill: undefined,         // The Quill instance deployed in form mode.
                             // FIXME: support more than one Quill instance per form.
 
-  components: {}
+  compDefs: {}              // Registered components
 }
 
 const actions = {
@@ -110,10 +110,35 @@ const actions = {
 
   // ---
 
-  registerComponent (_, comp) {
-    const comps = state.components[comp.mount] || (state.components[comp.mount] = [])
-    comp.id = compCount++
-    comps.push(comp)
+  registerComponent (_, compDef) {
+    const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
+    compDef.id = compCount++
+    compDefs.push(compDef)
+  },
+
+  /**
+   * Instantiates and mounts the registered components for mount point "webclient".
+   */
+  mountComponents () {
+    state.compDefs.webclient.forEach(compDef => {
+      // Note: to manually mounted components the store must be passed explicitly
+      // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
+      const Component = Vue.extend(compDef.comp)
+      const comp = new Component({store}).$mount(`#mount-${compDef.id}`)
+      // inject props
+      if (compDef.props) {
+        for (var prop in compDef.props) {
+          const val = compDef.props[prop]
+          if (typeof val === "function") {
+            // reactive (val is getter function)
+            registerPropWatcher(comp, prop, val)
+          } else {
+            // static (val is value)
+            comp.$props[prop] = val
+          }
+        }
+      }
+    })
   },
 
   //
@@ -186,10 +211,23 @@ function cancelEdit () {
 
 function initWritable() {
    state.object && _initWritable()
- }
+}
 
 function _initWritable() {
   state.object.isWritable().then(writable => {
     state.writable = writable
   })
+}
+
+//
+
+function registerPropWatcher (comp, prop, getter) {
+  // console.log('registerPropWatcher', prop)
+  store.watch(
+    getter,
+    val => {
+      // console.log(`"${prop}" changed`, val)
+      comp.$props[prop] = val
+    }
+  )
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="dm5-webclient">
-    <component v-for="comp in components" :is="comp.comp" :key="comp.id"></component>
+    <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
     <dm5-detail-panel v-if="detailPanelVisibility"></dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
@@ -43,8 +43,8 @@ export default {
       return this.detail !== undefined
     },
 
-    components () {
-      return this.$store.state.components.webclient
+    compDefs () {
+      return this.$store.state.compDefs.webclient
     },
 
     menuTopicTypes () {
@@ -59,6 +59,12 @@ export default {
       this.$nextTick(() => {
         this.$store.dispatch('resizeTopicmapRenderer')
       })
+    }
+  },
+
+  methods: {
+    mountId (compDef) {
+      return `mount-${compDef.id}`
     }
   },
 

@@ -1,4 +1,4 @@
-export default (store) => {
+export default store => {
 
   // TODO: declarative store watchers?
   store.watch(
@@ -18,7 +18,11 @@ export default (store) => {
     components: [
       {
         comp: require('dm5-topicmap-panel'),
-        mount: 'webclient'
+        mount: 'webclient',
+        props: {
+          object: state => state.object,                  // reactive (getter function)
+          objectRenderers: store.state.objectRenderers    // static (value)
+        }
       },
       {
         comp: require('./components/TopicmapSelect'),
