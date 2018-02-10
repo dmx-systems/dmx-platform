@@ -1,7 +1,8 @@
 <template>
   <div class="dm5-webclient">
     <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
-    <dm5-detail-panel v-if="detailPanelVisibility"></dm5-detail-panel>
+    <dm5-detail-panel v-if="detailPanelVisibility" :object="object" :writable="writable" :mode="mode">
+    </dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -10,8 +11,6 @@
 export default {
 
   computed: {
-
-    // export context ### TODO: drop
 
     object () {
       return this.$store.state.object
@@ -37,6 +36,7 @@ export default {
 
     detailPanelVisibility () {
       return this.detail !== undefined
+        && this.object       // TODO: sync object availability?
     },
 
     compDefs () {

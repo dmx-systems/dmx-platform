@@ -15,10 +15,10 @@ const state = {
 
   detail: undefined,        // The selected tab in the detail panel: 'edit', 'related', ...
                             // If undefined the detail panel is not visible.
-                            // TODO: move to separate dm5-detail-panel standard plugin
+                            // TODO: move to separate dm5-detail-panel standard plugin?
 
   mode: undefined,          // 'info' or 'form'
-                            // TODO: move to separate dm5-detail-panel standard plugin
+                            // TODO: move to separate dm5-detail-panel standard plugin?
 
   objectRenderers: {},      // Registered page renderers:
                             //   {
@@ -204,11 +204,11 @@ function cancelEdit () {
 
 //
 
-function initWritable() {
+function initWritable () {
    state.object && _initWritable()
 }
 
-function _initWritable() {
+function _initWritable () {
   state.object.isWritable().then(writable => {
     state.writable = writable
   })

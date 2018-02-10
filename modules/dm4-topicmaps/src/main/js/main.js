@@ -20,7 +20,8 @@ export default store => {
         comp: require('dm5-topicmap-panel'),
         mount: 'webclient',
         props: {
-          object: state => state.object,                  // reactive (getter function)
+          object:   state => state.object,                // reactive (getter function)
+          writable: state => state.writable,              // reactive (getter function)
           objectRenderers: store.state.objectRenderers    // static (value)
         }
       },
