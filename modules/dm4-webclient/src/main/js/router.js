@@ -5,7 +5,7 @@
 
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Webclient from './components/Webclient'
+import Webclient from './components/dm5-webclient'
 import store from './store/webclient'
 import dm5 from 'dm5'
 
@@ -191,22 +191,20 @@ function navigate (to, from) {
     p = Promise.resolve()
   }
   // selection
-  var p2  // a promise resolved once topic/assoc data has arrived (global "object" state is up-to-date).
   const topicId = to.params.topicId
   const oldTopicId = from.params.topicId
   if (topicId != oldTopicId) {
     if (topicId) {                                // FIXME: 0 is a valid topic ID
-      p2 = fetchTopic(topicId, p)
+      fetchTopic(topicId, p)
     }
   }
   const assocId = to.params.assocId
   const oldAssocId = from.params.assocId
   if (assocId != oldAssocId) {
     if (assocId) {                                // FIXME: 0 is a valid topic ID
-      p2 = fetchAssoc(assocId, p)
+      fetchAssoc(assocId, p)
     }
   }
-  p2 = p2 || Promise.resolve()
   const topicCleared = oldTopicId && !topicId     // FIXME: 0 is a valid topic ID
   const assocCleared = oldAssocId && !assocId     // FIXME: 0 is a valid topic ID
   if (topicCleared || assocCleared) {
@@ -217,11 +215,6 @@ function navigate (to, from) {
   const oldDetail = from.params.detail
   if (detail != oldDetail) {
     store.dispatch('selectDetail', detail)
-    if (detail === 'edit') {
-      p2.then(() => {
-        store.dispatch('edit')
-      })
-    }
   }
 }
 
@@ -235,8 +228,6 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.
  *
  * @param   p   a promise resolved once the topicmap rendering is complete.
- *
- * @return      a promise resolved once topic data has arrived (global "object" state is up-to-date).
  */
 function fetchTopic (id, p) {
   // console.log('requesting topic', id)
@@ -248,15 +239,12 @@ function fetchTopic (id, p) {
   p.then(() => {
     store.dispatch('setTopicSelection', {id, p: p2})  // topicmap panel
   })
-  return p2
 }
 
 /**
  * Fetches the given assoc, displays it in the detail panel, and renders it as selected in the topicmap panel.
  *
  * @param   p   a promise resolved once the topicmap rendering is complete.
- *
- * @return      a promise resolved once assoc data has arrived (global "object" state is up-to-date).
  */
 function fetchAssoc (id, p) {
   // includeChilds=true, includeAssocChilds=true
@@ -266,7 +254,6 @@ function fetchAssoc (id, p) {
   p.then(() => {
     store.dispatch('setAssocSelection', {id, p: p2})  // topicmap panel
   })
-  return p2
 }
 
 function unsetSelection(p) {

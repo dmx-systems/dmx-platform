@@ -20,7 +20,7 @@ new Vue({
 })
 // console.log('### Vue root instance created!')
 
-// The vue component hierarchy must be instantiated *before* the Webclient plugins are
+// The vue component hierarchy must be instantiated *before* the webclient plugins are
 // loaded. Plugins that customize the detail panel rely on the "registerObjectRenderer"
 // action, which is only registered in dm5-detail-panel's created() hook (see comment there). ### TODO: still true?
 pluginManager.loadPlugins()
@@ -33,7 +33,7 @@ Vue.nextTick(() => {
   store.dispatch('mountComponents')
 })
 
-// Initial navigation must take place *after* the Webclient plugins are loaded.
+// Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
   // Both, the Topicmap Panel and the Detail Panel, rely on a populated type cache.

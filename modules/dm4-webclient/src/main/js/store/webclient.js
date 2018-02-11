@@ -17,9 +17,6 @@ const state = {
                             // If undefined the detail panel is not visible.
                             // TODO: move to separate dm5-detail-panel standard plugin?
 
-  mode: undefined,          // 'info' or 'form'
-                            // TODO: move to separate dm5-detail-panel standard plugin?
-
   objectRenderers: {},      // Registered page renderers:
                             //   {
                             //     typeUri: component
@@ -37,7 +34,6 @@ const actions = {
     // console.log('displayObject')
     state.object = object.isType() ? object.asType() : object
     _initWritable()
-    cancelEdit()    // Note: inline state is still set when inline editing was left without saving
   },
 
   emptyDisplay () {
@@ -45,17 +41,9 @@ const actions = {
     state.object = undefined
   },
 
-  /**
-   * Precondition:
-   * - topic/assoc data has arrived (global "object" state is up-to-date).
-   */
-  edit () {
-    console.log('edit', state.object)
-    state.mode = 'form'
-  },
-
-  submit (_, object) {
+  submit ({dispatch}, object) {
     _submit(object)
+    dispatch('stripDetailFromRoute')
   },
 
   // TODO: introduce edit buffer also for inline editing?
@@ -144,7 +132,6 @@ const actions = {
 
   loggedOut () {
     initWritable()
-    cancelEdit()
   },
 
   // WebSocket messages
@@ -194,12 +181,6 @@ function _submit (object) {
   object.update().then(object => {
     store.dispatch('_processDirectives', object.directives)
   })
-  cancelEdit()
-}
-
-function cancelEdit () {
-  state.mode = 'info'               // cancel form edit
-  // state.inlineCompId = undefined ### TODO: cancel inline edit?
 }
 
 //

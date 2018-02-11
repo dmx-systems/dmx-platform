@@ -15,7 +15,7 @@ export default {
 
     topicmapId: {
       get () {
-        // Note: in the moment the Webclient components are mounted no topicmap is loaded yet
+        // Note: in the moment the webclient components are mounted no topicmap is loaded yet
         return this.topicmap && this.topicmap.id
       },
       set (id) {
