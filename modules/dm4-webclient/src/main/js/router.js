@@ -248,7 +248,7 @@ function fetchTopic (id, p) {
  */
 function fetchAssoc (id, p) {
   // includeChilds=true, includeAssocChilds=true
-  const p2 = dm5.restClient.getAssoc(id, true, true).then(assoc => {
+  const p2 = dm5.restClient.getAssocWithPlayers(id, true, true).then(assoc => {
     store.dispatch('displayObject', assoc)            // detail panel
   })
   p.then(() => {
