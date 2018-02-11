@@ -10,7 +10,7 @@ const state = {
 const actions = {
 
   login ({dispatch}, credentials) {
-    return dm5.restClient.login(credentials).then(response => {
+    return dm5.restClient.login(credentials).then(() => {
       const username = credentials.username
       console.log('Login', username)
       setUsername(username)
@@ -25,10 +25,13 @@ const actions = {
 
   logout ({dispatch}) {
     console.log('Logout', state.username)
-    setUsername()
-    dm5.restClient.logout()
-    dm5.permCache.clear()
-    dispatch('loggedOut')
+    // Note: once logout request is sent we must succeed synchronously. Plugins may perform further
+    // requests in their "loggedOut" handler which may rely on up-to-date login/logout state.
+    dm5.restClient.logout().then(() => {
+      setUsername()
+      dm5.permCache.clear()
+      dispatch('loggedOut')
+    })
   },
 
   openLoginDialog () {
