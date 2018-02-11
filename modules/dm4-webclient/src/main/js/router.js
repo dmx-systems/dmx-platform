@@ -264,10 +264,8 @@ function fetchAssoc (id, p) {
     store.dispatch('displayObject', assoc)            // detail panel
   })
   p.then(() => {
-    store.dispatch('setAssocSelection', id)           // topicmap panel
+    store.dispatch('setAssocSelection', {id, p: p2})  // topicmap panel
   })
-  // Note: in contrast to topic details assoc details are not displayed in-map.
-  // "setAssocSelection" does not rely on the actual assoc data.
   return p2
 }
 

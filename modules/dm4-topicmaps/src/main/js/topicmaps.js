@@ -153,13 +153,15 @@ const actions = {
    *
    * Postcondition:
    * - "selections" state is up-to-date.
+   *
+   * @param   p   a promise resolved once assoc data has arrived (global "object" state is up-to-date).
    */
-  setAssocSelection ({dispatch}, id) {
+  setAssocSelection ({dispatch}, {id, p}) {
     // console.log('Setting assoc selection of topicmap', _topicmapId(), 'to', id)
     // update state
     state.selections[_topicmapId()] = {type: 'assoc', id}
     // sync view
-    dispatch('syncSelect', {id, p: Promise.resolve()})
+    dispatch('syncSelect', {id, p})
   },
 
   /**
