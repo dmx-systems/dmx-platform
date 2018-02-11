@@ -26,7 +26,7 @@ export default store => {
         }
       },
       {
-        comp: require('./components/TopicmapSelect'),
+        comp: require('./components/dm5-topicmap-select'),
         mount: 'toolbar'
       }
     ],

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="dm5-type-renderer">
     <!-- Generic Object -->
     <dm5-object :object="object" :mode="mode" :level="0"></dm5-object>
     <!-- Data Type -->
@@ -10,11 +10,11 @@
         <el-option-group label="Simple">
           <el-option :label="dataTypes['dm4.core.text'].value"     :value="dataTypes['dm4.core.text'].uri">
           </el-option>
-          <el-option :label="dataTypes['dm4.core.html'].value"     :value="dataTypes['dm4.core.html'].uri">
-          </el-option>
           <el-option :label="dataTypes['dm4.core.number'].value"   :value="dataTypes['dm4.core.number'].uri">
           </el-option>
           <el-option :label="dataTypes['dm4.core.boolean'].value"  :value="dataTypes['dm4.core.boolean'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dm4.core.html'].value"     :value="dataTypes['dm4.core.html'].uri">
           </el-option>
         </el-option-group>
         <el-option-group label="Composite">
@@ -34,7 +34,7 @@ import dm5 from 'dm5'
 export default {
 
   mixins: [
-    require('./mixins/mode-prop').default,
+    require('./mixins/mode').default,
     require('./mixins/info-mode').default
   ],
 

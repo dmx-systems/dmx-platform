@@ -1,4 +1,4 @@
-export default (store) => ({
+export default store => ({
 
   storeModule: {
     name: 'typeeditor',
@@ -6,8 +6,8 @@ export default (store) => ({
   },
 
   detailPanel: {
-    'dm4.core.topic_type': require('./components/TypeRenderer'),
-    'dm4.core.assoc_type': require('./components/TypeRenderer')
+    'dm4.core.topic_type': require('./components/dm5-type-renderer'),
+    'dm4.core.assoc_type': require('./components/dm5-type-renderer')
   },
 
   extraMenuItems: [
