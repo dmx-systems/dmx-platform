@@ -10,21 +10,26 @@
 <style>
 :root {
   /*
-    Note: font name "Lucida Grande" is not quoted.
+    Note 1: we use the native font of the respective platform.
+      https://make.wordpress.org/core/2016/07/07/native-fonts-in-4-6/
+      https://bitsofco.de/the-new-system-font-stack/
+
+    Note 2: multiple-word font names like "Segoe UI" are not quoted.
     In various browsers DOM style.getPropertyValue() works differently (see https://jsfiddle.net/jri_/tt8o97yu/2/):
       Safari: converts " -> '
       Chrome: converts ' -> "
       Firefox: no conversion
     This affects at least 2 situations:
       1) When styling Cytoscape nodes/edges (style: {'font-family': ...}) Cytoscape expects " to be used when quoting
-         multiple word font names. Otherwise an error is reported along with stacktrace (but rendering works anyways).
+         multiple-word font names. Otherwise an error is reported along with stacktrace (but rendering works anyways).
       2) When rendering a SVG <text> element the font-family attribute value must be enclosed in the opposite quoting
          style (e.g. <text font-family='"Lucida Grande", sans-serif'>). Otherwise the SVG would be malformed.
     So, the different style.getPropertyValue() browser behavior creates quite a mess.
-    All the mess vanish if multiple word font names are not quoted at all in CSS. There are some debates whether this
-    is valid CSS or not. Fact is multiple word font names without quotes do work in all major browsers.
+    All the mess vanish if multiple-word font names are not quoted at all in CSS. There are some debates whether this
+    is valid CSS or not. Fact is multiple-word font names without quotes do work in all major browsers.
   */
-  --main-font-family: Lucida Grande, Verdana, sans-serif;
+  --main-font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+      Helvetica Neue, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
   --label-color: #878d99;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
