@@ -280,7 +280,8 @@ const actions = {
     state.topicmap.removeAssocs(id)
     state.topicmap.getTopic(id).setVisibility(false)
     dispatch('unselectIf', id)
-    // sync view (up-to-date already)
+    // sync view
+    dispatch('syncRemoveTopic', id)
     // update server
     if (state.writable) {
       dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)
@@ -291,7 +292,8 @@ const actions = {
     // update state
     state.topicmap.removeAssoc(id)
     dispatch('unselectIf', id)
-    // sync view (up-to-date already)
+    // sync view
+    dispatch('syncRemoveAssoc', id)
     // update server
     if (state.writable) {
       dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)
@@ -302,7 +304,8 @@ const actions = {
     // update state
     state.topicmap.removeAssocs(id)
     state.topicmap.removeTopic(id)
-    // sync view (up-to-date already)
+    // sync view
+    dispatch('syncRemoveTopic', id)
     // update server
     dm5.restClient.deleteTopic(id).then(object => {
       dispatch('_processDirectives', object.directives)
@@ -312,7 +315,8 @@ const actions = {
   deleteAssoc ({dispatch}, id) {
     // update state
     state.topicmap.removeAssoc(id)
-    // sync view (up-to-date already)
+    // sync view
+    dispatch('syncRemoveAssoc', id)
     // update server
     dm5.restClient.deleteAssoc(id).then(object => {
       dispatch('_processDirectives', object.directives)
