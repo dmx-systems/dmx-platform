@@ -7,11 +7,11 @@ export default {
 
   components: [
     {
-      comp: require('./components/LoginDialog'),
+      comp: require('./components/dm5-login-dialog'),
       mount: 'webclient'
     },
     {
-      comp: require('./components/LoginState'),
+      comp: require('./components/dm5-login-state'),
       mount: 'toolbar'
     }
   ]

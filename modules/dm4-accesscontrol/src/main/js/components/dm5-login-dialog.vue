@@ -1,5 +1,5 @@
 <template>
-  <el-dialog custom-class="login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
+  <el-dialog custom-class="dm5-login-dialog" :visible="visible" width="20em" title="Login" @open="open" @close="close">
     <div>
       <div class="field-label">Username</div>
       <el-input v-model="credentials.username" ref="username" @keyup.native.enter="advance"></el-input>
@@ -67,11 +67,11 @@ export default {
 </script>
 
 <style>
-.login-dialog .password-field {
+.dm5-login-dialog .password-field {
   margin-top: 1em;
 }
 
-.login-dialog .message {
+.dm5-login-dialog .message {
   margin-top: 1em;
 }
 </style>

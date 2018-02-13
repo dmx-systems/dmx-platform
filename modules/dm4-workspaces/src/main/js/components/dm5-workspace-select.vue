@@ -1,5 +1,5 @@
 <template>
-  <div class="workspace-select">
+  <div class="dm5-workspace-select">
     <div class="field-label">Workspace</div>
     <el-select v-model="workspaceId">
       <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style>
-.workspace-select .el-button {
+.dm5-workspace-select .el-button {
   padding-left: 2px;
 }
 </style>

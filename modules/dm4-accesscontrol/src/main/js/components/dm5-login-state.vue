@@ -35,7 +35,8 @@ export default {
 
 <style>
 .login-state {
-  flex: auto;
+  position: absolute;
+  right: 0;
   text-align: right;
 }
 
