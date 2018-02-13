@@ -7,7 +7,7 @@ module.exports = (env = {}) => {
   var webpackConfig = {
     entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
-      filename: 'webclient.js',
+      filename: 'build.js',
       path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/')
     },
     resolve: {

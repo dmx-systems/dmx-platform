@@ -7,10 +7,10 @@ export default {
       console.info('You are running DM5 in development mode.\n' +
         'The standard plugins are loaded from file system and are hot replaced.')
     }
-    initPlugin(require('modules/dm4-workspaces/src/main/js/main.js').default)
-    initPlugin(require('modules/dm4-topicmaps/src/main/js/main.js').default)
-    initPlugin(require('modules/dm4-accesscontrol/src/main/js/main.js').default)
-    initPlugin(require('modules/dm4-typeeditor/src/main/js/main.js').default)
+    initPlugin(require('modules/dm4-workspaces/src/main/js/plugin.js').default)
+    initPlugin(require('modules/dm4-topicmaps/src/main/js/plugin.js').default)
+    initPlugin(require('modules/dm4-accesscontrol/src/main/js/plugin.js').default)
+    initPlugin(require('modules/dm4-typeeditor/src/main/js/plugin.js').default)
     // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
     // So, they are not init'ed again. ### TODO: explain better
     loadPluginsFromServer()
@@ -20,7 +20,7 @@ export default {
 /**
  * Registers a plugin's resources (store module, components, ...).
  *
- * @param   expo    The plugin main.js export. Either an object or a function that returns an object.
+ * @param   expo    The plugin.js export. Either an object or a function that returns an object.
  */
 function initPlugin (expo) {
   const plugin = typeof expo === 'function' ? expo(store) : expo
