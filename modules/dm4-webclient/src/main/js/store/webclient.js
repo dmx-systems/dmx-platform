@@ -13,7 +13,7 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  detail: undefined,        // The selected tab in the detail panel: 'edit', 'related', ...
+  detail: undefined,        // The selected tab in the detail panel: 'info', 'related', ...
                             // If undefined the detail panel is not visible.
                             // TODO: move to separate dm5-detail-panel standard plugin?
 
@@ -52,11 +52,11 @@ const actions = {
   },
 
   editTopic ({dispatch}, id) {
-    dispatch('callTopicDetailRoute', {id, detail: 'edit'})
+    dispatch('callTopicDetailRoute', {id, detail: 'info'})
   },
 
   editAssoc ({dispatch}, id) {
-    dispatch('callAssocDetailRoute', {id, detail: 'edit'})
+    dispatch('callAssocDetailRoute', {id, detail: 'info'})
   },
 
   whatsRelated ({dispatch}, id) {

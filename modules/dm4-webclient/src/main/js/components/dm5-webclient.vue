@@ -1,7 +1,8 @@
 <template>
   <div class="dm5-webclient">
     <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
-    <dm5-detail-panel v-if="detailPanelVisibility" :object="object" :writable="writable" mode="form">
+    <dm5-detail-panel v-if="detailPanelVisibility" :object="object" :writable="writable" :tab="detail" mode="form"
+      :object-renderers="objectRenderers" @tab-click="tabClick">
     </dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
@@ -28,8 +29,6 @@ export default {
       return this.$store.state.objectRenderers
     },
 
-    //
-
     detailPanelVisibility () {
       return this.detail !== undefined
     },
@@ -54,18 +53,15 @@ export default {
   },
 
   methods: {
+
+    tabClick (name) {
+      this.$store.dispatch('callRoute', {
+        params: {detail: name}
+      })
+    },
+
     mountId (compDef) {
       return `mount-${compDef.id}`
-    }
-  },
-
-  provide () {
-    // Injection and Reactivity:
-    // Returning {object: this.object}: no reactivity.
-    // Returning a calculated property which returns {object: this.object}: no reactivity.
-    // Returning just "this": only the topicmap panel is reactive, not the detail panel. This feels strange!
-    return {
-      context: this
     }
   },
 
