@@ -109,18 +109,22 @@ const actions = {
       const Component = Vue.extend(compDef.comp)
       const comp = new Component({store}).$mount(`#mount-${compDef.id}`)
       // inject props
-      if (compDef.props) {
-        for (var prop in compDef.props) {
-          const val = compDef.props[prop]
-          if (typeof val === "function") {
-            // reactive (val is getter function)
-            registerPropWatcher(comp, prop, val)
-          } else {
-            // static (val is value)
-            comp.$props[prop] = val
-          }
+      for (let prop in compDef.props) {
+        const val = compDef.props[prop]
+        if (typeof val === "function") {
+          // reactive (val is getter function)
+          registerPropWatcher(comp, prop, val)
+        } else {
+          // static (val is value)
+          // TODO: drop static values? Besides watcher set initial value?
+          comp.$props[prop] = val
         }
       }
+      // add listeners
+      for (let eventName in compDef.listeners) {
+        comp.$on(eventName, compDef.listeners[eventName])
+      }
+      // TODO: unregister listeners?
     })
   },
 
