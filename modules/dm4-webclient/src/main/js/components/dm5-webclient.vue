@@ -1,9 +1,6 @@
 <template>
   <div class="dm5-webclient">
     <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
-    <dm5-detail-panel v-if="detailPanelVisibility" :object="object" :writable="writable" :tab="detail" mode="form"
-      :object-renderers="objectRenderers" @tab-click="tabClick">
-    </dm5-detail-panel>
     <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
@@ -12,26 +9,6 @@
 export default {
 
   computed: {
-
-    object () {
-      return this.$store.state.object
-    },
-
-    writable () {
-      return this.$store.state.writable
-    },
-
-    detail () {
-      return this.$store.state.detail
-    },
-
-    objectRenderers () {
-      return this.$store.state.objectRenderers
-    },
-
-    detailPanelVisibility () {
-      return this.detail !== undefined
-    },
 
     compDefs () {
       return this.$store.state.compDefs.webclient
@@ -42,31 +19,13 @@ export default {
     }
   },
 
-  // Showing/hiding the detail panel changes the topicmap panel dimensions.
-  // The Cytoscape renderer size needs to adapt.
-  watch: {
-    detailPanelVisibility () {
-      this.$nextTick(() => {
-        this.$store.dispatch('resizeTopicmapRenderer')
-      })
-    }
-  },
-
   methods: {
-
-    tabClick (name) {
-      this.$store.dispatch('callRoute', {
-        params: {detail: name}
-      })
-    },
-
     mountId (compDef) {
       return `mount-${compDef.id}`
     }
   },
 
   components: {
-    'dm5-detail-panel':  require('dm5-detail-panel'),
     'dm5-search-widget': require('dm5-search-widget')
   }
 }

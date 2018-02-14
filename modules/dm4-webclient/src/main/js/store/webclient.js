@@ -13,10 +13,6 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  detail: undefined,        // The selected tab in the detail panel: 'info', 'related', ...
-                            // If undefined the detail panel is not visible.
-                            // TODO: move to separate dm5-detail-panel standard plugin?
-
   objectRenderers: {},      // Registered page renderers:
                             //   {
                             //     typeUri: component
@@ -61,11 +57,6 @@ const actions = {
 
   whatsRelated ({dispatch}, id) {
     dispatch('callTopicDetailRoute', {id, detail: 'related'})
-  },
-
-  selectDetail (_, detail) {
-    // console.log('selectDetail', detail)
-    state.detail = detail
   },
 
   registerObjectRenderer (_, {typeUri, component}) {

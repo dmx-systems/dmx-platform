@@ -60,6 +60,7 @@ store.registerModule('routerModule', {
     },
 
     callRoute (_, location) {
+      // console.log('callRoute', location)
       router.push(location)
     },
 
