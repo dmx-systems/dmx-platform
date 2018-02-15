@@ -12,17 +12,15 @@ export default store => ({
       props: {
         object:          state => state.object,
         writable:        state => state.writable,
+        visible:         state => state.details.visible,
         tab:             state => state.details.tab,
         mode:            state => state.details.mode,
         objectRenderers: state => state.objectRenderers
       },
       listeners: {
         'tab-click': tab => {
-          // console.log('dynamic tab-click', tab)
-          store.dispatch('callRoute', {
-            name: store.state.object.isTopic() ? 'topicDetail' : 'assocDetail',
-            params: {detail: tab}
-          })
+          console.log('tab-click', tab)
+          store.dispatch('callDetailRoute', tab)
         }
       }
     },

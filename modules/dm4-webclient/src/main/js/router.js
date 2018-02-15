@@ -91,6 +91,7 @@ store.registerModule('routerModule', {
       })
     },
 
+    // TODO: needed?
     callTopicDetailRoute (_, {id, detail}) {
       router.push({
         name: 'topicDetail',
@@ -98,6 +99,7 @@ store.registerModule('routerModule', {
       })
     },
 
+    // TODO: needed?
     callAssocDetailRoute (_, {id, detail}) {
       router.push({
         name: 'assocDetail',
@@ -105,10 +107,21 @@ store.registerModule('routerModule', {
       })
     },
 
+    callDetailRoute (_, detail) {
+      const object = store.state.object
+      if (!object) {
+        throw 'callDetailRoute when no object is selected'
+      }
+      router.push({
+        name: object.isTopic() ? 'topicDetail' : 'assocDetail',
+        params: {detail}
+      })
+    },
+
     stripDetailFromRoute () {
       const object = store.state.object
       if (!object) {
-        throw 'stripDetailFromRoute called when no object is selected'
+        throw 'stripDetailFromRoute when no object is selected'
       }
       router.push({
         name: object.isTopic() ? 'topic' : 'assoc'
@@ -215,7 +228,9 @@ function navigate (to, from) {
   const detail = to.params.detail
   const oldDetail = from.params.detail
   if (detail != oldDetail) {
-    store.dispatch('selectDetail', detail)
+    if (detail) {
+      store.dispatch('selectDetail', detail)
+    }
   }
 }
 
