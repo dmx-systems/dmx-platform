@@ -47,18 +47,6 @@ const actions = {
     _submit(state.object)
   },
 
-  editTopic ({dispatch}, id) {
-    dispatch('callTopicDetailRoute', {id, detail: 'info'})
-  },
-
-  editAssoc ({dispatch}, id) {
-    dispatch('callAssocDetailRoute', {id, detail: 'info'})
-  },
-
-  whatsRelated ({dispatch}, id) {
-    dispatch('callTopicDetailRoute', {id, detail: 'related'})
-  },
-
   registerObjectRenderer (_, {typeUri, component}) {
     state.objectRenderers[typeUri] = component
   },
