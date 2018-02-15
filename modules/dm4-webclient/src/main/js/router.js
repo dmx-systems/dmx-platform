@@ -114,7 +114,7 @@ store.registerModule('routerModule', {
   }
 })
 
-function registerWatcher () {
+function registerRouteWatcher () {
   store.watch(
     state => state.routerModule.router.currentRoute,
     (to, from) => {
@@ -129,7 +129,7 @@ function registerWatcher () {
  */
 function initialNavigation (route) {
   //
-  registerWatcher()
+  registerRouteWatcher()
   //
   let urlPresent
   // 1) select topicmap
@@ -165,6 +165,12 @@ function initialNavigation (route) {
     })
   } else {
     store.dispatch('selectFirstWorkspace')                        // push initial route (indirectly)
+  }
+  // 3) setup detail panel
+  const detail = route.params.detail
+  if (detail) {
+    store.dispatch('setDetailPanelVisibility', true)
+    store.dispatch('selectDetail', detail)
   }
   // console.log('### Initial navigation complete!')
 }

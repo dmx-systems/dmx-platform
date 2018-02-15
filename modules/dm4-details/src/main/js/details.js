@@ -16,6 +16,10 @@ const actions = {
     }
   },
 
+  setDetailPanelVisibility (visible) {
+    state.visible = visible
+  },
+
   selectDetail (_, detail) {
     console.log('selectDetail', detail)
     state.tab = detail
