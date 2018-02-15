@@ -32,7 +32,7 @@
       Helvetica Neue, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
-  --label-color: #878d99;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
+  --label-color: #909399;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
   --color-topic-icon: #36a;     /* topicmap panel */
   --color-topic-hover: #36a;    /* topicmap panel */
   --line-height: 1.5em;
@@ -40,7 +40,7 @@
   --highlight-color: #409eff;         /* see --color-primary */
   --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
   --background-color-darker: #ebeef5;
-  --color-danger: #fa5555;            /* see --color-danger */
+  --color-danger: #f56c6c;            /* see --color-danger */
   --border-color: #dcdfe6;            /* see --border-color-base */
   --border-color-lighter: #ebeef5;    /* see --border-color-lighter */
   --shadow-hover: inset 0px 0px 0px 1px;
