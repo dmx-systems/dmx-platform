@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-type-renderer">
     <!-- Generic Object -->
-    <dm5-object :object="object" :mode="mode" :level="0"></dm5-object>
+    <dm5-object :object="object" :level="0" :context="context"></dm5-object>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
@@ -34,8 +34,8 @@ import dm5 from 'dm5'
 export default {
 
   mixins: [
-    require('./mixins/mode').default,
-    require('./mixins/info-mode').default
+    require('./mixins/info-mode').default,
+    require('./mixins/context').default
   ],
 
   props: {
@@ -46,6 +46,10 @@ export default {
   },
 
   computed: {
+
+    mode () {
+      return this.context.mode
+    },
 
     dataType () {
       return this.object.getDataType()
