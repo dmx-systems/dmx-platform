@@ -39,7 +39,7 @@ const actions = {
 
   submit ({dispatch}, object) {
     _submit(object)
-    dispatch('stripDetailFromRoute')
+    dispatch('callDetailRoute', 'info')
   },
 
   // TODO: introduce edit buffer also for inline editing?

@@ -32,6 +32,12 @@ export default store => ({
         'tab-click': tab => {
           console.log('tab-click', tab)
           store.dispatch('callDetailRoute', tab)
+        },
+        edit () {
+          store.dispatch('callDetailRoute', 'edit')
+        },
+        submit (object) {
+          store.dispatch('submit', object)
         }
       }
     },
