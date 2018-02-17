@@ -12,7 +12,7 @@ export default {
     },
     {
       comp: require('./components/dm5-login-state'),
-      mount: 'toolbar'
+      mount: 'toolbar-right'
     }
   ]
 }

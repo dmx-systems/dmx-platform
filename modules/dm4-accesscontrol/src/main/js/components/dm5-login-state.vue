@@ -35,8 +35,6 @@ export default {
 
 <style>
 .login-state {
-  position: absolute;
-  right: 0;
   text-align: right;
 }
 

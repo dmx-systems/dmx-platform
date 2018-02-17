@@ -22,12 +22,16 @@ export default store => {
         props: {
           object:          state => state.object,
           writable:        state => state.writable,
-          objectRenderers: state => state.objectRenderers
+          objectRenderers: state => state.objectRenderers,
+          toolbarCompDefs: state => ({
+            left:  state.compDefs['toolbar-left'],
+            right: state.compDefs['toolbar-right']
+          })
         }
       },
       {
         comp: require('./components/dm5-topicmap-select'),
-        mount: 'toolbar'
+        mount: 'toolbar-left'
       }
     ],
 

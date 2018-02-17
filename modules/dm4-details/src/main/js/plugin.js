@@ -26,7 +26,7 @@ export default store => ({
     },
     {
       comp: require('./components/dm5-detail-panel-toggle'),
-      mount: 'toolbar'
+      mount: 'toolbar-right'
     }
   ]
 })

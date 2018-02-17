@@ -35,7 +35,7 @@
   --label-color: #909399;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
   --color-topic-icon: #36a;     /* topicmap panel */
   --color-topic-hover: #36a;    /* topicmap panel */
-  --line-height: 1.5em;
+  --line-height: 1.6em;
   --paragraph-spacing: 1em;
   --highlight-color: #409eff;         /* see --color-primary */
   --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
