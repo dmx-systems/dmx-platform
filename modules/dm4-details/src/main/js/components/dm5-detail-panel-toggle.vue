@@ -1,5 +1,6 @@
 <template>
-  <el-button :class="['dm5-detail-panel-toggle', 'fa', icon]" :disabled="!object" type="text" @click="toggle">
+  <el-button :class="['dm5-detail-panel-toggle', 'fa', icon]" :disabled="disabled" :title="title" type="text"
+    @click="toggle">
   </el-button>
 </template>
 
@@ -16,8 +17,16 @@
         return this.$store.state.details.visible
       },
 
+      disabled () {
+        return !this.object && !this.visible
+      },
+
       icon () {
         return this.visible ? 'fa-caret-square-o-right' : 'fa-caret-square-o-left'
+      },
+
+      title () {
+        return (this.visible ? 'Hide' : 'Show') + ' detail panel'
       }
     },
 
