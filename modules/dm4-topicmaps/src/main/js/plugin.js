@@ -1,19 +1,19 @@
 export default store => {
-
-  // TODO: declarative store watchers?
-  store.watch(
-    state => state.typeCache.assocTypes,
-    assocTypes => {
-      store.dispatch('syncStyles', assocTypeColors())
-    }
-  )
-
   return {
 
     storeModule: {
       name: 'topicmaps',
       module: require('./topicmaps')
     },
+
+    storeWatcher: [
+      {
+        getter: state => state.typeCache.assocTypes,
+        callback: assocTypes => {
+          store.dispatch('syncStyles', assocTypeColors())
+        }
+      }
+    ],
 
     components: [
       {

@@ -39,6 +39,8 @@ export default {
 
 .dm5-webclient .dm5-topicmap-panel {
   flex-grow: 1;
+  flex-basis: 70%;
+  overflow: hidden;     /* leave place for the detail panel */
   position: relative;
 }
 

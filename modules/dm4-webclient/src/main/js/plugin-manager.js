@@ -34,6 +34,13 @@ function initPlugin (expo) {
       storeModule.module.default
     )
   }
+  // store watcher
+  const storeWatcher = plugin.storeWatcher
+  if (storeWatcher) {
+    storeWatcher.forEach(watcher => {
+      store.watch(watcher.getter, watcher.callback)
+    })
+  }
   // components
   const components = plugin.components
   if (components) {
