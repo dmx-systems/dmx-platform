@@ -6,14 +6,12 @@ export default store => {
       module: require('./topicmaps')
     },
 
-    storeWatcher: [
-      {
-        getter: state => state.typeCache.assocTypes,
-        callback: assocTypes => {
-          store.dispatch('syncStyles', assocTypeColors())
-        }
+    storeWatcher: [{
+      getter: state => state.typeCache.assocTypes,
+      callback: () => {
+        store.dispatch('syncStyles', assocTypeColors())
       }
-    ],
+    }],
 
     components: [
       {

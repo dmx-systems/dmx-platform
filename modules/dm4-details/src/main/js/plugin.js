@@ -1,9 +1,20 @@
+import Vue from 'vue'
+
 export default store => ({
 
   storeModule: {
     name: 'details',
     module: require('./details')
   },
+
+  storeWatcher: [{
+    getter: state => state.details.visible,
+    callback: () => {
+      Vue.nextTick(() => {
+        store.dispatch('resizeTopicmapRenderer')
+      })
+    }
+  }],
 
   components: [
     {

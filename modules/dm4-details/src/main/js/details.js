@@ -21,7 +21,7 @@ const actions = {
   },
 
   selectDetail (_, detail) {
-    console.log('selectDetail', detail)
+    // console.log('selectDetail', detail)
     state.tab = detail
   }
 }
