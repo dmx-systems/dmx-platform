@@ -1,6 +1,7 @@
 /**
- * Adapts app state to route changes.
- * Creates the initial app state, based on start URL.
+ * The router.
+ * - Adapts app state when route changes.
+ * - Sets up initial app state according to start URL.
  */
 
 import Vue from 'vue'
@@ -125,6 +126,7 @@ function registerRouteWatcher () {
 }
 
 /**
+ * Sets up initial app state according to start URL.
  * Selects the intial topicmap and workspace, and pushes the initial route if needed.
  */
 function initialNavigation (route) {
@@ -175,6 +177,9 @@ function initialNavigation (route) {
   // console.log('### Initial navigation complete!')
 }
 
+/**
+ * Adapts app state when route changes.
+ */
 function navigate (to, from) {
   // topicmap
   const topicmapId = to.params.topicmapId
@@ -195,29 +200,30 @@ function navigate (to, from) {
     p = Promise.resolve()
   }
   // selection
+  var selectionCleared
   const topicId = to.params.topicId
-  const oldTopicId = from.params.topicId
-  if (topicId != oldTopicId) {
+  if (topicId != from.params.topicId) {
     if (topicId) {                                // FIXME: 0 is a valid topic ID
       fetchTopic(topicId, p)
+    } else {
+      selectionCleared = true
     }
   }
   const assocId = to.params.assocId
-  const oldAssocId = from.params.assocId
-  if (assocId != oldAssocId) {
+  if (assocId != from.params.assocId) {
     if (assocId) {                                // FIXME: 0 is a valid topic ID
       fetchAssoc(assocId, p)
+    } else {
+      selectionCleared = true
     }
   }
-  const topicCleared = oldTopicId && !topicId     // FIXME: 0 is a valid topic ID
-  const assocCleared = oldAssocId && !assocId     // FIXME: 0 is a valid topic ID
-  if (topicCleared || assocCleared) {
+  if (selectionCleared) {
     unsetSelection(p)
   }
   // detail
   const detail = to.params.detail
-  const oldDetail = from.params.detail
-  if (detail != oldDetail) {
+  if (detail != from.params.detail) {
+    store.dispatch('setDetailPanelVisibility', detail !== undefined)
     if (detail) {
       store.dispatch('selectDetail', detail)
     }

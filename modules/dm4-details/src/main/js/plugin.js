@@ -30,7 +30,7 @@ export default store => ({
       },
       listeners: {
         'tab-click': tab => {
-          console.log('tab-click', tab)
+          // console.log('tab-click', tab)
           store.dispatch('callDetailRoute', tab)
         },
         edit () {

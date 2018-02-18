@@ -14,15 +14,19 @@ const state = {
 const actions = {
 
   toggleDetailPanelVisibility ({dispatch}) {
-    state.visible = !state.visible
     if (state.visible) {
-      dispatch('callDetailRoute', state.tab)
-    } else {
       dispatch('stripDetailFromRoute')
+    } else {
+      dispatch('callDetailRoute', state.tab)
     }
   },
 
-  setDetailPanelVisibility (visible) {
+  setDetailPanelVisibility (_, visible) {
+    // Note: we expect actual boolean values (not truish/falsish) as the watcher
+    // is supposed to fire on actual visibility *changes* only (see plugin.js).
+    if (typeof visible !== 'boolean') {
+      throw Error(`Boolean expexted but got ${typeof visible}`)
+    }
     state.visible = visible
   },
 
