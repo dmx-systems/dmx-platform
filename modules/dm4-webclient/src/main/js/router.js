@@ -243,13 +243,14 @@ const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
  */
 function fetchTopic (id, p) {
   // console.log('requesting topic', id)
-  // includeChilds=true, includeAssocChilds=true
-  const p2 = dm5.restClient.getTopic(id, true, true).then(topic => {
+  // detail panel
+  const p2 = dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
     // console.log('topic', id, 'arrived')
-    store.dispatch('displayObject', topic)            // detail panel
+    store.dispatch('displayObject', topic)
   })
+  // topicmap panel
   p.then(() => {
-    store.dispatch('setTopicSelection', {id, p: p2})  // topicmap panel
+    store.dispatch('setTopicSelection', {id, p: p2})
   })
 }
 
@@ -259,18 +260,21 @@ function fetchTopic (id, p) {
  * @param   p   a promise resolved once the topicmap rendering is complete.
  */
 function fetchAssoc (id, p) {
-  // includeChilds=true, includeAssocChilds=true
-  const p2 = dm5.restClient.getAssocWithPlayers(id, true, true).then(assoc => {
-    store.dispatch('displayObject', assoc)            // detail panel
+  // detail panel
+  const p2 = dm5.restClient.getAssoc(id, true, true).then(assoc => {    // includeChilds=true, includeAssocChilds=true
+    store.dispatch('displayObject', assoc)
   })
+  // topicmap panel
   p.then(() => {
-    store.dispatch('setAssocSelection', {id, p: p2})  // topicmap panel
+    store.dispatch('setAssocSelection', {id, p: p2})
   })
 }
 
 function unsetSelection(p) {
-  store.dispatch('emptyDisplay')                      // detail panel
+  // detail panel
+  store.dispatch('emptyDisplay')
+  // topicmap panel
   p.then(() => {
-    store.dispatch('unsetSelection')                  // topicmap panel
+    store.dispatch('unsetSelection')
   })
 }
