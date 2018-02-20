@@ -104,22 +104,28 @@ const actions = {
     }
   },
 
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
   selectTopic ({dispatch}, id) {
     dispatch('callTopicRoute', id)
   },
 
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
   selectAssoc ({dispatch}, id) {
     dispatch('callAssocRoute', id)
   },
 
-  onBackgroundClick ({dispatch}) {
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  unselect ({dispatch}) {
     dispatch('stripSelectionFromRoute')
-  },
-
-  onTopicDoubleClick ({dispatch}, viewTopic) {
-    if (viewTopic.typeUri === 'dm4.topicmaps.topicmap') {
-      dispatch('selectTopicmap', viewTopic.id)
-    }
   },
 
   /**
@@ -236,7 +242,13 @@ const actions = {
     }
   },
 
-  onTopicDragged (_, {id, pos}) {
+  /**
+   * Preconditions:
+   * - the topic belongs to the selected topicmap
+   * - the view is up-to-date
+   * - the server is *not* yet up-to-date
+   */
+  setTopicPosition (_, {id, pos}) {
     // update state
     state.topicmap.getTopic(id).setPosition(pos)
     // sync view (up-to-date already)
@@ -246,18 +258,12 @@ const actions = {
     }
   },
 
-  onTopicDroppedOntoTopic ({dispatch}, {topicId, droppedOntoTopicId}) {
+  createAssoc ({dispatch}, {topicId1, topicId2}) {
     // TODO: display search/create widget; initiate assoc creation there
     const assocModel = {
       typeUri: 'dm4.core.association',
-      role1: {
-        roleTypeUri: 'dm4.core.default',
-        topicId
-      },
-      role2: {
-        roleTypeUri: 'dm4.core.default',
-        topicId: droppedOntoTopicId
-      }
+      role1: {topicId: topicId1, roleTypeUri: 'dm4.core.default'},
+      role2: {topicId: topicId2, roleTypeUri: 'dm4.core.default'}
     }
     console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
@@ -266,13 +272,6 @@ const actions = {
     }).catch(error => {
       console.error(error)
     })
-  },
-
-  /**
-   * @param   pos   `model` and `render` positions
-   */
-  onBackgroundRightClick ({dispatch}, pos) {
-    dispatch('openSearchWidget', {pos})
   },
 
   hideTopic ({dispatch}, id) {

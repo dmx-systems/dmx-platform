@@ -25,6 +25,15 @@ export default store => {
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
           })
+        },
+        listeners: {
+          'topic-select':         id          => store.dispatch('selectTopic', id),
+          'topic-double-click':   id          => selectTopicmapIf(id),
+          'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
+          'topic-drop-on-topic':  ids         => store.dispatch('createAssoc', ids),
+          'assoc-select':         id          => store.dispatch('selectAssoc', id),
+          'topicmap-click':       ()          => store.dispatch('unselect'),
+          'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos})
         }
       },
       {
@@ -40,6 +49,12 @@ export default store => {
         store.dispatch('createTopicmap', name)
       }
     }]
+  }
+
+  function selectTopicmapIf (id) {
+    if (store.state.topicmaps.topicmap.getTopic(id).typeUri === 'dm4.topicmaps.topicmap') {
+      store.dispatch('selectTopicmap', id)
+    }
   }
 
   function assocTypeColors() {
