@@ -72,16 +72,16 @@ store.registerModule('routerModule', {
       })
     },
 
-    callTopicRoute (_, id) {
+    callTopicRoute ({rootState}, id) {
       router.push({
-        name: 'topic',
+        name: rootState.details.visible ? 'topicDetail' : 'topic',
         params: {topicId: id}
       })
     },
 
-    callAssocRoute (_, id) {
+    callAssocRoute ({rootState}, id) {
       router.push({
-        name: 'assoc',
+        name: rootState.details.visible ? 'assocDetail' : 'assoc',
         params: {assocId: id}
       })
     },
