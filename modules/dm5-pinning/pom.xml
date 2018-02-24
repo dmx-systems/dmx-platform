@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Box Renderer (DOM)</name>
+    <name>DeepaMehta 5 Pinning</name>
     <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-box-renderer-dom</artifactId>
+    <artifactId>deepamehta-pinning</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.boxrenderer.dom.BoxRendererPlugin
+                            de.deepamehta.pinning.PinningPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

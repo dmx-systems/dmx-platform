@@ -135,7 +135,7 @@
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>deepamehta-box-renderer-dom</artifactId>
+            <artifactId>deepamehta-pinning</artifactId>
             <version>5.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

@@ -317,7 +317,7 @@
                 <module>modules/dm4-caching</module>
                 <module>modules/dm4-config</module>
                 <module>modules/dm4-storage-neo4j</module>
-                <module>modules/dm4-box-renderer-dom</module>
+                <module>modules/dm5-pinning</module>
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects follow -->
@@ -411,7 +411,7 @@
                 <module>modules/dm4-caching</module>
                 <module>modules/dm4-config</module>
                 <module>modules/dm4-storage-neo4j</module>
-                <module>modules/dm4-box-renderer-dom</module>
+                <module>modules/dm5-pinning</module>
                 <!-- Testing -->
                 <module>modules/dm4-test</module>
                 <!-- POM projects -->

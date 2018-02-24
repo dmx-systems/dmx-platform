@@ -33,7 +33,7 @@
         <bundle>mvn:de.deepamehta/deepamehta-caching/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-config/${project.version}</bundle>
         <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/${project.version}</bundle>
-        <bundle>mvn:de.deepamehta/deepamehta-box-renderer-dom/${project.version}</bundle>
+        <bundle>mvn:de.deepamehta/deepamehta-pinning/${project.version}</bundle>
     </feature>
 
     <feature name="dm4-standard-distribution" description="DeepaMehta 4 Standard Distribution" version="${project.version}">

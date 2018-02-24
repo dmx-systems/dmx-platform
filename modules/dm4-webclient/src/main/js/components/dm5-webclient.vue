@@ -6,6 +6,8 @@
 </template>
 
 <script>
+import dm5 from 'dm5'
+
 export default {
 
   computed: {
@@ -14,8 +16,14 @@ export default {
       return this.$store.state.compDefs.webclient
     },
 
+    topicTypes () {
+      return this.$store.state.typeCache.topicTypes
+    },
+
     menuTopicTypes () {
-      return this.$store.getters.menuTopicTypes
+      return dm5.utils.filter(this.topicTypes, topicType =>
+        topicType.getViewConfig('dm4.webclient.show_in_create_menu')
+      )
     }
   },
 
