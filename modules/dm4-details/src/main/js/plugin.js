@@ -4,7 +4,7 @@ export default store => ({
 
   storeModule: {
     name: 'details',
-    module: require('./details')
+    module: require('./details').default
   },
 
   storeWatcher: [{

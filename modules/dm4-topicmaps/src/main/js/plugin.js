@@ -3,7 +3,7 @@ export default store => {
 
     storeModule: {
       name: 'topicmaps',
-      module: require('./topicmaps')
+      module: require('./topicmaps').default
     },
 
     storeWatcher: [{

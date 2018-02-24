@@ -2,7 +2,7 @@ export default {
 
   storeModule: {
     name: 'accesscontrol',
-    module: require('./accesscontrol')
+    module: require('./accesscontrol').default
   },
 
   components: [

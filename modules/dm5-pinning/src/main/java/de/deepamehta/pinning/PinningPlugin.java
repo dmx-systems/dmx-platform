@@ -30,7 +30,7 @@ public class PinningPlugin extends PluginActivator implements ViewmodelCustomize
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    // *** Hook Implementations ***
+    // *** Plugin Hooks ***
 
     @Override
     public void serviceArrived(Object service) {
@@ -47,7 +47,7 @@ public class PinningPlugin extends PluginActivator implements ViewmodelCustomize
         ((TopicmapsService) service).unregisterViewmodelCustomizer(this);
     }
 
-    // *** ViewmodelCustomizer Implementation ***
+    // *** ViewmodelCustomizer ***
 
     @Override
     public void enrichViewProperties(RelatedTopic topic, ViewProperties viewProps) {

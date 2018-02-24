@@ -2,7 +2,7 @@ export default store => ({
 
   storeModule: {
     name: 'typeeditor',
-    module: require('./typeeditor')
+    module: require('./typeeditor').default
   },
 
   detailPanel: {

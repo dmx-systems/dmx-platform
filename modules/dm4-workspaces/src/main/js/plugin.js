@@ -2,7 +2,7 @@ export default (store) => ({
 
   storeModule: {
     name: 'workspaces',
-    module: require('./workspaces')
+    module: require('./workspaces').default
   },
 
   components: [{
