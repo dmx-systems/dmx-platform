@@ -12,7 +12,6 @@ export default {
     initPlugin(require('modules/dm4-accesscontrol/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-details/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-typeeditor/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dm5-pinning/src/main/js/plugin.js').default)
     // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
     // So, they are not init'ed again. ### TODO: explain better
     loadPluginsFromServer()
