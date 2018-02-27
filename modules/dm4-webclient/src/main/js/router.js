@@ -181,13 +181,13 @@ function initialNavigation (route) {
  * Adapts app state when route changes.
  */
 function navigate (to, from) {
-  // topicmap
+  // console.log('navigate', to, from)
+  var p     // a promise resolved once the topicmap rendering is complete
+  // 1) topicmap
   const topicmapId = to.params.topicmapId
-  const oldTopicmapId = from.params.topicmapId
-  var p   // a promise resolved once the topicmap rendering is complete
   // Note: path param values read from URL are strings. Path param values set by push() are numbers.
   // So we do *not* use exact equality (!==) here.
-  if (topicmapId != oldTopicmapId) {
+  if (topicmapId != from.params.topicmapId) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
     p = new Promise(resolve => {
@@ -199,28 +199,21 @@ function navigate (to, from) {
   } else {
     p = Promise.resolve()
   }
-  // selection
-  var selectionCleared
+  // 2) selection
   const topicId = to.params.topicId
-  if (topicId != from.params.topicId) {
-    if (topicId) {                                // FIXME: 0 is a valid topic ID
-      fetchTopic(topicId, p)
-    } else {
-      selectionCleared = true
-    }
-  }
   const assocId = to.params.assocId
-  if (assocId != from.params.assocId) {
-    if (assocId) {                                // FIXME: 0 is a valid topic ID
-      fetchAssoc(assocId, p)
-    } else {
-      selectionCleared = true
-    }
+  const topicChanged = topicId != from.params.topicId
+  const assocChanged = assocId != from.params.assocId
+  if (topicChanged && topicId) {                                    // FIXME: 0 is a valid topic ID
+    fetchTopic(topicId, p)
   }
-  if (selectionCleared) {
+  if (assocChanged && assocId) {
+    fetchAssoc(assocId, p)
+  }
+  if ((topicChanged || assocChanged) && !topicId && !assocId) {     // FIXME: 0 is a valid topic ID
     unsetSelection(p)
   }
-  // detail
+  // 3) detail
   const detail = to.params.detail
   if (detail != from.params.detail) {
     store.dispatch('setDetailPanelVisibility', detail !== undefined)
