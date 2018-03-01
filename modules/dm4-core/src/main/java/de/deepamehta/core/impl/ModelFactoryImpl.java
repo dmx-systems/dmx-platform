@@ -832,8 +832,8 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
-    public AssociationViewModel newAssociationViewModel(AssociationModel assoc) {
-        return new AssociationViewModelImpl((AssociationModelImpl) assoc);
+    public AssociationViewModel newAssociationViewModel(AssociationModel assoc, ViewProperties viewProps) {
+        return new AssociationViewModelImpl((AssociationModelImpl) assoc, viewProps);
     }
 
 

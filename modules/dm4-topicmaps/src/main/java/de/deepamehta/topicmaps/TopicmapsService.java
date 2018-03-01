@@ -47,7 +47,7 @@ public interface TopicmapsService {
     /**
      * Adds an association to a topicmap. If the association is added already an exception is thrown.
      */
-    void addAssociationToTopicmap(long topicmapId, long assocId);
+    void addAssociationToTopicmap(long topicmapId, long assocId, ViewProperties viewProps);
 
     // Note: this is needed in order to reveal a related topic in a *single* request. Otherwise client-sync might fail
     // due to asynchronicity. A client might receive the "addAssoc" WebSocket message *before* the "addTopic" message.
@@ -55,7 +55,9 @@ public interface TopicmapsService {
 
     // ---
 
-    void setViewProperties(long topicmapId, long topicId, ViewProperties viewProps);
+    void setTopicViewProperties(long topicmapId, long topicId, ViewProperties viewProps);
+
+    void setAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps);
 
     /**
      * Convenience method to update the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.

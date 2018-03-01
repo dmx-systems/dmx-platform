@@ -224,7 +224,7 @@ const actions = {
     // update server
     if (state.writable) {
       if (op.type === 'add') {
-        dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id)
+        dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id, op.viewProps)
       }
     }
   },
@@ -297,6 +297,30 @@ const actions = {
     if (state.writable) {
       dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)
     }
+  },
+
+  setTopicPinned ({dispatch}, {topicId, pinned}) {
+    console.log('setTopicPinned', topicId, pinned)
+    // update state
+    state.topicmap.setTopicViewProp(topicId, 'dm4.topicmaps.pinned', pinned)
+    // sync view
+    dispatch('syncPinned', {objectId: topicId, pinned})
+    // update server
+    dm5.restClient.setTopicViewProps(state.topicmap.id, topicId, {
+      'dm4.topicmaps.pinned': pinned
+    })
+  },
+
+  setAssocPinned ({dispatch}, {assocId, pinned}) {
+    console.log('setAssocPinned', assocId, pinned)
+    // update state
+    state.topicmap.setAssocViewProp(assocId, 'dm4.topicmaps.pinned', pinned)
+    // sync view
+    dispatch('syncPinned', {objectId: assocId, pinned})
+    // update server
+    dm5.restClient.setAssocViewProps(state.topicmap.id, assocId, {
+      'dm4.topicmaps.pinned': pinned
+    })
   },
 
   deleteTopic ({dispatch}, id) {

@@ -175,7 +175,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public void addAssociationToTopicmap(@PathParam("id") final long topicmapId,
-                                         @PathParam("assoc_id") final long assocId) {
+                                         @PathParam("assoc_id") final long assocId, final ViewProperties viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
             dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
@@ -185,12 +185,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                         throw new RuntimeException("Association " + assocId + " already added to topicmap " +
                             topicmapId);
                     }
-                    createAssociationMapcontext(topicmapId, assocId);
+                    createAssociationMapcontext(topicmapId, assocId, viewProps);
                     return null;
                 }
             });
         } catch (Exception e) {
-            throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed", e);
+            throw new RuntimeException("Adding association " + assocId + " to topicmap " + topicmapId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
         }
     }
 
@@ -235,11 +236,19 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Path("/{id}/topic/{topic_id}")
     @Transactional
     @Override
-    public void setViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
-                                                                    ViewProperties viewProps) {
-        storeViewProperties(topicmapId, topicId, viewProps);
+    public void setTopicViewProperties(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
+                                                                         ViewProperties viewProps) {
+        storeTopicViewProperties(topicmapId, topicId, viewProps);
     }
 
+    @PUT
+    @Path("/{id}/association/{assoc_id}")
+    @Transactional
+    @Override
+    public void setAssociationViewProperties(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
+                                                                               ViewProperties viewProps) {
+        storeAssociationViewProperties(topicmapId, assocId, viewProps);
+    }
 
     @PUT
     @Path("/{id}/topic/{topic_id}/{x}/{y}")
@@ -248,7 +257,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
         try {
-            storeViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+            storeTopicViewProperties(topicmapId, topicId, new ViewProperties(x, y));
             me.setTopicPosition(topicmapId, topicId, x, y);
         } catch (Exception e) {
             throw new RuntimeException("Setting position of topic " + topicId + " in topicmap " + topicmapId +
@@ -273,7 +282,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 }
             }
             // show/hide topic
-            storeViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+            storeTopicViewProperties(topicmapId, topicId, new ViewProperties(visibility));
             // send message
             me.setTopicVisibility(topicmapId, topicId, visibility);
         } catch (Exception e) {
@@ -399,7 +408,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
             "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
-            assocs.put(assoc.getId(), mf.newAssociationViewModel(assoc.getModel()));
+            assocs.put(assoc.getId(), createAssocViewModel(assoc));
         }
         return assocs;
     }
@@ -408,11 +417,21 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private TopicViewModel createTopicViewModel(RelatedTopic topic) {
         try {
-            ViewProperties viewProps = fetchViewProperties(topic.getRelatingAssociation());
+            ViewProperties viewProps = fetchTopicViewProperties(topic.getRelatingAssociation());
             invokeViewmodelCustomizers(topic, viewProps);
             return mf.newTopicViewModel(topic.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Creating viewmodel for topic " + topic.getId() + " failed", e);
+        }
+    }
+
+    private AssociationViewModel createAssocViewModel(RelatedAssociation assoc) {
+        try {
+            ViewProperties viewProps = fetchAssocViewProperties(assoc.getRelatingAssociation());
+            // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
+            return mf.newAssociationViewModel(assoc.getModel(), viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Creating viewmodel for association " + assoc.getId() + " failed", e);
         }
     }
 
@@ -440,13 +459,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         me.addTopicToTopicmap(topicmapId, topic);
     }
 
-    private void createAssociationMapcontext(long topicmapId, long assocId) {
-        dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+    private void createAssociationMapcontext(long topicmapId, long assocId, ViewProperties viewProps) {
+        Association assocMapcontext = dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
             mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
         ));
+        storeViewProperties(assocMapcontext, viewProps);
         //
-        AssociationModel assoc = dm4.getAssociation(assocId).getModel();
+        AssociationModel assoc = dm4.getAssociation(assocId).getModel();    // TODO: view props
         me.addAssociationToTopicmap(topicmapId, assoc);
     }
 
@@ -476,7 +496,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     /**
      * Convenience.
      */
-    private void storeViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
+    private void storeTopicViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
         try {
             Association topicMapcontext = fetchTopicMapcontext(topicmapId, topicId);
             if (topicMapcontext == null) {
@@ -489,9 +509,25 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    private void storeViewProperties(Association topicMapcontext, ViewProperties viewProps) {
+    /**
+     * Convenience.
+     */
+    private void storeAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps) {
+        try {
+            Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
+            if (assocMapcontext == null) {
+                throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
+            }
+            storeViewProperties(assocMapcontext, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view properties of association " + assocId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        }
+    }
+
+    private void storeViewProperties(Association mapcontext, ViewProperties viewProps) {
         for (String propUri : viewProps) {
-            topicMapcontext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
+            mapcontext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
         }
     }
 

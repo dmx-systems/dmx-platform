@@ -241,7 +241,7 @@ public interface ModelFactory {
 
     TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps);
 
-    AssociationViewModel newAssociationViewModel(AssociationModel assoc);
+    AssociationViewModel newAssociationViewModel(AssociationModel assoc, ViewProperties viewProps);
 
 
 

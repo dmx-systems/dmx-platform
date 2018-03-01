@@ -57,8 +57,9 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
         return viewProps.get(propUri);
     }
 
-    public void put(String propUri, Object value) {
+    public ViewProperties put(String propUri, Object value) {
         viewProps.put(propUri, value);
+        return this;
     }
 
     // ---
