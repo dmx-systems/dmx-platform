@@ -61,6 +61,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private static final String PROP_X          = "dm4.topicmaps.x";
     private static final String PROP_Y          = "dm4.topicmaps.y";
     private static final String PROP_VISIBILITY = "dm4.topicmaps.visibility";
+    private static final String PROP_PINNED     = "dm4.topicmaps.pinned";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -167,7 +168,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility) {
-        addTopicToTopicmap(topicmapId, topicId, new ViewProperties(x, y, visibility));
+        addTopicToTopicmap(topicmapId, topicId, new ViewProperties(x, y, visibility, false));   // pinned=false
     }
 
     @POST
@@ -220,7 +221,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     // Note: it is an error if the association is already in the topicmap. In this case the topic is
                     // already in the topicmap too, and the Webclient would not send the request in the first place.
                     // ### TODO: rethink method contract. Do it analoguous to "add topic"?
-                    addAssociationToTopicmap(topicmapId, assocId);
+                    addAssociationToTopicmap(topicmapId, assocId, new ViewProperties().put(PROP_PINNED, false));
                     return null;
                 }
             });
@@ -480,15 +481,27 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
-    private ViewProperties fetchViewProperties(Association topicMapcontext) {
-        int x = (Integer) topicMapcontext.getProperty(PROP_X);
-        int y = (Integer) topicMapcontext.getProperty(PROP_Y);
-        boolean visibility = visibility(topicMapcontext);
-        return new ViewProperties(x, y, visibility);
+    private ViewProperties fetchTopicViewProperties(Association topicMapcontext) {
+        return new ViewProperties(
+            (Integer) topicMapcontext.getProperty(PROP_X),
+            (Integer) topicMapcontext.getProperty(PROP_Y),
+            visibility(topicMapcontext),
+            pinned(topicMapcontext)
+        );
+    }
+
+    private ViewProperties fetchAssocViewProperties(Association assocMapcontext) {
+        return new ViewProperties(
+            pinned(assocMapcontext)
+        );
     }
 
     private boolean visibility(Association topicMapcontext) {
         return (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
+    }
+
+    private boolean pinned(Association mapcontext) {
+        return (Boolean) mapcontext.getProperty(PROP_PINNED);
     }
 
     // --- Store ---
