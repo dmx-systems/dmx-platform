@@ -491,9 +491,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private ViewProperties fetchAssocViewProperties(Association assocMapcontext) {
-        return new ViewProperties(
-            pinned(assocMapcontext)
-        );
+        return new ViewProperties().put(PROP_PINNED, pinned(assocMapcontext));
     }
 
     private boolean visibility(Association topicMapcontext) {

@@ -94,6 +94,11 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
         return new JSONObject(viewProps);
     }
 
+    @Override
+    public String toString() {
+        return viewProps.toString();
+    }
+
     // ------------------------------------------------------------------------------------------------ Private  Methods
 
     private void initPos(int x, int y) {
