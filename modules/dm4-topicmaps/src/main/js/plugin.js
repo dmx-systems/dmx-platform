@@ -15,7 +15,7 @@ export default store => {
 
     components: [
       {
-        comp: require('dm5-topicmap-panel'),
+        comp: require('dm5-topicmap-panel').default,
         mount: 'webclient',
         props: {
           object:          state => state.object,
@@ -37,7 +37,7 @@ export default store => {
         }
       },
       {
-        comp: require('./components/dm5-topicmap-select'),
+        comp: require('./components/dm5-topicmap-select').default,
         mount: 'toolbar-left'
       }
     ],

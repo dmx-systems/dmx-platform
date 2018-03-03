@@ -34,7 +34,7 @@ export default {
   },
 
   components: {
-    'dm5-search-widget': require('dm5-search-widget')
+    'dm5-search-widget': require('dm5-search-widget').default
   }
 }
 </script>

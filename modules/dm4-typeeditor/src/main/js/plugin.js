@@ -6,8 +6,8 @@ export default store => ({
   },
 
   detailPanel: {
-    'dm4.core.topic_type': require('./components/dm5-type-renderer'),
-    'dm4.core.assoc_type': require('./components/dm5-type-renderer')
+    'dm4.core.topic_type': require('./components/dm5-type-renderer').default,
+    'dm4.core.assoc_type': require('./components/dm5-type-renderer').default
   },
 
   extraMenuItems: [

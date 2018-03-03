@@ -18,7 +18,7 @@ export default store => ({
 
   components: [
     {
-      comp: require('dm5-detail-panel'),
+      comp: require('dm5-detail-panel').default,
       mount: 'webclient',
       props: {
         object:          state => state.object,
@@ -42,7 +42,7 @@ export default store => ({
       }
     },
     {
-      comp: require('./components/dm5-detail-panel-toggle'),
+      comp: require('./components/dm5-detail-panel-toggle').default,
       mount: 'toolbar-right'
     }
   ]

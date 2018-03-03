@@ -61,7 +61,7 @@ export default {
   },
 
   components: {
-    'dm5-object': require('dm5-object-renderer/src/components/dm5-object')
+    'dm5-object': require('dm5-object-renderer/src/components/dm5-object').default
   }
 }
 </script>

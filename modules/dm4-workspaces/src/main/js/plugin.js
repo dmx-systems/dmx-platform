@@ -6,7 +6,7 @@ export default (store) => ({
   },
 
   components: [{
-    comp: require('./components/dm5-workspace-select'),
+    comp: require('./components/dm5-workspace-select').default,
     mount: 'toolbar-left'
   }],
 
