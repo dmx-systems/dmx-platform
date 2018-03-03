@@ -1,19 +1,17 @@
-var path = require('path')
-var webpack = require('webpack')
-var HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
 
 module.exports = (env = {}) => {
 
-  var webpackConfig = {
+  const webpackConfig = {
     entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
-      filename: 'build.js',
-      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/')
+      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist'),
+      publicPath: 'dist/'
     },
     resolve: {
       extensions: [".js", ".vue"],
       alias: {
-        'modules': path.resolve(__dirname, 'modules')
+        'modules': path.resolve(__dirname, 'modules')     // needed by plugin-manager.js
       }
     },
     module: {
@@ -41,22 +39,21 @@ module.exports = (env = {}) => {
           loader: 'file-loader'
         }
       ]
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        DEV: env.dev,
-      }),
-      new HtmlWebpackPlugin({
-        template: 'modules/dm4-webclient/src/main/js/index.html'
-      })
-    ]
+    }
   }
 
   if (env.dev) {
     webpackConfig.devServer = {
       port: 8082,
       proxy: {
-        '/': 'http://localhost:8080'
+        '/': {
+          target: 'http://localhost:8080',
+          bypass: req => {
+            if (req.url === '/') {
+              return 'modules/dm4-webclient/src/main/resources/web/'
+            }
+          }
+        }
       },
       noInfo: true,
       open: true

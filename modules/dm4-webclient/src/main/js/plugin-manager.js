@@ -3,10 +3,6 @@ import store from './store/webclient'
 
 export default {
   loadPlugins () {
-    if (DEV) {
-      console.info('You are running DM5 in development mode.\n' +
-        'The standard plugins are loaded from file system and are hot replaced.')
-    }
     initPlugin(require('modules/dm4-workspaces/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-topicmaps/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-accesscontrol/src/main/js/plugin.js').default)
