@@ -38,6 +38,7 @@ export default store => ({
         },
         submit (object) {
           store.dispatch('submit', object)
+          store.dispatch('callDetailRoute', 'info')
         }
       }
     },

@@ -1,14 +1,11 @@
 const state = {
 
-  // Detail panel visibility
-  visible: false,
+  visible: false,     // Detail panel visibility
 
-  // Selected tab: 'info', 'related', 'meta', 'view'.
-  // Note: form edit takes place in "info" tab, while 'mode' is set to 'form'.
-  tab: 'info',
+  tab: 'info',        // Selected tab: 'info', 'related', 'meta', 'view'.
+                      // Note: form edit takes place in "info" tab, while 'mode' is set to 'form'.
 
-  // Mode of the "info" tab: 'info' or 'form'.
-  mode: 'info'
+  mode: 'info'        // Mode of the "info" tab: 'info' or 'form'.
 }
 
 const actions = {

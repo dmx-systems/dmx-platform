@@ -33,7 +33,8 @@ export default store => {
           'topic-drop-on-topic':  ids         => store.dispatch('createAssoc', ids),
           'assoc-select':         id          => store.dispatch('selectAssoc', id),
           'topicmap-click':       ()          => store.dispatch('unselect'),
-          'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos})
+          'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos}),
+          'object-submit':        object      => store.dispatch('submit', object)
         }
       },
       {

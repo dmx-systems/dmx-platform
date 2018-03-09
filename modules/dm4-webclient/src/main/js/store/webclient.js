@@ -37,14 +37,11 @@ const actions = {
     state.object = undefined
   },
 
-  submit ({dispatch}, object) {
-    _submit(object)
-    dispatch('callDetailRoute', 'info')
-  },
-
   // TODO: introduce edit buffer also for inline editing?
-  submitInline () {
-    _submit(state.object)
+  submit ({dispatch}, object) {
+    object.update().then(object => {
+      dispatch('_processDirectives', object.directives)
+    })
   },
 
   registerObjectRenderer (_, {typeUri, component}) {
@@ -163,12 +160,6 @@ function displayObjectIf (object) {
 function isSelected (id) {
   const object = state.object
   return object && object.id === id
-}
-
-function _submit (object) {
-  object.update().then(object => {
-    store.dispatch('_processDirectives', object.directives)
-  })
 }
 
 //
