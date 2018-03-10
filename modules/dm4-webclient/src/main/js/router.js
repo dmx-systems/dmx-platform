@@ -95,7 +95,7 @@ store.registerModule('routerModule', {
     callDetailRoute (_, detail) {
       const object = store.state.object
       if (!object) {
-        throw Error('callDetailRoute when no object is selected')
+        throw Error('callDetailRoute when nothing is selected')
       }
       router.push({
         name: object.isTopic() ? 'topicDetail' : 'assocDetail',
@@ -103,10 +103,24 @@ store.registerModule('routerModule', {
       })
     },
 
+    callTopicDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'topicDetail',
+        params: {topicId: id, detail}
+      })
+    },
+
+    callAssocDetailRoute (_, {id, detail}) {
+      router.push({
+        name: 'assocDetail',
+        params: {assocId: id, detail}
+      })
+    },
+
     stripDetailFromRoute () {
       const object = store.state.object
       if (!object) {
-        throw Error('stripDetailFromRoute when no object is selected')
+        throw Error('stripDetailFromRoute when nothing is selected')
       }
       router.push({
         name: object.isTopic() ? 'topic' : 'assoc'
