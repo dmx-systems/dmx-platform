@@ -21,6 +21,18 @@ export default store => {
           object:          state => state.object,
           writable:        state => state.writable,
           objectRenderers: state => state.objectRenderers,
+          // TODO: static props? Note: contextCommands does not operate on state
+          // TODO: make the commands extensible for 3rd-party plugins
+          contextCommands: state => ({
+            topic: [
+              {label: 'Hide',   handler: id => store.dispatch('hideTopic',   id)},
+              {label: 'Delete', handler: id => store.dispatch('deleteTopic', id)}
+            ],
+            assoc: [
+              {label: 'Hide',   handler: id => store.dispatch('hideAssoc',   id)},
+              {label: 'Delete', handler: id => store.dispatch('deleteAssoc', id)}
+            ]
+          }),
           toolbarCompDefs: state => ({
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
