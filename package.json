@@ -19,9 +19,9 @@
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
-    "element-ui": "^2.2.0",
+    "element-ui": "^2.2.1",
     "font-awesome": "^4.7.0",
-    "vue": "^2.5.13",
+    "vue": "2.5.13",
     "vue-router": "^2.8.1",
     "vuex": "^2.5.0"
   },
@@ -32,11 +32,11 @@
     "babel-preset-env": "^1.6.1",
     "css-loader": "^0.28.10",
     "file-loader": "^1.1.11",
-    "style-loader": "^0.20.2",
+    "style-loader": "^0.20.3",
     "vue-loader": "^14.2.1",
-    "vue-template-compiler": "^2.5.13",
+    "vue-template-compiler": "2.5.13",
     "webpack": "^4.1.1",
-    "webpack-cli": "^2.0.10",
-    "webpack-dev-server": "^3.1.0"
+    "webpack-cli": "^2.0.11",
+    "webpack-dev-server": "^3.1.1"
   }
 }
