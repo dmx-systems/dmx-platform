@@ -29,7 +29,7 @@ export default store => ({
         objectRenderers: state => state.objectRenderers
       },
       listeners: {
-        'tab-click': tab => {
+        'tab-click' (tab) {
           // console.log('tab-click', tab)
           store.dispatch('callDetailRoute', tab)
         },
@@ -39,6 +39,9 @@ export default store => ({
         submit (object) {
           store.dispatch('submit', object)
           store.dispatch('callDetailRoute', 'info')
+        },
+        'submit-inline' (object) {
+          store.dispatch('submit', object)
         }
       }
     },

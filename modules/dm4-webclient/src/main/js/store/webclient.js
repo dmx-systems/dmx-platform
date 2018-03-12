@@ -37,7 +37,6 @@ const actions = {
     state.object = undefined
   },
 
-  // TODO: introduce edit buffer also for inline editing?
   submit ({dispatch}, object) {
     object.update().then(object => {
       dispatch('_processDirectives', object.directives)
