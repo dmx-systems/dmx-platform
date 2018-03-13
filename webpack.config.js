@@ -3,6 +3,7 @@ const path = require('path')
 module.exports = {
   entry: './modules/dm4-webclient/src/main/js/main.js',
   output: {
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist'),
     publicPath: 'dist/'
   },

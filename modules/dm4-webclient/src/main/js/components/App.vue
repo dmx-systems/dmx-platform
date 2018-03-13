@@ -36,7 +36,7 @@
   --color-topic-icon: #36a;     /* topicmap panel */
   --color-topic-hover: #36a;    /* topicmap panel */
   --line-height: 1.6em;
-  --paragraph-spacing: 1em;
+  --paragraph-spacing: 0.6em;
   --highlight-color: #409eff;         /* see --color-primary */
   --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
   --background-color-darker: #ebeef5;

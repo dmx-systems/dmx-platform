@@ -20,6 +20,7 @@ const state = {
 
   quill: undefined,         // The Quill instance deployed in form mode.
                             // FIXME: support more than one Quill instance per form.
+                            // TODO: move to dm5-object-renderer as local state
 
   compDefs: {}              // Registered components
 }
