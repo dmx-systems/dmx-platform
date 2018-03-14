@@ -21,6 +21,10 @@ export default store => {
           object:          state => state.object,
           writable:        state => state.writable,
           objectRenderers: state => state.objectRenderers,
+          toolbarCompDefs: state => ({
+            left:  state.compDefs['toolbar-left'],
+            right: state.compDefs['toolbar-right']
+          }),
           // TODO: static props? Note: contextCommands does not operate on state
           // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => ({
@@ -36,10 +40,7 @@ export default store => {
               {label: 'Edit',            handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})}
             ]
           }),
-          toolbarCompDefs: state => ({
-            left:  state.compDefs['toolbar-left'],
-            right: state.compDefs['toolbar-right']
-          })
+          quillConfig: state => state.quillConfig
         },
         listeners: {
           'topic-select':         id          => store.dispatch('selectTopic', id),

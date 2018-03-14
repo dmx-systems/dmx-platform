@@ -18,6 +18,7 @@ node_modules/
 
 npm-debug.log
 npm-debug.log.*
+stats*.json
 
 commit-message.txt
 

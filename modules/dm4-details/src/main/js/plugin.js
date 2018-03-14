@@ -26,7 +26,8 @@ export default store => ({
         visible:         state => state.details.visible,
         tab:             state => state.details.tab,
         mode:            state => state.details.mode,
-        objectRenderers: state => state.objectRenderers
+        objectRenderers: state => state.objectRenderers,
+        quillConfig:     state => state.quillConfig
       },
       listeners: {
         'tab-click' (tab) {

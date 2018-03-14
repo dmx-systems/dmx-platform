@@ -22,7 +22,22 @@ const state = {
                             // FIXME: support more than one Quill instance per form.
                             // TODO: move to dm5-object-renderer as local state
 
-  compDefs: {}              // Registered components
+  compDefs: {},             // Registered components
+
+  quillConfig: {
+    options: {
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'code'],
+          ['blockquote', 'code-block'],
+          [{'list': 'ordered'}, {'list': 'bullet'}],
+          [{'header': [1, 2, 3, false]}],
+          ['topic-link', 'link', 'image', 'video']
+        ]
+      },
+      theme: 'snow'
+    }
+  }
 }
 
 const actions = {
@@ -48,10 +63,12 @@ const actions = {
     state.objectRenderers[typeUri] = component
   },
 
+  // TODO: drop
   setQuill (_, quill) {
     state.quill = quill
   },
 
+  // TODO: drop
   createTopicLink (_, topic) {
     console.log('createTopicLink', topic)
     state.quill.format('topic-link', {
