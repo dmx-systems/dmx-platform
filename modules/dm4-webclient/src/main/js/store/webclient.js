@@ -18,22 +18,23 @@ const state = {
                             //     typeUri: component
                             //   }
 
-  quill: undefined,         // The Quill instance deployed in form mode.
-                            // FIXME: support more than one Quill instance per form.
-                            // TODO: move to dm5-object-renderer as local state
-
   compDefs: {},             // Registered components
 
   quillConfig: {
     options: {
       modules: {
-        toolbar: [
-          ['bold', 'italic', 'code'],
-          ['blockquote', 'code-block'],
-          [{'list': 'ordered'}, {'list': 'bullet'}],
-          [{'header': [1, 2, 3, false]}],
-          ['topic-link', 'link', 'image', 'video']
-        ]
+        toolbar: {
+          container: [
+            ['bold', 'italic', 'code'],
+            ['blockquote', 'code-block'],
+            [{'list': 'ordered'}, {'list': 'bullet'}],
+            [{'header': [1, 2, 3, false]}],
+            ['topic-link', 'link', 'image', 'video']
+          ],
+          handlers: {
+            'topic-link': topicLinkHandler
+          }
+        }
       },
       theme: 'snow'
     }
@@ -61,20 +62,6 @@ const actions = {
 
   registerObjectRenderer (_, {typeUri, component}) {
     state.objectRenderers[typeUri] = component
-  },
-
-  // TODO: drop
-  setQuill (_, quill) {
-    state.quill = quill
-  },
-
-  // TODO: drop
-  createTopicLink (_, topic) {
-    console.log('createTopicLink', topic)
-    state.quill.format('topic-link', {
-      topicId: topic.id,
-      linkId: undefined   // TODO
-    })
   },
 
   unselectIf ({dispatch}, id) {
@@ -192,6 +179,27 @@ function _initWritable () {
 }
 
 //
+
+function topicLinkHandler (value) {
+  // Note: "value" is the button of/off state, "this" refers to the Quill toolbar instance
+  console.log('topicLinkHandler', value)
+  store.dispatch('openSearchWidget', {
+    pos: {
+      model:  {x: 100, y: 100},   // TODO
+      render: {x: 100, y: 100}
+    },
+    options: {
+      noSelect: true,
+      topicHandler: topic => {
+        console.log('createTopicLink', topic)
+        this.quill.format('topic-link', {
+          topicId: topic.id,
+          linkId: undefined   // TODO
+        })
+      }
+    }
+  })
+}
 
 function registerPropWatcher (comp, prop, getter) {
   // console.log('registerPropWatcher', prop)
