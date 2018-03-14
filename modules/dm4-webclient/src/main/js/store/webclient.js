@@ -30,14 +30,15 @@ const state = {
             [{'list': 'ordered'}, {'list': 'bullet'}],
             [{'header': [1, 2, 3, false]}],
             ['topic-link', 'link', 'image', 'video']
-          ],
-          handlers: {
-            'topic-link': topicLinkHandler
-          }
+          ]
         }
       },
       theme: 'snow'
-    }
+    },
+    // TODO: allow DM webclient plugins to provide Quill extensions
+    extensions: [
+      require('../topic-link').default
+    ]
   }
 }
 
@@ -179,27 +180,6 @@ function _initWritable () {
 }
 
 //
-
-function topicLinkHandler (value) {
-  // Note: "value" is the button of/off state, "this" refers to the Quill toolbar instance
-  console.log('topicLinkHandler', value)
-  store.dispatch('openSearchWidget', {
-    pos: {
-      model:  {x: 100, y: 100},   // TODO
-      render: {x: 100, y: 100}
-    },
-    options: {
-      noSelect: true,
-      topicHandler: topic => {
-        console.log('createTopicLink', topic)
-        this.quill.format('topic-link', {
-          topicId: topic.id,
-          linkId: undefined   // TODO
-        })
-      }
-    }
-  })
-}
 
 function registerPropWatcher (comp, prop, getter) {
   // console.log('registerPropWatcher', prop)
