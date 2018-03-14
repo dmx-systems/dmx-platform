@@ -1,4 +1,5 @@
 const path = require('path')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
 
 module.exports = {
   entry: './modules/dm4-webclient/src/main/js/main.js',
@@ -34,6 +35,9 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new CleanWebpackPlugin(['modules/dm4-webclient/src/main/resources/web/dist'])
+  ],
   devServer: {
     port: 8082,
     proxy: {
