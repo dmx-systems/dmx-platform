@@ -9,8 +9,8 @@
     "url": "https://github.com/jri/deepamehta.git"
   },
   "scripts": {
-    "dev": "webpack-dev-server -d --hot",
-    "build": "webpack -p --hide-modules"
+    "build": "webpack -p --hide-modules",
+    "dev": "webpack-dev-server -d --hot"
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",
@@ -19,6 +19,7 @@
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
+    "vue-quill-minimum": "https://github.com/jri/vue-quill-minimum.git",
     "element-ui": "^2.2.1",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.15",
