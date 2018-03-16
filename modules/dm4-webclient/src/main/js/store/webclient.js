@@ -22,6 +22,7 @@ const state = {
 
   quillConfig: {
     options: {
+      theme: 'bubble',
       modules: {
         toolbar: {
           container: [
@@ -32,8 +33,7 @@ const state = {
             ['topic-link', 'link', 'image', 'video']
           ]
         }
-      },
-      theme: 'snow'
+      }
     },
     // TODO: allow DM webclient plugins to provide Quill extensions
     extensions: [

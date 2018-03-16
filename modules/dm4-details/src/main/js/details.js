@@ -22,7 +22,7 @@ const actions = {
     // Note: we expect actual boolean values (not truish/falsish) as the watcher
     // is supposed to fire only on actual visibility changes (see plugin.js).
     if (typeof visible !== 'boolean') {
-      throw Error(`Boolean expexted but got ${typeof visible}`)
+      throw Error(`Boolean expexted, got ${typeof visible}`)
     }
     state.visible = visible
   },
