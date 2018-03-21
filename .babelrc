@@ -5,7 +5,8 @@
     }]
   ],
   "plugins": [
-    "syntax-dynamic-import", [
+    "syntax-dynamic-import",
+    "syntax-object-rest-spread", [
     "component", {
       "libraryName": "element-ui",
       "styleLibraryName": "theme-chalk"

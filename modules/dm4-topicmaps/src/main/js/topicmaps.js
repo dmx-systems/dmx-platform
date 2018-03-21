@@ -192,7 +192,6 @@ const actions = {
     dm5.restClient.getTopic(topicId).then(topic => {
       dispatch('revealTopic', {
         topic,
-        pos: {x: 100, y: 100},   // TODO
         select: true
       })
     })
@@ -202,7 +201,7 @@ const actions = {
    * Reveals a topic on the topicmap panel.
    *
    * @param   topic   the topic to reveal (a dm5.Topic object).
-   * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
+   * @param   pos     Optional: the topic position in model coordinates (an object with "x", "y" properties).
    * @param   select  Optional: if trueish the revealed topic is selected programmatically.
    */
   revealTopic ({dispatch}, {topic, pos, select}) {
@@ -230,10 +229,10 @@ const actions = {
   },
 
   // TODO: add "select" param?
-  revealRelatedTopic ({dispatch}, {relTopic, pos}) {
+  revealRelatedTopic ({dispatch}, relTopic) {
     // update state + sync view
-    const topicOp = _revealTopic(relTopic, pos, true, dispatch)      // select=true
-    const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)    // select=false
+    const topicOp = _revealTopic(relTopic, undefined, true, dispatch)   // pos=undefined, select=true
+    const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)       // select=false
     // update server
     if (state.writable) {
       if (topicOp.type || assocOp.type) {
@@ -565,8 +564,8 @@ function _displayTopicmap (rootState, dispatch) {
 
 /**
  * @param   topic   the topic to reveal (a dm5.Topic object).
- * @param   pos     the topic position in model coordinates (an object with "x", "y" properties).
- * @param   select  if trueish the revealed topic is selected programmatically.
+ * @param   pos     Optional: the topic position in model coordinates (an object with "x", "y" properties).
+ * @param   select  Optional: if trueish the revealed topic is selected programmatically.
  */
 function _revealTopic (topic, pos, select, dispatch) {
   // update state

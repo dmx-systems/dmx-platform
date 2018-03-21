@@ -46,7 +46,7 @@ const actions = {
 
   displayObject (_, object) {
     // console.log('displayObject')
-    state.object = object.isType() ? object.asType() : object
+    state.object = object.isType() ? object.asType() : object  // logical copy in createDetail() (cytoscape-renderer.js)
     _initWritable()
   },
 
