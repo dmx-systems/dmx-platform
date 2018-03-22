@@ -3,7 +3,7 @@ import dm5 from 'dm5'
 
 const state = {
 
-  topicmap: undefined,        // The displayed topicmap (derived state) (a dm5.Topicmap object).
+  topicmap: undefined,        // The displayed topicmap (derived state) (dm5.Topicmap).
                               // Updated by "displayTopicmap" action.
 
   writable: undefined,        // True if the current user has WRITE permission for the displayed topicmap.
@@ -200,8 +200,9 @@ const actions = {
   /**
    * Reveals a topic on the topicmap panel.
    *
-   * @param   topic   the topic to reveal (a dm5.Topic object).
-   * @param   pos     Optional: the topic position in model coordinates (an object with "x", "y" properties).
+   * @param   topic   the topic to reveal (dm5.Topic).
+   * @param   pos     Optional: the topic position in model coordinates (object with "x", "y" props).
+   *                  If not given it's up to the topicmap renderer to position the topic.
    * @param   select  Optional: if trueish the revealed topic is selected programmatically.
    */
   revealTopic ({dispatch}, {topic, pos, select}) {
@@ -563,8 +564,9 @@ function _displayTopicmap (rootState, dispatch) {
 }
 
 /**
- * @param   topic   the topic to reveal (a dm5.Topic object).
- * @param   pos     Optional: the topic position in model coordinates (an object with "x", "y" properties).
+ * @param   topic   the topic to reveal (dm5.Topic).
+ * @param   pos     Optional: the topic position in model coordinates (object with "x", "y" props).
+ *                  If not given it's up to the topicmap renderer to position the topic.
  * @param   select  Optional: if trueish the revealed topic is selected programmatically.
  */
 function _revealTopic (topic, pos, select, dispatch) {

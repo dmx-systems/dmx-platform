@@ -50,7 +50,8 @@ export default store => {
           'assoc-select':         id          => store.dispatch('selectAssoc', id),
           'topicmap-click':       ()          => store.dispatch('unselect'),
           'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos}),
-          'object-submit':        object      => store.dispatch('submit', object)
+          'object-submit':        object      => store.dispatch('submit', object),
+          'child-topic-reveal':   relTopic    => store.dispatch('revealRelatedTopic', relTopic)
         }
       },
       {

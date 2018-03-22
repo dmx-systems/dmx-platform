@@ -30,20 +30,13 @@ export default store => ({
         quillConfig:     state => state.quillConfig
       },
       listeners: {
-        'tab-click' (tab) {
-          // console.log('tab-click', tab)
-          store.dispatch('callDetailRoute', tab)
-        },
-        edit () {
-          store.dispatch('callDetailRoute', 'edit')
-        },
-        submit (object) {
-          store.dispatch('submit', object)
-          store.dispatch('callDetailRoute', 'info')
-        },
-        'submit-inline' (object) {
-          store.dispatch('submit', object)
-        }
+        'tab-click':           tab      => {store.dispatch('callDetailRoute', tab)},
+        'edit':                ()       => {store.dispatch('callDetailRoute', 'edit')},
+        'submit':              object   => {store.dispatch('submit', object)
+                                            store.dispatch('callDetailRoute', 'info')},
+        'submit-inline':       object   => {store.dispatch('submit', object)},
+        'child-topic-reveal':  relTopic => {store.dispatch('revealRelatedTopic', relTopic)},
+        'related-topic-click': relTopic => {store.dispatch('revealRelatedTopic', relTopic)}
       }
     },
     {
