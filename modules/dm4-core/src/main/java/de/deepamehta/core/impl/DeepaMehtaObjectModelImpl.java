@@ -612,15 +612,18 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     /**
      * Calculates the simple value that is to be indexed for this object.
      *
-     * HTML tags are stripped from HTML values. Non-HTML values are returned directly.
+     * HTML tags are stripped from HTML values. Non-HTML values are returned directly. ### FIXDOC
      */
     SimpleValue getIndexValue() {
-        SimpleValue value = getSimpleValue();
+        // TODO: rethink HTML indexing.
+        // DM5's value updater needs the exact index also for HTML values.
+        return value;
+        /* SimpleValue value = getSimpleValue();
         if (getType().getDataTypeUri().equals("dm4.core.html")) {
             return new SimpleValue(JavaUtils.stripHTML(value.toString()));
         } else {
             return value;
-        }
+        } */
     }
 
     boolean uriChange(String newUri, String compareUri) {
