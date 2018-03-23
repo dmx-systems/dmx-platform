@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {
-  Button, Input, Select, Option, OptionGroup, Checkbox, Dialog, Table, TableColumn, Tabs, TabPane
+  Button, Input, Select, Option, OptionGroup, Checkbox, Dialog, Tabs, TabPane
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
@@ -20,7 +20,5 @@ Vue.use(Option)
 Vue.use(OptionGroup)
 Vue.use(Checkbox)
 Vue.use(Dialog)
-Vue.use(Table)
-Vue.use(TableColumn)
 Vue.use(Tabs)
 Vue.use(TabPane)
