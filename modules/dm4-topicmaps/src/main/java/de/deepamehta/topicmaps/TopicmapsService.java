@@ -18,6 +18,8 @@ public interface TopicmapsService {
 
     /**
      * @return  the created Topicmap topic.
+     *
+     * ### TODO: rename 2nd param into "topicmapTypeUri"
      */
     Topic createTopicmap(String name, String topicmapRendererUri, boolean isPrivate);
 
@@ -79,6 +81,7 @@ public interface TopicmapsService {
 
     // ---
 
+    // ### TODO: refactor to registerTopicmapType(TopicmapType topicmapType)
     void registerTopicmapRenderer(TopicmapRenderer renderer);
 
     // ### TODO: unregister needed? Might a renderer hold a stale dm4 instance?

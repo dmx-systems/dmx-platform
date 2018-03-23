@@ -5,10 +5,12 @@ import de.deepamehta.core.service.ModelFactory;
 
 
 
+// ### TODO: rename to "DefaultTopicmap"
 class DefaultTopicmapRenderer implements TopicmapRenderer {
 
     @Override
     public String getUri() {
+        // ### TODO: change to "dm4.topicmaps.default_topicmap"
         return "dm4.webclient.default_topicmap_renderer";
     }
 

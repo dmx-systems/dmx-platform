@@ -6,10 +6,12 @@ import de.deepamehta.topicmaps.TopicmapRenderer;
 
 
 
+// ### TODO: rename to Geomap
 class GeomapRenderer implements TopicmapRenderer {
 
     @Override
     public String getUri() {
+        // ### TODO: change to "dm4.geomaps.geomap"
         return "dm4.geomaps.geomap_renderer";
     }
 

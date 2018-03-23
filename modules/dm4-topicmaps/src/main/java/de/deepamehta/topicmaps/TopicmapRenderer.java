@@ -5,6 +5,7 @@ import de.deepamehta.core.service.ModelFactory;
 
 
 
+// ### TODO: rename to "TopicmapType"
 public interface TopicmapRenderer {
 
     String getUri();

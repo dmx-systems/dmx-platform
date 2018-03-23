@@ -23,6 +23,8 @@ import java.util.logging.Logger;
  * Features:
  * - load from DB (by constructor).
  * - Serialization to JSON.
+ *
+ * ### TODO: rename to GeomapViewmodel
  */
 public class Geomap implements Iterable<TopicModel>, JSONEnabled {
 
@@ -39,6 +41,8 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
 
     /**
      * Loads a topicmap from the DB.
+     *
+     * ### TODO: pass geomap data instead of retrieving in constructor. Don't pass core service.
      */
     public Geomap(long geomapId, CoreService dm4) {
         logger.info("Loading geomap " + geomapId);

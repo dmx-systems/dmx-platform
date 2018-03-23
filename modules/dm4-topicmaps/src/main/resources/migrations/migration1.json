@@ -13,8 +13,8 @@
             "indexModeUris": ["dm4.core.fulltext"]
         },
         {
-            "value":       "Topicmap Renderer URI",
-            "uri":         "dm4.topicmaps.topicmap_renderer_uri",
+            "value":       "Topicmap Renderer URI",                 # TODO: rename to "Topicmap Type URI"
+            "uri":         "dm4.topicmaps.topicmap_renderer_uri",   # TODO: rename to "dm4.topicmaps.topicmap_type_uri"
             "dataTypeUri": "dm4.core.text",
             "viewConfigTopics": [
                 {
