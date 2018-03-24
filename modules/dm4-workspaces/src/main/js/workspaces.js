@@ -12,9 +12,9 @@ const state = {
 
 const actions = {
 
-  createWorkspace ({dispatch}, name) {
-    console.log('Creating workspace', name)
-    dm5.restClient.createWorkspace(name, undefined, 'dm4.workspaces.public').then(topic => {
+  createWorkspace ({dispatch}, {name, sharingModeUri}) {
+    console.log('createWorkspace', name, sharingModeUri)
+    dm5.restClient.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
       console.log('Workspace', topic)
       state.workspaceTopics.push(topic)
       dispatch('selectWorkspace', topic.id)
@@ -23,8 +23,8 @@ const actions = {
 
   selectWorkspace ({dispatch}, id) {
     // console.log('selectWorkspace', id)
-    // Note: the topicmap can be selected once the workspace's topicmap topics are available
     dispatch('_selectWorkspace', id).then(() => {
+      // select topicmap once the workspace's topicmap topics are available
       dispatch('selectTopicmapForWorkspace')
     })
   },

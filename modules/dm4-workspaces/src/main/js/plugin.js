@@ -1,4 +1,4 @@
-export default (store) => ({
+export default store => ({
 
   storeModule: {
     name: 'workspaces',
@@ -13,8 +13,9 @@ export default (store) => ({
   extraMenuItems: [{
     uri: 'dm4.workspaces.workspace',
     label: 'Workspace',
-    create: name => {
-      store.dispatch('createWorkspace', name)
+    optionsComp: require('./components/dm5-workspace-options').default,
+    create: (name, data) => {
+      store.dispatch('createWorkspace', {name, sharingModeUri: data.sharingModeUri})
     }
   }]
 })

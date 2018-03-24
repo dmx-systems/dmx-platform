@@ -101,6 +101,10 @@ button {
   padding: 0px 8px;                     /* was 0px 15px */
 }
 
+.el-radio {
+  font-weight: unset;                   /* was 500 */
+}
+
 .el-dialog__title {
   font-size: var(--main-font-size);     /* was 18px */
   line-height: unset;                   /* was 24px */
@@ -119,13 +123,15 @@ button {
   padding: 0 12px;                      /* was 0 20px */
 }
 
+/* Note: el-table is currently not in use */
+
 .el-table {
   font-size: var(--main-font-size);     /* was 12px (.el-table--mini) */
 }
 
 .el-table th {
   font-size: var(--label-font-size);
-  font-weight: normal;                  /* User agent stylesheet sets bold */
+  font-weight: normal;                  /* was bold through user agent stylesheet */
   padding: 0;                           /* was 12px 0 (.el-table th) or 6px 0 (.el-table--mini th) */
 }
 
