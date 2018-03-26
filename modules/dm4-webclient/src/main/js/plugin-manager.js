@@ -8,6 +8,7 @@ export default {
     initPlugin(require('modules/dm4-accesscontrol/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-details/src/main/js/plugin.js').default)
     initPlugin(require('modules/dm4-typeeditor/src/main/js/plugin.js').default)
+    initPlugin(require('modules/dm4-geomaps/src/main/js/plugin.js').default)
     // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
     // So, they are not init'ed again. ### TODO: explain better
     loadPluginsFromServer()
@@ -46,7 +47,7 @@ function initPlugin (expo) {
     })
   }
   // detail panel
-  const renderers = plugin.detailPanel
+  const renderers = plugin.detailPanel    // TODO: rename prop to "objectRenderers"
   if (renderers) {
     for (let typeUri in renderers) {
       store.dispatch('registerObjectRenderer', {
