@@ -39,6 +39,7 @@ const state = {
                               //   {
                               //     topicmapTypeUri: {
                               //       uri:
+                              //       name:
                               //       storeModule:
                               //       comp:
                               //     }
@@ -47,12 +48,9 @@ const state = {
 
 const actions = {
 
-  createTopicmap ({rootState, dispatch}, name) {
+  createTopicmap ({rootState, dispatch}, {name, topicmapTypeUri, isPrivate}) {
     console.log('Creating topicmap', name)
-    dm5.restClient.createTopicmap(name,
-      'dm4.webclient.default_topicmap_renderer',  // TODO
-      false                                       // TODO
-    ).then(topic => {
+    dm5.restClient.createTopicmap(name, topicmapTypeUri, isPrivate).then(topic => {
       console.log('Topicmap topic', topic)
       state.topicmapTopics[_workspaceId(rootState)].push(topic)
       dispatch('callTopicmapRoute', topic.id)

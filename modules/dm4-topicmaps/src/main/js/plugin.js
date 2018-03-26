@@ -63,10 +63,22 @@ export default store => {
     extraMenuItems: [{
       uri: 'dm4.topicmaps.topicmap',
       label: 'Topicmap',
-      create: name => {
-        store.dispatch('createTopicmap', name)
+      optionsComp: require('./components/dm5-topicmap-options').default,
+      create: (name, data) => {
+        store.dispatch('createTopicmap', {
+          name,
+          topicmapTypeUri: data.topicmapTypeUri,
+          isPrivate: false      // TODO
+        })
       }
-    }]
+    }],
+
+    topicmapType: {
+      uri: 'dm4.webclient.default_topicmap_renderer',
+      name: "Topicmap",
+      storeModule: undefined,   // TODO
+      comp: undefined           // TODO
+    }
   }
 
   function selectTopicmapIf (id) {
