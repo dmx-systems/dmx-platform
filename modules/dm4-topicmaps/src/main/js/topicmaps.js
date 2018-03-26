@@ -19,7 +19,7 @@ const state = {
                               //     workspaceId: topicmapId
                               //   }
 
-  selections: {},             // Per-topicmap selection entries, hashed by topicmap ID:
+  selections: {},             // Per-topicmap selection entries, keyed by topicmap ID:
                               //   {
                               //     topicmapId: {
                               //       type: "topic"|"assoc"
@@ -28,12 +28,21 @@ const state = {
                               //   }
                               // Topicmaps with no selection have no selection entry.
 
-  topicmapCache: {}           // Loaded topicmaps, hashed by ID:
+  topicmapCache: {},          // Loaded topicmaps, keyed by ID:
                               //   {
                               //     topicmapId: Topicmap         # a dm5.Topicmap
                               //   }
                               // Note: the topicmap cache is not actually reactive state.
                               // TODO: move it to a local variable?
+
+  topicmapTypes: {}           // Registered topicmap types, keyed by topicmap type URI:
+                              //   {
+                              //     topicmapTypeUri: {
+                              //       uri:
+                              //       storeModule:
+                              //       comp:
+                              //     }
+                              //   {
 }
 
 const actions = {
@@ -410,6 +419,10 @@ const actions = {
 
   clearTopicmapCache () {
     state.topicmapCache = {}
+  },
+
+  registerTopicmapType (_, topicmapType) {
+    state.topicmapTypes[topicmapType.uri] = topicmapType
   },
 
   //

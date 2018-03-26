@@ -15,9 +15,10 @@ export default {
 }
 
 /**
- * Registers a plugin's resources (store module, components, ...).
+ * Registers a plugin's assets (store module, components, ...).
  *
- * @param   expo    The plugin.js export. Either an object or a function that returns an object.
+ * @param   expo    The plugin.js default export.
+ *                  Either an object or a function that returns an object.
  */
 function initPlugin (expo) {
   const plugin = typeof expo === 'function' ? expo(store) : expo
@@ -40,8 +41,8 @@ function initPlugin (expo) {
   // components
   const components = plugin.components
   if (components) {
-    components.forEach(comp => {
-      store.dispatch('registerComponent', comp)
+    components.forEach(compDef => {
+      store.dispatch('registerComponent', compDef)
     })
   }
   // detail panel
@@ -58,6 +59,11 @@ function initPlugin (expo) {
   const extraMenuItems = plugin.extraMenuItems
   if (extraMenuItems) {
     store.dispatch('registerExtraMenuItems', extraMenuItems)
+  }
+  // topicmap type
+  const topicmapType = plugin.topicmapType
+  if (topicmapType) {
+    store.dispatch('registerTopicmapType', topicmapType)
   }
 }
 

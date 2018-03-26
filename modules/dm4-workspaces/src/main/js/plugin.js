@@ -15,7 +15,10 @@ export default store => ({
     label: 'Workspace',
     optionsComp: require('./components/dm5-workspace-options').default,
     create: (name, data) => {
-      store.dispatch('createWorkspace', {name, sharingModeUri: data.sharingModeUri})
+      store.dispatch('createWorkspace', {
+        name,
+        sharingModeUri: data.sharingModeUri
+      })
     }
   }]
 })

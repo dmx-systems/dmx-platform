@@ -13,7 +13,7 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  objectRenderers: {},      // Registered page renderers:
+  objectRenderers: {},      // Registered object renderers:
                             //   {
                             //     typeUri: component
                             //   }
