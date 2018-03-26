@@ -21,6 +21,7 @@ export default store => {
           object:          state => state.object,
           writable:        state => state.writable,
           objectRenderers: state => state.objectRenderers,
+          topicmapTypes:   state => state.topicmaps.topicmapTypes,
           toolbarCompDefs: state => ({
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
@@ -77,7 +78,7 @@ export default store => {
       uri: 'dm4.webclient.default_topicmap_renderer',
       name: "Topicmap",
       storeModule: undefined,   // TODO
-      comp: undefined           // TODO
+      comp: require('dm5-cytoscape-renderer').default
     }
   }
 
