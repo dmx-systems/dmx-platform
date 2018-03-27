@@ -8,8 +8,9 @@ export default store => {
 
     storeWatcher: [{
       getter: state => state.typeCache.assocTypes,
-      callback: () => {
-        store.dispatch('syncStyles', assocTypeColors())
+      callback: assocTypes => {
+        // console.log('storeWatcher', assocTypes)
+        // store.dispatch('syncStyles', assocTypeColors())    // ### TODO
       }
     }],
 
