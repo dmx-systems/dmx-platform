@@ -568,7 +568,7 @@ function _displayTopicmap (rootState, dispatch) {
       state.topicmap = topicmap
       // sync view
       p.then(() => {
-        dispatch('syncTopicmap', topicmap).then(resolve)
+        dispatch('renderTopicmap', topicmap).then(resolve)
       })
     })
   })

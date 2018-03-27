@@ -6,13 +6,6 @@ export default store => {
       module: require('./topicmaps').default
     },
 
-    storeWatcher: [{
-      getter: state => state.typeCache.assocTypes,
-      callback: () => {
-        store.dispatch('syncStyles', assocTypeColors())
-      }
-    }],
-
     components: [
       {
         comp: require('dm5-topicmap-panel').default,
@@ -78,7 +71,11 @@ export default store => {
       uri: 'dm4.webclient.default_topicmap_renderer',
       name: "Topicmap",
       storeModule: undefined,   // TODO
-      comp: require('dm5-cytoscape-renderer').default
+      comp: require('dm5-cytoscape-renderer').default,
+      mounted () {
+        // TODO: sync styles dynamically when assoc type view config changes
+        store.dispatch('syncStyles', assocTypeColors())
+      }
     }
   }
 
