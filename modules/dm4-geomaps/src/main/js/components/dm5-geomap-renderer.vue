@@ -1,12 +1,21 @@
 <template>
-  <div>
-    <br><br>
-    <h1>Geomap Renderer!</h1>
+  <div class="dm5-geomap-renderer">
+    <l-map :center="center" :zoom="zoom">
+      <l-tile-layer :url="url"></l-tile-layer>
+    </l-map>
   </div>
 </template>
 
 <script>
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
+
 export default {
+
+  created () {
+    console.log('dm5-geomap-renderer created')
+    this.$store.registerModule('geomapRenderer', require('../geomaps').default)
+  },
 
   mounted () {
     console.log('dm5-geomap-renderer mounted')
@@ -18,5 +27,24 @@ export default {
   destroyed () {
     console.log('dm5-geomap-renderer destroyed')
   },
+
+  data () {
+    return {
+      center: L.latLng(51, 11),
+      zoom: 6,
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+    }
+  },
+
+  components: {
+    'l-map':        require('vue2-leaflet').LMap,
+    'l-tile-layer': require('vue2-leaflet').LTileLayer
+  }
 }
 </script>
+
+<style>
+.dm5-geomap-renderer {
+  height: 100%;
+}
+</style>

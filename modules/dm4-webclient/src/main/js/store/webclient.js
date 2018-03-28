@@ -87,10 +87,10 @@ const actions = {
     state.compDefs.webclient.forEach(compDef => {
       // 1) init props
       // Note 1: props must be inited explicitly. E.g. the "objectRenderers" store state is populated while
-      // loading plugins and does not change afterwards. The watcher (see step 4) would not fire as it is
+      // loading plugins and does not change afterwards. The watcher (see step 3) would not fire as it is
       // registered *after* the plugins are loaded.
       // TODO: think about startup order: instantiating the Webclient component vs. loading the plugins.
-      // Note 2: props must be inited *before* the component is instantiated (see step 3). While instantiation
+      // Note 2: props must be inited *before* the component is instantiated (see step 2). While instantiation
       // the component receives the declared "default" value (plugin.js), if no value is set already.
       // The default value must not be overridden by an undefined init value.
       const propsData = {}
@@ -100,8 +100,7 @@ const actions = {
       // 2) instantiate
       // Note: to manually mounted components the store must be passed explicitly
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
-      const Component = Vue.extend(compDef.comp)
-      const comp = new Component({store, propsData}).$mount(`#mount-${compDef.id}`)
+      const comp = new Vue({store, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
       // 3) make props reactive
       for (let prop in compDef.props) {
         registerPropWatcher(comp, prop, compDef.props[prop])

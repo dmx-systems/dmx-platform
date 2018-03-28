@@ -14,16 +14,17 @@
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",
+    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-detail-panel": "https://github.com/jri/dm5-detail-panel.git",
     "dm5-object-renderer": "https://github.com/jri/dm5-object-renderer.git",
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
-    "dm5-cytoscape-renderer": "https://github.com/jri/dm5-cytoscape-renderer.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.2.2",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.16",
     "vue-router": "^2.8.1",
+    "vue2-leaflet": "^1.0.1",
     "vuex": "^2.5.0"
   },
   "devDependencies": {

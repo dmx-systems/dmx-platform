@@ -1,4 +1,6 @@
 const actions = {
+  syncTopicmap () {
+  }
 }
 
 export default {
