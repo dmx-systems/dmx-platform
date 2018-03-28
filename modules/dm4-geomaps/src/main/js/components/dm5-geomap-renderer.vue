@@ -1,6 +1,6 @@
 <template>
   <div class="dm5-geomap-renderer">
-    <l-map :center="center" :zoom="zoom">
+    <l-map :center="center" :zoom="zoom" :options="options">
       <l-tile-layer :url="url"></l-tile-layer>
     </l-map>
   </div>
@@ -8,7 +8,8 @@
 
 <script>
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
+
+var {LMap, LTileLayer} = require('vue2-leaflet')
 
 export default {
 
@@ -30,15 +31,18 @@ export default {
 
   data () {
     return {
-      center: L.latLng(51, 11),
+      center: [51, 11],
       zoom: 6,
-      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+      url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      options: {
+        zoomControl: false,
+        attributionControl: false
+      }
     }
   },
 
   components: {
-    'l-map':        require('vue2-leaflet').LMap,
-    'l-tile-layer': require('vue2-leaflet').LTileLayer
+    LMap, LTileLayer
   }
 }
 </script>
