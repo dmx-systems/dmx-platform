@@ -8,10 +8,13 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-// The dm5 library must be inited *before* the SearchWidget component is created.
-// The SearchWidget relies on dm5's "menuTopicTypes" store getter.
+// 1) Init dm5 library
+// The dm5 library must be inited *before* the dm5-webclient component is created.
+// The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init().
 const ready = dm5.init(store)
 
+// 2) Create Vue root instance
+// In particular instantiates dm5-webclient component, and its child component dm5-search-widget.
 new Vue({
   el: '#app',
   store,
@@ -20,19 +23,23 @@ new Vue({
 })
 // console.log('### Vue root instance created!')
 
-// The vue component hierarchy must be instantiated *before* the webclient plugins are
-// loaded. Plugins that customize the detail panel rely on the "registerObjectRenderer"
-// action, which is only registered in dm5-detail-panel's created() hook (see comment there). ### TODO: still true?
+// 3) Load plugins
+// Plugin loading (and initialization) must take place *after* the Vue root instance is created.
+// Plugins that provide entries for the create menu rely on the "registerExtraMenuItems" action,
+// which is only registered in dm5-search-widget's created() hook.
 pluginManager.loadPlugins()
 // console.log('### Plugins loaded!')
 
 // TODO: synchronize initial navigation with loading the external plugins?
 // (Note: the standard plugins are "loaded" synchronously anyways.)
 
+// 4) Mount Webclient components (as provided by plugins)
+// Note: the mount point DOM is ready only on next tick.
 Vue.nextTick(() => {
   store.dispatch('mountComponents')
 })
 
+// 5) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
