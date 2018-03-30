@@ -253,7 +253,11 @@ function fetchTopic (id, p) {
   // detail panel
   const p2 = dm5.restClient.getTopic(id, true, true).then(topic => {    // includeChilds=true, includeAssocChilds=true
     // console.log('topic', id, 'arrived')
-    store.dispatch('displayObject', topic)
+    // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
+    // The "object" state must not be set before a topicmap renderer is instantiated.
+    p.then(() => {
+      store.dispatch('displayObject', topic)
+    })
   })
   // topicmap panel
   p.then(() => {
@@ -269,7 +273,11 @@ function fetchTopic (id, p) {
 function fetchAssoc (id, p) {
   // detail panel
   const p2 = dm5.restClient.getAssoc(id, true, true).then(assoc => {    // includeChilds=true, includeAssocChilds=true
-    store.dispatch('displayObject', assoc)
+    // Note: the topicmap panel manually syncs the selected object with the topicmap renderer.
+    // The "object" state must not be set before a topicmap renderer is instantiated.
+    p.then(() => {
+      store.dispatch('displayObject', assoc)
+    })
   })
   // topicmap panel
   p.then(() => {
