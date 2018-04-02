@@ -21,26 +21,30 @@ const actions = {
     })
   },
 
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
   selectWorkspace ({dispatch}, id) {
     // console.log('selectWorkspace', id)
     dispatch('_selectWorkspace', id).then(() => {
-      // select topicmap once the workspace's topicmap topics are available
+      // the workspace's topicmap topics are now available
       dispatch('selectTopicmapForWorkspace')
     })
   },
 
   /**
-   * Low-level action as dispatched by router.
+   * Sets the workspace state ("workspaceId" and cookie), and fetches the workspace's topicmap topics
+   * if not done already.
    *
-   * Displays the given workspace in the workspace selector.
-   * Displays the given workspace's topicmaps in the topicmap selector.
-   * Fetches the topicmap topics for the workspace if not yet done.
+   * Low-level action (dispatched by router) that sets the workspace state *without* selecting a topicmap.
    *
    * Postconditions:
    * - "workspaceId" state is up-to-date
    * - "dm4_workspace_id" cookie is up-to-date.
    *
    * @return  a promise resolved once the workspace's topicmap topics are available.
+   *          At this time the "topicmapTopics" state is up-to-date (see topicmaps module).
    */
   _selectWorkspace ({dispatch}, id) {
     // console.log('_selectWorkspace', id)
@@ -50,7 +54,11 @@ const actions = {
   },
 
   /**
-   * Low-level action as dispatched by router.
+   * Low-level action as dispatched for initial navigation (see router.js)
+   * and after logout (see loggedOut() below).
+   *
+   * Preconditions:
+   * - the route is *not* yet set.
    */
   selectFirstWorkspace ({dispatch}) {
     dispatch('selectWorkspace', state.workspaceTopics[0].id)

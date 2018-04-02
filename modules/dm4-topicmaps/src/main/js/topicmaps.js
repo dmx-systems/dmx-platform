@@ -13,6 +13,7 @@ const state = {
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
                               //   }
+                              // TODO: make the array a map, key by topicmap ID?
 
   selectedTopicmapId: {},     // Per-workspace selected topicmap:
                               //   {
@@ -27,13 +28,6 @@ const state = {
                               //     }
                               //   }
                               // Topicmaps with no selection have no selection entry.
-
-  topicmapCache: {},          // Loaded topicmaps, keyed by ID:
-                              //   {
-                              //     topicmapId: Topicmap         # a dm5.Topicmap
-                              //   }
-                              // Note: the topicmap cache is not actually reactive state.
-                              // TODO: move it to a local variable?
 
   topicmapTypes: {}           // Registered topicmap types, keyed by topicmap type URI:
                               //   {
@@ -58,12 +52,13 @@ const actions = {
   },
 
   /**
-   * Displays the given topicmap.
+   * Sets the topicmap state ("selectedTopicmapId" and cookie), and displays the given topicmap.
    * The topicmap is retrieved either from cache or from server (asynchronously).
    *
    * Preconditions:
    * - the route is set.
    * - the topicmap belongs to the selected workspace ("workspaceId" state is up-to-date, see workspaces module).
+   * - the workspace's topicmap topics are available.
    *
    * Postconditions:
    * - "selectedTopicmapId" state is up-to-date
@@ -74,7 +69,7 @@ const actions = {
    * - "writable" (updated only once permission retrieval is complete)
    *
    * @returns   a promise resolved once topicmap rendering is complete.
-   *            At this time the "topicmap" and "writable" states are up-to-date as well.
+   *            At this time the "topicmap" and "writable" states are up-to-date.
    */
   displayTopicmap ({rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
@@ -360,9 +355,9 @@ const actions = {
    * Calls the "topicmap" (or "topic"/"assoc") route.
    *
    * Preconditions:
+   * - the route is *not* yet set.
    * - the workspace is selected ("workspaceId" state is up-to-date, see workspaces module).
    * - the topicmap topics for the selected workspace are loaded ("topicmapTopics" state is up-to-date).
-   * - the route is *not* yet set.
    */
   selectTopicmapForWorkspace ({rootState, dispatch}) {
     const workspaceId = _workspaceId(rootState)
@@ -413,10 +408,6 @@ const actions = {
       })
     }
     return p
-  },
-
-  clearTopicmapCache () {
-    state.topicmapCache = {}
   },
 
   registerTopicmapType (_, topicmapType) {
@@ -520,57 +511,30 @@ export default {
   actions
 }
 
-// Topicmap Cache
-
-// TODO: store promises in topicmap cache
-function getTopicmap (id) {
-  var p   // a promise for a dm5.Topicmap
-  const topicmap = getCachedTopicmap(id)
-  if (topicmap) {
-    p = Promise.resolve(topicmap)
-  } else {
-    // console.log('Fetching topicmap', id)
-    p = dm5.restClient.getTopicmap(id).then(topicmap => {
-      cacheTopicmap(topicmap)
-      return topicmap
-    }).catch(error => {
-      console.error(error)
-    })
-  }
-  return p
-}
-
-function getCachedTopicmap (id) {
-  return state.topicmapCache[id]
-}
-
-function cacheTopicmap (topicmap) {
-  state.topicmapCache[topicmap.id] = topicmap
-}
-
 // Update state + sync view
 
 /**
+ * Displays the topicmap that is selected according to current state.
+ *
  * Preconditions:
  * - "selectedTopicmapId" state is up-to-date
  * - "workspaceId" state is up-to-date (see workspaces module)
+ * - the workspace's topicmap topics are available ("topicmapTopics" state is up-to-date)
  *
  * @returns   a promise resolved once topicmap rendering is complete.
+ *            At this time the "topicmap" and "writable" states are up-to-date as well.
  */
 function _displayTopicmap (rootState, dispatch) {
-  const id = state.selectedTopicmapId[_workspaceId(rootState)]
-  const p = dm5.permCache.isTopicWritable(id).then(writable => {
-    state.writable = writable
-  })
+  const topicmapTopic = getTopicmapTopic(rootState)
   return new Promise(resolve => {
-    getTopicmap(id).then(topicmap => {
-      // update state
-      state.topicmap = topicmap
-      // sync view
-      p.then(() => {
-        dispatch('renderTopicmap', topicmap).then(resolve)
+    dm5.permCache.isTopicWritable(topicmapTopic.id)
+      .then(writable => state.writable = writable)
+      .then(() => dispatch('renderTopicmap', topicmapTopic))
+      .then(topicmap => {
+        console.log('_displayTopicmap', topicmap)
+        state.topicmap = topicmap
       })
-    })
+      .then(resolve)
   })
 }
 
@@ -644,6 +608,31 @@ function deleteAssoc (assoc, dispatch) {
 }
 
 // Helper
+
+/**
+ * Returns the topicmapTopic according to current state.
+ *
+ * Preconditions:
+ * - "selectedTopicmapId" state is up-to-date
+ * - "workspaceId" state is up-to-date (see workspaces module)
+ * - the workspace's topicmap topics are available ("topicmapTopics" state is up-to-date)
+ */
+function getTopicmapTopic (rootState) {
+  const workspaceId = _workspaceId(rootState)
+  const topicmapId = state.selectedTopicmapId[workspaceId]
+  if (typeof topicmapId !== 'number') {
+    throw Error(`topicmapId is expected to be of type 'number', but is ${typeof topicmapId}`)
+  }
+  const topicmapTopics = state.topicmapTopics[workspaceId]
+  if (!topicmapTopics) {
+    throw Error(`Topicmap topics of workspace ${workspaceId} not yet loaded`)
+  }
+  const topicmapTopic = topicmapTopics.find(topic => topic.id === topicmapId)
+  if (!topicmapTopic) {
+    throw Error(`Topicmap topic ${topicmapId} not found (workspace ${workspaceId})`)
+  }
+  return topicmapTopic
+}
 
 function findTopicmapTopic (id, callback) {
   for (const topics of Object.values(state.topicmapTopics)) {

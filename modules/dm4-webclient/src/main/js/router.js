@@ -129,6 +129,8 @@ store.registerModule('routerModule', {
   }
 })
 
+// TODO: why does the watcher kick in when an initial URL is present?
+// Since when is it this way?
 function registerRouteWatcher () {
   store.watch(
     state => state.routerModule.router.currentRoute,
@@ -149,15 +151,16 @@ function initialNavigation (route) {
   //
   let urlPresent
   // 1) select topicmap
-  let topicmapId = route.params.topicmapId                        // FIXME: convert to number?
-  const topicId  = route.params.topicId
-  const assocId  = route.params.assocId
+  // Note: route params read from URL are strings (may be undefined). Route params set by push() are numbers.
+  let topicmapId = id(route.params.topicmapId)
+  const topicId  = id(route.params.topicId)
+  const assocId  = id(route.params.assocId)
   if (topicmapId) {
     // console.log('### Initial navigation (topicmapId, topicId, assocId obtained from URL)', topicmapId, topicId,
     // assocId)
     urlPresent = true
   } else {
-    topicmapId = dm5.utils.getCookie('dm4_topicmap_id')           // FIXME: convert to number?
+    topicmapId = id(dm5.utils.getCookie('dm4_topicmap_id'))
     if (topicmapId) {
       // console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
     } else {
@@ -165,22 +168,24 @@ function initialNavigation (route) {
     }
   }
   // 2) select workspace
-  // Note: at this stage a topicmap ID might or might not known. If *known* (either obtained from URL or from cookie)
-  // the route is already up-to-date, no (further) push required. If *not* known the route still needs to be pushed.
+  // Note: at this stage a topicmap ID might be available or not. If available it is either obtained from URL or from
+  // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required. On the other
+  // hand, if obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
   if (topicmapId) {
     getAssignedWorkspace(topicmapId).then(workspace => {
       // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      store.dispatch('_selectWorkspace', workspace.id)            // no route push
+      const p1 = store.dispatch('_selectWorkspace', workspace.id)                 // no route push
+      // p1 is a promise resolved once the workspace's topicmap topics are available
       if (urlPresent) {
-        const p = store.dispatch('displayTopicmap', topicmapId)   // no route push
-        topicId && fetchTopic(topicId, p)                         // FIXME: 0 is a valid topic ID
-        assocId && fetchAssoc(assocId, p)
+        const p2 = p1.then(() => store.dispatch('displayTopicmap', topicmapId))   // no route push
+        topicId && fetchTopic(topicId, p2)                                        // FIXME: 0 is a valid topic ID
+        assocId && fetchAssoc(assocId, p2)
       } else {
-        store.dispatch('callTopicmapRoute', topicmapId)           // push initial route
+        store.dispatch('callTopicmapRoute', topicmapId)                           // push initial route
       }
     })
   } else {
-    store.dispatch('selectFirstWorkspace')                        // push initial route (indirectly)
+    store.dispatch('selectFirstWorkspace')                                        // push initial route (indirectly)
   }
   // 3) setup detail panel
   const detail = route.params.detail
@@ -198,26 +203,25 @@ function navigate (to, from) {
   // console.log('navigate', to, from)
   var p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
-  const topicmapId = to.params.topicmapId
-  // Note: path param values read from URL are strings. Path param values set by push() are numbers.
-  // So we do *not* use exact equality (!==) here.
-  if (topicmapId != from.params.topicmapId) {
+  const topicmapId = id(to.params.topicmapId)
+  // Note: route params read from URL are strings. Route params set by push() are numbers.
+  if (topicmapId !== id(from.params.topicmapId)) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
     p = new Promise(resolve => {
-      getAssignedWorkspace(topicmapId).then(workspace => {
-        store.dispatch('_selectWorkspace', workspace.id)
-        store.dispatch('displayTopicmap', topicmapId).then(resolve)
-      })
+      getAssignedWorkspace(topicmapId)
+        .then(workspace => store.dispatch('_selectWorkspace', workspace.id))
+        .then(() => store.dispatch('displayTopicmap', topicmapId))
+        .then(resolve)
     })
   } else {
     p = Promise.resolve()
   }
   // 2) selection
-  const topicId = to.params.topicId
-  const assocId = to.params.assocId
-  const topicChanged = topicId != from.params.topicId
-  const assocChanged = assocId != from.params.assocId
+  const topicId = id(to.params.topicId)
+  const assocId = id(to.params.assocId)
+  const topicChanged = topicId !== id(from.params.topicId)
+  const assocChanged = assocId !== id(from.params.assocId)
   if (topicChanged && topicId) {                                    // FIXME: 0 is a valid topic ID
     fetchTopic(topicId, p)
   }
@@ -285,11 +289,23 @@ function fetchAssoc (id, p) {
   })
 }
 
-function unsetSelection(p) {
+function unsetSelection (p) {
   // detail panel
   store.dispatch('emptyDisplay')
   // topicmap panel
   p.then(() => {
     store.dispatch('unsetSelection')
   })
+}
+
+function id (v) {
+  // Note: Number(undefined) is NaN, and NaN != NaN is true!
+  // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')
+  if (typeof v === 'number') {
+    return v
+  } else if (typeof v === 'string') {
+    return Number(v)
+  } else if (v !== undefined && v !== null) {
+    throw Error(`id() expects one of [number|string|undefined|null], but got ${v}`)
+  }
 }
