@@ -334,47 +334,19 @@ const actions = {
     }
   },
 
-  _addTopicToTopicmap ({dispatch}, {topicmapId, viewTopic}) {
-    if (topicmapId === state.topicmap.id) {
-      state.topicmap.addTopic(new dm5.ViewTopic(viewTopic))               // update state
-      dispatch('syncAddTopic', viewTopic.id)                              // sync view
-    }
-  },
-
-  _addAssocToTopicmap ({dispatch}, {topicmapId, assoc}) {
-    if (topicmapId === state.topicmap.id) {
-      state.topicmap.addAssoc(new dm5.Assoc(assoc))                       // update state
-      dispatch('syncAddAssoc', assoc.id)                                  // sync view
-    }
-  },
-
-  _setTopicPosition ({dispatch}, {topicmapId, topicId, pos}) {
-    if (topicmapId === state.topicmap.id) {
-      state.topicmap.getTopic(topicId).setPosition(pos)                   // update state
-      dispatch('syncTopicPosition', topicId)                              // sync view
-    }
-  },
-
   _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
-    if (topicmapId === state.topicmap.id) {
+    if (topicmapId === _topicmapId()) {
       // update state
       if (!visibility) {
-        state.topicmap.removeAssocs(topicId)
         dispatch('unselectIf', topicId)
       }
-      state.topicmap.getTopic(topicId).setVisibility(visibility)
-      // sync view
-      dispatch('syncTopicVisibility', topicId)
     }
   },
 
   _removeAssocFromTopicmap ({dispatch}, {topicmapId, assocId}) {
-    if (topicmapId === state.topicmap.id) {
+    if (topicmapId === _topicmapId()) {
       // update state
-      state.topicmap.removeAssoc(assocId)
       dispatch('unselectIf', assocId)
-      // sync view
-      dispatch('syncRemoveAssoc', assocId)
     }
   },
 
