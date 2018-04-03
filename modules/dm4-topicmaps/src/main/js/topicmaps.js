@@ -201,22 +201,6 @@ const actions = {
     })
   },
 
-  /**
-   * Preconditions:
-   * - the topic belongs to the selected topicmap
-   * - the view is up-to-date
-   * - the server is *not* yet up-to-date
-   */
-  setTopicPosition (_, {id, pos}) {
-    // update state
-    state.topicmap.getTopic(id).setPosition(pos)
-    // sync view (up-to-date already)
-    // update server
-    if (state.writable) {
-      dm5.restClient.setTopicPosition(state.topicmap.id, id, pos)
-    }
-  },
-
   createAssoc ({dispatch}, {topicId1, topicId2}) {
     // TODO: display search/create widget; initiate assoc creation there
     const assocModel = {
@@ -235,59 +219,15 @@ const actions = {
 
   hideTopic ({dispatch}, id) {
     // update state
-    state.topicmap.removeAssocs(id)
-    state.topicmap.getTopic(id).setVisibility(false)
     dispatch('unselectIf', id)
-    // sync view
-    dispatch('syncRemoveTopic', id)
-    // update server
-    if (state.writable) {
-      dm5.restClient.setTopicVisibility(state.topicmap.id, id, false)
-    }
   },
 
   hideAssoc ({dispatch}, id) {
     // update state
-    state.topicmap.removeAssoc(id)
     dispatch('unselectIf', id)
-    // sync view
-    dispatch('syncRemoveAssoc', id)
-    // update server
-    if (state.writable) {
-      dm5.restClient.removeAssocFromTopicmap(state.topicmap.id, id)
-    }
-  },
-
-  setTopicPinned ({dispatch}, {topicId, pinned}) {
-    console.log('setTopicPinned', topicId, pinned)
-    // update state
-    state.topicmap.setTopicViewProp(topicId, 'dm4.topicmaps.pinned', pinned)
-    // sync view
-    dispatch('syncPinned', {objectId: topicId, pinned})
-    // update server
-    dm5.restClient.setTopicViewProps(state.topicmap.id, topicId, {
-      'dm4.topicmaps.pinned': pinned
-    })
-  },
-
-  setAssocPinned ({dispatch}, {assocId, pinned}) {
-    console.log('setAssocPinned', assocId, pinned)
-    // update state
-    state.topicmap.setAssocViewProp(assocId, 'dm4.topicmaps.pinned', pinned)
-    // sync view
-    dispatch('syncPinned', {objectId: assocId, pinned})
-    // update server
-    dm5.restClient.setAssocViewProps(state.topicmap.id, assocId, {
-      'dm4.topicmaps.pinned': pinned
-    })
   },
 
   deleteTopic ({dispatch}, id) {
-    // update state
-    state.topicmap.removeAssocs(id)
-    state.topicmap.removeTopic(id)
-    // sync view
-    dispatch('syncRemoveTopic', id)
     // update server
     dm5.restClient.deleteTopic(id).then(object => {
       dispatch('_processDirectives', object.directives)
@@ -295,10 +235,6 @@ const actions = {
   },
 
   deleteAssoc ({dispatch}, id) {
-    // update state
-    state.topicmap.removeAssoc(id)
-    // sync view
-    dispatch('syncRemoveAssoc', id)
     // update server
     dm5.restClient.deleteAssoc(id).then(object => {
       dispatch('_processDirectives', object.directives)
@@ -449,15 +385,6 @@ const actions = {
       case "UPDATE_TOPIC":
         updateTopic(dir.arg, dispatch)    // FIXME: construct dm5.Topic?
         break
-      case "DELETE_TOPIC":
-        deleteTopic(dir.arg, dispatch)
-        break
-      case "UPDATE_ASSOCIATION":
-        updateAssoc(dir.arg, dispatch)
-        break
-      case "DELETE_ASSOCIATION":
-        deleteAssoc(dir.arg, dispatch)
-        break
       }
     })
   }
@@ -483,7 +410,7 @@ export default {
  */
 function _displayTopicmap (rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
-  return dm5.permCache.isTopicWritable(topicmapTopic.id)
+  return topicmapTopic.isWritable()
     .then(writable => state.writable = writable)
     .then(writable => dispatch('showTopicmap', {topicmapTopic, writable}))
     .then(topicmap => {
@@ -496,41 +423,9 @@ function _displayTopicmap (rootState, dispatch) {
 
 function updateTopic (topic, dispatch) {
   // console.log('updateTopic', topic)
-  // update topicmap
-  const _topic = state.topicmap.getTopicIfExists(topic.id)
-  if (_topic) {
-    _topic.value = topic.value              // update state
-    dispatch('syncTopic', topic.id)         // sync view
-  }
-  // update topicmap topics
   findTopicmapTopic(topic.id, (topics, i) => {
     Vue.set(topics, i, topic)
   })
-}
-
-function updateAssoc (assoc, dispatch) {
-  const _assoc = state.topicmap.getAssocIfExists(assoc.id)
-  if (_assoc) {
-    _assoc.value = assoc.value              // update state
-    _assoc.typeUri = assoc.typeUri          // update state
-    dispatch('syncAssoc', assoc.id)         // sync view
-  }
-}
-
-function deleteTopic (topic, dispatch) {
-  const _topic = state.topicmap.getTopicIfExists(topic.id)
-  if (_topic) {
-    state.topicmap.removeTopic(topic.id)    // update state
-    dispatch('syncRemoveTopic', topic.id)   // sync view
-  }
-}
-
-function deleteAssoc (assoc, dispatch) {
-  const _assoc = state.topicmap.getAssocIfExists(assoc.id)
-  if (_assoc) {
-    state.topicmap.removeAssoc(assoc.id)    // update state
-    dispatch('syncRemoveAssoc', assoc.id)   // sync view
-  }
 }
 
 // Helper
