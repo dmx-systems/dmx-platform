@@ -15,8 +15,7 @@ export default {
 
     topicmapId: {
       get () {
-        // Note: in the moment the webclient components are mounted no topicmap is loaded yet
-        return this.topicmap && this.topicmap.id
+        return this.$store.getters.topicmapId
       },
       set (id) {
         this.$store.dispatch('selectTopicmap', id)
@@ -25,10 +24,6 @@ export default {
 
     workspaceId () {
       return this.$store.state.workspaces.workspaceId
-    },
-
-    topicmap () {
-      return this.$store.state.topicmaps.topicmap
     },
 
     topics () {

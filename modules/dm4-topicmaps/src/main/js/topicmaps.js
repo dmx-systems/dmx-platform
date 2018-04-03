@@ -76,7 +76,7 @@ const actions = {
   displayTopicmap ({rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
     // update state
-    state.selectedTopicmapId[_workspaceId(rootState)] = id
+    Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
     dm5.utils.setCookie('dm4_topicmap_id', id)
     // update state + sync view
     return _displayTopicmap(rootState, dispatch)
@@ -145,10 +145,10 @@ const actions = {
    *
    * @param   p   a promise resolved once topic data has arrived (global "object" state is up-to-date).
    */
-  setTopicSelection ({dispatch}, {id, p}) {
-    // console.log('Setting topic selection of topicmap', _topicmapId(), 'to', id)
+  setTopicSelection ({getters, dispatch}, {id, p}) {
+    // console.log('setTopicSelection', _topicmapId(getters), id)
     // update state
-    state.selections[_topicmapId()] = {type: 'topic', id}
+    state.selections[_topicmapId(getters)] = {type: 'topic', id}
     // sync view
     dispatch('syncSelect', {id, p})
   },
@@ -166,10 +166,10 @@ const actions = {
    *
    * @param   p   a promise resolved once assoc data has arrived (global "object" state is up-to-date).
    */
-  setAssocSelection ({dispatch}, {id, p}) {
-    // console.log('Setting assoc selection of topicmap', _topicmapId(), 'to', id)
+  setAssocSelection ({getters, dispatch}, {id, p}) {
+    // console.log('setAssocSelection', _topicmapId(getters), id)
     // update state
-    state.selections[_topicmapId()] = {type: 'assoc', id}
+    state.selections[_topicmapId(getters)] = {type: 'assoc', id}
     // sync view
     dispatch('syncSelect', {id, p})
   },
@@ -184,10 +184,10 @@ const actions = {
    * Postcondition:
    * - "selections" state is up-to-date.
    */
-  unsetSelection ({dispatch}) {
-    // console.log('unsetSelection', _topicmapId())
+  unsetSelection ({getters, dispatch}) {
+    // console.log('unsetSelection', _topicmapId(getters))
     // update state
-    delete state.selections[_topicmapId()]
+    delete state.selections[_topicmapId(getters)]
     // sync view
     dispatch('syncUnselect')
   },
@@ -262,12 +262,12 @@ const actions = {
     dispatch('selectTopicmap', topicmapId)
   },
 
-  reloadTopicmap ({rootState, dispatch}) {
-    console.log('Reloading topicmap', _topicmapId())
+  reloadTopicmap ({rootState, getters, dispatch}) {
+    console.log('Reloading topicmap', _topicmapId(getters))
     dispatch('clearTopicmapCache')
     _displayTopicmap(rootState, dispatch).then(() => {
       // sync view (selection)
-      const selection = state.selections[_topicmapId()]
+      const selection = state.selections[_topicmapId(getters)]
       if (selection) {
         dispatch('syncSelect', {id: selection.id, p: Promise.resolve()})
       }
@@ -334,8 +334,8 @@ const actions = {
     }
   },
 
-  _setTopicVisibility ({dispatch}, {topicmapId, topicId, visibility}) {
-    if (topicmapId === _topicmapId()) {
+  _setTopicVisibility ({getters, dispatch}, {topicmapId, topicId, visibility}) {
+    if (topicmapId === _topicmapId(getters)) {
       // update state
       if (!visibility) {
         dispatch('unselectIf', topicId)
@@ -343,8 +343,8 @@ const actions = {
     }
   },
 
-  _removeAssocFromTopicmap ({dispatch}, {topicmapId, assocId}) {
-    if (topicmapId === _topicmapId()) {
+  _removeAssocFromTopicmap ({getters, dispatch}, {topicmapId, assocId}) {
+    if (topicmapId === _topicmapId(getters)) {
       // update state
       dispatch('unselectIf', assocId)
     }
@@ -362,9 +362,26 @@ const actions = {
   }
 }
 
+const getters = {
+
+  /**
+   * ID of the selected topicmap.
+   * Its calculation is based on "workspaceId" state (see workspaces module) and "selectedTopicmapId" state.
+   * Undefined if no workspace and/or no topicmap is selected.
+   */
+  topicmapId: (state, getters, rootState) => {
+    // Note: at the moment the webclient components are instantiated no workspace and no topicmap is selected
+    const workspaceId = __workspaceId(rootState)
+    const topicmapId = workspaceId && state.selectedTopicmapId[workspaceId]
+    // console.log('# topicmapId getter', workspaceId, topicmapId)
+    return topicmapId
+  }
+}
+
 export default {
   state,
-  actions
+  actions,
+  getters
 }
 
 // Update state + sync view
@@ -443,18 +460,21 @@ function findTopicmapTopic (id, callback) {
  * Preconditions:
  * - the "topicmap" state is up-to-date.
  */
-function _topicmapId () {
-  const topicmap = state.topicmap
-  if (!topicmap) {
+function _topicmapId (getters) {
+  if (!getters.topicmapId) {
     throw Error('No selected topicmap known')
   }
-  return topicmap.id
+  return getters.topicmapId
 }
 
 function _workspaceId (rootState) {
-  const workspaceId = rootState.workspaces.workspaceId
+  const workspaceId = __workspaceId(rootState)
   if (!workspaceId) {
     throw Error(`No selected workspace known`)
   }
   return workspaceId
+}
+
+function __workspaceId (rootState) {
+  return rootState.workspaces.workspaceId
 }
