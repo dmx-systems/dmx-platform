@@ -8,7 +8,7 @@ const actions = {
     return dm5.restClient.getTopicmap(id)
   },
 
-  renderTopicmap (_, topicmap) {
+  renderTopicmap (_, {topicmap, writable}) {
   }
 }
 

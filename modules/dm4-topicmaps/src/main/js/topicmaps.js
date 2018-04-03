@@ -5,9 +5,11 @@ const state = {
 
   topicmap: undefined,        // The displayed topicmap (derived state) (dm5.Topicmap).
                               // Updated by "displayTopicmap" action.
+                              // ### TODO: drop it? "topicmap" state is hold in renderer.
 
   writable: undefined,        // True if the current user has WRITE permission for the displayed topicmap.
                               // Updated by "displayTopicmap" action.
+                              // ### TODO: drop it? "writable" state is hold in renderer.
 
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
@@ -197,51 +199,6 @@ const actions = {
         select: true
       })
     })
-  },
-
-  /**
-   * Reveals a topic on the topicmap panel.
-   *
-   * @param   topic   the topic to reveal (dm5.Topic).
-   * @param   pos     Optional: the topic position in model coordinates (object with "x", "y" props).
-   *                  If not given it's up to the topicmap renderer to position the topic.
-   * @param   select  Optional: if trueish the revealed topic is selected programmatically.
-   */
-  revealTopic ({dispatch}, {topic, pos, select}) {
-    // update state + sync view
-    const op = _revealTopic(topic, pos, select, dispatch)
-    // update server
-    if (state.writable) {
-      if (op.type === 'add') {
-        dm5.restClient.addTopicToTopicmap(state.topicmap.id, topic.id, op.viewProps)
-      } else if (op.type === 'show') {
-        dm5.restClient.setTopicVisibility(state.topicmap.id, topic.id, true)
-      }
-    }
-  },
-
-  revealAssoc ({dispatch}, {assoc, select}) {
-    // update state + sync view
-    const op = _revealAssoc(assoc, select, dispatch)
-    // update server
-    if (state.writable) {
-      if (op.type === 'add') {
-        dm5.restClient.addAssocToTopicmap(state.topicmap.id, assoc.id, op.viewProps)
-      }
-    }
-  },
-
-  // TODO: add "select" param?
-  revealRelatedTopic ({dispatch}, relTopic) {
-    // update state + sync view
-    const topicOp = _revealTopic(relTopic, undefined, true, dispatch)   // pos=undefined, select=true
-    const assocOp = _revealAssoc(relTopic.assoc, false, dispatch)       // select=false
-    // update server
-    if (state.writable) {
-      if (topicOp.type || assocOp.type) {
-        dm5.restClient.addRelatedTopicToTopicmap(state.topicmap.id, relTopic.id, relTopic.assoc.id, topicOp.viewProps)
-      }
-    }
   },
 
   /**
@@ -526,44 +483,13 @@ export default {
  */
 function _displayTopicmap (rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
-  return new Promise(resolve => {
-    dm5.permCache.isTopicWritable(topicmapTopic.id)
-      .then(writable => state.writable = writable)
-      .then(() => dispatch('showTopicmap', topicmapTopic))
-      .then(topicmap => {
-        console.log('_displayTopicmap', topicmap)
-        state.topicmap = topicmap
-      })
-      .then(resolve)
-  })
-}
-
-/**
- * @param   topic   the topic to reveal (dm5.Topic).
- * @param   pos     Optional: the topic position in model coordinates (object with "x", "y" props).
- *                  If not given it's up to the topicmap renderer to position the topic.
- * @param   select  Optional: if trueish the revealed topic is selected programmatically.
- */
-function _revealTopic (topic, pos, select, dispatch) {
-  // update state
-  const op = state.topicmap.revealTopic(topic, pos)
-  // sync view
-  if (op.type === 'add' || op.type === 'show') {
-    dispatch('syncAddTopic', topic.id)
-  }
-  select && dispatch('selectTopic', topic.id)
-  return op
-}
-
-function _revealAssoc (assoc, select, dispatch) {
-  // update state
-  const op = state.topicmap.revealAssoc(assoc)
-  // sync view
-  if (op.type === 'add') {
-    dispatch('syncAddAssoc', assoc.id)
-  }
-  select && dispatch('selectAssoc', assoc.id)
-  return op
+  return dm5.permCache.isTopicWritable(topicmapTopic.id)
+    .then(writable => state.writable = writable)
+    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable}))
+    .then(topicmap => {
+      console.log('_displayTopicmap', topicmap)
+      state.topicmap = topicmap
+    })
 }
 
 // Process directives
