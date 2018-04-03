@@ -8,9 +8,7 @@ const actions = {
     return dm5.restClient.getTopicmap(id)
   },
 
-  // TODO: drop
-  syncTopicmap (_, topicmap) {
-    return topicmap
+  renderTopicmap (_, topicmap) {
   }
 }
 

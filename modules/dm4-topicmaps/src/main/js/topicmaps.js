@@ -514,7 +514,7 @@ export default {
 // Update state + sync view
 
 /**
- * Displays the topicmap that is selected according to current state.
+ * Displays the selected topicmap, according to current state.
  *
  * Preconditions:
  * - "selectedTopicmapId" state is up-to-date
@@ -529,7 +529,7 @@ function _displayTopicmap (rootState, dispatch) {
   return new Promise(resolve => {
     dm5.permCache.isTopicWritable(topicmapTopic.id)
       .then(writable => state.writable = writable)
-      .then(() => dispatch('renderTopicmap', topicmapTopic))
+      .then(() => dispatch('showTopicmap', topicmapTopic))
       .then(topicmap => {
         console.log('_displayTopicmap', topicmap)
         state.topicmap = topicmap
@@ -610,7 +610,7 @@ function deleteAssoc (assoc, dispatch) {
 // Helper
 
 /**
- * Returns the topicmapTopic according to current state.
+ * Returns the selected topicmap topic, according to current state.
  *
  * Preconditions:
  * - "selectedTopicmapId" state is up-to-date
