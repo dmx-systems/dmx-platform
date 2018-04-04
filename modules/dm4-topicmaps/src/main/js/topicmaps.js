@@ -3,14 +3,6 @@ import dm5 from 'dm5'
 
 const state = {
 
-  topicmap: undefined,        // The displayed topicmap (derived state) (dm5.Topicmap).
-                              // Updated by "displayTopicmap" action.
-                              // ### TODO: drop it? "topicmap" state is hold in renderer.
-
-  writable: undefined,        // True if the current user has WRITE permission for the displayed topicmap.
-                              // Updated by "displayTopicmap" action.
-                              // ### TODO: drop it? "writable" state is hold in renderer.
-
   topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
@@ -399,13 +391,9 @@ export default {
  */
 function _displayTopicmap (rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
-  return topicmapTopic.isWritable()
-    .then(writable => state.writable = writable)
-    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable}))
-    .then(topicmap => {
-      console.log('_displayTopicmap', topicmap)
-      state.topicmap = topicmap
-    })
+  return topicmapTopic.isWritable().then(writable =>
+    dispatch('showTopicmap', {topicmapTopic, writable})
+  )
 }
 
 // Process directives

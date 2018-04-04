@@ -38,7 +38,7 @@ export default store => {
         },
         listeners: {
           'topic-select':         id          => store.dispatch('selectTopic', id),
-          'topic-double-click':   id          => selectTopicmapIf(id),
+          'topic-double-click':   viewTopic   => selectTopicmapIf(viewTopic),
           'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
           'topic-drop-on-topic':  ids         => store.dispatch('createAssoc', ids),
           'assoc-select':         id          => store.dispatch('selectAssoc', id),
@@ -79,9 +79,9 @@ export default store => {
     }
   }
 
-  function selectTopicmapIf (id) {
-    if (store.state.topicmaps.topicmap.getTopic(id).typeUri === 'dm4.topicmaps.topicmap') {
-      store.dispatch('selectTopicmap', id)
+  function selectTopicmapIf (viewTopic) {
+    if (viewTopic.typeUri === 'dm4.topicmaps.topicmap') {
+      store.dispatch('selectTopicmap', viewTopic.id)
     }
   }
 
