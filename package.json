@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "webpack -p --hide-modules",
-    "dev": "webpack-dev-server -d --hot"
+    "dev": "webpack-dev-server -d --hot",
+    "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json ./modules/dm4-webclient/src/main/resources/web/dist"
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",
@@ -20,7 +21,7 @@
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
-    "element-ui": "^2.3.2",
+    "element-ui": "^2.3.3",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.16",
     "vue-router": "^2.8.1",
@@ -41,6 +42,7 @@
     "vue-loader": "^14.2.2",
     "vue-template-compiler": "^2.5.15",
     "webpack": "^4.4.1",
+    "webpack-bundle-analyzer": "^2.11.1",
     "webpack-cli": "^2.0.13",
     "webpack-dev-server": "^3.1.1"
   }
