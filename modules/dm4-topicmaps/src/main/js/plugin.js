@@ -70,8 +70,7 @@ export default store => {
     topicmapType: {
       uri: 'dm4.webclient.default_topicmap_renderer',
       name: "Topicmap",
-      storeModule: undefined,   // TODO
-      comp: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */),
+      renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */),
       mounted () {
         // TODO: sync styles dynamically when assoc type view config changes
         store.dispatch('syncStyles', assocTypeColors())
