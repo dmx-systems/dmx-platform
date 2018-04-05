@@ -15,7 +15,6 @@ export default {
 
   created () {
     console.log('dm5-geomap-renderer created')
-    this.$store.registerModule('geomapRenderer', require('../geomap-model').default)
   },
 
   mounted () {
