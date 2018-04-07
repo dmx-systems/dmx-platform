@@ -4,6 +4,7 @@ import dm5 from 'dm5'
 import store from './store/webclient'
 import router from './router'
 import pluginManager from './plugin-manager'
+import onHttpError from './error-handler'
 import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
@@ -11,7 +12,10 @@ import './websocket'
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
 // The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init().
-const ready = dm5.init(store)
+const ready = dm5.init({
+  store,
+  onHttpError
+})
 
 // 2) Create Vue root instance
 // In particular instantiates dm5-webclient component, and its child component dm5-search-widget.

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {
-  Button, Input, Select, Option, OptionGroup, Checkbox, Radio, RadioGroup, Dialog, Tabs, TabPane
+  Button, Input, Select, Option, OptionGroup, Checkbox, Radio, RadioGroup, Dialog, Tabs, TabPane, Notification
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
@@ -24,3 +24,5 @@ Vue.use(RadioGroup)
 Vue.use(Dialog)
 Vue.use(Tabs)
 Vue.use(TabPane)
+
+Vue.prototype.$notify = Notification
