@@ -204,8 +204,6 @@ const actions = {
     dm5.restClient.createAssoc(assocModel).then(assoc => {
       console.log(assoc)
       dispatch('revealAssoc', {assoc, select: true})
-    }).catch(error => {
-      console.error(error)
     })
   },
 
