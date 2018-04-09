@@ -1,5 +1,6 @@
 <template>
   <div class="dm5-workspace-options">
+    <div class="field-label">Sharing Mode</div>
     <el-radio-group v-model="sharingModeUri">
       <el-radio label="dm4.workspaces.private">Private</el-radio>
       <el-radio label="dm4.workspaces.confidential">Confidential</el-radio>
@@ -33,6 +34,6 @@ export default {
 .dm5-workspace-options .el-radio-group .el-radio {
   display: block;       /* was inline-block */
   margin-left: 0;       /* was 30px (.el-radio+.el-radio) */
-  line-height: 2;       /* was 1 */
+  line-height: 1.8;     /* was 1 */
 }
 </style>

@@ -38,6 +38,7 @@
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
   --highlight-color: #409eff;         /* see --color-primary */
+  --color-text-disabled: #c0c4cc;     /* see --color-text-placeholder */
   --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
   --background-color-darker: #ebeef5;
   --color-danger: #f56c6c;            /* see --color-danger */
@@ -113,14 +114,6 @@ button {
 .el-dialog__body {
   padding: 15px;                        /* was 30px 20px */
   line-height: unset;                   /* was 24px */
-}
-
-.el-tabs__item {
-  font-size: var(--label-font-size);    /* was 14px */
-  color: var(--label-color);            /* was #2d2f33 (Element UI --color-text-primary) */
-  height: 36px;                         /* was 40px */
-  line-height: 36px;                    /* was 40px */
-  padding: 0 12px;                      /* was 0 20px */
 }
 
 /* Note: el-table is currently not in use */

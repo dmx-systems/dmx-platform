@@ -1,6 +1,6 @@
 <template>
   <div class="dm5-topicmap-options">
-    <div class="field-label">Type</div>
+    <div class="field-label">Topicmap Type</div>
     <el-select v-model="topicmapTypeUri">
       <el-option v-for="type in topicmapTypes" :label="type.name" :value="type.uri" :key="type.uri"></el-option>
     </el-select>
