@@ -21,11 +21,11 @@
     "dm5-search-widget": "https://github.com/jri/dm5-search-widget.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
-    "element-ui": "^2.3.3",
+    "element-ui": "^2.3.4",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.16",
     "vue-router": "^2.8.1",
-    "vue2-leaflet": "^1.0.1",
+    "vue2-leaflet": "^1.0.2",
     "vuex": "^2.5.0"
   },
   "devDependencies": {
@@ -40,7 +40,7 @@
     "file-loader": "^1.1.11",
     "style-loader": "^0.20.3",
     "vue-loader": "^14.2.2",
-    "vue-template-compiler": "^2.5.15",
+    "vue-template-compiler": "^2.5.16",
     "webpack": "^4.5.0",
     "webpack-bundle-analyzer": "^2.11.1",
     "webpack-cli": "^2.0.14",
