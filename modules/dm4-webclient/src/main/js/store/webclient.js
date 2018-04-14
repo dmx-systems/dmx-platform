@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import dm5 from 'dm5'
+import Selection from '../selection'
 
 Vue.use(Vuex)
 
@@ -13,12 +14,14 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
+  selection: new Selection(handleSelection),
+
   objectRenderers: {},      // Registered object renderers:
                             //   {
                             //     typeUri: component
                             //   }
 
-  compDefs: {},             // Registered components
+  compDefs: {},             // Registered webclient components
 
   quillConfig: {
     options: {
@@ -61,9 +64,41 @@ const actions = {
     })
   },
 
-  registerObjectRenderer (_, {typeUri, component}) {
-    state.objectRenderers[typeUri] = component
+  // ---
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  selectTopic ({dispatch}, id) {
+    state.selection.addTopic(id)
   },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  selectAssoc ({dispatch}, id) {
+    state.selection.addAssoc(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  unselectTopic ({dispatch}, id) {
+    state.selection.removeTopic(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  unselectAssoc ({dispatch}, id) {
+    state.selection.removeAssoc(id)
+  },
+
+  // ---
 
   unselectIf ({dispatch}, id) {
     // console.log('unselectIf', id, isSelected(id))
@@ -73,6 +108,10 @@ const actions = {
   },
 
   // ---
+
+  registerObjectRenderer (_, {typeUri, component}) {
+    state.objectRenderers[typeUri] = component
+  },
 
   registerComponent (_, compDef) {
     const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])
@@ -158,6 +197,20 @@ export default store
 function displayObjectIf (object) {
   if (isSelected(object.id)) {
     store.dispatch('displayObject', object)
+  }
+}
+
+function handleSelection () {
+  console.log('selection', state.selection.topicIds, state.selection.assocIds)
+  if (state.selection.isEmpty()) {
+    store.dispatch('stripSelectionFromRoute')
+  } else if (state.selection.isSingle()) {
+    const topicId = state.selection.singleTopicId()
+    const assocId = state.selection.singleAssocId()
+    topicId && store.dispatch('callTopicRoute', topicId)
+    assocId && store.dispatch('callAssocRoute', assocId)
+  } else {
+    // TODO
   }
 }
 

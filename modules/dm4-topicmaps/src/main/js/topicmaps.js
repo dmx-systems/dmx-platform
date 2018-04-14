@@ -101,30 +101,6 @@ const actions = {
   },
 
   /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectTopic ({dispatch}, id) {
-    dispatch('callTopicRoute', id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectAssoc ({dispatch}, id) {
-    dispatch('callAssocRoute', id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  unselect ({dispatch}) {
-    dispatch('stripSelectionFromRoute')
-  },
-
-  /**
    * Renders the given topic as selected in the topicmap panel.
    *
    * Preconditions:
