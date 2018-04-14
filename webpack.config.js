@@ -1,5 +1,6 @@
 const path = require('path')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   entry: './modules/dm4-webclient/src/main/js/main.js',
@@ -52,6 +53,24 @@ module.exports = {
     },
     noInfo: true,
     open: true
+  },
+  // When minifying ES6 code uglify-es 3.3.9 (as package locked by uglifyjs-webpack-plugin) generates code that throws
+  // "TypeError: Assignment to constant variable". This is due to a bug in uglify-es 3.3.9 in conjunction with function
+  // inlining.
+  // https://github.com/mishoo/UglifyJS2/issues/2854
+  // https://github.com/mishoo/UglifyJS2/issues/2842
+  // The solution is to disable function inlining.
+  // https://github.com/webpack/webpack/issues/6567
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: {
+            inline: false
+          }
+        }
+      })
+    ]
   },
   performance: {
     hints: false
