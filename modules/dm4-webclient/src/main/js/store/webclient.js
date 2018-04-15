@@ -71,6 +71,7 @@ const actions = {
    * - the route is *not* yet set.
    */
   selectTopic ({dispatch}, id) {
+    console.log('selectTopic', id)
     state.selection.addTopic(id)
   },
 
@@ -201,7 +202,7 @@ function displayObjectIf (object) {
 }
 
 function handleSelection () {
-  console.log('selection', state.selection.topicIds, state.selection.assocIds)
+  console.log('handleSelection', state.selection.topicIds, state.selection.assocIds)
   if (state.selection.isEmpty()) {
     store.dispatch('stripSelectionFromRoute')
   } else if (state.selection.isSingle()) {
