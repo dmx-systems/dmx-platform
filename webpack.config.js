@@ -54,7 +54,7 @@ module.exports = {
     noInfo: true,
     open: true
   },
-  // When uglify-es minifies ES6 the generated code might throw "TypeError: Assignment to constant variable".
+  // ES6 code minified by uglify-es might throw "TypeError: Assignment to constant variable".
   // This is due to a bug in uglify-es related to function inlining.
   // https://github.com/mishoo/UglifyJS2/issues/2842
   // The solution is to disable function inlining.

@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 /**
  * Tracks single select/unselect operations while this tick
- * and handles the aggreagated selection in the next tick.
+ * and handles the accumulated selection in the next tick.
  */
 export default class Selection {
 
@@ -13,38 +13,44 @@ export default class Selection {
     this.p = false    // tracks deferred handler invocation
   }
 
+  // These 4 methods accumulate state changes, and invoke the handler in the next tick.
+  // They are called *before* a route change.
+
   addTopic (id) {
-    if (this.topicIds.includes(id)) {
-      throw Error(`${id} is already in the selected topic list`)
-    }
+    this._checkAddTopic(id)
     this.topicIds.push(id)
     this._postpone()
   }
 
   addAssoc (id) {
-    if (this.assocIds.includes(id)) {
-      throw Error(`${id} is already in the selected assoc list`)
-    }
+    this._checkAddAssoc(id)
     this.assocIds.push(id)
     this._postpone()
   }
 
   removeTopic (id) {
-    const i = this.topicIds.indexOf(id)
-    if (i === -1) {
-      throw Error(`${id} not found in the selected topic list`)
-    }
+    const i = this._checkRemoveTopic(id)
     this.topicIds.splice(i, 1)
     this._postpone()
   }
 
   removeAssoc (id) {
-    const i = this.assocIds.indexOf(id)
-    if (i === -1) {
-      throw Error(`${id} not found in the selected assoc list`)
-    }
+    const i = this._checkRemoveAssoc(id)
     this.assocIds.splice(i, 1)
     this._postpone()
+  }
+
+  // These 2 methods manipulate the selection *silently*, that is without handler invocation.
+  // They are called *after* a route change in order to adapt the state.
+
+  setTopic (id) {
+    // this._checkAddTopic(id)    // TODO: think about
+    this.topicIds = [id]
+  }
+
+  setAssoc (id) {
+    // this._checkAddAssoc(id)    // TODO: think about
+    this.assocIds = [id]
   }
 
   // ---
@@ -69,6 +75,36 @@ export default class Selection {
       throw Error(`singleAssocId() called when there is no single selection`)
     }
     return this.assocIds[0]
+  }
+
+  // ---
+
+  _checkAddTopic (id) {
+    if (this.topicIds.includes(id)) {
+      throw Error(`${id} is already in the selected topic list`)
+    }
+  }
+
+  _checkAddAssoc (id) {
+    if (this.assocIds.includes(id)) {
+      throw Error(`${id} is already in the selected assoc list`)
+    }
+  }
+
+  _checkRemoveTopic (id) {
+    const i = this.topicIds.indexOf(id)
+    if (i === -1) {
+      throw Error(`${id} not found in the selected topic list`)
+    }
+    return i
+  }
+
+  _checkRemoveAssoc (id) {
+    const i = this.assocIds.indexOf(id)
+    if (i === -1) {
+      throw Error(`${id} not found in the selected assoc list`)
+    }
+    return i
   }
 
   // ---

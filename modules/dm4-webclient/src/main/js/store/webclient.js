@@ -101,6 +101,24 @@ const actions = {
 
   // ---
 
+  /**
+   * Preconditions:
+   * - the route is set.
+   */
+  setTopicSelection (_, {id}) {
+    state.selection.setTopic(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is set.
+   */
+  setAssocSelection (_, {id}) {
+    state.selection.setAssoc(id)
+  },
+
+  // ---
+
   unselectIf ({dispatch}, id) {
     // console.log('unselectIf', id, isSelected(id))
     if (isSelected(id)) {
