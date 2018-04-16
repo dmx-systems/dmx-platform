@@ -289,12 +289,28 @@ function fetchAssoc (id, p) {
   })
 }
 
+/**
+ * @param   p   a promise resolved once the topicmap rendering is complete.
+ */
 function unsetSelection (p) {
+  const id = store.state.object.id      // remember id as 'emptyDisplay' action resets "object" state
+  console.log('unsetSelection', id, store.state.selection.isMulti())
   // detail panel
   store.dispatch('emptyDisplay')
   // topicmap panel
   p.then(() => {
     store.dispatch('unsetSelection')
+    // By design multi selection behave different than single selections:
+    // - multi selections are not represented in the browser URL.
+    // - the object details of a multi selection are *not* displayed in-map (unless pinned).
+    // As a consequence when a single selection is extended to a multi selection the selection part is stripped from
+    // URL, causing the router to remove the single selection from state and view. However in case of a multi selection
+    // the former single selection must be visually restored in order to match the multi selection state. This is done
+    // by dispatching the low-level '_syncSelect' action, which manipulates the view only. The normal 'syncSelect'
+    // action would display the in-map details.
+    if (store.state.selection.isMulti()) {
+      store.dispatch('_syncSelect', id)
+    }
   })
 }
 

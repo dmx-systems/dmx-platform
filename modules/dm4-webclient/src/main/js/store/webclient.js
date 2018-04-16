@@ -70,7 +70,7 @@ const actions = {
    * Preconditions:
    * - the route is *not* yet set.
    */
-  selectTopic ({dispatch}, id) {
+  selectTopic (_, id) {
     console.log('selectTopic', id)
     state.selection.addTopic(id)
   },
@@ -79,7 +79,8 @@ const actions = {
    * Preconditions:
    * - the route is *not* yet set.
    */
-  selectAssoc ({dispatch}, id) {
+  selectAssoc (_, id) {
+    console.log('selectAssoc', id)
     state.selection.addAssoc(id)
   },
 
@@ -87,7 +88,8 @@ const actions = {
    * Preconditions:
    * - the route is *not* yet set.
    */
-  unselectTopic ({dispatch}, id) {
+  unselectTopic (_, id) {
+    console.log('unselectTopic', id)
     state.selection.removeTopic(id)
   },
 
@@ -95,7 +97,8 @@ const actions = {
    * Preconditions:
    * - the route is *not* yet set.
    */
-  unselectAssoc ({dispatch}, id) {
+  unselectAssoc (_, id) {
+    console.log('unselectAssoc', id)
     state.selection.removeAssoc(id)
   },
 
@@ -117,6 +120,10 @@ const actions = {
     state.selection.setAssoc(id)
   },
 
+  /**
+   * Preconditions:
+   * - the route is set.
+   */
   displayTopicmap (_, id) {
     state.selection.empty()
   },
@@ -225,15 +232,13 @@ function displayObjectIf (object) {
 
 function handleSelection () {
   console.log('handleSelection', state.selection.topicIds, state.selection.assocIds)
-  if (state.selection.isEmpty()) {
-    store.dispatch('stripSelectionFromRoute')
-  } else if (state.selection.isSingle()) {
+  if (state.selection.isSingle()) {
     const topicId = state.selection.singleTopicId()
     const assocId = state.selection.singleAssocId()
     topicId && store.dispatch('callTopicRoute', topicId)
     assocId && store.dispatch('callAssocRoute', assocId)
   } else {
-    // TODO
+    store.dispatch('stripSelectionFromRoute')
   }
 }
 

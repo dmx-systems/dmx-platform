@@ -148,6 +148,7 @@ const actions = {
    * Preconditions:
    * - the route is set.
    * - the "topicmap" state is up-to-date.
+   * - the topicmap rendering is complete.
    *
    * Postcondition:
    * - "selections" state is up-to-date.

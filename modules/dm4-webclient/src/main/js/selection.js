@@ -68,6 +68,10 @@ export default class Selection {
     return this._size() === 1
   }
 
+  isMulti () {
+    return this._size() > 1
+  }
+
   singleTopicId () {
     if (!this.isSingle()) {
       throw Error(`singleTopicId() called when there is no single selection`)
