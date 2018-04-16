@@ -55,6 +55,11 @@ export default class Selection {
 
   // ---
 
+  empty () {
+    this.topicIds = []
+    this.assocIds = []
+  }
+
   isEmpty () {
     return this._size() === 0
   }

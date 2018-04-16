@@ -261,7 +261,7 @@ const actions = {
       p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
         // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
         if (!topics.length) {
-          throw Error(`Workspace ${workspaceId} has no topicmap`)
+          throw Error(`workspace ${workspaceId} has no topicmap`)
         }
         Vue.set(state.topicmapTopics, workspaceId, topics)
       })
@@ -397,11 +397,11 @@ function getTopicmapTopic (rootState) {
   }
   const topicmapTopics = state.topicmapTopics[workspaceId]
   if (!topicmapTopics) {
-    throw Error(`Topicmap topics of workspace ${workspaceId} not yet loaded`)
+    throw Error(`topicmap topics of workspace ${workspaceId} not yet loaded`)
   }
   const topicmapTopic = topicmapTopics.find(topic => topic.id === topicmapId)
   if (!topicmapTopic) {
-    throw Error(`Topicmap topic ${topicmapId} not found (workspace ${workspaceId})`)
+    throw Error(`topicmap topic ${topicmapId} not found (workspace ${workspaceId})`)
   }
   return topicmapTopic
 }
@@ -424,7 +424,7 @@ function findTopicmapTopic (id, callback) {
  */
 function _topicmapId (getters) {
   if (!getters.topicmapId) {
-    throw Error('No selected topicmap known')
+    throw Error('no selected topicmap known')
   }
   return getters.topicmapId
 }
@@ -432,7 +432,7 @@ function _topicmapId (getters) {
 function _workspaceId (rootState) {
   const workspaceId = __workspaceId(rootState)
   if (!workspaceId) {
-    throw Error(`No selected workspace known`)
+    throw Error(`no selected workspace known`)
   }
   return workspaceId
 }

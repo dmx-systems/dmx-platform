@@ -95,7 +95,7 @@ store.registerModule('routerModule', {
     callDetailRoute (_, detail) {
       const object = store.state.object
       if (!object) {
-        throw Error('callDetailRoute when nothing is selected')
+        throw Error('callDetailRoute() called when nothing is selected')
       }
       router.push({
         name: object.isTopic() ? 'topicDetail' : 'assocDetail',

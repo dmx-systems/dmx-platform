@@ -117,6 +117,10 @@ const actions = {
     state.selection.setAssoc(id)
   },
 
+  displayTopicmap (_, id) {
+    state.selection.empty()
+  },
+
   // ---
 
   unselectIf ({dispatch}, id) {
