@@ -108,24 +108,8 @@ const actions = {
    * Preconditions:
    * - the route is set.
    */
-  setTopicSelection (_, {id}) {
-    state.selection.setTopic(id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is set.
-   */
-  setAssocSelection (_, {id}) {
-    state.selection.setAssoc(id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is set.
-   */
   displayTopicmap (_, id) {
-    state.selection.empty()
+    state.selection.empty()   // TODO: have per-topicmap "selection" state?
   },
 
   // ---

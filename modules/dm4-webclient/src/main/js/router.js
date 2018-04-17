@@ -265,8 +265,8 @@ function fetchTopic (id, p) {
   })
   // topicmap panel
   p.then(() => {
-    unselectMulti()
     store.dispatch('setTopicSelection', {id, p: p2})
+    _setTopicSelection(id)
   })
 }
 
@@ -286,8 +286,8 @@ function fetchAssoc (id, p) {
   })
   // topicmap panel
   p.then(() => {
-    unselectMulti()
     store.dispatch('setAssocSelection', {id, p: p2})
+    _setAssocSelection(id)
   })
 }
 
@@ -302,34 +302,55 @@ function unsetSelection (p) {
   // topicmap panel
   p.then(() => {
     store.dispatch('unsetSelection')
-    selectMulti(id)
+    _unsetSelection(id)
   })
 }
 
-function selectMulti (id) {
-  // By design multi selection behave different than single selections:
-  // - multi selections are not represented in the browser URL.
-  // - the object details of a multi selection are *not* displayed in-map (unless pinned).
-  // As a consequence when a single selection is extended to a multi selection the selection part is stripped from
-  // URL, causing the router to remove the single selection from state and view. However in case of a multi selection
-  // the former single selection must be visually restored in order to match the multi selection state. This is done
-  // by dispatching the low-level '_syncSelect' action, which manipulates the view only. The normal 'syncSelect'
-  // action would display the in-map details.
+// Multi-selection handling: update "selection" state and sync view
+
+// Note: by design multi-selection behave different than single selections:
+// - multi selections are not represented in the browser URL.
+// - the object details of a multi selection are *not* displayed in-map (unless pinned).
+
+function _setTopicSelection (id) {
+  _setSelection()
+  store.state.selection.setTopic(id)
+}
+
+function _setAssocSelection (id) {
+  _setSelection()
+  store.state.selection.setAssoc(id)
+}
+
+function _setSelection () {
+  console.log('_setSelection', store.state.selection.topicIds, store.state.selection.assocIds)
+  // If there is a multi selection and history navigation leads to a single-selection route, the multi selection must
+  // be visually removed and the "selection" state must be updated manuallly (see subsequent call). In contrast when
+  // changing the selection by topicmap interaction the "selection" state and view are up-to-date already.
   if (store.state.selection.isMulti()) {
+    store.state.selection.forEachId(id => {
+      store.dispatch('_syncUnselect', id)     // TODO: pinned multi selection?
+    })
+  }
+}
+
+function _unsetSelection (id) {
+  console.log('_unsetSelection', store.state.selection.topicIds, store.state.selection.assocIds)
+  if (store.state.selection.isSingle()) {
+    // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
+    // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
+    // is up-to-date already.
+    store.state.selection.empty()
+  } else if (store.state.selection.isMulti()) {
+    // If a single selection is extended to a multi selection the URL's selection part is stripped, causing the router
+    // to remove the single selection from state and view. The former single selection must be visually restored in
+    // order to match the multi selection state. This is done by dispatching the low-level '_syncSelect' action, which
+    // manipulates the view only. The normal 'syncSelect' action would display the in-map details.
     store.dispatch('_syncSelect', id)
   }
 }
 
-function unselectMulti () {
-  // At the time history navigation leads to a single selection route a multi selection might exist. The multi selection
-  // must be removed visually. The multi selection state update is done by 'setTopic/AssociationSelection' action.
-  if (store.state.selection.isMulti()) {
-    store.state.selection.forEachId(id => {
-      store.dispatch('_syncUnselect', id)
-      // TODO: pinned multi selection?
-    })
-  }
-}
+//
 
 function id (v) {
   // Note: Number(undefined) is NaN, and NaN != NaN is true!

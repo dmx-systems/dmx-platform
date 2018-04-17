@@ -46,10 +46,12 @@ export default class Selection {
   setTopic (id) {
     // this._checkAddTopic(id)    // TODO: think about
     this.topicIds = [id]
+    this.assocIds = []
   }
 
   setAssoc (id) {
     // this._checkAddAssoc(id)    // TODO: think about
+    this.topicIds = []
     this.assocIds = [id]
   }
 
