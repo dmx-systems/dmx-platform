@@ -86,6 +86,11 @@ export default class Selection {
     return this.assocIds[0]
   }
 
+  forEachId (visitor) {
+    this.topicIds.forEach(visitor)
+    this.assocIds.forEach(visitor)
+  }
+
   // ---
 
   _checkAddTopic (id) {
