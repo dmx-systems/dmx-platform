@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 /**
- * Tracks single select/unselect operations while this tick
+ * Tracks single select/unselect operations while current tick
  * and handles the accumulated selection in the next tick.
  */
 export default class Selection {
@@ -9,38 +9,38 @@ export default class Selection {
   constructor (handler) {
     this.topicIds = []
     this.assocIds = []
-    this.handler = handler
-    this.p = false    // tracks deferred handler invocation
+    this._handler = handler
+    this._p = false    // tracks deferred handler invocation
   }
 
-  // These 4 methods accumulate state changes, and invoke the handler in the next tick.
+  // These 4 methods accumulate state changes, and defers handler invocation to the next tick.
   // They are called *before* a route change.
 
   addTopic (id) {
     this._checkAddTopic(id)
     this.topicIds.push(id)
-    this._postpone()
+    this._defer()
   }
 
   addAssoc (id) {
     this._checkAddAssoc(id)
     this.assocIds.push(id)
-    this._postpone()
+    this._defer()
   }
 
   removeTopic (id) {
     const i = this._checkRemoveTopic(id)
     this.topicIds.splice(i, 1)
-    this._postpone()
+    this._defer()
   }
 
   removeAssoc (id) {
     const i = this._checkRemoveAssoc(id)
     this.assocIds.splice(i, 1)
-    this._postpone()
+    this._defer()
   }
 
-  // These 2 methods manipulate the selection *silently*, that is without handler invocation.
+  // These 3 methods manipulate the selection *silently*, that is without handler invocation.
   // They are called *after* a route change in order to adapt the state.
 
   setTopic (id) {
@@ -55,37 +55,37 @@ export default class Selection {
     this.assocIds = [id]
   }
 
-  // ---
-
   empty () {
     this.topicIds = []
     this.assocIds = []
   }
 
+  // ---
+
+  size () {
+    return this.topicIds.length + this.assocIds.length
+  }
+
   isEmpty () {
-    return this._size() === 0
+    return this.size() === 0
   }
 
   isSingle () {
-    return this._size() === 1
+    return this.size() === 1
   }
 
   isMulti () {
-    return this._size() > 1
+    return this.size() > 1
   }
 
-  singleTopicId () {
-    if (!this.isSingle()) {
-      throw Error(`singleTopicId() called when there is no single selection`)
-    }
-    return this.topicIds[0]
+  getObjectId () {
+    this._checkSingle('getObjectId')
+    return this.getType() === 'topic' ? this.topicIds[0] : this.assocIds[0]
   }
 
-  singleAssocId () {
-    if (!this.isSingle()) {
-      throw Error(`singleAssocId() called when there is no single selection`)
-    }
-    return this.assocIds[0]
+  getType () {
+    this._checkSingle('getType')
+    return this.topicIds.length ? 'topic' : 'assoc'
   }
 
   forEachId (visitor) {
@@ -123,19 +123,21 @@ export default class Selection {
     return i
   }
 
-  // ---
-
-  _postpone () {
-    if (!this.p) {
-      Vue.nextTick(() => {
-        this.handler()
-        this.p = false
-      })
-      this.p = true
+  _checkSingle (fnName) {
+    if (!this.isSingle()) {
+      throw Error(`${fnName}() called when there is no single selection`)
     }
   }
 
-  _size () {
-    return this.topicIds.length + this.assocIds.length
+  // ---
+
+  _defer () {
+    if (!this._p) {
+      Vue.nextTick(() => {
+        this._handler(this)
+        this._p = false
+      })
+      this._p = true
+    }
   }
 }

@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import dm5 from 'dm5'
-import Selection from '../selection'
 
 Vue.use(Vuex)
 
@@ -13,8 +12,6 @@ const state = {
                             // Undefined if nothing is selected.
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
-
-  selection: new Selection(handleSelection),
 
   objectRenderers: {},      // Registered object renderers:
                             //   {
@@ -62,54 +59,6 @@ const actions = {
     object.update().then(object => {
       dispatch('_processDirectives', object.directives)
     })
-  },
-
-  // ---
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectTopic (_, id) {
-    console.log('selectTopic', id)
-    state.selection.addTopic(id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectAssoc (_, id) {
-    console.log('selectAssoc', id)
-    state.selection.addAssoc(id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  unselectTopic (_, id) {
-    console.log('unselectTopic', id)
-    state.selection.removeTopic(id)
-  },
-
-  /**
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  unselectAssoc (_, id) {
-    console.log('unselectAssoc', id)
-    state.selection.removeAssoc(id)
-  },
-
-  // ---
-
-  /**
-   * Preconditions:
-   * - the route is set.
-   */
-  displayTopicmap (_, id) {
-    state.selection.empty()   // TODO: have per-topicmap "selection" state?
   },
 
   // ---
@@ -211,18 +160,6 @@ export default store
 function displayObjectIf (object) {
   if (isSelected(object.id)) {
     store.dispatch('displayObject', object)
-  }
-}
-
-function handleSelection () {
-  console.log('handleSelection', state.selection.topicIds, state.selection.assocIds)
-  if (state.selection.isSingle()) {
-    const topicId = state.selection.singleTopicId()
-    const assocId = state.selection.singleAssocId()
-    topicId && store.dispatch('callTopicRoute', topicId)
-    assocId && store.dispatch('callAssocRoute', assocId)
-  } else {
-    store.dispatch('stripSelectionFromRoute')
   }
 }
 

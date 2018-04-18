@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import dm5 from 'dm5'
+import Selection from './selection'
 
 const state = {
 
@@ -14,22 +15,18 @@ const state = {
                               //     workspaceId: topicmapId
                               //   }
 
-  selections: {},             // Per-topicmap selection entries, keyed by topicmap ID:
+  selections: {},             // Per-topicmap selection, keyed by topicmap ID:
                               //   {
-                              //     topicmapId: {
-                              //       type: "topic"|"assoc"
-                              //       id: topicId|assocId
-                              //     }
+                              //     topicmapId: Selection
                               //   }
-                              // Topicmaps with no selection have no selection entry.
 
   topicmapTypes: {}           // Registered topicmap types, keyed by topicmap type URI:
                               //   {
                               //     topicmapTypeUri: {
                               //       uri:
                               //       name:
-                              //       storeModule:
-                              //       comp:
+                              //       renderer:
+                              //       mounted: callback
                               //     }
                               //   {
 }
@@ -86,19 +83,59 @@ const actions = {
   selectTopicmap ({dispatch}, id) {
     const selection = state.selections[id]
     // console.log('selectTopicmap', id, selection)
-    if (selection) {
-      const type = selection.type
+    if (selection.isSingle()) {
+      const type = selection.getType()
       dispatch('callRoute', {
         name: type,
         params: {
           topicmapId: id,
-          [`${type}Id`]: selection.id
+          [`${type}Id`]: selection.getObjectId()
         }
       })
     } else {
       dispatch('callTopicmapRoute', id)
     }
   },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  selectTopic ({getters}, id) {
+    console.log('selectTopic', id)
+    getters.selection.addTopic(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  selectAssoc ({getters}, id) {
+    console.log('selectAssoc', id)
+    getters.selection.addAssoc(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  unselectTopic ({getters}, id) {
+    console.log('unselectTopic', id)
+    getters.selection.removeTopic(id)
+  },
+
+  /**
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  unselectAssoc ({getters}, id) {
+    console.log('unselectAssoc', id)
+    getters.selection.removeAssoc(id)
+  },
+
+  // Note: by design multi-selections behave different than single selections:
+  // - multi selections are not represented in the browser URL.
+  // - the object details of a multi selection are *not* displayed in-map (unless pinned).
 
   /**
    * Renders the given topic as selected in the topicmap panel.
@@ -115,10 +152,11 @@ const actions = {
    */
   setTopicSelection ({getters, dispatch}, {id, p}) {
     // console.log('setTopicSelection', _topicmapId(getters), id)
-    // update state
-    state.selections[_topicmapId(getters)] = {type: 'topic', id}
-    // sync view
+    // sync view          // Note: view must be synced before state is updated
     dispatch('syncSelect', {id, p})
+    _syncUnselectMulti(getters, dispatch)
+    // update state
+    getters.selection.setTopic(id)
   },
 
   /**
@@ -136,10 +174,11 @@ const actions = {
    */
   setAssocSelection ({getters, dispatch}, {id, p}) {
     // console.log('setAssocSelection', _topicmapId(getters), id)
-    // update state
-    state.selections[_topicmapId(getters)] = {type: 'assoc', id}
-    // sync view
+    // sync view          // Note: view must be synced before state is updated
     dispatch('syncSelect', {id, p})
+    _syncUnselectMulti(getters, dispatch)
+    // update state
+    getters.selection.setAssoc(id)
   },
 
   /**
@@ -153,12 +192,32 @@ const actions = {
    * Postcondition:
    * - "selections" state is up-to-date.
    */
-  unsetSelection ({getters, dispatch}) {
-    // console.log('unsetSelection', _topicmapId(getters))
-    // update state
-    delete state.selections[_topicmapId(getters)]
-    // sync view
-    dispatch('syncUnselect')
+  unsetSelection ({getters, dispatch}, id) {
+    console.log('unsetSelection', getters.selection.topicIds, getters.selection.assocIds)
+    if (getters.selection.isEmpty()) {
+      // sync view
+      dispatch('syncUnselect')
+    } else if (getters.selection.isSingle()) {
+      // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
+      // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
+      // is up-to-date already.
+      //
+      // update state
+      getters.selection.empty()
+      // sync view
+      dispatch('syncUnselect')
+    } else if (getters.selection.isMulti()) {
+      // If a single selection is extended to a multi selection the URL's selection part is stripped, causing the router
+      // to remove the single selection from state and view. The former single selection must be visually restored in
+      // order to match the multi selection state. The low-level '_syncSelect' action manipulates the view only. The
+      // normal 'syncSelect' action would display the in-map details.
+      //
+      // sync view
+      dispatch('syncUnselect')
+      dispatch('_syncSelect', id)
+    } else {
+      throw Error('invalid selection')
+    }
   },
 
   revealTopicById ({dispatch}, topicId) {
@@ -229,21 +288,25 @@ const actions = {
     dispatch('selectTopicmap', topicmapId)
   },
 
-  reloadTopicmap ({rootState, getters, dispatch}) {
+  reloadTopicmap ({getters, rootState, dispatch}) {
     console.log('Reloading topicmap', _topicmapId(getters))
     dispatch('clearTopicmapCache')
     _displayTopicmap(rootState, dispatch).then(() => {
       // sync view (selection)
-      const selection = state.selections[_topicmapId(getters)]
-      if (selection) {
-        dispatch('syncSelect', {id: selection.id, p: Promise.resolve()})
+      if (getters.selection.isSingle()) {
+        dispatch('syncSelect', {
+          id: getters.selection.getObjectId(),
+          p: Promise.resolve()
+        })
+      } else {
+        // TODO
       }
     })
   },
 
   /**
    * Fetches the topicmap topics for the selected workspace.
-   * Updates the "topicmapTopics" state.
+   * Updates the "topicmapTopics" and "selections" states.
    * If the topicmap topics for the selected workspace are fetched already nothing is performed.
    * (In this case the returned promise is already resolved.)
    *
@@ -252,7 +315,7 @@ const actions = {
    *
    * @return  a promise resolved once the "topicmapTopics" state is up-to-date.
    */
-  fetchTopicmapTopics ({rootState}) {
+  fetchTopicmapTopics ({rootState, dispatch}) {
     const workspaceId = _workspaceId(rootState)
     let p
     if (state.topicmapTopics[workspaceId]) {
@@ -265,6 +328,9 @@ const actions = {
           throw Error(`workspace ${workspaceId} has no topicmap`)
         }
         Vue.set(state.topicmapTopics, workspaceId, topics)
+        topics.forEach(topic => {
+          initSelection(topic.id, dispatch)
+        })
       })
     }
     return p
@@ -332,16 +398,22 @@ const actions = {
 const getters = {
 
   /**
-   * ID of the selected topicmap.
-   * Its calculation is based on "workspaceId" state (see workspaces module) and "selectedTopicmapId" state.
-   * Undefined if no workspace and/or no topicmap is selected.
+   * ID of the selected topicmap. Its calculation is based on "workspaceId" state (see workspaces module) and
+   * "selectedTopicmapId" state.
+   * Undefined if no workspace and/or no topicmap is selected. Note: at the moment the webclient components are
+   * instantiated no workspace and no topicmap is selected
    */
   topicmapId: (state, getters, rootState) => {
-    // Note: at the moment the webclient components are instantiated no workspace and no topicmap is selected
     const workspaceId = __workspaceId(rootState)
     const topicmapId = workspaceId && state.selectedTopicmapId[workspaceId]
     // console.log('# topicmapId getter', workspaceId, topicmapId)
     return topicmapId
+  },
+
+  selection: (state, getters) => {
+    const topicmapId = getters.topicmapId     // FIXME: undefined?
+    // console.log('# selection getter', topicmapId, state.selections[topicmapId])
+    return state.selections[topicmapId]
   }
 }
 
@@ -350,8 +422,6 @@ export default {
   actions,
   getters
 }
-
-// Update state + sync view
 
 /**
  * Displays the selected topicmap, according to current state.
@@ -369,6 +439,38 @@ function _displayTopicmap (rootState, dispatch) {
   return topicmapTopic.isWritable().then(writable =>
     dispatch('showTopicmap', {topicmapTopic, writable})
   )
+}
+
+function _syncUnselectMulti (getters, dispatch) {
+  console.log('_syncUnselectMulti', getters.selection.topicIds, getters.selection.assocIds)
+  // If there is a multi selection and history navigation leads to a single-selection route, the multi selection must be
+  // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
+  if (getters.selection.isMulti()) {
+    getters.selection.forEachId(id => {
+      dispatch('_syncUnselect', id)     // TODO: pinned multi selection?
+    })
+  }
+}
+
+function initSelection (id, dispatch) {
+  if (state.selections[id]) {
+    throw Error('think about')
+  }
+  state.selections[id] = new Selection(selectionHandler(dispatch))
+}
+
+function selectionHandler (dispatch) {
+  return selection => {
+    console.log('handleSelection', selection.topicIds, selection.assocIds)
+    if (selection.isSingle()) {
+      dispatch(
+        selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute',
+        selection.getObjectId()
+      )
+    } else {
+      dispatch('stripSelectionFromRoute')
+    }
+  }
 }
 
 // Process directives
