@@ -204,8 +204,9 @@ function navigate (to, from) {
   var p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
   const topicmapId = id(to.params.topicmapId)
+  const topicmapChanged = topicmapId !== id(from.params.topicmapId)
   // Note: route params read from URL are strings. Route params set by push() are numbers.
-  if (topicmapId !== id(from.params.topicmapId)) {
+  if (topicmapChanged) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
     p = new Promise(resolve => {
@@ -241,11 +242,7 @@ function navigate (to, from) {
   }
 }
 
-//
-
 const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
-
-//
 
 /**
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.

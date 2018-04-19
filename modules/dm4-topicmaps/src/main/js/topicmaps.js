@@ -62,13 +62,13 @@ const actions = {
    * @returns   a promise resolved once topicmap rendering is complete.
    *            At this time the "topicmap" and "writable" states are up-to-date.
    */
-  displayTopicmap ({rootState, dispatch}, id) {
+  displayTopicmap ({getters, rootState, dispatch}, id) {
     // console.log('displayTopicmap', id)
     // update state
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
     dm5.utils.setCookie('dm4_topicmap_id', id)
     // update state + sync view
-    return _displayTopicmap(rootState, dispatch)
+    return _displayTopicmap(getters, rootState, dispatch)
   },
 
   /**
@@ -79,6 +79,7 @@ const actions = {
    * - the route is *not* yet set.
    *
    * Note: the topicmap is *not* required to belong to the selected workspace.
+   * This allows for cross-workspace browser history navigation.
    */
   selectTopicmap ({dispatch}, id) {
     const selection = state.selections[id]
@@ -291,7 +292,7 @@ const actions = {
   reloadTopicmap ({getters, rootState, dispatch}) {
     console.log('Reloading topicmap', _topicmapId(getters))
     dispatch('clearTopicmapCache')
-    _displayTopicmap(rootState, dispatch).then(() => {
+    _displayTopicmap(getters, rootState, dispatch).then(() => {
       // sync view (selection)
       if (getters.selection.isSingle()) {
         dispatch('syncSelect', {
@@ -299,7 +300,7 @@ const actions = {
           p: Promise.resolve()
         })
       } else {
-        // TODO
+        // TODO?
       }
     })
   },
@@ -434,19 +435,31 @@ export default {
  * @returns   a promise resolved once topicmap rendering is complete.
  *            At this time the "topicmap" and "writable" states are up-to-date as well.
  */
-function _displayTopicmap (rootState, dispatch) {
+function _displayTopicmap (getters, rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
-  return topicmapTopic.isWritable().then(writable =>
-    dispatch('showTopicmap', {topicmapTopic, writable})
+  return topicmapTopic.isWritable()
+    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable})
+    .then(() => _syncSelectMulti(getters, dispatch))
   )
 }
 
+function _syncSelectMulti (getters, dispatch) {
+  const selection = getters.selection
+  console.log('_syncSelectMulti', selection.topicIds, selection.assocIds)
+  if (selection.isMulti()) {
+    selection.forEachId(id => {
+      dispatch('_syncSelect', id)
+    })
+  }
+}
+
 function _syncUnselectMulti (getters, dispatch) {
-  console.log('_syncUnselectMulti', getters.selection.topicIds, getters.selection.assocIds)
+  const selection = getters.selection
+  console.log('_syncUnselectMulti', selection.topicIds, selection.assocIds)
   // If there is a multi selection and history navigation leads to a single-selection route, the multi selection must be
   // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
-  if (getters.selection.isMulti()) {
-    getters.selection.forEachId(id => {
+  if (selection.isMulti()) {
+    selection.forEachId(id => {
       dispatch('_syncUnselect', id)     // TODO: pinned multi selection?
     })
   }
