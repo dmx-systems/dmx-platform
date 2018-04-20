@@ -221,8 +221,11 @@ function navigate (to, from) {
   // 2) selection
   const topicId = id(to.params.topicId)
   const assocId = id(to.params.assocId)
-  const topicChanged = topicId !== id(from.params.topicId)
-  const assocChanged = assocId !== id(from.params.assocId)
+  const oldTopicId = id(from.params.topicId)
+  const oldAssocId = id(from.params.assocId)
+  const oldId = oldTopicId || oldAssocId
+  const topicChanged = topicId !== oldTopicId
+  const assocChanged = assocId !== oldAssocId
   if (topicChanged && topicId) {                                    // FIXME: 0 is a valid topic ID
     fetchTopic(topicId, p)
   }
@@ -230,7 +233,12 @@ function navigate (to, from) {
     fetchAssoc(assocId, p)
   }
   if ((topicChanged || assocChanged) && !topicId && !assocId) {     // FIXME: 0 is a valid topic ID
-    unsetSelection(p)
+    // detail panel
+    store.dispatch('emptyDisplay')
+    // topicmap panel
+    if (!topicmapChanged) {
+      p.then(() => store.dispatch('unsetSelection', oldId))
+    }
   }
   // 3) detail
   const detail = to.params.detail
@@ -287,19 +295,13 @@ function fetchAssoc (id, p) {
 }
 
 /**
- * @param   p   a promise resolved once the topicmap rendering is complete.
+ * Converts the given value into Number.
+ *
+ * @return  the number, or undefined if `undefined` or `null` is given.
+ *          Never returns `null`.
+ *
+ * @throws  if the given value is not one of Number/String/undefined/null.
  */
-function unsetSelection (p) {
-  const id = store.state.object.id      // remember id as 'emptyDisplay' action resets "object" state ### TODO
-  console.log('unsetSelection', id)
-  // detail panel
-  store.dispatch('emptyDisplay')
-  // topicmap panel
-  p.then(() => {
-    store.dispatch('unsetSelection', id)
-  })
-}
-
 function id (v) {
   // Note: Number(undefined) is NaN, and NaN != NaN is true!
   // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')

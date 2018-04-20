@@ -192,9 +192,14 @@ const actions = {
    *
    * Postcondition:
    * - "selections" state is up-to-date.
+   *
+   * @param   id    id of the topic/assoc to unselect
    */
   unsetSelection ({getters, dispatch}, id) {
-    console.log('unsetSelection', getters.selection.topicIds, getters.selection.assocIds)
+    console.log('unsetSelection', id, getters.selection.topicIds, getters.selection.assocIds)
+    if (typeof id !== 'number') {
+      throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
+    }
     if (getters.selection.isEmpty()) {
       // sync view
       dispatch('syncUnselect')
