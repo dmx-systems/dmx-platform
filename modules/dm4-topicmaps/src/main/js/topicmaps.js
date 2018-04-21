@@ -155,7 +155,7 @@ const actions = {
     // console.log('setTopicSelection', _topicmapId(getters), id)
     // sync view          // Note: view must be synced before state is updated
     dispatch('syncSelect', {id, p})
-    _syncUnselectMulti(getters, dispatch)
+    _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setTopic(id)
   },
@@ -177,7 +177,7 @@ const actions = {
     // console.log('setAssocSelection', _topicmapId(getters), id)
     // sync view          // Note: view must be synced before state is updated
     dispatch('syncSelect', {id, p})
-    _syncUnselectMulti(getters, dispatch)
+    _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setAssoc(id)
   },
@@ -196,33 +196,23 @@ const actions = {
    * @param   id    id of the topic/assoc to unselect
    */
   unsetSelection ({getters, dispatch}, id) {
-    console.log('unsetSelection', id, getters.selection.topicIds, getters.selection.assocIds)
+    const selection = getters.selection
+    console.log('unsetSelection', id, selection.topicIds, selection.assocIds)
     if (typeof id !== 'number') {
       throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
     }
-    if (getters.selection.isEmpty()) {
-      // sync view
-      dispatch('syncUnselect')
-    } else if (getters.selection.isSingle()) {
+    dispatch('syncUnselect')          // sync view
+    if (selection.isSingle()) {
       // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
       // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
       // is up-to-date already.
-      //
-      // update state
-      getters.selection.empty()
-      // sync view
-      dispatch('syncUnselect')
-    } else if (getters.selection.isMulti()) {
+      selection.empty()               // update state
+    } else if (selection.isMulti()) {
       // If a single selection is extended to a multi selection the URL's selection part is stripped, causing the router
       // to remove the single selection from state and view. The former single selection must be visually restored in
       // order to match the multi selection state. The low-level '_syncSelect' action manipulates the view only. The
       // normal 'syncSelect' action would display the in-map details.
-      //
-      // sync view
-      dispatch('syncUnselect')
-      dispatch('_syncSelect', id)
-    } else {
-      throw Error('invalid selection')
+      dispatch('_syncSelect', id)     // sync view
     }
   },
 
@@ -298,14 +288,15 @@ const actions = {
     console.log('Reloading topicmap', _topicmapId(getters))
     dispatch('clearTopicmapCache')
     _displayTopicmap(getters, rootState, dispatch).then(() => {
-      // sync view (selection)
-      if (getters.selection.isSingle()) {
+      // sync view
+      const selection = getters.selection
+      if (selection.isSingle()) {
         dispatch('syncSelect', {
-          id: getters.selection.getObjectId(),
+          id: selection.getObjectId(),
           p: Promise.resolve()
         })
       } else {
-        // TODO?
+        // Note: a multi selection is visually restored by _displayTopicmap() already
       }
     })
   },
@@ -444,12 +435,11 @@ function _displayTopicmap (getters, rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
   return topicmapTopic.isWritable()
     .then(writable => dispatch('showTopicmap', {topicmapTopic, writable})
-    .then(() => _syncSelectMulti(getters, dispatch))
+    .then(() => _syncSelectMulti(getters.selection, dispatch))
   )
 }
 
-function _syncSelectMulti (getters, dispatch) {
-  const selection = getters.selection
+function _syncSelectMulti (selection, dispatch) {
   console.log('_syncSelectMulti', selection.topicIds, selection.assocIds)
   if (selection.isMulti()) {
     selection.forEachId(id => {
@@ -458,8 +448,7 @@ function _syncSelectMulti (getters, dispatch) {
   }
 }
 
-function _syncUnselectMulti (getters, dispatch) {
-  const selection = getters.selection
+function _syncUnselectMulti (selection, dispatch) {
   console.log('_syncUnselectMulti', selection.topicIds, selection.assocIds)
   // If there is a multi selection and history navigation leads to a single-selection route, the multi selection must be
   // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
