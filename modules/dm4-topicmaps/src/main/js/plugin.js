@@ -38,11 +38,12 @@ export default store => {
         },
         listeners: {
           'topic-select':         id          => store.dispatch('selectTopic', id),
+          'topic-unselect':       id          => store.dispatch('unselectTopic', id),
           'topic-double-click':   viewTopic   => selectTopicmapIf(viewTopic),
           'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
           'topic-drop-on-topic':  ids         => store.dispatch('createAssoc', ids),
           'assoc-select':         id          => store.dispatch('selectAssoc', id),
-          'topicmap-click':       ()          => store.dispatch('unselect'),
+          'assoc-unselect':       id          => store.dispatch('unselectAssoc', id),
           'topicmap-contextmenu': pos         => store.dispatch('openSearchWidget', {pos}),
           'object-submit':        object      => store.dispatch('submit', object),
           'child-topic-reveal':   relTopic    => store.dispatch('revealRelatedTopic', relTopic)

@@ -95,7 +95,7 @@ store.registerModule('routerModule', {
     callDetailRoute (_, detail) {
       const object = store.state.object
       if (!object) {
-        throw Error('callDetailRoute when nothing is selected')
+        throw Error('callDetailRoute() called when nothing is selected')
       }
       router.push({
         name: object.isTopic() ? 'topicDetail' : 'assocDetail',
@@ -204,8 +204,9 @@ function navigate (to, from) {
   var p     // a promise resolved once the topicmap rendering is complete
   // 1) topicmap
   const topicmapId = id(to.params.topicmapId)
+  const topicmapChanged = topicmapId !== id(from.params.topicmapId)
   // Note: route params read from URL are strings. Route params set by push() are numbers.
-  if (topicmapId !== id(from.params.topicmapId)) {
+  if (topicmapChanged) {
     // Note: the workspace must be set *before* the topicmap is displayed.
     // See preconditions at "displayTopicmap".
     p = new Promise(resolve => {
@@ -220,8 +221,11 @@ function navigate (to, from) {
   // 2) selection
   const topicId = id(to.params.topicId)
   const assocId = id(to.params.assocId)
-  const topicChanged = topicId !== id(from.params.topicId)
-  const assocChanged = assocId !== id(from.params.assocId)
+  const oldTopicId = id(from.params.topicId)
+  const oldAssocId = id(from.params.assocId)
+  const oldId = oldTopicId || oldAssocId
+  const topicChanged = topicId !== oldTopicId
+  const assocChanged = assocId !== oldAssocId
   if (topicChanged && topicId) {                                    // FIXME: 0 is a valid topic ID
     fetchTopic(topicId, p)
   }
@@ -229,7 +233,12 @@ function navigate (to, from) {
     fetchAssoc(assocId, p)
   }
   if ((topicChanged || assocChanged) && !topicId && !assocId) {     // FIXME: 0 is a valid topic ID
-    unsetSelection(p)
+    // detail panel
+    store.dispatch('emptyDisplay')
+    // topicmap panel
+    if (!topicmapChanged) {
+      p.then(() => store.dispatch('unsetSelection', oldId))
+    }
   }
   // 3) detail
   const detail = to.params.detail
@@ -241,11 +250,7 @@ function navigate (to, from) {
   }
 }
 
-//
-
 const getAssignedWorkspace = dm5.restClient.getAssignedWorkspace
-
-//
 
 /**
  * Fetches the given topic, displays it in the detail panel, and renders it as selected in the topicmap panel.
@@ -289,15 +294,14 @@ function fetchAssoc (id, p) {
   })
 }
 
-function unsetSelection (p) {
-  // detail panel
-  store.dispatch('emptyDisplay')
-  // topicmap panel
-  p.then(() => {
-    store.dispatch('unsetSelection')
-  })
-}
-
+/**
+ * Converts the given value into Number.
+ *
+ * @return  the number, or undefined if `undefined` or `null` is given.
+ *          Never returns `null`.
+ *
+ * @throws  if the given value is not one of Number/String/undefined/null.
+ */
 function id (v) {
   // Note: Number(undefined) is NaN, and NaN != NaN is true!
   // Note: dm5.utils.getCookie may return null, and Number(null) is 0 (and typeof null is 'object')

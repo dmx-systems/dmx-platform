@@ -18,7 +18,7 @@ const state = {
                             //     typeUri: component
                             //   }
 
-  compDefs: {},             // Registered components
+  compDefs: {},             // Registered webclient components
 
   quillConfig: {
     options: {
@@ -61,9 +61,7 @@ const actions = {
     })
   },
 
-  registerObjectRenderer (_, {typeUri, component}) {
-    state.objectRenderers[typeUri] = component
-  },
+  // ---
 
   unselectIf ({dispatch}, id) {
     // console.log('unselectIf', id, isSelected(id))
@@ -73,6 +71,10 @@ const actions = {
   },
 
   // ---
+
+  registerObjectRenderer (_, {typeUri, component}) {
+    state.objectRenderers[typeUri] = component
+  },
 
   registerComponent (_, compDef) {
     const compDefs = state.compDefs[compDef.mount] || (state.compDefs[compDef.mount] = [])

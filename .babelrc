@@ -6,6 +6,7 @@
   ],
   "plugins": [
     "syntax-dynamic-import",
+    "transform-class-properties",
     "transform-object-rest-spread", [
     "component", {
       "libraryName": "element-ui",
