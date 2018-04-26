@@ -461,7 +461,7 @@ function _syncUnselectMulti (selection, dispatch) {
 
 function initSelection (id, dispatch) {
   if (state.selections[id]) {
-    throw Error('think about')
+    throw Error(`'selections' state for topicmap ${id} already initialized`)
   }
   state.selections[id] = new Selection(selectionHandler(dispatch))
 }

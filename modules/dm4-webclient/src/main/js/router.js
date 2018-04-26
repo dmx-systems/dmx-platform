@@ -172,20 +172,26 @@ function initialNavigation (route) {
   // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required. On the other
   // hand, if obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
   if (topicmapId) {
-    getAssignedWorkspace(topicmapId).then(workspace => {
-      // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-      const p1 = store.dispatch('_selectWorkspace', workspace.id)                 // no route push
-      // p1 is a promise resolved once the workspace's topicmap topics are available
-      if (urlPresent) {
-        const p2 = p1.then(() => store.dispatch('displayTopicmap', topicmapId))   // no route push
-        topicId && fetchTopic(topicId, p2)                                        // FIXME: 0 is a valid topic ID
-        assocId && fetchAssoc(assocId, p2)
-      } else {
-        store.dispatch('callTopicmapRoute', topicmapId)                           // push initial route
-      }
-    })
+    getAssignedWorkspace(topicmapId)
+      .then(workspace => {
+        // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
+        return store.dispatch('_selectWorkspace', workspace.id)       // no route push
+      })
+      .then(() => {
+        // the workspace's topicmap topics are now available
+        if (urlPresent) {
+          // Note: 'displayTopicmap' relies on the topicmap topics in order to tell what topicmap renderer to use
+          const p = store.dispatch('displayTopicmap', topicmapId)     // no route push
+          topicId && fetchTopic(topicId, p)                           // FIXME: 0 is a valid topic ID
+          assocId && fetchAssoc(assocId, p)
+        } else {
+          // Note: when the topicmap changes '_selectWorkspace' is dispatched again (see navigate() below).
+          // Calling the topicmap route only when the topicmap topics are available avoids loading them twice.
+          store.dispatch('callTopicmapRoute', topicmapId)             // push initial route
+        }
+      })
   } else {
-    store.dispatch('selectFirstWorkspace')                                        // push initial route (indirectly)
+    store.dispatch('selectFirstWorkspace')                            // push initial route (indirectly)
   }
   // 3) setup detail panel
   const detail = route.params.detail
