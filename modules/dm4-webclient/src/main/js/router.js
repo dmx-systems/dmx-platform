@@ -187,6 +187,7 @@ function initialNavigation (route) {
         } else {
           // Note: when the topicmap changes '_selectWorkspace' is dispatched again (see navigate() below).
           // Calling the topicmap route only when the topicmap topics are available avoids loading them twice.
+          // TODO: avoid dispatching '_selectWorkspace' twice in the first place?
           store.dispatch('callTopicmapRoute', topicmapId)             // push initial route
         }
       })

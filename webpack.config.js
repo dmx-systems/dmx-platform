@@ -61,9 +61,13 @@ module.exports = {
   // https://github.com/mishoo/UglifyJS2/issues/2842
   // The solution is to disable function inlining.
   // https://github.com/webpack-contrib/uglifyjs-webpack-plugin/issues/264
+  // Note: setting optimization.minimizer overrides the defaults provided by Webpack
   optimization: {
     minimizer: [
       new UglifyJsPlugin({
+        cache: true,        // Webpack default
+        parallel: true,     // Webpack default
+        sourceMap: false,
         uglifyOptions: {
           compress: {
             inline: false
