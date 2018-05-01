@@ -37,6 +37,6 @@ export default {
 
 <style>
 .dm5-workspace-select .el-button {
-  padding-left: 2px;
+  padding-left: 2px !important;
 }
 </style>

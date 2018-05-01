@@ -49,6 +49,6 @@ export default {
 
 .login-state .el-button {
   font-size: var(--label-font-size) !important;
-  padding: 0;
+  padding: 0 !important;
 }
 </style>

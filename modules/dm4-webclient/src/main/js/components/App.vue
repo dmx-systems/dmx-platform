@@ -89,45 +89,38 @@ button {
   e-button                  14px      12px      12px
 */
 
-.el-button--small {
-  padding: 8px 14px;                    /* was 9px 15px */
-}
-
 .el-button--mini {
-  padding: 6px 13px;                    /* was 7px 15px */
+  padding: 6px 13px !important;                   /* was 7px 15px */
 }
 
 .el-input__inner {
-  padding: 0px 8px;                     /* was 0px 15px */
+  padding: 0px 8px !important;                    /* was 0px 15px */
 }
 
 .el-radio {
-  font-weight: unset;                   /* was 500 */
+  font-weight: unset !important;                  /* was 500 */
+}
+
+.el-dialog__header {
+  padding: 15px 15px 5px !important;              /* was 20px 20px 10px */
 }
 
 .el-dialog__title {
-  font-size: var(--main-font-size);     /* was 18px */
-  line-height: unset;                   /* was 24px */
+  font-size: var(--main-font-size) !important;    /* was 18px */
+  line-height: unset !important;                  /* was 24px */
+}
+
+.el-dialog__headerbtn {
+  top: 15px !important;                           /* was 20px */
+  right: 15px !important;                         /* was 20px */
 }
 
 .el-dialog__body {
-  padding: 15px;                        /* was 30px 20px */
-  line-height: unset;                   /* was 24px */
+  padding: 15px !important;                       /* was 30px 20px */
+  line-height: unset !important;                  /* was 24px */
 }
 
-/* Note: el-table is currently not in use */
-
-.el-table {
-  font-size: var(--main-font-size);     /* was 12px (.el-table--mini) */
-}
-
-.el-table th {
-  font-size: var(--label-font-size);
-  font-weight: normal;                  /* was bold through user agent stylesheet */
-  padding: 0;                           /* was 12px 0 (.el-table th) or 6px 0 (.el-table--mini th) */
-}
-
-.el-table .cell {
-  word-break: normal;                   /* was break-all which breaks words instead of line wrap */
+.el-dialog__footer {
+  padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
 }
 </style>

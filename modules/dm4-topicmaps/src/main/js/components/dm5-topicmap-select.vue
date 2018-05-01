@@ -47,6 +47,6 @@ export default {
 }
 
 .dm5-topicmap-select .el-button {
-  padding-left: 2px;
+  padding-left: 2px !important;
 }
 </style>
