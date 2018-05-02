@@ -37,7 +37,10 @@ const actions = {
     console.log('Creating topicmap', name)
     dm5.restClient.createTopicmap(name, topicmapTypeUri, isPrivate).then(topic => {
       console.log('Topicmap topic', topic)
+      // update state
       state.topicmapTopics[_workspaceId(rootState)].push(topic)
+      initSelection(topic.id, dispatch)
+      //
       dispatch('callTopicmapRoute', topic.id)
     })
   },
@@ -434,9 +437,8 @@ export default {
 function _displayTopicmap (getters, rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
   return topicmapTopic.isWritable()
-    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable})
+    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable}))
     .then(() => _syncSelectMulti(getters.selection, dispatch))
-  )
 }
 
 function _syncSelectMulti (selection, dispatch) {
