@@ -350,20 +350,21 @@ const actions = {
 
   // WebSocket messages
 
-  _newTopicmap (_, args) {
-    const topicmapTopic = new dm5.Topic(args.topicmapTopic)
-    const workspace = topicmapTopic.getChildTopic('dm4.workspaces.workspace')
+  _newTopicmap ({dispatch}, {topicmapTopic}) {
+    const _topicmapTopic = new dm5.Topic(topicmapTopic)
+    const workspace = _topicmapTopic.getChildTopic('dm4.workspaces.workspace')
     // Note: the default topicmap created for new workspaces have no workspace assignment yet
     if (!workspace) {
-      console.warn('No workspace found in topicmap', topicmapTopic)
+      console.warn('No workspace found in topicmap', _topicmapTopic)
       return
     }
     const topics = state.topicmapTopics[workspace.id]
     if (topics) {
-      console.log('Adding topicmap topic', topicmapTopic, 'to workspace', workspace.id)
-      topics.push(topicmapTopic)
+      console.log('Adding topicmap topic', _topicmapTopic, 'to workspace', workspace.id)
+      topics.push(_topicmapTopic)
+      initSelection(_topicmapTopic.id, dispatch)
     } else {
-      console.log('Ignoring topicmap topic', topicmapTopic, 'for workspace', workspace.id)
+      console.log('Ignoring topicmap topic', _topicmapTopic, 'for workspace', workspace.id)
     }
   },
 
