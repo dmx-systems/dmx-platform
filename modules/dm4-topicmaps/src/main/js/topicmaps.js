@@ -106,7 +106,7 @@ const actions = {
    * - the route is *not* yet set.
    */
   selectTopic ({getters}, id) {
-    console.log('selectTopic', id)
+    // console.log('selectTopic', id)
     getters.selection.addTopic(id)
   },
 
@@ -115,7 +115,7 @@ const actions = {
    * - the route is *not* yet set.
    */
   selectAssoc ({getters}, id) {
-    console.log('selectAssoc', id)
+    // console.log('selectAssoc', id)
     getters.selection.addAssoc(id)
   },
 
@@ -124,7 +124,7 @@ const actions = {
    * - the route is *not* yet set.
    */
   unselectTopic ({getters}, id) {
-    console.log('unselectTopic', id)
+    // console.log('unselectTopic', id)
     getters.selection.removeTopic(id)
   },
 
@@ -133,7 +133,7 @@ const actions = {
    * - the route is *not* yet set.
    */
   unselectAssoc ({getters}, id) {
-    console.log('unselectAssoc', id)
+    // console.log('unselectAssoc', id)
     getters.selection.removeAssoc(id)
   },
 
@@ -200,7 +200,7 @@ const actions = {
    */
   unsetSelection ({getters, dispatch}, id) {
     const selection = getters.selection
-    console.log('unsetSelection', id, selection.topicIds, selection.assocIds)
+    // console.log('unsetSelection', id, selection.topicIds, selection.assocIds)
     if (typeof id !== 'number') {
       throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
     }
@@ -443,7 +443,7 @@ function _displayTopicmap (getters, rootState, dispatch) {
 }
 
 function _syncSelectMulti (selection, dispatch) {
-  console.log('_syncSelectMulti', selection.topicIds, selection.assocIds)
+  // console.log('_syncSelectMulti', selection.topicIds, selection.assocIds)
   if (selection.isMulti()) {
     selection.forEachId(id => {
       dispatch('_syncSelect', id)
@@ -452,7 +452,7 @@ function _syncSelectMulti (selection, dispatch) {
 }
 
 function _syncUnselectMulti (selection, dispatch) {
-  console.log('_syncUnselectMulti', selection.topicIds, selection.assocIds)
+  // console.log('_syncUnselectMulti', selection.topicIds, selection.assocIds)
   // If there is a multi selection and history navigation leads to a single-selection route, the multi selection must be
   // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
   if (selection.isMulti()) {
@@ -471,7 +471,7 @@ function initSelection (id, dispatch) {
 
 function selectionHandler (dispatch) {
   return selection => {
-    console.log('handleSelection', selection.topicIds, selection.assocIds)
+    // console.log('handleSelection', selection.topicIds, selection.assocIds)
     if (selection.isSingle()) {
       dispatch(
         selection.getType() === 'topic' ? 'callTopicRoute' : 'callAssocRoute',
