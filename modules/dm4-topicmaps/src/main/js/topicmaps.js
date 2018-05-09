@@ -137,6 +137,11 @@ const actions = {
     getters.selection.removeAssoc(id)
   },
 
+  unselectIf ({getters}, id) {
+    // console.log('unselectIf', id)
+    getters.selection.remove(id)
+  },
+
   // Note: by design multi-selections behave different than single selections:
   // - multi selections are not represented in the browser URL.
   // - the object details of a multi selection are *not* displayed in-map (unless pinned).

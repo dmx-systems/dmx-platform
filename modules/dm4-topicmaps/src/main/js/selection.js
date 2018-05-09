@@ -40,7 +40,7 @@ export default class Selection {
     this._defer()
   }
 
-  // These 3 methods manipulate the selection *silently*, that is without handler invocation.
+  // These 4 methods manipulate the selection *silently*, that is without handler invocation.
   // They are called *after* a route change in order to adapt the state.
 
   setTopic (id) {
@@ -53,6 +53,11 @@ export default class Selection {
     // this._checkAddAssoc(id)    // TODO: think about
     this.topicIds = []
     this.assocIds = [id]
+  }
+
+  remove (id) {
+    const i1 = this.topicIds.indexOf(id); if (i1 !== -1) this.topicIds.splice(i1, 1)
+    const i2 = this.assocIds.indexOf(id); if (i2 !== -1) this.assocIds.splice(i2, 1)
   }
 
   empty () {

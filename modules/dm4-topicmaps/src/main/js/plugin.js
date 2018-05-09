@@ -14,7 +14,7 @@ export default store => {
           object:          state => state.object,
           writable:        state => state.writable,
           selection:       (state, getters) => {    // TODO: why is getters undefined on 1st call?
-            console.log('getters', getters)
+            // console.log('getters', getters)
             return getters && getters.selection
           },
           objectRenderers: state => state.objectRenderers,
