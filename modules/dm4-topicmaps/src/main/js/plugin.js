@@ -43,7 +43,11 @@ export default store => {
             assoc: [
               {label: 'Hide',            handler: id => store.dispatch('hideAssoc',   id)},
               {label: 'Delete',          handler: id => store.dispatch('deleteAssoc', id)},
-              {label: 'Edit',            handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})}
+              {
+                label: 'Edit',
+                handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
+                single: true
+              }
             ]
           }),
           quillConfig: state => state.quillConfig
