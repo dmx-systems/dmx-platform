@@ -29,8 +29,16 @@ export default store => {
             topic: [
               {label: 'Hide',            handler: id => store.dispatch('hideTopic',   id)},
               {label: 'Delete',          handler: id => store.dispatch('deleteTopic', id)},
-              {label: 'Edit',            handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})},
-              {label: "What's related?", handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})}
+              {
+                label: 'Edit',
+                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
+                single: true
+              },
+              {
+                label: "What's related?",
+                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'}),
+                single: true
+              }
             ],
             assoc: [
               {label: 'Hide',            handler: id => store.dispatch('hideAssoc',   id)},

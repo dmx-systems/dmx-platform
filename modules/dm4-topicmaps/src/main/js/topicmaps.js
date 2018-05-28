@@ -108,6 +108,7 @@ const actions = {
   selectTopic ({getters}, id) {
     // console.log('selectTopic', id)
     getters.selection.addTopic(id)
+    // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
   /**
@@ -117,6 +118,7 @@ const actions = {
   selectAssoc ({getters}, id) {
     // console.log('selectAssoc', id)
     getters.selection.addAssoc(id)
+    // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
   /**
@@ -126,6 +128,7 @@ const actions = {
   unselectTopic ({getters}, id) {
     // console.log('unselectTopic', id)
     getters.selection.removeTopic(id)
+    // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
   /**
@@ -135,6 +138,7 @@ const actions = {
   unselectAssoc ({getters}, id) {
     // console.log('unselectAssoc', id)
     getters.selection.removeAssoc(id)
+    // console.log(getters.selection.topicIds, getters.selection.assocIds)
   },
 
   unselectIf ({getters}, id) {
@@ -160,7 +164,7 @@ const actions = {
    * @param   p   a promise resolved once topic data has arrived (global "object" state is up-to-date).
    */
   setTopicSelection ({getters, dispatch}, {id, p}) {
-    // console.log('setTopicSelection', _topicmapId(getters), id)
+    // console.log('setTopicSelection', _topicmapId(getters), id, getters.selection.topicIds)
     // sync view          // Note: view must be synced before state is updated
     dispatch('syncSelect', {id, p})
     _syncUnselectMulti(getters.selection, dispatch)
