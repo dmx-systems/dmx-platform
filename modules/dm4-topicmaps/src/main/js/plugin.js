@@ -27,26 +27,39 @@ export default store => {
           // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => ({
             topic: [
-              {label: 'Hide',            handler: id => store.dispatch('hideTopic',   id)},
-              {label: 'Delete',          handler: id => store.dispatch('deleteTopic', id)},
+              {
+                label: 'Hide',
+                handler: selection => dispatchMulti(selection, 'hideTopic', 'hideAssoc'),
+                multi: true
+              },
+              {
+                label: 'Delete',
+                handler: selection => dispatchMulti(selection, 'deleteTopic', 'deleteAssoc'),
+                multi: true
+              },
               {
                 label: 'Edit',
-                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'}),
-                single: true
+                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})
               },
               {
                 label: "What's related?",
-                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'}),
-                single: true
+                handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})
               }
             ],
             assoc: [
-              {label: 'Hide',            handler: id => store.dispatch('hideAssoc',   id)},
-              {label: 'Delete',          handler: id => store.dispatch('deleteAssoc', id)},
+              {
+                label: 'Hide',
+                handler: selection => dispatchMulti(selection, 'hideTopic', 'hideAssoc'),
+                multi: true
+              },
+              {
+                label: 'Delete',
+                handler: selection => dispatchMulti(selection, 'deleteTopic', 'deleteAssoc'),
+                multi: true
+              },
               {
                 label: 'Edit',
-                handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'}),
-                single: true
+                handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})
               }
             ]
           }),
@@ -93,6 +106,12 @@ export default store => {
         store.dispatch('syncStyles', assocTypeColors())
       }
     }
+  }
+
+  // TODO: send single request to multi-API
+  function dispatchMulti (selection, topicAction, assocAction) {
+    selection.topicIds.forEach(id => store.dispatch(topicAction, id))
+    selection.assocIds.forEach(id => store.dispatch(assocAction, id))
   }
 
   function selectTopicmapIf (viewTopic) {

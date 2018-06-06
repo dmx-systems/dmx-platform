@@ -56,7 +56,7 @@ public interface FacetsService {
      *
      * @param   object          The facetted object: a topic, association, a type ...
      * @param   facetTypeUri    URI of the facet type.
-     * @param   facetValue      The new facet value.
+     * @param   value           The new facet value.
      */
     void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValueModel value);
 

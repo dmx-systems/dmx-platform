@@ -247,7 +247,7 @@ public interface ModelFactory {
 
     // === Facets ===
 
-    FacetValueModel newFacetValueModel(String childTypeUri);
+    FacetValueModel newFacetValueModel(String childTypeUri);    // TODO: rename param to "assocDefUri"?
 
     FacetValueModel newFacetValueModel(JSONObject facetValue);
 }
