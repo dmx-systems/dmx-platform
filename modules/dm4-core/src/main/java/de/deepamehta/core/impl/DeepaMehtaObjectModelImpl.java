@@ -457,10 +457,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Delete ===
 
     /**
-     * Deletes 1) this DeepaMehta object's child topics (recursively) which have an underlying association definition of
-     * type "Composition Definition" and 2) deletes all the remaining direct associations of this DeepaMehta object.
-     * <p>
-     * Note: deletion of the object itself is up to the subclasses. ### FIXDOC
+     * Deletes this object's direct associations, and the object itself.
      */
     final void delete() {
         try {
@@ -468,15 +465,6 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             preDelete();
             //
-            // delete child topics (recursively)
-            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
-                if (assocDef.getTypeUri().equals("dm4.core.composition_def")) {
-                    for (TopicModelImpl childTopic : getRelatedTopics(assocDef.getInstanceLevelAssocTypeUri(),
-                            "dm4.core.parent", "dm4.core.child", assocDef.getChildTypeUri())) {
-                        childTopic.delete();
-                    }
-                }
-            }
             // delete direct associations
             for (AssociationModelImpl assoc : getAssociations()) {
                 assoc.delete();
