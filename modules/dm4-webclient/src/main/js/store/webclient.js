@@ -8,8 +8,9 @@ var compCount = 0
 
 const state = {
 
-  object: undefined,        // The selected Topic/Assoc/TopicType/AssocType.
-                            // Undefined if nothing is selected.
+  object: undefined,        // If there is a single-selection: the selected Topic/Assoc/TopicType/AssocType.
+                            // This object is displayed in the detail panel. Its ID appears in the browser URL.
+                            // Undefined if there is no selection or a multi-selection.
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
@@ -59,6 +60,15 @@ const actions = {
     object.update().then(object => {
       dispatch('_processDirectives', object.directives)
     })
+  },
+
+  deleteMulti ({dispatch}, idLists) {
+    // update server
+    dm5.restClient.deleteMulti(idLists).then(object => {
+      dispatch('_processDirectives', object.directives)
+    })
+    // TODO: update client state, for immediate user feedback? Dispatch 'deleteTopic'/'deleteAssoc' several times then.
+    // Or rely solely on directives processing?
   },
 
   // ---

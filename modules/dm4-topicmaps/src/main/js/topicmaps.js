@@ -261,20 +261,6 @@ const actions = {
     dispatch('unselectIf', id)
   },
 
-  deleteTopic ({dispatch}, id) {
-    // update server
-    dm5.restClient.deleteTopic(id).then(object => {
-      dispatch('_processDirectives', object.directives)
-    })
-  },
-
-  deleteAssoc ({dispatch}, id) {
-    // update server
-    dm5.restClient.deleteAssoc(id).then(object => {
-      dispatch('_processDirectives', object.directives)
-    })
-  },
-
   //
 
   /**
@@ -398,7 +384,7 @@ const actions = {
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateTopic(dir.arg, dispatch)    // FIXME: construct dm5.Topic?
+        updateTopic(dir.arg)    // FIXME: construct dm5.Topic?
         break
       }
     })
@@ -494,7 +480,11 @@ function selectionHandler (dispatch) {
 
 // Process directives
 
-function updateTopic (topic, dispatch) {
+/**
+ * Processes an UPDATE_TOPIC directive.
+ * Used to update the topicmap menu when a topicmap is renamed.
+ */
+function updateTopic (topic) {
   // console.log('updateTopic', topic)
   findTopicmapTopic(topic.id, (topics, i) => {
     Vue.set(topics, i, topic)

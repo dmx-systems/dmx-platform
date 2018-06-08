@@ -208,6 +208,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    /**
+     * Convenience.
+     */
     void deleteTopic(long topicId) {
         try {
             deleteTopic(fetchTopic(topicId));
@@ -397,6 +400,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    /**
+     * Convenience.
+     */
     void deleteAssociation(long assocId) {
         try {
             deleteAssociation(fetchAssociation(assocId));

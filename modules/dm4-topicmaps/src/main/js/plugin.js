@@ -34,7 +34,7 @@ export default store => {
               },
               {
                 label: 'Delete',
-                handler: selection => dispatchMulti(selection, 'deleteTopic', 'deleteAssoc'),
+                handler: selection => store.dispatch('deleteMulti', selection),
                 multi: true
               },
               {
@@ -54,7 +54,7 @@ export default store => {
               },
               {
                 label: 'Delete',
-                handler: selection => dispatchMulti(selection, 'deleteTopic', 'deleteAssoc'),
+                handler: selection => store.dispatch('deleteMulti', selection),
                 multi: true
               },
               {
