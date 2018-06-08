@@ -17,6 +17,7 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.DirectivesResponse;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.Transactional;
+import de.deepamehta.core.util.IdList;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -393,6 +394,45 @@ public class WebservicePlugin extends PluginActivator {
         Association assoc = dm4.getAssociation(assocId);
         return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
+    }
+
+
+
+    // **********************
+    // *** Multi REST API ***
+    // **********************
+
+
+
+    @DELETE
+    @Path("/topics/{topicIds}")
+    @Transactional
+    public DirectivesResponse deleteTopics(@PathParam("topicIds") IdList topicIds) {
+        return deleteMulti(topicIds, new IdList());
+    }
+
+    @DELETE
+    @Path("/assocs/{assocIds}")
+    @Transactional
+    public DirectivesResponse deleteAssocs(@PathParam("assocIds") IdList assocIds) {
+        return deleteMulti(new IdList(), assocIds);
+    }
+
+    @DELETE
+    @Path("/topics/{topicIds}/assocs/{assocIds}")
+    @Transactional
+    public DirectivesResponse deleteMulti(@PathParam("topicIds") IdList topicIds,
+                                          @PathParam("assocIds") IdList assocIds) {
+        logger.info("topicIds=" + topicIds + ", assocIds=" + assocIds);
+        // TODO: this naive implementation does not work in all cases. Due to the deletion cascade objects might
+        // get deleted twice, throwing "IllegalStateException: ... has been deleted in this tx".
+        for (long id : topicIds) {
+            dm4.deleteTopic(id);
+        }
+        for (long id : assocIds) {
+            dm4.deleteAssociation(id);
+        }
+        return new DirectivesResponse();
     }
 
 
