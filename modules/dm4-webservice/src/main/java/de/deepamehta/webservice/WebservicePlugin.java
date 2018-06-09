@@ -424,8 +424,6 @@ public class WebservicePlugin extends PluginActivator {
     public DirectivesResponse deleteMulti(@PathParam("topicIds") IdList topicIds,
                                           @PathParam("assocIds") IdList assocIds) {
         logger.info("topicIds=" + topicIds + ", assocIds=" + assocIds);
-        // TODO: this naive implementation does not work in all cases. Due to the deletion cascade objects might
-        // get deleted twice, throwing "IllegalStateException: ... has been deleted in this tx".
         for (long id : topicIds) {
             dm4.deleteTopic(id);
         }

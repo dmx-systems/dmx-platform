@@ -406,6 +406,18 @@ public final class PersistenceLayer extends StorageDecorator {
     void deleteAssociation(long assocId) {
         try {
             deleteAssociation(fetchAssociation(assocId));
+        } catch (IllegalStateException e) {
+            // Note: fetchAssociation() might throw IllegalStateException and is no problem.
+            // This happens when the association is deleted already. In this case nothing needs to be performed.
+            //
+            // Compare to DeepaMehtaObjectModelImpl.delete()
+            // TODO: introduce storage-vendor neutral DM exception.
+            if (e.getMessage().equals("Node[" + assocId + "] has been deleted in this tx")) {
+                logger.info("### Association " + assocId + " has already been deleted in this transaction. " +
+                    "This can happen while executing a delete-multi request.");
+            } else {
+                throw e;
+            }
         } catch (Exception e) {
             throw new RuntimeException("Fetching and deleting association " + assocId + " failed", e);
         }
