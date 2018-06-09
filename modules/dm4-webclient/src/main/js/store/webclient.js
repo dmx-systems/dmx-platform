@@ -63,12 +63,13 @@ const actions = {
   },
 
   deleteMulti ({dispatch}, idLists) {
-    // update server
+    // update client state + sync view (for immediate visual feedback)
+    idLists.topicIds.forEach(id => dispatch('removeTopic', id))
+    idLists.assocIds.forEach(id => dispatch('removeAssoc', id))
+    // update server state
     dm5.restClient.deleteMulti(idLists).then(object => {
       dispatch('_processDirectives', object.directives)
     })
-    // TODO: update client state, for immediate user feedback? Dispatch 'deleteTopic'/'deleteAssoc' several times then.
-    // Or rely solely on directives processing?
   },
 
   // ---
