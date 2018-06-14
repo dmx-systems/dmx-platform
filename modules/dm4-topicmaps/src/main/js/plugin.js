@@ -70,6 +70,7 @@ export default store => {
           'topic-unselect':       id          => store.dispatch('unselectTopic', id),
           'topic-double-click':   viewTopic   => selectTopicmapIf(viewTopic),
           'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
+          'topics-drag':          coords      => store.dispatch('setTopicPositions', coords),
           'topic-drop-on-topic':  ids         => store.dispatch('createAssoc', ids),
           'assoc-select':         id          => store.dispatch('selectAssoc', id),
           'assoc-unselect':       id          => store.dispatch('unselectAssoc', id),
