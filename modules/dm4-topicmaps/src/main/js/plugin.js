@@ -29,7 +29,7 @@ export default store => {
             topic: [
               {
                 label: 'Hide',
-                handler: selection => dispatchMulti(selection, 'hideTopic', 'hideAssoc'),
+                handler: selection => store.dispatch('hideMulti', selection),
                 multi: true
               },
               {
@@ -49,7 +49,7 @@ export default store => {
             assoc: [
               {
                 label: 'Hide',
-                handler: selection => dispatchMulti(selection, 'hideTopic', 'hideAssoc'),
+                handler: selection => store.dispatch('hideMulti', selection),
                 multi: true
               },
               {
@@ -107,12 +107,6 @@ export default store => {
         store.dispatch('syncStyles', assocTypeColors())
       }
     }
-  }
-
-  // TODO: send single request to multi-API
-  function dispatchMulti (selection, topicAction, assocAction) {
-    selection.topicIds.forEach(id => store.dispatch(topicAction, id))
-    selection.assocIds.forEach(id => store.dispatch(assocAction, id))
   }
 
   function selectTopicmapIf (viewTopic) {
