@@ -17,6 +17,7 @@ import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.IdList;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -307,6 +308,39 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
                 e);
+        }
+    }
+
+    // ---
+
+    @PUT
+    @Path("/{id}/topics/{topicIds}/visibility/false")
+    @Transactional
+    @Override
+    public void hideTopics(@PathParam("id") long topicmapId, @PathParam("topicIds") IdList topicIds) {
+        hideMulti(topicmapId, topicIds, new IdList());
+    }
+
+    @PUT
+    @Path("/{id}/assocs/{assocIds}/visibility/false")
+    @Transactional
+    @Override
+    public void hideAssocs(@PathParam("id") long topicmapId, @PathParam("assocIds") IdList assocIds) {
+        hideMulti(topicmapId, new IdList(), assocIds);
+    }
+
+    @PUT
+    @Path("/{id}/topics/{topicIds}/assocs/{assocIds}/visibility/false")
+    @Transactional
+    @Override
+    public void hideMulti(@PathParam("id") long topicmapId, @PathParam("topicIds") IdList topicIds,
+                                                            @PathParam("assocIds") IdList assocIds) {
+        logger.info("topicmapId=" + topicmapId + ", topicIds=" + topicIds + ", assocIds=" + assocIds);
+        for (long id : topicIds) {
+            setTopicVisibility(topicmapId, id, false);
+        }
+        for (long id : assocIds) {
+            removeAssociationFromTopicmap(topicmapId, id);
         }
     }
 

@@ -4,6 +4,7 @@ import de.deepamehta.topicmaps.model.TopicmapViewmodel;
 
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
+import de.deepamehta.core.util.IdList;
 
 
 
@@ -72,6 +73,12 @@ public interface TopicmapsService {
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility);
 
     void removeAssociationFromTopicmap(long topicmapId, long assocId);
+
+    // ---
+
+    void hideTopics(long topicmapId, IdList topicIds);
+    void hideAssocs(long topicmapId, IdList assocIds);
+    void hideMulti(long topicmapId, IdList topicIds, IdList assocIds);
 
     // ---
 
