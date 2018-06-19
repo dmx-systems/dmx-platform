@@ -29,12 +29,12 @@ export default store => {
             topic: [
               {
                 label: 'Hide',
-                handler: selection => store.dispatch('hideMulti', selection),
+                handler: idLists => store.dispatch('hideMulti', idLists),
                 multi: true
               },
               {
                 label: 'Delete',
-                handler: selection => store.dispatch('deleteMulti', selection),
+                handler: idLists => store.dispatch('deleteMulti', idLists),
                 multi: true
               },
               {
@@ -49,12 +49,12 @@ export default store => {
             assoc: [
               {
                 label: 'Hide',
-                handler: selection => store.dispatch('hideMulti', selection),
+                handler: idLists => store.dispatch('hideMulti', idLists),
                 multi: true
               },
               {
                 label: 'Delete',
-                handler: selection => store.dispatch('deleteMulti', selection),
+                handler: idLists => store.dispatch('deleteMulti', idLists),
                 multi: true
               },
               {

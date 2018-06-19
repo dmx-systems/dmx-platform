@@ -10,7 +10,7 @@ const state = {
                               //   }
                               // TODO: make the array a map, key by topicmap ID?
 
-  selectedTopicmapId: {},     // Per-workspace selected topicmap:
+  selectedTopicmapId: {},     // Selected topicmap, per-workspace:
                               //   {
                               //     workspaceId: topicmapId
                               //   }

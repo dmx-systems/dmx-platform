@@ -414,7 +414,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // TODO: introduce storage-vendor neutral DM exception.
             if (e.getMessage().equals("Node[" + assocId + "] has been deleted in this tx")) {
                 logger.info("### Association " + assocId + " has already been deleted in this transaction. " +
-                    "This can happen while executing a delete-multi request.");
+                    "This can happen while delete-multi.");
             } else {
                 throw e;
             }

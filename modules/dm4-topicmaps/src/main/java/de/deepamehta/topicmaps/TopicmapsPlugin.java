@@ -300,11 +300,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         try {
             Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
-            if (assocMapcontext == null) {
-                throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
+            // Note: idempotence of remove-assoc-from-topicmap is needed for delete-muti
+            if (assocMapcontext != null) {
+                deleteAssociationMapcontext(assocMapcontext);
+                me.removeAssociationFromTopicmap(topicmapId, assocId);
             }
-            deleteAssociationMapcontext(assocMapcontext);
-            me.removeAssociationFromTopicmap(topicmapId, assocId);
         } catch (Exception e) {
             throw new RuntimeException("Removing association " + assocId + " from topicmap " + topicmapId + " failed ",
                 e);
@@ -509,7 +509,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void deleteAssociationMapcontext(Association assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
-        // Deletion is possible only via privileged operation.
+        // Deleting a mapcontext association is a privileged operation.
         dm4.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
     }
 
