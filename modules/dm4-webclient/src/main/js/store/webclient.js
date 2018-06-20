@@ -63,9 +63,10 @@ const actions = {
   },
 
   deleteMulti ({dispatch}, idLists) {
+    console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
     // update client state + sync view (for immediate visual feedback)
-    idLists.topicIds.forEach(id => dispatch('removeTopic', id))
-    idLists.assocIds.forEach(id => dispatch('removeAssoc', id))
+    idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
+    idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))
     // update server state
     dm5.restClient.deleteMulti(idLists).then(object => {
       dispatch('_processDirectives', object.directives)

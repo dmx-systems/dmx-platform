@@ -251,12 +251,12 @@ const actions = {
     })
   },
 
-  hideTopic ({dispatch}, id) {
+  _hideTopic ({dispatch}, id) {
     // update state
     dispatch('unselectIf', id)
   },
 
-  hideAssoc ({dispatch}, id) {
+  _hideAssoc ({dispatch}, id) {
     // update state
     dispatch('unselectIf', id)
   },
