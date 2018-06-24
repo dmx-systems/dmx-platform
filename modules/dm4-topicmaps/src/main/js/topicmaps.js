@@ -432,9 +432,10 @@ export default {
  */
 function _displayTopicmap (getters, rootState, dispatch) {
   const topicmapTopic = getTopicmapTopic(rootState)
+  const selection = getters.selection
   return topicmapTopic.isWritable()
-    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable}))
-    .then(() => _syncSelectMulti(getters.selection, dispatch))
+    .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))
+    .then(() => _syncSelectMulti(selection, dispatch))
 }
 
 function _syncSelectMulti (selection, dispatch) {
