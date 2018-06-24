@@ -3,6 +3,8 @@ import Vue from 'vue'
 /**
  * Tracks single select/unselect operations while current tick
  * and handles the accumulated selection in the next tick.
+ *
+ * TODO: architecture. The reusable dm5 components must not rely on this application specific class.
  */
 export default class Selection {
 
@@ -93,6 +95,18 @@ export default class Selection {
     return this.topicIds.length ? 'topic' : 'assoc'
   }
 
+  includesTopic (id) {
+    return this.topicIds.includes(id)
+  }
+
+  includesAssoc (id) {
+    return this.assocIds.includes(id)
+  }
+
+  includesId (id) {
+    return this.includesTopic(id) || this.includesAssoc(id)
+  }
+
   forEachId (visitor) {
     this.topicIds.forEach(visitor)
     this.assocIds.forEach(visitor)
@@ -101,13 +115,13 @@ export default class Selection {
   // ---
 
   _checkAddTopic (id) {
-    if (this.topicIds.includes(id)) {
+    if (this.includesTopic(id)) {
       throw Error(`${id} is already in the selected topic list`)
     }
   }
 
   _checkAddAssoc (id) {
-    if (this.assocIds.includes(id)) {
+    if (this.includesAssoc(id)) {
       throw Error(`${id} is already in the selected assoc list`)
     }
   }
