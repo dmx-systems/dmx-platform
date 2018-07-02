@@ -575,6 +575,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteTopicType(String topicTypeUri) {
         try {
+            // ### FIXME: access control
             _getTopicType(topicTypeUri).delete();           // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
@@ -583,6 +584,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteAssociationType(String assocTypeUri) {
         try {
+            // ### FIXME: access control
             _getAssociationType(assocTypeUri).delete();     // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);

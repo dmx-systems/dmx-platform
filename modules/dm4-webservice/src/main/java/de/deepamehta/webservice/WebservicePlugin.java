@@ -425,7 +425,7 @@ public class WebservicePlugin extends PluginActivator {
                                           @PathParam("assocIds") IdList assocIds) {
         logger.info("topicIds=" + topicIds + ", assocIds=" + assocIds);
         for (long id : topicIds) {
-            dm4.deleteTopic(id);
+            deleteAnyTopic(id);
         }
         for (long id : assocIds) {
             dm4.deleteAssociation(id);
@@ -486,7 +486,20 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
+    // ---
 
+    // TODO: move this logic to dm4.deleteTopic() so that it can delete types as well? (types ARE topics after all)
+    private void deleteAnyTopic(long id) {
+        Topic t = dm4.getTopic(id);
+        String typeUri = t.getTypeUri();
+        if (typeUri.equals("dm4.core.topic_type")) {
+            dm4.deleteTopicType(t.getUri());
+        } else if (typeUri.equals("dm4.core.assoc_type")) {
+            dm4.deleteAssociationType(t.getUri());
+        } else {
+            dm4.deleteTopic(id);
+        }
+    }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
 
