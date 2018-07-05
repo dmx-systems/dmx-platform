@@ -146,6 +146,11 @@ class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
         pl.checkTopicReadAccess(id);
     }
 
+    @Override
+    final void checkWriteAccess() {
+        pl.checkTopicWriteAccess(id);
+    }
+
     // ---
 
     @Override

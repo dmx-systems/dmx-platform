@@ -256,6 +256,11 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
         pl.checkAssociationReadAccess(id);
     }
 
+    @Override
+    final void checkWriteAccess() {
+        pl.checkAssociationWriteAccess(id);
+    }
+
     // ---
 
     @Override

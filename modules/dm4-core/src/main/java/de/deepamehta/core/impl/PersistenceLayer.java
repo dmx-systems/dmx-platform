@@ -3,8 +3,6 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.RelatedAssociation;
-import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -20,7 +18,6 @@ import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -199,7 +196,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void updateTopic(TopicModelImpl topic, TopicModelImpl updateModel) {
         try {
-            checkTopicWriteAccess(topic.getId());
+            topic.checkWriteAccess();
             topic.update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic " + topic.getId() + " failed", e);
@@ -221,7 +218,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteTopic(TopicModelImpl topic) {
         try {
-            checkTopicWriteAccess(topic.getId());
+            topic.checkWriteAccess();
             topic.delete();
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic " + topic.getId() + " failed", e);
@@ -552,9 +549,9 @@ public final class PersistenceLayer extends StorageDecorator {
     void updateTopicType(TopicTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String topicTypeUri = fetchTopic(updateModel.getId()).getUri();
-            _getTopicType(topicTypeUri).update(updateModel);
+            TopicModelImpl topic = fetchTopic(updateModel.getId());
+            topic.checkWriteAccess();
+            _getTopicType(topic.getUri()).update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating topic type failed, updateModel=" + updateModel, e);
         }
@@ -563,9 +560,9 @@ public final class PersistenceLayer extends StorageDecorator {
     void updateAssociationType(AssociationTypeModelImpl updateModel) {
         try {
             // Note: type lookup is by ID. The URI might have changed, the ID does not.
-            // ### FIXME: access control
-            String assocTypeUri = fetchTopic(updateModel.getId()).getUri();
-            _getAssociationType(assocTypeUri).update(updateModel);
+            TopicModelImpl topic = fetchTopic(updateModel.getId());
+            topic.checkWriteAccess();
+            _getAssociationType(topic.getUri()).update(updateModel);
         } catch (Exception e) {
             throw new RuntimeException("Updating association type failed, updateModel=" + updateModel, e);
         }
@@ -575,8 +572,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteTopicType(String topicTypeUri) {
         try {
-            // ### FIXME: access control
-            _getTopicType(topicTypeUri).delete();           // ### TODO: delete view config topics
+            TypeModelImpl type = _getTopicType(topicTypeUri);
+            type.checkWriteAccess();
+            type.delete();
+            // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting topic type \"" + topicTypeUri + "\" failed", e);
         }
@@ -584,8 +583,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void deleteAssociationType(String assocTypeUri) {
         try {
-            // ### FIXME: access control
-            _getAssociationType(assocTypeUri).delete();     // ### TODO: delete view config topics
+            TypeModelImpl type = _getAssociationType(assocTypeUri);
+            type.checkWriteAccess();
+            type.delete();
+            // ### TODO: delete view config topics
         } catch (Exception e) {
             throw new RuntimeException("Deleting association type \"" + assocTypeUri + "\" failed", e);
         }
@@ -610,10 +611,16 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    /**
+     * Type cache direct access. No permission check.
+     */
     TopicTypeModelImpl _getTopicType(String uri) {
         return typeStorage.getTopicType(uri);
     }
 
+    /**
+     * Type cache direct access. No permission check.
+     */
     AssociationTypeModelImpl _getAssociationType(String uri) {
         return typeStorage.getAssociationType(uri);
     }
@@ -769,6 +776,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    // TODO: add return to model's checkReadAccess() and drop this method?
     <M extends DeepaMehtaObjectModelImpl> M checkReadAccess(M model) {
         model.checkReadAccess();
         return model;
@@ -776,21 +784,33 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
+    /**
+     * @throws  AccessControlException  if the current user has no permission.
+     */
     void checkTopicReadAccess(long topicId) {
         em.fireEvent(CoreEvent.CHECK_TOPIC_READ_ACCESS, topicId);
     }
 
+    /**
+     * @throws  AccessControlException  if the current user has no permission.
+     */
     void checkAssociationReadAccess(long assocId) {
         em.fireEvent(CoreEvent.CHECK_ASSOCIATION_READ_ACCESS, assocId);
     }
 
     // ---
 
-    private void checkTopicWriteAccess(long topicId) {
+    /**
+     * @throws  AccessControlException  if the current user has no permission.
+     */
+    void checkTopicWriteAccess(long topicId) {
         em.fireEvent(CoreEvent.CHECK_TOPIC_WRITE_ACCESS, topicId);
     }
 
-    private void checkAssociationWriteAccess(long assocId) {
+    /**
+     * @throws  AccessControlException  if the current user has no permission.
+     */
+    void checkAssociationWriteAccess(long assocId) {
         em.fireEvent(CoreEvent.CHECK_ASSOCIATION_WRITE_ACCESS, assocId);
     }
 
