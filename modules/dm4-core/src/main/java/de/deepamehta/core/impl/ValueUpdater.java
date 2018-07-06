@@ -33,6 +33,7 @@ class ValueUpdater {
     private DeepaMehtaObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
     private boolean isAssoc;
+    private boolean isType;
 
     // For composites: assoc def URIs of empty child topics.
     // Evaluated when deleting child-assignments, see updateAssignments().
@@ -65,6 +66,7 @@ class ValueUpdater {
         this.updateModel = updateModel;
         this.targetObject = targetObject;
         this.isAssoc = updateModel instanceof AssociationModel;
+        this.isType  = updateModel instanceof TypeModel;
         //
         // process refs
         if (updateModel instanceof TopicReferenceModel) {
@@ -81,7 +83,7 @@ class ValueUpdater {
         // Note: we must get type *after* processing refs. Refs might have no type set.
         this.type = updateModel.getType();
         //
-        // value update
+        // update value
         DeepaMehtaObjectModelImpl _value = updateModel.isSimple() ? updateSimple() : updateComposite();
         //
         // Note: UnifiedValue instantiation saves the update model's ID *before* it is overwritten
@@ -112,6 +114,8 @@ class ValueUpdater {
         }
     }
 
+    // Simple
+
     /**
      * Preconditions:
      *   - this.updateModel is not null
@@ -121,10 +125,11 @@ class ValueUpdater {
      *          The latter is the case if this.updateModel is the empty string.
      */
     private DeepaMehtaObjectModelImpl updateSimple() {
-        if (isAssoc) {
-            // Note: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
+        if (isAssoc || isType) {
+            // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
             // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
             // different players.) An assoc's simple value is updated in-place.
+            // Note 2: a type's simple value is not unified. A type is updated in-place.
             return storeAssocSimpleValue();
         } else if (updateModel.getSimpleValue().toString().isEmpty()) {
             return null;
@@ -170,6 +175,8 @@ class ValueUpdater {
         }
         return topic;
     }
+
+    // Composite
 
     /**
      * Updates a composite value and returns the unified composite value.
