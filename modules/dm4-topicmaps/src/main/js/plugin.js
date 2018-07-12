@@ -11,7 +11,7 @@ export default store => {
         comp: require('dm5-topicmap-panel').default,
         mount: 'webclient',
         props: {
-          object:          state => state.object,
+          object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
           writable:        state => state.writable,
           objectRenderers: state => state.objectRenderers,
           topicmapTypes:   state => state.topicmaps.topicmapTypes,

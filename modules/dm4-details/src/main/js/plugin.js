@@ -21,7 +21,7 @@ export default store => ({
       comp: require('dm5-detail-panel').default,
       mount: 'webclient',
       props: {
-        object:          state => state.object,
+        object:          (_, getters) => getters && getters.object,   // TODO: why is getters undefined on 1st call?
         writable:        state => state.writable,
         visible:         state => state.details.visible,
         tab:             state => state.details.tab,

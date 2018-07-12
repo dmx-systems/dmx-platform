@@ -483,7 +483,7 @@ function selectionHandler (dispatch) {
 
 /**
  * Processes an UPDATE_TOPIC directive.
- * Used to update the topicmap menu when a topicmap is renamed.
+ * Updates the topicmap menu when a topicmap is renamed.
  */
 function updateTopic (topic) {
   // console.log('updateTopic', topic)

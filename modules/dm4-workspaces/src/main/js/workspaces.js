@@ -120,6 +120,10 @@ function isWorkspaceReadable () {
 
 // Process directives
 
+/**
+ * Processes an UPDATE_TOPIC directive.
+ * Updates the workspace menu when a workspace is renamed.
+ */
 function updateTopic (topic) {
   const i = state.workspaceTopics.findIndex(_topic => _topic.id === topic.id)
   if (i !== -1) {
