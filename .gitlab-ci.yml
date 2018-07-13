@@ -6,6 +6,7 @@ maven-build:
     - maven
 
   artifacts:
+    enabled: true
     name: "${CI_PROJECT_NAME}-${CI_COMMIT_TAG}"
 
     
