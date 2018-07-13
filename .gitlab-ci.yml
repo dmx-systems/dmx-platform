@@ -1,3 +1,6 @@
 maven-build:
   script:
     - mvn clean install -P all -Dmaven.test.skip=true
+  tags:
+    - maven
+    
