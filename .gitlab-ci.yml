@@ -1,11 +1,11 @@
 maven-build:
   script:
     - export MAVEN_OPTS='-Xmx128m'
-    - mvn clean install -P all,dist -Dmaven.test.skip=true
+    - mvn clean install -P all,dist -DcreateChecksum=true -Ddm4.websockets.port=9999 -DskipTests
   tags:
     - maven
 
-  artifacts:
-    name: "${CI_PROJECT_NAME}-${CI_COMMIT_TAG}"
+#  artifacts:
+#    name: "${CI_PROJECT_NAME}-${CI_COMMIT_TAG}"
 
     
