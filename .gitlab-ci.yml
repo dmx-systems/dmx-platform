@@ -1,7 +1,7 @@
 maven-build:
   script:
     - export MAVEN_OPTS='-Xmx128m'
-    - mvn clean install -P all -Dmaven.test.skip=true
+    - mvn clean install -P all,dist -Dmaven.test.skip=true
   tags:
     - maven
 
