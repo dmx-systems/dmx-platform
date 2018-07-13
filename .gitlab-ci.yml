@@ -3,7 +3,7 @@ maven-build:
     - export MAVEN_OPTS='-Xmx128m'
     - mvn clean install -P all -Dmaven.test.skip=true
   tags:
-    - dmx-standard
+    - maven
 
   artifacts:
     paths:
