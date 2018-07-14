@@ -12,5 +12,5 @@ maven-build:
     - cp ${DISTDIR}/${ZIPFILE} /var/www/download.dmx.systems/ci/dmx-desktop-5.0_NIGHLTY_${NUNC}_${CI_PIPELINE_ID}.zip
 
   artifacts:
-    - paths: 
+    paths: 
       - dmx-platform/modules/dm4-distribution/target/*.zip
