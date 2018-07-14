@@ -12,6 +12,7 @@ maven-build:
     - FILENAME="$( basename ${ZIPFILE} .zip )"
     - NUNC="$( date +%F )"
     - cp ${DISTDIR}/${FILENAME}.zip /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
+    - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/latest.zip
 
 ## This actualy works, but we won't need it for now.
 #  artifacts:
