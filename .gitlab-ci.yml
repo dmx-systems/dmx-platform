@@ -5,7 +5,8 @@ maven-build:
   tags:
     - maven
 
-#  artifacts:
-#    name: "${CI_PROJECT_NAME}-${CI_COMMIT_TAG}"
-
-    
+  after_script:
+    - DISTDIR='./.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
+    - ZIPFILE='deepamehta-distribution-5.0-SNAPSHOT.zip'
+    - NUNC="$( date +%F )"
+    - cp ${DISTDIR}/${ZIPFILE} /var/www/download.dmx.systems/dmx-desktop-5.0_NIGHLTY_${NUNC}_${CI_PIPELINE_ID}.zip
