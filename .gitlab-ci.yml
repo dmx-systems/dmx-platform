@@ -5,7 +5,7 @@ maven-build:
 
   script:
     - export MAVEN_OPTS='-Xmx128m'
-    - mvn clean install -P all,dist 
+    - mvn clean install -P all,dist -DskipTests
 
   after_script:
     # - DISTDIR='/home/gitlab-runner/.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
