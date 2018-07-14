@@ -1,9 +1,11 @@
 maven-build:
-  script:
-    - export MAVEN_OPTS='-Xmx128m'
-    - mvn clean install -P all,dist -DcreateChecksum=true -Ddm4.websockets.port=9999 -DskipTests
+
   tags:
     - maven
+
+  script:
+    - export MAVEN_OPTS='-Xmx128m'
+    - mvn clean install -P all,dist 
 
   after_script:
     # - DISTDIR='/home/gitlab-runner/.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
