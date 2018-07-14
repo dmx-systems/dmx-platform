@@ -13,4 +13,4 @@ maven-build:
 
   artifacts:
     paths: 
-      - dmx-platform/modules/dm4-distribution/target/*.zip
+      - modules/dm4-distribution/target/*.zip
