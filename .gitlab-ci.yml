@@ -6,11 +6,14 @@ maven-build:
     - maven
 
   after_script:
-    - DISTDIR='/home/gitlab-runner/.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
-    - ZIPFILE='deepamehta-distribution-5.0-SNAPSHOT.zip'
+    # - DISTDIR='/home/gitlab-runner/.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
+    - DISTDIR='modules/dm4-distribution/target'
+    - ZIPFILE="$( ls ${DISTDIR}/*.zip )"
+    - FILENAME="$( basename ${ZIPFILE} .zip )"
     - NUNC="$( date +%F )"
-    - cp ${DISTDIR}/${ZIPFILE} /var/www/download.dmx.systems/ci/dmx-desktop-5.0_NIGHLTY_${NUNC}_${CI_PIPELINE_ID}.zip
+    - cp ${DISTDIR}/${FILENAME}.zip /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
 
-  artifacts:
-    paths: 
-      - modules/dm4-distribution/target/*.zip
+## This actualy works, but we won't need it for now.
+#  artifacts:
+#    paths: 
+#      - modules/dm4-distribution/target/*.zip
