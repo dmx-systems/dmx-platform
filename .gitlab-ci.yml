@@ -16,5 +16,5 @@ maven-build:
     - MY_JOB_TOKEN="$(</home/gitlab-runner/.after-maven-build.token)"
     - cp ${DISTDIR}/${FILENAME}.zip /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
-    # trigger pipeline to re-deploy docker image for dmx demo
+    # trigger pipeline to build new debian image for dmx platform
     - curl --request POST --form token="${MY_JOB_TOKEN}" --form ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline
