@@ -3,8 +3,8 @@ import store from './store/webclient'
 
 /* eslint no-new: 0 */
 
-new DM5WebSocket('de.deepamehta.webclient', dispatcher)
+new DM5WebSocket('de.deepamehta.webclient', dispatch)
 
-function dispatcher (message) {
+function dispatch (message) {
   store.dispatch('_' + message.type, message.args)
 }
