@@ -56,26 +56,6 @@ module.exports = {
     noInfo: true,
     open: true
   },
-  // ES6 code minified by uglify-es might throw "TypeError: Assignment to constant variable".
-  // This is due to a bug in uglify-es related to function inlining.
-  // https://github.com/mishoo/UglifyJS2/issues/2842
-  // The solution is to disable function inlining.
-  // https://github.com/webpack-contrib/uglifyjs-webpack-plugin/issues/264
-  // Note: setting optimization.minimizer overrides the defaults provided by Webpack
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        cache: true,        // Webpack default
-        parallel: true,     // Webpack default
-        sourceMap: false,
-        uglifyOptions: {
-          compress: {
-            inline: false
-          }
-        }
-      })
-    ]
-  },
   performance: {
     hints: false
   }

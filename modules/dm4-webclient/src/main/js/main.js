@@ -9,6 +9,8 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
+console.log('DM5 Webclient 2018/07/18')
+
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
 // The dm5-webclient component relies on the "typeCache" store module as registered by dm5.init().

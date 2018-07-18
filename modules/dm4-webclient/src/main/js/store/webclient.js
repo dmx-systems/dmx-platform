@@ -163,7 +163,10 @@ const actions = {
 const getters = {
   // Using a getter "object" is recalculated once the underlying type changes.
   // The detail panel updates when a type is renamed.
-  object: state => state.object && (state.object.isType() ? state.object.asType() : state.object)
+  object: state => {
+    // console.log('object getter', state.object, state.object && state.typeCache.topicTypes[state.object.uri])
+    return state.object && (state.object.isType() ? state.object.asType() : state.object)
+  }
   // logical copy in createDetail()/updateDetail() (topicmap-model.js of dm5-cytoscape-renderer module)
 }
 
