@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "webpack -p --hide-modules",
-    "dev": "webpack-dev-server -d --hot",
+    "dev": "webpack-dev-server -d --env.dev --hot",
     "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json ./modules/dm4-webclient/src/main/resources/web/dist"
   },
   "dependencies": {
