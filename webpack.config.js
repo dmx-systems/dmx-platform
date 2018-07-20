@@ -1,6 +1,7 @@
 const path = require('path')
-const { VueLoaderPlugin } = require('vue-loader')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = (env = {}) => {
 
@@ -8,8 +9,7 @@ module.exports = (env = {}) => {
     entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
       filename: '[name].bundle.js',
-      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web/dist'),
-      publicPath: 'dist/'
+      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web')
     },
     resolve: {
       extensions: [".js", ".vue"],
@@ -39,8 +39,11 @@ module.exports = (env = {}) => {
       ]
     },
     plugins: [
-      new VueLoaderPlugin(),
-      new CleanWebpackPlugin(['modules/dm4-webclient/src/main/resources/web/dist'])
+      new HtmlWebpackPlugin({
+        template: 'modules/dm4-webclient/src/main/resources/index.html'
+      }),
+      new CleanWebpackPlugin(['modules/dm4-webclient/src/main/resources/web']),
+      new VueLoaderPlugin()
     ],
     performance: {
       hints: false
@@ -51,14 +54,7 @@ module.exports = (env = {}) => {
     webpackConfig.devServer = {
       port: 8082,
       proxy: {
-        '/': {
-          target: 'http://localhost:8080',
-          bypass: req => {
-            if (req.url === '/') {
-              return 'modules/dm4-webclient/src/main/resources/web/'
-            }
-          }
-        }
+        '/': 'http://localhost:8080'
       },
       noInfo: true,
       open: true
