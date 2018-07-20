@@ -1,4 +1,3 @@
-const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
@@ -8,13 +7,13 @@ module.exports = (env = {}) => {
   const webpackConfig = {
     entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
-      filename: '[name].bundle.js',
-      path: path.resolve(__dirname, 'modules/dm4-webclient/src/main/resources/web')
+      path: __dirname + '/modules/dm4-webclient/src/main/resources/web',
+      filename: env.dev ? '[name].bundle.js' : '[chunkhash].[name].js'
     },
     resolve: {
       extensions: [".js", ".vue"],
       alias: {
-        'modules': path.resolve(__dirname, 'modules')     // needed by plugin-manager.js
+        'modules': __dirname + '/modules'     // needed by plugin-manager.js
       }
     },
     module: {
