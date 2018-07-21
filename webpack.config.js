@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 
@@ -8,7 +9,7 @@ module.exports = (env = {}) => {
     entry: './modules/dm4-webclient/src/main/js/main.js',
     output: {
       path: __dirname + '/modules/dm4-webclient/src/main/resources/web',
-      filename: env.dev ? '[name].bundle.js' : '[chunkhash].[name].js'
+      filename: env.dev ? '[name].js' : '[chunkhash].[name].js'
     },
     resolve: {
       extensions: [".js", ".vue"],
@@ -29,7 +30,7 @@ module.exports = (env = {}) => {
         },
         {
           test: /\.css$/,
-          loader: ['style-loader', 'css-loader']
+          loader: [env.dev ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader']
         },
         {
           test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
@@ -41,7 +42,12 @@ module.exports = (env = {}) => {
       new HtmlWebpackPlugin({
         template: 'modules/dm4-webclient/src/main/resources/index.html'
       }),
-      new CleanWebpackPlugin(['modules/dm4-webclient/src/main/resources/web']),
+      new MiniCssExtractPlugin({
+        filename: env.dev ? '[name].css' : '[contenthash].[name].css'
+      }),
+      new CleanWebpackPlugin([
+        'modules/dm4-webclient/src/main/resources/web'
+      ]),
       new VueLoaderPlugin()
     ],
     performance: {
@@ -52,9 +58,7 @@ module.exports = (env = {}) => {
   if (env.dev) {
     webpackConfig.devServer = {
       port: 8082,
-      proxy: {
-        '/': 'http://localhost:8080'
-      },
+      proxy: {'/': 'http://localhost:8080'},
       noInfo: true,
       open: true
     }
