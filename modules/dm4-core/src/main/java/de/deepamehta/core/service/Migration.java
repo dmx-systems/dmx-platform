@@ -1,6 +1,6 @@
 package de.deepamehta.core.service;
 
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.service.ModelFactory;
 
 
@@ -51,7 +51,7 @@ public abstract class Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void setViewConfigValue(DeepaMehtaType type, String setting, Object value) {
+    private void setViewConfigValue(DMXType type, String setting, Object value) {
         type.getViewConfig().setConfigValue("dm4.webclient.view_config", "dm4.webclient." + setting, value);
     }
 }

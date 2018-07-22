@@ -228,7 +228,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Abstract Methods ===
 
-    DeepaMehtaTypeImpl instantiate() {
+    DMXTypeImpl instantiate() {
         throw new UnsupportedOperationException();
     }
 

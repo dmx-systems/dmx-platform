@@ -9,7 +9,7 @@ import java.util.List;
 
 
 
-public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
+public interface DMXObject extends Identifiable, JSONEnabled {
 
 
 
@@ -49,8 +49,8 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
 
     // ---
 
-    DeepaMehtaObject loadChildTopics();
-    DeepaMehtaObject loadChildTopics(String assocDefUri);
+    DMXObject loadChildTopics();
+    DMXObject loadChildTopics(String assocDefUri);
 
     // ---
 
@@ -63,7 +63,7 @@ public interface DeepaMehtaObject extends Identifiable, JSONEnabled {
      * Note: if the user would have no READ access to this object the DeepaMehta Core would not instantiate it in the
      * first place, but throw an <code>AccessControlException</code>.
      */
-    DeepaMehtaType getType();
+    DMXType getType();
 
     DeepaMehtaObjectModel getModel();
 

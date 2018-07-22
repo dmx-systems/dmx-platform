@@ -2,7 +2,7 @@ package de.deepamehta.core.service;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -236,7 +236,7 @@ public interface CoreService {
 
     // === Generic Object ===
 
-    DeepaMehtaObject getObject(long id);
+    DMXObject getObject(long id);
 
 
 

@@ -9,7 +9,7 @@ import de.deepamehta.core.model.TopicModel;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Topic extends DeepaMehtaObject {
+public interface Topic extends DMXObject {
 
     void update(TopicModel model);
 
@@ -26,7 +26,7 @@ public interface Topic extends DeepaMehtaObject {
      * The search is driven by this topic's type definition. That is child topics which do not adhere
      * to the type definition are not found.
      * <p>
-     * TODO: make this generic by moving to DeepaMehtaObject interface?
+     * TODO: make this generic by moving to DMXObject interface?
      *
      * @return  the found topic, or <code>null</code>.
      */

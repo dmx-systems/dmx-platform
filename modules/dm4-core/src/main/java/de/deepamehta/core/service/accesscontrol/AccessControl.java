@@ -1,7 +1,7 @@
 package de.deepamehta.core.service.accesscontrol;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 
@@ -167,7 +167,7 @@ public interface AccessControl {
      * Use this method only for objects which have no workspace assignment already, that is e.g. objects
      * created in a migration or objects created while workspace assignment is deliberately suppressed.
      */
-    void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+    void assignToWorkspace(DMXObject object, long workspaceId);
 
     /**
      * Checks if an association represents a workspace assignment.

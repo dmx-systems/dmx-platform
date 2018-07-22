@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface Association extends DeepaMehtaObject {
+public interface Association extends DMXObject {
 
     Role getRole1();
 
@@ -21,9 +21,9 @@ public interface Association extends DeepaMehtaObject {
 
     // ---
 
-    DeepaMehtaObject getPlayer1();
+    DMXObject getPlayer1();
 
-    DeepaMehtaObject getPlayer2();
+    DMXObject getPlayer2();
 
     // --- Convenience Methods ---
 

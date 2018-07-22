@@ -1,6 +1,6 @@
 package de.deepamehta.facets;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.facets.FacetValueModel;
@@ -23,7 +23,7 @@ public interface FacetsService {
      *
      * @return  The retrieved facet value (including its child topics) or <code>null</code> if no such topic extists.
      */
-    RelatedTopic getFacet(DeepaMehtaObject object, String facetTypeUri);
+    RelatedTopic getFacet(DMXObject object, String facetTypeUri);
 
     // ---
 
@@ -39,7 +39,7 @@ public interface FacetsService {
      *
      * @return  The retrieved facet values (including their child topics). The list may be empty.
      */
-    List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri);
+    List<RelatedTopic> getFacets(DMXObject object, String facetTypeUri);
 
     // ---
 
@@ -58,7 +58,7 @@ public interface FacetsService {
      * @param   facetTypeUri    URI of the facet type.
      * @param   value           The new facet value.
      */
-    void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValueModel value);
+    void updateFacet(DMXObject object, String facetTypeUri, FacetValueModel value);
 
     // ---
 

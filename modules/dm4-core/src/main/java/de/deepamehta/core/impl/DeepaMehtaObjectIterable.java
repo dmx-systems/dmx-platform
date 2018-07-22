@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -89,7 +89,7 @@ class AssociationIterator extends ObjectIterator<Association, AssociationModelIm
 
 
 
-abstract class ObjectIterator<O extends DeepaMehtaObject, M extends DeepaMehtaObjectModelImpl> implements Iterator<O> {
+abstract class ObjectIterator<O extends DMXObject, M extends DeepaMehtaObjectModelImpl> implements Iterator<O> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

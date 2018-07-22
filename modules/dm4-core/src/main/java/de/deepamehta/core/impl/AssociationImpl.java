@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedObject;
 import de.deepamehta.core.RelatedTopic;
@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 /**
  * An association model that is attached to the DB.
  */
-class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
+class AssociationImpl extends DMXObjectImpl implements Association {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -56,12 +56,12 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
     // ---
 
     @Override
-    public final DeepaMehtaObject getPlayer1() {
+    public final DMXObject getPlayer1() {
         return getRole1().getPlayer();
     }
 
     @Override
-    public final DeepaMehtaObject getPlayer2() {
+    public final DMXObject getPlayer2() {
         return getRole2().getPlayer();
     }
 
@@ -156,7 +156,7 @@ class AssociationImpl extends DeepaMehtaObjectImpl implements Association {
 
 
     // ***************************************
-    // *** DeepaMehtaObject Implementation ***
+    // *** DMXObject Implementation ***
     // ***************************************
 
 

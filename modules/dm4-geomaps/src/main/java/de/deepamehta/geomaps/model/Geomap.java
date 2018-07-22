@@ -46,7 +46,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
      */
     public Geomap(long geomapId, CoreService dm4) {
         logger.info("Loading geomap " + geomapId);
-        // Note: a Geomap is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
+        // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
         // child topic loading is not applied. We must load the child topics manually here.
         this.geomapTopic = dm4.getTopic(geomapId).loadChildTopics();
         this.dm4 = dm4;

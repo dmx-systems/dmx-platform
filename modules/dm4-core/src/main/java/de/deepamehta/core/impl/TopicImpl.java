@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * A topic that is attached to the {@link CoreService}.
  */
-class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
+class TopicImpl extends DMXObjectImpl implements Topic {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -70,7 +70,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
     // ---
 
-    // Note: overridden by DeepaMehtaTypeImpl
+    // Note: overridden by DMXTypeImpl
     @Override
     public TopicModelImpl getModel() {
         return (TopicModelImpl) model;
@@ -79,7 +79,7 @@ class TopicImpl extends DeepaMehtaObjectImpl implements Topic {
 
 
     // ***************************************
-    // *** DeepaMehtaObject Implementation ***
+    // *** DMXObject Implementation ***
     // ***************************************
 
 

@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
@@ -331,7 +331,7 @@ class AccessControlImpl implements AccessControl {
     }
 
     @Override
-    public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
+    public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             // create assignment association
             pl.createAssociation("dm4.core.aggregation",

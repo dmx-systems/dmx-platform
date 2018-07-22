@@ -1,7 +1,7 @@
 package de.deepamehta.time;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 
 import java.util.Collection;
@@ -18,7 +18,7 @@ public interface TimeService {
 
     // ---
 
-    void setModified(DeepaMehtaObject object);
+    void setModified(DMXObject object);
 
     // === Retrieval ===
 

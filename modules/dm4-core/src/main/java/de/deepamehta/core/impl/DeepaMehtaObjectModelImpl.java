@@ -1,6 +1,6 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -247,7 +247,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    DeepaMehtaObject instantiate() {
+    DMXObject instantiate() {
         throw new UnsupportedOperationException();
     }
 
@@ -431,7 +431,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
             //
             // Note: in case of a type topic the instantiate() call above creates a cloned model
             // that doesn't reflect the update. Here we instantiate the now updated model.
-            DeepaMehtaObject object = instantiate();
+            DMXObject object = instantiate();
             Directives.get().add(getUpdateDirective(), object);
             em.fireEvent(getPostUpdateEvent(), object, updateModel, oldObject);
         } catch (Exception e) {
@@ -517,7 +517,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // === Update Child Topics (memory + DB) ===
 
-    // ### TODO: make this private. See comment in DeepaMehtaObjectImpl.setChildTopics()
+    // ### TODO: make this private. See comment in DMXObjectImpl.setChildTopics()
     // ### TODO: drop it!
     final void _updateChildTopics(ChildTopicsModelImpl updateModel) {
         try {
@@ -554,8 +554,8 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // Note: the given association definition must not necessarily originate from the parent object's type definition.
     // It may originate from a facet definition as well.
-    // Called from DeepaMehtaObjectImpl.updateChildTopic() and DeepaMehtaObjectImpl.updateChildTopics().
-    // ### TODO: make this private? See comments in DeepaMehtaObjectImpl.
+    // Called from DMXObjectImpl.updateChildTopic() and DMXObjectImpl.updateChildTopics().
+    // ### TODO: make this private? See comments in DMXObjectImpl.
     // ### TODO: drop it!
     final void updateChildTopics(RelatedTopicModelImpl newChildTopic, List<RelatedTopicModelImpl> newChildTopics,
                                                                       AssociationDefinitionModel assocDef) {

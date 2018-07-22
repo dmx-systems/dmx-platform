@@ -2,7 +2,7 @@ package de.deepamehta.caching;
 
 import de.deepamehta.time.TimeService;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.ServiceRequestFilterListener;
@@ -82,7 +82,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
     @Override
     public void serviceResponseFilter(ContainerResponse response) {
-        DeepaMehtaObject object = responseObject(response);
+        DMXObject object = responseObject(response);
         if (object != null) {
             setCacheControlHeader(response, "max-age=0");
         }
@@ -116,9 +116,9 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     // ---
 
     // ### FIXME: copy in TimePlugin
-    private DeepaMehtaObject responseObject(ContainerResponse response) {
+    private DMXObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
-        return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
+        return entity instanceof DMXObject ? (DMXObject) entity : null;
     }
 
     private void setCacheControlHeader(ContainerResponse response, String value) {

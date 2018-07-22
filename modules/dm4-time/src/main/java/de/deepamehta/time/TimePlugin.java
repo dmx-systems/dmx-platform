@@ -1,7 +1,7 @@
 package de.deepamehta.time;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -103,7 +103,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     @Override
-    public void setModified(DeepaMehtaObject object) {
+    public void setModified(DMXObject object) {
         storeTimestamp(object);
     }
 
@@ -211,7 +211,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     @Override
     public void serviceResponseFilter(ContainerResponse response) {
-        DeepaMehtaObject object = responseObject(response);
+        DMXObject object = responseObject(response);
         if (object != null) {
             setLastModifiedHeader(response, getModificationTime(object.getId()));
         }
@@ -221,13 +221,13 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void storeTimestamps(DeepaMehtaObject object) {
+    private void storeTimestamps(DMXObject object) {
         long time = System.currentTimeMillis();
         storeCreationTime(object, time);
         storeModificationTime(object, time);
     }
 
-    private void storeTimestamp(DeepaMehtaObject object) {
+    private void storeTimestamp(DMXObject object) {
         long time = System.currentTimeMillis();
         storeModificationTime(object, time);
     }
@@ -235,36 +235,36 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     // ---
 
     private void storeParentsTimestamp(Topic topic) {
-        for (DeepaMehtaObject object : getParents(topic)) {
+        for (DMXObject object : getParents(topic)) {
             storeTimestamp(object);
         }
     }
 
     // ---
 
-    private void storeCreationTime(DeepaMehtaObject object, long time) {
+    private void storeCreationTime(DMXObject object, long time) {
         storeTime(object, PROP_CREATED, time);
     }
 
-    private void storeModificationTime(DeepaMehtaObject object, long time) {
+    private void storeModificationTime(DMXObject object, long time) {
         storeTime(object, PROP_MODIFIED, time);
     }
 
     // ---
 
-    private void storeTime(DeepaMehtaObject object, String propUri, long time) {
+    private void storeTime(DMXObject object, String propUri, long time) {
         object.setProperty(propUri, time, true);    // addToIndex=true
     }
 
     // ===
 
     // ### FIXME: copy in CachingPlugin
-    private DeepaMehtaObject responseObject(ContainerResponse response) {
+    private DMXObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
-        return entity instanceof DeepaMehtaObject ? (DeepaMehtaObject) entity : null;
+        return entity instanceof DMXObject ? (DMXObject) entity : null;
     }
 
-    private void enrichWithTimestamp(DeepaMehtaObject object) {
+    private void enrichWithTimestamp(DMXObject object) {
         long objectId = object.getId();
         ChildTopicsModel childTopics = object.getChildTopics().getModel()
             .put(PROP_CREATED, getCreationTime(objectId))
@@ -295,8 +295,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
      * Traversal is informed by the "parent" and "child" role types.
      * Traversal stops when no parent exists or when an association is met.
      */
-    private Set<DeepaMehtaObject> getParents(Topic topic) {
-        Set<DeepaMehtaObject> parents = new LinkedHashSet();
+    private Set<DMXObject> getParents(Topic topic) {
+        Set<DMXObject> parents = new LinkedHashSet();
         //
         List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
             "dm4.core.parent", null);

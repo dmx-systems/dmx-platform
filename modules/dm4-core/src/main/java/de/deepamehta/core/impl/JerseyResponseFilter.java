@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.ChildTopics;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -79,18 +79,18 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 // 1) Loading child topics
                 boolean includeChilds = getIncludeChilds(request);
                 boolean includeAssocChilds = getIncludeAssocChilds(request);
-                if (entity instanceof DeepaMehtaObject) {
-                    loadChildTopics((DeepaMehtaObject) entity, includeChilds, includeAssocChilds);
-                } else if (isIterable(response, DeepaMehtaObject.class)) {
-                    loadChildTopics((Iterable<DeepaMehtaObject>) entity, includeChilds, includeAssocChilds);
+                if (entity instanceof DMXObject) {
+                    loadChildTopics((DMXObject) entity, includeChilds, includeAssocChilds);
+                } else if (isIterable(response, DMXObject.class)) {
+                    loadChildTopics((Iterable<DMXObject>) entity, includeChilds, includeAssocChilds);
                 }
                 //
                 // 2) Firing PRE_SEND events
                 Directives directives = null;
-                if (entity instanceof DeepaMehtaObject) {
-                    firePreSend((DeepaMehtaObject) entity);
-                } else if (isIterable(response, DeepaMehtaObject.class)) {
-                    firePreSend((Iterable<DeepaMehtaObject>) entity);
+                if (entity instanceof DMXObject) {
+                    firePreSend((DMXObject) entity);
+                } else if (isIterable(response, DMXObject.class)) {
+                    firePreSend((Iterable<DMXObject>) entity);
                 } else if (entity instanceof DirectivesResponse) {
                     firePreSend(((DirectivesResponse) entity).getObject());
                     //
@@ -99,7 +99,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                     // with timestamps. The timestamps in turn are needed at client-side by the Caching plugin
                     // in order to issue conditional PUT requests.
                     // ### TODO: don't fire PRE_SEND events for the individual directives but only for the wrapped
-                    // DeepaMehtaObject? Let the update() Core Service calls return the updated object?
+                    // DMXObject? Let the update() Core Service calls return the updated object?
                     directives = ((DirectivesResponse) entity).getDirectives();
                     firePreSend(directives);
                 }
@@ -124,7 +124,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Loading child topics ===
 
-    private void loadChildTopics(DeepaMehtaObject object, boolean includeChilds,
+    private void loadChildTopics(DMXObject object, boolean includeChilds,
                                                           boolean includeAssocChilds) {
         if (includeChilds) {
             object.loadChildTopics();
@@ -134,16 +134,16 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    private void loadChildTopics(Iterable<DeepaMehtaObject> objects, boolean includeChilds,
+    private void loadChildTopics(Iterable<DMXObject> objects, boolean includeChilds,
                                                                      boolean includeAssocChilds) {
-        for (DeepaMehtaObject object : objects) {
+        for (DMXObject object : objects) {
             loadChildTopics(object, includeChilds, includeChilds);
         }
     }
 
     // ---
 
-    private void loadRelatingAssociationChildTopics(DeepaMehtaObject object) {
+    private void loadRelatingAssociationChildTopics(DMXObject object) {
         ChildTopics childTopics = object.getChildTopics();
         for (String childTypeUri : childTopics) {
             Object value = childTopics.get(childTypeUri);
@@ -166,7 +166,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Firing PRE_SEND events ===
 
-    private void firePreSend(DeepaMehtaObject object) {
+    private void firePreSend(DMXObject object) {
         if (object instanceof TopicType) {                  // Note: must take precedence over topic
             em.fireEvent(CoreEvent.PRE_SEND_TOPIC_TYPE, object);
         } else if (object instanceof AssociationType) {     // Note: must take precedence over topic
@@ -178,8 +178,8 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    private void firePreSend(Iterable<DeepaMehtaObject> objects) {
-        for (DeepaMehtaObject object : objects) {
+    private void firePreSend(Iterable<DMXObject> objects) {
+        for (DMXObject object : objects) {
             firePreSend(object);
         }
     }
@@ -191,7 +191,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
             case UPDATE_ASSOCIATION:
             case UPDATE_TOPIC_TYPE:
             case UPDATE_ASSOCIATION_TYPE:
-                firePreSend((DeepaMehtaObject) entry.arg);
+                firePreSend((DMXObject) entry.arg);
                 break;
             }
         }

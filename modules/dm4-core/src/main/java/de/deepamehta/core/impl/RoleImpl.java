@@ -1,6 +1,6 @@
 package de.deepamehta.core.impl;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.model.RoleModel;
 
@@ -40,7 +40,7 @@ abstract class RoleImpl implements Role {
     }
 
     @Override
-    public DeepaMehtaObject getPlayer() {
+    public DMXObject getPlayer() {
         return model.getPlayer(assoc).instantiate();    // ### TODO: permission check?
     }
 

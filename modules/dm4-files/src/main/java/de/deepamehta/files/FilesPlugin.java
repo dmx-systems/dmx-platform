@@ -7,7 +7,7 @@ import de.deepamehta.config.ConfigService;
 import de.deepamehta.config.ConfigTarget;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -666,7 +666,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      *
      * @param   object  a File topic, a Folder topic, or a folder association (type "Aggregation").
      */
-    private void createWorkspaceAssignment(DeepaMehtaObject object, String repoPath) {
+    private void createWorkspaceAssignment(DMXObject object, String repoPath) {
         try {
             AccessControl ac = dm4.getAccessControl();
             long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDeepaMehtaWorkspaceId();

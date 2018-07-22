@@ -1,8 +1,8 @@
 package de.deepamehta.workspaces;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXObject;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.accesscontrol.SharingMode;
 
@@ -54,12 +54,12 @@ public interface WorkspacesService {
     /**
      * Assigns the given object to the given workspace.
      */
-    void assignToWorkspace(DeepaMehtaObject object, long workspaceId);
+    void assignToWorkspace(DMXObject object, long workspaceId);
 
     /**
      * Assigns the given type and all its view configuration topics to the given workspace.
      */
-    void assignTypeToWorkspace(DeepaMehtaType type, long workspaceId);
+    void assignTypeToWorkspace(DMXType type, long workspaceId);
 
     // ---
 

@@ -573,7 +573,7 @@ class TypeStorage {
 
     // Note: the sequence is fetched in 2 situations:
     // 1) When fetching a type's association definitions.
-    //    In this situation we don't have a DeepaMehtaType object at hand but a sole type topic.
+    //    In this situation we don't have a DMXType object at hand but a sole type topic.
     // 2) When deleting a sequence in order to rebuild it.
     private List<RelatedAssociationModelImpl> fetchSequence(TopicModel typeTopic) {
         try {

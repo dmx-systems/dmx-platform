@@ -2,8 +2,8 @@ package de.deepamehta.webclient;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXObject;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Role;
 import de.deepamehta.core.Topic;
@@ -122,7 +122,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @GET
     @Path("/object/{id}/related_topics")
     public List<RelatedTopic> getRelatedTopics(@PathParam("id") long objectId) {
-        DeepaMehtaObject object = dm4.getObject(objectId);
+        DMXObject object = dm4.getObject(objectId);
         List<RelatedTopic> relTopics = object.getRelatedTopics(null);   // assocTypeUri=null
         Iterator<RelatedTopic> i = relTopics.iterator();
         int removed = 0;
@@ -330,7 +330,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // ---
 
-    private void updateViewConfig(DeepaMehtaType type, Topic viewConfig) {
+    private void updateViewConfig(DMXType type, Topic viewConfig) {
         type.getModel().getViewConfig().updateConfigTopic(viewConfig.getModel());
     }
 
@@ -390,7 +390,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Misc ===
 
-    private boolean isDirectModelledChildTopic(DeepaMehtaObject parentObject, RelatedTopic childTopic) {
+    private boolean isDirectModelledChildTopic(DMXObject parentObject, RelatedTopic childTopic) {
         // association definition
         if (hasAssocDef(parentObject, childTopic)) {
             // role types
@@ -400,10 +400,10 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         return false;
     }
 
-    private boolean hasAssocDef(DeepaMehtaObject parentObject, RelatedTopic childTopic) {
+    private boolean hasAssocDef(DMXObject parentObject, RelatedTopic childTopic) {
         // Note: the user might have no explicit READ permission for the type.
-        // DeepaMehtaObject's getType() has *implicit* READ permission.
-        DeepaMehtaType parentType = parentObject.getType();
+        // DMXObject's getType() has *implicit* READ permission.
+        DMXType parentType = parentObject.getType();
         //
         String childTypeUri = childTopic.getTypeUri();
         String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();

@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -629,7 +629,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // === Generic Object ===
 
-    DeepaMehtaObject getObject(long id) {
+    DMXObject getObject(long id) {
         return checkReadAccessAndInstantiate(fetchObject(id));
     }
 

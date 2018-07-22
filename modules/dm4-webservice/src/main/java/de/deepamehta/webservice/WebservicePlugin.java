@@ -2,7 +2,7 @@ package de.deepamehta.webservice;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
@@ -460,7 +460,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private List<RelatedTopic> getRelatedTopics(DeepaMehtaObject object, String objectInfo, String assocTypeUri,
+    private List<RelatedTopic> getRelatedTopics(DMXObject object, String objectInfo, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
         String operation = "Fetching related topics of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
@@ -473,7 +473,7 @@ public class WebservicePlugin extends PluginActivator {
         }
     }
 
-    private List<RelatedAssociation> getRelatedAssociations(DeepaMehtaObject object, String objectInfo,
+    private List<RelatedAssociation> getRelatedAssociations(DMXObject object, String objectInfo,
                        String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri, String othersAssocTypeUri) {
         String operation = "Fetching related associations of " + objectInfo + " " + object.getId();
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +

@@ -1,7 +1,7 @@
 package de.deepamehta.accesscontrol.migrations;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Migration;
 
@@ -33,7 +33,7 @@ public class Migration2 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void migrateObject(DeepaMehtaObject object, String type) {
+    private void migrateObject(DMXObject object, String type) {
         try {
             count++;
             String info = "### Migrating " + type + " " + object.getId() + " (#" + count + ")";
@@ -50,7 +50,7 @@ public class Migration2 extends Migration {
         }
     }
 
-    private void renameProperty(DeepaMehtaObject object, String oldPropUri, String newPropUri, boolean addToIndex) {
+    private void renameProperty(DMXObject object, String oldPropUri, String newPropUri, boolean addToIndex) {
         String propValue = (String) object.getProperty(oldPropUri);
         object.setProperty(newPropUri, propValue, addToIndex);
         object.removeProperty(oldPropUri);

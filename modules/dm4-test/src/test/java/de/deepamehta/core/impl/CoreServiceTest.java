@@ -3,8 +3,8 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.ChildTopics;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXObject;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.RelatedAssociation;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -73,8 +73,8 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dm4.core.plugin_migration_nr", assocDef.getChildTypeUri());
         assertEquals("dm4.core.one",                 assocDef.getParentCardinalityUri());
         assertEquals("dm4.core.one",                 assocDef.getChildCardinalityUri());
-        DeepaMehtaObject t1 = assocDef.getPlayer("dm4.core.parent_type");
-        DeepaMehtaObject t2 = assocDef.getPlayer("dm4.core.child_type");
+        DMXObject t1 = assocDef.getPlayer("dm4.core.parent_type");
+        DMXObject t2 = assocDef.getPlayer("dm4.core.child_type");
         assertEquals("dm4.core.plugin",              t1.getUri());
         assertEquals("dm4.core.topic_type",          t1.getTypeUri());
         assertEquals("dm4.core.plugin_migration_nr", t2.getUri());
@@ -615,7 +615,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void assocDefSequence() {
-        DeepaMehtaType type = dm4.getTopicType("dm4.core.plugin");
+        DMXType type = dm4.getTopicType("dm4.core.plugin");
         //
         // find assoc def 1/3
         RelatedAssociation assocDef = type.getRelatedAssociation("dm4.core.aggregation", "dm4.core.type",

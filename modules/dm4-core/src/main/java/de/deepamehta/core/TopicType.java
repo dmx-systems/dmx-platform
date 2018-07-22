@@ -9,7 +9,7 @@ import de.deepamehta.core.model.TopicTypeModel;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface TopicType extends DeepaMehtaType {
+public interface TopicType extends DMXType {
 
     // === Updating ===
 

@@ -1,7 +1,7 @@
 package de.deepamehta.accesscontrol.migrations;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.service.Migration;
 
@@ -40,7 +40,7 @@ public class Migration6 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void migrateObject(DeepaMehtaObject object, String type) {
+    private void migrateObject(DMXObject object, String type) {
         try {
             objects++;
             if (object.hasProperty("dm4.accesscontrol.owner")) {

@@ -1,7 +1,7 @@
 package de.deepamehta.workspaces.migrations;
 
 import de.deepamehta.core.Association;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -73,7 +73,7 @@ public class Migration5 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void initWorkspaceProperty(DeepaMehtaObject object) {
+    private void initWorkspaceProperty(DMXObject object) {
         List<RelatedTopic> workspaces = object.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
             "dm4.core.child", "dm4.workspaces.workspace");
         objects++;
@@ -97,7 +97,7 @@ public class Migration5 extends Migration {
         }
     }
 
-    private boolean isUserAccountRelated(DeepaMehtaObject object) {
+    private boolean isUserAccountRelated(DMXObject object) {
         String typeUri = object.getTypeUri();
         return typeUri.equals("dm4.accesscontrol.user_account") ||
             typeUri.equals("dm4.accesscontrol.username") ||
@@ -106,7 +106,7 @@ public class Migration5 extends Migration {
 
     // ---
 
-    private String info(DeepaMehtaObject object) {
+    private String info(DMXObject object) {
         if (object instanceof Topic) {
             return "topic " + object.getId() + " (typeUri=\"" + object.getTypeUri() + "\", value=\"" +
                 object.getSimpleValue() + "\", uri=\"" + object.getUri() + "\")";

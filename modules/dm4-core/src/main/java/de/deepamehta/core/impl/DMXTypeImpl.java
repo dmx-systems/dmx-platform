@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.IndexMode;
@@ -13,11 +13,11 @@ import java.util.List;
 
 
 
-abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
+abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaTypeImpl(TypeModelImpl model, PersistenceLayer pl) {
+    DMXTypeImpl(TypeModelImpl model, PersistenceLayer pl) {
         super(model, pl);
     }
 
@@ -26,7 +26,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
 
 
     // *************************************
-    // *** DeepaMehtaType Implementation ***
+    // *** DMXType Implementation ***
     // *************************************
 
 
@@ -39,7 +39,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     }
 
     @Override
-    public final DeepaMehtaType setDataTypeUri(String dataTypeUri) {
+    public final DMXType setDataTypeUri(String dataTypeUri) {
         _getModel().updateDataTypeUri(dataTypeUri);     // TODO: should call _updateDataTypeUri()
         return this;
     }
@@ -54,7 +54,7 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     }
 
     @Override
-    public final DeepaMehtaType addIndexMode(IndexMode indexMode) {
+    public final DMXType addIndexMode(IndexMode indexMode) {
         _getModel()._addIndexMode(indexMode);
         return this;
     }
@@ -79,18 +79,18 @@ abstract class DeepaMehtaTypeImpl extends TopicImpl implements DeepaMehtaType {
     }
 
     @Override
-    public final DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef) {
+    public final DMXType addAssocDef(AssociationDefinitionModel assocDef) {
         return addAssocDefBefore(assocDef, null);   // beforeAssocDefUri=null
     }
 
     @Override
-    public final DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
+    public final DMXType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         _getModel()._addAssocDefBefore((AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
         return this;
     }
 
     @Override
-    public final DeepaMehtaType removeAssocDef(String assocDefUri) {
+    public final DMXType removeAssocDef(String assocDefUri) {
         _getModel()._removeAssocDef(assocDefUri);
         return this;
     }

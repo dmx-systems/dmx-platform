@@ -1,6 +1,6 @@
 package de.deepamehta.core;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.model.RoleModel;
 
 
@@ -11,7 +11,7 @@ public interface Role extends JSONEnabled {
 
     long getPlayerId();
 
-    DeepaMehtaObject getPlayer();
+    DMXObject getPlayer();
 
     // ---
 

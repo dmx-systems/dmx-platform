@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -298,7 +298,7 @@ public class CoreServiceImpl implements CoreService {
     // === Generic Object ===
 
     @Override
-    public DeepaMehtaObject getObject(long id) {
+    public DMXObject getObject(long id) {
         return pl.getObject(id);
     }
 
@@ -537,7 +537,7 @@ public class CoreServiceImpl implements CoreService {
             // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
             // the data type assigning association is created *before* the association type is fetched.
             // (see AssociationImpl.store(): storage.storeAssociation() is called before getType()
-            // in DeepaMehtaObjectImpl.store().)
+            // in DMXObjectImpl.store().)
             // ### FIXDOC: not true anymore
             //
             // Important is that associateDataType("dm4.core.aggregation") is the first call here.

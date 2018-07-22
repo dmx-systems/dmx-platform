@@ -1,6 +1,6 @@
 package de.deepamehta.core.util;
 
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Identifiable;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.Topic;
@@ -69,9 +69,9 @@ public class DeepaMehtaUtils {
         return ids;
     }
 
-    public static <M> List<M> toModelList(Iterable<? extends DeepaMehtaObject> objects) {
+    public static <M> List<M> toModelList(Iterable<? extends DMXObject> objects) {
         List<M> modelList = new ArrayList();
-        for (DeepaMehtaObject object : objects) {
+        for (DMXObject object : objects) {
             modelList.add((M) object.getModel());
         }
         return modelList;
@@ -90,8 +90,8 @@ public class DeepaMehtaUtils {
         return names.toString();
     }
 
-    public static <T extends DeepaMehtaObject> List<T> loadChildTopics(List<T> objects) {
-        for (DeepaMehtaObject object : objects) {
+    public static <T extends DMXObject> List<T> loadChildTopics(List<T> objects) {
+        for (DMXObject object : objects) {
             object.loadChildTopics();
         }
         return objects;

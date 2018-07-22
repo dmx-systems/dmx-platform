@@ -10,8 +10,8 @@ import de.deepamehta.topicmaps.TopicmapsService;
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXObject;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.osgi.PluginActivator;
@@ -181,7 +181,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     @Override
-    public void assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
+    public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             checkWorkspaceId(workspaceId);
             _assignToWorkspace(object, workspaceId);
@@ -191,7 +191,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     @Override
-    public void assignTypeToWorkspace(DeepaMehtaType type, long workspaceId) {
+    public void assignTypeToWorkspace(DMXType type, long workspaceId) {
         try {
             checkWorkspaceId(workspaceId);
             _assignToWorkspace(type, workspaceId);
@@ -426,7 +426,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Returns the ID of the DeepaMehta workspace or -1 to signal abortion of type introduction.
      */
-    private long workspaceIdForType(DeepaMehtaType type) {
+    private long workspaceIdForType(DMXType type) {
         return workspaceId() == -1 && isDeepaMehtaStandardType(type) ? getDeepaMehtaWorkspace().getId() : -1;
     }
 
@@ -436,7 +436,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dm4.getAccessControl().getAssignedWorkspaceId(objectId);
     }
 
-    private void _assignToWorkspace(DeepaMehtaObject object, long workspaceId) {
+    private void _assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
         facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
             mf.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
@@ -480,7 +480,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // --- Helper ---
 
-    private boolean isDeepaMehtaStandardType(DeepaMehtaType type) {
+    private boolean isDeepaMehtaStandardType(DMXType type) {
         return type.getUri().startsWith("dm4.");
     }
 
@@ -503,9 +503,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
     }
 
-    private void applyWorkspaceFilter(Iterator<? extends DeepaMehtaObject> objects, long workspaceId) {
+    private void applyWorkspaceFilter(Iterator<? extends DMXObject> objects, long workspaceId) {
         while (objects.hasNext()) {
-            DeepaMehtaObject object = objects.next();
+            DMXObject object = objects.next();
             if (getAssignedWorkspaceId(object.getId()) != workspaceId) {
                 objects.remove();
             }
@@ -528,7 +528,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
-    private boolean workspaceAssignmentIsSuppressed(DeepaMehtaObject object) {
+    private boolean workspaceAssignmentIsSuppressed(DMXObject object) {
         boolean suppressed = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
         if (suppressed) {
             logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
@@ -539,8 +539,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     // ### FIXME: copied from Access Control
-    // ### TODO: add shortInfo() to DeepaMehtaObject interface
-    private String info(DeepaMehtaObject object) {
+    // ### TODO: add shortInfo() to DMXObject interface
+    private String info(DMXObject object) {
         if (object instanceof TopicType) {
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof AssociationType) {

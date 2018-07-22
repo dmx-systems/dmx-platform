@@ -1,6 +1,6 @@
 package de.deepamehta.webclient.migrations;
 
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.TopicModel;
@@ -49,8 +49,8 @@ public class Migration3 extends Migration {
         */
     }
 
-    private void repair(List<? extends DeepaMehtaType> types, int i) {
-        for (DeepaMehtaType type : types) {
+    private void repair(List<? extends DMXType> types, int i) {
+        for (DMXType type : types) {
             // Note: no View Config can be associated to the type "View Configuration" itself as this would cause an
             // endless recursion while fetching that type. Fetching a type involves fetching its view config, that is
             // all its view config topics, including their child topics. Fetching child topics is driven by the topic's
@@ -63,7 +63,7 @@ public class Migration3 extends Migration {
         }
     }
 
-    private void repair(DeepaMehtaType type, int i) {
+    private void repair(DMXType type, int i) {
         try {
             ViewConfiguration viewConfig = type.getViewConfig();
             Topic configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
@@ -95,7 +95,7 @@ public class Migration3 extends Migration {
     }
 
     // Copied from WorkspacePlugin.java
-    private boolean isDeepaMehtaStandardType(DeepaMehtaType type) {
+    private boolean isDeepaMehtaStandardType(DMXType type) {
         return type.getUri().startsWith("dm4.");
     }
 }

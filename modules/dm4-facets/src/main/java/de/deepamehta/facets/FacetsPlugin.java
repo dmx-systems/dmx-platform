@@ -2,7 +2,7 @@ package de.deepamehta.facets;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.ChildTopicsModel;
@@ -58,7 +58,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public RelatedTopic getFacet(DeepaMehtaObject object, String facetTypeUri) {
+    public RelatedTopic getFacet(DMXObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
         return fetchChildTopic(object, getAssocDef(facetTypeUri));
     }
@@ -74,7 +74,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public List<RelatedTopic> getFacets(DeepaMehtaObject object, String facetTypeUri) {
+    public List<RelatedTopic> getFacets(DMXObject object, String facetTypeUri) {
         // ### TODO: integrity check: is the object an instance of that facet type?
         return fetchChildTopics(object, getAssocDef(facetTypeUri));
     }
@@ -137,7 +137,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     }
 
     @Override
-    public void updateFacet(DeepaMehtaObject object, String facetTypeUri, FacetValueModel value) {
+    public void updateFacet(DMXObject object, String facetTypeUri, FacetValueModel value) {
         AssociationDefinition assocDef = getAssocDef(facetTypeUri);
         if (!isMultiFacet(facetTypeUri)) {
             object.updateChildTopic(value.getTopic(), assocDef);
@@ -148,9 +148,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     // ---
 
-    // Note: there is a similar private method in DeepaMehtaObjectImpl:
+    // Note: there is a similar private method in DMXObjectImpl:
     // fetchChildTopic(AssociationDefinition assocDef, long childTopicId)
-    // ### TODO: Extend DeepaMehtaObject interface by hasChildTopic()?
+    // ### TODO: Extend DMXObject interface by hasChildTopic()?
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getAssocDef(facetTypeUri).getInstanceLevelAssocTypeUri();
@@ -166,11 +166,11 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns a child topic or <code>null</code> if no such topic extists.
      * <p>
-     * Note: There is a principal copy in DeepaMehtaObjectImpl but here the precondition is different:
+     * Note: There is a principal copy in DMXObjectImpl but here the precondition is different:
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private RelatedTopic fetchChildTopic(DeepaMehtaObject object, AssociationDefinition assocDef) {
+    private RelatedTopic fetchChildTopic(DMXObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopic(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri);
@@ -179,11 +179,11 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     /**
      * Fetches and returns child topics.
      * <p>
-     * Note: There is a principal copy in DeepaMehtaObjectImpl but here the precondition is different:
+     * Note: There is a principal copy in DMXObjectImpl but here the precondition is different:
      * The given association definition must not necessarily originate from the given object's type definition.
      * ### TODO: meanwhile we have the ValueStorage. Can we use its method instead?
      */
-    private List<RelatedTopic> fetchChildTopics(DeepaMehtaObject object, AssociationDefinition assocDef) {
+    private List<RelatedTopic> fetchChildTopics(DMXObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
         return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri);

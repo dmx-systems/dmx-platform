@@ -119,7 +119,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                          @QueryParam("include_childs") boolean includeChilds) {
         try {
             logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
-            // Note: a TopicmapViewmodel is not a DeepaMehtaObject. So the JerseyResponseFilter's automatic
+            // Note: a TopicmapViewmodel is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dm4.getTopic(topicmapId).loadChildTopics();
             Map<Long, TopicViewModel> topics = fetchTopics(topicmapTopic, includeChilds);

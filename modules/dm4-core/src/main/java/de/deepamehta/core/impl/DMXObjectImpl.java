@@ -1,8 +1,8 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.AssociationDefinition;
-import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaType;
+import de.deepamehta.core.DMXObject;
+import de.deepamehta.core.DMXType;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.DeepaMehtaObjectModel;
@@ -27,7 +27,7 @@ import java.util.List;
  *  - fetchXX()         Fetches value from DB.              ### FIXDOC
  *  - storeXX()         Stores current value (model) to DB. ### FIXDOC
  */
-abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
+abstract class DMXObjectImpl implements DMXObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -38,7 +38,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectImpl(DeepaMehtaObjectModelImpl model, PersistenceLayer pl) {
+    DMXObjectImpl(DeepaMehtaObjectModelImpl model, PersistenceLayer pl) {
         this.model = model;
         this.pl = pl;
         this.mf = pl.mf;
@@ -49,7 +49,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
 
     // ***************************************
-    // *** DeepaMehtaObject Implementation ***
+    // *** DMXObject Implementation ***
     // ***************************************
 
 
@@ -142,13 +142,13 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // ---
 
     @Override
-    public DeepaMehtaObject loadChildTopics() {
+    public DMXObject loadChildTopics() {
         model.loadChildTopics();
         return this;
     }
 
     @Override
-    public DeepaMehtaObject loadChildTopics(String assocDefUri) {
+    public DMXObject loadChildTopics(String assocDefUri) {
         model.loadChildTopics(assocDefUri);
         return this;
     }
@@ -156,7 +156,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
     // ---
 
     @Override
-    public final DeepaMehtaType getType() {
+    public final DMXType getType() {
         return model.getType().instantiate();
     }
 
@@ -280,7 +280,7 @@ abstract class DeepaMehtaObjectImpl implements DeepaMehtaObject {
 
     @Override
     public final boolean equals(Object o) {
-        return ((DeepaMehtaObjectImpl) o).model.equals(model);
+        return ((DMXObjectImpl) o).model.equals(model);
     }
 
     @Override

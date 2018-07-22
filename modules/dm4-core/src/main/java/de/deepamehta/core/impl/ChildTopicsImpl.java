@@ -321,7 +321,7 @@ class ChildTopicsImpl implements ChildTopics {
     // no dynamic dispatch. See the methodOverloading tests in JavaAPITest.java (in module dm4-test). ### still true?
 
     // Note 2: calling parent.update(..) would not work. The JVM would call the update() method of the base class
-    // (DeepaMehtaObjectImpl), not the subclass's update() method. This is related to Java's (missing) multiple
+    // (DMXObjectImpl), not the subclass's update() method. This is related to Java's (missing) multiple
     // dispatch. Note that 2 inheritance hierarchies are involved here: the DM object hierarchy and the DM model
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test). ### still true?
 

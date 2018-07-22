@@ -10,7 +10,7 @@ import java.util.List;
 
 
 
-public interface DeepaMehtaType extends Topic {
+public interface DMXType extends Topic {
 
 
 
@@ -18,7 +18,7 @@ public interface DeepaMehtaType extends Topic {
 
     String getDataTypeUri();
 
-    DeepaMehtaType setDataTypeUri(String dataTypeUri);
+    DMXType setDataTypeUri(String dataTypeUri);
 
 
 
@@ -26,7 +26,7 @@ public interface DeepaMehtaType extends Topic {
 
     List<IndexMode> getIndexModes();
 
-    DeepaMehtaType addIndexMode(IndexMode indexMode);
+    DMXType addIndexMode(IndexMode indexMode);
 
 
 
@@ -38,15 +38,15 @@ public interface DeepaMehtaType extends Topic {
 
     boolean hasAssocDef(String assocDefUri);
 
-    DeepaMehtaType addAssocDef(AssociationDefinitionModel assocDef);
+    DMXType addAssocDef(AssociationDefinitionModel assocDef);
 
     /**
      * @param   beforeAssocDefUri   the URI of the assoc def <i>before</i> the given assoc def is inserted.
      *                              If <code>null</code> the assoc def is appended at the end.
      */
-    DeepaMehtaType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
+    DMXType addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri);
 
-    DeepaMehtaType removeAssocDef(String assocDefUri);
+    DMXType removeAssocDef(String assocDefUri);
 
 
 

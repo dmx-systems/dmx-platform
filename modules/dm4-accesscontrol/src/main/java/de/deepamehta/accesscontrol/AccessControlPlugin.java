@@ -14,7 +14,7 @@ import de.deepamehta.workspaces.WorkspacesService;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.AssociationType;
-import de.deepamehta.core.DeepaMehtaObject;
+import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
@@ -833,7 +833,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * <p>
      * If no user is logged in, nothing is performed.
      */
-    private void setCreatorAndModifier(DeepaMehtaObject object) {
+    private void setCreatorAndModifier(DMXObject object) {
         try {
             String username = getUsername();
             // Note: when no user is logged in we do NOT fallback to the default user for the access control setup.
@@ -856,7 +856,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * @param   username    must not be null.
      */
-    private void setCreatorAndModifier(DeepaMehtaObject object, String username) {
+    private void setCreatorAndModifier(DMXObject object, String username) {
         setCreator(object, username);
         setModifier(object, username);
     }
@@ -866,7 +866,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     /**
      * Sets the creator of a topic or an association.
      */
-    private void setCreator(DeepaMehtaObject object, String username) {
+    private void setCreator(DMXObject object, String username) {
         try {
             object.setProperty(PROP_CREATOR, username, true);   // addToIndex=true
         } catch (Exception e) {
@@ -877,7 +877,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---
 
-    private void setModifier(DeepaMehtaObject object) {
+    private void setModifier(DMXObject object) {
         String username = getUsername();
         // Note: when a plugin topic is updated there is no user logged in yet.
         if (username == null) {
@@ -887,7 +887,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         setModifier(object, username);
     }
 
-    private void setModifier(DeepaMehtaObject object, String username) {
+    private void setModifier(DMXObject object, String username) {
         object.setProperty(PROP_MODIFIER, username, false);     // addToIndex=false
     }
 
@@ -979,7 +979,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // === Logging ===
 
-    private String info(DeepaMehtaObject object) {
+    private String info(DMXObject object) {
         if (object instanceof TopicType) {
             return "topic type \"" + object.getUri() + "\" (id=" + object.getId() + ")";
         } else if (object instanceof AssociationType) {
