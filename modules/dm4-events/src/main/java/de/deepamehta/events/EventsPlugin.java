@@ -7,7 +7,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.event.PreCreateAssociationListener;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 import de.deepamehta.time.TimeService;
 
 import javax.ws.rs.GET;
@@ -70,11 +70,11 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
         // Event <-> Person
-        DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.person",
+        DMXUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.person",
             "dm4.events.participant", "dm4.core.default", "dm4.core.default", dm4);
         //
         // Event -> Address
-        RoleModel[] roles = DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.address",
+        RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.address",
             "dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", dm4);
         if (roles != null) {
             long eventId = roles[0].getPlayerId();

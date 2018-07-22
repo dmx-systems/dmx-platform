@@ -427,7 +427,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns the ID of the DeepaMehta workspace or -1 to signal abortion of type introduction.
      */
     private long workspaceIdForType(DMXType type) {
-        return workspaceId() == -1 && isDeepaMehtaStandardType(type) ? getDeepaMehtaWorkspace().getId() : -1;
+        return workspaceId() == -1 && isDMXStandardType(type) ? getDMXWorkspace().getId() : -1;
     }
 
     // ---
@@ -480,7 +480,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // --- Helper ---
 
-    private boolean isDeepaMehtaStandardType(DMXType type) {
+    private boolean isDMXStandardType(DMXType type) {
         return type.getUri().startsWith("dm4.");
     }
 
@@ -499,7 +499,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     /**
      * Returns the DeepaMehta workspace or throws an exception if it doesn't exist.
      */
-    private Topic getDeepaMehtaWorkspace() {
+    private Topic getDMXWorkspace() {
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
     }
 

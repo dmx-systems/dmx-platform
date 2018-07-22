@@ -1,7 +1,7 @@
 package de.deepamehta.core.model.topicmaps;
 
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -23,7 +23,7 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
      * Note: invoked from JAX-RS message body reader (see Webservice's ObjectProvider.java).
      */
     public ViewProperties(JSONObject viewProps) {
-        DeepaMehtaUtils.toMap(viewProps, this.viewProps);
+        DMXUtils.toMap(viewProps, this.viewProps);
     }
 
     // ---

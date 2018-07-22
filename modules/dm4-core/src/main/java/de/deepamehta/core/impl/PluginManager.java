@@ -121,7 +121,7 @@ class PluginManager {
         int plugins = 0;
         int activated = 0;
         for (Bundle bundle : bundles) {
-            if (isDeepaMehtaPlugin(bundle)) {
+            if (isDMXPlugin(bundle)) {
                 plugins++;
                 if (_isPluginActivated(bundle.getSymbolicName())) {
                     activated++;
@@ -136,7 +136,7 @@ class PluginManager {
     /**
      * Plugin detection: checks if an arbitrary bundle is a DeepaMehta plugin.
      */
-    private boolean isDeepaMehtaPlugin(Bundle bundle) {
+    private boolean isDMXPlugin(Bundle bundle) {
         try {
             String activatorClassName = (String) bundle.getHeaders().get("Bundle-Activator");
             if (activatorClassName != null) {

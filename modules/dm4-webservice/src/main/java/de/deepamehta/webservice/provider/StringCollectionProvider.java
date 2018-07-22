@@ -1,7 +1,7 @@
 package de.deepamehta.webservice.provider;
 
 import de.deepamehta.core.util.JavaUtils;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 
@@ -59,7 +59,7 @@ public class StringCollectionProvider implements MessageBodyReader<List<String>>
                                                                 throws IOException, WebApplicationException {
         try {
             String json = JavaUtils.readText(entityStream);
-            return DeepaMehtaUtils.toList(new JSONArray(json));
+            return DMXUtils.toList(new JSONArray(json));
         } catch (Exception e) {
             throw new RuntimeException("Deserializing a List<String> object failed", e);
         }

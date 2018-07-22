@@ -1,7 +1,7 @@
 package de.deepamehta.files;
 
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -42,7 +42,7 @@ public class DirectoryListing implements JSONEnabled {
     public JSONObject toJSON() {
         try {
             return dirInfo.toJSON()
-                .put("items", DeepaMehtaUtils.toJSONArray(fileItems));
+                .put("items", DMXUtils.toJSONArray(fileItems));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

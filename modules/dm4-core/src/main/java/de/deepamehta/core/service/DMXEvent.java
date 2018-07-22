@@ -9,7 +9,7 @@ import java.util.Map;
  * Base class for all events.
  * That is core events as well as plugin events.
  */
-public abstract class DeepaMehtaEvent {
+public abstract class DMXEvent {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
@@ -17,7 +17,7 @@ public abstract class DeepaMehtaEvent {
      * A map of all known events (contains core events as well as plugin events).
      * Used to find the event that corresponds to a certain listener interface.
      */
-    private static Map<String, DeepaMehtaEvent> events = new HashMap();
+    private static Map<String, DMXEvent> events = new HashMap();
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -28,7 +28,7 @@ public abstract class DeepaMehtaEvent {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public DeepaMehtaEvent(Class listenerInterface) {
+    public DMXEvent(Class listenerInterface) {
         this.listenerInterface = listenerInterface;
         putEvent(this, listenerInterface);
     }
@@ -50,8 +50,8 @@ public abstract class DeepaMehtaEvent {
     /**
      * Returns the event that corresponds to the given listener interface.
      */
-    public static DeepaMehtaEvent getEvent(Class listenerInterface) {
-        DeepaMehtaEvent event = events.get(listenerInterface.getName());
+    public static DMXEvent getEvent(Class listenerInterface) {
+        DMXEvent event = events.get(listenerInterface.getName());
         //
         if (event == null) {
             throw new RuntimeException("The event object for listener " + listenerInterface + " is unknown");
@@ -62,7 +62,7 @@ public abstract class DeepaMehtaEvent {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void putEvent(DeepaMehtaEvent event, Class listenerInterface) {
+    private void putEvent(DMXEvent event, Class listenerInterface) {
         events.put(listenerInterface.getName(), event);
     }
 }

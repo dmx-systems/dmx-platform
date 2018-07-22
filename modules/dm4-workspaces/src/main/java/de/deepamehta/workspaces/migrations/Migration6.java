@@ -28,7 +28,7 @@ public class Migration6 extends Migration {
     @Inject
     private WorkspacesService wsService;
 
-    private long deepamehtaWorkspaceId;
+    private long dmxWorkspaceId;
 
     private long types = 0, standardTypes = 0, assocDefs = 0, configTopics = 0;
 
@@ -40,7 +40,7 @@ public class Migration6 extends Migration {
     public void run() {
         logger.info("########## Assigning standard association definitions (and their view config topics) to " +
             "DeepaMehta workspace");
-        deepamehtaWorkspaceId = getDeepaMehtaWorkspace().getId();
+        dmxWorkspaceId = getDMXWorkspace().getId();
         //
         for (TopicType topicType : dm4.getAllTopicTypes()) {
             assignWorkspace(topicType);
@@ -57,32 +57,32 @@ public class Migration6 extends Migration {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    void assignWorkspace(DMXType type) {
+    private void assignWorkspace(DMXType type) {
         types++;
-        if (isDeepaMehtaStandardType(type)) {
+        if (isDMXStandardType(type)) {
             standardTypes++;
             for (AssociationDefinition assocDef : type.getAssocDefs()) {
                 assocDefs++;
-                assignToDeepamehtaWorkspace(assocDef);
+                assignToDMXWorkspace(assocDef);
                 for (Topic configTopic : assocDef.getViewConfig().getConfigTopics()) {
                     configTopics++;
-                    assignToDeepamehtaWorkspace(configTopic);
+                    assignToDMXWorkspace(configTopic);
                 }
             }
         }
     }
 
-    void assignToDeepamehtaWorkspace(DMXObject object) {
-        wsService.assignToWorkspace(object, deepamehtaWorkspaceId);
+    private void assignToDMXWorkspace(DMXObject object) {
+        wsService.assignToWorkspace(object, dmxWorkspaceId);
     }
 
     // ### copy in WorkspacesPlugin.java
-    private Topic getDeepaMehtaWorkspace() {
+    private Topic getDMXWorkspace() {
         return wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
     }
 
     // ### copy in WorkspacesPlugin.java
-    private boolean isDeepaMehtaStandardType(DMXType type) {
+    private boolean isDMXStandardType(DMXType type) {
         return type.getUri().startsWith("dm4.");
     }
 }

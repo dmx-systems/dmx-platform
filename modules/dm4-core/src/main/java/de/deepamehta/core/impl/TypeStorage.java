@@ -12,7 +12,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import static java.util.Arrays.asList;
 import java.util.ArrayList;
@@ -292,7 +292,7 @@ class TypeStorage {
                 assocDefs.size() + " association definitions but in sequence are " + sequence.size());
         }
         //
-        return sortAssocDefs(assocDefs, DeepaMehtaUtils.idList(sequence));
+        return sortAssocDefs(assocDefs, DMXUtils.idList(sequence));
     }
 
     private Map<Long, AssociationDefinitionModel> fetchAssociationDefinitionsUnsorted(TopicModelImpl typeTopic) {

@@ -7,7 +7,7 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.osgi.PluginContext;
 import de.deepamehta.core.service.CoreService;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ModelFactory;
@@ -619,7 +619,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void registerListeners() {
         try {
-            List<DeepaMehtaEvent> events = getEvents();
+            List<DMXEvent> events = getEvents();
             //
             if (events.size() == 0) {
                 logger.info("Registering event listeners of " + this + " SKIPPED -- no event listeners implemented");
@@ -627,7 +627,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Registering " + events.size() + " event listeners of " + this);
-            for (DeepaMehtaEvent event : events) {
+            for (DMXEvent event : events) {
                 dm4.em.addListener(event, (EventListener) pluginContext);
             }
         } catch (Exception e) {
@@ -636,13 +636,13 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void unregisterListeners() {
-        List<DeepaMehtaEvent> events = getEvents();
+        List<DMXEvent> events = getEvents();
         if (events.size() == 0) {
             return;
         }
         //
         logger.info("Unregistering event listeners of " + this);
-        for (DeepaMehtaEvent event : events) {
+        for (DMXEvent event : events) {
             dm4.em.removeListener(event, (EventListener) pluginContext);
         }
     }
@@ -652,11 +652,11 @@ public class PluginImpl implements Plugin, EventHandler {
     /**
      * Returns the events this plugin is listening to.
      */
-    private List<DeepaMehtaEvent> getEvents() {
-        List<DeepaMehtaEvent> events = new ArrayList();
+    private List<DMXEvent> getEvents() {
+        List<DMXEvent> events = new ArrayList();
         for (Class interfaze : pluginContext.getClass().getInterfaces()) {
             if (isListenerInterface(interfaze)) {
-                DeepaMehtaEvent event = DeepaMehtaEvent.getEvent(interfaze);
+                DMXEvent event = DMXEvent.getEvent(interfaze);
                 logger.fine("### EventListener Interface: " + interfaze + ", event=" + event);
                 events.add(event);
             }
@@ -670,7 +670,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * <p>
      * Called internally to dispatch the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
-    private void dispatchEvent(DeepaMehtaEvent event, Object... params) {
+    private void dispatchEvent(DMXEvent event, Object... params) {
         dm4.em.dispatchEvent(this, event, params);
     }
 
@@ -883,7 +883,7 @@ public class PluginImpl implements Plugin, EventHandler {
         return dm4.pluginManager.isPluginActivated(pluginUri);
     }
 
-    // Note: PLUGIN_ACTIVATED is defined as an OSGi event and not as a DeepaMehtaEvent.
+    // Note: PLUGIN_ACTIVATED is defined as an OSGi event and not as a DMXEvent.
     // PLUGIN_ACTIVATED is not supposed to be listened by plugins.
     // It is a solely used internally (to track plugin availability).
 

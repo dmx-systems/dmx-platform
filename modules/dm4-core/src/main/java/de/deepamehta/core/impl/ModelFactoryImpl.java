@@ -23,7 +23,7 @@ import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;

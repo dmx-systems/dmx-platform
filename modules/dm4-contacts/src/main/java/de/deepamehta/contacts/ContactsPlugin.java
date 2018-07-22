@@ -4,7 +4,7 @@ import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.event.PreCreateAssociationListener;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -56,7 +56,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
         // Person <-> Institution
-        DeepaMehtaUtils.associationAutoTyping(assoc, "dm4.contacts.person", "dm4.contacts.institution",
+        DMXUtils.associationAutoTyping(assoc, "dm4.contacts.person", "dm4.contacts.institution",
             "dm4.contacts.organization_association", "dm4.core.default", "dm4.core.default", dm4);
     }
 }

@@ -24,9 +24,9 @@ import java.util.logging.Logger;
 
 
 
-public class DeepaMehtaUtils {
+public class DMXUtils {
 
-    private static final Logger logger = Logger.getLogger(DeepaMehtaUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(DMXUtils.class.getName());
 
     private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");  // ### TODO: default value (#734)
     static {
@@ -45,7 +45,7 @@ public class DeepaMehtaUtils {
      * Checks if an URL refers to this DeepaMehta installation.
      * The check relies on the "dm4.host.url" system property.
      */
-    public static boolean isDeepaMehtaURL(URL url) {
+    public static boolean isDMXURL(URL url) {
         try {
             return url.toString().startsWith(DM4_HOST_URL);
         } catch (Exception e) {

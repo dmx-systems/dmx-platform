@@ -11,7 +11,7 @@ import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -497,7 +497,7 @@ class ValueUpdater {
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
-        // logger.info("### candidates (" + candidates.size() + "): " + DeepaMehtaUtils.idList(candidates));
+        // logger.info("### candidates (" + candidates.size() + "): " + DMXUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
             UnifiedValue value = (UnifiedValue) childTopics.get(assocDefUri);
             eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
@@ -515,7 +515,7 @@ class ValueUpdater {
             return comp;
         default:
             throw new RuntimeException("ValueUpdater ambiguity: there are " + candidates.size() +
-                " parents (typeUri=\"" + type.uri + "\", " + DeepaMehtaUtils.idList(candidates) +
+                " parents (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(candidates) +
                 ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
         }
     }

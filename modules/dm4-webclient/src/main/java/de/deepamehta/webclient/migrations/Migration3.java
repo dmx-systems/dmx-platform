@@ -35,7 +35,7 @@ public class Migration3 extends Migration {
         // See also addDefaultViewConfig() in WebclientPlugin.java
         // ### TODO: rethink about this.
         /*
-        initDeepaMehtaWorkspaceId();
+        initDMXWorkspaceId();
         //
         logger.info("########## Repairing types with missing \"View Config\" topic (" +
             (deepaMehtaWorkspaceId == -1 ? "clean install" : "update") + " detected)");
@@ -77,7 +77,7 @@ public class Migration3 extends Migration {
                 // activated *after* the Webclient module.
                 // In case of a UPDATE the DeepaMehta workspace exists already and we make the assignment here.
                 // Type-introduction of the Workspaces module will not perform as this module is installed already.
-                if (deepaMehtaWorkspaceId != -1 && isDeepaMehtaStandardType(type)) {
+                if (deepaMehtaWorkspaceId != -1 && isDMXStandardType(type)) {
                     dm4.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);
                 }
                 //
@@ -89,13 +89,13 @@ public class Migration3 extends Migration {
         }
     }
 
-    private void initDeepaMehtaWorkspaceId() {
+    private void initDMXWorkspaceId() {
         Topic ws = dm4.getTopicByUri("dm4.workspaces.deepamehta");
         deepaMehtaWorkspaceId = ws != null ? ws.getId() : -1;
     }
 
     // Copied from WorkspacePlugin.java
-    private boolean isDeepaMehtaStandardType(DMXType type) {
+    private boolean isDMXStandardType(DMXType type) {
         return type.getUri().startsWith("dm4.");
     }
 }

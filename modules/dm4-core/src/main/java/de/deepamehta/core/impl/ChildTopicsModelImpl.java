@@ -6,7 +6,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -489,7 +489,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
                 if (value instanceof RelatedTopicModel) {
                     json.put(assocDefUri, ((RelatedTopicModel) value).toJSON());
                 } else if (value instanceof List) {
-                    json.put(assocDefUri, DeepaMehtaUtils.toJSONArray((List<RelatedTopicModel>) value));
+                    json.put(assocDefUri, DMXUtils.toJSONArray((List<RelatedTopicModel>) value));
                 } else {
                     throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
                 }

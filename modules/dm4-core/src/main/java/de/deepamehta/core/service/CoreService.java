@@ -250,9 +250,9 @@ public interface CoreService {
 
     // === Events ===
 
-    void fireEvent(DeepaMehtaEvent event, Object... params);
+    void fireEvent(DMXEvent event, Object... params);
 
-    void dispatchEvent(String pluginUri, DeepaMehtaEvent event, Object... params);
+    void dispatchEvent(String pluginUri, DMXEvent event, Object... params);
 
 
 

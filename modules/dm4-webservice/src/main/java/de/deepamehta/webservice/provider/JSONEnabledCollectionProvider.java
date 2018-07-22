@@ -1,7 +1,7 @@
 package de.deepamehta.webservice.provider;
 
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class JSONEnabledCollectionProvider implements MessageBodyWriter<Collecti
                         throws IOException, WebApplicationException {
         try {
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(entityStream));
-            DeepaMehtaUtils.toJSONArray(objects).write(writer);
+            DMXUtils.toJSONArray(objects).write(writer);
             writer.flush();
         } catch (Exception e) {
             throw new RuntimeException("Writing message body failed (" + objects.size() + " objects)", e);

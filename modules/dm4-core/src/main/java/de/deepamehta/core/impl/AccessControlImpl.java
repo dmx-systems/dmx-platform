@@ -288,7 +288,7 @@ class AccessControlImpl implements AccessControl {
     // ---
 
     @Override
-    public long getDeepaMehtaWorkspaceId() {
+    public long getDMXWorkspaceId() {
         return getWorkspace(DEEPAMEHTA_WORKSPACE_URI).getId();
     }
 

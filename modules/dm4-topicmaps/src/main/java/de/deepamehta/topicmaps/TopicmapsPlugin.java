@@ -16,7 +16,7 @@ import de.deepamehta.core.model.topicmaps.TopicViewModel;
 import de.deepamehta.core.model.topicmaps.ViewProperties;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 import de.deepamehta.core.util.IdList;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -430,7 +430,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
             "dm4.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
         if (includeChilds) {
-            DeepaMehtaUtils.loadChildTopics(relTopics);
+            DMXUtils.loadChildTopics(relTopics);
         }
         for (RelatedTopic topic : relTopics) {
             topics.put(topic.getId(), createTopicViewModel(topic));

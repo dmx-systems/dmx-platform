@@ -1,7 +1,7 @@
 package de.deepamehta.core.service;
 
 import de.deepamehta.core.JSONEnabled;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -42,7 +42,7 @@ public class Directives implements Iterable<Directives.Entry> {
     }
 
     public JSONArray toJSONArray() {
-        return DeepaMehtaUtils.toJSONArray(directives);
+        return DMXUtils.toJSONArray(directives);
     }
 
     // ---

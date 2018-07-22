@@ -13,7 +13,7 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicDeletionModel;
 import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.Directive;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.util.JavaUtils;
@@ -241,7 +241,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // === Abstract Methods ===
 
     // ### TODO: make this a real abstract class.
-    // Change the model factory in a way it never instantiates DeepaMehtaObjectModels.
+    // Change the model factory in a way it never instantiates DMXObjectModels.
 
     String className() {
         throw new UnsupportedOperationException();
@@ -341,19 +341,19 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // ---
 
-    DeepaMehtaEvent getPreUpdateEvent() {
+    DMXEvent getPreUpdateEvent() {
         throw new UnsupportedOperationException();
     }
 
-    DeepaMehtaEvent getPostUpdateEvent() {
+    DMXEvent getPostUpdateEvent() {
         throw new UnsupportedOperationException();
     }
 
-    DeepaMehtaEvent getPreDeleteEvent() {
+    DMXEvent getPreDeleteEvent() {
         throw new UnsupportedOperationException();
     }
 
-    DeepaMehtaEvent getPostDeleteEvent() {
+    DMXEvent getPostDeleteEvent() {
         throw new UnsupportedOperationException();
     }
 

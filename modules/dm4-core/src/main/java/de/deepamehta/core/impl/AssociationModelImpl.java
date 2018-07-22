@@ -7,7 +7,7 @@ import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.Directive;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -264,22 +264,22 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     // ---
 
     @Override
-    final DeepaMehtaEvent getPreUpdateEvent() {
+    final DMXEvent getPreUpdateEvent() {
         return CoreEvent.PRE_UPDATE_ASSOCIATION;
     }
 
     @Override
-    final DeepaMehtaEvent getPostUpdateEvent() {
+    final DMXEvent getPostUpdateEvent() {
         return CoreEvent.POST_UPDATE_ASSOCIATION;
     }
 
     @Override
-    final DeepaMehtaEvent getPreDeleteEvent() {
+    final DMXEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_ASSOCIATION;
     }
 
     @Override
-    final DeepaMehtaEvent getPostDeleteEvent() {
+    final DMXEvent getPostDeleteEvent() {
         return CoreEvent.POST_DELETE_ASSOCIATION;
     }
 
@@ -375,7 +375,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
         // ### FIXME: the duplicate check is supported only for topic players, and if they are identified by-ID.
         // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
-        // Compare to DeepaMehtaUtils.associationAutoTyping()
+        // Compare to DMXUtils.associationAutoTyping()
         if (!(roleModel1 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel1).topicIdentifiedByUri() ||
             !(roleModel2 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel2).topicIdentifiedByUri()) {
             return;

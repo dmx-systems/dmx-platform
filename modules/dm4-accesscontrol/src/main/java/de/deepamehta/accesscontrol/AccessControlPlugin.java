@@ -21,7 +21,7 @@ import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.osgi.PluginActivator;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
@@ -121,7 +121,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String PROP_MODIFIER = "dm4.accesscontrol.modifier";
 
     // Events
-    private static DeepaMehtaEvent POST_LOGIN_USER = new DeepaMehtaEvent(PostLoginUserListener.class) {
+    private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUserListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostLoginUserListener) listener).postLoginUser(
@@ -129,7 +129,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             );
         }
     };
-    private static DeepaMehtaEvent POST_LOGOUT_USER = new DeepaMehtaEvent(PostLogoutUserListener.class) {
+    private static DMXEvent POST_LOGOUT_USER = new DMXEvent(PostLogoutUserListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((PostLogoutUserListener) listener).postLogoutUser(

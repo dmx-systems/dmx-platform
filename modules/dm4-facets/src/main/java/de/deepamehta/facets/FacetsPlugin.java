@@ -10,7 +10,7 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.facets.FacetValueModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Transactional;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -99,7 +99,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
                 } else {
                     List<RelatedTopic> values = getFacets(topic, facetTypeUri);
                     // Note: without the type witness the generic put() method (which takes an Object) would be called
-                    childTopics.put(childTypeUri, DeepaMehtaUtils.<RelatedTopicModel>toModelList(values));
+                    childTopics.put(childTypeUri, DMXUtils.<RelatedTopicModel>toModelList(values));
                 }
             }
             return topic;

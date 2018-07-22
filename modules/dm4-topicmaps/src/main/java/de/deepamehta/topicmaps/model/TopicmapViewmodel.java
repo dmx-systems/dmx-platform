@@ -4,7 +4,7 @@ import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.topicmaps.AssociationViewModel;
 import de.deepamehta.core.model.topicmaps.TopicViewModel;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -73,8 +73,8 @@ public class TopicmapViewmodel implements JSONEnabled {
         try {
             return new JSONObject()
                 .put("info", topicmapTopic.toJSON())
-                .put("topics", DeepaMehtaUtils.toJSONArray(topics.values()))
-                .put("assocs", DeepaMehtaUtils.toJSONArray(assocs.values()));
+                .put("topics", DMXUtils.toJSONArray(topics.values()))
+                .put("assocs", DMXUtils.toJSONArray(assocs.values()));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

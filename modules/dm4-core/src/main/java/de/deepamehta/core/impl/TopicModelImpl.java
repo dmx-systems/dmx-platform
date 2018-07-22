@@ -8,7 +8,7 @@ import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.model.TypeModel;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.Directive;
 
 import java.util.List;
@@ -154,22 +154,22 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     // ---
 
     @Override
-    final DeepaMehtaEvent getPreUpdateEvent() {
+    final DMXEvent getPreUpdateEvent() {
         return CoreEvent.PRE_UPDATE_TOPIC;
     }
 
     @Override
-    final DeepaMehtaEvent getPostUpdateEvent() {
+    final DMXEvent getPostUpdateEvent() {
         return CoreEvent.POST_UPDATE_TOPIC;
     }
 
     @Override
-    final DeepaMehtaEvent getPreDeleteEvent() {
+    final DMXEvent getPreDeleteEvent() {
         return CoreEvent.PRE_DELETE_TOPIC;
     }
 
     @Override
-    final DeepaMehtaEvent getPostDeleteEvent() {
+    final DMXEvent getPostDeleteEvent() {
         return CoreEvent.POST_DELETE_TOPIC;
     }
 

@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.osgi.PluginContext;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 
@@ -33,7 +33,7 @@ class EventManager {
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
-    void addListener(DeepaMehtaEvent event, EventListener listener) {
+    void addListener(DMXEvent event, EventListener listener) {
         List<EventListener> listeners = getListeners(event);
         if (listeners == null) {
             listeners = new ArrayList();
@@ -42,7 +42,7 @@ class EventManager {
         listeners.add(listener);
     }
 
-    void removeListener(DeepaMehtaEvent event, EventListener listener) {
+    void removeListener(DMXEvent event, EventListener listener) {
         List<EventListener> listeners = getListeners(event);
         if (!listeners.remove(listener)) {
             throw new RuntimeException("Removing " + listener + " from " +
@@ -52,7 +52,7 @@ class EventManager {
 
     // ---
 
-    void fireEvent(DeepaMehtaEvent event, Object... params) {
+    void fireEvent(DMXEvent event, Object... params) {
         List<EventListener> listeners = getListeners(event);
         if (listeners != null) {
             for (EventListener listener : listeners) {
@@ -67,7 +67,7 @@ class EventManager {
      * Delivers an event to a particular plugin.
      * If the plugin is not a listener for that event nothing is performed.
      */
-    void dispatchEvent(PluginImpl plugin, DeepaMehtaEvent event, Object... params) {
+    void dispatchEvent(PluginImpl plugin, DMXEvent event, Object... params) {
         PluginContext pluginContext = plugin.getContext();
         if (!isListener(pluginContext, event)) {
             return;
@@ -78,7 +78,7 @@ class EventManager {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private void dispatchEvent(EventListener listener, DeepaMehtaEvent event, Object... params) {
+    private void dispatchEvent(EventListener listener, DMXEvent event, Object... params) {
         try {
             event.dispatch(listener, params);
         } catch (WebApplicationException e) {
@@ -103,17 +103,17 @@ class EventManager {
     /**
      * Returns true if the given plugin is a listener for the given event.
      */
-    private boolean isListener(PluginContext pluginContext, DeepaMehtaEvent event) {
+    private boolean isListener(PluginContext pluginContext, DMXEvent event) {
         return event.getListenerInterface().isAssignableFrom(pluginContext.getClass());
     }
 
     // ---
 
-    private List<EventListener> getListeners(DeepaMehtaEvent event) {
+    private List<EventListener> getListeners(DMXEvent event) {
         return listenerRegistry.get(event.getClass().getName());
     }
 
-    private void putListeners(DeepaMehtaEvent event, List<EventListener> listeners) {
+    private void putListeners(DMXEvent event, List<EventListener> listeners) {
         listenerRegistry.put(event.getClass().getName(), listeners);
     }
 }

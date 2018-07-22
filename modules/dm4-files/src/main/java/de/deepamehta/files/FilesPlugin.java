@@ -16,14 +16,14 @@ import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Cookies;
-import de.deepamehta.core.service.DeepaMehtaEvent;
+import de.deepamehta.core.service.DMXEvent;
 import de.deepamehta.core.service.EventListener;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.event.StaticResourceFilterListener;
-import de.deepamehta.core.util.DeepaMehtaUtils;
+import de.deepamehta.core.util.DMXUtils;
 import de.deepamehta.core.util.JavaUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -71,7 +71,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private static final Pattern PER_WORKSPACE_PATH_PATTERN = Pattern.compile(WORKSPACE_DIRECTORY_PREFIX + "(\\d+).*");
 
     // Events
-    public static DeepaMehtaEvent CHECK_DISK_QUOTA = new DeepaMehtaEvent(CheckDiskQuotaListener.class) {
+    public static DMXEvent CHECK_DISK_QUOTA = new DMXEvent(CheckDiskQuotaListener.class) {
         @Override
         public void dispatch(EventListener listener, Object... params) {
             ((CheckDiskQuotaListener) listener).checkDiskQuota(
@@ -306,7 +306,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     public String getRepositoryPath(URL url) {
         String operation = "Checking for file repository URL (\"" + url + "\")";
         try {
-            if (!DeepaMehtaUtils.isDeepaMehtaURL(url)) {
+            if (!DMXUtils.isDMXURL(url)) {
                 logger.info(operation + " => null");
                 return null;
             }
@@ -669,7 +669,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private void createWorkspaceAssignment(DMXObject object, String repoPath) {
         try {
             AccessControl ac = dm4.getAccessControl();
-            long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDeepaMehtaWorkspaceId();
+            long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDMXWorkspaceId();
             ac.assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
             throw new RuntimeException("Creating workspace assignment for File/Folder topic or folder association " +
