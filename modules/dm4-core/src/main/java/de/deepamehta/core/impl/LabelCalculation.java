@@ -20,7 +20,7 @@ class LabelCalculation {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModelImpl comp;
+    private DMXObjectModelImpl comp;
     private List<String> labelAssocDefUris;
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -34,7 +34,7 @@ class LabelCalculation {
      *
      * @param   comp    A composite.
      */
-    LabelCalculation(DeepaMehtaObjectModelImpl comp) {
+    LabelCalculation(DMXObjectModelImpl comp) {
         this.comp = comp;
         this.labelAssocDefUris = comp.getType().getLabelAssocDefUris();
     }

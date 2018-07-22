@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.TopicRoleModel;
@@ -21,7 +21,7 @@ import java.util.List;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements AssociationModel {
+class AssociationModelImpl extends DMXObjectModelImpl implements AssociationModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -30,7 +30,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    AssociationModelImpl(DeepaMehtaObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
+    AssociationModelImpl(DMXObjectModelImpl object, RoleModelImpl roleModel1, RoleModelImpl roleModel2) {
         super(object);
         this.roleModel1 = roleModel1;
         this.roleModel2 = roleModel2;
@@ -305,7 +305,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
     }
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+    void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
         // update association specific parts: the 2 roles
         updateRoles((AssociationModel) updateModel);
         //
@@ -345,7 +345,7 @@ class AssociationModelImpl extends DeepaMehtaObjectModelImpl implements Associat
      *          <p>
      *          If there are 2 such players an exception is thrown.
      */
-    DeepaMehtaObjectModelImpl getPlayer(String roleTypeUri) {
+    DMXObjectModelImpl getPlayer(String roleTypeUri) {
         RoleModelImpl role = getRoleModel(roleTypeUri);
         return role != null ? role.getPlayer(this) : null;
     }

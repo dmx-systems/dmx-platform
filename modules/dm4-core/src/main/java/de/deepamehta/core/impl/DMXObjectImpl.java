@@ -5,7 +5,7 @@ import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.DMXType;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 
@@ -31,14 +31,14 @@ abstract class DMXObjectImpl implements DMXObject {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    DeepaMehtaObjectModelImpl model;    // underlying model
+    DMXObjectModelImpl model;    // underlying model
 
     PersistenceLayer pl;
     ModelFactoryImpl mf;
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DMXObjectImpl(DeepaMehtaObjectModelImpl model, PersistenceLayer pl) {
+    DMXObjectImpl(DMXObjectModelImpl model, PersistenceLayer pl) {
         this.model = model;
         this.pl = pl;
         this.mf = pl.mf;
@@ -161,7 +161,7 @@ abstract class DMXObjectImpl implements DMXObject {
     }
 
     @Override
-    public DeepaMehtaObjectModelImpl getModel() {
+    public DMXObjectModelImpl getModel() {
         return model;
     }
 

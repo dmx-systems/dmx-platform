@@ -4,7 +4,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicDeletionModel;
@@ -29,8 +29,8 @@ class ValueUpdater {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DeepaMehtaObjectModelImpl updateModel;
-    private DeepaMehtaObjectModelImpl targetObject;    // may null
+    private DMXObjectModelImpl updateModel;
+    private DMXObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
     private boolean isAssoc;
     private boolean isType;
@@ -60,7 +60,7 @@ class ValueUpdater {
      *
      * @return  the unified value; never null; its "value" field is null if there was nothing to update.
      */
-    <M extends DeepaMehtaObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
+    <M extends DMXObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
         // Note: updateModel must be initialized *before* processing refs.
         // UnifiedValue constructor operates on updateModel.
         this.updateModel = updateModel;
@@ -84,7 +84,7 @@ class ValueUpdater {
         this.type = updateModel.getType();
         //
         // update value
-        DeepaMehtaObjectModelImpl _value = updateModel.isSimple() ? updateSimple() : updateComposite();
+        DMXObjectModelImpl _value = updateModel.isSimple() ? updateSimple() : updateComposite();
         //
         // Note: UnifiedValue instantiation saves the update model's ID *before* it is overwritten
         UnifiedValue value = new UnifiedValue(_value);
@@ -106,7 +106,7 @@ class ValueUpdater {
     private UnifiedValue unifyRef() {
         TopicReferenceModelImpl ref = (TopicReferenceModelImpl) updateModel;
         if (!ref.isEmptyRef()) {
-            DeepaMehtaObjectModelImpl object = ref.resolve();
+            DMXObjectModelImpl object = ref.resolve();
             logger.info("Referencing " + object);
             return new UnifiedValue(object);
         } else {
@@ -124,7 +124,7 @@ class ValueUpdater {
      * @return  the unified value, or null if there was nothing to update.
      *          The latter is the case if this.updateModel is the empty string.
      */
-    private DeepaMehtaObjectModelImpl updateSimple() {
+    private DMXObjectModelImpl updateSimple() {
         if (isAssoc || isType) {
             // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
             // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
@@ -142,7 +142,7 @@ class ValueUpdater {
      * Preconditions:
      *   - this.updateModel is an assoc model.
      */
-    private DeepaMehtaObjectModelImpl storeAssocSimpleValue() {
+    private DMXObjectModelImpl storeAssocSimpleValue() {
         if (targetObject != null) {
             // update
             targetObject._updateSimpleValue(updateModel.getSimpleValue());
@@ -186,7 +186,7 @@ class ValueUpdater {
      *
      * @return  the unified value, or null if there was nothing to update.
      */
-    private DeepaMehtaObjectModelImpl updateComposite() {
+    private DMXObjectModelImpl updateComposite() {
         try {
             Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
             ChildTopicsModel _childTopics = updateModel.getChildTopicsModel();
@@ -212,7 +212,7 @@ class ValueUpdater {
                     childTopics.put(assocDefUri, childTopic);
                 }
             }
-            DeepaMehtaObjectModelImpl value = unifyComposite(childTopics);
+            DMXObjectModelImpl value = unifyComposite(childTopics);
             //
             // label calculation
             if (value != null) {
@@ -254,7 +254,7 @@ class ValueUpdater {
      *
      * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
-    private DeepaMehtaObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
+    private DMXObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
         if (isValueType()) {
             return !childTopics.isEmpty() ? unifyChildTopics(childTopics, type) : null;
         } else {
@@ -265,7 +265,7 @@ class ValueUpdater {
     /**
      * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
-    private DeepaMehtaObjectModelImpl identifyParent(Map<String, Object> childTopics) {
+    private DMXObjectModelImpl identifyParent(Map<String, Object> childTopics) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
@@ -279,7 +279,7 @@ class ValueUpdater {
             if (identityAssocDefUris.size() > 0) {
                 return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris), identityAssocDefUris);
             } else {
-                DeepaMehtaObjectModelImpl parent = createSimpleTopic();
+                DMXObjectModelImpl parent = createSimpleTopic();
                 logger.info("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
                     "\")");
                 return parent;
@@ -326,7 +326,7 @@ class ValueUpdater {
      *
      * @param   unifiedChilds     value: UnifiedValue or List<UnifiedValue>
      */
-    private DeepaMehtaObjectModelImpl updateAssignments(DeepaMehtaObjectModelImpl parent,
+    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent,
                                                         Map<String, Object> unifiedChilds) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
@@ -354,7 +354,7 @@ class ValueUpdater {
     /**
      * @param   unifiedChild    may be null
      */
-    private void updateAssignmentsOne(DeepaMehtaObjectModelImpl parent, TopicModel unifiedChild, String assocDefUri) {
+    private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel unifiedChild, String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
         boolean newValueIsEmpty = isEmptyValue(assocDefUri);
@@ -402,7 +402,7 @@ class ValueUpdater {
     /**
      * @param   unifiedChilds   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DeepaMehtaObjectModelImpl parent, List<UnifiedValue> unifiedChilds,
+    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> unifiedChilds,
                                                                          String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
@@ -495,7 +495,7 @@ class ValueUpdater {
      *
      * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
-    private DeepaMehtaObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
+    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
         // logger.info("### candidates (" + candidates.size() + "): " + DeepaMehtaUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
@@ -510,7 +510,7 @@ class ValueUpdater {
             // logger.info("### no composite found, childTopics=" + childTopics);
             return createCompositeTopic(childTopics);
         case 1:
-            DeepaMehtaObjectModelImpl comp = candidates.get(0);
+            DMXObjectModelImpl comp = candidates.get(0);
             logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
@@ -537,7 +537,7 @@ class ValueUpdater {
             throw new RuntimeException("Type mismatch");
         }
         //
-        DeepaMehtaObjectModel childTopic;
+        DMXObjectModel childTopic;
         if (isOne(assocDefUri)) {
             childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
         } else {
@@ -550,7 +550,7 @@ class ValueUpdater {
     /**
      * @param   childTopic      may be null
      */
-    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, DeepaMehtaObjectModel childTopic,
+    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, DMXObjectModel childTopic,
                                                                                    String assocDefUri) {
         AssociationDefinitionModel assocDef = assocDef(assocDefUri);
         Iterator<RelatedTopicModelImpl> i = candidates.iterator();
@@ -601,7 +601,7 @@ class ValueUpdater {
         logger.info("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childTopics.keySet()) {
             if (isOne(assocDefUri)) {
-                DeepaMehtaObjectModel childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
+                DMXObjectModel childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
                 createChildAssociation(topic, childTopic, assocDefUri);
             } else {
                 for (UnifiedValue value : (List<UnifiedValue>) childTopics.get(assocDefUri)) {
@@ -612,12 +612,12 @@ class ValueUpdater {
         return topic;
     }
 
-    private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, DeepaMehtaObjectModel child,
+    private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
                                                                                       String assocDefUri) {
         return createChildAssociation(parent, child, assocDefUri, false);
     }
 
-    private AssociationModelImpl createChildAssociation(DeepaMehtaObjectModel parent, DeepaMehtaObjectModel child,
+    private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
                                                                                   String assocDefUri, boolean deleted) {
         logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
             assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
@@ -671,10 +671,10 @@ class ValueUpdater {
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    class UnifiedValue<M extends DeepaMehtaObjectModelImpl> {
+    class UnifiedValue<M extends DMXObjectModelImpl> {
 
         M value;                                   // the resulting unified value
-        DeepaMehtaObjectModelImpl _updateModel;    // the original update model
+        DMXObjectModelImpl _updateModel;    // the original update model
         long originalId;                           // the original ID, saved here cause it is overwritten (see update())
 
         /**

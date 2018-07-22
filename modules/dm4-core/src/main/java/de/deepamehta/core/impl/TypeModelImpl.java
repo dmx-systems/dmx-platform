@@ -3,7 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.JSONEnabled;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -232,7 +232,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         throw new UnsupportedOperationException();
     }
 
-    List<? extends DeepaMehtaObjectModelImpl> getAllInstances() {
+    List<? extends DMXObjectModelImpl> getAllInstances() {
         throw new UnsupportedOperationException();
     }
 
@@ -251,7 +251,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // === Core Internal Hooks ===
 
     @Override
-    void preUpdate(DeepaMehtaObjectModel updateModel) {
+    void preUpdate(DMXObjectModel updateModel) {
         // ### TODO: is it sufficient if we rehash (remove + add) at post-time?
         if (uriChange(updateModel.getUri(), uri)) {
             removeFromTypeCache();
@@ -259,7 +259,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
-    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+    void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
         if (uriChange(updateModel.getUri(), oldObject.getUri())) {
             putInTypeCache();
         }
@@ -267,7 +267,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         updateType((TypeModelImpl) updateModel);
         //
         // Note: the UPDATE_TOPIC_TYPE/UPDATE_ASSOCIATION_TYPE directive must be added *before* a possible UPDATE_TOPIC
-        // directive (added by DeepaMehtaObjectModelImpl.update()). In case of a changed type URI the webclient's type
+        // directive (added by DMXObjectModelImpl.update()). In case of a changed type URI the webclient's type
         // cache must be updated *before* the TopicTypeRenderer/AssociationTypeRenderer can render the type.
         addUpdateTypeDirective();
     }
@@ -284,7 +284,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         // 2) delete all assoc defs
         //
         // Note 1: we use the preDelete() hook to delete the assoc defs *before* they would get deleted by the generic
-        // deletion logic (see "delete direct associations" in DeepaMehtaObjectModelImpl.delete()). The generic deletion
+        // deletion logic (see "delete direct associations" in DMXObjectModelImpl.delete()). The generic deletion
         // logic deletes the direct associations in an *arbitrary* order. The "Sequence Start" association might get
         // deleted *before* any other assoc def. When subsequently deleting an assoc def the sequence can't be rebuild
         // as it is corrupted.
@@ -557,7 +557,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     private void indexAllInstances(IndexMode indexMode) {
-        List<? extends DeepaMehtaObjectModelImpl> objects = getAllInstances();
+        List<? extends DMXObjectModelImpl> objects = getAllInstances();
         //
         String str = "\"" + value + "\" (" + uri + ") instances";
         if (indexModes.size() > 0) {
@@ -570,7 +570,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             logger.info("### Indexing " + str + " SKIPPED -- no index mode set");
         }
         //
-        for (DeepaMehtaObjectModelImpl obj : objects) {
+        for (DMXObjectModelImpl obj : objects) {
             obj.indexSimpleValue(indexMode);
         }
     }

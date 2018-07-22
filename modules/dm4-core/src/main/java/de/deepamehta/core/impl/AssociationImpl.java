@@ -91,7 +91,7 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
     @Override
     public final RelatedObject getPlayer(String roleTypeUri) {
-        DeepaMehtaObjectModelImpl object = getModel().getPlayer(roleTypeUri);
+        DMXObjectModelImpl object = getModel().getPlayer(roleTypeUri);
         return object != null ? (RelatedObject) object.instantiate() : null;    // ### TODO: permission check?
     }
 

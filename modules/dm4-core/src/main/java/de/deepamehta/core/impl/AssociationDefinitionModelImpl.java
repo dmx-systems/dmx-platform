@@ -2,7 +2,7 @@ package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.ViewConfigurationModel;
@@ -175,7 +175,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      *                b) updateModel might contain refs and deletion-refs; this model never contains refs
      */
     @Override
-    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+    void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
         super.postUpdate(updateModel, oldObject);
         //
         updateCardinality((AssociationDefinitionModel) updateModel);

@@ -1,7 +1,7 @@
 package de.deepamehta.core;
 
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 
@@ -65,7 +65,7 @@ public interface DMXObject extends Identifiable, JSONEnabled {
      */
     DMXType getType();
 
-    DeepaMehtaObjectModel getModel();
+    DMXObjectModel getModel();
 
 
 

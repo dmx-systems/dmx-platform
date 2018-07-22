@@ -15,11 +15,11 @@ import java.util.List;
 
 
 
-class TopicModelImpl extends DeepaMehtaObjectModelImpl implements TopicModel {
+class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicModelImpl(DeepaMehtaObjectModelImpl object) {
+    TopicModelImpl(DMXObjectModelImpl object) {
         super(object);
     }
 

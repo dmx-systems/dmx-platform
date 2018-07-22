@@ -7,7 +7,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -407,7 +407,7 @@ public final class PersistenceLayer extends StorageDecorator {
             // Note: fetchAssociation() might throw IllegalStateException and is no problem.
             // This happens when the association is deleted already. In this case nothing needs to be performed.
             //
-            // Compare to DeepaMehtaObjectModelImpl.delete()
+            // Compare to DMXObjectModelImpl.delete()
             // TODO: introduce storage-vendor neutral DM exception.
             if (e.getMessage().equals("Node[" + assocId + "] has been deleted in this tx")) {
                 logger.info("### Association " + assocId + " has already been deleted in this transaction. " +
@@ -744,19 +744,19 @@ public final class PersistenceLayer extends StorageDecorator {
     // Call these methods when passing objects fetched from the DB to the user.
 
     // ### TODO: drop this. No instatiations in this class.
-    <O> O checkReadAccessAndInstantiate(DeepaMehtaObjectModelImpl model) {
+    <O> O checkReadAccessAndInstantiate(DMXObjectModelImpl model) {
         return (O) checkReadAccess(model).instantiate();
     }
 
     // ### TODO: drop this. No instatiations in this class.
-    <O> List<O> checkReadAccessAndInstantiate(List<? extends DeepaMehtaObjectModelImpl> models) {
+    <O> List<O> checkReadAccessAndInstantiate(List<? extends DMXObjectModelImpl> models) {
         return instantiate(filterReadables(models));
     }
 
     // ---
 
-    private <M extends DeepaMehtaObjectModelImpl> List<M> filterReadables(List<M> models) {
-        Iterator<? extends DeepaMehtaObjectModelImpl> i = models.iterator();
+    private <M extends DMXObjectModelImpl> List<M> filterReadables(List<M> models) {
+        Iterator<? extends DMXObjectModelImpl> i = models.iterator();
         while (i.hasNext()) {
             if (!hasReadAccess(i.next())) {
                 i.remove();
@@ -765,7 +765,7 @@ public final class PersistenceLayer extends StorageDecorator {
         return models;
     }
 
-    boolean hasReadAccess(DeepaMehtaObjectModelImpl model) {
+    boolean hasReadAccess(DMXObjectModelImpl model) {
         try {
             checkReadAccess(model);
             return true;
@@ -777,7 +777,7 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     // TODO: add return to model's checkReadAccess() and drop this method?
-    <M extends DeepaMehtaObjectModelImpl> M checkReadAccess(M model) {
+    <M extends DMXObjectModelImpl> M checkReadAccess(M model) {
         model.checkReadAccess();
         return model;
     }
@@ -819,9 +819,9 @@ public final class PersistenceLayer extends StorageDecorator {
     // === Instantiation ===
 
     // ### TODO: move to kernel utils
-    <O> List<O> instantiate(Iterable<? extends DeepaMehtaObjectModelImpl> models) {
+    <O> List<O> instantiate(Iterable<? extends DMXObjectModelImpl> models) {
         List<O> objects = new ArrayList();
-        for (DeepaMehtaObjectModelImpl model : models) {
+        for (DMXObjectModelImpl model : models) {
             objects.add((O) model.instantiate());
         }
         return objects;
@@ -893,7 +893,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    private <M extends DeepaMehtaObjectModelImpl> M updateValues(M updateModel, M targetObject) {
+    private <M extends DMXObjectModelImpl> M updateValues(M updateModel, M targetObject) {
         M value = new ValueUpdater(this).update(updateModel, targetObject).value;
         // sanity check
         if (value == null) {

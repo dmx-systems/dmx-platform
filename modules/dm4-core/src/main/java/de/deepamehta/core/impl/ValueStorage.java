@@ -3,7 +3,7 @@ package de.deepamehta.core.impl;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
@@ -41,8 +41,8 @@ class ValueStorage {
      * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
      * overhead in others (e.g. when updating composite structures).
      */
-    void fetchChildTopics(DeepaMehtaObjectModel parent) {
-        for (AssociationDefinitionModel assocDef : ((DeepaMehtaObjectModelImpl) parent).getType().getAssocDefs()) {
+    void fetchChildTopics(DMXObjectModel parent) {
+        for (AssociationDefinitionModel assocDef : ((DMXObjectModelImpl) parent).getType().getAssocDefs()) {
             fetchChildTopics(parent, assocDef);
         }
     }
@@ -56,7 +56,7 @@ class ValueStorage {
      *
      * @param   assocDef    The child topic models according to this association definition are fetched.
      */
-    void fetchChildTopics(DeepaMehtaObjectModel parent, AssociationDefinitionModel assocDef) {
+    void fetchChildTopics(DMXObjectModel parent, AssociationDefinitionModel assocDef) {
         try {
             ChildTopicsModel childTopics = parent.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
@@ -92,7 +92,7 @@ class ValueStorage {
      *
      * ### TODO: drop it
      */
-    void storeValue(DeepaMehtaObjectModelImpl model) {
+    void storeValue(DMXObjectModelImpl model) {
         if (model.isSimple()) {
             model.storeSimpleValue();
         } else {
@@ -110,7 +110,7 @@ class ValueStorage {
      * Note: the given model can contain childs not defined in the type definition.
      * Only the childs defined in the type definition are stored.
      */
-    private void storeChildTopics(DeepaMehtaObjectModelImpl parent) {
+    private void storeChildTopics(DMXObjectModelImpl parent) {
         ChildTopicsModelImpl model = null;
         try {
             model = parent.getChildTopicsModel();
@@ -139,7 +139,7 @@ class ValueStorage {
         }
     }
 
-    private void storeChildTopic(RelatedTopicModelImpl childTopic, DeepaMehtaObjectModel parent,
+    private void storeChildTopic(RelatedTopicModelImpl childTopic, DMXObjectModel parent,
                                                                    AssociationDefinitionModel assocDef) {
         if (childTopic instanceof TopicReferenceModel) {
             resolveReference((TopicReferenceModel) childTopic);
@@ -158,7 +158,7 @@ class ValueStorage {
         topicRef.set(fetchReferencedTopic(topicRef));
     }
 
-    private DeepaMehtaObjectModel fetchReferencedTopic(TopicReferenceModel topicRef) {
+    private DMXObjectModel fetchReferencedTopic(TopicReferenceModel topicRef) {
         // Note: the resolved topic must be fetched including its child topics.
         // They might be required for label calculation and/or at client-side.
         if (topicRef.isReferenceById()) {
@@ -180,7 +180,7 @@ class ValueStorage {
      * Creates an association between the given parent object ("Parent" role) and the child topic ("Child" role).
      * The association type is taken from the given association definition.
      */
-    void associateChildTopic(DeepaMehtaObjectModel parent, RelatedTopicModel childTopic,
+    void associateChildTopic(DMXObjectModel parent, RelatedTopicModel childTopic,
                                                            AssociationDefinitionModel assocDef) {
         AssociationModel assoc = childTopic.getRelatingAssociation();
         assoc.setTypeUri(assocDef.getInstanceLevelAssocTypeUri());

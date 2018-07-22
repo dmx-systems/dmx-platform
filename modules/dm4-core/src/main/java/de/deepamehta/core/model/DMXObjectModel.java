@@ -5,7 +5,7 @@ import de.deepamehta.core.JSONEnabled;
 
 
 
-public interface DeepaMehtaObjectModel extends Identifiable, JSONEnabled, Cloneable {
+public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     // --- ID ---
 
@@ -49,7 +49,7 @@ public interface DeepaMehtaObjectModel extends Identifiable, JSONEnabled, Clonea
 
     // --- misc ---
 
-    void set(DeepaMehtaObjectModel object);
+    void set(DMXObjectModel object);
 
     // ---
 
@@ -59,5 +59,5 @@ public interface DeepaMehtaObjectModel extends Identifiable, JSONEnabled, Clonea
 
     // === Java API ===
 
-    DeepaMehtaObjectModel clone();
+    DMXObjectModel clone();
 }

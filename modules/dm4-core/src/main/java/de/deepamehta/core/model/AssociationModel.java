@@ -7,7 +7,7 @@ package de.deepamehta.core.model;
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
-public interface AssociationModel extends DeepaMehtaObjectModel {
+public interface AssociationModel extends DMXObjectModel {
 
     RoleModel getRoleModel1();
 

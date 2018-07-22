@@ -4,7 +4,7 @@ import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 
 
 
-class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
+class DMXObjectModelImpl implements DMXObjectModel {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -57,7 +57,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    DeepaMehtaObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
+    DMXObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
                                                                                       PersistenceLayer pl) {
         this.id          = id;
         this.uri         = uri;
@@ -70,7 +70,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         this.mf          = pl.mf;
     }
 
-    DeepaMehtaObjectModelImpl(DeepaMehtaObjectModelImpl object) {
+    DMXObjectModelImpl(DMXObjectModelImpl object) {
         this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
             object.getChildTopicsModel(), object.pl);
     }
@@ -162,7 +162,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // --- misc ---
 
     @Override
-    public void set(DeepaMehtaObjectModel object) {
+    public void set(DMXObjectModel object) {
         setId(object.getId());
         setUri(object.getUri());
         setTypeUri(object.getTypeUri());
@@ -205,19 +205,19 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     // === Java API ===
 
     @Override
-    public DeepaMehtaObjectModel clone() {
+    public DMXObjectModel clone() {
         try {
-            DeepaMehtaObjectModel object = (DeepaMehtaObjectModel) super.clone();
+            DMXObjectModel object = (DMXObjectModel) super.clone();
             object.setChildTopicsModel(childTopics.clone());
             return object;
         } catch (Exception e) {
-            throw new RuntimeException("Cloning a DeepaMehtaObjectModel failed", e);
+            throw new RuntimeException("Cloning a DMXObjectModel failed", e);
         }
     }
 
     @Override
     public boolean equals(Object o) {
-        return ((DeepaMehtaObjectModel) o).getId() == id;
+        return ((DMXObjectModel) o).getId() == id;
     }
 
     @Override
@@ -251,7 +251,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
         throw new UnsupportedOperationException();
     }
 
-    DeepaMehtaObjectModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
+    DMXObjectModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
         throw new UnsupportedOperationException();
     }
 
@@ -379,10 +379,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
 
     // ---
 
-    void preUpdate(DeepaMehtaObjectModel updateModel) {
+    void preUpdate(DMXObjectModel updateModel) {
     }
 
-    void postUpdate(DeepaMehtaObjectModel updateModel, DeepaMehtaObjectModel oldObject) {
+    void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
     }
 
     // ---
@@ -407,10 +407,10 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *              If the type URI is <code>null</code> it is not updated.
      *              If the simple value is <code>null</code> it is not updated.
      */
-    final void update(DeepaMehtaObjectModelImpl updateModel) {
+    final void update(DMXObjectModelImpl updateModel) {
         try {
             logger.info("Updating " + objectInfo() + " (typeUri=\"" + typeUri + "\")");
-            DeepaMehtaObjectModel oldObject = clone();
+            DMXObjectModel oldObject = clone();
             em.fireEvent(getPreUpdateEvent(), instantiate(), updateModel);
             //
             preUpdate(updateModel);
@@ -586,7 +586,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     /**
      * Loads the child topics which are not loaded already.
      */
-    final DeepaMehtaObjectModel loadChildTopics() {
+    final DMXObjectModel loadChildTopics() {
         for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
             loadChildTopics(assocDef);
         }
@@ -596,7 +596,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
     /**
      * Loads the child topics for the given assoc def, provided they are not loaded already.
      */
-    final DeepaMehtaObjectModel loadChildTopics(String assocDefUri) {
+    final DMXObjectModel loadChildTopics(String assocDefUri) {
         try {
             return loadChildTopics(getAssocDef(assocDefUri));
         } catch (Exception e) {
@@ -661,7 +661,7 @@ class DeepaMehtaObjectModelImpl implements DeepaMehtaObjectModel {
      *                      Note: the association definition must not necessarily originate from the parent object's
      *                      type definition. It may originate from a facet definition as well.
      */
-    DeepaMehtaObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
+    DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());

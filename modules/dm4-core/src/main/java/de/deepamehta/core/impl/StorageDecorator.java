@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -303,8 +303,8 @@ class StorageDecorator {
 
     // === Generic Object ===
 
-    final DeepaMehtaObjectModelImpl fetchObject(long id) {
-        return (DeepaMehtaObjectModelImpl) storage.fetchObject(id);
+    final DMXObjectModelImpl fetchObject(long id) {
+        return (DMXObjectModelImpl) storage.fetchObject(id);
     }
 
 

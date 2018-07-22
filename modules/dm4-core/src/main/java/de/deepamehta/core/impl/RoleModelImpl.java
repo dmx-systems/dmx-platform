@@ -74,7 +74,7 @@ abstract class RoleModelImpl implements RoleModel {
         }
     }
 
-    // TODO: copy in DeepaMehtaObjectModelImpl
+    // TODO: copy in DMXObjectModelImpl
     // Can we use Java 8 and put this in the JSONEnabled interface?
     @Override
     public String toString() {
@@ -95,5 +95,5 @@ abstract class RoleModelImpl implements RoleModel {
     /**
      * @param   assoc   the association this role is involved in
      */
-    abstract DeepaMehtaObjectModelImpl getPlayer(AssociationModelImpl assoc);
+    abstract DMXObjectModelImpl getPlayer(AssociationModelImpl assoc);
 }

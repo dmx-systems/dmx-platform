@@ -5,7 +5,7 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationRoleModel;
 import de.deepamehta.core.model.AssociationTypeModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -60,7 +60,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicModelImpl newTopicModel(long id, String uri, String typeUri, SimpleValue value,
                                                                              ChildTopicsModel childTopics) {
-        return new TopicModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics));
+        return new TopicModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics));
     }
 
     // TODO: needed?
@@ -117,7 +117,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public TopicModelImpl newTopicModel(JSONObject topic) {
         try {
-            return new TopicModelImpl(newDeepaMehtaObjectModel(topic));
+            return new TopicModelImpl(newDMXObjectModel(topic));
         } catch (Exception e) {
             throw parsingFailed(topic, e, "TopicModelImpl");
         }
@@ -130,7 +130,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationModelImpl newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                 RoleModel roleModel2, SimpleValue value, ChildTopicsModel childTopics) {
-        return new AssociationModelImpl(newDeepaMehtaObjectModel(id, uri, typeUri, value, childTopics),
+        return new AssociationModelImpl(newDMXObjectModel(id, uri, typeUri, value, childTopics),
             (RoleModelImpl) roleModel1, (RoleModelImpl) roleModel2);
     }
 
@@ -171,7 +171,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationModelImpl newAssociationModel(JSONObject assoc) {
         try {
-            return new AssociationModelImpl(newDeepaMehtaObjectModel(assoc),
+            return new AssociationModelImpl(newDMXObjectModel(assoc),
                 assoc.has("role1") ? parseRole(assoc.getJSONObject("role1")) : null,
                 assoc.has("role2") ? parseRole(assoc.getJSONObject("role2")) : null
             );
@@ -198,7 +198,7 @@ public class ModelFactoryImpl implements ModelFactory {
 
 
 
-    // === DeepaMehtaObjectModel ===
+    // === DMXObjectModel ===
 
     /**
      * @param   id          Optional (-1 is a valid value and represents "not set").
@@ -208,13 +208,13 @@ public class ModelFactoryImpl implements ModelFactory {
      * @param   value       Optional (<code>null</code> is a valid value).
      * @param   childTopics Optional (<code>null</code> is a valid value and is transformed into an empty composite).
      */
-    DeepaMehtaObjectModelImpl newDeepaMehtaObjectModel(long id, String uri, String typeUri, SimpleValue value,
+    DMXObjectModelImpl newDMXObjectModel(long id, String uri, String typeUri, SimpleValue value,
                                                                                          ChildTopicsModel childTopics) {
-        return new DeepaMehtaObjectModelImpl(id, uri, typeUri, value, (ChildTopicsModelImpl) childTopics, pl());
+        return new DMXObjectModelImpl(id, uri, typeUri, value, (ChildTopicsModelImpl) childTopics, pl());
     }
 
-    DeepaMehtaObjectModelImpl newDeepaMehtaObjectModel(JSONObject object) throws JSONException {
-        return newDeepaMehtaObjectModel(
+    DMXObjectModelImpl newDMXObjectModel(JSONObject object) throws JSONException {
+        return newDMXObjectModel(
             object.optLong("id", -1),
             object.optString("uri", null),
             object.optString("typeUri", null),

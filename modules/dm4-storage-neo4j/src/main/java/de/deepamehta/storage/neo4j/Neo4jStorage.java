@@ -2,7 +2,7 @@ package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.AssociationRoleModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedAssociationModel;
 import de.deepamehta.core.model.RelatedTopicModel;
@@ -362,7 +362,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === Generic Object ===
 
     @Override
-    public DeepaMehtaObjectModel fetchObject(long id) {
+    public DMXObjectModel fetchObject(long id) {
         Node node = fetchNode(id);
         NodeType nodeType = NodeType.of(node);
         switch (nodeType) {
@@ -1135,8 +1135,8 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
     // ---
 
-    // ### TODO: a principal copy exists in DeepaMehtaObjectModel
-    private void setDefaults(DeepaMehtaObjectModel model) {
+    // ### TODO: a principal copy exists in DMXObjectModel
+    private void setDefaults(DMXObjectModel model) {
         if (model.getUri() == null) {
             model.setUri("");
         }

@@ -1,7 +1,7 @@
 package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.TopicModel;
 
 import org.neo4j.graphdb.Node;
@@ -40,7 +40,7 @@ class AssociationModelIterator extends ModelIterator<AssociationModel> {
 
 
 
-abstract class ModelIterator<E extends DeepaMehtaObjectModel> implements Iterator<E> {
+abstract class ModelIterator<E extends DMXObjectModel> implements Iterator<E> {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

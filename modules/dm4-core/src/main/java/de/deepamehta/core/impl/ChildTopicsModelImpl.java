@@ -30,7 +30,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // Note: it must be List<RelatedTopicModel>, not Set<RelatedTopicModel>.
     // There may be several TopicModels with the same ID. That occurrs if the webclient user adds several new topics
     // at once (by the means of an "Add" button). In this case the ID is -1. TopicModel equality is defined solely as
-    // ID equality (see DeepaMehtaObjectModel.equals()).
+    // ID equality (see DMXObjectModel.equals()).
 
     private ModelFactory mf;
 

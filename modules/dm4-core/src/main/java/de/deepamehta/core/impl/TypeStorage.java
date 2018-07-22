@@ -4,7 +4,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.ChildTopicsModel;
-import de.deepamehta.core.model.DeepaMehtaObjectModel;
+import de.deepamehta.core.model.DMXObjectModel;
 import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
@@ -766,8 +766,8 @@ class TypeStorage {
 
     // --- Helper ---
 
-    private void fetchChildTopics(Iterable<? extends DeepaMehtaObjectModel> objects) {
-        for (DeepaMehtaObjectModel object : objects) {
+    private void fetchChildTopics(Iterable<? extends DMXObjectModel> objects) {
+        for (DMXObjectModel object : objects) {
             pl.valueStorage.fetchChildTopics(object);
         }
     }
