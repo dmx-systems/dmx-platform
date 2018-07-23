@@ -11,8 +11,8 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXStorage;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 
 
-public class Neo4jStorage implements DeepaMehtaStorage {
+public class Neo4jStorage implements DMXStorage {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -106,7 +106,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
 
 
     // ****************************************
-    // *** DeepaMehtaStorage Implementation ***
+    // *** DMXStorage Implementation ***
     // ****************************************
 
 
@@ -538,7 +538,7 @@ public class Neo4jStorage implements DeepaMehtaStorage {
     // === DB ===
 
     @Override
-    public DeepaMehtaTransaction beginTx() {
+    public DMXTransaction beginTx() {
         return new Neo4jTransactionAdapter(neo4j);
     }
 

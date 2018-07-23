@@ -13,7 +13,7 @@ import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -517,7 +517,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     private void installPluginInDB() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) create "Plugin" topic
             boolean isCleanInstall = createPluginTopicIfNotExists();

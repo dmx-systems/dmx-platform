@@ -11,7 +11,7 @@ import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.SimpleValue;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -83,7 +83,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createWithoutComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 new SimpleValue("DeepaMehta 4 Notes")));
@@ -106,7 +106,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createWithComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // Note: has() is internal API, so we need a TopicImpl here
             TopicImpl topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
@@ -133,7 +133,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void onDemandChildTopicLoading() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
@@ -155,7 +155,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void onDemandChildTopicLoadingWithConvenienceAccessor() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
                 mf.newChildTopicsModel().put("dm4.core.plugin_migration_nr", 23)
@@ -178,7 +178,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void changeLabelWithSetChildTopics() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
@@ -198,7 +198,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void changeLabelWithChildTopicsSet() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             assertEquals("", topic.getSimpleValue().toString());
@@ -220,7 +220,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void setLabelChildWhileChildsAreNotLoaded() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
@@ -242,7 +242,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void setNonlabelChildWhileChildsAreNotLoaded() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.core.plugin", mf.newChildTopicsModel()
                 .put("dm4.core.plugin_name", "My Plugin")
@@ -266,7 +266,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void changeLabelWithSetRefSimple() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define model
             // "Person Name" (simple)
@@ -298,7 +298,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void changeLabelWithSetRefComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define model
             // "First Name", "Last Name" (simple)
@@ -343,7 +343,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void changeLabelWithSetComposite() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define model
             // "First Name", "Last Name" (simple)
@@ -393,7 +393,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void hasIncludeInLabelForAddedAssocDef() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // add assoc def programmatically
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
@@ -419,7 +419,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void setIncludeInLabel() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             TopicTypeImpl tt = dm4.getTopicType("dm4.core.plugin");
             //
@@ -441,7 +441,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void setIncludeInLabelWhenCustomAssocTypeIsSet() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) create composite type, set a custom assoc type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.date", "Date", "dm4.core.text"));
@@ -476,7 +476,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void editAssocDefViaAssoc() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // set "Include in Label" flag
             long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
@@ -500,7 +500,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void editAssocDefSetCustomAssocType() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // set Custom Association Type (via assoc def)
             dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getChildTopics()
@@ -522,7 +522,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void editAssocDefViaAssocSetCustomAssocType() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // set Custom Association Type (via association)
             long assocDefId = dm4.getTopicType("dm4.core.plugin").getAssocDef("dm4.core.plugin_name").getId();
@@ -547,7 +547,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void uriUniquenessCreateTopic() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic.getUri());
@@ -567,7 +567,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void uriUniquenessSetUri() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic1 = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
             assertEquals("dm4.my.uri", topic1.getUri());
@@ -588,7 +588,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void uriUniquenessUpdate() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         long topic2Id = -1;
         try {
             Topic topic1 = dm4.createTopic(mf.newTopicModel("dm4.my.uri", "dm4.core.plugin"));
@@ -648,7 +648,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void insertAssocDefAtPos0() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
@@ -676,7 +676,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void insertAssocDefAtPos1() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // create child type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.name", "Name", "dm4.core.text"));
@@ -733,7 +733,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeAssociation() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic type;
         List<RelatedTopic> childTypes;
         try {
@@ -770,7 +770,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeAssociationRoles() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic type;
         List<RelatedTopic> childTypes;
         try {
@@ -804,7 +804,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeTopicAndTraverse() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic t0;
         List<RelatedTopic> topics;
         try {
@@ -841,7 +841,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeAssociationAndTraverse() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic t0;
         List<RelatedAssociation> assocs;
         try {
@@ -878,7 +878,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void retypeTopicAndTraverseInstantiations() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic type;
         List<RelatedTopic> topics;
         try {
@@ -921,7 +921,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void updateAggregationOne() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         TopicImpl comp1;    // Note: has() is internal API, so we need a TopicImpl here
         Topic item1, item2;
         try {
@@ -994,7 +994,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void updateAggregationOneFacet() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         TopicImpl name;     // Note: has() is internal API, so we need a TopicImpl here
         Topic item1, item2;
         try {
@@ -1054,7 +1054,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createManyChildRefViaModel() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic parent1, child1;
         try {
             // 1) define composite type
@@ -1085,7 +1085,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createManyChildRefViaObject() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic parent1, child1;
         try {
             // 1) define parent type (with Aggregation-Many child definition)
@@ -1112,7 +1112,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createManyChildViaObject() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         Topic parent1;
         try {
             // 1) define composite type
@@ -1140,7 +1140,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createAndUpdateAggregationOne() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define parent type (with Aggregation-One child definition)
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
@@ -1170,7 +1170,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createCompositionWithChildRef() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define composite type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
@@ -1196,7 +1196,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void createAggregationWithChildRef() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             // 1) define composite type
             dm4.createTopicType(mf.newTopicTypeModel("dm4.test.child", "Child", "dm4.core.text"));
@@ -1224,7 +1224,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void deleteTopic() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             dm4.createTopic(mf.newTopicModel("dm4.test.t0", "dm4.core.plugin"));
             //
@@ -1245,7 +1245,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void coreACAssignTopicToWorkspace() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic t1 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Topic ws = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
@@ -1263,7 +1263,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
 
     @Test
     public void coreACAssignAssociationToWorkspace() {
-        DeepaMehtaTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dm4.beginTx();
         try {
             Topic t1 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));
             Topic t2 = dm4.createTopic(mf.newTopicModel("dm4.core.plugin"));

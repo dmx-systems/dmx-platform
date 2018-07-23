@@ -8,8 +8,8 @@ import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
+import de.deepamehta.core.storage.spi.DMXTransaction;
+import de.deepamehta.core.storage.spi.DMXStorage;
 
 import static java.util.Arrays.asList;
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ class StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private final DeepaMehtaStorage storage;
+    private final DMXStorage storage;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    StorageDecorator(DeepaMehtaStorage storage) {
+    StorageDecorator(DMXStorage storage) {
         this.storage = storage;
     }
 
@@ -638,7 +638,7 @@ class StorageDecorator {
 
     // === DB ===
 
-    final DeepaMehtaTransaction beginTx() {
+    final DMXTransaction beginTx() {
         return storage.beginTx();
     }
 

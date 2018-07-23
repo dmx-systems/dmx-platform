@@ -1,7 +1,7 @@
 package de.deepamehta.core.impl;
 
 import de.deepamehta.core.service.Transactional;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -28,7 +28,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 
-    private static final ThreadLocal<DeepaMehtaTransaction> threadLocalTransaction = new ThreadLocal();
+    private static final ThreadLocal<DMXTransaction> threadLocalTransaction = new ThreadLocal();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
@@ -74,7 +74,7 @@ class TransactionFactory implements ResourceFilterFactory {
                 @Override
                 public ContainerRequest filter(ContainerRequest request) {
                     logger.fine("### Begining transaction of " + info(method));
-                    DeepaMehtaTransaction tx = pl.beginTx();
+                    DMXTransaction tx = pl.beginTx();
                     threadLocalTransaction.set(tx);
                     return request;
                 }
@@ -87,7 +87,7 @@ class TransactionFactory implements ResourceFilterFactory {
 
                 @Override
                 public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-                    DeepaMehtaTransaction tx = threadLocalTransaction.get();
+                    DMXTransaction tx = threadLocalTransaction.get();
                     boolean success = response.getMappedThrowable() == null;    // ### TODO: is this criteria concise?
                     if (success) {
                         logger.fine("### Comitting transaction of " + info(method));

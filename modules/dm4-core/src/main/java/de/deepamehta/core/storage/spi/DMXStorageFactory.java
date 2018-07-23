@@ -10,7 +10,7 @@ import de.deepamehta.core.service.ModelFactory;
  * Note: the factory is only needed by the test environment.
  * The DeepaMehta Core obtains the storage as an OSGi service.
  */
-public interface DeepaMehtaStorageFactory {
+public interface DMXStorageFactory {
 
-    DeepaMehtaStorage newDeepaMehtaStorage(String databasePath, ModelFactory mf);
+    DMXStorage newDMXStorage(String databasePath, ModelFactory mf);
 }

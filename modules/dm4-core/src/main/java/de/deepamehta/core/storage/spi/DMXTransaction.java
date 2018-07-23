@@ -2,7 +2,7 @@ package de.deepamehta.core.storage.spi;
 
 
 
-public interface DeepaMehtaTransaction {
+public interface DMXTransaction {
 
     void success();
 

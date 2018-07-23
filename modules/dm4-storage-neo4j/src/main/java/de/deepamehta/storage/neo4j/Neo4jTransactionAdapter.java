@@ -1,6 +1,6 @@
 package de.deepamehta.storage.neo4j;
 
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -10,7 +10,7 @@ import org.neo4j.graphdb.Transaction;
 /**
  * Adapts a Neo4j transaction to a DeepaMehta transaction.
  */
-class Neo4jTransactionAdapter implements DeepaMehtaTransaction {
+class Neo4jTransactionAdapter implements DMXTransaction {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 

@@ -11,8 +11,8 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXStorage;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 import de.deepamehta.core.util.JavaUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 public class Neo4jStorageTest {
 
-    private DeepaMehtaStorage storage;
+    private DMXStorage storage;
     private ModelFactoryImpl mf;
 
     private long assocId;
@@ -46,7 +46,7 @@ public class Neo4jStorageTest {
     @Before
     public void setup() {
         mf = new ModelFactoryImpl();
-        storage = new Neo4jStorageFactory().newDeepaMehtaStorage(createTempDirectory("neo4j-test-"), mf);
+        storage = new Neo4jStorageFactory().newDMXStorage(createTempDirectory("neo4j-test-"), mf);
         new PersistenceLayer(storage);  // Note: the ModelFactory doesn't work when no PersistenceLayer is created
         setupContent();
     }
@@ -112,7 +112,7 @@ public class Neo4jStorageTest {
 
     @Test
     public void deleteAssociation() {
-        DeepaMehtaTransaction tx = storage.beginTx();
+        DMXTransaction tx = storage.beginTx();
         try {
             TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
             assertNotNull(topic);
@@ -138,7 +138,7 @@ public class Neo4jStorageTest {
 
     @Test(expected = IllegalStateException.class)
     public void deleteAssociationAndFetchAgain() {
-        DeepaMehtaTransaction tx = storage.beginTx();
+        DMXTransaction tx = storage.beginTx();
         try {
             AssociationModel assoc = storage.fetchAssociation(assocId);
             assertNotNull(assoc);
@@ -206,7 +206,7 @@ public class Neo4jStorageTest {
         TopicModel topic;
         topic = storage.fetchTopic("uri", "dm4.core.data_type"); assertNotNull(topic);
         topic = storage.fetchTopic("uri", "dm4.core.*");         assertNull(topic);
-        // => DeepaMehtaStorage's get-singular method supports no wildcards.
+        // => DMXStorage's get-singular method supports no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }
 
@@ -235,7 +235,7 @@ public class Neo4jStorageTest {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void setupContent() {
-        DeepaMehtaTransaction tx = storage.beginTx();
+        DMXTransaction tx = storage.beginTx();
         try {
             createTopic("dm4.core.topic_type", "dm4.core.meta_type",  "Topic Type");
             createTopic("dm4.core.data_type",  "dm4.core.topic_type", "Data Type");

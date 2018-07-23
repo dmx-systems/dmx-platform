@@ -1,7 +1,7 @@
 package de.deepamehta.storage.neo4j;
 
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
+import de.deepamehta.core.storage.spi.DMXStorage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -31,7 +31,7 @@ public class Neo4jStorageActivator implements BundleActivator {
     private ServiceTracker modelFactoryTracker;
 
     // provided service
-    private DeepaMehtaStorage storage;
+    private DMXStorage storage;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -136,7 +136,7 @@ public class Neo4jStorageActivator implements BundleActivator {
             storage = new Neo4jStorage(DATABASE_PATH, mf);
             //
             logger.info("Registering DeepaMehta 4 storage service - Neo4j - at OSGi framework");
-            bundleContext.registerService(DeepaMehtaStorage.class.getName(), storage, null);
+            bundleContext.registerService(DMXStorage.class.getName(), storage, null);
         }
     }
 }

@@ -15,7 +15,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
+import de.deepamehta.core.storage.spi.DMXStorage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -54,7 +54,7 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public PersistenceLayer(DeepaMehtaStorage storage) {
+    public PersistenceLayer(DMXStorage storage) {
         super(storage);
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();

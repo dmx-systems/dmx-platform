@@ -5,7 +5,7 @@ import de.deepamehta.core.impl.ModelFactoryImpl;
 import de.deepamehta.core.impl.PersistenceLayer;
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
+import de.deepamehta.core.storage.spi.DMXStorage;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -25,7 +25,7 @@ public class CoreActivator implements BundleActivator {
     private static BundleContext bundleContext;
 
     // consumed services
-    private DeepaMehtaStorage storageService;
+    private DMXStorage storageService;
     private static HttpService httpService;
 
     private ServiceTracker storageServiceTracker;
@@ -54,7 +54,7 @@ public class CoreActivator implements BundleActivator {
             //
             registerModelFactory();
             //
-            (storageServiceTracker = createServiceTracker(DeepaMehtaStorage.class)).open();
+            (storageServiceTracker = createServiceTracker(DMXStorage.class)).open();
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
             logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 Core\":", e);
@@ -155,9 +155,9 @@ public class CoreActivator implements BundleActivator {
     // ---
 
     private void addService(Object service) {
-        if (service instanceof DeepaMehtaStorage) {
+        if (service instanceof DMXStorage) {
             logger.info("Adding storage service to DeepaMehta 4 Core");
-            storageService = (DeepaMehtaStorage) service;
+            storageService = (DMXStorage) service;
             checkRequirementsForActivation();
         } else if (service instanceof HttpService) {
             logger.info("Adding HTTP service to DeepaMehta 4 Core");

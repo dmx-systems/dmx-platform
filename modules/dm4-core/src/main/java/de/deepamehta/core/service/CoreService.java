@@ -13,7 +13,7 @@ import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import java.util.List;
 
@@ -296,7 +296,7 @@ public interface CoreService {
 
     // === Misc ===
 
-    DeepaMehtaTransaction beginTx();
+    DMXTransaction beginTx();
 
     // ---
 

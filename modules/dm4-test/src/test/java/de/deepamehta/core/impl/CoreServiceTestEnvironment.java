@@ -4,8 +4,8 @@ import de.deepamehta.core.util.JavaUtils;
 
 import de.deepamehta.core.service.CoreService;
 import de.deepamehta.core.service.ModelFactory;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorage;
-import de.deepamehta.core.storage.spi.DeepaMehtaStorageFactory;
+import de.deepamehta.core.storage.spi.DMXStorage;
+import de.deepamehta.core.storage.spi.DMXStorageFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class CoreServiceTestEnvironment {
 
     protected Logger logger = Logger.getLogger(getClass().getName());
 
-    private DeepaMehtaStorage storage;
+    private DMXStorage storage;
     private File dbPath;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -52,12 +52,12 @@ public class CoreServiceTestEnvironment {
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    private DeepaMehtaStorage openDB(String databasePath) {
+    private DMXStorage openDB(String databasePath) {
         try {
             logger.info("Instantiating the storage layer\n    databasePath=\"" + databasePath +
                 "\"\n    databaseFactory=\"" + DATABASE_FACTORY + "\"");
-            DeepaMehtaStorageFactory factory = (DeepaMehtaStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
-            return factory.newDeepaMehtaStorage(databasePath, mf);
+            DMXStorageFactory factory = (DMXStorageFactory) Class.forName(DATABASE_FACTORY).newInstance();
+            return factory.newDMXStorage(databasePath, mf);
         } catch (Exception e) {
             throw new RuntimeException("Instantiating the storage layer failed (databasePath=\"" + databasePath +
                 "\", databaseFactory=\"" + DATABASE_FACTORY + "\"", e);

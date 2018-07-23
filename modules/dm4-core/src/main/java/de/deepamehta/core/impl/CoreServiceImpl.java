@@ -18,7 +18,7 @@ import de.deepamehta.core.service.ModelFactory;
 import de.deepamehta.core.service.Plugin;
 import de.deepamehta.core.service.PluginInfo;
 import de.deepamehta.core.service.accesscontrol.AccessControl;
-import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.core.storage.spi.DMXTransaction;
 
 import org.osgi.framework.BundleContext;
 
@@ -407,7 +407,7 @@ public class CoreServiceImpl implements CoreService {
     // === Misc ===
 
     @Override
-    public DeepaMehtaTransaction beginTx() {
+    public DMXTransaction beginTx() {
         return pl.beginTx();
     }
 
@@ -467,7 +467,7 @@ public class CoreServiceImpl implements CoreService {
      *   3) runs the core migrations.
      */
     private void setupDB() {
-        DeepaMehtaTransaction tx = beginTx();
+        DMXTransaction tx = beginTx();
         try {
             logger.info("----- Setting up the database -----");
             boolean isCleanInstall = pl.init();

@@ -14,7 +14,7 @@ import java.util.List;
 
 
 
-public interface DeepaMehtaStorage {
+public interface DMXStorage {
 
 
 
@@ -235,7 +235,7 @@ public interface DeepaMehtaStorage {
 
     // === DB ===
 
-    DeepaMehtaTransaction beginTx();
+    DMXTransaction beginTx();
 
     boolean setupRootNode();
 
