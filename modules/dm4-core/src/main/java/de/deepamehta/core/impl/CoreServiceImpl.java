@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Implementation of the DeepaMehta core service. Embeddable into Java applications.
+ * Implementation of the DMX core service. Embeddable into Java applications.
  */
 public class CoreServiceImpl implements CoreService {
 
@@ -50,7 +50,7 @@ public class CoreServiceImpl implements CoreService {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     /**
-     * @param   bundleContext   The context of the DeepaMehta 4 Core bundle.
+     * @param   bundleContext   The context of the DMX Core bundle.
      */
     public CoreServiceImpl(PersistenceLayer pl, BundleContext bundleContext) {
         this.bundleContext = bundleContext;

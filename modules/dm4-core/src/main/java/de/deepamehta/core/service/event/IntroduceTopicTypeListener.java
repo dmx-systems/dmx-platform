@@ -17,14 +17,14 @@ import de.deepamehta.core.service.EventListener;
  *      the plugin has been installed.
  * </ul>
  * This hook is typically used by plugins which provide cross-cutting concerns by affecting <i>all</i>
- * type definitions of a DeepaMehta installation. Typically such a plugin adds new data fields to types
+ * type definitions of a DMX installation. Typically such a plugin adds new data fields to types
  * or relates types with specific topics.
  * <p>
  * Examples of plugins which use this hook:
  * <ul>
- *  <li>The "DeepaMehta 4 Workspaces" plugin adds a "Workspaces" field to all types.
- *  <li>The "DeepaMehta 4 Time" plugin adds timestamp fields to all types.
- *  <li>The "DeepaMehta 4 Access Control" plugin adds a "Creator" field to all types and relates them to a user.
+ *  <li>The "DMX Workspaces" plugin adds a "Workspaces" field to all types.
+ *  <li>The "DMX Time" plugin adds timestamp fields to all types.
+ *  <li>The "DMX Access Control" plugin adds a "Creator" field to all types and relates them to a user.
  * </ul>
  *
  * @param   topicType   the type to be modified. The passed object is actually an instance of a {@link TopicType}

@@ -892,7 +892,7 @@ public class Neo4jStorage implements DMXStorage {
 
     // === Helper ===
 
-    // --- Neo4j -> DeepaMehta Bridge ---
+    // --- Neo4j -> DMX Bridge ---
 
     TopicModel buildTopic(Node topicNode) {
         try {
@@ -957,7 +957,7 @@ public class Neo4jStorage implements DMXStorage {
 
 
 
-    // --- DeepaMehta -> Neo4j Bridge ---
+    // --- DMX -> Neo4j Bridge ---
 
     private Node storePlayerRelationship(Node assocNode, RoleModel roleModel) {
         Node playerNode = fetchPlayerNode(roleModel);
@@ -1105,7 +1105,7 @@ public class Neo4jStorage implements DMXStorage {
 
 
 
-    // --- DeepaMehta Helper ---
+    // --- DMX Helper ---
 
     // ### TODO: this is a DB agnostic helper method. It could be moved e.g. to a common base class.
     private List<RelatedTopicModel> buildRelatedTopics(List<AssociationModel> assocs, long playerId) {

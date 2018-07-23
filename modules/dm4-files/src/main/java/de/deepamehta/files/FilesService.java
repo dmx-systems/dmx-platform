@@ -190,10 +190,10 @@ public interface FilesService {
     DirectoryListing getDirectoryListing(String repoPath);
 
     /**
-     * Checks if the given URL refers to the file repository of this DeepaMehta installation.
+     * Checks if the given URL refers to the file repository of this DMX installation.
      *
      * @return  the refered file's/directory's repository path, or <code>null</code> if the URL
-     *          does not refer to the file repository of this DeepaMehta installation.
+     *          does not refer to the file repository of this DMX installation.
      */
     String getRepositoryPath(URL url);
 

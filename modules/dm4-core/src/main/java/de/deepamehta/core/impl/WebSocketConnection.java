@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A WebSocket connection that is bound to a DeepaMehta plugin.
+ * A WebSocket connection that is bound to a DMX plugin.
  * When a message arrives on the connection the plugin is notified via a WEBSOCKET_TEXT_MESSAGE event.
  * <p>
  * Once the actual WebSocket connection is opened or closed the WebSocketConnection is added/removed to a pool.

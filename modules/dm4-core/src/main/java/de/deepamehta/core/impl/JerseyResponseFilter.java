@@ -94,7 +94,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
                 } else if (entity instanceof DirectivesResponse) {
                     firePreSend(((DirectivesResponse) entity).getObject());
                     //
-                    // Note: some plugins rely on the PRE_SEND event to be fired for the individual DeepaMehta
+                    // Note: some plugins rely on the PRE_SEND event to be fired for the individual DMX
                     // objects contained in the set of directives. E.g. the Time plugin enriches updated objects
                     // with timestamps. The timestamps in turn are needed at client-side by the Caching plugin
                     // in order to issue conditional PUT requests.

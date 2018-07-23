@@ -129,12 +129,12 @@ class PluginManager {
             }
         }
         logger.info("### Bundles total: " + bundles.length +
-            ", DeepaMehta plugins: " + plugins + ", Activated: " + activated);
+            ", DMX plugins: " + plugins + ", Activated: " + activated);
         return plugins == activated;
     }
 
     /**
-     * Plugin detection: checks if an arbitrary bundle is a DeepaMehta plugin.
+     * Plugin detection: checks if an arbitrary bundle is a DMX plugin.
      */
     private boolean isDMXPlugin(Bundle bundle) {
         try {

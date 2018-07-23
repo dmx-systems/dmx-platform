@@ -5,7 +5,7 @@ import de.deepamehta.core.model.AssociationDefinitionModel;
 
 
 /**
- * Definition of an association between 2 topic types -- part of DeepaMehta's type system,
+ * Definition of an association between 2 topic types -- part of DMX's type system,
  * like an association in a class diagram. Used to represent both, aggregations and compositions.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>

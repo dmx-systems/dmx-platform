@@ -86,7 +86,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         DMXTransaction tx = dm4.beginTx();
         try {
             Topic topic = dm4.createTopic(mf.newTopicModel("de.deepamehta.notes", "dm4.core.plugin",
-                new SimpleValue("DeepaMehta 4 Notes")));
+                new SimpleValue("DMX Notes")));
             //
             topic.getChildTopics().set("dm4.core.plugin_migration_nr", 23);
             //

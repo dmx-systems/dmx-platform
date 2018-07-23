@@ -5,7 +5,7 @@ import de.deepamehta.core.model.TopicModel;
 
 
 /**
- * Specification of a topic -- DeepaMehta's central data object.
+ * Specification of a topic -- DMX's central data object.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

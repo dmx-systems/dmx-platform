@@ -156,9 +156,9 @@ public class Neo4jStorageTest {
     public void testFulltextIndex() {
         List<TopicModel> topics;
         // By default a Lucene index is case-insensitive:
-        topics = storage.queryTopics("DeepaMehta"); assertEquals(2, topics.size());
-        topics = storage.queryTopics("deepamehta"); assertEquals(2, topics.size());
-        topics = storage.queryTopics("DEEPAMEHTA"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("Dmx"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("dmx"); assertEquals(2, topics.size());
+        topics = storage.queryTopics("DMX"); assertEquals(2, topics.size());
         // Lucene's default operator is OR:
         topics = storage.queryTopics("collaboration platform");         assertEquals(1, topics.size());
         topics = storage.queryTopics("collaboration plaXXXform");       assertEquals(1, topics.size());
@@ -248,9 +248,9 @@ public class Neo4jStorageTest {
             // Fulltext indexing
             //
             createTopic("note-1", "dm4.notes.note",
-                "DeepaMehta is a platform for collaboration and knowledge management", IndexMode.FULLTEXT, null);
+                "DMX is a platform for collaboration and knowledge management", IndexMode.FULLTEXT, null);
             createTopic("note-2", "dm4.notes.note",
-                "Lead developer of DeepaMehta is Jörg Richter", IndexMode.FULLTEXT, null);
+                "Lead developer of DMX is Jörg Richter", IndexMode.FULLTEXT, null);
             //
             // Fulltext HTML indexing
             //

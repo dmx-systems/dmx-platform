@@ -60,7 +60,7 @@ public interface DMXObject extends Identifiable, JSONEnabled {
      * No access control is performed as <i>Implicit READ permission</i> applies: if a user has READ access to an object
      * she has READ access to its type as well.
      * <p>
-     * Note: if the user would have no READ access to this object the DeepaMehta Core would not instantiate it in the
+     * Note: if the user would have no READ access to this object the DMX Core would not instantiate it in the
      * first place, but throw an <code>AccessControlException</code>.
      */
     DMXType getType();
@@ -79,7 +79,7 @@ public interface DMXObject extends Identifiable, JSONEnabled {
     // === Deletion ===
 
     /**
-     * Deletes the DeepaMehta object in its entirety, that is
+     * Deletes the DMX object in its entirety, that is
      * - the object itself (the <i>parent</i>)
      * - all child topics associated via "dm4.core.composition", recusively
      * - all the remaining direct associations, e.g. "dm4.core.instantiation"

@@ -16,7 +16,7 @@ import java.util.List;
 
 
 /**
- * A DeepaMehta object model that is attached to the DB.
+ * A DMX object model that is attached to the DB.
  *
  * Method name conventions and semantics:
  *  - getXX()           Reads from memory (model).

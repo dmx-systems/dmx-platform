@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Assigns standard association definitions (and their view config topics) to DeepaMehta workspace.
+ * Assigns standard association definitions (and their view config topics) to DMX workspace.
  * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.6
@@ -39,7 +39,7 @@ public class Migration6 extends Migration {
     @Override
     public void run() {
         logger.info("########## Assigning standard association definitions (and their view config topics) to " +
-            "DeepaMehta workspace");
+            "DMX workspace");
         dmxWorkspaceId = getDMXWorkspace().getId();
         //
         for (TopicType topicType : dm4.getAllTopicTypes()) {
@@ -50,7 +50,7 @@ public class Migration6 extends Migration {
         }
         //
         logger.info("########## Assigning standard association definitions (and their view config topics) to " +
-            "DeepaMehta workspace complete\n    Types processed: " + types + "\n    Standard types: " +
+            "DMX workspace complete\n    Types processed: " + types + "\n    Standard types: " +
             standardTypes + "\n    Association definitions: " + assocDefs + "\n    View config topics: " +
             configTopics);
     }
@@ -78,7 +78,7 @@ public class Migration6 extends Migration {
 
     // ### copy in WorkspacesPlugin.java
     private Topic getDMXWorkspace() {
-        return wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+        return wsService.getWorkspace(WorkspacesService.DMX_WORKSPACE_URI);
     }
 
     // ### copy in WorkspacesPlugin.java

@@ -8,7 +8,7 @@ import org.neo4j.graphdb.Transaction;
 
 
 /**
- * Adapts a Neo4j transaction to a DeepaMehta transaction.
+ * Adapts a Neo4j transaction to a DMX transaction.
  */
 class Neo4jTransactionAdapter implements DMXTransaction {
 

@@ -5,10 +5,10 @@ import de.deepamehta.core.service.ModelFactory;
 
 
 /**
- * Factory for obtaining a DeepaMehta storage.
+ * Factory for obtaining a DMX storage.
  * <p>
  * Note: the factory is only needed by the test environment.
- * The DeepaMehta Core obtains the storage as an OSGi service.
+ * The DMX Core obtains the storage as an OSGi service.
  */
 public interface DMXStorageFactory {
 

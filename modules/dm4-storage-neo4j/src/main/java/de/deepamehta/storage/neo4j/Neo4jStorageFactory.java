@@ -7,10 +7,10 @@ import de.deepamehta.core.storage.spi.DMXStorageFactory;
 
 
 /**
- * Factory for obtaining a DeepaMehta storage based on Neo4j/Lucene.
+ * Factory for obtaining a DMX storage based on Neo4j/Lucene.
  * <p>
  * Note: the factory is only needed by the test environment.
- * The DeepaMehta Core obtains the storage as an OSGi service.
+ * The DMX Core obtains the storage as an OSGi service.
  */
 public class Neo4jStorageFactory implements DMXStorageFactory {
 

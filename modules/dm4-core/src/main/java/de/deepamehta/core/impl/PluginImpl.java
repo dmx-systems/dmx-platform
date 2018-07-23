@@ -64,7 +64,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private List<String> pluginDependencies;    // plugin URIs as read from "dm4.plugin.activate_after" property
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
-    // Consumed services (DeepaMehta Core and OSGi)
+    // Consumed services (DMX Core and OSGi)
     private CoreServiceImpl dm4;
     private ModelFactory mf;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
@@ -74,7 +74,7 @@ public class PluginImpl implements Plugin, EventHandler {
     //      value: an InjectableService
     private Map<Class<?>, InjectableService> injectableServices = new HashMap();
 
-    // Trackers for the consumed services (DeepaMehta Core, OSGi, and injected services)
+    // Trackers for the consumed services (DMX Core, OSGi, and injected services)
     private List<ServiceTracker> serviceTrackers = new ArrayList();
 
     // Provided OSGi service
@@ -406,7 +406,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void addService(Object service, Class serviceInterface) {
         if (service instanceof CoreService) {
-            logger.info("Adding DeepaMehta 4 core service to " + this);
+            logger.info("Adding DMX core service to " + this);
             setCoreService((CoreServiceImpl) service);
             publishWebResources();
             publishRestResources();
@@ -425,7 +425,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void removeService(Object service, Class serviceInterface) {
         if (service == dm4) {
-            logger.info("Removing DeepaMehta 4 core service from " + this);
+            logger.info("Removing DMX core service from " + this);
             unpublishRestResources();
             unpublishWebResources();
             unpublishFileSystem();

@@ -5,7 +5,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 
 
 /**
- * Specification of a topic type -- part of DeepaMehta's type system, like a class.
+ * Specification of a topic type -- part of DMX's type system, like a class.
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */

@@ -15,8 +15,8 @@ import java.util.logging.Logger;
 
 
 /**
- * Base class for all DeepaMehta plugins.
- * All DeepaMehta plugins are derived from this class, directly or indirectly.
+ * Base class for all DMX plugins.
+ * All DMX plugins are derived from this class, directly or indirectly.
  * ### FIXDOC: subclassing is not required if the plugin has no server-side part.
  */
 public class PluginActivator implements BundleActivator, PluginContext {
@@ -29,7 +29,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     private BundleContext bundleContext;
     private PluginImpl plugin;
-    private String pluginName;  // This bundle's name = POM project name, e.g. "DeepaMehta 4 Webclient"
+    private String pluginName;  // This bundle's name = POM project name, e.g. "DMX Webclient"
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

@@ -42,14 +42,14 @@ public class DMXUtils {
 
 
     /**
-     * Checks if an URL refers to this DeepaMehta installation.
+     * Checks if an URL refers to this DMX installation.
      * The check relies on the "dm4.host.url" system property.
      */
     public static boolean isDMXURL(URL url) {
         try {
             return url.toString().startsWith(DM4_HOST_URL);
         } catch (Exception e) {
-            throw new RuntimeException("Checking for DeepaMehta URL failed (url=\"" + url + "\")", e);
+            throw new RuntimeException("Checking for DMX URL failed (url=\"" + url + "\")", e);
         }
     }
 
@@ -138,7 +138,7 @@ public class DMXUtils {
         }
     }
 
-    // === DeepaMehta specific ===
+    // === DMX specific ===
 
     public static JSONArray toJSONArray(Iterable<? extends JSONEnabled> items) {
         JSONArray array = new JSONArray();

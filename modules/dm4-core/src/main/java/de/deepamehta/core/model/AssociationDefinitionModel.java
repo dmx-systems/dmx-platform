@@ -3,7 +3,7 @@ package de.deepamehta.core.model;
 
 
 /**
- * Definition of an association between a parent type and a child type -- part of DeepaMehta's type system;
+ * Definition of an association between a parent type and a child type -- part of DMX's type system;
  * like a composition or an aggregation in an UML class diagram.
  * <p>
  * The child type is a topic type. The parent type is either a topic type or an association type.

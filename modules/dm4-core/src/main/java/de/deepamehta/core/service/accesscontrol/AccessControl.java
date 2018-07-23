@@ -136,7 +136,7 @@ public interface AccessControl {
     // ---
 
     /**
-     * Returns the ID of the "DeepaMehta" workspace.
+     * Returns the ID of the "DMX" workspace.
      */
     long getDMXWorkspaceId();
 

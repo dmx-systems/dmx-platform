@@ -20,18 +20,18 @@ import java.util.List;
 
 
 /**
- * Specification of the DeepaMehta core service -- the heart of DeepaMehta.
+ * Specification of the DMX core service -- the heart of DMX.
  * <p>
- * The responsibility of the DeepaMehta core service is to orchestrate the control flow and allow plugins to hook in.
- * The main duties of the DeepaMehta core service are to provide access to the storage layer and to dispatch events to
+ * The responsibility of the DMX core service is to orchestrate the control flow and allow plugins to hook in.
+ * The main duties of the DMX core service are to provide access to the storage layer and to dispatch events to
  * the installed plugins. ### FIXDOC
  * <p>
- * The DeepaMehta core service is a realization of the <i>Inversion of Control</i> pattern.
+ * The DMX core service is a realization of the <i>Inversion of Control</i> pattern.
  * <p>
- * The DeepaMehta core service provides methods to deal with topics, associations, types, and plugins.
+ * The DMX core service provides methods to deal with topics, associations, types, and plugins.
  * <p>
  * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
- * DeepaMehta core service is available through the <code>dm4</code> object.
+ * DMX core service is available through the <code>dm4</code> object.
  */
 public interface CoreService {
 

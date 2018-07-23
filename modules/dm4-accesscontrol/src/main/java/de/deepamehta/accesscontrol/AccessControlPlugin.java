@@ -109,7 +109,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // via feature:install from Karaf. The default values must match the values defined in project POM.
     private static final boolean IS_PUBLIC_INSTALLATION = ANONYMOUS_READ_ALLOWED.equals("ALL");
 
-    private static final String AUTHENTICATION_REALM = "DeepaMehta";
+    private static final String AUTHENTICATION_REALM = "DMX";
 
     // Type URIs
     private static final String LOGIN_ENABLED_TYPE = "dm4.accesscontrol.login_enabled";
@@ -189,7 +189,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void logout() {
         _logout(request);
         //
-        // For a "private" DeepaMehta installation: emulate a HTTP logout by forcing the webbrowser to bring up its
+        // For a "private" DMX installation: emulate a HTTP logout by forcing the webbrowser to bring up its
         // login dialog and to forget the former Authorization information. The user is supposed to press "Cancel".
         // The login dialog can't be used to login again.
         if (!IS_PUBLIC_INSTALLATION) {
@@ -659,7 +659,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             if (getUsername() != null) {
                 workspace = getPrivateWorkspace();
             } else {
-                workspace = wsService.getWorkspace(WorkspacesService.DEEPAMEHTA_WORKSPACE_URI);
+                workspace = wsService.getWorkspace(WorkspacesService.DMX_WORKSPACE_URI);
             }
             wsService.assignToWorkspace(searchTopic, workspace.getId());
         } catch (Exception e) {

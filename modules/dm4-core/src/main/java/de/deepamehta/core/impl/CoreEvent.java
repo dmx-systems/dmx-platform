@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * Events fired by the DeepaMehta core service.
+ * Events fired by the DMX core service.
  * Plugins can listen to these events by implementing the respective listener interfaces.
  *
  * @see de.deepamehta.core.service.event

@@ -299,14 +299,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
     /**
-     * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
+     * Takes care the DMX standard types (and their parts) get an assignment to the DMX workspace.
      * This is important in conjunction with access control.
      * Note: type introduction is aborted if at least one of these conditions apply:
      *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this
      *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
-     *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
+     *     - The type is not a DMX standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).
-     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DeepaMehta standard
+     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DMX standard
      *       type if its URI begins with "dm4."
      */
     @Override
@@ -320,14 +320,14 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Takes care the DeepaMehta standard types (and their parts) get an assignment to the DeepaMehta workspace.
+     * Takes care the DMX standard types (and their parts) get an assignment to the DMX workspace.
      * This is important in conjunction with access control.
      * Note: type introduction is aborted if at least one of these conditions apply:
      *     - A workspace cookie is present. In this case the type gets its workspace assignment the regular way (this
      *       plugin's post-create listeners). This happens e.g. when a type is created interactively in the Webclient.
-     *     - The type is not a DeepaMehta standard type. In this case the 3rd-party plugin developer is responsible
+     *     - The type is not a DMX standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).
-     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DeepaMehta standard
+     *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DMX standard
      *       type if its URI begins with "dm4."
      */
     @Override
@@ -359,7 +359,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         //
         long workspaceId = workspaceId();
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-        // the DeepaMehta workspace. This would not help in gaining data consistency because the topics created
+        // the DMX workspace. This would not help in gaining data consistency because the topics created
         // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
         // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
         // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
@@ -386,7 +386,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         //
         long workspaceId = workspaceId();
         // Note: when there is no current workspace (because no user is logged in) we do NOT fallback to assigning
-        // the DeepaMehta workspace. This would not help in gaining data consistency because the associations created
+        // the DMX workspace. This would not help in gaining data consistency because the associations created
         // so far (BEFORE the Workspaces plugin is activated) would still have no workspace assignment.
         // Note: for types the situation is different. The type-introduction mechanism (see introduceTopicType()
         // handler above) ensures EVERY type is catched (regardless of plugin activation order). For instances on
@@ -424,7 +424,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     /**
-     * Returns the ID of the DeepaMehta workspace or -1 to signal abortion of type introduction.
+     * Returns the ID of the DMX workspace or -1 to signal abortion of type introduction.
      */
     private long workspaceIdForType(DMXType type) {
         return workspaceId() == -1 && isDMXStandardType(type) ? getDMXWorkspace().getId() : -1;
@@ -497,10 +497,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     /**
-     * Returns the DeepaMehta workspace or throws an exception if it doesn't exist.
+     * Returns the DMX workspace or throws an exception if it doesn't exist.
      */
     private Topic getDMXWorkspace() {
-        return getWorkspace(DEEPAMEHTA_WORKSPACE_URI);
+        return getWorkspace(DMX_WORKSPACE_URI);
     }
 
     private void applyWorkspaceFilter(Iterator<? extends DMXObject> objects, long workspaceId) {

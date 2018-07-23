@@ -49,7 +49,7 @@ public class CoreActivator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) {
         try {
-            logger.info("========== Starting \"DeepaMehta 4 Core\" ==========");
+            logger.info("========== Starting \"DMX Core\" ==========");
             this.bundleContext = bundleContext;
             //
             registerModelFactory();
@@ -57,7 +57,7 @@ public class CoreActivator implements BundleActivator {
             (storageServiceTracker = createServiceTracker(DMXStorage.class)).open();
             (httpServiceTracker = createServiceTracker(HttpService.class)).open();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 Core\":", e);
+            logger.log(Level.SEVERE, "An error occurred while starting \"DMX Core\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
@@ -67,7 +67,7 @@ public class CoreActivator implements BundleActivator {
     @Override
     public void stop(BundleContext bundleContext) {
         try {
-            logger.info("========== Stopping \"DeepaMehta 4 Core\" ==========");
+            logger.info("========== Stopping \"DMX Core\" ==========");
             storageServiceTracker.close();
             httpServiceTracker.close();
             //
@@ -77,7 +77,7 @@ public class CoreActivator implements BundleActivator {
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while stopping \"DeepaMehta 4 Core\":", e);
+            logger.log(Level.SEVERE, "An error occurred while stopping \"DMX Core\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }
@@ -130,7 +130,7 @@ public class CoreActivator implements BundleActivator {
                     addService(service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
-                        " to \"DeepaMehta 4 Core\":", e);
+                        " to \"DMX Core\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -144,7 +144,7 @@ public class CoreActivator implements BundleActivator {
                     super.removedService(ref, service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
-                        " from \"DeepaMehta 4 Core\":", e);
+                        " from \"DMX Core\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -156,11 +156,11 @@ public class CoreActivator implements BundleActivator {
 
     private void addService(Object service) {
         if (service instanceof DMXStorage) {
-            logger.info("Adding storage service to DeepaMehta 4 Core");
+            logger.info("Adding storage service to DMX Core");
             storageService = (DMXStorage) service;
             checkRequirementsForActivation();
         } else if (service instanceof HttpService) {
-            logger.info("Adding HTTP service to DeepaMehta 4 Core");
+            logger.info("Adding HTTP service to DMX Core");
             httpService = (HttpService) service;
             checkRequirementsForActivation();
         }
@@ -168,10 +168,10 @@ public class CoreActivator implements BundleActivator {
 
     private void removeService(Object service) {
         if (service == storageService) {
-            logger.info("Removing storage service from DeepaMehta 4 Core");
+            logger.info("Removing storage service from DMX Core");
             storageService = null;
         } else if (service == httpService) {
-            logger.info("Removing HTTP service from DeepaMehta 4 Core");
+            logger.info("Removing HTTP service from DMX Core");
             httpService = null;
         }
     }
@@ -182,7 +182,7 @@ public class CoreActivator implements BundleActivator {
         if (storageService != null && httpService != null) {
             dm4 = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
             //
-            logger.info("Registering DeepaMehta 4 core service at OSGi framework");
+            logger.info("Registering DMX core service at OSGi framework");
             bundleContext.registerService(CoreService.class.getName(), dm4, null);
         }
     }

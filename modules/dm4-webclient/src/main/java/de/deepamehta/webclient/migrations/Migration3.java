@@ -72,10 +72,10 @@ public class Migration3 extends Migration {
                 configTopic = viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
                 //
                 // 2) assign workspace
-                // In case of a CLEAN_INSTALL the DeepaMehta workspace does not yet exist. The config topic gets its
+                // In case of a CLEAN_INSTALL the DMX workspace does not yet exist. The config topic gets its
                 // workspace assignment via type-introduction of the Workspaces module. The Workspaces module is
                 // activated *after* the Webclient module.
-                // In case of a UPDATE the DeepaMehta workspace exists already and we make the assignment here.
+                // In case of a UPDATE the DMX workspace exists already and we make the assignment here.
                 // Type-introduction of the Workspaces module will not perform as this module is installed already.
                 if (deepaMehtaWorkspaceId != -1 && isDMXStandardType(type)) {
                     dm4.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);

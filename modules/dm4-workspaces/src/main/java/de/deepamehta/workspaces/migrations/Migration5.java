@@ -54,7 +54,7 @@ public class Migration5 extends Migration {
         dm4.getTopicType("dm4.workspaces.workspace_facet").getAssocDef("dm4.workspaces.workspace")
             .setChildCardinalityUri("dm4.core.one");
         //
-        // 3) Corrects URI of the "DeepaMehta" workspace: "de." -> "dm4."
+        // 3) Corrects URI of the "DMX" workspace: "de." -> "dm4."
         //
         dm4.getTopicByUri("de.workspaces.deepamehta").setUri("dm4.workspaces.deepamehta");
         //

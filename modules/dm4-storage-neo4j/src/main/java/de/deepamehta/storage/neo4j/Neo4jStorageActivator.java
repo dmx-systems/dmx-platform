@@ -48,12 +48,12 @@ public class Neo4jStorageActivator implements BundleActivator {
     @Override
     public void start(BundleContext bundleContext) {
         try {
-            logger.info("========== Starting \"DeepaMehta 4 Storage - Neo4j\" ==========");
+            logger.info("========== Starting \"DMX Storage - Neo4j\" ==========");
             this.bundleContext = bundleContext;
             //
             (modelFactoryTracker = createServiceTracker(ModelFactory.class)).open();
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while starting \"DeepaMehta 4 Storage - Neo4j\":", e);
+            logger.log(Level.SEVERE, "An error occurred while starting \"DMX Storage - Neo4j\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
             // File Install would retry to start the bundle endlessly.
@@ -63,14 +63,14 @@ public class Neo4jStorageActivator implements BundleActivator {
     @Override
     public void stop(BundleContext bundleContext) {
         try {
-            logger.info("========== Stopping \"DeepaMehta 4 Storage - Neo4j\" ==========");
+            logger.info("========== Stopping \"DMX Storage - Neo4j\" ==========");
             modelFactoryTracker.close();
             //
             if (storage != null) {
                 storage.shutdown();
             }
         } catch (Throwable e) {
-            logger.log(Level.SEVERE, "An error occurred while stopping \"DeepaMehta 4 Storage - Neo4j\":", e);
+            logger.log(Level.SEVERE, "An error occurred while stopping \"DMX Storage - Neo4j\":", e);
             // Note: here we catch anything, also errors (like NoClassDefFoundError).
             // If thrown through the OSGi container it would not print out the stacktrace.
         }
@@ -90,7 +90,7 @@ public class Neo4jStorageActivator implements BundleActivator {
                     addService(service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
-                        " to \"DeepaMehta 4 Storage - Neo4j\":", e);
+                        " to \"DMX Storage - Neo4j\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -104,7 +104,7 @@ public class Neo4jStorageActivator implements BundleActivator {
                     super.removedService(ref, service);
                 } catch (Throwable e) {
                     logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
-                        " from \"DeepaMehta 4 Storage - Neo4j\":", e);
+                        " from \"DMX Storage - Neo4j\":", e);
                     // Note: here we catch anything, also errors (like NoClassDefFoundError).
                     // If thrown through the OSGi container it would not print out the stacktrace.
                 }
@@ -116,7 +116,7 @@ public class Neo4jStorageActivator implements BundleActivator {
 
     private void addService(Object service) {
         if (service instanceof ModelFactory) {
-            logger.info("Adding ModelFactory service to DeepaMehta 4 Storage - Neo4j");
+            logger.info("Adding ModelFactory service to DMX Storage - Neo4j");
             mf = (ModelFactory) service;
             checkRequirementsForActivation();
         }
@@ -124,7 +124,7 @@ public class Neo4jStorageActivator implements BundleActivator {
 
     private void removeService(Object service) {
         if (service == mf) {
-            logger.info("Removing ModelFactory service from DeepaMehta 4 Storage - Neo4j");
+            logger.info("Removing ModelFactory service from DMX Storage - Neo4j");
             mf = null;
         }
     }
@@ -135,7 +135,7 @@ public class Neo4jStorageActivator implements BundleActivator {
         if (mf != null) {
             storage = new Neo4jStorage(DATABASE_PATH, mf);
             //
-            logger.info("Registering DeepaMehta 4 storage service - Neo4j - at OSGi framework");
+            logger.info("Registering DMX storage service - Neo4j - at OSGi framework");
             bundleContext.registerService(DMXStorage.class.getName(), storage, null);
         }
     }
