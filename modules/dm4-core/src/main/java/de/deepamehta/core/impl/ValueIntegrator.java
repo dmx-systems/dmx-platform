@@ -25,11 +25,11 @@ import java.util.logging.Logger;
 /**
  * Integrates new values into the DB.
  */
-class ValueUpdater {
+class ValueIntegrator {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private DMXObjectModelImpl updateModel;
+    private DMXObjectModelImpl newValues;
     private DMXObjectModelImpl targetObject;    // may null
     private TypeModelImpl type;
     private boolean isAssoc;
@@ -48,7 +48,7 @@ class ValueUpdater {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    ValueUpdater(PersistenceLayer pl) {
+    ValueIntegrator(PersistenceLayer pl) {
         this.pl = pl;
         this.mf = pl.mf;
     }
@@ -58,35 +58,35 @@ class ValueUpdater {
     /**
      * Integrates new values into the DB and returns the unified value.
      *
-     * @return  the unified value; never null; its "value" field is null if there was nothing to update.
+     * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
-    <M extends DMXObjectModelImpl> UnifiedValue<M> update(M updateModel, M targetObject) {
-        // Note: updateModel must be initialized *before* processing refs.
-        // UnifiedValue constructor operates on updateModel.
-        this.updateModel = updateModel;
+    <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject) {
+        // Note: newValues must be initialized *before* processing refs.
+        // UnifiedValue constructor operates on newValues.
+        this.newValues = newValues;
         this.targetObject = targetObject;
-        this.isAssoc = updateModel instanceof AssociationModel;
-        this.isType  = updateModel instanceof TypeModel;
+        this.isAssoc = newValues instanceof AssociationModel;
+        this.isType  = newValues instanceof TypeModel;
         //
         // process refs
-        if (updateModel instanceof TopicReferenceModel) {
+        if (newValues instanceof TopicReferenceModel) {
             return unifyRef();
         }
-        if (updateModel instanceof TopicDeletionModel) {
+        if (newValues instanceof TopicDeletionModel) {
             return new UnifiedValue(null);
         }
         // argument check
-        if (updateModel.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to update values whose typeUri is not set, updateModel=" +
-                updateModel + ", targetObject=" + targetObject);
+        if (newValues.getTypeUri() == null) {
+            throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
+                newValues + ", targetObject=" + targetObject);
         }
         // Note: we must get type *after* processing refs. Refs might have no type set.
-        this.type = updateModel.getType();
+        this.type = newValues.getType();
         //
-        // update value
-        DMXObjectModelImpl _value = updateModel.isSimple() ? updateSimple() : updateComposite();
+        // integrate values
+        DMXObjectModelImpl _value = newValues.isSimple() ? integrateSimple() : integrateComposite();
         //
-        // Note: UnifiedValue instantiation saves the update model's ID *before* it is overwritten
+        // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
         UnifiedValue value = new UnifiedValue(_value);
         //
         // ID transfer
@@ -95,7 +95,7 @@ class ValueUpdater {
                 throw new RuntimeException("Unification result has no ID set");
             }
             // Note: this is an ugly side effect, but we keep it for pragmatic reasons
-            updateModel.id = _value.id;
+            newValues.id = _value.id;
         }
         //
         return value;
@@ -104,7 +104,7 @@ class ValueUpdater {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private UnifiedValue unifyRef() {
-        TopicReferenceModelImpl ref = (TopicReferenceModelImpl) updateModel;
+        TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
             logger.info("Referencing " + object);
@@ -118,20 +118,20 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is not null
-     *   - this.updateModel is simple
+     *   - this.newValues is not null
+     *   - this.newValues is simple
      *
-     * @return  the unified value, or null if there was nothing to update.
-     *          The latter is the case if this.updateModel is the empty string.
+     * @return  the unified value, or null if there was nothing to integrate.
+     *          The latter is the case if this.newValues is the empty string.
      */
-    private DMXObjectModelImpl updateSimple() {
+    private DMXObjectModelImpl integrateSimple() {
         if (isAssoc || isType) {
             // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
             // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
             // different players.) An assoc's simple value is updated in-place.
             // Note 2: a type's simple value is not unified. A type is updated in-place.
             return storeAssocSimpleValue();
-        } else if (updateModel.getSimpleValue().toString().isEmpty()) {
+        } else if (newValues.getSimpleValue().toString().isEmpty()) {
             return null;
         } else {
             return unifySimple();
@@ -140,29 +140,29 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is an assoc model.
+     *   - this.newValues is an assoc model.
      */
     private DMXObjectModelImpl storeAssocSimpleValue() {
         if (targetObject != null) {
             // update
-            targetObject._updateSimpleValue(updateModel.getSimpleValue());
+            targetObject._updateSimpleValue(newValues.getSimpleValue());
             return targetObject;
         } else {
             // create
-            updateModel.storeSimpleValue();
-            return updateModel;
+            newValues.storeSimpleValue();
+            return newValues;
         }
     }
 
     /**
      * Preconditions:
-     *   - this.updateModel is simple
-     *   - this.updateModel is not empty
+     *   - this.newValues is simple
+     *   - this.newValues is not empty
      *
      * @return  the unified value. Is never null.
      */
     private TopicModelImpl unifySimple() {
-        SimpleValue newValue = updateModel.getSimpleValue();
+        SimpleValue newValue = newValues.getSimpleValue();
         // FIXME: HTML values must be tag-stripped before lookup, complementary to indexing
         TopicImpl _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModelImpl topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
@@ -182,16 +182,16 @@ class ValueUpdater {
      * Updates a composite value and returns the unified composite value.
      *
      * Preconditions:
-     *   - this.updateModel is composite
+     *   - this.newValues is composite
      *
-     * @return  the unified value, or null if there was nothing to update.
+     * @return  the unified value, or null if there was nothing to integrate.
      */
-    private DMXObjectModelImpl updateComposite() {
+    private DMXObjectModelImpl integrateComposite() {
         try {
             Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
-            ChildTopicsModel _childTopics = updateModel.getChildTopicsModel();
-            // Iterate through type, not through updateModel.
-            // updateModel might contain childs not contained in the type def, e.g. "dm4.time.modified".
+            ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
+            // Iterate through type, not through newValues.
+            // newValues might contain childs not contained in the type def, e.g. "dm4.time.modified".
             for (String assocDefUri : type) {
                 Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
                 if (isOne(assocDefUri)) {
@@ -205,7 +205,7 @@ class ValueUpdater {
                     continue;
                 }
                 //
-                Object childTopic = updateChildValue(newChildValue, assocDefUri);
+                Object childTopic = integrateChildValue(newChildValue, assocDefUri);
                 if (isOne(assocDefUri) && ((UnifiedValue) childTopic).value == null) {
                     emptyValues.add(assocDefUri);
                 } else {
@@ -223,24 +223,24 @@ class ValueUpdater {
             //
             return value;
         } catch (Exception e) {
-            throw new RuntimeException("Updating a composite value failed, updateModel=" + updateModel, e);
+            throw new RuntimeException("Updating a composite value failed, newValues=" + newValues, e);
         }
     }
 
     /**
-     * Invokes a ValueUpdater for a child value.
+     * Invokes a ValueIntegrator for a child value.
      *
      * @param   childValue      RelatedTopicModelImpl or List<RelatedTopicModelImpl>
      *
      * @return  UnifiedValue or List<UnifiedValue>; never null;
      */
-    private Object updateChildValue(Object childValue, String assocDefUri) {
+    private Object integrateChildValue(Object childValue, String assocDefUri) {
         if (isOne(assocDefUri)) {
-            return new ValueUpdater(pl).update((RelatedTopicModelImpl) childValue, null); // targetObject=null
+            return new ValueIntegrator(pl).integrate((RelatedTopicModelImpl) childValue, null);     // targetObject=null
         } else {
             List<UnifiedValue> values = new ArrayList();
             for (RelatedTopicModelImpl value : (List<RelatedTopicModelImpl>) childValue) {
-                values.add(new ValueUpdater(pl).update(value, null));                     // targetObject=null
+                values.add(new ValueIntegrator(pl).integrate(value, null));                         // targetObject=null
             }
             return values;
         }
@@ -248,7 +248,7 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is composite
+     *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
      *
@@ -270,10 +270,10 @@ class ValueUpdater {
         if (targetObject != null) {
             return targetObject;
         } else if (isAssoc) {
-            if (updateModel.id == -1) {
-                throw new RuntimeException("updateModel has no ID set");
+            if (newValues.id == -1) {
+                throw new RuntimeException("newValues has no ID set");
             }
-            return mf.newAssociationModel(updateModel.id, null, updateModel.typeUri, null, null);
+            return mf.newAssociationModel(newValues.id, null, newValues.typeUri, null, null);
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
@@ -318,7 +318,7 @@ class ValueUpdater {
      * Updates a parent's child assignments in-place.
      *
      * Preconditions:
-     *   - this.updateModel is composite
+     *   - this.newValues is composite
      *   - this.type is an identity type
      *   - parent's type is this.type
      *   - assocDef's parent type is this.type
@@ -326,11 +326,10 @@ class ValueUpdater {
      *
      * @param   unifiedChilds     value: UnifiedValue or List<UnifiedValue>
      */
-    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent,
-                                                        Map<String, Object> unifiedChilds) {
+    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> unifiedChilds) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
-            throw new RuntimeException("Type mismatch: updateModel type=\"" + type.getUri() + "\" vs. parent type=\"" +
+            throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\" vs. parent type=\"" +
                 parent.getTypeUri() + "\"");
         }
         //
@@ -393,7 +392,7 @@ class ValueUpdater {
                 assoc = oldValue.getRelatingAssociation();
             }
             if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = updateModel.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
                 updateRelatingAssociation(assoc, assocDefUri, newChildValue);
             }
         }
@@ -403,7 +402,7 @@ class ValueUpdater {
      * @param   unifiedChilds   never null; a UnifiedValue's "value" field may be null
      */
     private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> unifiedChilds,
-                                                                         String assocDefUri) {
+                                                                  String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
         // logger.info("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
@@ -450,32 +449,32 @@ class ValueUpdater {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    RelatedTopicModelImpl updateModel = (RelatedTopicModelImpl) _unifiedChild._updateModel;
-                    updateRelatingAssociation(assoc, assocDefUri, updateModel);
+                    RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) _unifiedChild._newValues;
+                    updateRelatingAssociation(assoc, assocDefUri, newValues);
                 }
             }
         }
     }
 
     private void updateRelatingAssociation(AssociationModelImpl assoc, String assocDefUri,
-                                           RelatedTopicModelImpl updateModel) {
+                                           RelatedTopicModelImpl newValues) {
         try {
-            // Note: for partial create/update requests updateModel might be null
-            if (updateModel != null) {
-                AssociationModelImpl _updateModel = updateModel.getRelatingAssociation();
+            // Note: for partial create/update requests newValues might be null
+            if (newValues != null) {
+                AssociationModelImpl _newValues = newValues.getRelatingAssociation();
                 // Note: the roles must be suppressed from being updated. Update would fail if a new child has
                 // been assigned (step 2) because the player is another one then. Here we are only interested
                 // in updating the assoc value.
-                _updateModel.setRoleModel1(null);
-                _updateModel.setRoleModel2(null);
+                _newValues.setRoleModel1(null);
+                _newValues.setRoleModel2(null);
                 // Note: if no relating assocs are contained in a create/update request the model factory
                 // creates assocs anyways, but these are completely uninitialized. ### TODO: Refactor
                 // TODO: is condition needed? => yes, try create new topic
-                if (_updateModel.typeUri != null) {
-                    assoc.update(_updateModel);
+                if (_newValues.typeUri != null) {
+                    assoc.update(_newValues);
                     // TODO: access control? Note: currently the child assocs of a workspace have no workspace
                     // assignments. With strict access control, updating a workspace topic would fail.
-                    // pl.updateAssociation(assoc, _updateModel);
+                    // pl.updateAssociation(assoc, _newValues);
                 }
             }
         } catch (Exception e) {
@@ -488,7 +487,7 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is composite
+     *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
      *   - childTopics map is not empty
@@ -514,7 +513,7 @@ class ValueUpdater {
             logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
-            throw new RuntimeException("ValueUpdater ambiguity: there are " + candidates.size() +
+            throw new RuntimeException("ValueIntegrator ambiguity: there are " + candidates.size() +
                 " parents (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(candidates) +
                 ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
         }
@@ -522,7 +521,7 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is composite
+     *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
      *   - childTopics map is not empty
@@ -579,7 +578,7 @@ class ValueUpdater {
 
     /**
      * Preconditions:
-     *   - this.updateModel is a topic model.
+     *   - this.newValues is a topic model.
      */
     private TopicModelImpl createSimpleTopic() {
         // sanity check
@@ -587,7 +586,7 @@ class ValueUpdater {
             throw new RuntimeException("Tried to create a topic from an assoc model");
         }
         //
-        return pl._createTopic(mf.newTopicModel(updateModel.uri, updateModel.typeUri, updateModel.value)).getModel();
+        return pl._createTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
     }
 
     /**
@@ -613,12 +612,12 @@ class ValueUpdater {
     }
 
     private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
-                                                                                      String assocDefUri) {
+                                                                               String assocDefUri) {
         return createChildAssociation(parent, child, assocDefUri, false);
     }
 
     private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
-                                                                                  String assocDefUri, boolean deleted) {
+                                                                               String assocDefUri, boolean deleted) {
         logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
             assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
@@ -673,17 +672,17 @@ class ValueUpdater {
 
     class UnifiedValue<M extends DMXObjectModelImpl> {
 
-        M value;                                   // the resulting unified value
-        DMXObjectModelImpl _updateModel;    // the original update model
-        long originalId;                           // the original ID, saved here cause it is overwritten (see update())
+        M value;                            // the resulting unified value
+        DMXObjectModelImpl _newValues;      // the original new values
+        long originalId;                    // the original ID, saved here cause it is overwritten (see integrate())
 
         /**
          * @param   value   may be null
          */
         private UnifiedValue(M value) {
             this.value = value;
-            this._updateModel = updateModel;
-            this.originalId = updateModel.id;
+            this._newValues = newValues;
+            this.originalId = newValues.id;
         }
     }
 }

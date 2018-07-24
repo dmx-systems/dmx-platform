@@ -356,7 +356,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     private void addDefaultViewConfig(TypeModel typeModel) {
         // This would create View Config topics without any child topics.
-        // Now with the ValueUpdater we can't create empty composites.
+        // Now with the ValueIntegrator we can't create empty composites.
         // See also WebclientPlugin Migration3.java
         // ### TODO: rethink about this.
         /*

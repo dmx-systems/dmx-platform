@@ -894,10 +894,10 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---
 
     private <M extends DMXObjectModelImpl> M updateValues(M updateModel, M targetObject) {
-        M value = new ValueUpdater(this).update(updateModel, targetObject).value;
+        M value = new ValueIntegrator(this).integrate(updateModel, targetObject).value;
         // sanity check
         if (value == null) {
-            throw new RuntimeException("ValueUpdater yields no result");
+            throw new RuntimeException("ValueIntegrator yields no result");
         }
         //
         return value;
