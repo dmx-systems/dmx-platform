@@ -13,6 +13,7 @@ import de.deepamehta.core.model.TopicReferenceModel;
 import de.deepamehta.core.model.TypeModel;
 import de.deepamehta.core.util.DMXUtils;
 
+import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,10 +31,12 @@ class ValueIntegrator {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private DMXObjectModelImpl newValues;
-    private DMXObjectModelImpl targetObject;    // may null
+    private DMXObjectModelImpl targetObject;        // may null
+    private AssociationDefinitionModel assocDef;    // may null
     private TypeModelImpl type;
     private boolean isAssoc;
     private boolean isType;
+    private boolean isFacetUpdate;
 
     // For composites: assoc def URIs of empty child topics.
     // Evaluated when deleting child-assignments, see updateAssignments().
@@ -60,13 +63,14 @@ class ValueIntegrator {
      *
      * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
-    <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject) {
-        // Note: newValues must be initialized *before* processing refs.
-        // UnifiedValue constructor operates on newValues.
+    <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject,
+                                                             AssociationDefinitionModel assocDef) {
         this.newValues = newValues;
         this.targetObject = targetObject;
+        this.assocDef = assocDef;
         this.isAssoc = newValues instanceof AssociationModel;
         this.isType  = newValues instanceof TypeModel;
+        this.isFacetUpdate = assocDef != null;
         //
         // process refs
         if (newValues instanceof TopicReferenceModel) {
@@ -84,7 +88,9 @@ class ValueIntegrator {
         this.type = newValues.getType();
         //
         // integrate values
-        DMXObjectModelImpl _value = newValues.isSimple() ? integrateSimple() : integrateComposite();
+        // Note: because a facet type is composite by definition a facet update is a composite operation, even if the
+        // faceted object is a simple one.
+        DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ? integrateSimple() : integrateComposite();
         //
         // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
         UnifiedValue value = new UnifiedValue(_value);
@@ -94,7 +100,7 @@ class ValueIntegrator {
             if (_value.id == -1) {
                 throw new RuntimeException("Unification result has no ID set");
             }
-            // Note: this is an ugly side effect, but we keep it for pragmatic reasons
+            // Note: this is an ugly side effect, but we keep it for pragmatic reasons ### TODO: rethink
             newValues.id = _value.id;
         }
         //
@@ -117,6 +123,8 @@ class ValueIntegrator {
     // Simple
 
     /**
+     * Integrates a simple value into the DB and returns the unified simple value.
+     *
      * Preconditions:
      *   - this.newValues is not null
      *   - this.newValues is simple
@@ -125,16 +133,20 @@ class ValueIntegrator {
      *          The latter is the case if this.newValues is the empty string.
      */
     private DMXObjectModelImpl integrateSimple() {
-        if (isAssoc || isType) {
-            // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
-            // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
-            // different players.) An assoc's simple value is updated in-place.
-            // Note 2: a type's simple value is not unified. A type is updated in-place.
-            return storeAssocSimpleValue();
-        } else if (newValues.getSimpleValue().toString().isEmpty()) {
-            return null;
-        } else {
-            return unifySimple();
+        try {
+            if (isAssoc || isType) {
+                // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
+                // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
+                // different players.) An assoc's simple value is updated in-place.
+                // Note 2: a type's simple value is not unified. A type is updated in-place.
+                return storeAssocSimpleValue();
+            } else if (newValues.getSimpleValue().toString().isEmpty()) {
+                return null;
+            } else {
+                return unifySimple();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Integrating a simple value failed, newValues=" + newValues, e);
         }
     }
 
@@ -179,7 +191,7 @@ class ValueIntegrator {
     // Composite
 
     /**
-     * Updates a composite value and returns the unified composite value.
+     * Integrates a composite value into the DB and returns the unified composite value.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -192,7 +204,7 @@ class ValueIntegrator {
             ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
             // Iterate through type, not through newValues.
             // newValues might contain childs not contained in the type def, e.g. "dm4.time.modified".
-            for (String assocDefUri : type) {
+            for (String assocDefUri : assocDefUris()) {
                 Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
                 if (isOne(assocDefUri)) {
                     newChildValue = _childTopics.getTopicOrNull(assocDefUri);
@@ -223,12 +235,16 @@ class ValueIntegrator {
             //
             return value;
         } catch (Exception e) {
-            throw new RuntimeException("Updating a composite value failed, newValues=" + newValues, e);
+            throw new RuntimeException("Integrating a composite value failed, newValues=" + newValues, e);
         }
     }
 
+    private Iterable<String> assocDefUris() {
+        return isFacetUpdate ? asList(assocDef.getAssocDefUri()) : type;
+    }
+
     /**
-     * Invokes a ValueIntegrator for a child value.
+     * Integrates a child value into the DB and returns the unified value.
      *
      * @param   childValue      RelatedTopicModelImpl or List<RelatedTopicModelImpl>
      *
@@ -236,11 +252,11 @@ class ValueIntegrator {
      */
     private Object integrateChildValue(Object childValue, String assocDefUri) {
         if (isOne(assocDefUri)) {
-            return new ValueIntegrator(pl).integrate((RelatedTopicModelImpl) childValue, null);     // targetObject=null
+            return new ValueIntegrator(pl).integrate((RelatedTopicModelImpl) childValue, null, null);
         } else {
             List<UnifiedValue> values = new ArrayList();
             for (RelatedTopicModelImpl value : (List<RelatedTopicModelImpl>) childValue) {
-                values.add(new ValueIntegrator(pl).integrate(value, null));                         // targetObject=null
+                values.add(new ValueIntegrator(pl).integrate(value, null, null));
             }
             return values;
         }
@@ -329,12 +345,12 @@ class ValueIntegrator {
     private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> unifiedChilds) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
-            throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\" vs. parent type=\"" +
+            throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\", parent type=\"" +
                 parent.getTypeUri() + "\"");
         }
         //
-        for (String assocDefUri : type) {
-            parent.loadChildTopics(assocDefUri);    // TODO: load only one level deep?
+        for (String assocDefUri : assocDefUris()) {
+            parent.loadChildTopics(assocDef(assocDefUri));    // TODO: load only one level deep
             Object unifiedChild = unifiedChilds.get(assocDefUri);
             if (isOne(assocDefUri)) {
                 TopicModel _unifiedChild = (TopicModel) (unifiedChild != null ? ((UnifiedValue) unifiedChild).value :
@@ -653,7 +669,15 @@ class ValueIntegrator {
     // ---
 
     private AssociationDefinitionModel assocDef(String assocDefUri) {
-        return type.getAssocDef(assocDefUri);
+        if (isFacetUpdate) {
+            if (!assocDefUri.equals(assocDef.getAssocDefUri())) {
+                throw new RuntimeException("URI mismatch: assocDefUri=\"" + assocDefUri + "\", facet assocDefUri=\"" +
+                    assocDef.getAssocDefUri() + "\"");
+            }
+            return assocDef;
+        } else {
+            return type.getAssocDef(assocDefUri);
+        }
     }
 
     private boolean isOne(String assocDefUri) {

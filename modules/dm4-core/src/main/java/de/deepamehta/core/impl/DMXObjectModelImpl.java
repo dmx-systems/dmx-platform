@@ -417,7 +417,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
             //
             _updateUri(updateModel.getUri());
             _updateTypeUri(updateModel.getTypeUri());
-            new ValueIntegrator(pl).integrate(updateModel, this);   // TODO: handle return value
+            new ValueIntegrator(pl).integrate(updateModel, this, null);   // TODO: handle return value
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face
             // of DM5 update logic (= unification). Note that update() is not called recursively anmore.
             /* TODO: drop it!
@@ -582,7 +582,10 @@ class DMXObjectModelImpl implements DMXObjectModel {
     }
 
     final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinitionModel assocDef) {
-        // TODO
+        // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
+        // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
+        // Compare to update() method.
+        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, assocDef);
     }
 
     // ---

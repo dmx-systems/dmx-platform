@@ -138,12 +138,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     @Override
     public void updateFacet(DMXObject object, String facetTypeUri, FacetValueModel value) {
-        AssociationDefinition assocDef = getAssocDef(facetTypeUri);
-        if (!isMultiFacet(facetTypeUri)) {
-            object.updateChildTopic(value.getTopic(), assocDef);
-        } else {
-            object.updateChildTopics(value.getTopics(), assocDef);
-        }
+        object.updateChildTopics(value, getAssocDef(facetTypeUri));
     }
 
     // ---
