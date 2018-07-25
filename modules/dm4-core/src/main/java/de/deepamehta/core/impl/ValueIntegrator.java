@@ -113,7 +113,7 @@ class ValueIntegrator {
         TopicReferenceModelImpl ref = (TopicReferenceModelImpl) newValues;
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
-            logger.info("Referencing " + object);
+            logger.fine("Referencing " + object);
             return new UnifiedValue(object);
         } else {
             return new UnifiedValue(null);
@@ -227,10 +227,12 @@ class ValueIntegrator {
             DMXObjectModelImpl value = unifyComposite(childTopics);
             //
             // label calculation
-            if (value != null) {
-                new LabelCalculation(value).calculate();
-            } else if (isAssoc) {
-                storeAssocSimpleValue();
+            if (!isFacetUpdate) {
+                if (value != null) {
+                    new LabelCalculation(value).calculate();
+                } else if (isAssoc) {
+                    storeAssocSimpleValue();
+                }
             }
             //
             return value;
