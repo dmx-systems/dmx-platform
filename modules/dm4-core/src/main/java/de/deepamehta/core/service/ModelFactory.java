@@ -82,6 +82,9 @@ public interface ModelFactory {
     // ### TODO: Refactoring needed. See comments in impl.
     AssociationModel newAssociationModel(ChildTopicsModel childTopics);
 
+    // ### TODO: Refactoring needed. See comments in impl.
+    AssociationModel newAssociationModel(String typeUri, ChildTopicsModel childTopics);
+
     AssociationModel newAssociationModel(long id, String uri, String typeUri, RoleModel roleModel1,
                                                                               RoleModel roleModel2);
 

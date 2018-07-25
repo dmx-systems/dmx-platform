@@ -140,7 +140,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     AssociationDefinitionModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newAssociationDefinitionModel(childTopics);   // FIXME: must pass typeUri?
+        return mf.newAssociationDefinitionModel(typeUri, childTopics);
     }
 
 

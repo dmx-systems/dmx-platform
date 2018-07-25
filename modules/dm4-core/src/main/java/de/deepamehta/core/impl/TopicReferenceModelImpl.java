@@ -66,6 +66,14 @@ class TopicReferenceModelImpl extends RelatedTopicModelImpl implements TopicRefe
 
     // ---
 
+    /**
+     * Resolves this reference and replaces it by the resolved topic.
+     *
+     * TODO: don't manipulate in-place?
+     *
+     * @throws  RuntimeException    if retrieval of the refered topic fails
+     * @throws  RuntimeException    if this reference refers to nothing
+     */
     TopicModelImpl resolve() {
         try {
             TopicModelImpl topic;

@@ -588,7 +588,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // ---
 
     /**
-     * Loads the child topics which are not loaded already.
+     * Recursively loads this object's child topics which are not loaded already.
      */
     final DMXObjectModel loadChildTopics() {
         for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
@@ -598,7 +598,10 @@ class DMXObjectModelImpl implements DMXObjectModel {
     }
 
     /**
-     * Loads the child topics for the given assoc def, provided they are not loaded already.
+     * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
+     * If the child topics are loaded already nothing is performed.
+     * <p>
+     * Can <i>not</i> be used to load facet values.
      */
     final DMXObjectModel loadChildTopics(String assocDefUri) {
         try {
@@ -607,6 +610,26 @@ class DMXObjectModelImpl implements DMXObjectModel {
             throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
                 e);
         }
+    }
+
+    /**
+     * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
+     * If the child topics are loaded already nothing is performed.
+     * <p>
+     * Can be used to load facet values.
+     *
+     * @param   assocDef    the child topics according to this association definition are loaded.
+     *                      <p>
+     *                      Note: the association definition must not necessarily originate from this object's
+     *                      type definition. It may originate from a facet type as well.
+     */
+    final DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
+        String assocDefUri = assocDef.getAssocDefUri();
+        if (!childTopics.has(assocDefUri)) {
+            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());
+            pl.valueStorage.fetchChildTopics(this, assocDef);
+        }
+        return this;
     }
 
     // ---
@@ -654,24 +677,6 @@ class DMXObjectModelImpl implements DMXObjectModel {
         if (getSimpleValue() == null) {
             setSimpleValue("");
         }
-    }
-
-    /**
-     * Recursively loads child topics (model) and updates this attached object cache accordingly. ### FIXDOC
-     * If the child topics are loaded already nothing is performed.
-     *
-     * @param   assocDef    the child topics according to this association definition are loaded.
-     *                      <p>
-     *                      Note: the association definition must not necessarily originate from the parent object's
-     *                      type definition. It may originate from a facet definition as well.
-     */
-    DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
-        String assocDefUri = assocDef.getAssocDefUri();
-        if (!childTopics.has(assocDefUri)) {
-            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());
-            pl.valueStorage.fetchChildTopics(this, assocDef);
-        }
-        return this;
     }
 
 

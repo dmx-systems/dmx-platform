@@ -146,15 +146,24 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make internal?
     @Override
     public AssociationModelImpl newAssociationModel() {
         return newAssociationModel(-1, null, null, null, null, null, null);
     }
 
     // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make internal?
     @Override
     public AssociationModelImpl newAssociationModel(ChildTopicsModel childTopics) {
-        return newAssociationModel(-1, null, null, null, null, null, childTopics);
+        return newAssociationModel(null, childTopics);
+    }
+
+    // ### TODO: don't leave the assoc uninitialized. Refactoring needed. See comment in TypeCache#put methods.
+    // ### TODO: make internal?
+    @Override
+    public AssociationModelImpl newAssociationModel(String typeUri, ChildTopicsModel childTopics) {
+        return newAssociationModel(typeUri, null, null, childTopics);
     }
 
     @Override
@@ -743,8 +752,8 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
-    AssociationDefinitionModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
-        return new AssociationDefinitionModelImpl(newAssociationModel(childTopics));
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri, ChildTopicsModel childTopics) {
+        return new AssociationDefinitionModelImpl(newAssociationModel(assocTypeUri, childTopics));
     }
 
     // ---

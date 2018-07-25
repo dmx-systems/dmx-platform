@@ -168,7 +168,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     @Override
     AssociationModelImpl createModelWithChildTopics(ChildTopicsModel childTopics) {
-        return mf.newAssociationModel(childTopics);     // FIXME: must pass typeUri?
+        return mf.newAssociationModel(typeUri, childTopics);
     }
 
     // ---

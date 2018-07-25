@@ -143,7 +143,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/{uri}")
     @Override
@@ -151,7 +151,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dm4.getAccessControl().getWorkspace(uri);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/object/{id}")
     @Override
@@ -214,7 +214,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/{id}/topics")
     @Override
@@ -222,7 +222,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return dm4.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/{id}/assocs")
     @Override
@@ -232,7 +232,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     // ---
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/{id}/topics/{topic_type_uri}")
     @Override
@@ -243,7 +243,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return topics;
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
     @GET
     @Path("/{id}/assocs/{assoc_type_uri}")
     @Override
