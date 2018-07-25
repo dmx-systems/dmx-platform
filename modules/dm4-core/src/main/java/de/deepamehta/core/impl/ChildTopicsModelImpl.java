@@ -54,7 +54,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // === Accessors ===
 
     @Override
-    public RelatedTopicModelImpl getTopic(String assocDefUri) {
+    public final RelatedTopicModelImpl getTopic(String assocDefUri) {
         RelatedTopicModelImpl topic = getTopicOrNull(assocDefUri);
         // error check
         if (topic == null) {
@@ -65,7 +65,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public RelatedTopicModelImpl getTopicOrNull(String assocDefUri) {
+    public final RelatedTopicModelImpl getTopicOrNull(String assocDefUri) {
         try {
             return (RelatedTopicModelImpl) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
@@ -77,7 +77,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ---
 
     @Override
-    public List<RelatedTopicModelImpl> getTopics(String assocDefUri) {
+    public final List<RelatedTopicModelImpl> getTopics(String assocDefUri) {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
         // error check
         if (topics == null) {
@@ -88,7 +88,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public List<RelatedTopicModelImpl> getTopicsOrNull(String assocDefUri) {
+    public final List<RelatedTopicModelImpl> getTopicsOrNull(String assocDefUri) {
         try {
             return (List<RelatedTopicModelImpl>) childTopics.get(assocDefUri);
         } catch (ClassCastException e) {
@@ -106,7 +106,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * @return  A RelatedTopicModel or List<RelatedTopicModel>, or null if there is no such child.
      */
     @Override
-    public Object get(String assocDefUri) {
+    public final Object get(String assocDefUri) {
         return childTopics.get(assocDefUri);
     }
 
@@ -119,7 +119,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public String getString(String assocDefUri) {
+    public final String getString(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().toString();
     }
 
@@ -128,7 +128,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public String getString(String assocDefUri, String defaultValue) {
+    public final String getString(String assocDefUri, String defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().toString() : defaultValue;
     }
@@ -140,7 +140,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public int getInt(String assocDefUri) {
+    public final int getInt(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().intValue();
     }
 
@@ -149,7 +149,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public int getInt(String assocDefUri, int defaultValue) {
+    public final int getInt(String assocDefUri, int defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().intValue() : defaultValue;
     }
@@ -161,7 +161,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public long getLong(String assocDefUri) {
+    public final long getLong(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().longValue();
     }
 
@@ -170,7 +170,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public long getLong(String assocDefUri, long defaultValue) {
+    public final long getLong(String assocDefUri, long defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().longValue() : defaultValue;
     }
@@ -182,7 +182,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public double getDouble(String assocDefUri) {
+    public final double getDouble(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().doubleValue();
     }
 
@@ -191,7 +191,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public double getDouble(String assocDefUri, double defaultValue) {
+    public final double getDouble(String assocDefUri, double defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().doubleValue() : defaultValue;
     }
@@ -203,7 +203,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public boolean getBoolean(String assocDefUri) {
+    public final boolean getBoolean(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().booleanValue();
     }
 
@@ -212,7 +212,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public boolean getBoolean(String assocDefUri, boolean defaultValue) {
+    public final boolean getBoolean(String assocDefUri, boolean defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().booleanValue() : defaultValue;
     }
@@ -224,7 +224,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public Object getObject(String assocDefUri) {
+    public final Object getObject(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().value();
     }
 
@@ -233,7 +233,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public Object getObject(String assocDefUri, Object defaultValue) {
+    public final Object getObject(String assocDefUri, Object defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getSimpleValue().value() : defaultValue;
     }
@@ -245,7 +245,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Throws if the child doesn't exist.
      */
     @Override
-    public ChildTopicsModel getChildTopicsModel(String assocDefUri) {
+    public final ChildTopicsModel getChildTopicsModel(String assocDefUri) {
         return getTopic(assocDefUri).getChildTopicsModel();
     }
 
@@ -254,7 +254,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns a default value if the child doesn't exist.
      */
     @Override
-    public ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
+    public final ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
         RelatedTopicModel topic = getTopicOrNull(assocDefUri);
         return topic != null ? topic.getChildTopicsModel() : defaultValue;
     }
@@ -272,7 +272,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * An existing value is overwritten.
      */
     @Override
-    public ChildTopicsModel put(String assocDefUri, RelatedTopicModel value) {
+    public final ChildTopicsModel put(String assocDefUri, RelatedTopicModel value) {
         try {
             // check argument
             if (value == null) {
@@ -288,7 +288,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public ChildTopicsModel put(String assocDefUri, TopicModel value) {
+    public final ChildTopicsModel put(String assocDefUri, TopicModel value) {
         return put(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
@@ -303,7 +303,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * @return  this ChildTopicsModel.
      */
     @Override
-    public ChildTopicsModel put(String assocDefUri, Object value) {
+    public final ChildTopicsModel put(String assocDefUri, Object value) {
         try {
             return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
         } catch (Exception e) {
@@ -319,7 +319,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * @return  this ChildTopicsModel.
      */
     @Override
-    public ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
+    public final ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
         return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), value));
     }
 
@@ -330,7 +330,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * An existing reference is overwritten.
      */
     @Override
-    public ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
+    public final ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
         put(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
@@ -340,7 +340,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * An existing reference is overwritten.
      */
     @Override
-    public ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
+    public final ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
         put(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
@@ -352,7 +352,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * An existing value is overwritten.
      */
     @Override
-    public ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
+    public final ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
         put(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
@@ -362,7 +362,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * An existing value is overwritten.
      */
     @Override
-    public ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
+    public final ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
         put(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
@@ -373,7 +373,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Removes a single-valued child.
      */
     @Override
-    public ChildTopicsModel remove(String assocDefUri) {
+    public final ChildTopicsModel remove(String assocDefUri) {
         childTopics.remove(assocDefUri);    // ### TODO: throw if not in map?
         return this;
     }
@@ -384,7 +384,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Adds a value to a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
+    public final ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
         // Note: topics just created have no child topics yet
         if (topics == null) {
@@ -398,7 +398,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     }
 
     @Override
-    public ChildTopicsModel add(String assocDefUri, TopicModel value) {
+    public final ChildTopicsModel add(String assocDefUri, TopicModel value) {
         return add(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
@@ -407,7 +407,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Existing values are overwritten.
      */
     @Override
-    public ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values) {
+    public final ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values) {
         childTopics.put(assocDefUri, values);
         return this;
     }
@@ -416,7 +416,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Removes a value from a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel remove(String assocDefUri, TopicModel value) {
+    public final ChildTopicsModel remove(String assocDefUri, TopicModel value) {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
         if (topics != null) {
             topics.remove(value);
@@ -430,7 +430,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Adds a by-ID topic reference to a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
+    public final ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
         add(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
@@ -439,7 +439,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Adds a by-URI topic reference to a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
+    public final ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
         add(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
         return this;
     }
@@ -450,7 +450,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Adds a by-ID topic deletion reference to a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
+    public final ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
         add(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
@@ -459,7 +459,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Adds a by-URI topic deletion reference to a multiple-valued child.
      */
     @Override
-    public ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
+    public final ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
         add(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
         return this;
     }
@@ -472,7 +472,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
      * Returns an interator which iterates this ChildTopicsModel's assoc def URIs.
      */
     @Override
-    public Iterator<String> iterator() {
+    public final Iterator<String> iterator() {
         return childTopics.keySet().iterator();
     }
 
@@ -481,7 +481,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
     // ===
 
     @Override
-    public JSONObject toJSON() {
+    public final JSONObject toJSON() {
         try {
             JSONObject json = new JSONObject();
             for (String assocDefUri : this) {
@@ -509,7 +509,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
 
     @Override
-    public ChildTopicsModel clone() {
+    public final ChildTopicsModel clone() {
         ChildTopicsModel clone = mf.newChildTopicsModel();
         for (String assocDefUri : this) {
             Object value = get(assocDefUri);

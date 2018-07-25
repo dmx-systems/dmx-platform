@@ -71,7 +71,12 @@ public interface DMXObject extends Identifiable, JSONEnabled {
 
     // === Updating ===
 
+    void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinition assocDef);
+
+    // ### TODO: drop it!
     void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef);
+
+    // ### TODO: drop it!
     void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics, AssociationDefinition assocDef);
 
 

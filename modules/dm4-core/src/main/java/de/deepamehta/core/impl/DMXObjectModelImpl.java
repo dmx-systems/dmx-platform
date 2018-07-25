@@ -581,6 +581,10 @@ class DMXObjectModelImpl implements DMXObjectModel {
         }
     }
 
+    final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinitionModel assocDef) {
+        // TODO
+    }
+
     // ---
 
     /**
@@ -930,6 +934,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // === Label Calculation ===
 
+    // ### TODO: drop it!
     private void _calculateLabelAndUpdate() {
         List<String> labelAssocDefUris = null;
         try {
@@ -983,6 +988,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         }
     }
 
+    // ### TODO: drop it!
     private String calculateChildLabel(String assocDefUri) {
         Object value = getChildTopicsModel().get(assocDefUri);
         // Note: topics just created have no child topics yet
