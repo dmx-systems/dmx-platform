@@ -128,15 +128,9 @@ abstract class DMXObjectImpl implements DMXObject {
         return new ChildTopicsImpl(model.childTopics, model, pl);
     }
 
-    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
-    // We should call the abstract updateWithChildTopics() instead.
     @Override
     public final void setChildTopics(ChildTopicsModel childTopics) {
-        try {
-            model._updateChildTopics((ChildTopicsModelImpl) childTopics);
-        } catch (Exception e) {
-            throw new RuntimeException("Setting the child topics failed (" + childTopics + ")", e);
-        }
+        model.updateChildTopics(childTopics);
     }
 
     // ---

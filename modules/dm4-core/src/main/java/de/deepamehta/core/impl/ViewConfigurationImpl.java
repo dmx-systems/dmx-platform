@@ -90,9 +90,9 @@ class ViewConfigurationImpl implements ViewConfiguration {
         TopicModelImpl configTopic = model.getConfigTopic(configTypeUri);
         if (configTopic == null) {
             configTopic = mf.newTopicModel(configTypeUri, childs);
-            _addConfigTopic(configTopic);                   // update memory + DB
+            _addConfigTopic(configTopic);               // update memory + DB
         } else {
-            configTopic.updateWithChildTopics(childs);      // update memory + DB
+            configTopic.updateChildTopics(childs);      // update memory + DB
         }
     }
 

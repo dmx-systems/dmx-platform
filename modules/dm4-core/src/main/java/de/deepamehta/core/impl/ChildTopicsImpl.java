@@ -23,9 +23,9 @@ class ChildTopicsImpl implements ChildTopics {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ChildTopicsModelImpl model;         // underlying model
+    private ChildTopicsModelImpl model;     // underlying model
 
-    private DMXObjectModelImpl parent;   // the parent object this ChildTopics belongs to
+    private DMXObjectModelImpl parent;      // the parent object this ChildTopics belongs to
 
     private PersistenceLayer pl;
     private ModelFactory mf;
@@ -326,12 +326,12 @@ class ChildTopicsImpl implements ChildTopics {
     // hierarchy. See the missingMultipleDispatch tests in JavaAPITest.java (in module dm4-test). ### still true?
 
     private ChildTopics _updateOne(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateWithChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
+        parent.updateChildTopics(mf.newChildTopicsModel().put(assocDefUri, newChildTopic));
         return this;
     }
 
     private ChildTopics _updateMany(String assocDefUri, RelatedTopicModel newChildTopic) {
-        parent.updateWithChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
+        parent.updateChildTopics(mf.newChildTopicsModel().add(assocDefUri, newChildTopic));
         return this;
     }
 

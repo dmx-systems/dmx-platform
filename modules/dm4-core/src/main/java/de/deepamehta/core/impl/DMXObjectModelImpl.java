@@ -397,7 +397,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // === Update (memory + DB) ===
 
-    final void updateWithChildTopics(ChildTopicsModel childTopics) {
+    final void updateChildTopics(ChildTopicsModel childTopics) {
         update(createModelWithChildTopics(childTopics));
     }
 
