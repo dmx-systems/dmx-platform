@@ -1022,7 +1022,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update facet
         tx = dm4.beginTx();
         try {
-            name.updateChildTopic(mf.newTopicReferenceModel(item1.getId()), assocDef);
+            name.updateChildTopics(
+                mf.newChildTopicsModel().putRef("dm4.test.item", item1.getId()),
+                assocDef
+            );
             tx.success();
         } finally {
             tx.finish();
@@ -1037,7 +1040,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         // update facet again
         tx = dm4.beginTx();
         try {
-            name.updateChildTopic(mf.newTopicReferenceModel(item2.getId()), assocDef);
+            name.updateChildTopics(
+                mf.newChildTopicsModel().putRef("dm4.test.item", item2.getId()),
+                assocDef
+            );
             tx.success();
         } finally {
             tx.finish();

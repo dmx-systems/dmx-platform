@@ -168,27 +168,6 @@ abstract class DMXObjectImpl implements DMXObject {
         model.updateChildTopics(updateModel, assocDef.getModel());
     }
 
-    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
-    // Directives/events is handled only in the high-level update() method.
-    // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
-    // ### TODO: drop it!
-    @Override
-    public final void updateChildTopic(RelatedTopicModel newChildTopic, AssociationDefinition assocDef) {
-        model.updateChildTopics((RelatedTopicModelImpl) newChildTopic, null, assocDef.getModel());
-            // newChildTopics=null
-    }
-
-    // ### FIXME: no UPDATE directive for *this* object is added. No UPDATE event for *this* object is fired.
-    // Directives/events is handled only in the high-level update() method.
-    // Here however we need to call the low-level updateChildTopics() method in order to pass an arbitrary assoc def.
-    // ### TODO: drop it!
-    @Override
-    public final void updateChildTopics(List<? extends RelatedTopicModel> newChildTopics,
-                                        AssociationDefinition assocDef) {
-        model.updateChildTopics(null, (List<RelatedTopicModelImpl>) newChildTopics, assocDef.getModel());
-            // newChildTopic=null
-    }
-
 
 
     // === Traversal ===
