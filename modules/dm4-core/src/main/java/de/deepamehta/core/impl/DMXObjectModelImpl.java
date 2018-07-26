@@ -401,6 +401,15 @@ class DMXObjectModelImpl implements DMXObjectModel {
         update(createModelWithChildTopics(childTopics));
     }
 
+    final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinitionModel assocDef) {
+        // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
+        // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
+        // Compare to update() method.
+        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, assocDef);
+    }
+
+    // ---
+
     /**
      * @param   updateModel    The data to update.
      *              If the URI is <code>null</code> it is not updated.
@@ -420,12 +429,6 @@ class DMXObjectModelImpl implements DMXObjectModel {
             new ValueIntegrator(pl).integrate(updateModel, this, null);   // TODO: handle return value
             // TODO: rethink semantics of 1) events, 2) core internal hooks, and 3) directives in the face
             // of DM5 update logic (= unification). Note that update() is not called recursively anmore.
-            /* TODO: drop it!
-            if (isSimple()) {
-                _updateSimpleValue(updateModel.getSimpleValue());
-            } else {
-                _updateChildTopics(updateModel.getChildTopicsModel());
-            } */
             //
             postUpdate(updateModel, oldObject);
             //
@@ -515,80 +518,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
 
 
-    // === Update Child Topics (memory + DB) ===
-
-    // ### TODO: make this private. See comment in DMXObjectImpl.setChildTopics()
-    // ### TODO: drop it!
-    final void _updateChildTopics(ChildTopicsModelImpl updateModel) {
-        try {
-            for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
-                String assocDefUri    = assocDef.getAssocDefUri();
-                String cardinalityUri = assocDef.getChildCardinalityUri();
-                RelatedTopicModelImpl newChildTopic = null;             // only used for "one"
-                List<RelatedTopicModelImpl> newChildTopics = null;      // only used for "many"
-                if (cardinalityUri.equals("dm4.core.one")) {
-                    newChildTopic = updateModel.getTopicOrNull(assocDefUri);
-                    // skip if not contained in update request
-                    if (newChildTopic == null) {
-                        continue;
-                    }
-                } else if (cardinalityUri.equals("dm4.core.many")) {
-                    newChildTopics = updateModel.getTopicsOrNull(assocDefUri);
-                    // skip if not contained in update request
-                    if (newChildTopics == null) {
-                        continue;
-                    }
-                } else {
-                    throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-                }
-                //
-                updateChildTopics(newChildTopic, newChildTopics, assocDef);
-            }
-            //
-            _calculateLabelAndUpdate();
-            //
-        } catch (Exception e) {
-            throw new RuntimeException("Updating the child topics of " + objectInfo() + " failed", e);
-        }
-    }
-
-    // Note: the given association definition must not necessarily originate from the parent object's type definition.
-    // It may originate from a facet definition as well.
-    // Called from DMXObjectImpl.updateChildTopic() and DMXObjectImpl.updateChildTopics().
-    // ### TODO: make this private? See comments in DMXObjectImpl.
-    // ### TODO: drop it!
-    final void updateChildTopics(RelatedTopicModelImpl newChildTopic, List<RelatedTopicModelImpl> newChildTopics,
-                                                                      AssociationDefinitionModel assocDef) {
-        // Note: updating the child topics requires them to be loaded
-        loadChildTopics(assocDef);
-        //
-        String assocTypeUri = assocDef.getTypeUri();
-        boolean one = newChildTopic != null;
-        if (assocTypeUri.equals("dm4.core.composition_def")) {
-            if (one) {
-                updateCompositionOne(newChildTopic, assocDef);
-            } else {
-                updateCompositionMany(newChildTopics, assocDef);
-            }
-        } else if (assocTypeUri.equals("dm4.core.aggregation_def")) {
-            if (one) {
-                updateAggregationOne(newChildTopic, assocDef);
-            } else {
-                updateAggregationMany(newChildTopics, assocDef);
-            }
-        } else {
-            throw new RuntimeException("Association type \"" + assocTypeUri + "\" not supported");
-        }
-    }
-
-    final void updateChildTopics(ChildTopicsModel updateModel, AssociationDefinitionModel assocDef) {
-        // ### TODO: think about: no directives are added, no events are fired, no core internal hooks are invoked.
-        // Possibly this is not wanted for facet updates. This method is solely used for facet updates.
-        // Compare to update() method.
-        new ValueIntegrator(pl).integrate(createModelWithChildTopics(updateModel), this, assocDef);
-    }
-
-    // ---
+    // ===
 
     /**
      * Recursively loads this object's child topics which are not loaded already.
@@ -711,253 +641,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
 
 
-    // ### TODO: drop it!
-    // === Update Child Topics (memory + DB) ===
-
-    // --- Composition ---
-
-    private void updateCompositionOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
-        // Note: for cardinality one the simple request format is sufficient. The child's topic ID is not required.
-        // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
-        if (newChildTopic instanceof TopicDeletionModel) {
-            deleteChildTopicOne(childTopic, assocDef, true);                                         // deleteChild=true
-        } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, true);// deleteChild=true
-        } else if (childTopic != null) {
-            updateRelatedTopic(childTopic, newChildTopic);
-        } else {
-            createChildTopicOne(newChildTopic, assocDef);
-        }
-    }
-
-    private void updateCompositionMany(List<RelatedTopicModelImpl> newChildTopics,
-                                       AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
-            long childTopicId = newChildTopic.getId();
-            if (newChildTopic instanceof TopicDeletionModel) {
-                deleteChildTopicMany(childTopicId, assocDef, true);                                 // deleteChild=true
-            } else if (newChildTopic instanceof TopicReferenceModel) {
-                createAssignmentMany((TopicReferenceModelImpl) newChildTopic, assocDef);
-            } else if (childTopicId != -1) {
-                updateChildTopicMany(newChildTopic, assocDef);
-            } else {
-                createChildTopicMany(newChildTopic, assocDef);
-            }
-        }
-    }
-
-    // --- Aggregation ---
-
-    private void updateAggregationOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
-        // ### TODO: possibly sanity check: if child's topic ID *is* provided it must match with the fetched topic.
-        if (newChildTopic instanceof TopicDeletionModel) {
-            deleteChildTopicOne(childTopic, assocDef, false);                                       // deleteChild=false
-        } else if (newChildTopic instanceof TopicReferenceModel) {
-            createAssignmentOne(childTopic, (TopicReferenceModelImpl) newChildTopic, assocDef, false);
-        } else if (newChildTopic.getId() != -1) {                                                   // deleteChild=false
-            updateChildTopicOne(newChildTopic, assocDef);
-        } else {
-            if (childTopic != null) {
-                childTopic.getRelatingAssociation().delete();
-            }
-            createChildTopicOne(newChildTopic, assocDef);
-        }
-    }
-
-    private void updateAggregationMany(List<RelatedTopicModelImpl> newChildTopics,
-                                       AssociationDefinitionModel assocDef) {
-        for (RelatedTopicModelImpl newChildTopic : newChildTopics) {
-            long childTopicId = newChildTopic.getId();
-            if (newChildTopic instanceof TopicDeletionModel) {
-                deleteChildTopicMany(childTopicId, assocDef, false);                                // deleteChild=false
-            } else if (newChildTopic instanceof TopicReferenceModel) {
-                createAssignmentMany((TopicReferenceModelImpl) newChildTopic, assocDef);
-            } else if (childTopicId != -1) {
-                updateChildTopicMany(newChildTopic, assocDef);
-            } else {
-                createChildTopicMany(newChildTopic, assocDef);
-            }
-        }
-    }
-
-    // --- Update ---
-
-    private void updateChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = childTopics.getTopicOrNull(assocDef.getAssocDefUri());
-        //
-        if (childTopic == null || childTopic.getId() != newChildTopic.getId()) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
-                " according to " + assocDef);
-        }
-        //
-        updateRelatedTopic(childTopic, newChildTopic);
-        // Note: memory is already up-to-date. The child topic is updated in-place of parent.
-    }
-
-    private void updateChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = childTopics.findChildTopicById(newChildTopic.getId(), assocDef);
-        //
-        if (childTopic == null) {
-            throw new RuntimeException("Topic " + newChildTopic.getId() + " is not a child of " + objectInfo() +
-                " according to " + assocDef);
-        }
-        //
-        updateRelatedTopic(childTopic, newChildTopic);
-        // Note: memory is already up-to-date. The child topic is updated in-place of parent.
-    }
-
-    // ---
-
-    private void updateRelatedTopic(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
-        // update topic
-        childTopic.update(newChildTopic);
-        // update association
-        updateRelatingAssociation(childTopic, newChildTopic);
-    }
-
-    private void updateRelatingAssociation(RelatedTopicModelImpl childTopic, RelatedTopicModelImpl newChildTopic) {
-        childTopic.getRelatingAssociation().update(newChildTopic.getRelatingAssociation());
-    }
-
-    // --- Create ---
-
-    private void createChildTopicOne(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        // update DB
-        createAndAssociateChildTopic(newChildTopic, assocDef);
-        // update memory
-        childTopics.putInChildTopics(newChildTopic, assocDef);
-    }
-
-    private void createChildTopicMany(RelatedTopicModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        // update DB
-        createAndAssociateChildTopic(newChildTopic, assocDef);
-        // update memory
-        childTopics.addToChildTopics(newChildTopic, assocDef);
-    }
-
-    // ---
-
-    private void createAndAssociateChildTopic(RelatedTopicModelImpl childTopic, AssociationDefinitionModel assocDef) {
-        pl.createTopic(childTopic);
-        associateChildTopic(childTopic, assocDef);
-    }
-
-    // --- Assignment ---
-
-    private void createAssignmentOne(RelatedTopicModelImpl childTopic, TopicReferenceModelImpl newChildTopic,
-                                     AssociationDefinitionModel assocDef, boolean deleteChildTopic) {
-        if (childTopic != null) {
-            if (newChildTopic.isReferingTo(childTopic)) {
-                updateRelatingAssociation(childTopic, newChildTopic);
-                // Note: memory is already up-to-date. The association is updated in-place of parent.
-                return;
-            }
-            if (deleteChildTopic) {
-                childTopic.delete();
-            } else {
-                childTopic.getRelatingAssociation().delete();
-            }
-        }
-        // update DB
-        resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
-        // update memory
-        childTopics.putInChildTopics(newChildTopic, assocDef);
-    }
-
-    private void createAssignmentMany(TopicReferenceModelImpl newChildTopic, AssociationDefinitionModel assocDef) {
-        RelatedTopicModelImpl childTopic = childTopics.findChildTopicByRef(newChildTopic, assocDef);
-        if (childTopic != null) {
-            // Note: "create assignment" is an idempotent operation. A create request for an assignment which
-            // exists already is not an error. Instead, nothing is performed.
-            updateRelatingAssociation(childTopic, newChildTopic);
-            // Note: memory is already up-to-date. The association is updated in-place of parent.
-            return;
-        }
-        // update DB
-        resolveRefAndAssociateChildTopic(newChildTopic, assocDef);
-        // update memory
-        childTopics.addToChildTopics(newChildTopic, assocDef);
-    }
-
-    // ---
-
-    /**
-     * Creates an association between our parent object ("Parent" role) and the referenced topic ("Child" role).
-     * The association type is taken from the given association definition.
-     *
-     * @return  the resolved child topic.
-     */
-    private void resolveRefAndAssociateChildTopic(TopicReferenceModel childTopicRef,
-                                                  AssociationDefinitionModel assocDef) {
-        pl.valueStorage.resolveReference(childTopicRef);
-        associateChildTopic(childTopicRef, assocDef);
-    }
-
-    private void associateChildTopic(RelatedTopicModel childTopic, AssociationDefinitionModel assocDef) {
-        pl.valueStorage.associateChildTopic(this, childTopic, assocDef);
-    }
-
-    // --- Delete ---
-
-    private void deleteChildTopicOne(RelatedTopicModelImpl childTopic, AssociationDefinitionModel assocDef,
-                                                                       boolean deleteChildTopic) {
-        if (childTopic == null) {
-            // Note: "delete child"/"delete assignment" is an idempotent operation. A delete request for a
-            // child/assignment which has been deleted already (resp. is non-existing) is not an error.
-            // Instead, nothing is performed.
-            return;
-        }
-        // update DB
-        if (deleteChildTopic) {
-            childTopic.delete();
-        } else {
-            childTopic.getRelatingAssociation().delete();
-        }
-        // update memory
-        childTopics.removeChildTopic(assocDef);
-    }
-
-    private void deleteChildTopicMany(long childTopicId, AssociationDefinitionModel assocDef,
-                                                         boolean deleteChildTopic) {
-        RelatedTopicModelImpl childTopic = childTopics.findChildTopicById(childTopicId, assocDef);
-        if (childTopic == null) {
-            // Note: "delete child"/"delete assignment" is an idempotent operation. A delete request for a
-            // child/assignment which has been deleted already (resp. is non-existing) is not an error.
-            // Instead, nothing is performed.
-            return;
-        }
-        // update DB
-        if (deleteChildTopic) {
-            childTopic.delete();
-        } else {
-            childTopic.getRelatingAssociation().delete();
-        }
-        // update memory
-        childTopics.removeFromChildTopics(childTopic, assocDef);
-    }
-
-
-
     // === Label Calculation ===
-
-    // ### TODO: drop it!
-    private void _calculateLabelAndUpdate() {
-        List<String> labelAssocDefUris = null;
-        try {
-            // load required childs
-            labelAssocDefUris = getLabelAssocDefUris();
-            for (String assocDefUri : labelAssocDefUris) {
-                loadChildTopics(assocDefUri);
-            }
-            //
-            calculateLabelAndUpdate();
-        } catch (Exception e) {
-            throw new RuntimeException("Calculating and updating label of " + objectInfo() +
-                " failed (assoc defs involved: " + labelAssocDefUris + ")", e);
-        }
-    }
 
     /**
      * Calculates the label for this object model and updates it in both, memory (in-place), and DB.
@@ -968,6 +652,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
      *    Note: this method does not load any child topics from DB.
      *
      * ### TODO: make private
+     * ### TODO: drop it
      */
     void calculateLabelAndUpdate() {
         try {
