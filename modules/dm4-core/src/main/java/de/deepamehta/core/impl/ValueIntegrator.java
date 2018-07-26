@@ -273,7 +273,9 @@ class ValueIntegrator {
      * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
     private DMXObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
-        if (isValueType()) {
+        // Note: because a facet does not contribute to the value of a value object
+        // a facet update is always an in-place modification
+        if (!isFacetUpdate && isValueType()) {
             return !childTopics.isEmpty() ? unifyChildTopics(childTopics, type) : null;
         } else {
             return updateAssignments(identifyParent(childTopics), childTopics);
@@ -551,7 +553,8 @@ class ValueIntegrator {
         // logger.info("### assocDefUri=\"" + assocDefUri + "\", childTopics=" + childTopics);
         // sanity check
         if (!type.getUri().equals(assocDef(assocDefUri).getParentTypeUri())) {
-            throw new RuntimeException("Type mismatch");
+            throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", assoc def's parent type=\"" +
+                assocDef(assocDefUri).getParentTypeUri() + "\"");
         }
         //
         DMXObjectModel childTopic;
