@@ -527,9 +527,9 @@ class DMXObjectModelImpl implements DMXObjectModel {
     /**
      * Recursively loads this object's child topics which are not loaded already.
      */
-    final DMXObjectModel loadChildTopics() {
+    final DMXObjectModel loadChildTopics(boolean deep) {
         for (AssociationDefinitionModel assocDef : getType().getAssocDefs()) {
-            loadChildTopics(assocDef);
+            loadChildTopics(assocDef, deep);
         }
         return this;
     }
@@ -538,15 +538,15 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
      * If the child topics are loaded already nothing is performed.
      * <p>
-     * Implemented on top of {@link #loadChildTopics(AssociationDefinitionModel)}.
+     * Implemented on top of {@link #loadChildTopics(AssociationDefinitionModel, boolean)}.
      * The assoc def is get from this object's type definition.
      * As a consequence this method can <i>not</i> be used to load facet values.
-     * To load facet values use {@link #loadChildTopics(AssociationDefinitionModel)} and pass the facet type's
+     * To load facet values use {@link #loadChildTopics(AssociationDefinitionModel, boolean)} and pass the facet type's
      * assoc def.
      */
-    final DMXObjectModel loadChildTopics(String assocDefUri) {
+    final DMXObjectModel loadChildTopics(String assocDefUri, boolean deep) {
         try {
-            return loadChildTopics(getAssocDef(assocDefUri));
+            return loadChildTopics(getAssocDef(assocDefUri), deep);
         } catch (Exception e) {
             throw new RuntimeException("Loading \"" + assocDefUri + "\" child topics of " + objectInfo() + " failed",
                 e);
@@ -564,11 +564,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
      *                      Note: the association definition must not necessarily originate from this object's
      *                      type definition. It may originate from a facet type as well.
      */
-    final DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
+    final DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef, boolean deep) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
             logger.fine("### Loading \"" + assocDefUri + "\" child topics of " + objectInfo());
-            new ChildTopicsFetcher(pl).fetch(this, assocDef);
+            new ChildTopicsFetcher(pl).fetch(this, assocDef, deep);
         }
         return this;
     }

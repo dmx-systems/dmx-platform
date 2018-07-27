@@ -341,7 +341,7 @@ class ChildTopicsImpl implements ChildTopics {
      * Loads the child topics for the given assoc def, provided they are not loaded already.
      */
     private void loadChildTopics(String assocDefUri) {
-        parent.loadChildTopics(assocDefUri);
+        parent.loadChildTopics(assocDefUri, false);       // deep=false, FIXME?
     }
 
 

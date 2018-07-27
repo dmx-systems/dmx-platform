@@ -772,7 +772,7 @@ class TypeStorage {
 
     private void loadChildTopics(Iterable<? extends DMXObjectModelImpl> objects) {
         for (DMXObjectModelImpl object : objects) {
-            object.loadChildTopics();
+            object.loadChildTopics(true);   // deep=true
         }
     }
 

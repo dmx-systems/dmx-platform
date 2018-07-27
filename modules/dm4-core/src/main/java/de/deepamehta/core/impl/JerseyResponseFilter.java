@@ -124,8 +124,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
 
     // === Loading child topics ===
 
-    private void loadChildTopics(DMXObject object, boolean includeChilds,
-                                                          boolean includeAssocChilds) {
+    private void loadChildTopics(DMXObject object, boolean includeChilds, boolean includeAssocChilds) {
         if (includeChilds) {
             object.loadChildTopics();
             if (includeAssocChilds) {
@@ -134,8 +133,7 @@ class JerseyResponseFilter implements ContainerResponseFilter {
         }
     }
 
-    private void loadChildTopics(Iterable<DMXObject> objects, boolean includeChilds,
-                                                                     boolean includeAssocChilds) {
+    private void loadChildTopics(Iterable<DMXObject> objects, boolean includeChilds, boolean includeAssocChilds) {
         for (DMXObject object : objects) {
             loadChildTopics(object, includeChilds, includeChilds);
         }

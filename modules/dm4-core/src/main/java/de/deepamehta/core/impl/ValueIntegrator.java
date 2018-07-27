@@ -25,6 +25,8 @@ import java.util.logging.Logger;
 
 /**
  * Integrates new values into the DB.
+ *
+ * Note: this class is not thread-safe. A ValueIntegrator instance must not be shared between threads.
  */
 class ValueIntegrator {
 
@@ -354,7 +356,11 @@ class ValueIntegrator {
         }
         //
         for (String assocDefUri : assocDefUris()) {
-            parent.loadChildTopics(assocDef(assocDefUri));    // TODO: load only one level deep
+            // TODO: possible optimization: load only ONE child level here (deep=false). Later on, when updating the
+            // assignments, load the remaining levels only IF the assignment did not change. In contrast if the
+            // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
+            // levels) as it is build bottom-up (starting from the simple values at the leaves).
+            parent.loadChildTopics(assocDef(assocDefUri), true);    // deep=true
             Object unifiedChild = unifiedChilds.get(assocDefUri);
             if (isOne(assocDefUri)) {
                 TopicModel _unifiedChild = (TopicModel) (unifiedChild != null ? ((UnifiedValue) unifiedChild).value :

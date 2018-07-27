@@ -45,7 +45,7 @@ class LabelCalculation {
         try {
             StringBuilder builder = new StringBuilder();
             for (String assocDefUri : labelAssocDefUris) {
-                comp.loadChildTopics(assocDefUri);
+                comp.loadChildTopics(assocDefUri, false);   // deep=false, FIXME?
                 appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
             }
             //

@@ -135,13 +135,13 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
     @Override
     public final Association loadChildTopics() {
-        model.loadChildTopics();
+        super.loadChildTopics();
         return this;
     }
 
     @Override
     public final Association loadChildTopics(String assocDefUri) {
-        model.loadChildTopics(assocDefUri);
+        super.loadChildTopics(assocDefUri);
         return this;
     }
 

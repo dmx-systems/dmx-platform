@@ -34,7 +34,7 @@ class ChildTopicsFetcher {
      *
      * @param   assocDef    The child topic models according to this association definition are fetched.
      */
-    void fetch(DMXObjectModel object, AssociationDefinitionModel assocDef) {
+    void fetch(DMXObjectModel object, AssociationDefinitionModel assocDef, boolean deep) {
         try {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
@@ -44,12 +44,16 @@ class ChildTopicsFetcher {
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
                     childTopics.put(assocDefUri, childTopic);
-                    fetchChildTopics(childTopic);    // recursion
+                    if (deep) {
+                        fetchChildTopics(childTopic, deep);    // recursion
+                    }
                 }
             } else if (cardinalityUri.equals("dm4.core.many")) {
                 for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), assocDef)) {
                     childTopics.add(assocDefUri, childTopic);
-                    fetchChildTopics(childTopic);    // recursion
+                    if (deep) {
+                        fetchChildTopics(childTopic, deep);    // recursion
+                    }
                 }
             } else {
                 throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
@@ -67,9 +71,9 @@ class ChildTopicsFetcher {
      * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
      * overhead in others (e.g. when updating composite structures).
      */
-    private void fetchChildTopics(DMXObjectModelImpl object) {
+    private void fetchChildTopics(DMXObjectModelImpl object, boolean deep) {
         for (AssociationDefinitionModel assocDef : object.getType().getAssocDefs()) {
-            fetch(object, assocDef);
+            fetch(object, assocDef, deep);
         }
     }
 
