@@ -518,7 +518,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
 
 
-    // ===
+    // === Load Child Topics ===
+
+    // All 3 loadChildTopics() methods use this object itself as a cache.
+    // Child topics are fetched from DB only when not fetched already.
+    // Caching is done on a per assoc def basis.
 
     /**
      * Recursively loads this object's child topics which are not loaded already.
@@ -534,7 +538,11 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * Recursively loads this object's child topics for the given assoc def, provided they are not loaded already.
      * If the child topics are loaded already nothing is performed.
      * <p>
-     * Can <i>not</i> be used to load facet values.
+     * Implemented on top of {@link #loadChildTopics(AssociationDefinitionModel)}.
+     * The assoc def is get from this object's type definition.
+     * As a consequence this method can <i>not</i> be used to load facet values.
+     * To load facet values use {@link #loadChildTopics(AssociationDefinitionModel)} and pass the facet type's
+     * assoc def.
      */
     final DMXObjectModel loadChildTopics(String assocDefUri) {
         try {
@@ -559,13 +567,15 @@ class DMXObjectModelImpl implements DMXObjectModel {
     final DMXObjectModel loadChildTopics(AssociationDefinitionModel assocDef) {
         String assocDefUri = assocDef.getAssocDefUri();
         if (!childTopics.has(assocDefUri)) {
-            logger.fine("### Lazy-loading \"" + assocDefUri + "\" child topic(s) of " + objectInfo());
-            pl.valueStorage.fetchChildTopics(this, assocDef);
+            logger.fine("### Loading \"" + assocDefUri + "\" child topics of " + objectInfo());
+            new ChildTopicsFetcher(pl).fetch(this, assocDef);
         }
         return this;
     }
 
-    // ---
+
+
+    // ===
 
     /**
      * Calculates the simple value that is to be indexed for this object.

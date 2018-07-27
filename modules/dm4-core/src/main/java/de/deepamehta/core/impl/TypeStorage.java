@@ -740,8 +740,12 @@ class TypeStorage {
 
     // ---
 
-    private ViewConfigurationModel viewConfigModel(Iterable<? extends TopicModel> configTopics) {
-        fetchChildTopics(configTopics);
+    /**
+     * Creates a view config model from a bunch of config topics.
+     * Loads the child topics of the given topics and updates them in-place.
+     */
+    private ViewConfigurationModel viewConfigModel(Iterable<? extends TopicModelImpl> configTopics) {
+        loadChildTopics(configTopics);
         return mf.newViewConfigurationModel(configTopics);
     }
 
@@ -766,9 +770,9 @@ class TypeStorage {
 
     // --- Helper ---
 
-    private void fetchChildTopics(Iterable<? extends DMXObjectModel> objects) {
-        for (DMXObjectModel object : objects) {
-            pl.valueStorage.fetchChildTopics(object);
+    private void loadChildTopics(Iterable<? extends DMXObjectModelImpl> objects) {
+        for (DMXObjectModelImpl object : objects) {
+            object.loadChildTopics();
         }
     }
 

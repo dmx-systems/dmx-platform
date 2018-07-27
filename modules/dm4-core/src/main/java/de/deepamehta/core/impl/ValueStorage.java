@@ -37,54 +37,6 @@ class ValueStorage {
     // ----------------------------------------------------------------------------------------- Package Private Methods
 
     /**
-     * Fetches the child topic models (recursively) of the given parent object model and updates it in-place.
-     * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
-     * overhead in others (e.g. when updating composite structures).
-     */
-    void fetchChildTopics(DMXObjectModel parent) {
-        for (AssociationDefinitionModel assocDef : ((DMXObjectModelImpl) parent).getType().getAssocDefs()) {
-            fetchChildTopics(parent, assocDef);
-        }
-    }
-
-    /**
-     * Fetches the child topic models (recursively) of the given parent object model and updates it in-place.
-     * ### TODO: recursion is required in some cases (e.g. when fetching a topic through REST API) but is possibly
-     * overhead in others (e.g. when updating composite structures).
-     * <p>
-     * Works for both, "one" and "many" association definitions.
-     *
-     * @param   assocDef    The child topic models according to this association definition are fetched.
-     */
-    void fetchChildTopics(DMXObjectModel parent, AssociationDefinitionModel assocDef) {
-        try {
-            ChildTopicsModel childTopics = parent.getChildTopicsModel();
-            String cardinalityUri = assocDef.getChildCardinalityUri();
-            String assocDefUri    = assocDef.getAssocDefUri();
-            if (cardinalityUri.equals("dm4.core.one")) {
-                RelatedTopicModel childTopic = fetchChildTopic(parent.getId(), assocDef);
-                // Note: topics just created have no child topics yet
-                if (childTopic != null) {
-                    childTopics.put(assocDefUri, childTopic);
-                    fetchChildTopics(childTopic);    // recursion
-                }
-            } else if (cardinalityUri.equals("dm4.core.many")) {
-                for (RelatedTopicModel childTopic : fetchChildTopics(parent.getId(), assocDef)) {
-                    childTopics.add(assocDefUri, childTopic);
-                    fetchChildTopics(childTopic);    // recursion
-                }
-            } else {
-                throw new RuntimeException("\"" + cardinalityUri + "\" is an unexpected cardinality URI");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Fetching the \"" + assocDef.getAssocDefUri() + "\" child topics of object " +
-                parent.getId() + " failed", e);
-        }
-    }
-
-    // ---
-
-    /**
      * Stores and indexes the specified model's value, either a simple value or a composite value (child topics).
      * Depending on the model type's data type dispatches either to storeSimpleValue() or to storeChildTopics().
      * <p>
@@ -187,30 +139,5 @@ class ValueStorage {
         assoc.setRoleModel1(parent.createRoleModel("dm4.core.parent"));
         assoc.setRoleModel2(childTopic.createRoleModel("dm4.core.child"));
         pl.createAssociation((AssociationModelImpl) assoc);
-    }
-
-
-
-    // === Helper ===
-
-    /**
-     * Fetches and returns a child topic or <code>null</code> if no such topic extists.
-     */
-    private RelatedTopicModel fetchChildTopic(long parentId, AssociationDefinitionModel assocDef) {
-        return pl.fetchRelatedTopic(
-            parentId,
-            assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.parent", "dm4.core.child",
-            assocDef.getChildTypeUri()
-        );
-    }
-
-    private List<RelatedTopicModelImpl> fetchChildTopics(long parentId, AssociationDefinitionModel assocDef) {
-        return pl.fetchRelatedTopics(
-            parentId,
-            assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.parent", "dm4.core.child",
-            assocDef.getChildTypeUri()
-        );
     }
 }
