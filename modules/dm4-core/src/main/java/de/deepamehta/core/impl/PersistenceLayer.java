@@ -6,14 +6,9 @@ import de.deepamehta.core.DMXObject;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.AssociationTypeModel;
-import de.deepamehta.core.model.DMXObjectModel;
-import de.deepamehta.core.model.RelatedAssociationModel;
-import de.deepamehta.core.model.RelatedTopicModel;
 import de.deepamehta.core.model.RoleModel;
 import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
-import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.service.accesscontrol.AccessControlException;
 import de.deepamehta.core.storage.spi.DMXStorage;
 
@@ -45,8 +40,6 @@ public final class PersistenceLayer extends StorageDecorator {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     TypeStorage typeStorage;
-    ValueStorage valueStorage;
-
     EventManager em;
     ModelFactoryImpl mf;
 
@@ -59,9 +52,7 @@ public final class PersistenceLayer extends StorageDecorator {
         // Note: mf must be initialzed before the type storage is instantiated
         this.em = new EventManager();
         this.mf = (ModelFactoryImpl) storage.getModelFactory();
-        //
         this.typeStorage = new TypeStorage(this);
-        this.valueStorage = new ValueStorage(this);
         //
         // Note: this is a constructor side effect. This is a cyclic dependency. This is nasty.
         // ### TODO: explain why we do it.

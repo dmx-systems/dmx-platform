@@ -651,107 +651,14 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
 
 
-    // === Label Calculation ===
-
-    /**
-     * Calculates the label for this object model and updates it in both, memory (in-place), and DB.
-     * <p>
-     * Prerequisites:
-     * 1) this object model is a composite.
-     * 2) this object model contains all the child topic models involved in the label calculation.
-     *    Note: this method does not load any child topics from DB.
-     *
-     * ### TODO: make private
-     * ### TODO: drop it
-     */
-    void calculateLabelAndUpdate() {
-        try {
-            updateSimpleValue(new SimpleValue(calculateLabel()));
-        } catch (Exception e) {
-            throw new RuntimeException("Calculating and updating label of " + objectInfo() + " failed", e);
-        }
-    }
-
-    /**
-     * Calculates the label for this object model recursively. Recursion ends at a simple object model.
-     * <p>
-     * Note: called from this class only but can't be private as called on a different object.
-     *
-     * ### TODO: drop it
-     */
-    String calculateLabel() {
-        if (isSimple()) {
-            return getSimpleValue().toString();
-        } else {
-            StringBuilder builder = new StringBuilder();
-            for (String assocDefUri : getLabelAssocDefUris()) {
-                appendLabel(calculateChildLabel(assocDefUri), builder, LABEL_CHILD_SEPARATOR);
-            }
-            return builder.toString();
-        }
-    }
-
-    // ### TODO: drop it!
-    private String calculateChildLabel(String assocDefUri) {
-        Object value = getChildTopicsModel().get(assocDefUri);
-        // Note: topics just created have no child topics yet
-        if (value == null) {
-            return "";
-        }
-        //
-        if (value instanceof TopicModel) {
-            // single value
-            return ((TopicModelImpl) value).calculateLabel();                               // recursion
-        } else if (value instanceof List) {
-            // multiple value
-            StringBuilder builder = new StringBuilder();
-            for (TopicModelImpl childTopic : (List<TopicModelImpl>) value) {
-                appendLabel(childTopic.calculateLabel(), builder, LABEL_TOPIC_SEPARATOR);   // recursion
-            }
-            return builder.toString();
-        } else {
-            throw new RuntimeException("Unexpected value in a ChildTopicsModel: " + value);
-        }
-    }
-
-    private void appendLabel(String label, StringBuilder builder, String separator) {
-        // add separator
-        if (builder.length() > 0 && label.length() > 0) {
-            builder.append(separator);
-        }
-        //
-        builder.append(label);
-    }
-
-    /**
-     * Prerequisite: this is a composite model.
-     */
-    private List<String> getLabelAssocDefUris() {
-        TypeModelImpl type = getType();
-        List<String> labelConfig = type.getLabelConfig();
-        if (labelConfig.size() > 0) {
-            return labelConfig;
-        } else {
-            List<String> assocDefUris = new ArrayList();
-            Iterator<? extends AssociationDefinitionModel> i = type.getAssocDefs().iterator();
-            // Note: types just created might have no child types yet
-            if (i.hasNext()) {
-                assocDefUris.add(i.next().getAssocDefUri());
-            }
-            return assocDefUris;
-        }
-    }
-
-
-
     // === Helper ===
 
+    // Note: doesn't work for facets
     private AssociationDefinitionModel getAssocDef(String assocDefUri) {
-        // Note: doesn't work for facets
         return getType().getAssocDef(assocDefUri);
     }
 
-    // ### TODO: drop it
+    // ### TODO: drop it?
     String objectInfo() {
         return className() + " " + id;
     }
