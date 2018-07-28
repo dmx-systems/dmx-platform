@@ -83,7 +83,7 @@
                             <descriptors>
                                 <descriptor>assembly.xml</descriptor>
                             </descriptors>
-                            <finalName>deepamehta-${project.version}</finalName>
+                            <finalName>dmx-${project.version}</finalName>
                             <!-- Exclude assembly ID ("-distribution") from assembly final name -->
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>

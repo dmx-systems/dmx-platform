@@ -21,7 +21,7 @@
         <!-- copy bundles to /bundle -->
         <dependencySet>
             <includes>
-                <include>de.deepamehta:*:jar</include>
+                <include>systems.dmx:*:jar</include>
                 <include>com.sun.jersey:*</include>
                 <include>commons-fileupload:*</include>
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
