@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Facets</name>
+    <name>DMX Facets</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-facets</artifactId>
     <version>5.0-SNAPSHOT</version>

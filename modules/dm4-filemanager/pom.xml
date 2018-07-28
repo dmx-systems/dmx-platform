@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 File Manager</name>
+    <name>DMX File Manager</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-filemanager</artifactId>
     <version>5.0-SNAPSHOT</version>

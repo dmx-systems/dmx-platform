@@ -3,12 +3,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Bundles</name>
+    <name>DMX Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-bundles</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>DeepaMehta bundles that make up the DeepaMehta 4 Standard Distribution.</description>
+    <description>DeepaMehta bundles that make up the DMX Standard Distribution.</description>
 
     <parent>
         <groupId>de.deepamehta</groupId>

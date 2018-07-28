@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Core</name>
+    <name>DMX Core</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-core</artifactId>
     <version>5.0-SNAPSHOT</version>

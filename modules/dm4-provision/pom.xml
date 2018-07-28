@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Provision</name>
+    <name>DMX Provision</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-provision</artifactId>
     <version>5.0-SNAPSHOT</version>
@@ -17,7 +17,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <!--
-        POM projects with main dependency sets of the DeepaMehta 4 Standard Distribution.
+        POM projects with main dependency sets of the DMX Standard Distribution.
         More precisely:
         1) The dm4-distribution POM depends on these POMs when assembling the Distribution.
            The assembly descriptor uses the project POM dependencies to transitive include artifacts.

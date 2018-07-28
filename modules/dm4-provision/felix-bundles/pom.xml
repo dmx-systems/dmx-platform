@@ -8,7 +8,7 @@
     <artifactId>felix-bundles</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>Apache Felix bundles that belong to the DeepaMehta 4 standard distribution.</description>
+    <description>Apache Felix bundles that belong to the DMX standard distribution.</description>
 
     <parent>
         <groupId>de.deepamehta</groupId>

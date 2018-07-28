@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Type Search</name>
+    <name>DMX Type Search</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-typesearch</artifactId>
     <version>5.0-SNAPSHOT</version>

@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Webbrowser</name>
+    <name>DMX Webbrowser</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webbrowser</artifactId>
     <version>5.0-SNAPSHOT</version>

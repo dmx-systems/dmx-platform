@@ -2,7 +2,7 @@
 
 <features name="deepamehta-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.0.0">
 
-    <feature name="dm4-platform" description="DeepaMehta 4 Platform" version="${project.version}">
+    <feature name="dm4-platform" description="DMX Platform" version="${project.version}">
 
         <feature>http</feature>
         <feature>eventadmin</feature>
@@ -35,7 +35,7 @@
         <bundle>mvn:de.deepamehta/deepamehta-storage-neo4j/${project.version}</bundle>
     </feature>
 
-    <feature name="dm4-standard-distribution" description="DeepaMehta 4 Standard Distribution" version="${project.version}">
+    <feature name="dm4-standard-distribution" description="DMX Standard Distribution" version="${project.version}">
 
         <feature>dm4-platform</feature>
 

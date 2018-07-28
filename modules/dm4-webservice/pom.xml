@@ -4,7 +4,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Webservice</name>
+    <name>DMX Webservice</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>deepamehta-webservice</artifactId>
     <version>5.0-SNAPSHOT</version>
