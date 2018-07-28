@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Workspaces</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-workspaces</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx-plugin</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../dmx-plugin/pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-facets</artifactId>
+            <version>5.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-topicmaps</artifactId>
+            <version>5.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-config</artifactId>
+            <version>5.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.workspaces.WorkspacesPlugin
+                        </Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

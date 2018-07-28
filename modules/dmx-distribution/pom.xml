@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Distribution</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-distribution</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <!-- Inherit properties -->
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- Override properties. The distribution must use relative paths. -->
+    <properties>
+        <felix.fileinstall.dir>bundle-deploy</felix.fileinstall.dir>
+        <dm4.database.path>deepamehta-db</dm4.database.path>
+        <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-bundles</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>3rd-party-bundles</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>felix-bundles</artifactId>
+            <version>5.0-SNAPSHOT</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.main</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.command</artifactId>
+            <version>0.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.shell</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <id>build distribution</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>assembly.xml</descriptor>
+                            </descriptors>
+                            <finalName>deepamehta-${project.version}</finalName>
+                            <!-- Exclude assembly ID ("-distribution") from assembly final name -->
+                            <appendAssemblyId>false</appendAssemblyId>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

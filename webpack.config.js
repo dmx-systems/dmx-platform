@@ -6,9 +6,9 @@ const { VueLoaderPlugin } = require('vue-loader')
 module.exports = (env = {}) => {
 
   const webpackConfig = {
-    entry: './modules/dm4-webclient/src/main/js/main.js',
+    entry: './modules/dmx-webclient/src/main/js/main.js',
     output: {
-      path: __dirname + '/modules/dm4-webclient/src/main/resources/web',
+      path: __dirname + '/modules/dmx-webclient/src/main/resources/web',
       filename: env.dev ? '[name].js' : '[chunkhash].[name].js'
     },
     resolve: {
@@ -40,13 +40,13 @@ module.exports = (env = {}) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: 'modules/dm4-webclient/src/main/resources/index.html'
+        template: 'modules/dmx-webclient/src/main/resources/index.html'
       }),
       new MiniCssExtractPlugin({
         filename: env.dev ? '[name].css' : '[contenthash].[name].css'
       }),
       new CleanWebpackPlugin([
-        'modules/dm4-webclient/src/main/resources/web'
+        'modules/dmx-webclient/src/main/resources/web'
       ]),
       new VueLoaderPlugin()
     ],

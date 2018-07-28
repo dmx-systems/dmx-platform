@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>3rd Party Bundles</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>3rd-party-bundles</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <description>3rd-party (= non-DeepaMehta) libraries to be provisioned in the OSGi runtime.</description>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx-provision</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <!-- DeepaMehta Storage - Neo4j -->
+        <!-- Note: deepamehta-storage-neo4j can not be statically deployed because it depends on Core. -->
+        <!-- Core is hot-deployed and not yet available.                                               -->
+        <!--dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-storage-neo4j</artifactId>
+            <version>5.0-SNAPSHOT</version>
+        </dependency-->
+        <!-- Jersey -->
+        <!--dependency> - needed by Jersey 1.19
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+            <version>1.1.1</version>
+        </dependency-->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>1.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>1.14</version>
+        </dependency>
+        <!-- Jettison -->
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <!-- SLF4J (required by pax-web-jetty-bundle) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <!-- Commons FileUpload -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.2.2</version>
+        </dependency>
+        <!-- Commons IO (required by commons-fileupload) -->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+            <version>1.3.2_5</version>
+        </dependency>
+    </dependencies>
+</project>

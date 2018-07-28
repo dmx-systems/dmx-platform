@@ -4,13 +4,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DeepaMehta 4 Project</name>
-    <groupId>de.deepamehta</groupId>
-    <artifactId>deepamehta-project</artifactId>
+    <name>DMX</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <description>DeepaMehta is a software platform for knowledge workers</description>
+    <description>DMX is a software platform for knowledge workers</description>
     <url>http://www.deepamehta.de/</url>
     <scm>
         <connection>scm:git:git@github.com:jri/deepamehta.git</connection>
@@ -57,7 +57,7 @@
         </developer>
     </developers>
 
-    <!-- For a description of the config properties see /dm4-distribution/conf/config.properties -->
+    <!-- For a description of the config properties see /dmx-distribution/conf/config.properties -->
     <properties>
         <!-- Webserver -->
         <org.osgi.service.http.port>8080</org.osgi.service.http.port>
@@ -123,7 +123,7 @@
 
         <!-- Logging -->
         <java.util.logging.config.file>
-            ${project.basedir}/modules/dm4-distribution/conf/logging.properties
+            ${project.basedir}/modules/dmx-distribution/conf/logging.properties
         </java.util.logging.config.file>
         <!-- To see any Felix/File Install logging set the level to at least 4 -->
         <felix.log.level>0</felix.log.level>
@@ -269,8 +269,8 @@
                         <configuration>
                             <runner>1.8.6</runner>
                             <deployPoms>
-                                modules/dm4-provision/3rd-party-bundles/pom.xml,
-                                modules/dm4-provision/felix-bundles/pom.xml
+                                modules/dmx-provision/3rd-party-bundles/pom.xml,
+                                modules/dmx-provision/felix-bundles/pom.xml
                             </deployPoms>
                         </configuration>
                     </plugin>
@@ -294,38 +294,38 @@
         <profile>
             <id>all</id>
             <modules>
-                <module>modules/dm4-core</module>
-                <module>modules/dm4-webservice</module>
-                <module>modules/dm4-webclient</module>
-                <module>modules/dm4-webbrowser</module>
-                <module>modules/dm4-notes</module>
-                <module>modules/dm4-contacts</module>
-                <module>modules/dm4-events</module>
-                <module>modules/dm4-datetime</module>
-                <module>modules/dm4-workspaces</module>
-                <module>modules/dm4-typeeditor</module>
-                <module>modules/dm4-iconpicker</module>
-                <module>modules/dm4-typesearch</module>
-                <module>modules/dm4-topicmaps</module>
-                <module>modules/dm4-files</module>
-                <module>modules/dm4-filemanager</module>
-                <module>modules/dm4-help</module>
-                <module>modules/dm4-accesscontrol</module>
-                <module>modules/dm4-facets</module>
-                <module>modules/dm4-geomaps</module>
-                <module>modules/dm4-time</module>
-                <module>modules/dm4-caching</module>
-                <module>modules/dm4-config</module>
-                <module>modules/dm4-storage-neo4j</module>
+                <module>modules/dmx-core</module>
+                <module>modules/dmx-webservice</module>
+                <module>modules/dmx-webclient</module>
+                <module>modules/dmx-webbrowser</module>
+                <module>modules/dmx-notes</module>
+                <module>modules/dmx-contacts</module>
+                <module>modules/dmx-events</module>
+                <module>modules/dmx-datetime</module>
+                <module>modules/dmx-workspaces</module>
+                <module>modules/dmx-typeeditor</module>
+                <module>modules/dmx-iconpicker</module>
+                <module>modules/dmx-typesearch</module>
+                <module>modules/dmx-topicmaps</module>
+                <module>modules/dmx-files</module>
+                <module>modules/dmx-filemanager</module>
+                <module>modules/dmx-help</module>
+                <module>modules/dmx-accesscontrol</module>
+                <module>modules/dmx-facets</module>
+                <module>modules/dmx-geomaps</module>
+                <module>modules/dmx-time</module>
+                <module>modules/dmx-caching</module>
+                <module>modules/dmx-config</module>
+                <module>modules/dmx-storage-neo4j</module>
                 <!-- Testing -->
-                <module>modules/dm4-test</module>
+                <module>modules/dmx-test</module>
                 <!-- POM projects follow -->
-                <!-- Note: modules/dm4-distribution is not included here.              -->
+                <!-- Note: modules/dmx-distribution is not included here.              -->
                 <!-- We don't want to build the distribution with every reactor build. -->
                 <!-- To build the distribution use "mvn clean install -P dist".        -->
-                <module>modules/dm4-module</module>
-                <module>modules/dm4-plugin</module>
-                <module>modules/dm4-provision</module>
+                <module>modules/dmx-module</module>
+                <module>modules/dmx-plugin</module>
+                <module>modules/dmx-provision</module>
             </modules>
             <build>
                 <plugins>
@@ -361,8 +361,8 @@
         <profile>
             <id>dist</id>
             <modules>
-                <module>modules/dm4-distribution</module>
-                <module>modules/dm4-features</module>
+                <module>modules/dmx-distribution</module>
+                <module>modules/dmx-features</module>
             </modules>
             <build>
                 <plugins>
@@ -387,37 +387,37 @@
         <profile>
             <id>release</id>
             <modules>
-                <module>modules/dm4-core</module>
-                <module>modules/dm4-webservice</module>
-                <module>modules/dm4-webclient</module>
-                <module>modules/dm4-webbrowser</module>
-                <module>modules/dm4-notes</module>
-                <module>modules/dm4-contacts</module>
-                <module>modules/dm4-events</module>
-                <module>modules/dm4-datetime</module>
-                <module>modules/dm4-workspaces</module>
-                <module>modules/dm4-typeeditor</module>
-                <module>modules/dm4-iconpicker</module>
-                <module>modules/dm4-typesearch</module>
-                <module>modules/dm4-topicmaps</module>
-                <module>modules/dm4-files</module>
-                <module>modules/dm4-filemanager</module>
-                <module>modules/dm4-help</module>
-                <module>modules/dm4-accesscontrol</module>
-                <module>modules/dm4-facets</module>
-                <module>modules/dm4-geomaps</module>
-                <module>modules/dm4-time</module>
-                <module>modules/dm4-caching</module>
-                <module>modules/dm4-config</module>
-                <module>modules/dm4-storage-neo4j</module>
+                <module>modules/dmx-core</module>
+                <module>modules/dmx-webservice</module>
+                <module>modules/dmx-webclient</module>
+                <module>modules/dmx-webbrowser</module>
+                <module>modules/dmx-notes</module>
+                <module>modules/dmx-contacts</module>
+                <module>modules/dmx-events</module>
+                <module>modules/dmx-datetime</module>
+                <module>modules/dmx-workspaces</module>
+                <module>modules/dmx-typeeditor</module>
+                <module>modules/dmx-iconpicker</module>
+                <module>modules/dmx-typesearch</module>
+                <module>modules/dmx-topicmaps</module>
+                <module>modules/dmx-files</module>
+                <module>modules/dmx-filemanager</module>
+                <module>modules/dmx-help</module>
+                <module>modules/dmx-accesscontrol</module>
+                <module>modules/dmx-facets</module>
+                <module>modules/dmx-geomaps</module>
+                <module>modules/dmx-time</module>
+                <module>modules/dmx-caching</module>
+                <module>modules/dmx-config</module>
+                <module>modules/dmx-storage-neo4j</module>
                 <!-- Testing -->
-                <module>modules/dm4-test</module>
+                <module>modules/dmx-test</module>
                 <!-- POM projects -->
-                <module>modules/dm4-module</module>
-                <module>modules/dm4-plugin</module>
-                <module>modules/dm4-provision</module>
-                <module>modules/dm4-distribution</module>
-                <module>modules/dm4-features</module>
+                <module>modules/dmx-module</module>
+                <module>modules/dmx-plugin</module>
+                <module>modules/dmx-provision</module>
+                <module>modules/dmx-distribution</module>
+                <module>modules/dmx-features</module>
             </modules>
             <distributionManagement>
                 <snapshotRepository>

@@ -6,7 +6,7 @@ maven-build:
 
   after_script:
     # - DISTDIR='/home/gitlab-runner/.m2/repository/de/deepamehta/deepamehta-distribution/5.0-SNAPSHOT'
-    - DISTDIR='modules/dm4-distribution/target'
+    - DISTDIR='modules/dmx-distribution/target'
     - ZIPFILE="$( ls ${DISTDIR}/*.zip )"
     - FILENAME="$( basename ${ZIPFILE} .zip )"
     - NUNC="$( date +%F )"

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Module</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-module</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>
+        Parent POM for all DMX modules.
+
+        Its main feature is: hot deployment.
+        Once a DMX module (= bundle) is build it is copied to the `bundle-deploy` directory.
+
+        All DMX plugins are DMX modules as well, that is they derive the hot deployment feature.
+        (`dmx-plugin` is derived from `dmx-module`.)
+
+        Note: `dmx-test` is *not* derived from `dmx-module` (but directly from `dmx`) as it is not a bundle.
+    </description>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.core.osgi.PluginActivator
+                        </Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>hot-deploy</id>
+            <activation>
+                <property>
+                    <name>!dm4.deploy.disable</name>
+                </property>
+            </activation>
+            <properties>
+                <dm4.deploy.dir>../../bundle-deploy</dm4.deploy.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-clean-plugin</artifactId>
+                        <version>2.4.1</version>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>${dm4.deploy.dir}</directory>
+                                    <includes>
+                                        <include>${project.artifactId}*.jar</include>
+                                    </includes>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>2.7</version>
+                        <executions>
+                            <execution>
+                                <id>hot-deploy</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <resources>
+                                        <resource>
+                                            <directory>target</directory>
+                                            <includes>
+                                                <include>${project.artifactId}*.jar</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                    <outputDirectory>${dm4.deploy.dir}</outputDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

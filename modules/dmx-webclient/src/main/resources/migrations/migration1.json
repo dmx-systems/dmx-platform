@@ -1,0 +1,237 @@
+[{
+    // View Configuration
+
+    "topic_types": [
+        {
+            "value": "Icon",
+            "uri": "dm4.webclient.icon",
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Color",
+            "uri": "dm4.webclient.color",
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Show in Create Menu",
+            "uri": "dm4.webclient.show_in_create_menu",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Widget",
+            "uri": "dm4.webclient.widget",
+            "dataTypeUri": "dm4.core.text"
+        },
+        {
+            "value": "Clearable",
+            "uri": "dm4.webclient.clearable",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Customizable",
+            "uri": "dm4.webclient.customizable",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Input Field Rows",
+            "uri": "dm4.webclient.input_field_rows",
+            "dataTypeUri": "dm4.core.number",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Hidden",
+            "uri": "dm4.webclient.hidden",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Locked",
+            "uri": "dm4.webclient.locked",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Page Renderer URI",
+            "uri": "dm4.webclient.page_renderer_uri",
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Simple Renderer URI",
+            "uri": "dm4.webclient.simple_renderer_uri",
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Multi Renderer URI",
+            "uri": "dm4.webclient.multi_renderer_uri",
+            "dataTypeUri": "dm4.core.text",
+            "indexModeUris": ["dm4.core.key"]
+        },
+        {
+            "value": "Searchable as Unit",
+            "uri": "dm4.webclient.searchable_as_unit",
+            "dataTypeUri": "dm4.core.boolean",
+            "indexModeUris": ["dm4.core.key"]
+        }
+    ],
+
+    // Note: the Widget instances must be created *before* the "View Configuration" composite.
+    // The Widget assoc def refers to a Widget instance.
+
+    "topics": [
+        // Widgets
+        {
+            "value":   "Select",
+            "uri":     "dm4.webclient.select",
+            "typeUri": "dm4.webclient.widget"
+        }
+    ]
+},
+{
+    "topic_types": [
+        {
+            "value": "View Configuration",
+            "uri": "dm4.webclient.view_config",
+            "dataTypeUri": "dm4.core.identity",
+            "assocDefs": [
+                {
+                    "childTypeUri":         "dm4.webclient.icon",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.color",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.show_in_create_menu",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.widget",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "parentCardinalityUri": "dm4.core.many",
+                    "assocTypeUri":         "dm4.core.aggregation_def",
+                    "viewConfigTopics": [
+                        {
+                            "typeUri": "dm4.webclient.view_config",
+                            "childs": {
+                                "dm4.webclient.widget": "ref_uri:dm4.webclient.select",
+                                "dm4.webclient.clearable": true
+                            }
+                        }
+                    ]
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.clearable",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":         "dm4.webclient.customizable",
+                    "childCardinalityUri":  "dm4.core.one",
+                    "assocTypeUri":         "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.input_field_rows",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.hidden",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.locked",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.page_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.simple_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.multi_renderer_uri",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.searchable_as_unit",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                }
+            ]
+        },
+
+        // Search
+
+        {
+            "value": "Search Term",
+            "uri": "dm4.webclient.search_term",
+            "dataTypeUri": "dm4.core.text"
+        },
+        {
+            "value": "Search Result",
+            "uri": "dm4.webclient.search_result",
+            "dataTypeUri": "dm4.core.text",
+            "viewConfigTopics": [
+                {
+                    "typeUri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.simple_renderer_uri": "dm4.webclient.search_result_renderer"
+                    }
+                }
+            ]
+        },
+        {
+            "value": "Search",
+            "uri": "dm4.webclient.search",
+            "dataTypeUri": "dm4.core.identity",
+            "assocDefs": [
+                {
+                    "childTypeUri":        "dm4.webclient.search_term",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                },
+                {
+                    "childTypeUri":        "dm4.webclient.search_result",
+                    "childCardinalityUri": "dm4.core.one",
+                    "assocTypeUri":        "dm4.core.composition_def"
+                }
+            ],
+            "viewConfigTopics": [
+                {
+                    "typeUri": "dm4.webclient.view_config",
+                    "childs": {
+                        "dm4.webclient.icon": "/systems.dmx.webclient/images/balls.png",
+                        "dm4.webclient.locked": true
+                    }
+                }
+            ]
+        }
+    ],
+
+    "assoc_types": [
+        {
+            "value":       "Search Result Item",
+            "uri":         "dm4.webclient.search_result_item",
+            "dataTypeUri": "dm4.core.text"
+        }
+    ]
+}]

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Plugin</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-plugin</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>
+        Parent POM for all DMX plugins.
+
+        It derives the hot deployment feature from `dmx-module`.
+
+        The only feature provided here is: declaring the `dmx-core` dependency.
+        Thus plugin developers are not required to do this.
+    </description>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx-module</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../dmx-module/pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>systems.dmx</groupId>
+            <artifactId>dmx-core</artifactId>
+            <version>5.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>

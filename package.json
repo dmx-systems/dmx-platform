@@ -11,7 +11,7 @@
   "scripts": {
     "build": "webpack -p --hide-modules",
     "dev": "webpack-dev-server -d --env.dev --hot",
-    "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json ./modules/dm4-webclient/src/main/resources/web/dist"
+    "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json ./modules/dmx-webclient/src/main/resources/web/dist"
   },
   "dependencies": {
     "dm5": "https://github.com/jri/dm5.git",

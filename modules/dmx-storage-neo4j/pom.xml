@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <name>DMX Storage - Neo4j</name>
+    <groupId>systems.dmx</groupId>
+    <artifactId>dmx-storage-neo4j</artifactId>
+    <version>5.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <parent>
+        <groupId>systems.dmx</groupId>
+        <artifactId>dmx-plugin</artifactId>
+        <version>5.0-SNAPSHOT</version>
+        <relativePath>../dmx-plugin/pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <!-- Neo4j -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-lucene-index</artifactId>
+            <version>1.8.1</version>
+        </dependency>
+        <!-- JTA Specification (required by neo4j-kernel) -->
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-jta_1.1_spec</artifactId>
+            <version>1.1.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Lucene Core (required by neo4j-lucene-index) -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>
+                            de.deepamehta.storage.neo4j.Neo4jStorageActivator
+                        </Bundle-Activator>
+                        <Import-Package>
+                            !ch.qos.logback.*, !org.slf4j.*, !com.sun.*, !sun.misc.*, *
+                        </Import-Package>
+                        <_exportcontents><!-- export package without inlining the class files (we embed the jars)   -->
+                            <!-- exporting this packages supports Neo4j specific 3rd party plugins (dmx-geospatial) -->
+                            org.neo4j.graphdb, org.neo4j.graphdb.traversal, org.neo4j.kernel
+                        </_exportcontents>
+                        <Embed-Dependency>
+                            neo4j-kernel, neo4j-lucene-index, geronimo-jta_1.1_spec, lucene-core
+                        </Embed-Dependency>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
