@@ -67,46 +67,45 @@ class ValueIntegrator {
      */
     <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject,
                                                              AssociationDefinitionModel assocDef) {
-        this.newValues = newValues;
-        this.targetObject = targetObject;
-        this.assocDef = assocDef;
-        this.isAssoc = newValues instanceof AssociationModel;
-        this.isType  = newValues instanceof TypeModel;
-        this.isFacetUpdate = assocDef != null;
-        //
-        // process refs
-        if (newValues instanceof TopicReferenceModel) {
-            return unifyRef();
-        }
-        if (newValues instanceof TopicDeletionModel) {
-            return new UnifiedValue(null);
-        }
-        // argument check
-        if (newValues.getTypeUri() == null) {
-            throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
-                newValues + ", targetObject=" + targetObject);
-        }
-        // Note: we must get type *after* processing refs. Refs might have no type set.
-        this.type = newValues.getType();
-        //
-        // integrate values
-        // Note: because a facet type is composite by definition a facet update is a composite operation, even if the
-        // faceted object is a simple one.
-        DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ? integrateSimple() : integrateComposite();
-        //
-        // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
-        UnifiedValue value = new UnifiedValue(_value);
-        //
-        // ID transfer
-        if (_value != null) {
-            if (_value.id == -1) {
-                throw new RuntimeException("Unification result has no ID set");
+        try {
+            this.newValues = newValues;
+            this.targetObject = targetObject;
+            this.assocDef = assocDef;
+            this.isAssoc = newValues instanceof AssociationModel;
+            this.isType  = newValues instanceof TypeModel;
+            this.isFacetUpdate = assocDef != null;
+            //
+            // process refs
+            if (newValues instanceof TopicReferenceModel) {
+                return unifyRef();
             }
-            // Note: this is an ugly side effect, but we keep it for pragmatic reasons ### TODO: rethink
-            newValues.id = _value.id;
+            if (newValues instanceof TopicDeletionModel) {
+                return new UnifiedValue(null);
+            }
+            // argument check
+            if (newValues.getTypeUri() == null) {
+                throw new IllegalArgumentException("Tried to integrate values whose typeUri is not set, newValues=" +
+                    newValues + ", targetObject=" + targetObject);
+            }
+            // Note: we must get type *after* processing refs. Refs might have no type set.
+            this.type = newValues.getType();
+            //
+            // value integration
+            // Note: because a facet type is composite by definition a facet update is always a composite operation,
+            // even if the faceted object is a simple one.
+            DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ?
+                integrateSimple() :
+                integrateComposite();
+            // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
+            UnifiedValue value = new UnifiedValue(_value);
+            //
+            idTransfer(_value);
+            //
+            return value;
+        } catch (Exception e) {
+            throw new RuntimeException("Value integration failed, newValues=" + newValues + ", targetObject=" +
+                targetObject + ", assocDef=" + assocDef, e);
         }
-        //
-        return value;
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -119,6 +118,24 @@ class ValueIntegrator {
             return new UnifiedValue(object);
         } else {
             return new UnifiedValue(null);
+        }
+    }
+
+    // Note: this is a side effect, but we keep it for pragmatic reasons.
+    //
+    // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
+    // In DM5 the update model is not passed directly to the storage layer, but a new model object is created (see
+    // createSimpleTopic()). The ID transfer is here to emulate the DM4 behavior.
+    //
+    // Without this side effect e.g. managing view configs would be more hard. When creating a type through a migration
+    // (e.g. while bootstrap) the read type model is put in the type cache as is. Without the side effect the view
+    // config topic models would have no ID. Updating view config values later on would fail.
+    private void idTransfer(DMXObjectModelImpl value) {
+        if (value != null) {
+            if (value.id == -1) {
+                throw new RuntimeException("ID of unification result is not initialized: " + value);
+            }
+            newValues.id = value.id;
         }
     }
 
@@ -148,7 +165,7 @@ class ValueIntegrator {
                 return unifySimple();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a simple value failed, newValues=" + newValues, e);
+            throw new RuntimeException("Simple value integration failed, newValues=" + newValues, e);
         }
     }
 
@@ -239,7 +256,7 @@ class ValueIntegrator {
             //
             return value;
         } catch (Exception e) {
-            throw new RuntimeException("Integrating a composite value failed, newValues=" + newValues, e);
+            throw new RuntimeException("Composite value integration failed, newValues=" + newValues, e);
         }
     }
 
