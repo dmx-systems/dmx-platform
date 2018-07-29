@@ -38,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.geomaps.GeomapsPlugin
+                            systems.dmx.geomaps.GeomapsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

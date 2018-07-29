@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.datetime", function() {
+dm4c.add_plugin("systems.dmx.datetime", function() {
 
     var month_names = [undefined, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 

@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.webclient.WebclientPlugin
+                            systems.dmx.webclient.WebclientPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

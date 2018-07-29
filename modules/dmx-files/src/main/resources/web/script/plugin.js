@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.files", function() {
+dm4c.add_plugin("systems.dmx.files", function() {
 
     var self = this
 

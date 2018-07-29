@@ -38,7 +38,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.accesscontrol.AccessControlPlugin
+                            systems.dmx.accesscontrol.AccessControlPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

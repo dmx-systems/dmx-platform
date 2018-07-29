@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.time", function() {
+dm4c.add_plugin("systems.dmx.time", function() {
 
     // === REST Client Extension ===
 

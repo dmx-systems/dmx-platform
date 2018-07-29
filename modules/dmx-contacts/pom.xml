@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.contacts.ContactsPlugin
+                            systems.dmx.contacts.ContactsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

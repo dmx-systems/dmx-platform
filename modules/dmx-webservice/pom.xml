@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.webservice.WebservicePlugin
+                            systems.dmx.webservice.WebservicePlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

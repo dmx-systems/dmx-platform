@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.caching.CachingPlugin
+                            systems.dmx.caching.CachingPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

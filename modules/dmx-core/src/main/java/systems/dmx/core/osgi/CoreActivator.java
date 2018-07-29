@@ -1,0 +1,189 @@
+package systems.dmx.core.osgi;
+
+import systems.dmx.core.impl.CoreServiceImpl;
+import systems.dmx.core.impl.ModelFactoryImpl;
+import systems.dmx.core.impl.PersistenceLayer;
+import systems.dmx.core.service.CoreService;
+import systems.dmx.core.service.ModelFactory;
+import systems.dmx.core.storage.spi.DMXStorage;
+
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.http.HttpService;
+import org.osgi.util.tracker.ServiceTracker;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+
+public class CoreActivator implements BundleActivator {
+
+    // ---------------------------------------------------------------------------------------------- Instance Variables
+
+    private static BundleContext bundleContext;
+
+    // consumed services
+    private DMXStorage storageService;
+    private static HttpService httpService;
+
+    private ServiceTracker storageServiceTracker;
+    private ServiceTracker httpServiceTracker;
+
+    // provided service
+    private CoreServiceImpl dm4;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
+
+    // -------------------------------------------------------------------------------------------------- Public Methods
+
+
+
+    // **************************************
+    // *** BundleActivator Implementation ***
+    // **************************************
+
+
+
+    @Override
+    public void start(BundleContext bundleContext) {
+        try {
+            logger.info("========== Starting \"DMX Core\" ==========");
+            this.bundleContext = bundleContext;
+            //
+            registerModelFactory();
+            //
+            (storageServiceTracker = createServiceTracker(DMXStorage.class)).open();
+            (httpServiceTracker = createServiceTracker(HttpService.class)).open();
+        } catch (Throwable e) {
+            logger.log(Level.SEVERE, "An error occurred while starting \"DMX Core\":", e);
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
+            // File Install would retry to start the bundle endlessly.
+        }
+    }
+
+    @Override
+    public void stop(BundleContext bundleContext) {
+        try {
+            logger.info("========== Stopping \"DMX Core\" ==========");
+            storageServiceTracker.close();
+            httpServiceTracker.close();
+            //
+            if (dm4 != null) {
+                dm4.shutdown();
+            }
+            // Note: we do not shutdown the DB here.
+            // The DB shuts down itself through the storage bundle's stop() method.
+        } catch (Throwable e) {
+            logger.log(Level.SEVERE, "An error occurred while stopping \"DMX Core\":", e);
+            // Note: here we catch anything, also errors (like NoClassDefFoundError).
+            // If thrown through the OSGi container it would not print out the stacktrace.
+        }
+    }
+
+    // ---
+
+    public static CoreService getCoreService() {
+        return getService(CoreService.class);
+    }
+
+    public static ModelFactory getModelFactory() {
+        return getService(ModelFactory.class);
+    }
+
+    public static HttpService getHttpService() {
+        return httpService;
+    }
+
+    // ---
+
+    public static <S> S getService(Class<S> clazz) {
+        S serviceObject = bundleContext.getService(bundleContext.getServiceReference(clazz));
+        if (serviceObject == null) {
+            throw new RuntimeException("Service \"" + clazz.getName() + "\" is not available");
+        }
+        return serviceObject;
+    }
+
+
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    private void registerModelFactory() {
+        logger.info("Registering ModelFactory service at OSGi framework");
+        bundleContext.registerService(ModelFactory.class.getName(), new ModelFactoryImpl(), null);
+    }
+
+    // ---
+
+    private ServiceTracker createServiceTracker(final Class serviceInterface) {
+        //
+        return new ServiceTracker(bundleContext, serviceInterface.getName(), null) {
+
+            @Override
+            public Object addingService(ServiceReference serviceRef) {
+                Object service = null;
+                try {
+                    service = super.addingService(serviceRef);
+                    addService(service);
+                } catch (Throwable e) {
+                    logger.log(Level.SEVERE, "An error occurred while adding service " + serviceInterface.getName() +
+                        " to \"DMX Core\":", e);
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
+                }
+                return service;
+            }
+
+            @Override
+            public void removedService(ServiceReference ref, Object service) {
+                try {
+                    removeService(service);
+                    super.removedService(ref, service);
+                } catch (Throwable e) {
+                    logger.log(Level.SEVERE, "An error occurred while removing service " + serviceInterface.getName() +
+                        " from \"DMX Core\":", e);
+                    // Note: here we catch anything, also errors (like NoClassDefFoundError).
+                    // If thrown through the OSGi container it would not print out the stacktrace.
+                }
+            }
+        };
+    }
+
+    // ---
+
+    private void addService(Object service) {
+        if (service instanceof DMXStorage) {
+            logger.info("Adding storage service to DMX Core");
+            storageService = (DMXStorage) service;
+            checkRequirementsForActivation();
+        } else if (service instanceof HttpService) {
+            logger.info("Adding HTTP service to DMX Core");
+            httpService = (HttpService) service;
+            checkRequirementsForActivation();
+        }
+    }
+
+    private void removeService(Object service) {
+        if (service == storageService) {
+            logger.info("Removing storage service from DMX Core");
+            storageService = null;
+        } else if (service == httpService) {
+            logger.info("Removing HTTP service from DMX Core");
+            httpService = null;
+        }
+    }
+
+    // ---
+
+    private void checkRequirementsForActivation() {
+        if (storageService != null && httpService != null) {
+            dm4 = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
+            //
+            logger.info("Registering DMX core service at OSGi framework");
+            bundleContext.registerService(CoreService.class.getName(), dm4, null);
+        }
+    }
+}

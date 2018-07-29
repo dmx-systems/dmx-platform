@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.config", function() {
+dm4c.add_plugin("systems.dmx.config", function() {
 
     var config_defs
 

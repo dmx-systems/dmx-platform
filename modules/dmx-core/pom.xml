@@ -60,10 +60,10 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>de.deepamehta.core.osgi.CoreActivator</Bundle-Activator>
+                        <Bundle-Activator>systems.dmx.core.osgi.CoreActivator</Bundle-Activator>
                         <Embed-Dependency>jetty-websocket</Embed-Dependency>
                         <Export-Package>
-                            de.deepamehta.core.*,
+                            systems.dmx.core.*,
                             org.osgi.service.log    <!-- required when running headless (without Gogo Shell) -->
                         </Export-Package>
                     </instructions>

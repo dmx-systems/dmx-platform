@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.help", function() {
+dm4c.add_plugin("systems.dmx.help", function() {
 
     dm4c.toolbar.special_menu.add_item({
         label: "About DeepaMehta", handler: open_about_dialog
@@ -9,7 +9,7 @@ dm4c.add_plugin("de.deepamehta.help", function() {
             id: "about-dialog", title: "About DeepaMehta", content: '<table>' +
                 '<tr>' +
                     '<td>' +
-                        '<img src="/de.deepamehta.webclient/images/deepamehta-logo.png">' +
+                        '<img src="/systems.dmx.webclient/images/deepamehta-logo.png">' +
                     '</td>' +
                     '<td>' +
                         '<div class="field-label">Version</div>' +

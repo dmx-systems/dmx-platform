@@ -33,7 +33,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.events.EventsPlugin
+                            systems.dmx.events.EventsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

@@ -43,7 +43,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.workspaces.WorkspacesPlugin
+                            systems.dmx.workspaces.WorkspacesPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

@@ -101,7 +101,7 @@ While DeepaMehta starts a terminal window opens and a lot of information is logg
 Then a browser window opens and DeepaMehta is ready to use.
 
 To open the DeepaMehta browser window manually:  
-<http://localhost:8080/de.deepamehta.webclient/>
+<http://localhost:8080/systems.dmx.webclient/>
 
 Login with `admin` and empty password. Now you're ready to create content.
 

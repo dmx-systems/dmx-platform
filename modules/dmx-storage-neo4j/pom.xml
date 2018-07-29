@@ -52,7 +52,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.storage.neo4j.Neo4jStorageActivator
+                            systems.dmx.storage.neo4j.Neo4jStorageActivator
                         </Bundle-Activator>
                         <Import-Package>
                             !ch.qos.logback.*, !org.slf4j.*, !com.sun.*, !sun.misc.*, *

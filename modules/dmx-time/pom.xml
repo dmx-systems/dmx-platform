@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.time.TimePlugin
+                            systems.dmx.time.TimePlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

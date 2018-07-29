@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.webbrowser", function() {
+dm4c.add_plugin("systems.dmx.webbrowser", function() {
 
     // === Webclient Listeners ===
 

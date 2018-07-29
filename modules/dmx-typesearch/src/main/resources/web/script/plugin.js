@@ -1,7 +1,7 @@
 /**
  * Provides the "By Type" searchmode.
  */
-dm4c.add_plugin("de.deepamehta.typesearch", function() {
+dm4c.add_plugin("systems.dmx.typesearch", function() {
 
     var SEARCHMODE_URI = "dm4.typesearch.by_type"
 

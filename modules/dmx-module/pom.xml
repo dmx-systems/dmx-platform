@@ -39,7 +39,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.core.osgi.PluginActivator
+                            systems.dmx.core.osgi.PluginActivator
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

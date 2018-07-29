@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.config.ConfigPlugin
+                            systems.dmx.config.ConfigPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

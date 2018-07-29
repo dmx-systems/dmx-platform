@@ -1,4 +1,4 @@
-dm4c.add_plugin("de.deepamehta.caching", function() {
+dm4c.add_plugin("systems.dmx.caching", function() {
 
     var CACHABLE_PATH = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
     var PROP_MODIFIED = "dm4.time.modified"

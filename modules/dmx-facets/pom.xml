@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.facets.FacetsPlugin
+                            systems.dmx.facets.FacetsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

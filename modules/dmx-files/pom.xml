@@ -41,7 +41,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            de.deepamehta.files.FilesPlugin
+                            systems.dmx.files.FilesPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>
