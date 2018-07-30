@@ -67,7 +67,7 @@ public class UploadedFileProvider implements MessageBodyReader<UploadedFile>, Di
 
     @Override
     public void check(long fileSize) {
-        CoreService dm4 = CoreActivator.getCoreService();
+        CoreService dmx = CoreActivator.getCoreService();
         String username = dmx.getAccessControl().getUsername(request);
         if (username == null) {
             throw new RuntimeException("User <anonymous> has no disk quota");

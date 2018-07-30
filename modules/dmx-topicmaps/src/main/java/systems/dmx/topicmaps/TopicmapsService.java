@@ -95,7 +95,7 @@ public interface TopicmapsService {
     // ### TODO: refactor to registerTopicmapType(TopicmapType topicmapType)
     void registerTopicmapRenderer(TopicmapRenderer renderer);
 
-    // ### TODO: unregister needed? Might a renderer hold a stale dm4 instance?
+    // ### TODO: unregister needed? Might a renderer hold a stale dmx instance?
 
     // ---
 

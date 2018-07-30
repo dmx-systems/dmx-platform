@@ -31,7 +31,7 @@ import java.util.List;
  * The DMX core service provides methods to deal with topics, associations, types, and plugins.
  * <p>
  * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
- * DMX core service is available through the <code>dm4</code> object.
+ * DMX core service is available through the <code>dmx</code> object.
  */
 public interface CoreService {
 

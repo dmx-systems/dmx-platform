@@ -24,7 +24,7 @@ public class CoreServiceTestEnvironment {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     // providing the test subclasses access to the core service and logger
-    protected CoreServiceImpl dm4;
+    protected CoreServiceImpl dmx;
     protected ModelFactoryImpl mf;
 
     protected Logger logger = Logger.getLogger(getClass().getName());
@@ -39,7 +39,7 @@ public class CoreServiceTestEnvironment {
         dbPath = JavaUtils.createTempDirectory("dmx-test-");
         mf = new ModelFactoryImpl();
         storage = openDB(dbPath.getAbsolutePath());
-        dm4 = new CoreServiceImpl(new PersistenceLayer(storage), null);     // bundleContext=null
+        dmx = new CoreServiceImpl(new PersistenceLayer(storage), null);     // bundleContext=null
     }
 
     @After

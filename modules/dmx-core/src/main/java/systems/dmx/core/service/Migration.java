@@ -9,14 +9,14 @@ public abstract class Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected CoreService dm4;
+    protected CoreService dmx;
     protected ModelFactory mf;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     // ### TODO: make this internal. Define a public Migration interface?
-    public void setCoreService(CoreService dm4) {
-        this.dm4 = dm4;
+    public void setCoreService(CoreService dmx) {
+        this.dmx = dmx;
         this.mf = dmx.getModelFactory();
     }
 

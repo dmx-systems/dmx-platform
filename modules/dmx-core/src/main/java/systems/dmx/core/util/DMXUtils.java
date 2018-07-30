@@ -160,11 +160,11 @@ public class DMXUtils {
      * Retypes the given association if its player types match the given topic types.
      */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dm4) {
+                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dmx) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dm4);
+        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dmx);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -176,7 +176,7 @@ public class DMXUtils {
     }
 
     public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                                                          CoreService dm4) {
+                                                                                          CoreService dmx) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.

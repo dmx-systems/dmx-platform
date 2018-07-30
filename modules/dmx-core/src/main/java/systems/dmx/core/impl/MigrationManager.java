@@ -27,7 +27,7 @@ class MigrationManager {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private CoreServiceImpl dm4;
+    private CoreServiceImpl dmx;
     private ModelFactory mf;
 
     private enum MigrationRunMode {
@@ -38,8 +38,8 @@ class MigrationManager {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    MigrationManager(CoreServiceImpl dm4) {
-        this.dm4 = dm4;
+    MigrationManager(CoreServiceImpl dmx) {
+        this.dmx = dmx;
         this.mf = dmx.mf;
     }
 
@@ -131,7 +131,7 @@ class MigrationManager {
             } else {
                 Migration migration = (Migration) mi.migrationClass.newInstance(); // throws InstantiationException, ...
                 injectServices(migration, mi.migrationInfo, mi.plugin);
-                migration.setCoreService(dm4);
+                migration.setCoreService(dmx);
                 logger.info("Running " + mi.migrationType + " migration class " + mi.migrationClassName);
                 migration.run();
             }

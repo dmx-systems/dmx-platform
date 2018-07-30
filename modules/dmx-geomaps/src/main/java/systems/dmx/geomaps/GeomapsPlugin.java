@@ -81,7 +81,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Path("/{id}")
     @Override
     public Geomap getGeomap(@PathParam("id") long geomapId) {
-        return new Geomap(geomapId, dm4);
+        return new Geomap(geomapId, dmx);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter

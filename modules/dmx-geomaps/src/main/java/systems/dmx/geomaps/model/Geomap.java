@@ -33,7 +33,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     protected Topic geomapTopic;
     protected Map<Long, TopicModel> geoCoords = new HashMap();
 
-    protected CoreService dm4;
+    protected CoreService dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -44,12 +44,12 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
      *
      * ### TODO: pass geomap data instead of retrieving in constructor. Don't pass core service.
      */
-    public Geomap(long geomapId, CoreService dm4) {
+    public Geomap(long geomapId, CoreService dmx) {
         logger.info("Loading geomap " + geomapId);
         // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
         // child topic loading is not applied. We must load the child topics manually here.
         this.geomapTopic = dmx.getTopic(geomapId).loadChildTopics();
-        this.dm4 = dm4;
+        this.dmx = dmx;
         //
         fetchGeoCoordinates();
     }

@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 
 
 // ### TODO: refactoring? This class does too much.
-// ### It lies about its dependencies. It depends on dm4 but dm4 is not passed to constructor.
+// ### It lies about its dependencies. It depends on dmx but dmx is not passed to constructor.
 public class PluginImpl implements Plugin, EventHandler {
 
     // ------------------------------------------------------------------------------------------------------- Constants
@@ -65,7 +65,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DMX Core and OSGi)
-    private CoreServiceImpl dm4;
+    private CoreServiceImpl dmx;
     private ModelFactory mf;
     private EventAdmin eventService;            // needed to post the PLUGIN_ACTIVATED OSGi event
 
@@ -424,7 +424,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private void removeService(Object service, Class serviceInterface) {
-        if (service == dm4) {
+        if (service == dmx) {
             logger.info("Removing DMX core service from " + this);
             unpublishRestResources();
             unpublishWebResources();
@@ -443,10 +443,10 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
-    private void setCoreService(CoreServiceImpl dm4) {
-        this.dm4 = dm4;
-        this.mf = dm4 != null ? dmx.mf : null;
-        pluginContext.setCoreService(dm4);
+    private void setCoreService(CoreServiceImpl dmx) {
+        this.dmx = dmx;
+        this.mf = dmx != null ? dmx.mf : null;
+        pluginContext.setCoreService(dmx);
     }
 
     // ---
@@ -460,7 +460,7 @@ public class PluginImpl implements Plugin, EventHandler {
      *   - the plugin dependencies (according to the "dmx.plugin.activate_after" config property) are active.
      */
     private void checkRequirementsForActivation() {
-        if (dm4 != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
+        if (dmx != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
             dmx.pluginManager.activatePlugin(this);
         }
     }

@@ -31,14 +31,14 @@ class PluginManager {
      */
     private Map<String, PluginImpl> activatedPlugins = new HashMap();
 
-    private CoreServiceImpl dm4;
+    private CoreServiceImpl dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    PluginManager(CoreServiceImpl dm4) {
-        this.dm4 = dm4;
+    PluginManager(CoreServiceImpl dmx) {
+        this.dmx = dmx;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods

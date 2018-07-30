@@ -1,42 +1,42 @@
 /* === Person Name === */
 
-.dm4\.contacts\.person_name > .dm4\.contacts\.first_name,
-.dm4\.contacts\.person_name > .dm4\.contacts\.last_name {
+.dmx\.contacts\.person_name > .dmx\.contacts\.first_name,
+.dmx\.contacts\.person_name > .dmx\.contacts\.last_name {
     display: inline-block;
     vertical-align: top;
 }
 
-.dm4\.contacts\.person_name > .dm4\.contacts\.last_name {
+.dmx\.contacts\.person_name > .dmx\.contacts\.last_name {
     margin-top: 0 !important;
     margin-left: 1.5em;
 }
 
 /* Form */
 
-.dm4\.contacts\.person_name > .dm4\.contacts\.first_name input,
-.dm4\.contacts\.person_name > .dm4\.contacts\.last_name  input {
+.dmx\.contacts\.person_name > .dmx\.contacts\.first_name input,
+.dmx\.contacts\.person_name > .dmx\.contacts\.last_name  input {
     width: 10em !important;
 }
 
 
 /* === Address === */
 
-.dm4\.contacts\.address > .dm4\.contacts\.postal_code,
-.dm4\.contacts\.address > .dm4\.contacts\.city {
+.dmx\.contacts\.address > .dmx\.contacts\.postal_code,
+.dmx\.contacts\.address > .dmx\.contacts\.city {
     display: inline-block;
     vertical-align: top;
 }
 
-.dm4\.contacts\.address > .dm4\.contacts\.city {
+.dmx\.contacts\.address > .dmx\.contacts\.city {
     margin-left: 1.5em;
 }
 
 /* Form */
 
-.dm4\.contacts\.address > .dm4\.contacts\.postal_code input {
+.dmx\.contacts\.address > .dmx\.contacts\.postal_code input {
     width: 4em !important;
 }
 
-.dm4\.contacts\.address > .dm4\.contacts\.city  input {
+.dmx\.contacts\.address > .dmx\.contacts\.city  input {
     width: 12em !important;
 }

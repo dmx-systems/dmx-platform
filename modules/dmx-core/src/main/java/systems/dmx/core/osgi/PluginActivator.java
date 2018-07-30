@@ -23,7 +23,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected CoreService dm4;
+    protected CoreService dmx;
     protected ModelFactory mf;
     protected Bundle bundle;
 
@@ -120,9 +120,9 @@ public class PluginActivator implements BundleActivator, PluginContext {
     }
 
     @Override
-    public final void setCoreService(CoreService dm4) {
-        this.dm4 = dm4;
-        this.mf = dm4 != null ? dmx.getModelFactory() : null;
+    public final void setCoreService(CoreService dmx) {
+        this.dmx = dmx;
+        this.mf = dmx != null ? dmx.getModelFactory() : null;
     }
 
 

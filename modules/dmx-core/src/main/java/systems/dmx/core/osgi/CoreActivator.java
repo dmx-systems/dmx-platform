@@ -32,7 +32,7 @@ public class CoreActivator implements BundleActivator {
     private ServiceTracker httpServiceTracker;
 
     // provided service
-    private CoreServiceImpl dm4;
+    private CoreServiceImpl dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -71,7 +71,7 @@ public class CoreActivator implements BundleActivator {
             storageServiceTracker.close();
             httpServiceTracker.close();
             //
-            if (dm4 != null) {
+            if (dmx != null) {
                 dmx.shutdown();
             }
             // Note: we do not shutdown the DB here.
@@ -180,10 +180,10 @@ public class CoreActivator implements BundleActivator {
 
     private void checkRequirementsForActivation() {
         if (storageService != null && httpService != null) {
-            dm4 = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
+            dmx = new CoreServiceImpl(new PersistenceLayer(storageService), bundleContext);
             //
             logger.info("Registering DMX core service at OSGi framework");
-            bundleContext.registerService(CoreService.class.getName(), dm4, null);
+            bundleContext.registerService(CoreService.class.getName(), dmx, null);
         }
     }
 }

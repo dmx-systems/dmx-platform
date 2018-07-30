@@ -26,5 +26,5 @@ public interface PluginContext {
 
     BundleContext getBundleContext();
 
-    void setCoreService(CoreService dm4);
+    void setCoreService(CoreService dmx);
 }

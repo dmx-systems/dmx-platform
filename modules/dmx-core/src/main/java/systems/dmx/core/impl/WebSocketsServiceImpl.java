@@ -35,15 +35,15 @@ class WebSocketsServiceImpl implements WebSocketsService {
     private WebSocketsServer server;
     private WebSocketConnectionPool pool = new WebSocketConnectionPool();
     private SendMessageWorker worker = new SendMessageWorker();
-    private CoreService dm4;
+    private CoreService dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
     // ### TODO: inject event manager only 
-    WebSocketsServiceImpl(CoreService dm4) {
-        this.dm4 = dm4;
+    WebSocketsServiceImpl(CoreService dmx) {
+        this.dmx = dmx;
         init();
     }
 
@@ -163,7 +163,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
                 @Override
                 public WebSocket doWebSocketConnect(HttpServletRequest request, String protocol) {
                     checkProtocol(protocol);
-                    return new WebSocketConnection(protocol, sessionId(request), pool, dm4);
+                    return new WebSocketConnection(protocol, sessionId(request), pool, dmx);
                 }
             });
         }

@@ -29,17 +29,17 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
     private Connection connection;
 
     private WebSocketConnectionPool pool;
-    private CoreService dm4;
+    private CoreService dmx;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ----------------------------------------------------------------------------------------------------- Constructor
 
-    WebSocketConnection(String pluginUri, String sessionId, WebSocketConnectionPool pool, CoreService dm4) {
+    WebSocketConnection(String pluginUri, String sessionId, WebSocketConnectionPool pool, CoreService dmx) {
         this.pluginUri = pluginUri;
         this.sessionId = sessionId;
         this.pool = pool;
-        this.dm4 = dm4;
+        this.dmx = dmx;
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
