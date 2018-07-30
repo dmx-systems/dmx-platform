@@ -39,7 +39,7 @@ class ChildTopicsFetcher {
             ChildTopicsModel childTopics = object.getChildTopicsModel();
             String cardinalityUri = assocDef.getChildCardinalityUri();
             String assocDefUri    = assocDef.getAssocDefUri();
-            if (cardinalityUri.equals("dm4.core.one")) {
+            if (cardinalityUri.equals("dmx.core.one")) {
                 RelatedTopicModelImpl childTopic = fetchChildTopic(object.getId(), assocDef);
                 // Note: topics just created have no child topics yet
                 if (childTopic != null) {
@@ -48,7 +48,7 @@ class ChildTopicsFetcher {
                         fetchChildTopics(childTopic, deep);    // recursion
                     }
                 }
-            } else if (cardinalityUri.equals("dm4.core.many")) {
+            } else if (cardinalityUri.equals("dmx.core.many")) {
                 for (RelatedTopicModelImpl childTopic : fetchChildTopics(object.getId(), assocDef)) {
                     childTopics.add(assocDefUri, childTopic);
                     if (deep) {
@@ -86,7 +86,7 @@ class ChildTopicsFetcher {
         return pl.fetchRelatedTopic(
             objectId,
             assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.parent", "dm4.core.child",
+            "dmx.core.parent", "dmx.core.child",
             assocDef.getChildTypeUri()
         );
     }
@@ -95,7 +95,7 @@ class ChildTopicsFetcher {
         return pl.fetchRelatedTopics(
             objectId,
             assocDef.getInstanceLevelAssocTypeUri(),
-            "dm4.core.parent", "dm4.core.child",
+            "dmx.core.parent", "dmx.core.child",
             assocDef.getChildTypeUri()
         );
     }

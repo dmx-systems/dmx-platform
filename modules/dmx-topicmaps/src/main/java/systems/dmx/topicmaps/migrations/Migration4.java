@@ -30,17 +30,17 @@ public class Migration4 extends Migration {
         logger.info("########## Converting \"Topic Mapcontext\" associations");
         //
         // 1) convert the "Topic Mapcontext" association's child topics into properties
-        for (Association assoc : dm4.getAssociationsByType("dm4.topicmaps.topic_mapcontext")) {
+        for (Association assoc : dmx.getAssociationsByType("dmx.topicmaps.topic_mapcontext")) {
             migrateMapcontextAssociation(assoc);
         }
         //
         // 2) delete "Topic Mapcontext" child types
-        deleteTopicType("dm4.topicmaps.x");
-        deleteTopicType("dm4.topicmaps.y");
-        deleteTopicType("dm4.topicmaps.visibility");
+        deleteTopicType("dmx.topicmaps.x");
+        deleteTopicType("dmx.topicmaps.y");
+        deleteTopicType("dmx.topicmaps.visibility");
         //
         // 3) make "Topic Mapcontext" a simple type
-        dm4.getAssociationType("dm4.topicmaps.topic_mapcontext").setDataTypeUri("dm4.core.text");
+        dmx.getAssociationType("dmx.topicmaps.topic_mapcontext").setDataTypeUri("dmx.core.text");
         //
         logger.info("########## Converting \"Topic Mapcontext\" associations complete\n    Associations processed: " +
             assocs + "\n    X, Y, Visibility topics deleted: " + topicsDeleted + "\n    Topic types deleted: " +
@@ -53,23 +53,23 @@ public class Migration4 extends Migration {
         assocs++;
         //
         ChildTopics childs = assoc.getChildTopics();
-        int x = childs.getInt("dm4.topicmaps.x");
-        int y = childs.getInt("dm4.topicmaps.y");
-        boolean visibility = childs.getBoolean("dm4.topicmaps.visibility");
+        int x = childs.getInt("dmx.topicmaps.x");
+        int y = childs.getInt("dmx.topicmaps.y");
+        boolean visibility = childs.getBoolean("dmx.topicmaps.visibility");
         //
-        assoc.setProperty("dm4.topicmaps.x", x, false);                     // addToIndex = false
-        assoc.setProperty("dm4.topicmaps.y", y, false);                     // addToIndex = false
-        assoc.setProperty("dm4.topicmaps.visibility", visibility, false);   // addToIndex = false
+        assoc.setProperty("dmx.topicmaps.x", x, false);                     // addToIndex = false
+        assoc.setProperty("dmx.topicmaps.y", y, false);                     // addToIndex = false
+        assoc.setProperty("dmx.topicmaps.visibility", visibility, false);   // addToIndex = false
     }
 
     private void deleteTopicType(String topicTypeUri) {
         typesDeleted++;
         // delete instances
-        for (Topic topic : dm4.getTopicsByType(topicTypeUri)) {
+        for (Topic topic : dmx.getTopicsByType(topicTypeUri)) {
             topic.delete();
             topicsDeleted++;
         }
         // delete type
-        dm4.deleteTopicType(topicTypeUri);
+        dmx.deleteTopicType(topicTypeUri);
     }
 }

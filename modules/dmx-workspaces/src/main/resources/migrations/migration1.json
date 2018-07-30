@@ -5,52 +5,52 @@
 
         {
             "value":          "Name",
-            "uri":            "dm4.workspaces.name",
-            "dataTypeUri":    "dm4.core.text",
-            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext", "dm4.core.fulltext_key"]
+            "uri":            "dmx.workspaces.name",
+            "dataTypeUri":    "dmx.core.text",
+            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
         },
         {
             "value":          "Description",
-            "uri":            "dm4.workspaces.description",
-            "dataTypeUri":    "dm4.core.html",
-            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
+            "uri":            "dmx.workspaces.description",
+            "dataTypeUri":    "dmx.core.html",
+            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"]
         },
         {
             "value":       "Workspace",
-            "uri":         "dm4.workspaces.workspace",
-            "dataTypeUri": "dm4.core.identity",
+            "uri":         "dmx.workspaces.workspace",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.workspaces.name",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.workspaces.name",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 },
                 {
-                    "childTypeUri":        "dm4.workspaces.description",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.workspaces.description",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 }
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "\uf005",
-                        "dm4.webclient.searchable_as_unit": true
+                        "dmx.webclient.icon": "\uf005",
+                        "dmx.webclient.searchable_as_unit": true
                     }
                 }
             ]
         },
         {
             "value":       "Workspace Facet",
-            "uri":         "dm4.workspaces.workspace_facet",
-            "dataTypeUri": "dm4.core.identity",
+            "uri":         "dmx.workspaces.workspace_facet",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dm4.workspaces.workspace",
-                    "childCardinalityUri":  "dm4.core.one",
-                    "parentCardinalityUri": "dm4.core.many",
-                    "assocTypeUri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dmx.workspaces.workspace",
+                    "childCardinalityUri":  "dmx.core.one",
+                    "parentCardinalityUri": "dmx.core.many",
+                    "assocTypeUri":         "dmx.core.aggregation_def"
                 }
             ]
         }

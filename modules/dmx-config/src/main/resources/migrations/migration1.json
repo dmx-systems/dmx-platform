@@ -2,13 +2,13 @@
     "assoc_types": [
         {
             "value":       "Configuration",
-            "uri":         "dm4.config.configuration",
-            "dataTypeUri": "dm4.core.text",
+            "uri":         "dmx.config.configuration",
+            "dataTypeUri": "dmx.core.text",
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.color": "hsl(240, 66%, 66%)"
+                        "dmx.webclient.color": "hsl(240, 66%, 66%)"
                     }
                 }
             ]
@@ -19,8 +19,8 @@
         ### Role Types ###
         {
             "value":   "Configurable",
-            "uri":     "dm4.config.configurable",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.config.configurable",
+            "typeUri": "dmx.core.role_type"
         }
     ]
 }

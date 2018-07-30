@@ -4,8 +4,8 @@ package systems.dmx.core.service.accesscontrol;
 
 public enum Operation {
 
-    READ("dm4.accesscontrol.operation.read"),
-    WRITE("dm4.accesscontrol.operation.write");
+    READ("dmx.accesscontrol.operation.read"),
+    WRITE("dmx.accesscontrol.operation.write");
 
     public final String uri;
 

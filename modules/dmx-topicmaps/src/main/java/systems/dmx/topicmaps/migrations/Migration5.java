@@ -16,10 +16,10 @@ public class Migration5 extends Migration {
 
     @Override
     public void run() {
-        dm4.createTopicType(mf.newTopicTypeModel("dm4.topicmaps.private", "Private", "dm4.core.boolean"));
-        dm4.getTopicType("dm4.topicmaps.topicmap").addAssocDef(mf.newAssociationDefinitionModel(
-            "dm4.core.composition_def", "dm4.topicmaps.topicmap", "dm4.topicmaps.private",
-            "dm4.core.one", "dm4.core.one"
+        dmx.createTopicType(mf.newTopicTypeModel("dmx.topicmaps.private", "Private", "dmx.core.boolean"));
+        dmx.getTopicType("dmx.topicmaps.topicmap").addAssocDef(mf.newAssociationDefinitionModel(
+            "dmx.core.composition_def", "dmx.topicmaps.topicmap", "dmx.topicmaps.private",
+            "dmx.core.one", "dmx.core.one"
         ));
     }
 }

@@ -42,10 +42,10 @@ public class Migration6 extends Migration {
             "DMX workspace");
         dmxWorkspaceId = getDMXWorkspace().getId();
         //
-        for (TopicType topicType : dm4.getAllTopicTypes()) {
+        for (TopicType topicType : dmx.getAllTopicTypes()) {
             assignWorkspace(topicType);
         }
-        for (AssociationType assocType : dm4.getAllAssociationTypes()) {
+        for (AssociationType assocType : dmx.getAllAssociationTypes()) {
             assignWorkspace(assocType);
         }
         //
@@ -83,6 +83,6 @@ public class Migration6 extends Migration {
 
     // ### copy in WorkspacesPlugin.java
     private boolean isDMXStandardType(DMXType type) {
-        return type.getUri().startsWith("dm4.");
+        return type.getUri().startsWith("dmx.");
     }
 }

@@ -52,8 +52,8 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String PROP_CREATED  = "dm4.time.created";
-    private static String PROP_MODIFIED = "dm4.time.modified";
+    private static String PROP_CREATED  = "dmx.time.created";
+    private static String PROP_MODIFIED = "dmx.time.modified";
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
@@ -83,7 +83,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public long getCreationTime(@PathParam("id") long objectId) {
         try {
-            return dm4.hasProperty(objectId, PROP_CREATED) ? (Long) dm4.getProperty(objectId, PROP_CREATED) : 0;
+            return dmx.hasProperty(objectId, PROP_CREATED) ? (Long) dmx.getProperty(objectId, PROP_CREATED) : 0;
         } catch (Exception e) {
             throw new RuntimeException("Fetching creation time of object " + objectId + " failed", e);
         }
@@ -94,7 +94,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public long getModificationTime(@PathParam("id") long objectId) {
         try {
-            return dm4.hasProperty(objectId, PROP_MODIFIED) ? (Long) dm4.getProperty(objectId, PROP_MODIFIED) : 0;
+            return dmx.hasProperty(objectId, PROP_MODIFIED) ? (Long) dmx.getProperty(objectId, PROP_MODIFIED) : 0;
         } catch (Exception e) {
             throw new RuntimeException("Fetching modification time of object " + objectId + " failed", e);
         }
@@ -116,7 +116,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByCreationTime(@PathParam("from") long from,
                                                      @PathParam("to") long to) {
-        return dm4.getTopicsByPropertyRange(PROP_CREATED, from, to);
+        return dmx.getTopicsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -124,7 +124,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Topic> getTopicsByModificationTime(@PathParam("from") long from,
                                                          @PathParam("to") long to) {
-        return dm4.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
+        return dmx.getTopicsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
     @GET
@@ -132,7 +132,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByCreationTime(@PathParam("from") long from,
                                                                  @PathParam("to") long to) {
-        return dm4.getAssociationsByPropertyRange(PROP_CREATED, from, to);
+        return dmx.getAssociationsByPropertyRange(PROP_CREATED, from, to);
     }
 
     @GET
@@ -140,7 +140,7 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     @Override
     public Collection<Association> getAssociationsByModificationTime(@PathParam("from") long from,
                                                                      @PathParam("to") long to) {
-        return dm4.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
+        return dmx.getAssociationsByPropertyRange(PROP_MODIFIED, from, to);
     }
 
 
@@ -298,10 +298,10 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
     private Set<DMXObject> getParents(Topic topic) {
         Set<DMXObject> parents = new LinkedHashSet();
         //
-        List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-            "dm4.core.parent", null);
-        List<? extends Association> parentAssocs = topic.getRelatedAssociations(null, "dm4.core.child",
-            "dm4.core.parent", null);
+        List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child",
+            "dmx.core.parent", null);
+        List<? extends Association> parentAssocs = topic.getRelatedAssociations(null, "dmx.core.child",
+            "dmx.core.parent", null);
         parents.addAll(parentTopics);
         parents.addAll(parentAssocs);
         //

@@ -54,7 +54,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Path("/{facet_type_uri}/topic/{id}")
     @Override
     public RelatedTopic getFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
-        return getFacet(dm4.getTopic(topicId), facetTypeUri);
+        return getFacet(dmx.getTopic(topicId), facetTypeUri);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public List<RelatedTopic> getFacets(@PathParam("id") long topicId,
                                         @PathParam("facet_type_uri") String facetTypeUri) {
-        return getFacets(dm4.getTopic(topicId), facetTypeUri);
+        return getFacets(dmx.getTopic(topicId), facetTypeUri);
     }
 
     @Override
@@ -87,7 +87,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public Topic getFacettedTopic(@PathParam("id") long topicId,
                                   @QueryParam("facet_type_uri") List<String> facetTypeUris) {
         try {
-            Topic topic = dm4.getTopic(topicId);
+            Topic topic = dmx.getTopic(topicId);
             ChildTopicsModel childTopics = topic.getChildTopics().getModel();
             for (String facetTypeUri : facetTypeUris) {
                 String childTypeUri = getChildTypeUri(facetTypeUri);
@@ -114,9 +114,9 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Transactional
     @Override
     public void addFacetTypeToTopic(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri) {
-        dm4.createAssociation(mf.newAssociationModel("dm4.core.instantiation",
-            mf.newTopicRoleModel(topicId,      "dm4.core.instance"),
-            mf.newTopicRoleModel(facetTypeUri, "dm4.facets.facet")
+        dmx.createAssociation(mf.newAssociationModel("dmx.core.instantiation",
+            mf.newTopicRoleModel(topicId,      "dmx.core.instance"),
+            mf.newTopicRoleModel(facetTypeUri, "dmx.facets.facet")
         ));
     }
 
@@ -129,7 +129,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     public void updateFacet(@PathParam("id") long topicId, @PathParam("facet_type_uri") String facetTypeUri,
                                                                                         FacetValueModel value) {
         try {
-            updateFacet(dm4.getTopic(topicId), facetTypeUri, value);
+            updateFacet(dmx.getTopic(topicId), facetTypeUri, value);
         } catch (Exception e) {
             throw new RuntimeException("Updating facet \"" + facetTypeUri + "\" of topic " + topicId +
                 " failed (value=" + value + ")", e);
@@ -149,8 +149,8 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     @Override
     public boolean hasFacet(long topicId, String facetTypeUri, long facetTopicId) {
         String assocTypeUri = getAssocDef(facetTypeUri).getInstanceLevelAssocTypeUri();
-        Association assoc = dm4.getAssociation(assocTypeUri, topicId, facetTopicId,
-            "dm4.core.parent", "dm4.core.child");
+        Association assoc = dmx.getAssociation(assocTypeUri, topicId, facetTopicId,
+            "dmx.core.parent", "dmx.core.child");
         return assoc != null;
     }
 
@@ -168,7 +168,7 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private RelatedTopic fetchChildTopic(DMXObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
-        return object.getRelatedTopic(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri);
+        return object.getRelatedTopic(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
     }
 
     /**
@@ -181,13 +181,13 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
     private List<RelatedTopic> fetchChildTopics(DMXObject object, AssociationDefinition assocDef) {
         String assocTypeUri  = assocDef.getInstanceLevelAssocTypeUri();
         String othersTypeUri = assocDef.getChildTypeUri();
-        return object.getRelatedTopics(assocTypeUri, "dm4.core.parent", "dm4.core.child", othersTypeUri);
+        return object.getRelatedTopics(assocTypeUri, "dmx.core.parent", "dmx.core.child", othersTypeUri);
     }
 
     // ---
 
     private boolean isMultiFacet(String facetTypeUri) {
-        return getAssocDef(facetTypeUri).getChildCardinalityUri().equals("dm4.core.many");
+        return getAssocDef(facetTypeUri).getChildCardinalityUri().equals("dmx.core.many");
     }
 
     private String getChildTypeUri(String facetTypeUri) {
@@ -196,6 +196,6 @@ public class FacetsPlugin extends PluginActivator implements FacetsService {
 
     private AssociationDefinition getAssocDef(String facetTypeUri) {
         // Note: a facet type has exactly *one* association definition
-        return dm4.getTopicType(facetTypeUri).getAssocDefs().iterator().next();
+        return dmx.getTopicType(facetTypeUri).getAssocDefs().iterator().next();
     }
 }

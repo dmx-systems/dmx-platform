@@ -21,7 +21,7 @@
     <!-- Override properties. The distribution must use relative paths. -->
     <properties>
         <felix.fileinstall.dir>bundle-deploy</felix.fileinstall.dir>
-        <dm4.database.path>deepamehta-db</dm4.database.path>
+        <dmx.database.path>deepamehta-db</dmx.database.path>
         <java.util.logging.config.file>conf/logging.properties</java.util.logging.config.file>
     </properties>
 

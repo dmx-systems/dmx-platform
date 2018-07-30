@@ -2,45 +2,45 @@
     "topic_types": [
         {
             "value":          "Title",
-            "uri":            "dm4.notes.title",
-            "dataTypeUri":    "dm4.core.text",
-            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
+            "uri":            "dmx.notes.title",
+            "dataTypeUri":    "dmx.core.text",
+            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"]
         },
         {
             "value":          "Text",
-            "uri":            "dm4.notes.text",
-            "dataTypeUri":    "dm4.core.html",
-            "indexModeUris": ["dm4.core.key", "dm4.core.fulltext"]
+            "uri":            "dmx.notes.text",
+            "dataTypeUri":    "dmx.core.html",
+            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"]
         },
         {
             "value":          "Note",
-            "uri":            "dm4.notes.note",
-            "dataTypeUri":    "dm4.core.identity",
-            "indexModeUris": ["dm4.core.fulltext"],
+            "uri":            "dmx.notes.note",
+            "dataTypeUri":    "dmx.core.identity",
+            "indexModeUris": ["dmx.core.fulltext"],
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.notes.title",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.notes.title",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
-                            "typeUri": "dm4.webclient.view_config",
+                            "typeUri": "dmx.webclient.view_config",
                             "childs": {
-                                "dm4.webclient.simple_renderer_uri": "dm4.webclient.title_renderer"
+                                "dmx.webclient.simple_renderer_uri": "dmx.webclient.title_renderer"
                             }
                         }
                     ]
                 },
                 {
-                    "childTypeUri":        "dm4.notes.text",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.notes.text",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
-                            "typeUri": "dm4.webclient.view_config",
+                            "typeUri": "dmx.webclient.view_config",
                             "childs": {
-                                "dm4.webclient.input_field_rows": 15,
-                                "dm4.webclient.simple_renderer_uri": "dm4.webclient.body_text_renderer"
+                                "dmx.webclient.input_field_rows": 15,
+                                "dmx.webclient.simple_renderer_uri": "dmx.webclient.body_text_renderer"
                             }
                         }
                     ]
@@ -48,11 +48,11 @@
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "\uf24a",
-                        "dm4.webclient.show_in_create_menu": true,
-                        "dm4.webclient.searchable_as_unit": true
+                        "dmx.webclient.icon": "\uf24a",
+                        "dmx.webclient.show_in_create_menu": true,
+                        "dmx.webclient.searchable_as_unit": true
                     }
                 }
             ]

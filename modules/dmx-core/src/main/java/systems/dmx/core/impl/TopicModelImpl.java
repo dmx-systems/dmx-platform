@@ -191,7 +191,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     void preDelete() {
-        if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.assoc_type")) {
+        if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.assoc_type")) {
             throw new RuntimeException("Tried to delete a type with a generic delete-topic call. " +
                 "Use a delete-type call instead.");
         }
@@ -211,9 +211,9 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
                 String assocDefUri    = assocDef.getAssocDefUri();
                 String cardinalityUri = assocDef.getChildCardinalityUri();
                 TopicModelImpl childTopic = null;
-                if (cardinalityUri.equals("dm4.core.one")) {
+                if (cardinalityUri.equals("dmx.core.one")) {
                     childTopic = childTopics.getTopicOrNull(assocDefUri);                                // no DB access
-                } else if (cardinalityUri.equals("dm4.core.many")) {
+                } else if (cardinalityUri.equals("dmx.core.many")) {
                     List<RelatedTopicModelImpl> _childTopics = childTopics.getTopicsOrNull(assocDefUri); // no DB access
                     if (_childTopics != null && !_childTopics.isEmpty()) {
                         childTopic = _childTopics.get(0);
@@ -249,10 +249,10 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
     }
 
     // Note: this method works only for instances, not for types.
-    // This is because a type is not of type "dm4.core.topic_type" but of type "dm4.core.meta_type".
+    // This is because a type is not of type "dmx.core.topic_type" but of type "dmx.core.meta_type".
     private AssociationModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl topicType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance",
-            "dm4.core.type", "dm4.core.topic_type");
+        RelatedTopicModelImpl topicType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
+            "dmx.core.type", "dmx.core.topic_type");
         //
         if (topicType == null) {
             throw new RuntimeException("Topic " + id + " is not associated to a topic type");

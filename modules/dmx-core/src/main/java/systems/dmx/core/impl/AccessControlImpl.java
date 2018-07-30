@@ -30,35 +30,35 @@ class AccessControlImpl implements AccessControl {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Type URIs
-    // ### TODO: move to dm4.core namespace?
+    // ### TODO: move to dmx.core namespace?
     // ### TODO: copy in AccessControlPlugin.java
-    private static final String TYPE_MEMBERSHIP    = "dm4.accesscontrol.membership";
-    private static final String TYPE_USERNAME      = "dm4.accesscontrol.username";
+    private static final String TYPE_MEMBERSHIP    = "dmx.accesscontrol.membership";
+    private static final String TYPE_USERNAME      = "dmx.accesscontrol.username";
     // ### TODO: copy in TopicmapsPlugin.java
-    private static final String ASSOCIATION_MAPCONTEXT = "dm4.topicmaps.association_mapcontext";
+    private static final String ASSOCIATION_MAPCONTEXT = "dmx.topicmaps.association_mapcontext";
     //
-    private static final String TYPE_EMAIL_ADDRESS = "dm4.contacts.email_address";
+    private static final String TYPE_EMAIL_ADDRESS = "dmx.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
     private static final String ASSOC_TYPE_USER_MAILBOX = "org.deepamehta.signup.user_mailbox";
-    private static final String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
-    private static final String ROLE_TYPE_CONFIGURABLE   = "dm4.config.configurable";
-    private static final String ROLE_TYPE_DEFAULT = "dm4.core.default";
+    private static final String ASSOC_TYPE_CONFIGURATION = "dmx.config.configuration";
+    private static final String ROLE_TYPE_CONFIGURABLE   = "dmx.config.configurable";
+    private static final String ROLE_TYPE_DEFAULT = "dmx.core.default";
 
     // Property URIs
-    // ### TODO: move to dm4.core namespace?
+    // ### TODO: move to dmx.core namespace?
     // ### TODO: copy in AccessControlPlugin.java
-    private static final String PROP_CREATOR  = "dm4.accesscontrol.creator";
+    private static final String PROP_CREATOR  = "dmx.accesscontrol.creator";
     // ### TODO: copy in AccessControlPlugin.java
-    private static final String PROP_OWNER = "dm4.accesscontrol.owner";
+    private static final String PROP_OWNER = "dmx.accesscontrol.owner";
     // ### TODO: copy in WorkspacesPlugin.java
-    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
+    private static final String PROP_WORKSPACE_ID = "dmx.workspaces.workspace_id";
 
     // Workspace URIs
     // ### TODO: copy in WorkspaceService.java
-    private static final String DMX_WORKSPACE_URI = "dm4.workspaces.deepamehta";
+    private static final String DMX_WORKSPACE_URI = "dmx.workspaces.deepamehta";
     // ### TODO: copy in AccessControlService.java
-    private static final String ADMINISTRATION_WORKSPACE_URI = "dm4.workspaces.administration";
-    private static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+    private static final String ADMINISTRATION_WORKSPACE_URI = "dmx.workspaces.administration";
+    private static final String SYSTEM_WORKSPACE_URI = "dmx.workspaces.system";
 
     private long systemWorkspaceId = -1;    // initialized lazily
 
@@ -93,12 +93,12 @@ class AccessControlImpl implements AccessControl {
             //
             // Note: private topicmaps are treated special. The topicmap's workspace assignment doesn't matter here.
             // Also "operation" doesn't matter as READ/WRITE access is always granted/denied together.
-            if (typeUri.equals("dm4.topicmaps.topicmap") && isTopicmapPrivate(objectId)) {
+            if (typeUri.equals("dmx.topicmaps.topicmap") && isTopicmapPrivate(objectId)) {
                 return isCreator(username, objectId);
             }
             //
             long workspaceId;
-            if (typeUri.equals("dm4.workspaces.workspace")) {
+            if (typeUri.equals("dmx.workspaces.workspace")) {
                 workspaceId = objectId;
             } else {
                 workspaceId = getAssignedWorkspaceId(objectId);
@@ -193,7 +193,7 @@ class AccessControlImpl implements AccessControl {
             logger.info("##### Changing password for user \"" + cred.username + "\"");
             TopicModelImpl userAccount = _getUserAccount(_getUsernameTopicOrThrow(cred.username));
             userAccount.update(mf.newTopicModel(mf.newChildTopicsModel()
-                .put("dm4.accesscontrol.password", cred.password)
+                .put("dmx.accesscontrol.password", cred.password)
             ));
         } catch (Exception e) {
             throw new RuntimeException("Changing password for user \"" + cred.username + "\" failed", e);
@@ -210,7 +210,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getPrivateWorkspace(String username) {
-        for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dm4.workspaces.workspace")) {
+        for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dmx.workspaces.workspace")) {
             if (getSharingMode(workspace.getId()) == SharingMode.PRIVATE) {
                 return workspace.instantiate();
             }
@@ -226,7 +226,7 @@ class AccessControlImpl implements AccessControl {
             }
             // Note: direct storage access is required here
             AssociationModel membership = pl.fetchAssociation(TYPE_MEMBERSHIP,
-                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dm4.core.default", "dm4.core.default");
+                _getUsernameTopicOrThrow(username).getId(), workspaceId, "dmx.core.default", "dmx.core.default");
             return membership != null;
         } catch (Exception e) {
             throw new RuntimeException("Checking membership of user \"" + username + "\" and workspace " +
@@ -334,9 +334,9 @@ class AccessControlImpl implements AccessControl {
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             // create assignment association
-            pl.createAssociation("dm4.core.aggregation",
-                object.getModel().createRoleModel("dm4.core.parent"),
-                mf.newTopicRoleModel(workspaceId, "dm4.core.child")
+            pl.createAssociation("dmx.core.aggregation",
+                object.getModel().createRoleModel("dmx.core.parent"),
+                mf.newTopicRoleModel(workspaceId, "dmx.core.child")
             );
             // store assignment property
             object.setProperty(PROP_WORKSPACE_ID, workspaceId, true);   // addToIndex=true
@@ -347,9 +347,9 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public boolean isWorkspaceAssignment(Association assoc) {
-        if (assoc.getTypeUri().equals("dm4.core.aggregation")) {
-            DMXObjectModel topic = ((AssociationImpl) assoc).getModel().getPlayer("dm4.core.child");
-            if (topic != null && topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+        if (assoc.getTypeUri().equals("dmx.core.aggregation")) {
+            DMXObjectModel topic = ((AssociationImpl) assoc).getModel().getPlayer("dmx.core.child");
+            if (topic != null && topic.getTypeUri().equals("dmx.workspaces.workspace")) {
                 return true;
             }
         }
@@ -465,8 +465,8 @@ class AccessControlImpl implements AccessControl {
     private TopicModelImpl _getUserAccount(TopicModel usernameTopic) {
         // Note: checking the credentials is performed by <anonymous> and User Accounts are private.
         // So direct storage access is required here.
-        RelatedTopicModelImpl userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dm4.core.composition",
-            "dm4.core.child", "dm4.core.parent", "dm4.accesscontrol.user_account");
+        RelatedTopicModelImpl userAccount = pl.fetchTopicRelatedTopic(usernameTopic.getId(), "dmx.core.composition",
+            "dmx.core.child", "dmx.core.parent", "dmx.accesscontrol.user_account");
         if (userAccount == null) {
             throw new RuntimeException("Data inconsistency: there is no User Account topic for username \"" +
                 usernameTopic.getSimpleValue() + "\" (usernameTopic=" + usernameTopic + ")");
@@ -480,8 +480,8 @@ class AccessControlImpl implements AccessControl {
     private TopicModel _getPasswordTopic(TopicModel userAccount) {
         // Note: we only have a (User Account) topic model at hand and we don't want instantiate a Topic.
         // So we use direct storage access here.
-        RelatedTopicModel password = pl.fetchTopicRelatedTopic(userAccount.getId(), "dm4.core.composition",
-            "dm4.core.parent", "dm4.core.child", "dm4.accesscontrol.password");
+        RelatedTopicModel password = pl.fetchTopicRelatedTopic(userAccount.getId(), "dmx.core.composition",
+            "dmx.core.parent", "dmx.core.child", "dmx.accesscontrol.password");
         if (password == null) {
             throw new RuntimeException("Data inconsistency: there is no Password topic for User Account \"" +
                 userAccount.getSimpleValue() + "\" (userAccount=" + userAccount + ")");
@@ -541,8 +541,8 @@ class AccessControlImpl implements AccessControl {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dm4.core.aggregation", "dm4.core.parent",
-            "dm4.core.child", "dm4.workspaces.sharing_mode");
+        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dmx.core.aggregation", "dmx.core.parent",
+            "dmx.core.child", "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);
         }
@@ -551,7 +551,7 @@ class AccessControlImpl implements AccessControl {
 
     private void checkWorkspaceId(long workspaceId) {
         String typeUri = getTypeUri(workspaceId);
-        if (!typeUri.equals("dm4.workspaces.workspace")) {
+        if (!typeUri.equals("dmx.workspaces.workspace")) {
             throw new RuntimeException("Object " + workspaceId + " is not a workspace (but of type \"" + typeUri +
                 "\")");
         }
@@ -560,8 +560,8 @@ class AccessControlImpl implements AccessControl {
     // ---
 
     private boolean isTopicmapPrivate(long topicmapId) {
-        TopicModel privateFlag = pl.fetchTopicRelatedTopic(topicmapId, "dm4.core.composition", "dm4.core.parent",
-            "dm4.core.child", "dm4.topicmaps.private");
+        TopicModel privateFlag = pl.fetchTopicRelatedTopic(topicmapId, "dmx.core.composition", "dmx.core.parent",
+            "dmx.core.child", "dmx.topicmaps.private");
         if (privateFlag == null) {
             // Note: migrated topicmaps might not have a Private child topic ### TODO: throw exception?
             return false;   // treat as non-private
@@ -610,7 +610,7 @@ class AccessControlImpl implements AccessControl {
         String username = null;
         for (TopicModelImpl emailAddressTopic : queryTopics(TYPE_EMAIL_ADDRESS, emailAddress)) {
             TopicModel usernameTopic = emailAddressTopic.getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-                "dm4.core.child", "dm4.core.parent", TYPE_USERNAME);
+                "dmx.core.child", "dmx.core.parent", TYPE_USERNAME);
             if (usernameTopic != null) {
                 if (username != null) {
                     throw new RuntimeException("Ambiguity: the Username assignment for email address \"" +
@@ -624,7 +624,7 @@ class AccessControlImpl implements AccessControl {
 
     private String _getEmailAddress(String username) {
         TopicModel emailAddress = _getUsernameTopicOrThrow(username).getRelatedTopic(ASSOC_TYPE_USER_MAILBOX,
-            "dm4.core.parent", "dm4.core.child", TYPE_EMAIL_ADDRESS);
+            "dmx.core.parent", "dmx.core.child", TYPE_EMAIL_ADDRESS);
         return emailAddress != null ? emailAddress.getSimpleValue().toString() : null;
     }
 
@@ -635,7 +635,7 @@ class AccessControlImpl implements AccessControl {
     /**
      * Fetches a topic by key/value.
      * <p>
-     * IMPORTANT: only applicable to values indexed with <code>dm4.core.key</code>.
+     * IMPORTANT: only applicable to values indexed with <code>dmx.core.key</code>.
      *
      * @return  the topic, or <code>null</code> if no such topic exists.
      */
@@ -646,8 +646,8 @@ class AccessControlImpl implements AccessControl {
     /**
      * Queries topics by key/value.
      * <p>
-     * IMPORTANT: only applicable to values indexed with <code>dm4.core.fulltext</code> or
-     * <code>dm4.core.fulltext_key</code>.
+     * IMPORTANT: only applicable to values indexed with <code>dmx.core.fulltext</code> or
+     * <code>dmx.core.fulltext_key</code>.
      *
      * @return  a list, possibly empty.
      */

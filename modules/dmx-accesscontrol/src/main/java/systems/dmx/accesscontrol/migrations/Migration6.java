@@ -28,10 +28,10 @@ public class Migration6 extends Migration {
     @Override
     public void run() {
         logger.info("########## Removing owner and acl properties");
-        for (Topic topic : dm4.getAllTopics()) {
+        for (Topic topic : dmx.getAllTopics()) {
             migrateObject(topic, "topic");
         }
-        for (Association assoc : dm4.getAllAssociations()) {
+        for (Association assoc : dmx.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
         logger.info("########## Removing owner and acl properties complete\n    Objects processed: " + objects +
@@ -43,15 +43,15 @@ public class Migration6 extends Migration {
     private void migrateObject(DMXObject object, String type) {
         try {
             objects++;
-            if (object.hasProperty("dm4.accesscontrol.owner")) {
+            if (object.hasProperty("dmx.accesscontrol.owner")) {
                 // only workspaces keep the "owner" property
-                if (!object.getTypeUri().equals("dm4.workspaces.workspace")) {
-                    object.removeProperty("dm4.accesscontrol.owner");
+                if (!object.getTypeUri().equals("dmx.workspaces.workspace")) {
+                    object.removeProperty("dmx.accesscontrol.owner");
                     ownerRemoved++;
                 }
             }
-            if (object.hasProperty("dm4.accesscontrol.acl")) {
-                object.removeProperty("dm4.accesscontrol.acl");
+            if (object.hasProperty("dmx.accesscontrol.acl")) {
+                object.removeProperty("dmx.accesscontrol.acl");
                 aclRemoved++;
             }
         } catch (Exception e) {

@@ -53,16 +53,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
-    private static final String TOPIC_MAPCONTEXT       = "dm4.topicmaps.topic_mapcontext";
-    private static final String ASSOCIATION_MAPCONTEXT = "dm4.topicmaps.association_mapcontext";
-    private static final String ROLE_TYPE_TOPICMAP     = "dm4.core.default";
-    private static final String ROLE_TYPE_TOPIC        = "dm4.topicmaps.topicmap_topic";
-    private static final String ROLE_TYPE_ASSOCIATION  = "dm4.topicmaps.topicmap_association";
+    private static final String TOPIC_MAPCONTEXT       = "dmx.topicmaps.topic_mapcontext";
+    private static final String ASSOCIATION_MAPCONTEXT = "dmx.topicmaps.association_mapcontext";
+    private static final String ROLE_TYPE_TOPICMAP     = "dmx.core.default";
+    private static final String ROLE_TYPE_TOPIC        = "dmx.topicmaps.topicmap_topic";
+    private static final String ROLE_TYPE_ASSOCIATION  = "dmx.topicmaps.topicmap_association";
 
-    private static final String PROP_X          = "dm4.topicmaps.x";
-    private static final String PROP_Y          = "dm4.topicmaps.y";
-    private static final String PROP_VISIBILITY = "dm4.topicmaps.visibility";
-    private static final String PROP_PINNED     = "dm4.topicmaps.pinned";
+    private static final String PROP_X          = "dmx.topicmaps.x";
+    private static final String PROP_Y          = "dmx.topicmaps.y";
+    private static final String PROP_VISIBILITY = "dmx.topicmaps.visibility";
+    private static final String PROP_PINNED     = "dmx.topicmaps.pinned";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -101,11 +101,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                 @QueryParam("private") boolean isPrivate) {
         logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
             "\", isPrivate=" + isPrivate +")");
-        Topic topicmapTopic = dm4.createTopic(mf.newTopicModel("dm4.topicmaps.topicmap", mf.newChildTopicsModel()
-            .put("dm4.topicmaps.name", name)
-            .put("dm4.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dm4.topicmaps.private", isPrivate)
-            .put("dm4.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
+        Topic topicmapTopic = dmx.createTopic(mf.newTopicModel("dmx.topicmaps.topicmap", mf.newChildTopicsModel()
+            .put("dmx.topicmaps.name", name)
+            .put("dmx.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
+            .put("dmx.topicmaps.private", isPrivate)
+            .put("dmx.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
         me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
         return topicmapTopic;
     }
@@ -121,7 +121,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a TopicmapViewmodel is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
-            Topic topicmapTopic = dm4.getTopic(topicmapId).loadChildTopics();
+            Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
             Map<Long, TopicViewModel> topics = fetchTopics(topicmapTopic, includeChilds);
             Map<Long, AssociationViewModel> assocs = fetchAssociations(topicmapTopic);
             //
@@ -151,7 +151,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                    @PathParam("topic_id") final long topicId, final ViewProperties viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     if (isTopicInTopicmap(topicmapId, topicId)) {
@@ -180,7 +180,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                          @PathParam("assoc_id") final long assocId, final ViewProperties viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     if (isAssociationInTopicmap(topicmapId, assocId)) {
@@ -206,7 +206,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                           @PathParam("assoc_id") final long assocId, final ViewProperties viewProps) {
         try {
             // Note: a Mapcontext association must have no workspace assignment as it is not user-deletable
-            dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
+            dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Void>() {  // throws Exception
                 @Override
                 public Void call() {
                     // 1) add topic
@@ -276,7 +276,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         try {
             // remove associations
             if (!visibility) {
-                for (Association assoc : dm4.getTopic(topicId).getAssociations()) {
+                for (Association assoc : dmx.getTopic(topicId).getAssociations()) {
                     Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assoc.getId());
                     if (assocMapcontext != null) {
                         deleteAssociationMapcontext(assocMapcontext);
@@ -364,11 +364,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                          @PathParam("y") int transY) {
         try {
             ChildTopicsModel topicmapState = mf.newChildTopicsModel()
-                .put("dm4.topicmaps.state", mf.newChildTopicsModel()
-                    .put("dm4.topicmaps.translation", mf.newChildTopicsModel()
-                        .put("dm4.topicmaps.translation_x", transX)
-                        .put("dm4.topicmaps.translation_y", transY)));
-            dm4.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
+                .put("dmx.topicmaps.state", mf.newChildTopicsModel()
+                    .put("dmx.topicmaps.translation", mf.newChildTopicsModel()
+                        .put("dmx.topicmaps.translation_x", transX)
+                        .put("dmx.topicmaps.translation_y", transY)));
+            dmx.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
         } catch (Exception e) {
             throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
                 transX + ", transY=" + transY + ")", e);
@@ -427,8 +427,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewModel> topics = new HashMap();
-        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dm4.core.default",
-            "dm4.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dmx.core.default",
+            "dmx.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
         if (includeChilds) {
             DMXUtils.loadChildTopics(relTopics);
         }
@@ -441,7 +441,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<Long, AssociationViewModel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewModel> assocs = new HashMap();
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
-            "dm4.core.default", "dm4.topicmaps.topicmap_association", null);
+            "dmx.core.default", "dmx.topicmaps.topicmap_association", null);
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), createAssocViewModel(assoc));
         }
@@ -473,35 +473,35 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private Association fetchTopicMapcontext(long topicmapId, long topicId) {
-        return dm4.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
+        return dmx.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
     }
 
     private Association fetchAssociationMapcontext(long topicmapId, long assocId) {
-        return dm4.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
+        return dmx.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION);
     }
 
     // ---
 
     private void createTopicMapcontext(long topicmapId, long topicId, ViewProperties viewProps) {
-        Association topicMapcontext = dm4.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+        Association topicMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
             mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
             mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
         ));
         storeViewProperties(topicMapcontext, viewProps);
         //
-        TopicViewModel topic = mf.newTopicViewModel(dm4.getTopic(topicId).getModel(), viewProps);
+        TopicViewModel topic = mf.newTopicViewModel(dmx.getTopic(topicId).getModel(), viewProps);
         me.addTopicToTopicmap(topicmapId, topic);
     }
 
     private void createAssociationMapcontext(long topicmapId, long assocId, ViewProperties viewProps) {
-        Association assocMapcontext = dm4.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+        Association assocMapcontext = dmx.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
             mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
         ));
         storeViewProperties(assocMapcontext, viewProps);
         //
-        AssociationModel assoc = dm4.getAssociation(assocId).getModel();    // TODO: view props
+        AssociationModel assoc = dmx.getAssociation(assocId).getModel();    // TODO: view props
         me.addAssociationToTopicmap(topicmapId, assoc);
     }
 
@@ -510,7 +510,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private void deleteAssociationMapcontext(Association assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deleting a mapcontext association is a privileged operation.
-        dm4.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
+        dmx.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
     }
 
     // ---
@@ -609,7 +609,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private InputStream invokeWebclient() {
-        return dm4.getPlugin("systems.dmx.webclient").getStaticResource("/web/index.html");
+        return dmx.getPlugin("systems.dmx.webclient").getStaticResource("/web/index.html");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Classes
@@ -715,7 +715,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // ---
 
         private void messageToAllButOne(JSONObject message) {
-            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

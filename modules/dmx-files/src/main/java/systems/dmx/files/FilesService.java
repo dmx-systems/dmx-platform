@@ -21,7 +21,7 @@ public interface FilesService {
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -42,7 +42,7 @@ public interface FilesService {
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -68,7 +68,7 @@ public interface FilesService {
      * @param   repoPath        A repository path. Relative to the repository base path.
      *                          Must begin with slash, no slash at the end.
      *                          <p>
-     *                          If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                          If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                          the repository path must contain the workspace prefix as the first path segment,
      *                          e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                          <p>
@@ -94,7 +94,7 @@ public interface FilesService {
      * @param   repoPath        A repository path. Relative to the repository base path.
      *                          Must begin with slash, no slash at the end.
      *                          <p>
-     *                          If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                          If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                          the repository path must contain the workspace prefix as the first path segment,
      *                          e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                          <p>
@@ -123,7 +123,7 @@ public interface FilesService {
      *                      A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -148,7 +148,7 @@ public interface FilesService {
      *                      A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -171,7 +171,7 @@ public interface FilesService {
      *                      A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -208,7 +208,7 @@ public interface FilesService {
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -238,7 +238,7 @@ public interface FilesService {
      * @param   repoPath    A repository path. Relative to the repository base path.
      *                      Must begin with slash, no slash at the end.
      *                      <p>
-     *                      If per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>)
+     *                      If per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>)
      *                      the repository path must contain the workspace prefix as the first path segment,
      *                      e.g. <code>"/workspace-1234"</code> where <code>1234</code> is the workspace ID.
      *                      <p>
@@ -256,7 +256,7 @@ public interface FilesService {
 
     /**
      * Returns a prefix that can be used for constructing a repository path.
-     * In case of per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * In case of per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>) the prefix
      * represents the <i>current</i> workspace (e.g. <code>"/workspace-1234"</code>), based on the workspace cookie.
      * In case of per-workspace file repos are <i>not</i> active an empty string is returned.
      */
@@ -264,7 +264,7 @@ public interface FilesService {
 
     /**
      * Returns a prefix that can be used for constructing a repository path.
-     * In case of per-workspace file repos are active (<code>dm4.filerepo.per_workspace=true</code>) the prefix
+     * In case of per-workspace file repos are active (<code>dmx.filerepo.per_workspace=true</code>) the prefix
      * represents the <i>given</i> workspace (e.g. <code>"/workspace-1234"</code>).
      * In case of per-workspace file repos are <i>not</i> active an empty string is returned.
      */

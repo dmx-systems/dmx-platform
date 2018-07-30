@@ -1,4 +1,4 @@
-dm4c.add_simple_renderer("dm4.files.folder_content_renderer", {
+dm4c.add_simple_renderer("dmx.files.folder_content_renderer", {
 
     render_info: function(page_model, parent_element) {
         dm4c.render.field_label(page_model, parent_element)
@@ -8,7 +8,7 @@ dm4c.add_simple_renderer("dm4.files.folder_content_renderer", {
 
         function render_content() {
             try {
-                var path = page_model.parent.object.get("dm4.files.path")
+                var path = page_model.parent.object.get("dmx.files.path")
                 parent_element.append(dm4c.render.topic_list(get_topics(path), click_handler))
             } catch (e) {
                 parent_element.addClass("ui-state-error")
@@ -26,7 +26,7 @@ dm4c.add_simple_renderer("dm4.files.folder_content_renderer", {
                 }
                 // Note: dm4c.render.topic_list() takes arbitrary objects as long as they have "type_uri"
                 // and "value" properties.
-                var type_uri = item.kind == "file" ? "dm4.files.file" : "dm4.files.folder"
+                var type_uri = item.kind == "file" ? "dmx.files.file" : "dmx.files.folder"
                 topics.push({type_uri: type_uri, value: item.name, kind: item.kind, path: item.path})
             }
             // Note: dm4c.restc.get_directory_listing() provides no ordering guarantee

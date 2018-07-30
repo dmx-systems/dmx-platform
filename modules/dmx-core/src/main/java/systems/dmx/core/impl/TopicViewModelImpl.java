@@ -32,15 +32,15 @@ class TopicViewModelImpl extends TopicModelImpl implements TopicViewModel {
     // ---
 
     public int getX() {
-        return viewProps.getInt("dm4.topicmaps.x");
+        return viewProps.getInt("dmx.topicmaps.x");
     }
 
     public int getY() {
-        return viewProps.getInt("dm4.topicmaps.y");
+        return viewProps.getInt("dmx.topicmaps.y");
     }
 
     public boolean getVisibility() {
-        return viewProps.getBoolean("dm4.topicmaps.visibility");
+        return viewProps.getBoolean("dmx.topicmaps.visibility");
     }
 
     // ---

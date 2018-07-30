@@ -32,8 +32,8 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
     }
 
     /**
-     * Convenience constructor that initializes the "dm4.topicmaps.x", "dm4.topicmaps.y", "dm4.topicmaps.visibility",
-     * and "dm4.topicmaps.pinned" standard view properties.
+     * Convenience constructor that initializes the "dmx.topicmaps.x", "dmx.topicmaps.y", "dmx.topicmaps.visibility",
+     * and "dmx.topicmaps.pinned" standard view properties.
      */
     public ViewProperties(int x, int y, boolean visibility, boolean pinned) {
         initPos(x, y);
@@ -42,14 +42,14 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
     }
 
     /**
-     * Convenience constructor that initializes the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.
+     * Convenience constructor that initializes the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.
      */
     public ViewProperties(int x, int y) {
         initPos(x, y);
     }
 
     /**
-     * Convenience constructor that initializes the "dm4.topicmaps.visibility" standard view property.
+     * Convenience constructor that initializes the "dmx.topicmaps.visibility" standard view property.
      */
     public ViewProperties(boolean visibility) {
         initVisibility(visibility);
@@ -102,15 +102,15 @@ public class ViewProperties implements Iterable<String>, JSONEnabled {
     // ------------------------------------------------------------------------------------------------ Private  Methods
 
     private void initPos(int x, int y) {
-        put("dm4.topicmaps.x", x);
-        put("dm4.topicmaps.y", y);
+        put("dmx.topicmaps.x", x);
+        put("dmx.topicmaps.y", y);
     }
 
     private void initVisibility(boolean visibility) {
-        put("dm4.topicmaps.visibility", visibility);
+        put("dmx.topicmaps.visibility", visibility);
     }
 
     private void initPinned(boolean pinned) {
-        put("dm4.topicmaps.pinned", pinned);
+        put("dmx.topicmaps.pinned", pinned);
     }
 }

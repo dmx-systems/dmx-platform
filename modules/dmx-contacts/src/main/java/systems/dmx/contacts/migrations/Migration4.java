@@ -15,10 +15,10 @@ public class Migration4 extends Migration {
 
     @Override
     public void run() {
-        dm4.getTopicType("dm4.contacts.person")
+        dmx.getTopicType("dmx.contacts.person")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.date_of_birth", false, false,
-                "dm4.contacts.person", "dm4.datetime.date", "dm4.core.one", "dm4.core.one"),
-            "dm4.contacts.phone_number#dm4.contacts.phone_entry");
+                mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.date_of_birth", false, false,
+                "dmx.contacts.person", "dmx.datetime.date", "dmx.core.one", "dmx.core.one"),
+            "dmx.contacts.phone_number#dmx.contacts.phone_entry");
     }
 }

@@ -108,7 +108,7 @@ export default {
 // State helper
 
 function fetchWorkspaceTopics () {
-  return dm5.restClient.getTopicsByType('dm4.workspaces.workspace').then(topics => {
+  return dm5.restClient.getTopicsByType('dmx.workspaces.workspace').then(topics => {
     // console.log('### Workspaces ready!')
     state.workspaceTopics = topics
   })

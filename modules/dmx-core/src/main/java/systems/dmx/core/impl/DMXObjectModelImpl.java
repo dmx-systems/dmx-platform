@@ -587,7 +587,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
         // DM5's value updater needs the exact index also for HTML values.
         return value;
         /* SimpleValue value = getSimpleValue();
-        if (getType().getDataTypeUri().equals("dm4.core.html")) {
+        if (getType().getDataTypeUri().equals("dmx.core.html")) {
             return new SimpleValue(JavaUtils.stripHTML(value.toString()));
         } else {
             return value;
@@ -601,10 +601,10 @@ class DMXObjectModelImpl implements DMXObjectModel {
     boolean isSimple() {
         // TODO: add isSimple() to type model
         String dataTypeUri = getType().getDataTypeUri();
-        return dataTypeUri.equals("dm4.core.text")
-            || dataTypeUri.equals("dm4.core.html")
-            || dataTypeUri.equals("dm4.core.number")
-            || dataTypeUri.equals("dm4.core.boolean");
+        return dataTypeUri.equals("dmx.core.text")
+            || dataTypeUri.equals("dmx.core.html")
+            || dataTypeUri.equals("dmx.core.number")
+            || dataTypeUri.equals("dmx.core.boolean");
     }
 
 

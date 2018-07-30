@@ -53,7 +53,7 @@ dm4c.add_plugin("systems.dmx.config", function() {
         function config_command(config_type_uri) {
             return {
                 label: dm4c.topic_type_name(config_type_uri),
-                icon: dm4c.get_type_icon_src("dm4.core.topic_type"),
+                icon: dm4c.get_type_icon_src("dmx.core.topic_type"),
                 handler: function() {
                     var config_topic = new Topic(get_config_topic(topic.id, config_type_uri))
                     dm4c.show_topic(config_topic, "show", undefined, true)     // coordinates=undefined, do_center=true

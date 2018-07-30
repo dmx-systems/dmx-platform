@@ -5,12 +5,12 @@ function defaultType (name) {
     // Note: no type "uri" is set here. A new  type gets its default URI at server-side.
     // Also the "typeUri" is provided at server-side (see ModelFactoryImpl).
     value: name,
-    dataTypeUri: 'dm4.core.text',
-    indexModeUris: ['dm4.core.key', 'dm4.core.fulltext'],
+    dataTypeUri: 'dmx.core.text',
+    indexModeUris: ['dmx.core.key', 'dmx.core.fulltext'],
     viewConfigTopics: [{
-      typeUri: 'dm4.webclient.view_config',
+      typeUri: 'dmx.webclient.view_config',
       childs: {
-        'dm4.webclient.show_in_create_menu': true
+        'dmx.webclient.show_in_create_menu': true
       }
     }]
   }

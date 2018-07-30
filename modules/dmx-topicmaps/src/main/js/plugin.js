@@ -57,7 +57,7 @@ export default store => {
     ],
 
     extraMenuItems: [{
-      uri: 'dm4.topicmaps.topicmap',
+      uri: 'dmx.topicmaps.topicmap',
       label: 'Topicmap',
       optionsComp: require('./components/dm5-topicmap-options').default,
       create: (name, data) => {
@@ -70,7 +70,7 @@ export default store => {
     }],
 
     topicmapType: {
-      uri: 'dm4.webclient.default_topicmap_renderer',
+      uri: 'dmx.webclient.default_topicmap_renderer',
       name: "Topicmap",
       renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */),
       mounted () {
@@ -81,7 +81,7 @@ export default store => {
   }
 
   function selectTopicmapIf (viewTopic) {
-    if (viewTopic.typeUri === 'dm4.topicmaps.topicmap') {
+    if (viewTopic.typeUri === 'dmx.topicmaps.topicmap') {
       store.dispatch('selectTopicmap', viewTopic.id)
     }
   }

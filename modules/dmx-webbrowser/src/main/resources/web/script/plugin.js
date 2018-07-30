@@ -4,7 +4,7 @@ dm4c.add_plugin("systems.dmx.webbrowser", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
 
-        if (topic.type_uri == "dm4.webbrowser.url") {
+        if (topic.type_uri == "dmx.webbrowser.url") {
             return [
                 {
                     is_separator: true,
@@ -30,8 +30,8 @@ dm4c.add_plugin("systems.dmx.webbrowser", function() {
             if (!webpage) {
                 // Note: a Webpage *aggregates* an URL (see migration2.json),
                 // so we must use the REF_ID_PREFIX notation here
-                webpage = dm4c.create_topic("dm4.webbrowser.webpage", {
-                    "dm4.webbrowser.url": dm4c.REF_ID_PREFIX + topic.id
+                webpage = dm4c.create_topic("dmx.webbrowser.webpage", {
+                    "dmx.webbrowser.url": dm4c.REF_ID_PREFIX + topic.id
                 })
             }
             dm4c.do_reveal_related_topic(webpage.id, "show")
@@ -50,10 +50,10 @@ dm4c.add_plugin("systems.dmx.webbrowser", function() {
      */
     function get_webpage(url_topic) {
         var webpages = dm4c.restc.get_topic_related_topics(url_topic.id, {
-            assoc_type_uri: "dm4.core.aggregation",
-            my_role_type_uri: "dm4.core.child",
-            others_role_type_uri: "dm4.core.parent",
-            others_topic_type_uri: "dm4.webbrowser.webpage"
+            assoc_type_uri: "dmx.core.aggregation",
+            my_role_type_uri: "dmx.core.child",
+            others_role_type_uri: "dmx.core.parent",
+            others_topic_type_uri: "dmx.webbrowser.webpage"
         })
         //
         if (webpages.length > 1) {

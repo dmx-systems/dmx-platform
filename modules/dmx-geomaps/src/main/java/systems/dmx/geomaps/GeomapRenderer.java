@@ -11,17 +11,17 @@ class GeomapRenderer implements TopicmapRenderer {
 
     @Override
     public String getUri() {
-        // ### TODO: change to "dm4.geomaps.geomap"
-        return "dm4.geomaps.geomap_renderer";
+        // ### TODO: change to "dmx.geomaps.geomap"
+        return "dmx.geomaps.geomap_renderer";
     }
 
     @Override
     public ChildTopicsModel initialTopicmapState(ModelFactory mf) {
         return mf.newChildTopicsModel()
-            .put("dm4.topicmaps.translation", mf.newChildTopicsModel()
-                .put("dm4.topicmaps.translation_x", 11.0)     // default region is "Germany"
-                .put("dm4.topicmaps.translation_y", 51.0)
+            .put("dmx.topicmaps.translation", mf.newChildTopicsModel()
+                .put("dmx.topicmaps.translation_x", 11.0)     // default region is "Germany"
+                .put("dmx.topicmaps.translation_y", 51.0)
             )
-            .put("dm4.topicmaps.zoom_level", 6);
+            .put("dmx.topicmaps.zoom_level", 6);
     }
 }

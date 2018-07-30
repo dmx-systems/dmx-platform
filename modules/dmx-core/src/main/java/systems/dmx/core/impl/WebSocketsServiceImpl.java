@@ -25,8 +25,8 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final int    WEBSOCKETS_PORT = Integer.getInteger("dm4.websockets.port", 8081);
-    private static final String WEBSOCKETS_URL = System.getProperty("dm4.websockets.url", "ws://localhost:8081");
+    private static final int    WEBSOCKETS_PORT = Integer.getInteger("dmx.websockets.port", 8081);
+    private static final String WEBSOCKETS_URL = System.getProperty("dmx.websockets.url", "ws://localhost:8081");
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
@@ -174,7 +174,7 @@ class WebSocketsServiceImpl implements WebSocketsService {
                     throw new RuntimeException("A plugin URI is missing in the WebSocket handshake -- Add your " +
                         "plugin's URI as the 2nd argument to the JavaScript WebSocket constructor");
                 } else {
-                    dm4.getPlugin(pluginUri);   // check plugin URI, throws if invalid
+                    dmx.getPlugin(pluginUri);   // check plugin URI, throws if invalid
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Opening a WebSocket connection " +

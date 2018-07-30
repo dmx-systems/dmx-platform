@@ -85,7 +85,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
-            List<Topic> singleTopics = dm4.searchTopics(searchTerm, fieldUri);
+            List<Topic> singleTopics = dmx.searchTopics(searchTerm, fieldUri);
             Set<Topic> topics = findSearchableUnits(singleTopics);
             logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
             //
@@ -108,8 +108,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public Topic getTopics(@PathParam("type_uri") String typeUri) {
         try {
             logger.info("typeUri=\"" + typeUri + "\"");
-            String searchTerm = dm4.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<Topic> topics = dm4.getTopicsByType(typeUri);
+            String searchTerm = dmx.getTopicType(typeUri).getSimpleValue() + "(s)";
+            List<Topic> topics = dmx.getTopicsByType(typeUri);
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
@@ -122,7 +122,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @GET
     @Path("/object/{id}/related_topics")
     public List<RelatedTopic> getRelatedTopics(@PathParam("id") long objectId) {
-        DMXObject object = dm4.getObject(objectId);
+        DMXObject object = dmx.getObject(objectId);
         List<RelatedTopic> relTopics = object.getRelatedTopics(null);   // assocTypeUri=null
         Iterator<RelatedTopic> i = relTopics.iterator();
         int removed = 0;
@@ -197,7 +197,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      */
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
-        if (topic.getTypeUri().equals("dm4.webclient.view_config")) {
+        if (topic.getTypeUri().equals("dmx.webclient.view_config")) {
             updateType(topic);
             setConfigTopicLabel(topic);
         }
@@ -228,8 +228,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             if (searchableAsUnit(topic)) {
                 searchableUnits.add(topic);
             } else {
-                List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dm4.core.child",
-                    "dm4.core.parent", null);
+                List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child",
+                    "dmx.core.parent", null);
                 if (parentTopics.isEmpty()) {
                     searchableUnits.add(topic);
                 } else {
@@ -247,17 +247,17 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         try {
             // We suppress standard workspace assignment here as a Search topic requires a special assignment.
             // That is done by the Access Control module. ### TODO: refactoring. Do the assignment here.
-            return dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            return dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    Topic searchTopic = dm4.createTopic(mf.newTopicModel("dm4.webclient.search",
-                        mf.newChildTopicsModel().put("dm4.webclient.search_term", searchTerm)
+                    Topic searchTopic = dmx.createTopic(mf.newTopicModel("dmx.webclient.search",
+                        mf.newChildTopicsModel().put("dmx.webclient.search_term", searchTerm)
                     ));
                     // associate result items
                     for (Topic resultItem : resultItems) {
-                        dm4.createAssociation(mf.newAssociationModel("dm4.webclient.search_result_item",
-                            mf.newTopicRoleModel(searchTopic.getId(), "dm4.core.default"),
-                            mf.newTopicRoleModel(resultItem.getId(), "dm4.core.default")
+                        dmx.createAssociation(mf.newAssociationModel("dmx.webclient.search_result_item",
+                            mf.newTopicRoleModel(searchTopic.getId(), "dmx.core.default"),
+                            mf.newTopicRoleModel(resultItem.getId(), "dmx.core.default")
                         ));
                     }
                     //
@@ -272,7 +272,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // ---
 
     private boolean searchableAsUnit(Topic topic) {
-        TopicType topicType = dm4.getTopicType(topic.getTypeUri());
+        TopicType topicType = dmx.getTopicType(topic.getTypeUri());
         Boolean searchableAsUnit = (Boolean) getViewConfigValue(topicType, "searchable_as_unit");
         return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
@@ -288,7 +288,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * @return  The config value, or <code>null</code> if no value is set
      */
     private Object getViewConfigValue(TopicType topicType, String setting) {
-        return topicType.getViewConfigValue("dm4.webclient.view_config", "dm4.webclient." + setting);
+        return topicType.getViewConfigValue("dmx.webclient.view_config", "dmx.webclient." + setting);
     }
 
 
@@ -296,12 +296,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === View Configuration ===
 
     private void updateType(Topic viewConfig) {
-        Topic type = viewConfig.getRelatedTopic("dm4.core.aggregation", "dm4.core.view_config", "dm4.core.type", null);
+        Topic type = viewConfig.getRelatedTopic("dmx.core.aggregation", "dmx.core.view_config", "dmx.core.type", null);
         if (type != null) {
             String typeUri = type.getTypeUri();
-            if (typeUri.equals("dm4.core.topic_type") || typeUri.equals("dm4.core.meta_type")) {
+            if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
                 updateTopicType(type, viewConfig);
-            } else if (typeUri.equals("dm4.core.assoc_type")) {
+            } else if (typeUri.equals("dmx.core.assoc_type")) {
                 updateAssociationType(type, viewConfig);
             } else {
                 throw new RuntimeException("View Configuration " + viewConfig.getId() + " is associated to an " +
@@ -316,14 +316,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private void updateTopicType(Topic type, Topic viewConfig) {
         logger.info("### Updating view config of topic type \"" + type.getUri() + "\"");
-        TopicType topicType = dm4.getTopicType(type.getUri());
+        TopicType topicType = dmx.getTopicType(type.getUri());
         updateViewConfig(topicType, viewConfig);
         Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);           // ### TODO: should be implicit
     }
 
     private void updateAssociationType(Topic type, Topic viewConfig) {
         logger.info("### Updating view config of assoc type \"" + type.getUri() + "\"");
-        AssociationType assocType = dm4.getAssociationType(type.getUri());
+        AssociationType assocType = dmx.getAssociationType(type.getUri());
         updateViewConfig(assocType, viewConfig);
         Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);     // ### TODO: should be implicit
     }
@@ -361,9 +361,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // ### TODO: rethink about this.
         /*
         ViewConfigurationModel viewConfig = typeModel.getViewConfig();
-        TopicModel configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
+        TopicModel configTopic = viewConfig.getConfigTopic("dmx.webclient.view_config");
         if (configTopic == null) {
-            viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
+            viewConfig.addConfigTopic(mf.newTopicModel("dmx.webclient.view_config"));
         }
         */
     }
@@ -395,7 +395,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         if (hasAssocDef(parentObject, childTopic)) {
             // role types
             Association assoc = childTopic.getRelatingAssociation();
-            return assoc.matches("dm4.core.parent", parentObject.getId(), "dm4.core.child", childTopic.getId());
+            return assoc.matches("dmx.core.parent", parentObject.getId(), "dmx.core.child", childTopic.getId());
         }
         return false;
     }

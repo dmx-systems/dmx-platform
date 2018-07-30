@@ -37,11 +37,11 @@ public class Migration9 extends Migration {
     public void run() {
         logger.info("########## Deleting workspace assignments of \"Mapcontext\" associations");
         //
-        for (Association assoc : dm4.getAssociationsByType("dm4.topicmaps.topic_mapcontext")) {
+        for (Association assoc : dmx.getAssociationsByType("dmx.topicmaps.topic_mapcontext")) {
             deleteWorkspaceAssignment(assoc);
             topicContext++;
         }
-        for (Association assoc : dm4.getAssociationsByType("dm4.topicmaps.association_mapcontext")) {
+        for (Association assoc : dmx.getAssociationsByType("dmx.topicmaps.association_mapcontext")) {
             deleteWorkspaceAssignment(assoc);
             assocContext++;
         }
@@ -57,8 +57,8 @@ public class Migration9 extends Migration {
         Topic workspace = workspacesService.getAssignedWorkspace(assoc.getId());
         if (workspace != null) {
             // 1) delete association
-            facetsService.updateFacet(assoc, "dm4.workspaces.workspace_facet",
-                mf.newFacetValueModel("dm4.workspaces.workspace").putDeletionRef(workspace.getId()));
+            facetsService.updateFacet(assoc, "dmx.workspaces.workspace_facet",
+                mf.newFacetValueModel("dmx.workspaces.workspace").putDeletionRef(workspace.getId()));
             //
             // 2) delete property
             assoc.removeProperty(WorkspacesService.PROP_WORKSPACE_ID);

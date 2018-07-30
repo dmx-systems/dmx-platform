@@ -72,7 +72,7 @@ public class CoreActivator implements BundleActivator {
             httpServiceTracker.close();
             //
             if (dm4 != null) {
-                dm4.shutdown();
+                dmx.shutdown();
             }
             // Note: we do not shutdown the DB here.
             // The DB shuts down itself through the storage bundle's stop() method.

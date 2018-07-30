@@ -6,7 +6,7 @@ dm4c.add_plugin("systems.dmx.datetime", function() {
 
     dm4c.add_listener("option_topics", function(page_model) {
         var topic_type_uri = page_model.object_type.uri
-        if (topic_type_uri == "dm4.datetime.month") {
+        if (topic_type_uri == "dmx.datetime.month") {
             var month_topics = dm4c.restc.get_topics(topic_type_uri, false, true)   // include_childs=false, sort=true
             month_topics.forEach(function(month_topic) {
                 month_topic.value = month_names[month_topic.value]

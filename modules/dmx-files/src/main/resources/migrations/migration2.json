@@ -5,8 +5,8 @@
     "topic_types": [
         {
             "value": "Disk Quota (MB)",
-            "uri": "dm4.files.disk_quota",
-            "dataTypeUri": "dm4.core.number"
+            "uri": "dmx.files.disk_quota",
+            "dataTypeUri": "dmx.core.number"
         }
     ]
 }

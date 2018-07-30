@@ -48,7 +48,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
         logger.info("Loading geomap " + geomapId);
         // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
         // child topic loading is not applied. We must load the child topics manually here.
-        this.geomapTopic = dm4.getTopic(geomapId).loadChildTopics();
+        this.geomapTopic = dmx.getTopic(geomapId).loadChildTopics();
         this.dm4 = dm4;
         //
         fetchGeoCoordinates();
@@ -97,7 +97,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     }
 
     private List<RelatedTopic> fetchGeoCoordinates(Topic geomapTopic) {
-        return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dm4.geomaps.geotopic_mapcontext",
-            "dm4.core.default", "dm4.topicmaps.topicmap_topic", "dm4.geomaps.geo_coordinate"));
+        return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
+            "dmx.core.default", "dmx.topicmaps.topicmap_topic", "dmx.geomaps.geo_coordinate"));
     }
 }

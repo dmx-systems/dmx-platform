@@ -65,44 +65,44 @@ public class Neo4jStorageTest {
         AssociationModel assoc = storage.fetchAssociation(assocId);
         assertNotNull(assoc);
         //
-        RoleModel roleModel1 = assoc.getRoleModel("dm4.core.type");
+        RoleModel roleModel1 = assoc.getRoleModel("dmx.core.type");
         assertNotNull(roleModel1);
         //
-        RoleModel roleModel2 = assoc.getRoleModel("dm4.core.instance");
+        RoleModel roleModel2 = assoc.getRoleModel("dmx.core.instance");
         assertNotNull(roleModel2);
     }
 
     @Test
     public void traverse() {
-        TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
+        TopicModel topic = storage.fetchTopic("uri", "dmx.core.data_type");
         assertNotNull(topic);
         //
         List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
-            "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+            "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
         assertEquals(1, topics.size());
         //
         TopicModel type = topics.get(0);
-        assertEquals("dm4.core.topic_type", type.getUri());
+        assertEquals("dmx.core.topic_type", type.getUri());
         assertEquals("Topic Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseBidirectional() {
-        TopicModel topic = storage.fetchTopic("uri", "dm4.core.topic_type");
+        TopicModel topic = storage.fetchTopic("uri", "dmx.core.topic_type");
         assertNotNull(topic);
         //
         List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
-            "dm4.core.instantiation", "dm4.core.type", "dm4.core.instance", "dm4.core.topic_type");
+            "dmx.core.instantiation", "dmx.core.type", "dmx.core.instance", "dmx.core.topic_type");
         assertEquals(1, topics.size());
         //
         TopicModel type = topics.get(0);
-        assertEquals("dm4.core.data_type", type.getUri());
+        assertEquals("dmx.core.data_type", type.getUri());
         assertEquals("Data Type", type.getSimpleValue().toString());
     }
 
     @Test
     public void traverseWithWideFilter() {
-        TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
+        TopicModel topic = storage.fetchTopic("uri", "dmx.core.data_type");
         assertNotNull(topic);
         //
         List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(), null, null, null,
@@ -114,11 +114,11 @@ public class Neo4jStorageTest {
     public void deleteAssociation() {
         DMXTransaction tx = storage.beginTx();
         try {
-            TopicModel topic = storage.fetchTopic("uri", "dm4.core.data_type");
+            TopicModel topic = storage.fetchTopic("uri", "dmx.core.data_type");
             assertNotNull(topic);
             //
             List<? extends RelatedTopicModel> topics = storage.fetchTopicRelatedTopics(topic.getId(),
-                "dm4.core.instantiation", "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+                "dmx.core.instantiation", "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
             assertEquals(1, topics.size());
             //
             AssociationModel assoc = topics.get(0).getRelatingAssociation();
@@ -126,8 +126,8 @@ public class Neo4jStorageTest {
             //
             storage.deleteAssociation(assoc.getId());
             //
-            topics = storage.fetchTopicRelatedTopics(topic.getId(), "dm4.core.instantiation",
-                "dm4.core.instance", "dm4.core.type", "dm4.core.meta_type");
+            topics = storage.fetchTopicRelatedTopics(topic.getId(), "dmx.core.instantiation",
+                "dmx.core.instance", "dmx.core.type", "dmx.core.meta_type");
             assertEquals(0, topics.size());
             //
             tx.success();
@@ -195,17 +195,17 @@ public class Neo4jStorageTest {
         // => in contrast to Lucene docs a wildcard can be used as the first character of a search
         // http://lucene.apache.org/core/old_versioned_docs/versions/3_5_0/queryparsersyntax.html
         //
-        topics = storage.fetchTopics("uri", "dm4.core.*");   assertEquals(2, topics.size());
-        topics = storage.fetchTopics("uri", "dm4.*.*");      assertEquals(2, topics.size());
-        topics = storage.fetchTopics("uri", "dm4.*.*_type"); assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dmx.core.*");   assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dmx.*.*");      assertEquals(2, topics.size());
+        topics = storage.fetchTopics("uri", "dmx.*.*_type"); assertEquals(2, topics.size());
         // => more than one wildcard can be used in a search
     }
 
     @Test
     public void testExactIndexWithGet() {
         TopicModel topic;
-        topic = storage.fetchTopic("uri", "dm4.core.data_type"); assertNotNull(topic);
-        topic = storage.fetchTopic("uri", "dm4.core.*");         assertNull(topic);
+        topic = storage.fetchTopic("uri", "dmx.core.data_type"); assertNotNull(topic);
+        topic = storage.fetchTopic("uri", "dmx.core.*");         assertNull(topic);
         // => DMXStorage's get-singular method supports no wildcards.
         //    That reflects the behavior of the underlying Neo4j Index's get() method.
     }
@@ -237,26 +237,26 @@ public class Neo4jStorageTest {
     private void setupContent() {
         DMXTransaction tx = storage.beginTx();
         try {
-            createTopic("dm4.core.topic_type", "dm4.core.meta_type",  "Topic Type");
-            createTopic("dm4.core.data_type",  "dm4.core.topic_type", "Data Type");
+            createTopic("dmx.core.topic_type", "dmx.core.meta_type",  "Topic Type");
+            createTopic("dmx.core.data_type",  "dmx.core.topic_type", "Data Type");
             //
-            assocId = createAssociation("dm4.core.instantiation",
-                "dm4.core.topic_type", "dm4.core.type",
-                "dm4.core.data_type", "dm4.core.instance"
+            assocId = createAssociation("dmx.core.instantiation",
+                "dmx.core.topic_type", "dmx.core.type",
+                "dmx.core.data_type", "dmx.core.instance"
             );
             //
             // Fulltext indexing
             //
-            createTopic("note-1", "dm4.notes.note",
+            createTopic("note-1", "dmx.notes.note",
                 "DMX is a platform for collaboration and knowledge management", IndexMode.FULLTEXT, null);
-            createTopic("note-2", "dm4.notes.note",
+            createTopic("note-2", "dmx.notes.note",
                 "Lead developer of DMX is Jörg Richter", IndexMode.FULLTEXT, null);
             //
             // Fulltext HTML indexing
             //
             String htmlText = "Java and Oracle is no fun anymore. I'm learning <b>Haskell</b> now.";
-            createTopic("note-3", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, null);
-            createTopic("note-4", "dm4.notes.note", htmlText, IndexMode.FULLTEXT, JavaUtils.stripHTML(htmlText));
+            createTopic("note-3", "dmx.notes.note", htmlText, IndexMode.FULLTEXT, null);
+            createTopic("note-4", "dmx.notes.note", htmlText, IndexMode.FULLTEXT, JavaUtils.stripHTML(htmlText));
             //
             // Property indexing
             //
@@ -293,7 +293,7 @@ public class Neo4jStorageTest {
     }
 
     private void createTopic(String propUri, Object propValue) {
-        long topicId = createTopic(null, "dm4.notes.note", "");
+        long topicId = createTopic(null, "dmx.notes.note", "");
         storage.storeTopicProperty(topicId, propUri, propValue, true);     // addToIndex=true
     }
 

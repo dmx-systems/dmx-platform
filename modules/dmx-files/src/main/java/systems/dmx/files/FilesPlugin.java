@@ -59,9 +59,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    public static final String FILE_REPOSITORY_PATH = System.getProperty("dm4.filerepo.path", "/");
-    public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
-    public static final int DISK_QUOTA_MB = Integer.getInteger("dm4.filerepo.disk_quota", -1);
+    public static final String FILE_REPOSITORY_PATH = System.getProperty("dmx.filerepo.path", "/");
+    public static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
+    public static final int DISK_QUOTA_MB = Integer.getInteger("dmx.filerepo.disk_quota", -1);
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default value must match the value defined in project POM.
 
@@ -429,8 +429,8 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
-            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
-            mf.newTopicModel("dm4.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
+            ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
+            mf.newTopicModel("dmx.files.disk_quota", new SimpleValue(DISK_QUOTA_MB)),
             ConfigModificationRole.ADMIN
         ));
     }
@@ -447,7 +447,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Files plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
-            configService.unregisterConfigDefinition("dm4.files.disk_quota");
+            configService.unregisterConfigDefinition("dmx.files.disk_quota");
         } else {
             logger.warning("Config service is already gone");
         }
@@ -529,7 +529,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFileTopic(String repoPath) {
-        return fetchFileOrFolderTopic(repoPath, "dm4.files.file");
+        return fetchFileOrFolderTopic(repoPath, "dmx.files.file");
     }
 
     /**
@@ -539,7 +539,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        return fetchFileOrFolderTopic(repoPath, "dm4.files.folder");
+        return fetchFileOrFolderTopic(repoPath, "dmx.files.folder");
     }
 
     // ---
@@ -549,12 +549,12 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * If no such File/Folder topic exists <code>null</code> is returned.
      *
      * @param   repoPath        A repository path. Must be canonic.
-     * @param   topicTypeUri    The type of the topic to fetch: either "dm4.files.file" or "dm4.files.folder".
+     * @param   topicTypeUri    The type of the topic to fetch: either "dmx.files.file" or "dmx.files.folder".
      */
     private Topic fetchFileOrFolderTopic(String repoPath, String topicTypeUri) {
         Topic pathTopic = fetchPathTopic(repoPath);
         if (pathTopic != null) {
-            return pathTopic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", topicTypeUri);
+            return pathTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", topicTypeUri);
         }
         return null;
     }
@@ -563,7 +563,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @param   repoPath        A repository path. Must be canonic.
      */
     private Topic fetchPathTopic(String repoPath) {
-        return dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
+        return dmx.getTopicByValue("dmx.files.path", new SimpleValue(repoPath));
     }
 
     // ---
@@ -577,16 +577,16 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private Topic createFileTopic(File path) throws Exception {
         ChildTopicsModel childTopics = mf.newChildTopicsModel()
-            .put("dm4.files.file_name", path.getName())
-            .put("dm4.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
-            .put("dm4.files.size", path.length());
+            .put("dmx.files.file_name", path.getName())
+            .put("dmx.files.path", repoPath(path))  // TODO: is repo path already known by caller? Pass it?
+            .put("dmx.files.size", path.length());
         //
         String mediaType = JavaUtils.getFileType(path.getName());
         if (mediaType != null) {
-            childTopics.put("dm4.files.media_type", mediaType);
+            childTopics.put("dmx.files.media_type", mediaType);
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.file", childTopics));      // throws Exception
+        return createFileOrFolderTopic(mf.newTopicModel("dmx.files.file", childTopics));      // throws Exception
     }
 
     /**
@@ -602,7 +602,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
         // if the repo path represents a workspace root directory the workspace name is used as Folder Name
         if (FILE_REPOSITORY_PER_WORKSPACE) {
             if (repoPathFile.getParent().equals("/")) {
-                String workspaceName = dm4.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
+                String workspaceName = dmx.getTopic(getWorkspaceId(repoPath)).getSimpleValue().toString();
                 folderName = workspaceName;
             }
         }
@@ -611,9 +611,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
             folderName = repoPathFile.getName();    // Note: getName() of "/" returns ""
         }
         //
-        return createFileOrFolderTopic(mf.newTopicModel("dm4.files.folder", mf.newChildTopicsModel()
-            .put("dm4.files.folder_name", folderName)
-            .put("dm4.files.path", repoPath)));     // throws Exception
+        return createFileOrFolderTopic(mf.newTopicModel("dmx.files.folder", mf.newChildTopicsModel()
+            .put("dmx.files.folder_name", folderName)
+            .put("dmx.files.path", repoPath)));     // throws Exception
     }
 
     // ---
@@ -623,10 +623,10 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private Topic createFileOrFolderTopic(final TopicModel model) throws Exception {
         // We suppress standard workspace assignment here as File and Folder topics require a special assignment
-        Topic topic = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
+        Topic topic = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {  // throws Exception
             @Override
             public Topic call() {
-                return dm4.createTopic(model);
+                return dmx.createTopic(model);
             }
         });
         createWorkspaceAssignment(topic, repoPath(topic));
@@ -639,15 +639,15 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private void createFolderAssociation(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
-            boolean exists = dm4.getAssociations(folderTopicId, topicId, "dm4.core.aggregation").size() > 0;
+            boolean exists = dmx.getAssociations(folderTopicId, topicId, "dmx.core.aggregation").size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
-                Association assoc = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
+                Association assoc = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
                     @Override
                     public Association call() {
-                        return dm4.createAssociation(mf.newAssociationModel("dm4.core.aggregation",
-                            mf.newTopicRoleModel(folderTopicId, "dm4.core.parent"),
-                            mf.newTopicRoleModel(topicId,       "dm4.core.child")
+                        return dmx.createAssociation(mf.newAssociationModel("dmx.core.aggregation",
+                            mf.newTopicRoleModel(folderTopicId, "dmx.core.parent"),
+                            mf.newTopicRoleModel(topicId,       "dmx.core.child")
                         ));
                     }
                 });
@@ -662,13 +662,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     /**
      * Creates a workspace assignment for a File topic, a Folder topic, or a folder association (type "Aggregation").
-     * The workspce is calculated from both, the "dm4.filerepo.per_workspace" flag and the given repository path.
+     * The workspce is calculated from both, the "dmx.filerepo.per_workspace" flag and the given repository path.
      *
      * @param   object  a File topic, a Folder topic, or a folder association (type "Aggregation").
      */
     private void createWorkspaceAssignment(DMXObject object, String repoPath) {
         try {
-            AccessControl ac = dm4.getAccessControl();
+            AccessControl ac = dmx.getAccessControl();
             long workspaceId = FILE_REPOSITORY_PER_WORKSPACE ? getWorkspaceId(repoPath) : ac.getDMXWorkspaceId();
             ac.assignToWorkspace(object, workspaceId);
         } catch (Exception e) {
@@ -733,11 +733,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      */
     private File checkPath(File path) throws FileRepositoryException, IOException {
         // Note: a directory path returned by getCanonicalPath() never contains a "/" at the end.
-        // Thats why "dm4.filerepo.path" is expected to have no "/" at the end as well.
+        // Thats why "dmx.filerepo.path" is expected to have no "/" at the end as well.
         path = path.getCanonicalFile();     // throws IOException
         boolean pointsToRepository = path.getPath().startsWith(FILE_REPOSITORY_PATH);
         //
-        logger.fine("Checking path \"" + path + "\"\n  dm4.filerepo.path=" +
+        logger.fine("Checking path \"" + path + "\"\n  dmx.filerepo.path=" +
             "\"" + FILE_REPOSITORY_PATH + "\" => " + (pointsToRepository ? "PATH OK" : "FORBIDDEN"));
         //
         if (!pointsToRepository) {
@@ -777,9 +777,9 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
                     //
                     // Note: checkAuthorization() is called (indirectly) from an OSGi HTTP service static resource
                     // HttpContext. JAX-RS is not involved here. That's why no JAX-RS injection takes place.
-                    String username = dm4.getAccessControl().getUsername(request);
+                    String username = dmx.getAccessControl().getUsername(request);
                     long fileTopicId = fileTopic.getId();
-                    if (!dm4.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
+                    if (!dmx.getAccessControl().hasPermission(username, Operation.READ, fileTopicId)) {
                         throw new FileRepositoryException(userInfo(username) + " has no READ permission for " +
                             "repository path \"" + repoPath + "\" (File topic ID=" + fileTopicId + ")",
                             Status.UNAUTHORIZED);
@@ -837,7 +837,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @return  The repository path, is canonic.
      */
     private String repoPath(long fileTopicId) {
-        return repoPath(dm4.getTopic(fileTopicId));
+        return repoPath(dmx.getTopic(fileTopicId));
     }
 
     /**
@@ -846,7 +846,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
      * @return  The repository path, is canonic.
      */
     private String repoPath(Topic topic) {
-        return topic.getChildTopics().getString("dm4.files.path");
+        return topic.getChildTopics().getString("dmx.files.path");
     }
 
     /**
@@ -888,7 +888,7 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private long getWorkspaceId() {
         Cookies cookies = Cookies.get();
         if (!cookies.has("dmx_workspace_id")) {
-            throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
+            throw new RuntimeException("If \"dmx.filerepo.per_workspace\" is set the request requires a " +
                 "\"dmx_workspace_id\" cookie");
         }
         return cookies.getLong("dmx_workspace_id");

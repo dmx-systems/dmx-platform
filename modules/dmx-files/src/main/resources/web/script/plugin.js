@@ -133,7 +133,7 @@ dm4c.add_plugin("systems.dmx.files", function() {
 
     dm4c.add_listener("topic_doubleclicked", function(topic) {
         if (js.is_local_connection()) {
-            if (topic.type_uri == "dm4.files.file" || topic.type_uri == "dm4.files.folder") {
+            if (topic.type_uri == "dmx.files.file" || topic.type_uri == "dmx.files.folder") {
                 dm4c.restc.open_file(topic.id)
             }
         }
@@ -141,7 +141,7 @@ dm4c.add_plugin("systems.dmx.files", function() {
 
     dm4c.add_listener("topic_commands", function(topic) {
         var commands = []
-        if (topic.type_uri == "dm4.files.file") {
+        if (topic.type_uri == "dmx.files.file") {
             commands.push({
                 label: "Download File",
                 handler: do_download_file,
@@ -158,8 +158,8 @@ dm4c.add_plugin("systems.dmx.files", function() {
                 handler: do_create_icon,
                 context: "context-menu"
             })
-        } else if (topic.type_uri == "dm4.files.folder") {
-            if (dm4c.has_create_permission_for_topic_type("dm4.files.folder")) {
+        } else if (topic.type_uri == "dmx.files.folder") {
+            if (dm4c.has_create_permission_for_topic_type("dmx.files.folder")) {
                 commands.push({
                     label: "Create Folder",
                     handler: do_create_folder,
@@ -167,7 +167,7 @@ dm4c.add_plugin("systems.dmx.files", function() {
                     ui_icon: "folder-collapsed"
                 })
             }
-            if (dm4c.has_create_permission_for_topic_type("dm4.files.file")) {
+            if (dm4c.has_create_permission_for_topic_type("dmx.files.file")) {
                 commands.push({
                     label: "Upload File",
                     handler: do_open_upload_dialog,
@@ -180,27 +180,27 @@ dm4c.add_plugin("systems.dmx.files", function() {
 
         function do_create_folder() {
             dm4c.ui.prompt("Create Folder", "Folder Name", "Create", function(folder_name) {
-                var path = topic.get("dm4.files.path")
+                var path = topic.get("dmx.files.path")
                 dm4c.restc.create_folder(folder_name, path)
                 dm4c.page_panel.refresh()
             })
         }
 
         function do_open_upload_dialog() {
-            var path = topic.get("dm4.files.path")
+            var path = topic.get("dmx.files.path")
             self.open_upload_dialog("/files/" + encodeURIComponent(path), dm4c.page_panel.refresh)
         }
 
         function do_download_file() {
-            var path = topic.get("dm4.files.path")
+            var path = topic.get("dmx.files.path")
             location.href = "/filerepo/" + encodeURIComponent(path) + "?download"
         }
 
         function do_create_icon() {
             // update DB
             var icon = new Topic(dm4c.restc.create_topic({
-                type_uri: "dm4.webclient.icon",
-                value: "/filerepo/" + encodeURIComponent(topic.get("dm4.files.path"))
+                type_uri: "dmx.webclient.icon",
+                value: "/filerepo/" + encodeURIComponent(topic.get("dmx.files.path"))
             }))
             // update model and view
             dm4c.show_topic(icon, "show", undefined, true)      // do_center=true

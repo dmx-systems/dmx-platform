@@ -4,8 +4,8 @@
     "assoc_types": [
         {
             "value":       "Custom Association Type",
-            "uri":         "dm4.core.custom_assoc_type",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.custom_assoc_type",
+            "dataTypeUri": "dmx.core.text"
         }
     ]
 }

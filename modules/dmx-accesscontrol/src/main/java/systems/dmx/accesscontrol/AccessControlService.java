@@ -17,16 +17,16 @@ public interface AccessControlService {
 
     // Admin user account
     static final String ADMIN_USERNAME = "admin";
-    static final String ADMIN_INITIAL_PASSWORD = System.getProperty("dm4.security.initial_admin_password", "");
+    static final String ADMIN_INITIAL_PASSWORD = System.getProperty("dmx.security.initial_admin_password", "");
 
     // Administration workspace
     static final String ADMINISTRATION_WORKSPACE_NAME = "Administration";
-    static final String ADMINISTRATION_WORKSPACE_URI = "dm4.workspaces.administration";
+    static final String ADMINISTRATION_WORKSPACE_URI = "dmx.workspaces.administration";
     static final SharingMode ADMINISTRATION_WORKSPACE_SHARING_MODE = SharingMode.COLLABORATIVE;
 
     // System workspace
     static final String SYSTEM_WORKSPACE_NAME = "System";
-    static final String SYSTEM_WORKSPACE_URI = "dm4.workspaces.system";
+    static final String SYSTEM_WORKSPACE_URI = "dmx.workspaces.system";
     static final SharingMode SYSTEM_WORKSPACE_SHARING_MODE = SharingMode.PUBLIC;
 
     // Private workspaces
@@ -47,7 +47,7 @@ public interface AccessControlService {
      *                      Base64 encoded form of "{username}:{password}".
      *
      * @return  ### FIXDOC: The username of the matched User Account (a Topic of type "Username" /
-     *          <code>dm4.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
+     *          <code>dmx.accesscontrol.username</code>), or <code>null</code> if there is no matching User Account.
      */
     void login();
 
@@ -73,7 +73,7 @@ public interface AccessControlService {
     /**
      * Returns the "Username" topic of the logged in user.
      *
-     * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
+     * @return  The "Username" topic (type <code>dmx.accesscontrol.username</code>),
      *          or <code>null</code> if no user is logged in.
      */
     Topic getUsernameTopic();
@@ -114,7 +114,7 @@ public interface AccessControlService {
      *
      * @param   username    a username. Must not be null.
      *
-     * @return  The "Username" topic (type <code>dm4.accesscontrol.username</code>),
+     * @return  The "Username" topic (type <code>dmx.accesscontrol.username</code>),
      *          or <code>null</code> if no such username exists.
      */
     Topic getUsernameTopic(String username);
@@ -161,12 +161,12 @@ public interface AccessControlService {
     // TODO: unify both into "getPermissions()"
 
     /**
-     * @return  A Permissions object with one entry: <code>dm4.accesscontrol.operation.write</code>.
+     * @return  A Permissions object with one entry: <code>dmx.accesscontrol.operation.write</code>.
      */
     Permissions getTopicPermissions(long topicId);
 
     /**
-     * @return  A Permissions object with one entry: <code>dm4.accesscontrol.operation.write</code>.
+     * @return  A Permissions object with one entry: <code>dmx.accesscontrol.operation.write</code>.
      */
     Permissions getAssociationPermissions(long assocId);
 

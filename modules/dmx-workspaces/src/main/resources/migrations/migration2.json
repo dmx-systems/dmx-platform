@@ -6,37 +6,37 @@
 
         {
             "value":          "Sharing Mode",
-            "uri":            "dm4.workspaces.sharing_mode",
-            "dataTypeUri":    "dm4.core.text",
-            "indexModeUris": ["dm4.core.key"]
+            "uri":            "dmx.workspaces.sharing_mode",
+            "dataTypeUri":    "dmx.core.text",
+            "indexModeUris": ["dmx.core.key"]
         }
     ],
 
     "topics": [
         {
             "value":   "Private",
-            "uri":     "dm4.workspaces.private",
-            "typeUri": "dm4.workspaces.sharing_mode"
+            "uri":     "dmx.workspaces.private",
+            "typeUri": "dmx.workspaces.sharing_mode"
         },
         {
             "value":   "Confidential",
-            "uri":     "dm4.workspaces.confidential",
-            "typeUri": "dm4.workspaces.sharing_mode"
+            "uri":     "dmx.workspaces.confidential",
+            "typeUri": "dmx.workspaces.sharing_mode"
         },
         {
             "value":   "Collaborative",
-            "uri":     "dm4.workspaces.collaborative",
-            "typeUri": "dm4.workspaces.sharing_mode"
+            "uri":     "dmx.workspaces.collaborative",
+            "typeUri": "dmx.workspaces.sharing_mode"
         },
         {
             "value":   "Public",
-            "uri":     "dm4.workspaces.public",
-            "typeUri": "dm4.workspaces.sharing_mode"
+            "uri":     "dmx.workspaces.public",
+            "typeUri": "dmx.workspaces.sharing_mode"
         },
         {
             "value":   "Common",
-            "uri":     "dm4.workspaces.common",
-            "typeUri": "dm4.workspaces.sharing_mode"
+            "uri":     "dmx.workspaces.common",
+            "typeUri": "dmx.workspaces.sharing_mode"
         }
     ]
 }

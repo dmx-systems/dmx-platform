@@ -22,11 +22,11 @@ public class Migration2 extends Migration {
     @Override
     public void run() {
         count = 0;
-        for (Topic topic : dm4.getAllTopics()) {
+        for (Topic topic : dmx.getAllTopics()) {
             migrateObject(topic, "topic");
         }
         count = 0;
-        for (Association assoc : dm4.getAllAssociations()) {
+        for (Association assoc : dmx.getAllAssociations()) {
             migrateObject(assoc, "association");
         }
     }
@@ -39,9 +39,9 @@ public class Migration2 extends Migration {
             String info = "### Migrating " + type + " " + object.getId() + " (#" + count + ")";
             if (object.hasProperty("creator")) {
                 logger.info(info);
-                renameProperty(object, "creator", "dm4.accesscontrol.creator", true);   // addToIndex=true
-                renameProperty(object, "owner",   "dm4.accesscontrol.owner",   true);   // addToIndex=true
-                renameProperty(object, "acl",     "dm4.accesscontrol.acl",     false);  // addToIndex=false
+                renameProperty(object, "creator", "dmx.accesscontrol.creator", true);   // addToIndex=true
+                renameProperty(object, "owner",   "dmx.accesscontrol.owner",   true);   // addToIndex=true
+                renameProperty(object, "acl",     "dmx.accesscontrol.acl",     false);  // addToIndex=false
             } else {
                 logger.info(info + " SKIPPED -- Access control information not availble");
             }

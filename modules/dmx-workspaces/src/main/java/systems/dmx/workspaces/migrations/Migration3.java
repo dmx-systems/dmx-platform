@@ -14,11 +14,11 @@ public class Migration3 extends Migration {
 
     @Override
     public void run() {
-        dm4.getTopicType("dm4.workspaces.workspace").addAssocDef(mf.newAssociationDefinitionModel(
-            "dm4.core.aggregation_def",
-            "dm4.workspaces.workspace", "dm4.workspaces.sharing_mode", "dm4.core.many", "dm4.core.one",
+        dmx.getTopicType("dmx.workspaces.workspace").addAssocDef(mf.newAssociationDefinitionModel(
+            "dmx.core.aggregation_def",
+            "dmx.workspaces.workspace", "dmx.workspaces.sharing_mode", "dmx.core.many", "dmx.core.one",
             mf.newViewConfigurationModel().setConfigValueRef(
-                "dm4.webclient.view_config", "dm4.webclient.widget", "dm4.webclient.select"
+                "dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select"
             )
         ));
     }

@@ -10,6 +10,6 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        setTopicTypeViewConfigValue("dm4.core.role_type", "page_renderer_uri", "dm4.typeeditor.roletype_renderer");
+        setTopicTypeViewConfigValue("dmx.core.role_type", "page_renderer_uri", "dmx.typeeditor.roletype_renderer");
     }
 }

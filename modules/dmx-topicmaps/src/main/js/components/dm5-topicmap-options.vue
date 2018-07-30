@@ -12,7 +12,7 @@ export default {
 
   data () {
     return {
-      topicmapTypeUri: 'dm4.webclient.default_topicmap_renderer'
+      topicmapTypeUri: 'dmx.webclient.default_topicmap_renderer'
     }
   },
 

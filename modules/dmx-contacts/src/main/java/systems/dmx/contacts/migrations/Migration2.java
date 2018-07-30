@@ -39,32 +39,32 @@ public class Migration2 extends Migration {
         //
         // 2) change model
         //
-        dm4.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.phone_entry", "Phone Entry",
-            "dm4.core.identity")
-            .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
-            "dm4.contacts.phone_entry", "dm4.contacts.phone_label", "dm4.core.many", "dm4.core.one")));
-        dm4.createAssociationType(mf.newAssociationTypeModel("dm4.contacts.address_entry", "Address Entry",
-            "dm4.core.identity")
-            .addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",
-            "dm4.contacts.address_entry", "dm4.contacts.address_label", "dm4.core.many", "dm4.core.one")));
-        dm4.getTopicType("dm4.contacts.person")
+        dmx.createAssociationType(mf.newAssociationTypeModel("dmx.contacts.phone_entry", "Phone Entry",
+            "dmx.core.identity")
+            .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
+            "dmx.contacts.phone_entry", "dmx.contacts.phone_label", "dmx.core.many", "dmx.core.one")));
+        dmx.createAssociationType(mf.newAssociationTypeModel("dmx.contacts.address_entry", "Address Entry",
+            "dmx.core.identity")
+            .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
+            "dmx.contacts.address_entry", "dmx.contacts.address_label", "dmx.core.many", "dmx.core.one")));
+        dmx.getTopicType("dmx.contacts.person")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry", false, false,
-                "dm4.contacts.person", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
-            "dm4.contacts.email_address")
+                mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.phone_entry", false, false,
+                "dmx.contacts.person", "dmx.contacts.phone_number", "dmx.core.one", "dmx.core.many"),
+            "dmx.contacts.email_address")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry", false, false,
-                "dm4.contacts.person", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
-            "dm4.contacts.notes");
-        dm4.getTopicType("dm4.contacts.institution")
+                mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.address_entry", false, false,
+                "dmx.contacts.person", "dmx.contacts.address", "dmx.core.one", "dmx.core.many"),
+            "dmx.contacts.notes");
+        dmx.getTopicType("dmx.contacts.institution")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.phone_entry", false, false,
-                "dm4.contacts.institution", "dm4.contacts.phone_number", "dm4.core.one", "dm4.core.many"),
-            "dm4.contacts.email_address")
+                mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.phone_entry", false, false,
+                "dmx.contacts.institution", "dmx.contacts.phone_number", "dmx.core.one", "dmx.core.many"),
+            "dmx.contacts.email_address")
             .addAssocDefBefore(
-                mf.newAssociationDefinitionModel("dm4.core.composition_def", "dm4.contacts.address_entry", false, false,
-                "dm4.contacts.institution", "dm4.contacts.address", "dm4.core.one", "dm4.core.many"),
-            "dm4.contacts.notes");
+                mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.address_entry", false, false,
+                "dmx.contacts.institution", "dmx.contacts.address", "dmx.core.one", "dmx.core.many"),
+            "dmx.contacts.notes");
         //
         // 3) convert content
         //
@@ -83,17 +83,17 @@ public class Migration2 extends Migration {
         // 1) buffer entry topic content in memory
         //
         // Note: the actual conversion (as performed later) relies on the buffered content
-        for (Topic phoneEntry   : dm4.getTopicsByType("dm4.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
-        for (Topic addressEntry : dm4.getTopicsByType("dm4.contacts.address_entry")) bufferAddressEntry(addressEntry);
+        for (Topic phoneEntry   : dmx.getTopicsByType("dmx.contacts.phone_entry"))   bufferPhoneEntry(phoneEntry);
+        for (Topic addressEntry : dmx.getTopicsByType("dmx.contacts.address_entry")) bufferAddressEntry(addressEntry);
         //
         // 2) temporarily change entry types
         //
         // Note: we change comp_def to aggr_def to avoid deleting childs when deleting the entry topics (next step).
         // The childs are the Phone and Address topics we want keep and reassign later (while the actual conversion).
-        dm4.getTopicType("dm4.contacts.phone_entry").getAssocDef("dm4.contacts.phone_number")
-            .setTypeUri("dm4.core.aggregation_def");
-        dm4.getTopicType("dm4.contacts.address_entry").getAssocDef("dm4.contacts.address")
-            .setTypeUri("dm4.core.aggregation_def");
+        dmx.getTopicType("dmx.contacts.phone_entry").getAssocDef("dmx.contacts.phone_number")
+            .setTypeUri("dmx.core.aggregation_def");
+        dmx.getTopicType("dmx.contacts.address_entry").getAssocDef("dmx.contacts.address")
+            .setTypeUri("dmx.core.aggregation_def");
         //
         // 3) delete entry topics
         //
@@ -104,36 +104,36 @@ public class Migration2 extends Migration {
         // 4) delete entry types
         //
         // Note: the entry topic types must be deleted as they are recreated as association types with the same URI.
-        dm4.deleteTopicType("dm4.contacts.phone_entry");
-        dm4.deleteTopicType("dm4.contacts.address_entry");
+        dmx.deleteTopicType("dmx.contacts.phone_entry");
+        dmx.deleteTopicType("dmx.contacts.address_entry");
     }
 
     // ---
 
     private void bufferPhoneEntry(Topic phoneEntry) {
-        Topic parent = phoneEntry.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", null);
-        Topic phoneLabel  = phoneEntry.getChildTopics().getTopic("dm4.contacts.phone_label");
-        Topic phoneNumber = phoneEntry.getChildTopics().getTopic("dm4.contacts.phone_number");
+        Topic parent = phoneEntry.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
+        Topic phoneLabel  = phoneEntry.getChildTopics().getTopic("dmx.contacts.phone_label");
+        Topic phoneNumber = phoneEntry.getChildTopics().getTopic("dmx.contacts.phone_number");
         phoneEntries.add(new Entry(phoneEntry, parent, phoneLabel.getId(), phoneNumber.getId()));
     }
 
     private void bufferAddressEntry(Topic addressEntry) {
-        Topic parent = addressEntry.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent", null);
-        Topic addressLabel = addressEntry.getChildTopics().getTopic("dm4.contacts.address_label");
-        Topic address      = addressEntry.getChildTopics().getTopic("dm4.contacts.address");
+        Topic parent = addressEntry.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
+        Topic addressLabel = addressEntry.getChildTopics().getTopic("dmx.contacts.address_label");
+        Topic address      = addressEntry.getChildTopics().getTopic("dmx.contacts.address");
         addressEntries.add(new Entry(addressEntry, parent, addressLabel.getId(), address.getId()));
     }
 
     // ---
 
     private void convertPhoneEntry(Entry entry) {
-        entry.parent.getChildTopics().addRef("dm4.contacts.phone_number", entry.objectId, mf.newChildTopicsModel()
-            .putRef("dm4.contacts.phone_label", entry.labelId));
+        entry.parent.getChildTopics().addRef("dmx.contacts.phone_number", entry.objectId, mf.newChildTopicsModel()
+            .putRef("dmx.contacts.phone_label", entry.labelId));
     }
 
     private void convertAddressEntry(Entry entry) {
-        entry.parent.getChildTopics().addRef("dm4.contacts.address", entry.objectId, mf.newChildTopicsModel()
-            .putRef("dm4.contacts.address_label", entry.labelId));
+        entry.parent.getChildTopics().addRef("dmx.contacts.address", entry.objectId, mf.newChildTopicsModel()
+            .putRef("dmx.contacts.address_label", entry.labelId));
     }
 
     // ---

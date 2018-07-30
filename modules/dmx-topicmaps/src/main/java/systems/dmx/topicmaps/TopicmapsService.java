@@ -13,7 +13,7 @@ public interface TopicmapsService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     static final String DEFAULT_TOPICMAP_NAME     = "untitled";
-    static final String DEFAULT_TOPICMAP_RENDERER = "dm4.webclient.default_topicmap_renderer";
+    static final String DEFAULT_TOPICMAP_RENDERER = "dmx.webclient.default_topicmap_renderer";
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -63,12 +63,12 @@ public interface TopicmapsService {
     void setAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps);
 
     /**
-     * Convenience method to update the "dm4.topicmaps.x" and "dm4.topicmaps.y" standard view properties.
+     * Convenience method to update the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.
      */
     void setTopicPosition(long topicmapId, long topicId, int x, int y);
 
     /**
-     * Convenience method to update the "dm4.topicmaps.visibility" standard view property.
+     * Convenience method to update the "dmx.topicmaps.visibility" standard view property.
      */
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility);
 

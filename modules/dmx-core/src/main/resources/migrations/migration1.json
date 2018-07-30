@@ -7,23 +7,23 @@
 
         /*{
             "value":       "Data Type",
-            "uri":         "dm4.core.data_type",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.data_type",
+            "dataTypeUri": "dmx.core.text"
         },*/
         {
             "value":       "Role Type",
-            "uri":         "dm4.core.role_type",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.role_type",
+            "dataTypeUri": "dmx.core.text"
         },
         {
             "value":       "Cardinality",
-            "uri":         "dm4.core.cardinality",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.cardinality",
+            "dataTypeUri": "dmx.core.text"
         },
         {
             "value":       "Index Mode",
-            "uri":         "dm4.core.index_mode",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.index_mode",
+            "dataTypeUri": "dmx.core.text"
         }
     ],
 
@@ -36,28 +36,28 @@
 
         /*{
             "value":       "Aggregation",
-            "uri":         "dm4.core.aggregation",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.aggregation",
+            "dataTypeUri": "dmx.core.text"
         },*/
         {
             "value":       "Composition",
-            "uri":         "dm4.core.composition",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.composition",
+            "dataTypeUri": "dmx.core.text"
         },
         /*{
             "value":       "Instantiation",
-            "uri":         "dm4.core.instantiation",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.instantiation",
+            "dataTypeUri": "dmx.core.text"
         },*/
         {
             "value":       "Association",
-            "uri":         "dm4.core.association",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.association",
+            "dataTypeUri": "dmx.core.text"
         },
         {
             "value":       "Sequence",
-            "uri":         "dm4.core.sequence",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.core.sequence",
+            "dataTypeUri": "dmx.core.text"
         }
     ],
 
@@ -70,142 +70,142 @@
 
         /*{
             "value":   "Text",
-            "uri":     "dm4.core.text",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.text",
+            "typeUri": "dmx.core.data_type"
         },*/
         {
             "value":   "HTML",
-            "uri":     "dm4.core.html",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.html",
+            "typeUri": "dmx.core.data_type"
         },
         {
             "value":   "Number",
-            "uri":     "dm4.core.number",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.number",
+            "typeUri": "dmx.core.data_type"
         },
         {
             "value":   "Boolean",
-            "uri":     "dm4.core.boolean",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.boolean",
+            "typeUri": "dmx.core.data_type"
         },
         {
             "value":   "Value",
-            "uri":     "dm4.core.value",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.value",
+            "typeUri": "dmx.core.data_type"
         },
         {
             "value":   "Identity",
-            "uri":     "dm4.core.identity",
-            "typeUri": "dm4.core.data_type"
+            "uri":     "dmx.core.identity",
+            "typeUri": "dmx.core.data_type"
         },
 
         // Role Types
 
         {
             "value":   "Default",
-            "uri":     "dm4.core.default",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.default",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Type",
-            "uri":     "dm4.core.type",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.type",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Instance",
-            "uri":     "dm4.core.instance",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.instance",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Association Definition",
-            "uri":     "dm4.core.assoc_def",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.assoc_def",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Parent",
-            "uri":     "dm4.core.parent",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.parent",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Child",
-            "uri":     "dm4.core.child",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.child",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Parent Type",
-            "uri":     "dm4.core.parent_type",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.parent_type",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Child Type",
-            "uri":     "dm4.core.child_type",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.child_type",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Parent Cardinality",
-            "uri":     "dm4.core.parent_cardinality",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.parent_cardinality",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Child Cardinality",
-            "uri":     "dm4.core.child_cardinality",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.child_cardinality",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Predecessor",
-            "uri":     "dm4.core.predecessor",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.predecessor",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Successor",
-            "uri":     "dm4.core.successor",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.successor",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "Sequence Start",
-            "uri":     "dm4.core.sequence_start",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.sequence_start",
+            "typeUri": "dmx.core.role_type"
         },
         {
             "value":   "View Configuration",
-            "uri":     "dm4.core.view_config",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.core.view_config",
+            "typeUri": "dmx.core.role_type"
         },
 
         // Cardinalities
 
         {
             "value":   "One",
-            "uri":     "dm4.core.one",
-            "typeUri": "dm4.core.cardinality"
+            "uri":     "dmx.core.one",
+            "typeUri": "dmx.core.cardinality"
         },
         {
             "value":   "Many",
-            "uri":     "dm4.core.many",
-            "typeUri": "dm4.core.cardinality"
+            "uri":     "dmx.core.many",
+            "typeUri": "dmx.core.cardinality"
         },
 
         // Index Modes
 
         {
             "value":   "Off",
-            "uri":     "dm4.core.off",
-            "typeUri": "dm4.core.index_mode"
+            "uri":     "dmx.core.off",
+            "typeUri": "dmx.core.index_mode"
         },
         {
             "value":   "Key",
-            "uri":     "dm4.core.key",
-            "typeUri": "dm4.core.index_mode"
+            "uri":     "dmx.core.key",
+            "typeUri": "dmx.core.index_mode"
         },
         {
             "value":   "Fulltext",
-            "uri":     "dm4.core.fulltext",
-            "typeUri": "dm4.core.index_mode"
+            "uri":     "dmx.core.fulltext",
+            "typeUri": "dmx.core.index_mode"
         },
         {
             "value":   "Fulltext Key",
-            "uri":     "dm4.core.fulltext_key",
-            "typeUri": "dm4.core.index_mode"
+            "uri":     "dmx.core.fulltext_key",
+            "typeUri": "dmx.core.index_mode"
         }
     ]
 }

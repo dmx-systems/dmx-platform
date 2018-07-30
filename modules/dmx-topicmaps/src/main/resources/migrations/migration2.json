@@ -2,65 +2,65 @@
     "topic_types": [
         {
             "value":       "X",
-            "uri":         "dm4.topicmaps.translation_x",
-            "dataTypeUri": "dm4.core.number"
+            "uri":         "dmx.topicmaps.translation_x",
+            "dataTypeUri": "dmx.core.number"
             // TODO: index
         },
         {
             "value":       "Y",
-            "uri":         "dm4.topicmaps.translation_y",
-            "dataTypeUri": "dm4.core.number"
+            "uri":         "dmx.topicmaps.translation_y",
+            "dataTypeUri": "dmx.core.number"
             // TODO: index
         },
         {
             "value":       "Translation",
-            "uri":         "dm4.topicmaps.translation",
-            "dataTypeUri": "dm4.core.value",
+            "uri":         "dmx.topicmaps.translation",
+            "dataTypeUri": "dmx.core.value",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.topicmaps.translation_x",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.topicmaps.translation_x",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.topicmaps.translation_y",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.topicmaps.translation_y",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]
         },
         {
             "value":       "Zoom Level",
-            "uri":         "dm4.topicmaps.zoom_level",
-            "dataTypeUri": "dm4.core.number"
+            "uri":         "dmx.topicmaps.zoom_level",
+            "dataTypeUri": "dmx.core.number"
             // TODO: index
         },
         {
             "value":       "Topicmap State",
-            "uri":         "dm4.topicmaps.state",
-            "dataTypeUri": "dm4.core.value",
+            "uri":         "dmx.topicmaps.state",
+            "dataTypeUri": "dmx.core.value",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.topicmaps.translation",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.topicmaps.translation",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.topicmaps.zoom_level",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.topicmaps.zoom_level",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.hidden": true,
-                        "dm4.webclient.locked": true
+                        "dmx.webclient.hidden": true,
+                        "dmx.webclient.locked": true
                     }
                 }
             ]

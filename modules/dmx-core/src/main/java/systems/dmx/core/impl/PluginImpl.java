@@ -61,7 +61,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private Properties   pluginProperties;      // Read from file "plugin.properties"
     private String       pluginPackage;
     private PluginInfo   pluginInfo;
-    private List<String> pluginDependencies;    // plugin URIs as read from "dm4.plugin.activate_after" property
+    private List<String> pluginDependencies;    // plugin URIs as read from "dmx.plugin.activate_after" property
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
 
     // Consumed services (DMX Core and OSGi)
@@ -99,7 +99,7 @@ public class PluginImpl implements Plugin, EventHandler {
         this.pluginUri = pluginBundle.getSymbolicName();
         //
         this.pluginProperties = readConfigFile();
-        this.pluginPackage = getConfigProperty("dm4.plugin.main_package", pluginContext.getClass().getPackage()
+        this.pluginPackage = getConfigProperty("dmx.plugin.main_package", pluginContext.getClass().getPackage()
             .getName());
         this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
         this.pluginDependencies = pluginDependencies();
@@ -143,7 +143,7 @@ public class PluginImpl implements Plugin, EventHandler {
                     "only one directory per plugin is supported");
             }
             //
-            fileSystemResources = dm4.wpService.publishFileSystem(uriNamespace, path);
+            fileSystemResources = dmx.wpService.publishFileSystem(uriNamespace, path);
         } catch (Exception e) {
             throw new RuntimeException("Publishing file system \"" + path + "\" at URI namespace \"" + uriNamespace +
                 "\" failed", e);
@@ -228,7 +228,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Returns the migration class name for the given migration number.
      *
      * @return  the fully qualified migration class name, or <code>null</code> if the migration package is unknown.
-     *          This is the case if the plugin bundle contains no Plugin subclass and the "dm4.plugin.main_package"
+     *          This is the case if the plugin bundle contains no Plugin subclass and the "dmx.plugin.main_package"
      *          config property is not set.
      */
     String getMigrationClassName(int migrationNr) {
@@ -240,7 +240,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     void setMigrationNr(int migrationNr) {
-        pluginTopic.getChildTopics().set("dm4.core.plugin_migration_nr", migrationNr);
+        pluginTopic.getChildTopics().set("dmx.core.plugin_migration_nr", migrationNr);
     }
 
     // ---
@@ -429,7 +429,7 @@ public class PluginImpl implements Plugin, EventHandler {
             unpublishRestResources();
             unpublishWebResources();
             unpublishFileSystem();
-            dm4.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
+            dmx.pluginManager.deactivatePlugin(this);   // use plugin manager before core service is removed
             setCoreService(null);
         } else if (service == eventService) {
             logger.info("Removing Event Admin service from " + this);
@@ -445,7 +445,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private void setCoreService(CoreServiceImpl dm4) {
         this.dm4 = dm4;
-        this.mf = dm4 != null ? dm4.mf : null;
+        this.mf = dm4 != null ? dmx.mf : null;
         pluginContext.setCoreService(dm4);
     }
 
@@ -457,11 +457,11 @@ public class PluginImpl implements Plugin, EventHandler {
      * The requirements:
      *   - the 2 core services are available (CoreService, EventAdmin).
      *   - the injected services (according to the "Inject" annotation) are available.
-     *   - the plugin dependencies (according to the "dm4.plugin.activate_after" config property) are active.
+     *   - the plugin dependencies (according to the "dmx.plugin.activate_after" config property) are active.
      */
     private void checkRequirementsForActivation() {
         if (dm4 != null && eventService != null && injectedServicesAvailable() && dependenciesAvailable()) {
-            dm4.pluginManager.activatePlugin(this);
+            dmx.pluginManager.activatePlugin(this);
         }
     }
 
@@ -517,12 +517,12 @@ public class PluginImpl implements Plugin, EventHandler {
      *                                   {@link CoreEvent.INTRODUCE_ASSOCIATION_TYPE} events)
      */
     private void installPluginInDB() {
-        DMXTransaction tx = dm4.beginTx();
+        DMXTransaction tx = dmx.beginTx();
         try {
             // 1) create "Plugin" topic
             boolean isCleanInstall = createPluginTopicIfNotExists();
             // 2) run migrations
-            dm4.migrationManager.runPluginMigrations(this, isCleanInstall);
+            dmx.migrationManager.runPluginMigrations(this, isCleanInstall);
             // 3) type introduction
             if (isCleanInstall) {
                 introduceTopicTypesToPlugin();
@@ -557,15 +557,15 @@ public class PluginImpl implements Plugin, EventHandler {
      * A Plugin topic represents an installed plugin and is used to track its version.
      */
     private Topic createPluginTopic() {
-        return dm4.createTopic(mf.newTopicModel(pluginUri, "dm4.core.plugin", mf.newChildTopicsModel()
-            .put("dm4.core.plugin_name", pluginName())
-            .put("dm4.core.plugin_symbolic_name", pluginUri)
-            .put("dm4.core.plugin_migration_nr", 0)
+        return dmx.createTopic(mf.newTopicModel(pluginUri, "dmx.core.plugin", mf.newChildTopicsModel()
+            .put("dmx.core.plugin_name", pluginName())
+            .put("dmx.core.plugin_symbolic_name", pluginUri)
+            .put("dmx.core.plugin_migration_nr", 0)
         ));
     }
 
     private Topic fetchPluginTopic() {
-        return dm4.getTopicByUri(pluginUri);
+        return dmx.getTopicByUri(pluginUri);
     }
 
     // ---
@@ -573,7 +573,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ### TODO: move to PersistenceLayer?
     private void introduceTopicTypesToPlugin() {
         try {
-            for (TopicType topicType : dm4.getAllTopicTypes()) {
+            for (TopicType topicType : dmx.getAllTopicTypes()) {
                 dispatchEvent(CoreEvent.INTRODUCE_TOPIC_TYPE, topicType);
             }
         } catch (Exception e) {
@@ -584,7 +584,7 @@ public class PluginImpl implements Plugin, EventHandler {
     // ### TODO: move to PersistenceLayer?
     private void introduceAssociationTypesToPlugin() {
         try {
-            for (AssociationType assocType : dm4.getAllAssociationTypes()) {
+            for (AssociationType assocType : dmx.getAllAssociationTypes()) {
                 dispatchEvent(CoreEvent.INTRODUCE_ASSOCIATION_TYPE, assocType);
             }
         } catch (Exception e) {
@@ -628,7 +628,7 @@ public class PluginImpl implements Plugin, EventHandler {
             //
             logger.info("Registering " + events.size() + " event listeners of " + this);
             for (DMXEvent event : events) {
-                dm4.em.addListener(event, (EventListener) pluginContext);
+                dmx.em.addListener(event, (EventListener) pluginContext);
             }
         } catch (Exception e) {
             throw new RuntimeException("Registering event listeners of " + this + " failed", e);
@@ -643,7 +643,7 @@ public class PluginImpl implements Plugin, EventHandler {
         //
         logger.info("Unregistering event listeners of " + this);
         for (DMXEvent event : events) {
-            dm4.em.removeListener(event, (EventListener) pluginContext);
+            dmx.em.removeListener(event, (EventListener) pluginContext);
         }
     }
 
@@ -671,7 +671,7 @@ public class PluginImpl implements Plugin, EventHandler {
      * Called internally to dispatch the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.
      */
     private void dispatchEvent(DMXEvent event, Object... params) {
-        dm4.em.dispatchEvent(this, event, params);
+        dmx.em.dispatchEvent(this, event, params);
     }
 
     /**
@@ -737,7 +737,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             //
             logger.info("Publishing web resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
-            webResources = dm4.wpService.publishWebResources(uriNamespace, pluginBundle);
+            webResources = dmx.wpService.publishWebResources(uriNamespace, pluginBundle);
         } catch (Exception e) {
             throw new RuntimeException("Publishing web resources of " + this + " failed " +
                 "(URI namespace=\"" + uriNamespace + "\")", e);
@@ -787,7 +787,7 @@ public class PluginImpl implements Plugin, EventHandler {
             // root resources
             List<Object> rootResources = getRootResources();
             if (rootResources.size() != 0) {
-                String uriNamespace = dm4.wpService.getUriNamespace(pluginContext);
+                String uriNamespace = dmx.wpService.getUriNamespace(pluginContext);
                 logger.info("Publishing REST resources of " + this + " at URI namespace \"" + uriNamespace + "\"");
             } else {
                 logger.info("Publishing REST resources of " + this + " SKIPPED -- no REST resources provided");
@@ -801,7 +801,7 @@ public class PluginImpl implements Plugin, EventHandler {
             }
             // register
             if (rootResources.size() != 0 || providerClasses.size() != 0) {
-                restResources = dm4.wpService.publishRestResources(rootResources, providerClasses);
+                restResources = dmx.wpService.publishRestResources(rootResources, providerClasses);
             }
         } catch (Exception e) {
             unpublishWebResources();
@@ -821,7 +821,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private List<Object> getRootResources() {
         List<Object> rootResources = new ArrayList();
-        if (dm4.wpService.isRootResource(pluginContext)) {
+        if (dmx.wpService.isRootResource(pluginContext)) {
             rootResources.add(pluginContext);
         }
         return rootResources;
@@ -833,7 +833,7 @@ public class PluginImpl implements Plugin, EventHandler {
             Class clazz = loadClass(className);
             if (clazz == null) {
                 throw new RuntimeException("Loading provider class \"" + className + "\" failed");
-            } else if (!dm4.wpService.isProviderClass(clazz)) {
+            } else if (!dmx.wpService.isProviderClass(clazz)) {
                 // Note: scanPackage() also returns nested classes, so we check explicitly.
                 continue;
             }
@@ -849,7 +849,7 @@ public class PluginImpl implements Plugin, EventHandler {
 
     private List<String> pluginDependencies() {
         List<String> pluginDependencies = new ArrayList();
-        String activateAfter = getConfigProperty("dm4.plugin.activate_after");
+        String activateAfter = getConfigProperty("dmx.plugin.activate_after");
         if (activateAfter != null) {
             String[] pluginUris = activateAfter.split(", *");
             for (int i = 0; i < pluginUris.length; i++) {
@@ -880,7 +880,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     private boolean isPluginActivated(String pluginUri) {
-        return dm4.pluginManager.isPluginActivated(pluginUri);
+        return dmx.pluginManager.isPluginActivated(pluginUri);
     }
 
     // Note: PLUGIN_ACTIVATED is defined as an OSGi event and not as a DMXEvent.

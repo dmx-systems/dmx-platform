@@ -4,28 +4,28 @@
     "topic_types": [
         {
             "value":       "Organizational Role",
-            "uri":         "dm4.contacts.organizational_role",
-            "dataTypeUri": "dm4.core.text"
+            "uri":         "dmx.contacts.organizational_role",
+            "dataTypeUri": "dmx.core.text"
         }
     ],
     "assoc_types": [
         {
             "value":       "Organization Association",
-            "uri":         "dm4.contacts.organization_association",
-            "dataTypeUri": "dm4.core.identity",
+            "uri":         "dmx.contacts.organization_association",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dm4.contacts.organizational_role",
-                    "childCardinalityUri":  "dm4.core.one",
-                    "parentCardinalityUri": "dm4.core.many",
-                    "assocTypeUri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dmx.contacts.organizational_role",
+                    "childCardinalityUri":  "dmx.core.one",
+                    "parentCardinalityUri": "dmx.core.many",
+                    "assocTypeUri":         "dmx.core.aggregation_def"
                 }
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.color": "hsl(48, 80%, 50%)"
+                        "dmx.webclient.color": "hsl(48, 80%, 50%)"
                     }
                 }
             ]
@@ -34,35 +34,35 @@
     "topics": [
         {
             "value": "Executive Director",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Founder",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Chairman",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Partner",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Collaborator",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Employee",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Member",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         },
         {
             "value": "Associate",
-            "typeUri": "dm4.contacts.organizational_role"
+            "typeUri": "dmx.contacts.organizational_role"
         }
     ]
 }

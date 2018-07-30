@@ -33,16 +33,16 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/{id}/institutions")
     @Override
     public List<RelatedTopic> getInstitutions(@PathParam("id") long personId) {
-        return dm4.getTopic(personId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
-            "dm4.core.default", "dm4.contacts.institution");
+        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_association", "dmx.core.default",
+            "dmx.core.default", "dmx.contacts.institution");
     }
 
     @GET
     @Path("/{id}/persons")
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long instId) {
-        return dm4.getTopic(instId).getRelatedTopics("dm4.contacts.organization_association", "dm4.core.default",
-            "dm4.core.default", "dm4.contacts.person");
+        return dmx.getTopic(instId).getRelatedTopics("dmx.contacts.organization_association", "dmx.core.default",
+            "dmx.core.default", "dmx.contacts.person");
     }
 
 
@@ -56,7 +56,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
         // Person <-> Institution
-        DMXUtils.associationAutoTyping(assoc, "dm4.contacts.person", "dm4.contacts.institution",
-            "dm4.contacts.organization_association", "dm4.core.default", "dm4.core.default", dm4);
+        DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.institution",
+            "dmx.contacts.organization_association", "dmx.core.default", "dmx.core.default", dm4);
     }
 }

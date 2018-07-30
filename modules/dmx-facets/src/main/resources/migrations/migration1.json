@@ -3,8 +3,8 @@
         ### Role Types ###
         {
             "value":   "Facet",
-            "uri":     "dm4.facets.facet",
-            "typeUri": "dm4.core.role_type"
+            "uri":     "dmx.facets.facet",
+            "typeUri": "dmx.core.role_type"
         }
     ]
 }

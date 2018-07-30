@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 
 /**
- * Renames root Folder topics, in case of dm4.filerepo.per_workspace=true.
+ * Renames root Folder topics, in case of dmx.filerepo.per_workspace=true.
  * Renames topic type "Disk Quota" -> "Disk Quota (MB)".
  * Installs the file size renderer.
  * <p>
@@ -22,7 +22,7 @@ public class Migration4 extends Migration {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dm4.filerepo.per_workspace");
+    private static final boolean FILE_REPOSITORY_PER_WORKSPACE = Boolean.getBoolean("dmx.filerepo.per_workspace");
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -34,13 +34,13 @@ public class Migration4 extends Migration {
     public void run() {
         // 1) Rename root Folder topics
         if (FILE_REPOSITORY_PER_WORKSPACE) {
-            List<Topic> workspaces = dm4.getTopicsByType("dm4.workspaces.workspace");
+            List<Topic> workspaces = dmx.getTopicsByType("dmx.workspaces.workspace");
             logger.info("########## Renaming root Folder topics of " + workspaces.size() + " possible workspaces");
             int renamed = 0;
             for (Topic workspace : workspaces) {
                 Topic folderTopic = fetchFolderTopic("/workspace-" + workspace.getId());
                 if (folderTopic != null) {
-                    folderTopic.getChildTopics().set("dm4.files.folder_name", workspace.getSimpleValue().toString());
+                    folderTopic.getChildTopics().set("dmx.files.folder_name", workspace.getSimpleValue().toString());
                     renamed++;
                 }
             }
@@ -51,10 +51,10 @@ public class Migration4 extends Migration {
         }
         //
         // 2) Rename topic type "Disk Quota"
-        dm4.getTopicType("dm4.files.disk_quota").setSimpleValue("Disk Quota (MB)");
+        dmx.getTopicType("dmx.files.disk_quota").setSimpleValue("Disk Quota (MB)");
         //
         // 3) Install file size renderer
-        setTopicTypeViewConfigValue("dm4.files.size", "simple_renderer_uri", "dm4.files.file_size_renderer");
+        setTopicTypeViewConfigValue("dmx.files.size", "simple_renderer_uri", "dmx.files.file_size_renderer");
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -64,8 +64,8 @@ public class Migration4 extends Migration {
      * If no such Folder topic exists <code>null</code> is returned.
      */
     private Topic fetchFolderTopic(String repoPath) {
-        Topic topic = dm4.getTopicByValue("dm4.files.path", new SimpleValue(repoPath));
-        return topic != null ? topic.getRelatedTopic("dm4.core.composition", "dm4.core.child", "dm4.core.parent",
-            "dm4.files.folder") : null;
+        Topic topic = dmx.getTopicByValue("dmx.files.path", new SimpleValue(repoPath));
+        return topic != null ? topic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent",
+            "dmx.files.folder") : null;
     }
 }

@@ -66,7 +66,7 @@ class PluginManager {
             //
             if (checkAllPluginsActivated()) {
                 logger.info("########## All Plugins Active ##########");
-                dm4.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
+                dmx.fireEvent(CoreEvent.ALL_PLUGINS_ACTIVE);
             }
         } else {
             logger.info("Activating " + plugin + " SKIPPED -- already activated");
@@ -117,7 +117,7 @@ class PluginManager {
      * Checks if all installed plugins are activated.
      */
     private boolean checkAllPluginsActivated() {
-        Bundle[] bundles = dm4.bundleContext.getBundles();
+        Bundle[] bundles = dmx.bundleContext.getBundles();
         int plugins = 0;
         int activated = 0;
         for (Bundle bundle : bundles) {

@@ -40,8 +40,8 @@ public class Migration3 extends Migration {
         logger.info("########## Repairing types with missing \"View Config\" topic (" +
             (deepaMehtaWorkspaceId == -1 ? "clean install" : "update") + " detected)");
         //
-        repair(dm4.getAllTopicTypes(), 0);
-        repair(dm4.getAllAssociationTypes(), 1);
+        repair(dmx.getAllTopicTypes(), 0);
+        repair(dmx.getAllAssociationTypes(), 1);
         //
         logger.info("########## Repairing types with missing \"View Config\" topic complete\n    " +
             "Topic types repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +
@@ -55,7 +55,7 @@ public class Migration3 extends Migration {
             // endless recursion while fetching that type. Fetching a type involves fetching its view config, that is
             // all its view config topics, including their child topics. Fetching child topics is driven by the topic's
             // type (its assoc defs), here: "View Configuration" -- the one we're fetching just now.
-            if (type.getUri().equals("dm4.webclient.view_config")) {
+            if (type.getUri().equals("dmx.webclient.view_config")) {
                 continue;
             }
             //
@@ -66,10 +66,10 @@ public class Migration3 extends Migration {
     private void repair(DMXType type, int i) {
         try {
             ViewConfiguration viewConfig = type.getViewConfig();
-            Topic configTopic = viewConfig.getConfigTopic("dm4.webclient.view_config");
+            Topic configTopic = viewConfig.getConfigTopic("dmx.webclient.view_config");
             if (configTopic == null) {
                 // 1) create config topic
-                configTopic = viewConfig.addConfigTopic(mf.newTopicModel("dm4.webclient.view_config"));
+                configTopic = viewConfig.addConfigTopic(mf.newTopicModel("dmx.webclient.view_config"));
                 //
                 // 2) assign workspace
                 // In case of a CLEAN_INSTALL the DMX workspace does not yet exist. The config topic gets its
@@ -78,7 +78,7 @@ public class Migration3 extends Migration {
                 // In case of a UPDATE the DMX workspace exists already and we make the assignment here.
                 // Type-introduction of the Workspaces module will not perform as this module is installed already.
                 if (deepaMehtaWorkspaceId != -1 && isDMXStandardType(type)) {
-                    dm4.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);
+                    dmx.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);
                 }
                 //
                 count[i][1]++;
@@ -90,12 +90,12 @@ public class Migration3 extends Migration {
     }
 
     private void initDMXWorkspaceId() {
-        Topic ws = dm4.getTopicByUri("dm4.workspaces.deepamehta");
+        Topic ws = dmx.getTopicByUri("dmx.workspaces.deepamehta");
         deepaMehtaWorkspaceId = ws != null ? ws.getId() : -1;
     }
 
     // Copied from WorkspacePlugin.java
     private boolean isDMXStandardType(DMXType type) {
-        return type.getUri().startsWith("dm4.");
+        return type.getUri().startsWith("dmx.");
     }
 }

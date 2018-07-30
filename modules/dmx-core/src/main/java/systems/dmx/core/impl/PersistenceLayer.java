@@ -426,9 +426,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createTopicInstantiation(long topicId, String topicTypeUri) {
         try {
-            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
-                mf.newTopicRoleModel(topicTypeUri, "dm4.core.type"),
-                mf.newTopicRoleModel(topicId, "dm4.core.instance"));
+            AssociationModel assoc = mf.newAssociationModel("dmx.core.instantiation",
+                mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
+                mf.newTopicRoleModel(topicId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
             storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
             createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
@@ -440,9 +440,9 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void createAssociationInstantiation(long assocId, String assocTypeUri) {
         try {
-            AssociationModel assoc = mf.newAssociationModel("dm4.core.instantiation",
-                mf.newTopicRoleModel(assocTypeUri, "dm4.core.type"),
-                mf.newAssociationRoleModel(assocId, "dm4.core.instance"));
+            AssociationModel assoc = mf.newAssociationModel("dmx.core.instantiation",
+                mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
+                mf.newAssociationRoleModel(assocId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
             storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
         } catch (Exception e) {
@@ -589,10 +589,10 @@ public final class PersistenceLayer extends StorageDecorator {
         // check type URI argument
         String typeUri = model.getTypeUri();
         if (typeUri == null) {
-            model.setTypeUri("dm4.core.role_type");
+            model.setTypeUri("dmx.core.role_type");
         } else {
-            if (!typeUri.equals("dm4.core.role_type")) {
-                throw new IllegalArgumentException("A role type is supposed to be of type \"dm4.core.role_type\" " +
+            if (!typeUri.equals("dmx.core.role_type")) {
+                throw new IllegalArgumentException("A role type is supposed to be of type \"dmx.core.role_type\" " +
                     "(found: \"" + typeUri + "\")");
             }
         }
@@ -826,12 +826,12 @@ public final class PersistenceLayer extends StorageDecorator {
         try {
             List<String> topicTypeUris = new ArrayList();
             // add meta types
-            topicTypeUris.add("dm4.core.topic_type");
-            topicTypeUris.add("dm4.core.assoc_type");
-            topicTypeUris.add("dm4.core.meta_type");
+            topicTypeUris.add("dmx.core.topic_type");
+            topicTypeUris.add("dmx.core.assoc_type");
+            topicTypeUris.add("dmx.core.meta_type");
             // add regular types
             for (TopicModel topicType : filterReadables(fetchTopics("typeUri", new SimpleValue(
-                                                                    "dm4.core.topic_type")))) {
+                                                                    "dmx.core.topic_type")))) {
                 topicTypeUris.add(topicType.getUri());
             }
             return topicTypeUris;
@@ -844,7 +844,7 @@ public final class PersistenceLayer extends StorageDecorator {
         try {
             List<String> assocTypeUris = new ArrayList();
             for (TopicModel assocType : filterReadables(fetchTopics("typeUri", new SimpleValue(
-                                                                    "dm4.core.assoc_type")))) {
+                                                                    "dmx.core.assoc_type")))) {
                 assocTypeUris.add(assocType.getUri());
             }
             return assocTypeUris;
@@ -876,9 +876,9 @@ public final class PersistenceLayer extends StorageDecorator {
     }
 
     private void bootstrapTypeCache() {
-        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dm4.core.meta_meta_type", "Meta Meta Type",
-            "dm4.core.text");
-        metaMetaType.setTypeUri("dm4.core.meta_meta_meta_type");
+        TopicTypeModelImpl metaMetaType = mf.newTopicTypeModel("dmx.core.meta_meta_type", "Meta Meta Type",
+            "dmx.core.text");
+        metaMetaType.setTypeUri("dmx.core.meta_meta_meta_type");
         typeStorage.putInTypeCache(metaMetaType);
     }
 

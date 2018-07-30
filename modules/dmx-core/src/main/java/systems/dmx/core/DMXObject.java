@@ -80,8 +80,8 @@ public interface DMXObject extends Identifiable, JSONEnabled {
     /**
      * Deletes the DMX object in its entirety, that is
      * - the object itself (the <i>parent</i>)
-     * - all child topics associated via "dm4.core.composition", recusively
-     * - all the remaining direct associations, e.g. "dm4.core.instantiation"
+     * - all child topics associated via "dmx.core.composition", recusively
+     * - all the remaining direct associations, e.g. "dmx.core.instantiation"
      */
     void delete();
 

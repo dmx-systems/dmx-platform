@@ -2,11 +2,11 @@
   <div class="dm5-workspace-options">
     <div class="field-label">Sharing Mode</div>
     <el-radio-group v-model="sharingModeUri">
-      <el-radio label="dm4.workspaces.private">Private</el-radio>
-      <el-radio label="dm4.workspaces.confidential">Confidential</el-radio>
-      <el-radio label="dm4.workspaces.collaborative">Collaborative</el-radio>
-      <el-radio label="dm4.workspaces.public">Public</el-radio>
-      <el-radio label="dm4.workspaces.common">Common</el-radio>
+      <el-radio label="dmx.workspaces.private">Private</el-radio>
+      <el-radio label="dmx.workspaces.confidential">Confidential</el-radio>
+      <el-radio label="dmx.workspaces.collaborative">Collaborative</el-radio>
+      <el-radio label="dmx.workspaces.public">Public</el-radio>
+      <el-radio label="dmx.workspaces.common">Common</el-radio>
     </el-radio-group>
   </div>
 </template>
@@ -24,7 +24,7 @@ export default {
 
   data () {
     return {
-      sharingModeUri: 'dm4.workspaces.private'
+      sharingModeUri: 'dmx.workspaces.private'
     }
   }
 }

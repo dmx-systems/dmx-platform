@@ -39,13 +39,13 @@ public class Migration8 extends Migration {
     public void run() {
         // Note: at migration running time our plugin listeners are not yet registered. That means
         // access control is not yet in effect. We have full READ/WRITE access to the database.
-        List<Topic> userAccounts = dm4.getTopicsByType("dm4.accesscontrol.user_account");
+        List<Topic> userAccounts = dmx.getTopicsByType("dmx.accesscontrol.user_account");
         logger.info("########## Converting " + userAccounts.size() + " user accounts");
         for (Topic userAccount : userAccounts) {
             // compare to AccessControlPlugin.createUserAccount()
             ChildTopics childTopics = userAccount.getChildTopics();
-            Topic usernameTopic = childTopics.getTopic("dm4.accesscontrol.username");
-            Topic passwordTopic = childTopics.getTopic("dm4.accesscontrol.password");
+            Topic usernameTopic = childTopics.getTopic("dmx.accesscontrol.username");
+            Topic passwordTopic = childTopics.getTopic("dmx.accesscontrol.password");
             //
             // 1) create private workspace
             Topic privateWorkspace = wsService.createWorkspace(AccessControlService.DEFAULT_PRIVATE_WORKSPACE_NAME,
@@ -71,8 +71,8 @@ public class Migration8 extends Migration {
 
     private void createMemberships(Topic usernameTopic) {
         String username = usernameTopic.getSimpleValue().toString();
-        List<RelatedTopic> workspaces = usernameTopic.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
-            "dm4.core.child", "dm4.workspaces.workspace");
+        List<RelatedTopic> workspaces = usernameTopic.getRelatedTopics("dmx.core.aggregation", "dmx.core.parent",
+            "dmx.core.child", "dmx.workspaces.workspace");
         logger.info("######## User \"" + username + "\" is member of " + workspaces.size() + " workspaces");
         for (RelatedTopic workspace : workspaces) {
             long workspaceId = workspace.getId();

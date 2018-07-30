@@ -240,9 +240,9 @@ const actions = {
   createAssoc ({dispatch}, {topicId1, topicId2}) {
     // TODO: display search/create widget; initiate assoc creation there
     const assocModel = {
-      typeUri: 'dm4.core.association',
-      role1: {topicId: topicId1, roleTypeUri: 'dm4.core.default'},
-      role2: {topicId: topicId2, roleTypeUri: 'dm4.core.default'}
+      typeUri: 'dmx.core.association',
+      role1: {topicId: topicId1, roleTypeUri: 'dmx.core.default'},
+      role2: {topicId: topicId2, roleTypeUri: 'dmx.core.default'}
     }
     console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
@@ -317,7 +317,7 @@ const actions = {
       p = Promise.resolve()
     } else {
       // console.log('fetchTopicmapTopics', workspaceId)
-      p = dm5.restClient.getAssignedTopics(workspaceId, 'dm4.topicmaps.topicmap', true).then(topics => {
+      p = dm5.restClient.getAssignedTopics(workspaceId, 'dmx.topicmaps.topicmap', true).then(topics => {
         // console.log('### Topicmap topics ready!', topics.length)                  // includeChilds=true
         if (!topics.length) {
           throw Error(`workspace ${workspaceId} has no topicmap`)
@@ -347,7 +347,7 @@ const actions = {
 
   _newTopicmap ({dispatch}, {topicmapTopic}) {
     const _topicmapTopic = new dm5.Topic(topicmapTopic)
-    const workspace = _topicmapTopic.getChildTopic('dm4.workspaces.workspace')
+    const workspace = _topicmapTopic.getChildTopic('dmx.workspaces.workspace')
     // Note: the default topicmap created for new workspaces have no workspace assignment yet
     if (!workspace) {
       console.warn('No workspace found in topicmap', _topicmapTopic)

@@ -69,41 +69,41 @@
         <org.apache.felix.https.keystore.password></org.apache.felix.https.keystore.password>
         <org.apache.felix.https.keystore.key.password></org.apache.felix.https.keystore.key.password>
         <!-- WebSockets -->
-        <dm4.websockets.port>8081</dm4.websockets.port>
-        <dm4.websockets.url>ws://localhost:8081</dm4.websockets.url>
+        <dmx.websockets.port>8081</dmx.websockets.port>
+        <dmx.websockets.url>ws://localhost:8081</dmx.websockets.url>
 
         <!-- Request Filter -->
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
         <!-- Line breaks and tab characters are allowed however.                                     -->
-        <dm4.security.anonymous_read_allowed>ALL</dm4.security.anonymous_read_allowed>
+        <dmx.security.anonymous_read_allowed>ALL</dmx.security.anonymous_read_allowed>
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
         <!-- Line breaks and tab characters are allowed however.                                     -->
-        <dm4.security.anonymous_write_allowed>NONE</dm4.security.anonymous_write_allowed>
-        <dm4.security.subnet_filter>127.0.0.1/32</dm4.security.subnet_filter>
+        <dmx.security.anonymous_write_allowed>NONE</dmx.security.anonymous_write_allowed>
+        <dmx.security.subnet_filter>127.0.0.1/32</dmx.security.subnet_filter>
 
         <!-- User Accounts -->
-        <dm4.security.initial_admin_password></dm4.security.initial_admin_password>
-        <dm4.security.new_accounts_are_enabled>true</dm4.security.new_accounts_are_enabled>
+        <dmx.security.initial_admin_password></dmx.security.initial_admin_password>
+        <dmx.security.new_accounts_are_enabled>true</dmx.security.new_accounts_are_enabled>
         <!-- LDAP -->
-        <dm4.ldap.server>127.0.0.1</dm4.ldap.server>
-        <dm4.ldap.port>389</dm4.ldap.port>
-        <dm4.ldap.manager></dm4.ldap.manager>
-        <dm4.ldap.password></dm4.ldap.password>
-        <dm4.ldap.user_base></dm4.ldap.user_base>
-        <dm4.ldap.user_attribute></dm4.ldap.user_attribute>
-        <dm4.ldap.filter></dm4.ldap.filter>
+        <dmx.ldap.server>127.0.0.1</dmx.ldap.server>
+        <dmx.ldap.port>389</dmx.ldap.port>
+        <dmx.ldap.manager></dmx.ldap.manager>
+        <dmx.ldap.password></dmx.ldap.password>
+        <dmx.ldap.user_base></dmx.ldap.user_base>
+        <dmx.ldap.user_attribute></dmx.ldap.user_attribute>
+        <dmx.ldap.filter></dmx.ldap.filter>
 
         <!-- Workspace Sharing Modes -->
-        <dm4.workspaces.private.enabled>true</dm4.workspaces.private.enabled>
-        <dm4.workspaces.confidential.enabled>true</dm4.workspaces.confidential.enabled>
-        <dm4.workspaces.collaborative.enabled>true</dm4.workspaces.collaborative.enabled>
-        <dm4.workspaces.public.enabled>true</dm4.workspaces.public.enabled>
-        <dm4.workspaces.common.enabled>true</dm4.workspaces.common.enabled>
+        <dmx.workspaces.private.enabled>true</dmx.workspaces.private.enabled>
+        <dmx.workspaces.confidential.enabled>true</dmx.workspaces.confidential.enabled>
+        <dmx.workspaces.collaborative.enabled>true</dmx.workspaces.collaborative.enabled>
+        <dmx.workspaces.public.enabled>true</dmx.workspaces.public.enabled>
+        <dmx.workspaces.common.enabled>true</dmx.workspaces.common.enabled>
 
         <!-- File Repository -->
-        <dm4.filerepo.path>/</dm4.filerepo.path>
-        <dm4.filerepo.per_workspace>false</dm4.filerepo.per_workspace>
-        <dm4.filerepo.disk_quota>-1</dm4.filerepo.disk_quota>
+        <dmx.filerepo.path>/</dmx.filerepo.path>
+        <dmx.filerepo.per_workspace>false</dmx.filerepo.per_workspace>
+        <dmx.filerepo.disk_quota>-1</dmx.filerepo.disk_quota>
 
         <!-- Hot Deployment -->
         <!-- IMPORTANT: in case of a (comma-separated) list no spaces are allowed between the items. -->
@@ -113,13 +113,13 @@
         </felix.fileinstall.dir>
 
         <!-- Host -->
-        <dm4.host.url>http://localhost:${org.osgi.service.http.port}/</dm4.host.url>
+        <dmx.host.url>http://localhost:${org.osgi.service.http.port}/</dmx.host.url>
 
         <!-- Webservice -->
-        <dm4.webservice.path>/</dm4.webservice.path>
+        <dmx.webservice.path>/</dmx.webservice.path>
 
         <!-- Database -->
-        <dm4.database.path>${project.basedir}/deepamehta-db</dm4.database.path>
+        <dmx.database.path>${project.basedir}/deepamehta-db</dmx.database.path>
 
         <!-- Logging -->
         <java.util.logging.config.file>
@@ -501,7 +501,7 @@
                             <mainClass>org.neo4j.shell.StartClient</mainClass>
                             <arguments>
                                 <argument>-path</argument>
-                                <argument>${dm4.database.path}</argument>
+                                <argument>${dmx.database.path}</argument>
                                 <argument>-readonly</argument>
                                 <argument>-v</argument>
                             </arguments>

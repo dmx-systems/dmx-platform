@@ -70,12 +70,12 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String getParentTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dm4.core.parent_type")).getTopicUri();
+        return ((TopicRoleModel) getRoleModel("dmx.core.parent_type")).getTopicUri();
     }
 
     @Override
     public String getChildTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dm4.core.child_type")).getTopicUri();
+        return ((TopicRoleModel) getRoleModel("dmx.core.child_type")).getTopicUri();
     }
 
     @Override
@@ -200,7 +200,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // === Identity Configuration ===
 
     final boolean isIdentityAttr() {
-        TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dm4.core.identity_attr");
+        TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dmx.core.identity_attr");
         if (isIdentityAttr == null) {
             // ### TODO: should a isIdentityAttr topic always exist?
             // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Identity Attribute\" topic");
@@ -214,7 +214,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // === Label Configuration ===
 
     final boolean includeInLabel() {
-        TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dm4.core.include_in_label");
+        TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dmx.core.include_in_label");
         if (includeInLabel == null) {
             // ### TODO: should a includeInLabel topic always exist?
             // throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Include in Label\" topic");
@@ -296,14 +296,14 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // ===
 
     private TopicModelImpl getCustomAssocType() {
-        return getChildTopicsModel().getTopicOrNull("dm4.core.assoc_type#dm4.core.custom_assoc_type");
+        return getChildTopicsModel().getTopicOrNull("dmx.core.assoc_type#dmx.core.custom_assoc_type");
     }
 
     private String defaultInstanceLevelAssocTypeUri() {
-        if (typeUri.equals("dm4.core.aggregation_def")) {
-            return "dm4.core.aggregation";
-        } else if (typeUri.equals("dm4.core.composition_def")) {
-            return "dm4.core.composition";
+        if (typeUri.equals("dmx.core.aggregation_def")) {
+            return "dmx.core.aggregation";
+        } else if (typeUri.equals("dmx.core.composition_def")) {
+            return "dmx.core.composition";
         } else {
             throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");
         }

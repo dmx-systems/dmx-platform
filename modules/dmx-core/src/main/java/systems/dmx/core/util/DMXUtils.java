@@ -28,9 +28,9 @@ public class DMXUtils {
 
     private static final Logger logger = Logger.getLogger(DMXUtils.class.getName());
 
-    private static final String DM4_HOST_URL = System.getProperty("dm4.host.url");  // ### TODO: default value (#734)
+    private static final String DM4_HOST_URL = System.getProperty("dmx.host.url");  // ### TODO: default value (#734)
     static {
-        logger.info("Host setting:\ndm4.host.url=\"" + DM4_HOST_URL + "\"");
+        logger.info("Host setting:\ndmx.host.url=\"" + DM4_HOST_URL + "\"");
     }
 
 
@@ -43,7 +43,7 @@ public class DMXUtils {
 
     /**
      * Checks if an URL refers to this DMX installation.
-     * The check relies on the "dm4.host.url" system property.
+     * The check relies on the "dmx.host.url" system property.
      */
     public static boolean isDMXURL(URL url) {
         try {
@@ -161,7 +161,7 @@ public class DMXUtils {
      */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
                                        String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dm4) {
-        if (!assoc.getTypeUri().equals("dm4.core.association")) {
+        if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
         RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dm4);
@@ -187,8 +187,8 @@ public class DMXUtils {
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
-        String t1 = (String) dm4.getProperty(r1.getPlayerId(), "typeUri");
-        String t2 = (String) dm4.getProperty(r2.getPlayerId(), "typeUri");
+        String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
+        String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {

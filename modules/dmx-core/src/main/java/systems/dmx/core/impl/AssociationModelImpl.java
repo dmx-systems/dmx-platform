@@ -465,8 +465,8 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     }
 
     private AssociationModelImpl fetchInstantiation() {
-        RelatedTopicModelImpl assocType = getRelatedTopic("dm4.core.instantiation", "dm4.core.instance",
-            "dm4.core.type", "dm4.core.assoc_type");
+        RelatedTopicModelImpl assocType = getRelatedTopic("dmx.core.instantiation", "dmx.core.instance",
+            "dmx.core.type", "dmx.core.assoc_type");
         //
         if (assocType == null) {
             throw new RuntimeException("Association " + id + " is not associated to an association type");
@@ -506,16 +506,16 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     private boolean isAssocDef(AssociationModel assoc) {
         String typeUri = assoc.getTypeUri();
-        if (!typeUri.equals("dm4.core.aggregation_def") &&
-            !typeUri.equals("dm4.core.composition_def")) {
+        if (!typeUri.equals("dmx.core.aggregation_def") &&
+            !typeUri.equals("dmx.core.composition_def")) {
             return false;
         }
         //
         if (assoc.hasSameRoleTypeUris()) {
             return false;
         }
-        if (assoc.getRoleModel("dm4.core.parent_type") == null ||
-            assoc.getRoleModel("dm4.core.child_type") == null)  {
+        if (assoc.getRoleModel("dmx.core.parent_type") == null ||
+            assoc.getRoleModel("dmx.core.child_type") == null)  {
             return false;
         }
         //

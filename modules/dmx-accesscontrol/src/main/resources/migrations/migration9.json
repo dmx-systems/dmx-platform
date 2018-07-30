@@ -5,8 +5,8 @@
     "topic_types": [
         {
             "value": "Login enabled",
-            "uri": "dm4.accesscontrol.login_enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri": "dmx.accesscontrol.login_enabled",
+            "dataTypeUri": "dmx.core.boolean"
         }
     ]
 }

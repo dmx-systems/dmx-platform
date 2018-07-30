@@ -32,8 +32,8 @@ class TypeStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // role types
-    private static final String PARENT_CARDINALITY = "dm4.core.parent_cardinality";
-    private static final String CHILD_CARDINALITY  = "dm4.core.child_cardinality";
+    private static final String PARENT_CARDINALITY = "dmx.core.parent_cardinality";
+    private static final String CHILD_CARDINALITY  = "dmx.core.child_cardinality";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -166,20 +166,20 @@ class TypeStorage {
     private void checkTopicType(String topicTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Topic type \"" + topicTypeUri + "\" not found in DB");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.topic_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_type") &&
-                   !typeTopic.getTypeUri().equals("dm4.core.meta_meta_type")) {
+        } else if (!typeTopic.getTypeUri().equals("dmx.core.topic_type") &&
+                   !typeTopic.getTypeUri().equals("dmx.core.meta_type") &&
+                   !typeTopic.getTypeUri().equals("dmx.core.meta_meta_type")) {
             throw new RuntimeException("URI \"" + topicTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.topic_type\"");
+                "\" when the caller expects a \"dmx.core.topic_type\"");
         }
     }
 
     private void checkAssociationType(String assocTypeUri, TopicModel typeTopic) {
         if (typeTopic == null) {
             throw new RuntimeException("Association type \"" + assocTypeUri + "\" not found in DB");
-        } else if (!typeTopic.getTypeUri().equals("dm4.core.assoc_type")) {
+        } else if (!typeTopic.getTypeUri().equals("dmx.core.assoc_type")) {
             throw new RuntimeException("URI \"" + assocTypeUri + "\" refers to a \"" + typeTopic.getTypeUri() +
-                "\" when the caller expects a \"dm4.core.assoc_type\"");
+                "\" when the caller expects a \"dmx.core.assoc_type\"");
         }
     }
 
@@ -212,8 +212,8 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dm4.core.aggregation", "dm4.core.type",
-                "dm4.core.default", "dm4.core.data_type");
+            RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dmx.core.aggregation", "dmx.core.type",
+                "dmx.core.default", "dmx.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
             }
@@ -229,9 +229,9 @@ class TypeStorage {
     // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
-            pl.createAssociation("dm4.core.aggregation",
-                mf.newTopicRoleModel(typeUri,     "dm4.core.type"),
-                mf.newTopicRoleModel(dataTypeUri, "dm4.core.default")
+            pl.createAssociation("dmx.core.aggregation",
+                mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
+                mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
             );
         } catch (Exception e) {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
@@ -246,8 +246,8 @@ class TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dm4.core.aggregation",
-            "dm4.core.type", "dm4.core.default", "dm4.core.index_mode");
+        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dmx.core.aggregation",
+            "dmx.core.type", "dmx.core.default", "dmx.core.index_mode");
         return IndexMode.fromTopics(indexModes);
     }
 
@@ -260,9 +260,9 @@ class TypeStorage {
     }
 
     void storeIndexMode(String typeUri, IndexMode indexMode) {
-        pl.createAssociation("dm4.core.aggregation",
-            mf.newTopicRoleModel(typeUri,           "dm4.core.type"),
-            mf.newTopicRoleModel(indexMode.toUri(), "dm4.core.default")
+        pl.createAssociation("dmx.core.aggregation",
+            mf.newTopicRoleModel(typeUri,           "dmx.core.type"),
+            mf.newTopicRoleModel(indexMode.toUri(), "dmx.core.default")
         );
     }
 
@@ -277,7 +277,7 @@ class TypeStorage {
         if (cardinality != null) {
             return cardinality.getUri();
         } else {
-            return "dm4.core.one";
+            return "dmx.core.one";
         }
     }
 
@@ -302,11 +302,11 @@ class TypeStorage {
         // Note: we must set fetchRelatingComposite to false here. Fetching the composite of association type
         // Composition Definition would cause an endless recursion. Composition Definition is defined through
         // Composition Definition itself (child types "Include in Label", "Ordered"). ### FIXDOC: this is obsolete
-        // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dm4.core.topic_type"
-        // and "dm4.core.meta_type" (the latter is required e.g. by dmx-mail). ### TODO: add a getRelatedTopics()
+        // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dmx.core.topic_type"
+        // and "dmx.core.meta_type" (the latter is required e.g. by dmx-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dm4.core.aggregation_def",
-            "dm4.core.composition_def"), "dm4.core.parent_type", "dm4.core.child_type", null);
+        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dmx.core.aggregation_def",
+            "dmx.core.composition_def"), "dmx.core.parent_type", "dmx.core.child_type", null);
             // othersTopicTypeUri=null
         //
         // 2) create association definitions
@@ -362,20 +362,20 @@ class TypeStorage {
      */
     private void prepareAssocModel(AssociationModel assoc, String parentTypeUri, String childTypeUri) {
         long assocDefId = assoc.getId();
-        assoc.setRoleModel1(mf.newTopicRoleModel(parentTypeUri, "dm4.core.parent_type"));
-        assoc.setRoleModel2(mf.newTopicRoleModel(childTypeUri,  "dm4.core.child_type"));
+        assoc.setRoleModel1(mf.newTopicRoleModel(parentTypeUri, "dmx.core.parent_type"));
+        assoc.setRoleModel2(mf.newTopicRoleModel(childTypeUri,  "dmx.core.child_type"));
         ChildTopicsModel childTopics = assoc.getChildTopicsModel();
         RelatedTopicModel customAssocType = fetchCustomAssocType(assocDefId);
         if (customAssocType != null) {
-            childTopics.put("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocType);
+            childTopics.put("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);
         }
         RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assocDefId);
         if (isIdentityAttr != null) {   // ### TODO: should a isIdentityAttr topic always exist?
-            childTopics.put("dm4.core.identity_attr", isIdentityAttr);
+            childTopics.put("dmx.core.identity_attr", isIdentityAttr);
         }
         RelatedTopicModel includeInLabel = fetchIncludeInLabel(assocDefId);
         if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
-            childTopics.put("dm4.core.include_in_label", includeInLabel);
+            childTopics.put("dmx.core.include_in_label", includeInLabel);
         }
     }
 
@@ -383,20 +383,20 @@ class TypeStorage {
         // ### TODO: can we use model-driven retrieval? => NO!
         // Fetching assoc type "Aggregation Definition" would run into an endless recursion while fetching
         // its "Custom Association Type" assoc def.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.custom_assoc_type", "dm4.core.parent",
-            "dm4.core.child", "dm4.core.assoc_type");
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.custom_assoc_type", "dmx.core.parent",
+            "dmx.core.child", "dmx.core.assoc_type");
     }
 
     private RelatedTopicModel fetchIsIdentityAttr(long assocDefId) {
         // ### TODO: can we use model-driven retrieval? => NO! See above.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition", "dm4.core.parent",
-            "dm4.core.child", "dm4.core.identity_attr");
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.parent",
+            "dmx.core.child", "dmx.core.identity_attr");
     }
 
     private RelatedTopicModel fetchIncludeInLabel(long assocDefId) {
         // ### TODO: can we use model-driven retrieval?  => NO! See above.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.composition", "dm4.core.parent",
-            "dm4.core.child", "dm4.core.include_in_label");
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.parent",
+            "dmx.core.child", "dmx.core.include_in_label");
     }
 
     // ---
@@ -465,10 +465,10 @@ class TypeStorage {
      *          A topic representing either a topic type or an association type.
      */
     private TopicModel fetchParentTypeTopic(AssociationModelImpl assoc) {
-        TopicModel parentType = (TopicModel) assoc.getPlayer("dm4.core.parent_type");
+        TopicModel parentType = (TopicModel) assoc.getPlayer("dmx.core.parent_type");
         // error check
         if (parentType == null) {
-            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.parent_type\" is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dmx.core.parent_type\" is missing in " + assoc);
         }
         //
         return parentType;
@@ -481,10 +481,10 @@ class TypeStorage {
      *          A topic representing a topic type.
      */
     private TopicModel fetchChildTypeTopic(AssociationModelImpl assoc) {
-        TopicModel childType = (TopicModel) assoc.getPlayer("dm4.core.child_type");
+        TopicModel childType = (TopicModel) assoc.getPlayer("dmx.core.child_type");
         // error check
         if (childType == null) {
-            throw new RuntimeException("DB inconsistency: topic role \"dm4.core.child_type\" is missing in " + assoc);
+            throw new RuntimeException("DB inconsistency: topic role \"dmx.core.child_type\" is missing in " + assoc);
         }
         //
         return childType;
@@ -495,12 +495,12 @@ class TypeStorage {
     TypeModelImpl fetchParentType(AssociationModelImpl assoc) {
         TopicModel type = fetchParentTypeTopic(assoc);
         String typeUri = type.getTypeUri();
-        if (typeUri.equals("dm4.core.topic_type")) {
+        if (typeUri.equals("dmx.core.topic_type")) {
             return getTopicType(type.getUri());
-        } else if (typeUri.equals("dm4.core.assoc_type")) {
+        } else if (typeUri.equals("dmx.core.assoc_type")) {
             return getAssociationType(type.getUri());
         } else {
-            throw new RuntimeException("DB inconsistency: the \"dm4.core.parent_type\" player is not a type " +
+            throw new RuntimeException("DB inconsistency: the \"dmx.core.parent_type\" player is not a type " +
                 "but of type \"" + typeUri + "\" in " + assoc);
         }
     }
@@ -512,8 +512,8 @@ class TypeStorage {
     // --- Fetch ---
 
     private RelatedTopicModelImpl fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dm4.core.aggregation", "dm4.core.assoc_def",
-            cardinalityRoleTypeUri, "dm4.core.cardinality");
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.aggregation", "dmx.core.assoc_def",
+            cardinalityRoleTypeUri, "dmx.core.cardinality");
     }
 
     private RelatedTopicModelImpl fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
@@ -559,9 +559,9 @@ class TypeStorage {
     }
 
     private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
-        pl.createAssociation("dm4.core.aggregation",
+        pl.createAssociation("dmx.core.aggregation",
             mf.newTopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
-            mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def")
+            mf.newAssociationRoleModel(assocDefId, "dmx.core.assoc_def")
         );
     }
 
@@ -596,18 +596,18 @@ class TypeStorage {
     // ---
 
     private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
-        return pl.fetchTopicRelatedAssociation(typeId, "dm4.core.aggregation", "dm4.core.type",
-            "dm4.core.sequence_start", null);   // othersAssocTypeUri=null
+        return pl.fetchTopicRelatedAssociation(typeId, "dmx.core.aggregation", "dmx.core.type",
+            "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
     }
 
     private RelatedAssociationModelImpl fetchSuccessor(long assocDefId) {
-        return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.predecessor",
-            "dm4.core.successor", null);        // othersAssocTypeUri=null
+        return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.predecessor",
+            "dmx.core.successor", null);        // othersAssocTypeUri=null
     }
 
     private RelatedAssociationModelImpl fetchPredecessor(long assocDefId) {
-        return pl.fetchAssociationRelatedAssociation(assocDefId, "dm4.core.sequence", "dm4.core.successor",
-            "dm4.core.predecessor", null);      // othersAssocTypeUri=null
+        return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.successor",
+            "dmx.core.predecessor", null);      // othersAssocTypeUri=null
     }
 
     // --- Store ---
@@ -675,16 +675,16 @@ class TypeStorage {
     // ---
 
     private void storeSequenceStart(long typeId, long assocDefId) {
-        pl.createAssociation("dm4.core.aggregation",
-            mf.newTopicRoleModel(typeId, "dm4.core.type"),
-            mf.newAssociationRoleModel(assocDefId, "dm4.core.sequence_start")
+        pl.createAssociation("dmx.core.aggregation",
+            mf.newTopicRoleModel(typeId, "dmx.core.type"),
+            mf.newAssociationRoleModel(assocDefId, "dmx.core.sequence_start")
         );
     }
 
     private void storeSequenceSegment(long predAssocDefId, long succAssocDefId) {
-        pl.createAssociation("dm4.core.sequence",
-            mf.newAssociationRoleModel(predAssocDefId, "dm4.core.predecessor"),
-            mf.newAssociationRoleModel(succAssocDefId, "dm4.core.successor")
+        pl.createAssociation("dmx.core.sequence",
+            mf.newAssociationRoleModel(predAssocDefId, "dmx.core.predecessor"),
+            mf.newAssociationRoleModel(succAssocDefId, "dmx.core.successor")
         );
     }
 
@@ -720,8 +720,8 @@ class TypeStorage {
     private ViewConfigurationModel fetchTypeViewConfig(TopicModel typeTopic) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dm4.core.aggregation",
-                "dm4.core.type", "dm4.core.view_config", null));
+            return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.aggregation",
+                "dmx.core.type", "dmx.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
                 "\" failed", e);
@@ -731,8 +731,8 @@ class TypeStorage {
     private ViewConfigurationModel fetchAssocDefViewConfig(AssociationModel assocDef) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dm4.core.aggregation",
-                "dm4.core.assoc_def", "dm4.core.view_config", null));
+            return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dmx.core.aggregation",
+                "dmx.core.assoc_def", "dmx.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for assoc def " + assocDef.getId() + " failed", e);
         }
@@ -764,8 +764,8 @@ class TypeStorage {
 
     void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
         pl.createTopic(configTopic);
-        pl.createAssociation("dm4.core.aggregation", configurable,
-            mf.newTopicRoleModel(configTopic.getId(), "dm4.core.view_config"));
+        pl.createAssociation("dmx.core.aggregation", configurable,
+            mf.newTopicRoleModel(configTopic.getId(), "dmx.core.view_config"));
     }
 
     // --- Helper ---
@@ -779,11 +779,11 @@ class TypeStorage {
     // ---
 
     RoleModel newTypeRole(long typeId) {
-        return mf.newTopicRoleModel(typeId, "dm4.core.type");
+        return mf.newTopicRoleModel(typeId, "dmx.core.type");
     }
 
     RoleModel newAssocDefRole(long assocDefId) {
-        return mf.newAssociationRoleModel(assocDefId, "dm4.core.assoc_def");
+        return mf.newAssociationRoleModel(assocDefId, "dmx.core.assoc_def");
     }
 
 

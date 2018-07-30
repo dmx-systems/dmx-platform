@@ -243,7 +243,7 @@ public interface AccessControl {
     // ---
 
     /**
-     * Returns true if an "Email Address" (dm4.contacts.email_address) topic with the given value exists,
+     * Returns true if an "Email Address" (dmx.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>
      * This is a privileged method, it bypasses the access control system.

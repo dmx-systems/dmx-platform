@@ -64,7 +64,7 @@ class WebSocketConnection implements WebSocket, WebSocket.OnTextMessage, WebSock
     @Override
     public void onMessage(String message) {
         try {
-            dm4.dispatchEvent(pluginUri, CoreEvent.WEBSOCKET_TEXT_MESSAGE, message);
+            dmx.dispatchEvent(pluginUri, CoreEvent.WEBSOCKET_TEXT_MESSAGE, message);
         } catch (Exception e) {
             // Note: we don't rethrow to Jetty here. It would not log the exception's cause. DM's exception
             // mapper would not kick in either as the plugin is called from Jetty directly, not Jersey.

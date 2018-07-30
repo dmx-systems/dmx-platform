@@ -36,9 +36,9 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String ASSOC_TYPE_CONFIGURATION = "dm4.config.configuration";
-    private static String ROLE_TYPE_CONFIGURABLE = "dm4.config.configurable";
-    private static String ROLE_TYPE_DEFAULT = "dm4.core.default";
+    private static String ASSOC_TYPE_CONFIGURATION = "dmx.config.configuration";
+    private static String ROLE_TYPE_CONFIGURABLE = "dmx.config.configurable";
+    private static String ROLE_TYPE_DEFAULT = "dmx.core.default";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -121,7 +121,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     public ConfigDefinitions getConfigDefinitions() {
         try {
             JSONObject json = new JSONObject();
-            AccessControl ac = dm4.getAccessControl();
+            AccessControl ac = dmx.getAccessControl();
             for (String configurableUri: registry.keySet()) {
                 JSONArray array = new JSONArray();
                 for (ConfigDefinition configDef : lookupConfigDefinitions(configurableUri)) {
@@ -159,7 +159,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private RelatedTopic _getConfigTopic(String configTypeUri, long topicId) {
-        return dm4.getAccessControl().getConfigTopic(configTypeUri, topicId);
+        return dmx.getAccessControl().getConfigTopic(configTypeUri, topicId);
     }
 
     private RelatedTopic _createConfigTopic(final ConfigDefinition configDef, final Topic topic) {
@@ -167,12 +167,12 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
         try {
             logger.info("### Creating config topic of type \"" + configTypeUri + "\" for topic " + topic.getId());
             // suppress standard workspace assignment as a config topic requires a special assignment
-            final AccessControl ac = dm4.getAccessControl();
+            final AccessControl ac = dmx.getAccessControl();
             return ac.runWithoutWorkspaceAssignment(new Callable<RelatedTopic>() {
                 @Override
                 public RelatedTopic call() {
-                    Topic configTopic = dm4.createTopic(configDef.getConfigValue(topic));
-                    dm4.createAssociation(mf.newAssociationModel(ASSOC_TYPE_CONFIGURATION,
+                    Topic configTopic = dmx.createTopic(configDef.getConfigValue(topic));
+                    dmx.createAssociation(mf.newAssociationModel(ASSOC_TYPE_CONFIGURATION,
                         mf.newTopicRoleModel(topic.getId(), ROLE_TYPE_CONFIGURABLE),
                         mf.newTopicRoleModel(configTopic.getId(), ROLE_TYPE_DEFAULT)));
                     ac.assignToWorkspace(configTopic, workspaceId(configDef.getConfigModificationRole()));
@@ -187,7 +187,7 @@ public class ConfigPlugin extends PluginActivator implements ConfigService, Post
     }
 
     private long workspaceId(ConfigModificationRole role) {
-        AccessControl ac = dm4.getAccessControl();
+        AccessControl ac = dmx.getAccessControl();
         switch (role) {
         case ADMIN:
             return ac.getAdministrationWorkspaceId();

@@ -2,39 +2,39 @@
     "topic_types": [
         {
             "value":          "Plugin Name",
-            "uri":            "dm4.core.plugin_name",
-            "dataTypeUri":    "dm4.core.text"
+            "uri":            "dmx.core.plugin_name",
+            "dataTypeUri":    "dmx.core.text"
         },
         {
             "value":          "Symbolic Name",
-            "uri":            "dm4.core.plugin_symbolic_name",
-            "dataTypeUri":    "dm4.core.text"
+            "uri":            "dmx.core.plugin_symbolic_name",
+            "dataTypeUri":    "dmx.core.text"
         },
         {
             "value":          "Migration Nr.",
-            "uri":            "dm4.core.plugin_migration_nr",
-            "dataTypeUri":    "dm4.core.number",
-            "indexModeUris": ["dm4.core.key"]
+            "uri":            "dmx.core.plugin_migration_nr",
+            "dataTypeUri":    "dmx.core.number",
+            "indexModeUris": ["dmx.core.key"]
         },
         {
             "value":          "Plugin",
-            "uri":            "dm4.core.plugin",
-            "dataTypeUri":    "dm4.core.identity",
+            "uri":            "dmx.core.plugin",
+            "dataTypeUri":    "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.core.plugin_name",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.core.plugin_name",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 },
                 {
-                    "childTypeUri":        "dm4.core.plugin_symbolic_name",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.core.plugin_symbolic_name",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 },
                 {
-                    "childTypeUri":        "dm4.core.plugin_migration_nr",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.core.plugin_migration_nr",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 }
             ]
         }

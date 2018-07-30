@@ -96,15 +96,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Security settings
-    private static final String ANONYMOUS_READ_ALLOWED = System.getProperty("dm4.security.anonymous_read_allowed",
+    private static final String ANONYMOUS_READ_ALLOWED = System.getProperty("dmx.security.anonymous_read_allowed",
         "ALL");
-    private static final String ANONYMOUS_WRITE_ALLOWED = System.getProperty("dm4.security.anonymous_write_allowed",
+    private static final String ANONYMOUS_WRITE_ALLOWED = System.getProperty("dmx.security.anonymous_write_allowed",
         "NONE");
     private static final AnonymousAccessFilter accessFilter = new AnonymousAccessFilter(ANONYMOUS_READ_ALLOWED,
         ANONYMOUS_WRITE_ALLOWED);
-    private static final String SUBNET_FILTER = System.getProperty("dm4.security.subnet_filter", "127.0.0.1/32");
+    private static final String SUBNET_FILTER = System.getProperty("dmx.security.subnet_filter", "127.0.0.1/32");
     private static final boolean NEW_ACCOUNTS_ARE_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.security.new_accounts_are_enabled", "true"));
+        System.getProperty("dmx.security.new_accounts_are_enabled", "true"));
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
     private static final boolean IS_PUBLIC_INSTALLATION = ANONYMOUS_READ_ALLOWED.equals("ALL");
@@ -112,13 +112,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     private static final String AUTHENTICATION_REALM = "DMX";
 
     // Type URIs
-    private static final String LOGIN_ENABLED_TYPE = "dm4.accesscontrol.login_enabled";
-    private static final String MEMBERSHIP_TYPE = "dm4.accesscontrol.membership";
+    private static final String LOGIN_ENABLED_TYPE = "dmx.accesscontrol.login_enabled";
+    private static final String MEMBERSHIP_TYPE = "dmx.accesscontrol.membership";
 
     // Property URIs
-    private static final String PROP_CREATOR  = "dm4.accesscontrol.creator";
-    private static final String PROP_OWNER    = "dm4.accesscontrol.owner";
-    private static final String PROP_MODIFIER = "dm4.accesscontrol.modifier";
+    private static final String PROP_CREATOR  = "dmx.accesscontrol.creator";
+    private static final String PROP_OWNER    = "dmx.accesscontrol.owner";
+    private static final String PROP_MODIFIER = "dmx.accesscontrol.modifier";
 
     // Events
     private static DMXEvent POST_LOGIN_USER = new DMXEvent(PostLoginUserListener.class) {
@@ -158,10 +158,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     static {
         logger.info("Security settings:" +
-            "\n  dm4.security.anonymous_read_allowed = " + accessFilter.dumpReadSetting() +
-            "\n  dm4.security.anonymous_write_allowed = " + accessFilter.dumpWriteSetting() +
-            "\n  dm4.security.subnet_filter = " + SUBNET_FILTER +
-            "\n  dm4.security.new_accounts_are_enabled = " + NEW_ACCOUNTS_ARE_ENABLED);
+            "\n  dmx.security.anonymous_read_allowed = " + accessFilter.dumpReadSetting() +
+            "\n  dmx.security.anonymous_write_allowed = " + accessFilter.dumpWriteSetting() +
+            "\n  dmx.security.subnet_filter = " + SUBNET_FILTER +
+            "\n  dmx.security.new_accounts_are_enabled = " + NEW_ACCOUNTS_ARE_ENABLED);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -204,14 +204,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getUsername() {
-        return dm4.getAccessControl().getUsername(request);
+        return dmx.getAccessControl().getUsername(request);
     }
 
     @GET
     @Path("/username")
     @Override
     public Topic getUsernameTopic() {
-        return dm4.getAccessControl().getUsernameTopic(request);
+        return dmx.getAccessControl().getUsernameTopic(request);
     }
 
     // ---
@@ -224,7 +224,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         if (username == null) {
             throw new IllegalStateException("No user is logged in");
         }
-        return dm4.getAccessControl().getPrivateWorkspace(username);
+        return dmx.getAccessControl().getPrivateWorkspace(username);
     }
 
 
@@ -238,7 +238,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public Topic createUserAccount(final Credentials cred) {
         try {
             String username = cred.username;
-            AccessControl ac = dm4.getAccessControl();
+            AccessControl ac = dmx.getAccessControl();
             logger.info("Creating user account \"" + username + "\"");
             //
             // 1) create username topic
@@ -250,15 +250,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             Topic userAccount = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dm4.createTopic(mf.newTopicModel("dm4.accesscontrol.user_account", mf.newChildTopicsModel()
-                        .putRef("dm4.accesscontrol.username", usernameTopic.getId())
-                        .put("dm4.accesscontrol.password", cred.password)));
+                    return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.user_account", mf.newChildTopicsModel()
+                        .putRef("dmx.accesscontrol.username", usernameTopic.getId())
+                        .put("dmx.accesscontrol.password", cred.password)));
                 }
             });
             // 3) assign user account and password to private workspace
             // Note: the current user has no READ access to the private workspace just created.
             // So we must use the privileged assignToWorkspace calls here (instead of using the Workspaces service).
-            Topic passwordTopic = userAccount.getChildTopics().getTopic("dm4.accesscontrol.password");
+            Topic passwordTopic = userAccount.getChildTopics().getTopic("dmx.accesscontrol.password");
             long privateWorkspaceId = ac.getPrivateWorkspace(username).getId();
             ac.assignToWorkspace(userAccount, privateWorkspaceId);
             ac.assignToWorkspace(passwordTopic, privateWorkspaceId);
@@ -273,7 +273,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public Topic createUsername(final String username) {
         try {
             logger.info("Creating username topic \"" + username + "\"");
-            AccessControl ac = dm4.getAccessControl();
+            AccessControl ac = dmx.getAccessControl();
             //
             // 1) create username topic
             // We suppress standard workspace assignment here as a username topic require special assignment.
@@ -281,7 +281,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             Topic usernameTopic = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
-                    return dm4.createTopic(mf.newTopicModel("dm4.accesscontrol.username", new SimpleValue(username)));
+                    return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.username", new SimpleValue(username)));
                 }
             });
             // 2) create private workspace
@@ -309,7 +309,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/username/{username}")
     @Override
     public Topic getUsernameTopic(@PathParam("username") String username) {
-        return dm4.getAccessControl().getUsernameTopic(username);
+        return dmx.getAccessControl().getUsernameTopic(username);
     }
 
 
@@ -322,7 +322,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public String getWorkspaceOwner(@PathParam("workspace_id") long workspaceId) {
         // ### TODO: delegate to Core's AccessControl.getOwner()?
-        return dm4.hasProperty(workspaceId, PROP_OWNER) ? (String) dm4.getProperty(workspaceId, PROP_OWNER) : null;
+        return dmx.hasProperty(workspaceId, PROP_OWNER) ? (String) dmx.getProperty(workspaceId, PROP_OWNER) : null;
     }
 
     @Override
@@ -343,9 +343,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void createMembership(@PathParam("username") String username, @PathParam("workspace_id") long workspaceId) {
         try {
-            Association assoc = dm4.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
-                mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dm4.core.default"),
-                mf.newTopicRoleModel(workspaceId, "dm4.core.default")
+            Association assoc = dmx.createAssociation(mf.newAssociationModel(MEMBERSHIP_TYPE,
+                mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
+                mf.newTopicRoleModel(workspaceId, "dmx.core.default")
             ));
             assignMembership(assoc);
         } catch (Exception e) {
@@ -356,7 +356,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public boolean isMember(String username, long workspaceId) {
-        return dm4.getAccessControl().isMember(username, workspaceId);
+        return dmx.getAccessControl().isMember(username, workspaceId);
     }
 
 
@@ -386,7 +386,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getCreator(@PathParam("id") long objectId) {
-        return dm4.getAccessControl().getCreator(objectId);
+        return dmx.getAccessControl().getCreator(objectId);
     }
 
     @GET
@@ -394,7 +394,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Produces("text/plain")
     @Override
     public String getModifier(@PathParam("id") long objectId) {
-        return dm4.hasProperty(objectId, PROP_MODIFIER) ? (String) dm4.getProperty(objectId, PROP_MODIFIER) : null;
+        return dmx.hasProperty(objectId, PROP_MODIFIER) ? (String) dmx.getProperty(objectId, PROP_MODIFIER) : null;
     }
 
 
@@ -405,28 +405,28 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Path("/creator/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByCreator(@PathParam("username") String username) {
-        return dm4.getTopicsByProperty(PROP_CREATOR, username);
+        return dmx.getTopicsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/topics")
     @Override
     public Collection<Topic> getTopicsByOwner(@PathParam("username") String username) {
-        return dm4.getTopicsByProperty(PROP_OWNER, username);
+        return dmx.getTopicsByProperty(PROP_OWNER, username);
     }
 
     @GET
     @Path("/creator/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByCreator(@PathParam("username") String username) {
-        return dm4.getAssociationsByProperty(PROP_CREATOR, username);
+        return dmx.getAssociationsByProperty(PROP_CREATOR, username);
     }
 
     @GET
     @Path("/owner/{username}/assocs")
     @Override
     public Collection<Association> getAssociationsByOwner(@PathParam("username") String username) {
-        return dm4.getAssociationsByProperty(PROP_OWNER, username);
+        return dmx.getAssociationsByProperty(PROP_OWNER, username);
     }
 
 
@@ -464,7 +464,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
-            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
+            ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
             mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(NEW_ACCOUNTS_ARE_ENABLED)),
             ConfigModificationRole.ADMIN, this
         ));
@@ -493,10 +493,10 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public TopicModel getConfigValue(Topic topic) {
-        if (!topic.getTypeUri().equals("dm4.accesscontrol.username")) {
+        if (!topic.getTypeUri().equals("dmx.accesscontrol.username")) {
             throw new RuntimeException("Unexpected configurable topic: " + topic);
         }
-        // the "admin" account must be enabled regardless of the "dm4.security.new_accounts_are_enabled" setting
+        // the "admin" account must be enabled regardless of the "dmx.security.new_accounts_are_enabled" setting
         if (topic.getSimpleValue().toString().equals(ADMIN_USERNAME)) {
             return mf.newTopicModel(LOGIN_ENABLED_TYPE, new SimpleValue(true));
         }
@@ -528,7 +528,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkAssociationReadAccess(long assocId) {
         checkReadAccess(assocId);
         //
-        long[] playerIds = dm4.getPlayerIds(assocId);
+        long[] playerIds = dmx.getPlayerIds(assocId);
         checkReadAccess(playerIds[0]);
         checkReadAccess(playerIds[1]);
     }
@@ -542,7 +542,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preCreateTopic(TopicModel model) {
-        if (model.getTypeUri().equals("dm4.accesscontrol.username")) {
+        if (model.getTypeUri().equals("dmx.accesscontrol.username")) {
             String username = model.getSimpleValue().toString();
             Topic usernameTopic = getUsernameTopic(username);
             if (usernameTopic != null) {
@@ -554,9 +554,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postCreateTopic(Topic topic) {
         String typeUri = topic.getTypeUri();
-        if (typeUri.equals("dm4.workspaces.workspace")) {
+        if (typeUri.equals("dmx.workspaces.workspace")) {
             setWorkspaceOwner(topic);
-        } else if (typeUri.equals("dm4.webclient.search")) {
+        } else if (typeUri.equals("dmx.webclient.search")) {
             // ### TODO: refactoring. The Access Control module must not know about the Webclient.
             // Let the Webclient do the workspace assignment instead.
             assignSearchTopic(topic);
@@ -574,7 +574,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void preUpdateTopic(Topic topic, TopicModel updateModel) {
-        if (topic.getTypeUri().equals("dm4.accesscontrol.username")) {
+        if (topic.getTypeUri().equals("dmx.accesscontrol.username")) {
             SimpleValue newUsername = updateModel.getSimpleValue();
             String oldUsername = topic.getSimpleValue().toString();
             if (newUsername != null && !newUsername.toString().equals(oldUsername)) {
@@ -650,7 +650,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     private void assignMembership(Association assoc) {
-        wsService.assignToWorkspace(assoc, assoc.getTopicByType("dm4.workspaces.workspace").getId());
+        wsService.assignToWorkspace(assoc, assoc.getTopicByType("dmx.workspaces.workspace").getId());
     }
 
     private void assignSearchTopic(Topic searchTopic) {
@@ -671,7 +671,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private long getOccupiedSpace(String username) {
         long occupiedSpace = 0;
-        for (Topic fileTopic : dm4.getTopicsByType("dm4.files.file")) {
+        for (Topic fileTopic : dmx.getTopicsByType("dmx.files.file")) {
             long fileTopicId = fileTopic.getId();
             if (getCreator(fileTopicId).equals(username)) {
                 occupiedSpace += filesService.getFile(fileTopicId).length();
@@ -704,7 +704,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         String remoteAddr = request.getRemoteAddr();
         boolean allowed = JavaUtils.isInRange(remoteAddr, SUBNET_FILTER);
         //
-        logger.fine("Remote address=\"" + remoteAddr + "\", dm4.security.subnet_filter=\"" + SUBNET_FILTER +
+        logger.fine("Remote address=\"" + remoteAddr + "\", dmx.security.subnet_filter=\"" + SUBNET_FILTER +
             "\" => " + (allowed ? "ALLOWED" : "FORBIDDEN"));
         //
         if (!allowed) {
@@ -771,14 +771,14 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private Topic checkCredentials(Credentials cred, AuthorizationMethod am) {
         if (am == null) {
-            return dm4.getAccessControl().checkCredentials(cred);
+            return dmx.getAccessControl().checkCredentials(cred);
         } else {
             return am.checkCredentials(cred);
         }
     }
 
     private boolean getLoginEnabled(Topic usernameTopic) {
-        Topic loginEnabled = dm4.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
+        Topic loginEnabled = dmx.getAccessControl().getConfigTopic(LOGIN_ENABLED_TYPE, usernameTopic.getId());
         return loginEnabled.getSimpleValue().booleanValue();
     }
 
@@ -786,7 +786,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private void _login(String username, HttpServletRequest request) {
         request.getSession(false).setAttribute("username", username);   // create=false
-        dm4.fireEvent(POST_LOGIN_USER, username);
+        dmx.fireEvent(POST_LOGIN_USER, username);
     }
 
     private void _logout(HttpServletRequest request) {
@@ -795,13 +795,13 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         logger.info("##### Logging out from " + info(session));
         // Note: the session is not invalidated. Just the "username" attribute is removed.
         session.removeAttribute("username");
-        dm4.fireEvent(POST_LOGOUT_USER, username);
+        dmx.fireEvent(POST_LOGOUT_USER, username);
     }
 
     // ---
 
     private String username(HttpSession session) {
-        return dm4.getAccessControl().username(session);
+        return dmx.getAccessControl().username(session);
     }
 
     // ---
@@ -957,7 +957,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
      * @return  <code>true</code> if permission is granted, <code>false</code> otherwise.
      */
     private boolean hasPermission(String username, Operation operation, long objectId) {
-        return dm4.getAccessControl().hasPermission(username, operation, objectId);
+        return dmx.getAccessControl().hasPermission(username, operation, objectId);
     }
 
     private boolean inRequestScope() {

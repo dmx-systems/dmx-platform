@@ -122,7 +122,7 @@ public class PluginActivator implements BundleActivator, PluginContext {
     @Override
     public final void setCoreService(CoreService dm4) {
         this.dm4 = dm4;
-        this.mf = dm4 != null ? dm4.getModelFactory() : null;
+        this.mf = dm4 != null ? dmx.getModelFactory() : null;
     }
 
 

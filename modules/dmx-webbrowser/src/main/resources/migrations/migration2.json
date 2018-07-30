@@ -2,22 +2,22 @@
     "topic_types": [
         {
             "value": "Webpage",
-            "uri": "dm4.webbrowser.webpage",
-            "dataTypeUri": "dm4.core.identity",
+            "uri": "dmx.webbrowser.webpage",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dm4.webbrowser.url",
-                    "childCardinalityUri":  "dm4.core.one",
-                    "parentCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":         "dm4.core.aggregation_def"
+                    "childTypeUri":         "dmx.webbrowser.url",
+                    "childCardinalityUri":  "dmx.core.one",
+                    "parentCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":         "dmx.core.aggregation_def"
                 }
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.locked": true,
-                        "dm4.webclient.page_renderer_uri": "dm4.webbrowser.webpage_renderer"
+                        "dmx.webclient.locked": true,
+                        "dmx.webclient.page_renderer_uri": "dmx.webbrowser.webpage_renderer"
                     }
                 }
             ]

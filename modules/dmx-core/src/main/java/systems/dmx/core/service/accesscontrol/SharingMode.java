@@ -7,12 +7,12 @@ import java.util.Map;
 
 public enum SharingMode {
 
-    // ### TODO: move to dm4.core namespace?
-    PRIVATE("dm4.workspaces.private"),
-    CONFIDENTIAL("dm4.workspaces.confidential"),
-    COLLABORATIVE("dm4.workspaces.collaborative"),
-    PUBLIC("dm4.workspaces.public"),
-    COMMON("dm4.workspaces.common");
+    // ### TODO: move to dmx.core namespace?
+    PRIVATE("dmx.workspaces.private"),
+    CONFIDENTIAL("dmx.workspaces.confidential"),
+    COLLABORATIVE("dmx.workspaces.collaborative"),
+    PUBLIC("dmx.workspaces.public"),
+    COMMON("dmx.workspaces.common");
 
     // ------------------------------------------------------------------------------------------------- Class Variables
 

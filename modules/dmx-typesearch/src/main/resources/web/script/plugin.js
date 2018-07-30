@@ -3,7 +3,7 @@
  */
 dm4c.add_plugin("systems.dmx.typesearch", function() {
 
-    var SEARCHMODE_URI = "dm4.typesearch.by_type"
+    var SEARCHMODE_URI = "dmx.typesearch.by_type"
 
     var type_menu
 
@@ -35,7 +35,7 @@ dm4c.add_plugin("systems.dmx.typesearch", function() {
      * Refresh the type menu once a topic type is created.
      */
     dm4c.add_listener("post_create_topic", function(topic) {
-        if (topic.type_uri == "dm4.core.topic_type") {
+        if (topic.type_uri == "dmx.core.topic_type") {
             refresh_type_menu()
         }
     })
@@ -44,7 +44,7 @@ dm4c.add_plugin("systems.dmx.typesearch", function() {
      * Refresh the type menu once a topic type is updated.
      */
     dm4c.add_listener("post_update_topic", function(topic) {
-        if (topic.type_uri == "dm4.core.topic_type") {
+        if (topic.type_uri == "dmx.core.topic_type") {
             refresh_type_menu()
         }
     })

@@ -572,13 +572,13 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(String uri, String value, String dataTypeUri) {
-        return new TopicTypeModelImpl(newTypeModel(uri, "dm4.core.topic_type", new SimpleValue(value), dataTypeUri));
+        return new TopicTypeModelImpl(newTypeModel(uri, "dmx.core.topic_type", new SimpleValue(value), dataTypeUri));
     }
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(JSONObject topicType) {
         try {
-            return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", "dm4.core.topic_type")));
+            return new TopicTypeModelImpl(newTypeModel(topicType.put("typeUri", "dmx.core.topic_type")));
         } catch (Exception e) {
             throw parsingFailed(topicType, e, "TopicTypeModelImpl");
         }
@@ -598,14 +598,14 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(String uri, String value, String dataTypeUri) {
-        return new AssociationTypeModelImpl(newTypeModel(uri, "dm4.core.assoc_type", new SimpleValue(value),
+        return new AssociationTypeModelImpl(newTypeModel(uri, "dmx.core.assoc_type", new SimpleValue(value),
             dataTypeUri));
     }
 
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(JSONObject assocType) {
         try {
-            return new AssociationTypeModelImpl(newTypeModel(assocType.put("typeUri", "dm4.core.assoc_type")));
+            return new AssociationTypeModelImpl(newTypeModel(assocType.put("typeUri", "dmx.core.assoc_type")));
         } catch (Exception e) {
             throw parsingFailed(assocType, e, "AssociationTypeModelImpl");
         }
@@ -717,12 +717,12 @@ public class ModelFactoryImpl implements ModelFactory {
                 null, childTopics(assocDef)
             );
             //
-            if (!assocDef.has("parentCardinalityUri") && !assoc.getTypeUri().equals("dm4.core.composition_def")) {
+            if (!assocDef.has("parentCardinalityUri") && !assoc.getTypeUri().equals("dmx.core.composition_def")) {
                 throw new RuntimeException("\"parentCardinalityUri\" is missing");
             }
             //
             return new AssociationDefinitionModelImpl(assoc,
-                assocDef.optString("parentCardinalityUri", "dm4.core.one"),
+                assocDef.optString("parentCardinalityUri", "dmx.core.one"),
                 assocDef.getString("childCardinalityUri"),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
@@ -759,11 +759,11 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---
 
     private TopicRoleModel parentRole(String parentTypeUri) {
-        return newTopicRoleModel(parentTypeUri, "dm4.core.parent_type");
+        return newTopicRoleModel(parentTypeUri, "dmx.core.parent_type");
     }
 
     private TopicRoleModel childRole(String childTypeUri) {
-        return newTopicRoleModel(childTypeUri, "dm4.core.child_type");
+        return newTopicRoleModel(childTypeUri, "dmx.core.child_type");
     }
 
     // ---
@@ -779,15 +779,15 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private ChildTopicsModel childTopics(String customAssocTypeUri, boolean isIdentityAttr, boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
-            .put("dm4.core.identity_attr", isIdentityAttr)
-            .put("dm4.core.include_in_label", includeInLabel);
+            .put("dmx.core.identity_attr", isIdentityAttr)
+            .put("dmx.core.include_in_label", includeInLabel);
         //
         if (customAssocTypeUri != null) {
             if (customAssocTypeUri.startsWith(DEL_URI_PREFIX)) {
-                childTopics.putDeletionRef("dm4.core.assoc_type#dm4.core.custom_assoc_type",
+                childTopics.putDeletionRef("dmx.core.assoc_type#dmx.core.custom_assoc_type",
                     delTopicUri(customAssocTypeUri));
             } else {
-                childTopics.putRef("dm4.core.assoc_type#dm4.core.custom_assoc_type", customAssocTypeUri);
+                childTopics.putRef("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocTypeUri);
             }
         }
         //

@@ -1,4 +1,4 @@
-dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
+dm4c.add_simple_renderer("dmx.files.file_content_renderer", {
 
     render_info: function(page_model, parent_element) {
         render_content()
@@ -7,8 +7,8 @@ dm4c.add_simple_renderer("dm4.files.file_content_renderer", {
 
         function render_content() {
             try {
-                var path       = page_model.parent.object.get("dm4.files.path")
-                var media_type = page_model.parent.object.get("dm4.files.media_type")
+                var path       = page_model.parent.object.get("dmx.files.path")
+                var media_type = page_model.parent.object.get("dmx.files.media_type")
                 // Note: for embedded files (e.g. in a Person) the File topic might be empty
                 if (!path) {
                     return

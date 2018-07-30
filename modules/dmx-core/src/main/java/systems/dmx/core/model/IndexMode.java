@@ -11,7 +11,7 @@ public enum IndexMode {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static final String INDEX_MODES_NAMESPACE = "dm4.core.";
+    private static final String INDEX_MODES_NAMESPACE = "dmx.core.";
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 

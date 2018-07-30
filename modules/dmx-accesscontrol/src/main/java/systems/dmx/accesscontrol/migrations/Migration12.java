@@ -58,20 +58,20 @@ public class Migration12 extends Migration {
         // workspace remain undefined as the Administration workspace is actually created by the system itself.
         //
         // 2) reassign existing "Login enabled" and "Disk Quota" config topics
-        administrationWorkspaceId = dm4.getAccessControl().getAdministrationWorkspaceId();
-        assignConfigTopics("dm4.accesscontrol.login_enabled");
-        assignConfigTopics("dm4.files.disk_quota");
+        administrationWorkspaceId = dmx.getAccessControl().getAdministrationWorkspaceId();
+        assignConfigTopics("dmx.accesscontrol.login_enabled");
+        assignConfigTopics("dmx.files.disk_quota");
         // Note: the "Disk Quota" config topics are reassigned to the Administration workspace which is created
         // only here. The "Disk Quota" config type belongs to the Files plugin and the reassignment is supposed
         // to be performed by a Files migration. But the Files migrations run *before* the Access Control migrations
         // (as the Access Control plugin depends indirectly on the Files plugin).
         //
         // 3) create "Enabled Sharing Modes" config topics
-        List<Topic> usernames = dm4.getTopicsByType("dm4.accesscontrol.username");
-        logger.info("########## Creating config topics of type \"dm4.workspaces.enabled_sharing_modes\" for " +
+        List<Topic> usernames = dmx.getTopicsByType("dmx.accesscontrol.username");
+        logger.info("########## Creating config topics of type \"dmx.workspaces.enabled_sharing_modes\" for " +
             usernames.size() + " usernames");
         for (Topic username : usernames) {
-            configService.createConfigTopic("dm4.workspaces.enabled_sharing_modes", username);
+            configService.createConfigTopic("dmx.workspaces.enabled_sharing_modes", username);
         }
         // Note: the "Enabled Sharing Modes" config topics are assigned to the Administration workspace which is
         // created only here. The "Enabled Sharing Modes" config type belongs to the Workspaces plugin and the
@@ -82,7 +82,7 @@ public class Migration12 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void assignConfigTopics(String configTypeUri) {
-        List<Topic> configTopics = dm4.getTopicsByType(configTypeUri);
+        List<Topic> configTopics = dmx.getTopicsByType(configTypeUri);
         logger.info("########## Reassigning " + configTopics.size() + " config topics of type \"" + configTypeUri +
             "\" to workspace \"Administration\"");
         for (Topic configTopic : configTopics) {

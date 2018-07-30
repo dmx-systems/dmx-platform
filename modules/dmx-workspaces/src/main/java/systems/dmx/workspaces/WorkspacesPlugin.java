@@ -60,15 +60,15 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ------------------------------------------------------------------------------------------------------- Constants
 
     private static final boolean SHARING_MODE_PRIVATE_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.workspaces.private.enabled", "true"));
+        System.getProperty("dmx.workspaces.private.enabled", "true"));
     private static final boolean SHARING_MODE_CONFIDENTIAL_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.workspaces.confidential.enabled", "true"));
+        System.getProperty("dmx.workspaces.confidential.enabled", "true"));
     private static final boolean SHARING_MODE_COLLABORATIVE_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.workspaces.collaborative.enabled", "true"));
+        System.getProperty("dmx.workspaces.collaborative.enabled", "true"));
     private static final boolean SHARING_MODE_PUBLIC_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.workspaces.public.enabled", "true"));
+        System.getProperty("dmx.workspaces.public.enabled", "true"));
     private static final boolean SHARING_MODE_COMMON_ENABLED = Boolean.parseBoolean(
-        System.getProperty("dm4.workspaces.common.enabled", "true"));
+        System.getProperty("dmx.workspaces.common.enabled", "true"));
     // Note: the default values are required in case no config file is in effect. This applies when DM is started
     // via feature:install from Karaf. The default values must match the values defined in project POM.
 
@@ -110,16 +110,16 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // We suppress standard workspace assignment here as 1) a workspace itself gets no assignment at all,
             // and 2) the workspace's default topicmap requires a special assignment. See step 2) below.
-            Topic workspace = dm4.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            Topic workspace = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     logger.info(operation + info);
                     //
                     // 1) create workspace
-                    Topic workspace = dm4.createTopic(
-                        mf.newTopicModel(uri, "dm4.workspaces.workspace", mf.newChildTopicsModel()
-                            .put("dm4.workspaces.name", name)
-                            .putRef("dm4.workspaces.sharing_mode", sharingMode.getUri())));
+                    Topic workspace = dmx.createTopic(
+                        mf.newTopicModel(uri, "dmx.workspaces.workspace", mf.newChildTopicsModel()
+                            .put("dmx.workspaces.name", name)
+                            .putRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
                     Topic topicmap = topicmapsService.createTopicmap(
@@ -129,7 +129,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
                     // So we must use the privileged assignToWorkspace() call here. This is to support the
                     // "DM4 Sign-up" 3rd-party plugin.
-                    dm4.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
+                    dmx.getAccessControl().assignToWorkspace(topicmap, workspace.getId());
                     //
                     return workspace;
                 }
@@ -148,7 +148,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{uri}")
     @Override
     public Topic getWorkspace(@PathParam("uri") String uri) {
-        return dm4.getAccessControl().getWorkspace(uri);
+        return dmx.getAccessControl().getWorkspace(uri);
     }
 
     // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
@@ -160,7 +160,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (workspaceId == -1) {
             return null;
         }
-        return dm4.getTopic(workspaceId);
+        return dmx.getTopic(workspaceId);
     }
 
     // ---
@@ -173,7 +173,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                                                 @PathParam("workspace_id") long workspaceId) {
         try {
             checkWorkspaceId(workspaceId);
-            _assignToWorkspace(dm4.getObject(objectId), workspaceId);
+            _assignToWorkspace(dmx.getObject(objectId), workspaceId);
             return new DirectivesResponse();
         } catch (Exception e) {
             throw new RuntimeException("Assigning object " + objectId + " to workspace " + workspaceId + " failed", e);
@@ -219,7 +219,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{id}/topics")
     @Override
     public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId) {
-        return dm4.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
+        return dmx.getTopicsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
     // Note: the "include_childs" query paramter is handled by core's JerseyResponseFilter
@@ -227,7 +227,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Path("/{id}/assocs")
     @Override
     public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId) {
-        return dm4.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
+        return dmx.getAssociationsByProperty(PROP_WORKSPACE_ID, workspaceId);
     }
 
     // ---
@@ -238,7 +238,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public List<Topic> getAssignedTopics(@PathParam("id") long workspaceId,
                                          @PathParam("topic_type_uri") String topicTypeUri) {
-        List<Topic> topics = dm4.getTopicsByType(topicTypeUri);
+        List<Topic> topics = dmx.getTopicsByType(topicTypeUri);
         applyWorkspaceFilter(topics.iterator(), workspaceId);
         return topics;
     }
@@ -249,7 +249,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public List<Association> getAssignedAssociations(@PathParam("id") long workspaceId,
                                                      @PathParam("assoc_type_uri") String assocTypeUri) {
-        List<Association> assocs = dm4.getAssociationsByType(assocTypeUri);
+        List<Association> assocs = dmx.getAssociationsByType(assocTypeUri);
         applyWorkspaceFilter(assocs.iterator(), workspaceId);
         return assocs;
     }
@@ -265,13 +265,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     @Override
     public void preInstall() {
         configService.registerConfigDefinition(new ConfigDefinition(
-            ConfigTarget.TYPE_INSTANCES, "dm4.accesscontrol.username",
-            mf.newTopicModel("dm4.workspaces.enabled_sharing_modes", mf.newChildTopicsModel()
-                .put("dm4.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
-                .put("dm4.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
-                .put("dm4.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
-                .put("dm4.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
-                .put("dm4.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
+            ConfigTarget.TYPE_INSTANCES, "dmx.accesscontrol.username",
+            mf.newTopicModel("dmx.workspaces.enabled_sharing_modes", mf.newChildTopicsModel()
+                .put("dmx.workspaces.private.enabled",       SHARING_MODE_PRIVATE_ENABLED)
+                .put("dmx.workspaces.confidential.enabled",  SHARING_MODE_CONFIDENTIAL_ENABLED)
+                .put("dmx.workspaces.collaborative.enabled", SHARING_MODE_COLLABORATIVE_ENABLED)
+                .put("dmx.workspaces.public.enabled",        SHARING_MODE_PUBLIC_ENABLED)
+                .put("dmx.workspaces.common.enabled",        SHARING_MODE_COMMON_ENABLED)
             ),
             ConfigModificationRole.ADMIN
         ));
@@ -284,7 +284,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note 2: we must check if the Config service is still available. If the Config plugin is redeployed the
         // Workspaces plugin is stopped/started as well but at shutdown() time the Config service is already gone.
         if (configService != null) {
-            configService.unregisterConfigDefinition("dm4.workspaces.enabled_sharing_modes");
+            configService.unregisterConfigDefinition("dmx.workspaces.enabled_sharing_modes");
         } else {
             logger.warning("Config service is already gone");
         }
@@ -307,7 +307,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      *     - The type is not a DMX standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).
      *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DMX standard
-     *       type if its URI begins with "dm4."
+     *       type if its URI begins with "dmx."
      */
     @Override
     public void introduceTopicType(TopicType topicType) {
@@ -328,7 +328,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      *     - The type is not a DMX standard type. In this case the 3rd-party plugin developer is responsible
      *       for doing the workspace assignment (in case the type is created programmatically while a migration).
      *       DM can't know to which workspace a 3rd-party type belongs to. A type is regarded a DMX standard
-     *       type if its URI begins with "dm4."
+     *       type if its URI begins with "dmx."
      */
     @Override
     public void introduceAssociationType(AssociationType assocType) {
@@ -405,7 +405,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      */
     @Override
     public void preDeleteTopic(Topic topic) {
-        if (topic.getTypeUri().equals("dm4.workspaces.workspace")) {
+        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
             long workspaceId = topic.getId();
             deleteWorkspaceContent(workspaceId);
         }
@@ -433,13 +433,13 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // ---
 
     private long getAssignedWorkspaceId(long objectId) {
-        return dm4.getAccessControl().getAssignedWorkspaceId(objectId);
+        return dmx.getAccessControl().getAssignedWorkspaceId(objectId);
     }
 
     private void _assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
-        facetsService.updateFacet(object, "dm4.workspaces.workspace_facet",
-            mf.newFacetValueModel("dm4.workspaces.workspace").putRef(workspaceId));
+        facetsService.updateFacet(object, "dmx.workspaces.workspace_facet",
+            mf.newFacetValueModel("dmx.workspaces.workspace").putRef(workspaceId));
         // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
         //
         // 2) store assignment property
@@ -452,19 +452,19 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         try {
             // 1) delete instances by type
             // Note: also instances assigned to other workspaces must be deleted
-            for (Topic topicType : getAssignedTopics(workspaceId, "dm4.core.topic_type")) {
+            for (Topic topicType : getAssignedTopics(workspaceId, "dmx.core.topic_type")) {
                 String typeUri = topicType.getUri();
-                for (Topic topic : dm4.getTopicsByType(typeUri)) {
+                for (Topic topic : dmx.getTopicsByType(typeUri)) {
                     topic.delete();
                 }
-                dm4.getTopicType(typeUri).delete();
+                dmx.getTopicType(typeUri).delete();
             }
-            for (Topic assocType : getAssignedTopics(workspaceId, "dm4.core.assoc_type")) {
+            for (Topic assocType : getAssignedTopics(workspaceId, "dmx.core.assoc_type")) {
                 String typeUri = assocType.getUri();
-                for (Association assoc : dm4.getAssociationsByType(typeUri)) {
+                for (Association assoc : dmx.getAssociationsByType(typeUri)) {
                     assoc.delete();
                 }
-                dm4.getAssociationType(typeUri).delete();
+                dmx.getAssociationType(typeUri).delete();
             }
             // 2) delete remaining instances
             for (Topic topic : getAssignedTopics(workspaceId)) {
@@ -481,17 +481,17 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     // --- Helper ---
 
     private boolean isDMXStandardType(DMXType type) {
-        return type.getUri().startsWith("dm4.");
+        return type.getUri().startsWith("dmx.");
     }
 
     private boolean isWorkspaceDescription(Topic topic) {
-        return topic.getTypeUri().equals("dm4.workspaces.description");
+        return topic.getTypeUri().equals("dmx.workspaces.description");
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
         // Note: the current user might have no READ permission for the potential workspace.
         // This is the case e.g. when a newly created User Account is assigned to the new user's private workspace.
-        return dm4.getAccessControl().isWorkspaceAssignment(assoc);
+        return dmx.getAccessControl().isWorkspaceAssignment(assoc);
     }
 
     // ---
@@ -518,8 +518,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * ### TODO: principle copy in AccessControlImpl.checkWorkspaceId()
      */
     private void checkWorkspaceId(long topicId) {
-        String typeUri = dm4.getTopic(topicId).getTypeUri();
-        if (!typeUri.equals("dm4.workspaces.workspace")) {
+        String typeUri = dmx.getTopic(topicId).getTypeUri();
+        if (!typeUri.equals("dmx.workspaces.workspace")) {
             throw new IllegalArgumentException("Topic " + topicId + " is not a workspace (but of type \"" + typeUri +
                 "\")");
         }
@@ -529,7 +529,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
      * Returns true if standard workspace assignment is currently suppressed for the current thread.
      */
     private boolean workspaceAssignmentIsSuppressed(DMXObject object) {
-        boolean suppressed = dm4.getAccessControl().workspaceAssignmentIsSuppressed();
+        boolean suppressed = dmx.getAccessControl().workspaceAssignmentIsSuppressed();
         if (suppressed) {
             logger.fine("Standard workspace assignment for " + info(object) + " SUPPRESSED");
         }
@@ -585,7 +585,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // ---
 
         private void messageToAllButOne(JSONObject message) {
-            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

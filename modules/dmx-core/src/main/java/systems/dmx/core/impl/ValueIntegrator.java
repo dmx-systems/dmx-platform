@@ -222,7 +222,7 @@ class ValueIntegrator {
             Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
             ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
             // Iterate through type, not through newValues.
-            // newValues might contain childs not contained in the type def, e.g. "dm4.time.modified".
+            // newValues might contain childs not contained in the type def, e.g. "dmx.time.modified".
             for (String assocDefUri : assocDefUris()) {
                 Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
                 if (isOne(assocDefUri)) {
@@ -587,7 +587,7 @@ class ValueIntegrator {
             throw new RuntimeException("Unification of cardinality \"many\" values not yet implemented");
         }
         return pl.getTopicRelatedTopics(childTopic.getId(), assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
-            "dm4.core.child", "dm4.core.parent", type.getUri());
+            "dmx.core.child", "dmx.core.parent", type.getUri());
     }
 
     /**
@@ -602,14 +602,14 @@ class ValueIntegrator {
             String assocTypeUri = assocDef.getInstanceLevelAssocTypeUri();
             if (childTopic != null) {
                 // TODO: assoc parents?
-                if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dm4.core.parent", "dm4.core.child")
+                if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dmx.core.parent", "dmx.core.child")
                         == null) {
                     // logger.info("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
                 // TODO: assoc parents?
-                if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dm4.core.parent", "dm4.core.child",
+                if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
                     // logger.info("### eliminate (childs exist)");
                     i.remove();
@@ -665,8 +665,8 @@ class ValueIntegrator {
         logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
             assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
-            parent.createRoleModel("dm4.core.parent"),
-            child.createRoleModel("dm4.core.child")
+            parent.createRoleModel("dmx.core.parent"),
+            child.createRoleModel("dmx.core.child")
         ).getModel();
     }
 
@@ -709,11 +709,11 @@ class ValueIntegrator {
     }
 
     private boolean isOne(String assocDefUri) {
-        return assocDef(assocDefUri).getChildCardinalityUri().equals("dm4.core.one");
+        return assocDef(assocDefUri).getChildCardinalityUri().equals("dmx.core.one");
     }
 
     private boolean isValueType() {
-        return type.getDataTypeUri().equals("dm4.core.value");
+        return type.getDataTypeUri().equals("dmx.core.value");
     }
 
     private boolean isEmptyValue(String assocDefUri) {

@@ -24,7 +24,7 @@ public class Migration5 extends Migration {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // Note: copy in WorkspacesPlugin.java
-    private static final String PROP_WORKSPACE_ID = "dm4.workspaces.workspace_id";
+    private static final String PROP_WORKSPACE_ID = "dmx.workspaces.workspace_id";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -40,10 +40,10 @@ public class Migration5 extends Migration {
         // 1) Initializes workspace properties
         //
         logger.info("########## Initializing workspace properties");
-        for (Topic topic : dm4.getAllTopics()) {
+        for (Topic topic : dmx.getAllTopics()) {
             initWorkspaceProperty(topic);
         }
-        for (Association assoc : dm4.getAllAssociations()) {
+        for (Association assoc : dmx.getAllAssociations()) {
             initWorkspaceProperty(assoc);
         }
         logger.info("########## Initializing workspace properties complete\n    Objects processed: " + objects +
@@ -51,21 +51,21 @@ public class Migration5 extends Migration {
         //
         // 2) Changes cardinality of the workspace facet to "one".
         //
-        dm4.getTopicType("dm4.workspaces.workspace_facet").getAssocDef("dm4.workspaces.workspace")
-            .setChildCardinalityUri("dm4.core.one");
+        dmx.getTopicType("dmx.workspaces.workspace_facet").getAssocDef("dmx.workspaces.workspace")
+            .setChildCardinalityUri("dmx.core.one");
         //
-        // 3) Corrects URI of the "DMX" workspace: "de." -> "dm4."
+        // 3) Corrects URI of the "DMX" workspace: "de." -> "dmx."
         //
-        dm4.getTopicByUri("de.workspaces.deepamehta").setUri("dm4.workspaces.deepamehta");
+        dmx.getTopicByUri("de.workspaces.deepamehta").setUri("dmx.workspaces.deepamehta");
         //
         // 4) Sets the sharing mode of all workspaces to "Public".
         //
-        for (Topic workspace : dm4.getTopicsByType("dm4.workspaces.workspace")) {
+        for (Topic workspace : dmx.getTopicsByType("dmx.workspaces.workspace")) {
             workspace.update(mf.newTopicModel(mf.newChildTopicsModel()
-                .putRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
+                .putRef("dmx.workspaces.sharing_mode", "dmx.workspaces.public")
             ));
             // Note: instead of calling update(...) on the entire topic object we could update the child selectively:
-            //     workspace.getChildTopics().setRef("dm4.workspaces.sharing_mode", "dm4.workspaces.public")
+            //     workspace.getChildTopics().setRef("dmx.workspaces.sharing_mode", "dmx.workspaces.public")
             // This would be much more concise. However in this case the topic will loose its label.
             // ### TODO: fix that error in the labeling mechanism. ### TODO: check if already fixed
         }
@@ -74,8 +74,8 @@ public class Migration5 extends Migration {
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void initWorkspaceProperty(DMXObject object) {
-        List<RelatedTopic> workspaces = object.getRelatedTopics("dm4.core.aggregation", "dm4.core.parent",
-            "dm4.core.child", "dm4.workspaces.workspace");
+        List<RelatedTopic> workspaces = object.getRelatedTopics("dmx.core.aggregation", "dmx.core.parent",
+            "dmx.core.child", "dmx.workspaces.workspace");
         objects++;
         switch (workspaces.size()) {
         case 0:
@@ -99,9 +99,9 @@ public class Migration5 extends Migration {
 
     private boolean isUserAccountRelated(DMXObject object) {
         String typeUri = object.getTypeUri();
-        return typeUri.equals("dm4.accesscontrol.user_account") ||
-            typeUri.equals("dm4.accesscontrol.username") ||
-            typeUri.equals("dm4.accesscontrol.password");
+        return typeUri.equals("dmx.accesscontrol.user_account") ||
+            typeUri.equals("dmx.accesscontrol.username") ||
+            typeUri.equals("dmx.accesscontrol.password");
     }
 
     // ---

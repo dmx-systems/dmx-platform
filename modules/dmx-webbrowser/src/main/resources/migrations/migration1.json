@@ -2,40 +2,40 @@
     "topic_types": [
         {
             "value": "URL",
-            "uri": "dm4.webbrowser.url",
-            "dataTypeUri": "dm4.core.text",
-            "indexModeUris": ["dm4.core.fulltext", "dm4.core.key"]
+            "uri": "dmx.webbrowser.url",
+            "dataTypeUri": "dmx.core.text",
+            "indexModeUris": ["dmx.core.fulltext", "dmx.core.key"]
             // TODO: index
         },
         {
             "value": "Description",
-            "uri": "dm4.webbrowser.web_resource_description",
-            "dataTypeUri": "dm4.core.html",
-            "indexModeUris": ["dm4.core.fulltext"]
+            "uri": "dmx.webbrowser.web_resource_description",
+            "dataTypeUri": "dmx.core.html",
+            "indexModeUris": ["dmx.core.fulltext"]
         },
         {
             "value": "Web Resource",
-            "uri": "dm4.webbrowser.web_resource",
-            "dataTypeUri": "dm4.core.identity",
+            "uri": "dmx.webbrowser.web_resource",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.webbrowser.url",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.webbrowser.url",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 },
                 {
-                    "childTypeUri":        "dm4.webbrowser.web_resource_description",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def"
+                    "childTypeUri":        "dmx.webbrowser.web_resource_description",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def"
                 }
             ],
             "viewConfigTopics": [
                 {
-                    "typeUri": "dm4.webclient.view_config",
+                    "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dm4.webclient.icon": "\uf08e",
-                        "dm4.webclient.show_in_create_menu": true,
-                        "dm4.webclient.searchable_as_unit": true
+                        "dmx.webclient.icon": "\uf08e",
+                        "dmx.webclient.show_in_create_menu": true,
+                        "dmx.webclient.searchable_as_unit": true
                     }
                 }
             ]

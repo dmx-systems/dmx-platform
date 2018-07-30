@@ -52,11 +52,11 @@
             <id>hot-deploy</id>
             <activation>
                 <property>
-                    <name>!dm4.deploy.disable</name>
+                    <name>!dmx.deploy.disable</name>
                 </property>
             </activation>
             <properties>
-                <dm4.deploy.dir>../../bundle-deploy</dm4.deploy.dir>
+                <dmx.deploy.dir>../../bundle-deploy</dmx.deploy.dir>
             </properties>
             <build>
                 <plugins>
@@ -67,7 +67,7 @@
                         <configuration>
                             <filesets>
                                 <fileset>
-                                    <directory>${dm4.deploy.dir}</directory>
+                                    <directory>${dmx.deploy.dir}</directory>
                                     <includes>
                                         <include>${project.artifactId}*.jar</include>
                                     </includes>
@@ -95,7 +95,7 @@
                                             </includes>
                                         </resource>
                                     </resources>
-                                    <outputDirectory>${dm4.deploy.dir}</outputDirectory>
+                                    <outputDirectory>${dmx.deploy.dir}</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>

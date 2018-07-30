@@ -28,13 +28,13 @@ public class Migration7 extends Migration {
         //
         // - Must repair the label config of the types ("comp def" and "aggr def") BEFORE the instances can be repaired
         // - Must repair "aggr def" BEFORE "comp def"
-        dm4.getAssociationType("dm4.core.aggregation_def").getAssocDef("dm4.core.assoc_type#dm4.core.custom_assoc_type")
-            .getChildTopics().set("dm4.core.include_in_label", false);
-        dm4.getAssociationType("dm4.core.composition_def").getAssocDef("dm4.core.assoc_type#dm4.core.custom_assoc_type")
-            .getChildTopics().set("dm4.core.include_in_label", false);
+        dmx.getAssociationType("dmx.core.aggregation_def").getAssocDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
+            .getChildTopics().set("dmx.core.include_in_label", false);
+        dmx.getAssociationType("dmx.core.composition_def").getAssocDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
+            .getChildTopics().set("dmx.core.include_in_label", false);
         //
-        process(dm4.getAssociationsByType("dm4.core.composition_def"), 0);
-        process(dm4.getAssociationsByType("dm4.core.aggregation_def"), 1);
+        process(dmx.getAssociationsByType("dmx.core.composition_def"), 0);
+        process(dmx.getAssociationsByType("dmx.core.aggregation_def"), 1);
         //
         logger.info("########## Repairing assoc defs with missing \"Include in Label\" topic complete\n    " +
             "Composition defs repaired: " + count[0][1] + "/" + count[0][0] + "\n    " +
@@ -44,9 +44,9 @@ public class Migration7 extends Migration {
     private void process(List<Association> assocs, int i) {
         for (Association assoc : assocs) {
             ChildTopics childs = assoc.getChildTopics();
-            Topic includeInLabel = childs.getTopicOrNull("dm4.core.include_in_label");
+            Topic includeInLabel = childs.getTopicOrNull("dmx.core.include_in_label");
             if (includeInLabel == null) {
-                childs.set("dm4.core.include_in_label", false);
+                childs.set("dmx.core.include_in_label", false);
                 count[i][1]++;
             }
             count[i][0]++;

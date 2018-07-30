@@ -55,6 +55,6 @@
             <artifactId>pax-web-jetty-bundle</artifactId>
             <version>3.2.6</version>
         </dependency-->
-        <!-- Note: when replacing Felix HTTP with Pax Web you must set dm4.webservice.path=/* -->
+        <!-- Note: when replacing Felix HTTP with Pax Web you must set dmx.webservice.path=/* -->
     </dependencies>
 </project>

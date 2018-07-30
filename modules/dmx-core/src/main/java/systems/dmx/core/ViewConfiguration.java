@@ -35,8 +35,8 @@ public interface ViewConfiguration {
      * Sets a single value of a certain config topic.
      * If no such config topic exists in this view config it is created.
      *
-     * @param   configTypeUri   The type URI of the config topic, e.g. "dm4.webclient.view_config"
-     * @param   childTypeUri    The child type URI of the config value to set, e.g. "dm4.webclient.icon"
+     * @param   configTypeUri   The type URI of the config topic, e.g. "dmx.webclient.view_config"
+     * @param   childTypeUri    The child type URI of the config value to set, e.g. "dmx.webclient.icon"
      * @param   value           The config value (String, Integer, Long, Double, or Boolean)
      */
     ViewConfiguration setConfigValue(String configTypeUri, String childTypeUri, Object value);

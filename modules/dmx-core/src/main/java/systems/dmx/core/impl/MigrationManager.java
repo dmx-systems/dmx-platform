@@ -40,7 +40,7 @@ class MigrationManager {
 
     MigrationManager(CoreServiceImpl dm4) {
         this.dm4 = dm4;
-        this.mf = dm4.mf;
+        this.mf = dmx.mf;
     }
 
     // ----------------------------------------------------------------------------------------- Package Private Methods
@@ -49,9 +49,9 @@ class MigrationManager {
      * Determines the migrations to be run for the specified plugin, and runs them.
      */
     void runPluginMigrations(PluginImpl plugin, boolean isCleanInstall) {
-        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dm4.core.plugin_migration_nr")
+        int installedModelVersion = plugin.getPluginTopic().getChildTopics().getTopic("dmx.core.plugin_migration_nr")
             .getSimpleValue().intValue();
-        int requiredModelVersion = Integer.parseInt(plugin.getConfigProperty("dm4.plugin.model_version", "0"));
+        int requiredModelVersion = Integer.parseInt(plugin.getConfigProperty("dmx.plugin.model_version", "0"));
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
         if (migrationsToRun == 0) {
@@ -71,7 +71,7 @@ class MigrationManager {
      * Determines the core migrations to be run, and runs them.
      */
     void runCoreMigrations(boolean isCleanInstall) {
-        int installedModelVersion = dm4.pl.fetchMigrationNr();
+        int installedModelVersion = dmx.pl.fetchMigrationNr();
         int requiredModelVersion = CORE_MODEL_VERSION;
         int migrationsToRun = requiredModelVersion - installedModelVersion;
         //
@@ -144,7 +144,7 @@ class MigrationManager {
         try {
             logger.info("Updating installed model: version " + mi.migrationNr);
             if (mi.migrationType.equals("core")) {
-                dm4.pl.storeMigrationNr(mi.migrationNr);
+                dmx.pl.storeMigrationNr(mi.migrationNr);
             } else {
                 mi.plugin.setMigrationNr(mi.migrationNr);
             }
@@ -228,25 +228,25 @@ class MigrationManager {
 
     private void createTopicTypes(JSONArray topicTypes) throws JSONException {
         for (int i = 0; i < topicTypes.length(); i++) {
-            dm4.createTopicType(mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
+            dmx.createTopicType(mf.newTopicTypeModel(topicTypes.getJSONObject(i)));
         }
     }
 
     private void createAssociationTypes(JSONArray assocTypes) throws JSONException {
         for (int i = 0; i < assocTypes.length(); i++) {
-            dm4.createAssociationType(mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
+            dmx.createAssociationType(mf.newAssociationTypeModel(assocTypes.getJSONObject(i)));
         }
     }
 
     private void createTopics(JSONArray topics) throws JSONException {
         for (int i = 0; i < topics.length(); i++) {
-            dm4.createTopic(mf.newTopicModel(topics.getJSONObject(i)));
+            dmx.createTopic(mf.newTopicModel(topics.getJSONObject(i)));
         }
     }
 
     private void createAssociations(JSONArray assocs) throws JSONException {
         for (int i = 0; i < assocs.length(); i++) {
-            dm4.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
+            dmx.createAssociation(mf.newAssociationModel(assocs.getJSONObject(i)));
         }
     }
 
@@ -319,7 +319,7 @@ class MigrationManager {
                     throw new RuntimeException(message + "(" + migrationClassName + ") is found");
                 } else {
                     throw new RuntimeException(message + "is found. Note: a possible migration class can't be located" +
-                        " (plugin package is unknown). Consider setting \"dm4.plugin.main_package\" in " +
+                        " (plugin package is unknown). Consider setting \"dmx.plugin.main_package\" in " +
                         "plugin.properties");
                 }
             }

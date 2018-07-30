@@ -68,49 +68,49 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/topic/{id}")
     public Topic getTopic(@PathParam("id") long topicId) {
-        return dm4.getTopic(topicId);
+        return dmx.getTopic(topicId);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_uri/{uri}")
     public Topic getTopicByUri(@PathParam("uri") String uri) {
-        return dm4.getTopicByUri(uri);
+        return dmx.getTopicByUri(uri);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getTopicByValue(key, value);
+        return dmx.getTopicByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> getTopicsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getTopicsByValue(key, value);
+        return dmx.getTopicsByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_type/{topic_type_uri}")
     public List<Topic> getTopicsByType(@PathParam("topic_type_uri") String topicTypeUri) {
-        return dm4.getTopicsByType(topicTypeUri);
+        return dmx.getTopicsByType(topicTypeUri);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
     public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field") String fieldUri) {
-        return dm4.searchTopics(searchTerm, fieldUri);
+        return dmx.searchTopics(searchTerm, fieldUri);
     }
 
     @POST
     @Path("/topic")
     @Transactional
     public DirectivesResponse createTopic(TopicModel model) {
-        return new DirectivesResponse(dm4.createTopic(model));
+        return new DirectivesResponse(dmx.createTopic(model));
     }
 
     @PUT
@@ -121,7 +121,7 @@ public class WebservicePlugin extends PluginActivator {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(topicId);
-        dm4.updateTopic(model);
+        dmx.updateTopic(model);
         return new DirectivesResponse();
     }
 
@@ -129,7 +129,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topic/{id}")
     @Transactional
     public DirectivesResponse deleteTopic(@PathParam("id") long topicId) {
-        dm4.deleteTopic(topicId);
+        dmx.deleteTopic(topicId);
         return new DirectivesResponse();
     }
 
@@ -141,14 +141,14 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/association/{id}")
     public Association getAssociation(@PathParam("id") long assocId) {
-        return dm4.getAssociation(assocId);
+        return dmx.getAssociation(assocId);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/by_value/{key}/{value}")
     public Association getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
-        return dm4.getAssociationByValue(key, value);
+        return dmx.getAssociationByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -156,7 +156,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/assoc/multi/by_value/{key}/{value}")
     public List<Association> getAssociationsByValue(@PathParam("key") String key,
                                                     @PathParam("value") SimpleValue value) {
-        return dm4.getAssociationsByValue(key, value);
+        return dmx.getAssociationsByValue(key, value);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -165,7 +165,7 @@ public class WebservicePlugin extends PluginActivator {
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
                    @PathParam("topic1_id") long topic1Id, @PathParam("topic2_id") long topic2Id,
                    @PathParam("role_type1_uri") String roleTypeUri1, @PathParam("role_type2_uri") String roleTypeUri2) {
-        return dm4.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
+        return dmx.getAssociation(assocTypeUri, topic1Id, topic2Id, roleTypeUri1, roleTypeUri2);
     }
 
     // ---
@@ -175,7 +175,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
                                              @PathParam("topic2_id") long topic2Id) {
-        return dm4.getAssociations(topic1Id, topic2Id);
+        return dmx.getAssociations(topic1Id, topic2Id);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -184,7 +184,7 @@ public class WebservicePlugin extends PluginActivator {
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
                                              @PathParam("topic2_id") long topic2Id,
                                              @PathParam("assoc_type_uri") String assocTypeUri) {
-        return dm4.getAssociations(topic1Id, topic2Id, assocTypeUri);
+        return dmx.getAssociations(topic1Id, topic2Id, assocTypeUri);
     }
 
     // ---
@@ -193,7 +193,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/association")
     @Transactional
     public DirectivesResponse createAssociation(AssociationModel model) {
-        return new DirectivesResponse(dm4.createAssociation(model));
+        return new DirectivesResponse(dmx.createAssociation(model));
     }
 
     @PUT
@@ -204,7 +204,7 @@ public class WebservicePlugin extends PluginActivator {
             throw new RuntimeException("ID mismatch in update request");
         }
         model.setId(assocId);
-        dm4.updateAssociation(model);
+        dmx.updateAssociation(model);
         return new DirectivesResponse();
     }
 
@@ -212,7 +212,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/association/{id}")
     @Transactional
     public DirectivesResponse deleteAssociation(@PathParam("id") long assocId) {
-        dm4.deleteAssociation(assocId);
+        dmx.deleteAssociation(assocId);
         return new DirectivesResponse();
     }
 
@@ -223,26 +223,26 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/topictype/{uri}")
     public TopicType getTopicType(@PathParam("uri") String uri) {
-        return dm4.getTopicType(uri);
+        return dmx.getTopicType(uri);
     }
 
     @GET
     @Path("/topictype/topic/{id}")
     public TopicType getTopicTypeImplicitly(@PathParam("id") long topicId) {
-        return dm4.getTopicTypeImplicitly(topicId);
+        return dmx.getTopicTypeImplicitly(topicId);
     }
 
     @GET
     @Path("/topictype/all")
     public List<TopicType> getAllTopicTypes() {
-        return dm4.getAllTopicTypes();
+        return dmx.getAllTopicTypes();
     }
 
     @POST
     @Path("/topictype")
     @Transactional
     public TopicType createTopicType(TopicTypeModel model) {
-        TopicType topicType = dm4.createTopicType(model);
+        TopicType topicType = dmx.createTopicType(model);
         me.newTopicType(topicType);
         return topicType;
     }
@@ -251,7 +251,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topictype")
     @Transactional
     public DirectivesResponse updateTopicType(TopicTypeModel model) {
-        dm4.updateTopicType(model);
+        dmx.updateTopicType(model);
         return new DirectivesResponse();
     }
 
@@ -259,7 +259,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/topictype/{uri}")
     @Transactional
     public DirectivesResponse deleteTopicType(@PathParam("uri") String uri) {
-        dm4.deleteTopicType(uri);
+        dmx.deleteTopicType(uri);
         return new DirectivesResponse();
     }
 
@@ -270,33 +270,33 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/assoctype/{uri}")
     public AssociationType getAssociationType(@PathParam("uri") String uri) {
-        return dm4.getAssociationType(uri);
+        return dmx.getAssociationType(uri);
     }
 
     @GET
     @Path("/assoctype/assoc/{id}")
     public AssociationType getAssociationTypeImplicitly(@PathParam("id") long assocId) {
-        return dm4.getAssociationTypeImplicitly(assocId);
+        return dmx.getAssociationTypeImplicitly(assocId);
     }
 
     @GET
     @Path("/assoctype/all")
     public List<AssociationType> getAssociationAllTypes() {
-        return dm4.getAllAssociationTypes();
+        return dmx.getAllAssociationTypes();
     }
 
     @POST
     @Path("/assoctype")
     @Transactional
     public AssociationType createAssociationType(AssociationTypeModel model) {
-        return dm4.createAssociationType(model);
+        return dmx.createAssociationType(model);
     }
 
     @PUT
     @Path("/assoctype")
     @Transactional
     public DirectivesResponse updateAssociationType(AssociationTypeModel model) {
-        dm4.updateAssociationType(model);
+        dmx.updateAssociationType(model);
         return new DirectivesResponse();
     }
 
@@ -304,7 +304,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/assoctype/{uri}")
     @Transactional
     public DirectivesResponse deleteAssociationType(@PathParam("uri") String uri) {
-        dm4.deleteAssociationType(uri);
+        dmx.deleteAssociationType(uri);
         return new DirectivesResponse();
     }
 
@@ -316,7 +316,7 @@ public class WebservicePlugin extends PluginActivator {
     @Path("/roletype")
     @Transactional
     public Topic createRoleType(TopicModel model) {
-        return dm4.createRoleType(model);
+        return dmx.createRoleType(model);
     }
 
 
@@ -326,7 +326,7 @@ public class WebservicePlugin extends PluginActivator {
     @GET
     @Path("/plugin")
     public List<PluginInfo> getPluginInfo() {
-        return dm4.getPluginInfo();
+        return dmx.getPluginInfo();
     }
 
 
@@ -345,7 +345,7 @@ public class WebservicePlugin extends PluginActivator {
                                                     @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                     @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                     @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
-        Topic topic = dm4.getTopic(topicId);
+        Topic topic = dmx.getTopic(topicId);
         return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
@@ -357,7 +357,7 @@ public class WebservicePlugin extends PluginActivator {
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                        @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
-        Topic topic = dm4.getTopic(topicId);
+        Topic topic = dmx.getTopic(topicId);
         return getRelatedAssociations(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
@@ -378,7 +378,7 @@ public class WebservicePlugin extends PluginActivator {
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                        @QueryParam("others_topic_type_uri") String othersTopicTypeUri) {
-        Association assoc = dm4.getAssociation(assocId);
+        Association assoc = dmx.getAssociation(assocId);
         return getRelatedTopics(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri);
     }
@@ -391,7 +391,7 @@ public class WebservicePlugin extends PluginActivator {
                                                        @QueryParam("my_role_type_uri")      String myRoleTypeUri,
                                                        @QueryParam("others_role_type_uri")  String othersRoleTypeUri,
                                                        @QueryParam("others_assoc_type_uri") String othersAssocTypeUri) {
-        Association assoc = dm4.getAssociation(assocId);
+        Association assoc = dmx.getAssociation(assocId);
         return getRelatedAssociations(assoc, "association", assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
             othersAssocTypeUri);
     }
@@ -428,7 +428,7 @@ public class WebservicePlugin extends PluginActivator {
             deleteAnyTopic(id);
         }
         for (long id : assocIds) {
-            dm4.deleteAssociation(id);
+            dmx.deleteAssociation(id);
         }
         return new DirectivesResponse();
     }
@@ -448,7 +448,7 @@ public class WebservicePlugin extends PluginActivator {
             @Override
             public JSONObject toJSON() {
                 try {
-                    return new JSONObject().put("dm4.websockets.url", dm4.getWebSocketsService().getWebSocketsURL());
+                    return new JSONObject().put("dmx.websockets.url", dmx.getWebSocketsService().getWebSocketsURL());
                 } catch (JSONException e) {
                     throw new RuntimeException("Serializing the WebSockets configuration failed", e);
                 }
@@ -488,16 +488,16 @@ public class WebservicePlugin extends PluginActivator {
 
     // ---
 
-    // TODO: move this logic to dm4.deleteTopic() so that it can delete types as well? (types ARE topics after all)
+    // TODO: move this logic to dmx.deleteTopic() so that it can delete types as well? (types ARE topics after all)
     private void deleteAnyTopic(long id) {
-        Topic t = dm4.getTopic(id);
+        Topic t = dmx.getTopic(id);
         String typeUri = t.getTypeUri();
-        if (typeUri.equals("dm4.core.topic_type")) {
-            dm4.deleteTopicType(t.getUri());
-        } else if (typeUri.equals("dm4.core.assoc_type")) {
-            dm4.deleteAssociationType(t.getUri());
+        if (typeUri.equals("dmx.core.topic_type")) {
+            dmx.deleteTopicType(t.getUri());
+        } else if (typeUri.equals("dmx.core.assoc_type")) {
+            dmx.deleteAssociationType(t.getUri());
         } else {
-            dm4.deleteTopic(id);
+            dmx.deleteTopic(id);
         }
     }
 
@@ -529,7 +529,7 @@ public class WebservicePlugin extends PluginActivator {
         // ---
 
         private void messageToAllButOne(JSONObject message) {
-            dm4.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
+            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
         }
     }
 }

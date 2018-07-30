@@ -1,7 +1,7 @@
 dm4c.add_plugin("systems.dmx.caching", function() {
 
     var CACHABLE_PATH = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
-    var PROP_MODIFIED = "dm4.time.modified"
+    var PROP_MODIFIED = "dmx.time.modified"
 
     // === Webclient Listeners ===
 

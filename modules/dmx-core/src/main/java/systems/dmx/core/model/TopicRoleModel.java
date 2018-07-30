@@ -11,7 +11,7 @@ package systems.dmx.core.model;
  * <p>
  * Assertion: both, the topic reference and the role type reference are set.
  * <p>
- * In the database a role type is represented by a topic of type "dm4.core.role_type".
+ * In the database a role type is represented by a topic of type "dmx.core.role_type".
  */
 public interface TopicRoleModel extends RoleModel {
 

@@ -8,6 +8,6 @@ public class Migration1 extends Migration {
 
     @Override
     public void run() {
-        setTopicTypeViewConfigValue("dm4.webclient.icon", "simple_renderer_uri", "dm4.iconpicker.icon_renderer");
+        setTopicTypeViewConfigValue("dmx.webclient.icon", "simple_renderer_uri", "dmx.iconpicker.icon_renderer");
     }
 }

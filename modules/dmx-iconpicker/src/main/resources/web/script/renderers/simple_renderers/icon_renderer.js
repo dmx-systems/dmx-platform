@@ -1,4 +1,4 @@
-dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
+dm4c.add_simple_renderer("dmx.iconpicker.icon_renderer", {
 
     render_info: function(page_model, parent_element) {
         dm4c.render.field_label(page_model, parent_element)
@@ -7,7 +7,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
 
     render_form: function(page_model, parent_element) {
         dm4c.render.field_label(page_model, parent_element)
-        var picked_icon = null                  // a topic of type "dm4.webclient.icon"
+        var picked_icon = null                  // a topic of type "dmx.webclient.icon"
         var image = dm4c.render.icon(page_model.value, page_model.value)
         parent_element.addClass("iconpicker")
             .append(image)
@@ -33,7 +33,7 @@ dm4c.add_simple_renderer("dm4.iconpicker.icon_renderer", {
 
         function open_choose_icon_dialog() {
             // retrieve icon topics
-            var icon_topics = dm4c.restc.get_topics("dm4.webclient.icon", false, true)  // include_childs=false,
+            var icon_topics = dm4c.restc.get_topics("dmx.webclient.icon", false, true)  // include_childs=false,
             //                                                                          // sort=true
             var content = $()
             for (var i = 0, icon_topic; icon_topic = icon_topics[i]; i++) {

@@ -22,7 +22,7 @@ export default {
 
     menuTopicTypes () {
       return dm5.utils.filter(this.topicTypes, topicType =>
-        topicType.getViewConfig('dm4.webclient.show_in_create_menu')
+        topicType.getViewConfig('dmx.webclient.show_in_create_menu')
       )
     }
   },

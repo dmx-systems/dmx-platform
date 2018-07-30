@@ -6,20 +6,20 @@ export default store => ({
   },
 
   detailPanel: {
-    'dm4.core.topic_type': require('./components/dm5-type-renderer').default,
-    'dm4.core.assoc_type': require('./components/dm5-type-renderer').default
+    'dmx.core.topic_type': require('./components/dm5-type-renderer').default,
+    'dmx.core.assoc_type': require('./components/dm5-type-renderer').default
   },
 
   extraMenuItems: [
     {
-      uri: 'dm4.core.topic_type',
+      uri: 'dmx.core.topic_type',
       label: 'Topic Type',
       create: name => {
         store.dispatch('createTopicType', name)
       }
     },
     {
-      uri: 'dm4.core.assoc_type',
+      uri: 'dmx.core.assoc_type',
       label: 'Association Type',
       create: name => {
         store.dispatch('createAssocType', name)

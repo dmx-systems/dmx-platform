@@ -17,17 +17,17 @@ public class Migration5 extends Migration {
     public void run() {
         // Note: "Aggregation Definition" must be updated before "Composition Definition" as the child type
         // is added via "Aggregation Definition" and this very definition is changed here.
-        dm4.getAssociationType("dm4.core.aggregation_def").addAssocDefBefore(
-            mf.newAssociationDefinitionModel("dm4.core.aggregation_def", "dm4.core.custom_assoc_type", false, false,
-                "dm4.core.aggregation_def", "dm4.core.assoc_type", "dm4.core.many", "dm4.core.one"
+        dmx.getAssociationType("dmx.core.aggregation_def").addAssocDefBefore(
+            mf.newAssociationDefinitionModel("dmx.core.aggregation_def", "dmx.core.custom_assoc_type", false, false,
+                "dmx.core.aggregation_def", "dmx.core.assoc_type", "dmx.core.many", "dmx.core.one"
             ),
-            "dm4.core.identity_attr"
+            "dmx.core.identity_attr"
         );
-        dm4.getAssociationType("dm4.core.composition_def").addAssocDefBefore(
-            mf.newAssociationDefinitionModel("dm4.core.aggregation_def", "dm4.core.custom_assoc_type", false, false,
-                "dm4.core.composition_def", "dm4.core.assoc_type", "dm4.core.many", "dm4.core.one"
+        dmx.getAssociationType("dmx.core.composition_def").addAssocDefBefore(
+            mf.newAssociationDefinitionModel("dmx.core.aggregation_def", "dmx.core.custom_assoc_type", false, false,
+                "dmx.core.composition_def", "dmx.core.assoc_type", "dmx.core.many", "dmx.core.one"
             ),
-            "dm4.core.identity_attr"
+            "dmx.core.identity_attr"
         );
     }
 }

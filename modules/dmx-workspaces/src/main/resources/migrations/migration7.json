@@ -8,67 +8,67 @@
 
         {
             "value":       "Private",
-            "uri":         "dm4.workspaces.private.enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri":         "dmx.workspaces.private.enabled",
+            "dataTypeUri": "dmx.core.boolean"
             // TODO: index
         },
         {
             "value":       "Confidential",
-            "uri":         "dm4.workspaces.confidential.enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri":         "dmx.workspaces.confidential.enabled",
+            "dataTypeUri": "dmx.core.boolean"
             // TODO: index
         },
         {
             "value":       "Collaborative",
-            "uri":         "dm4.workspaces.collaborative.enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri":         "dmx.workspaces.collaborative.enabled",
+            "dataTypeUri": "dmx.core.boolean"
             // TODO: index
         },
         {
             "value":       "Public",
-            "uri":         "dm4.workspaces.public.enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri":         "dmx.workspaces.public.enabled",
+            "dataTypeUri": "dmx.core.boolean"
             // TODO: index
         },
         {
             "value":       "Common",
-            "uri":         "dm4.workspaces.common.enabled",
-            "dataTypeUri": "dm4.core.boolean"
+            "uri":         "dmx.workspaces.common.enabled",
+            "dataTypeUri": "dmx.core.boolean"
             // TODO: index
         },
         {
             "value":       "Enabled Sharing Modes",
-            "uri":         "dm4.workspaces.enabled_sharing_modes",
-            "dataTypeUri": "dm4.core.value",
+            "uri":         "dmx.workspaces.enabled_sharing_modes",
+            "dataTypeUri": "dmx.core.value",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dm4.workspaces.private.enabled",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.workspaces.private.enabled",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.workspaces.confidential.enabled",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.workspaces.confidential.enabled",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.workspaces.collaborative.enabled",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.workspaces.collaborative.enabled",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.workspaces.public.enabled",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.workspaces.public.enabled",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":        "dm4.workspaces.common.enabled",
-                    "childCardinalityUri": "dm4.core.one",
-                    "assocTypeUri":        "dm4.core.composition_def",
+                    "childTypeUri":        "dmx.workspaces.common.enabled",
+                    "childCardinalityUri": "dmx.core.one",
+                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]

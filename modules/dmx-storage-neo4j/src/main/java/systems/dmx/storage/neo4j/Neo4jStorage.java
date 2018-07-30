@@ -553,8 +553,8 @@ public class Neo4jStorage implements DMXStorage {
             //
             rootNode.setProperty(KEY_NODE_TYPE, "topic");
             rootNode.setProperty(KEY_VALUE, "Meta Type");
-            storeAndIndexTopicUri(rootNode, "dm4.core.meta_type");
-            storeAndIndexTopicTypeUri(rootNode, "dm4.core.meta_meta_type");
+            storeAndIndexTopicUri(rootNode, "dmx.core.meta_type");
+            storeAndIndexTopicTypeUri(rootNode, "dmx.core.meta_meta_type");
             //
             return true;
         } catch (Exception e) {

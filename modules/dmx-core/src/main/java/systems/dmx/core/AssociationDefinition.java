@@ -29,8 +29,8 @@ public interface AssociationDefinition extends Association {
 
     /**
      * @return  The type to be used to create an association instance based on this association definition.
-     *          This is the custom association type if set, otherwise this is <code>dm4.core.composition</code>
-     *          or <code>dm4.core.aggregation</code> depending on this association definition's type.
+     *          This is the custom association type if set, otherwise this is <code>dmx.core.composition</code>
+     *          or <code>dmx.core.aggregation</code> depending on this association definition's type.
      *          Is never <code>null</code>.
      */
     String getInstanceLevelAssocTypeUri();

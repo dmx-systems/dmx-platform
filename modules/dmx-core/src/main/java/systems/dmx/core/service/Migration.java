@@ -17,7 +17,7 @@ public abstract class Migration {
     // ### TODO: make this internal. Define a public Migration interface?
     public void setCoreService(CoreService dm4) {
         this.dm4 = dm4;
-        this.mf = dm4.getModelFactory();
+        this.mf = dmx.getModelFactory();
     }
 
     public abstract void run();
@@ -35,7 +35,7 @@ public abstract class Migration {
      * @param   value           The config value (String, Integer, Long, Double, or Boolean).
      */
     protected final void setTopicTypeViewConfigValue(String topicTypeUri, String setting, Object value) {
-        setViewConfigValue(dm4.getTopicType(topicTypeUri), setting, value);
+        setViewConfigValue(dmx.getTopicType(topicTypeUri), setting, value);
     }
 
     /**
@@ -46,12 +46,12 @@ public abstract class Migration {
      * @param   value           The config value (String, Integer, Long, Double, or Boolean).
      */
     protected final void setAssocTypeViewConfigValue(String assocTypeUri, String setting, Object value) {
-        setViewConfigValue(dm4.getAssociationType(assocTypeUri), setting, value);
+        setViewConfigValue(dmx.getAssociationType(assocTypeUri), setting, value);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void setViewConfigValue(DMXType type, String setting, Object value) {
-        type.getViewConfig().setConfigValue("dm4.webclient.view_config", "dm4.webclient." + setting, value);
+        type.getViewConfig().setConfigValue("dmx.webclient.view_config", "dmx.webclient." + setting, value);
     }
 }

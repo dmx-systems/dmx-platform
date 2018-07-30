@@ -47,16 +47,16 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/participant/{id}")
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
-        return dm4.getTopic(personId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
-            "dm4.events.event");
+        return dmx.getTopic(personId).getRelatedTopics("dmx.events.participant", "dmx.core.default", "dmx.core.default",
+            "dmx.events.event");
     }
 
     @GET
     @Path("/{id}/participants")
     @Override
     public List<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
-        return dm4.getTopic(eventId).getRelatedTopics("dm4.events.participant", "dm4.core.default", "dm4.core.default",
-            "dm4.contacts.person");
+        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.participant", "dmx.core.default", "dmx.core.default",
+            "dmx.contacts.person");
     }
 
 
@@ -70,16 +70,16 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
         // Event <-> Person
-        DMXUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.person",
-            "dm4.events.participant", "dm4.core.default", "dm4.core.default", dm4);
+        DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
+            "dmx.events.participant", "dmx.core.default", "dmx.core.default", dm4);
         //
         // Event -> Address
-        RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dm4.events.event", "dm4.contacts.address",
-            "dm4.core.aggregation", "dm4.core.parent", "dm4.core.child", dm4);
+        RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
+            "dmx.core.aggregation", "dmx.core.parent", "dmx.core.child", dm4);
         if (roles != null) {
             long eventId = roles[0].getPlayerId();
-            Topic event = dm4.getTopic(eventId);
-            event.getChildTopics().getTopic("dm4.contacts.address").getRelatingAssociation().delete();
+            Topic event = dmx.getTopic(eventId);
+            event.getChildTopics().getTopic("dmx.contacts.address").getRelatingAssociation().delete();
             timeService.setModified(event);
         }
     }
