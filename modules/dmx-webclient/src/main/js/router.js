@@ -160,7 +160,7 @@ function initialNavigation (route) {
     // assocId)
     urlPresent = true
   } else {
-    topicmapId = id(dm5.utils.getCookie('dm4_topicmap_id'))
+    topicmapId = id(dm5.utils.getCookie('dmx_topicmap_id'))
     if (topicmapId) {
       // console.log('### Initial navigation (topicmap ID', topicmapId, 'obtained from cookie)')
     } else {

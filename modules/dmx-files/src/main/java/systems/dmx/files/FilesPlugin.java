@@ -887,11 +887,11 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
 
     private long getWorkspaceId() {
         Cookies cookies = Cookies.get();
-        if (!cookies.has("dm4_workspace_id")) {
+        if (!cookies.has("dmx_workspace_id")) {
             throw new RuntimeException("If \"dm4.filerepo.per_workspace\" is set the request requires a " +
-                "\"dm4_workspace_id\" cookie");
+                "\"dmx_workspace_id\" cookie");
         }
-        return cookies.getLong("dm4_workspace_id");
+        return cookies.getLong("dmx_workspace_id");
     }
 
     private long getWorkspaceId(String repoPath) {

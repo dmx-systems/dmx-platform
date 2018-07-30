@@ -69,7 +69,7 @@ const actions = {
     // console.log('displayTopicmap', id)
     // update state
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
-    dm5.utils.setCookie('dm4_topicmap_id', id)
+    dm5.utils.setCookie('dmx_topicmap_id', id)
     // update state + sync view
     return _displayTopicmap(getters, rootState, dispatch)
   },

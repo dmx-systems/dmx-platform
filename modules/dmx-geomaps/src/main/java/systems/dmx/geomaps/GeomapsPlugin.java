@@ -53,7 +53,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     private static final String GEOCODER_URL = "http://maps.googleapis.com/maps/api/geocode/json?" +
         "address=%s&sensor=false";
 
-    private static final String COOKIE_NO_GEOCODING = "dm4_no_geocoding";
+    private static final String COOKIE_NO_GEOCODING = "dmx_no_geocoding";
 
     private static final double EARTH_RADIUS_KM = 6371.009;
 

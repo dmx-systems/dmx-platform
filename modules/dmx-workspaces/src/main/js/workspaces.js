@@ -41,7 +41,7 @@ const actions = {
    *
    * Postconditions:
    * - "workspaceId" state is up-to-date
-   * - "dm4_workspace_id" cookie is up-to-date.
+   * - "dmx_workspace_id" cookie is up-to-date.
    *
    * @return  a promise resolved once the workspace's topicmap topics are available.
    *          At this time the "topicmapTopics" state is up-to-date (see topicmaps module).
@@ -49,7 +49,7 @@ const actions = {
   _selectWorkspace ({dispatch}, id) {
     // console.log('_selectWorkspace', id)
     state.workspaceId = id
-    dm5.utils.setCookie('dm4_workspace_id', id)
+    dm5.utils.setCookie('dmx_workspace_id', id)
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
   },
 

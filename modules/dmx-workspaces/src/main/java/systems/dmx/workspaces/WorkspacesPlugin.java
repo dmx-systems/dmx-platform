@@ -417,10 +417,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
     private long workspaceId() {
         Cookies cookies = Cookies.get();
-        if (!cookies.has("dm4_workspace_id")) {
+        if (!cookies.has("dmx_workspace_id")) {
             return -1;
         }
-        return cookies.getLong("dm4_workspace_id");
+        return cookies.getLong("dmx_workspace_id");
     }
 
     /**
