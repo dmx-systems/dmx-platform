@@ -1,6 +1,13 @@
 maven-build:
+  stage: build
   script:
     - mvn clean install -P all,dist -DskipTests
+
+copy-and-deploy:
+  stage: deploy
+  only:
+    - master
+  script:
     # copy to download area
     - DISTDIR='modules/dmx-distribution/target'
     - ZIPFILE="$( ls ${DISTDIR}/*.zip )"

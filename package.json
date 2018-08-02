@@ -23,7 +23,7 @@
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.4.5",
     "font-awesome": "^4.7.0",
-    "vue": "^2.5.16",
+    "vue": "^2.5.17",
     "vue-router": "^2.8.1",
     "vue2-leaflet": "^1.0.2",
     "vuex": "^2.5.0"
@@ -42,8 +42,8 @@
     "mini-css-extract-plugin": "^0.4.1",
     "style-loader": "^0.21.0",
     "vue-loader": "^15.2.6",
-    "vue-template-compiler": "^2.5.16",
-    "webpack": "^4.16.3",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.16.4",
     "webpack-bundle-analyzer": "^2.13.1",
     "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5"

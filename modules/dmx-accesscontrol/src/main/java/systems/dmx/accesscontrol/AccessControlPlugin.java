@@ -241,7 +241,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             AccessControl ac = dmx.getAccessControl();
             logger.info("Creating user account \"" + username + "\"");
             //
-            // 1) create username topic
+            // 1) create username topic and a private workspace
             final Topic usernameTopic = createUsername(username);
             //
             // 2) create user account

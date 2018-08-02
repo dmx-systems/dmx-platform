@@ -210,12 +210,16 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public Topic getPrivateWorkspace(String username) {
-        for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dmx.workspaces.workspace")) {
-            if (getSharingMode(workspace.getId()) == SharingMode.PRIVATE) {
-                return workspace.instantiate();
+        try {
+            for (TopicModelImpl workspace : fetchTopicsByOwner(username, "dmx.workspaces.workspace")) {
+                if (getSharingMode(workspace.getId()) == SharingMode.PRIVATE) {
+                    return workspace.instantiate();
+                }
             }
+            throw new RuntimeException("User \"" + username + "\" has no private workspace");
+        } catch (Exception e) {
+            throw new RuntimeException("Private workspace of user \"" + username + "\" can't be determined", e);
         }
-        throw new RuntimeException("User \"" + username + "\" has no private workspace");
     }
 
     @Override

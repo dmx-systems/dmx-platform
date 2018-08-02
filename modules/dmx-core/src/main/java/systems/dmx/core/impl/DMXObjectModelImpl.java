@@ -540,7 +540,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
      * <p>
      * Implemented on top of {@link #loadChildTopics(AssociationDefinitionModel, boolean)}.
      * The assoc def is get from this object's type definition.
-     * As a consequence this method can <i>not</i> be used to load facet values.
+     * <p>
+     * Can <i>not</i> be used to load facet values.
      * To load facet values use {@link #loadChildTopics(AssociationDefinitionModel, boolean)} and pass the facet type's
      * assoc def.
      */
