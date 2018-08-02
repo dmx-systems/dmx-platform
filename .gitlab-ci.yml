@@ -18,3 +18,5 @@ copy-and-deploy:
     - ln -sf /var/www/download.dmx.systems/ci/${FILENAME}_${NUNC}_${CI_PIPELINE_ID}.zip /var/www/download.dmx.systems/ci/dmx-latest.zip
     # trigger `dmx-build-deb` pipeline
     - curl -X POST -F token="${MY_JOB_TOKEN}" -F ref=master https://git.dmx.systems/api/v4/projects/16/trigger/pipeline
+  dependencies:
+    - maven-build
