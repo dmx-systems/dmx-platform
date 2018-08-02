@@ -2,6 +2,9 @@ maven-build:
   stage: build
   script:
     - mvn clean install -P all,dist -DskipTests
+  artifacts:
+    paths:
+      - modules/dmx-distribution/target/*.zip
 
 copy-and-deploy:
   stage: deploy
@@ -10,6 +13,8 @@ copy-and-deploy:
   script:
     # copy to download area
     - DISTDIR='modules/dmx-distribution/target'
+    - ls -la
+    - ls -la ${DISTDIR}
     - ZIPFILE="$( ls ${DISTDIR}/*.zip )"
     - FILENAME="$( basename ${ZIPFILE} .zip )"
     - NUNC="$( date +%F )"
