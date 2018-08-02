@@ -305,9 +305,8 @@ class TypeStorage {
         // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dmx.core.topic_type"
         // and "dmx.core.meta_type" (the latter is required e.g. by dmx-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dmx.core.aggregation_def",
-            "dmx.core.composition_def"), "dmx.core.parent_type", "dmx.core.child_type", null);
-            // othersTopicTypeUri=null
+        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics("dmx.core.composition_def",
+            "dmx.core.parent_type", "dmx.core.child_type", null);   // othersTopicTypeUri=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is

@@ -1,4 +1,3 @@
-// TODO: drop "Aggregation Definition"
 {
     // Note: Boolean topic types must be created *after* migration 1 has run.
     // Otherwise the data type "Boolean" does not exist. ### TODO: not true anymore
@@ -17,29 +16,10 @@
         }
     ],
 
-    // Note: Both association types relies on association type "Composition Definition".
-    // It must be defined first. See also CoreServiceImpl.createAssociationType().
     "assoc_types": [
         {
             "value":       "Composition Definition",
             "uri":         "dmx.core.composition_def",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.core.identity_attr",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
-                },
-                {
-                    "childTypeUri":        "dmx.core.include_in_label",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
-                }
-            ]
-        },
-        {
-            "value":       "Aggregation Definition",
-            "uri":         "dmx.core.aggregation_def",
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
