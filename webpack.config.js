@@ -50,6 +50,10 @@ module.exports = (env = {}) => {
       ]),
       new VueLoaderPlugin()
     ],
+    stats: {
+      entrypoints: false,
+      children: false
+    },
     performance: {
       hints: false
     }

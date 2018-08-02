@@ -119,7 +119,7 @@
         <dmx.webservice.path>/</dmx.webservice.path>
 
         <!-- Database -->
-        <dmx.database.path>${project.basedir}/deepamehta-db</dmx.database.path>
+        <dmx.database.path>${project.basedir}/dmx-db</dmx.database.path>
 
         <!-- Logging -->
         <java.util.logging.config.file>
