@@ -1,3 +1,6 @@
+# Part of DMX 5.0
+# Runs ALWAYS
+
 // TODO: rethink weather "Sharing Mode" should be defined in the Access Control module
 {
     "topic_types": [

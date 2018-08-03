@@ -9,12 +9,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Creates the "DMX" workspace.
- * Runs only in CLEAN_INSTALL mode.
+ * Runs ALWAYS.
  * <p>
- * Note: when UPDATEing to 4.5 the "DMX" workspace already exists.
- * It was created via postInstall() hook (which is obsolete in 4.5)
- * <p>
- * Part of DM 4.5
+ * Part of DMX 5.0
  */
 public class Migration4 extends Migration {
 
@@ -33,7 +30,7 @@ public class Migration4 extends Migration {
             WorkspacesService.DMX_WORKSPACE_SHARING_MODE
         );
         // Note 1: the workspace has no owner yet as the Access Control plugin is not yet activated (as it depends
-        // on the Workspaces plugin). We set the owner in the Access Control migration #7.
+        // on the Workspaces plugin). We set the owner in the Access Control migration #5.
         // Note 2: we can't postpone the creation of the "DMX" workspace to a Access Control migration as it
         // must be already available at Workspaces plugin activation time (as needed for the type introduction).
     }
