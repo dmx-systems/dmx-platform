@@ -2,7 +2,7 @@
     "topic_types": [
 
         // Note: The meta types "Topic Type" and "Association Type",
-        // and the topic type "Data Type" are created programmatically.
+        // and the topic type "Data Type" are created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
 
         /*{
@@ -60,7 +60,7 @@
 
         // Data Types
 
-        // Note: The data type "Text" is created programmatically.
+        // Note: The data type "Text" is created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
 
         /*{
