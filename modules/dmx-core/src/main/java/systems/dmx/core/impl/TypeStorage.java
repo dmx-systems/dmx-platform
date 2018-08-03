@@ -212,7 +212,7 @@ class TypeStorage {
 
     private RelatedTopicModel fetchDataTypeTopic(long typeId, String typeUri, String className) {
         try {
-            RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dmx.core.aggregation", "dmx.core.type",
+            RelatedTopicModel dataType = pl.fetchTopicRelatedTopic(typeId, "dmx.core.composition", "dmx.core.type",
                 "dmx.core.default", "dmx.core.data_type");
             if (dataType == null) {
                 throw new RuntimeException("No data type topic is associated to " + className + " \"" + typeUri + "\"");
@@ -229,7 +229,7 @@ class TypeStorage {
     // ### TODO: compare to low-level method CoreServiceImpl._associateDataType(). Remove structural similarity.
     void storeDataType(String typeUri, String dataTypeUri) {
         try {
-            pl.createAssociation("dmx.core.aggregation",
+            pl.createAssociation("dmx.core.composition",
                 mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
                 mf.newTopicRoleModel(dataTypeUri, "dmx.core.default")
             );
@@ -246,7 +246,7 @@ class TypeStorage {
     // --- Fetch ---
 
     private List<IndexMode> fetchIndexModes(long typeId) {
-        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dmx.core.aggregation",
+        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dmx.core.composition",
             "dmx.core.type", "dmx.core.default", "dmx.core.index_mode");
         return IndexMode.fromTopics(indexModes);
     }
@@ -260,7 +260,7 @@ class TypeStorage {
     }
 
     void storeIndexMode(String typeUri, IndexMode indexMode) {
-        pl.createAssociation("dmx.core.aggregation",
+        pl.createAssociation("dmx.core.composition",
             mf.newTopicRoleModel(typeUri,           "dmx.core.type"),
             mf.newTopicRoleModel(indexMode.toUri(), "dmx.core.default")
         );
@@ -305,9 +305,8 @@ class TypeStorage {
         // Note: the "othersTopicTypeUri" filter is not set here (null). We want match both "dmx.core.topic_type"
         // and "dmx.core.meta_type" (the latter is required e.g. by dmx-mail). ### TODO: add a getRelatedTopics()
         // method that takes a list of topic types.
-        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics(asList("dmx.core.aggregation_def",
-            "dmx.core.composition_def"), "dmx.core.parent_type", "dmx.core.child_type", null);
-            // othersTopicTypeUri=null
+        List<RelatedTopicModelImpl> childTypes = typeTopic.getRelatedTopics("dmx.core.composition_def",
+            "dmx.core.parent_type", "dmx.core.child_type", null);   // othersTopicTypeUri=null
         //
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
@@ -512,7 +511,7 @@ class TypeStorage {
     // --- Fetch ---
 
     private RelatedTopicModelImpl fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.aggregation", "dmx.core.assoc_def",
+        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.assoc_def",
             cardinalityRoleTypeUri, "dmx.core.cardinality");
     }
 
@@ -559,7 +558,7 @@ class TypeStorage {
     }
 
     private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
-        pl.createAssociation("dmx.core.aggregation",
+        pl.createAssociation("dmx.core.composition",
             mf.newTopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
             mf.newAssociationRoleModel(assocDefId, "dmx.core.assoc_def")
         );
@@ -596,7 +595,7 @@ class TypeStorage {
     // ---
 
     private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
-        return pl.fetchTopicRelatedAssociation(typeId, "dmx.core.aggregation", "dmx.core.type",
+        return pl.fetchTopicRelatedAssociation(typeId, "dmx.core.composition", "dmx.core.type",
             "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
     }
 
@@ -675,7 +674,7 @@ class TypeStorage {
     // ---
 
     private void storeSequenceStart(long typeId, long assocDefId) {
-        pl.createAssociation("dmx.core.aggregation",
+        pl.createAssociation("dmx.core.composition",
             mf.newTopicRoleModel(typeId, "dmx.core.type"),
             mf.newAssociationRoleModel(assocDefId, "dmx.core.sequence_start")
         );
@@ -720,7 +719,7 @@ class TypeStorage {
     private ViewConfigurationModel fetchTypeViewConfig(TopicModel typeTopic) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.aggregation",
+            return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
                 "dmx.core.type", "dmx.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
@@ -731,7 +730,7 @@ class TypeStorage {
     private ViewConfigurationModel fetchAssocDefViewConfig(AssociationModel assocDef) {
         try {
             // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
-            return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dmx.core.aggregation",
+            return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dmx.core.composition",
                 "dmx.core.assoc_def", "dmx.core.view_config", null));
         } catch (Exception e) {
             throw new RuntimeException("Fetching view configuration for assoc def " + assocDef.getId() + " failed", e);
@@ -764,7 +763,7 @@ class TypeStorage {
 
     void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
         pl.createTopic(configTopic);
-        pl.createAssociation("dmx.core.aggregation", configurable,
+        pl.createAssociation("dmx.core.composition", configurable,
             mf.newTopicRoleModel(configTopic.getId(), "dmx.core.view_config"));
     }
 

@@ -6,7 +6,7 @@ import systems.dmx.core.model.AssociationDefinitionModel;
 
 /**
  * Definition of an association between 2 topic types -- part of DMX's type system,
- * like an association in a class diagram. Used to represent both, aggregations and compositions.
+ * like an association in a class diagram. Used to represent both, aggregations and compositions. ### FIXDOC
  *
  * @author <a href="mailto:jri@deepamehta.de">Jörg Richter</a>
  */
@@ -29,8 +29,7 @@ public interface AssociationDefinition extends Association {
 
     /**
      * @return  The type to be used to create an association instance based on this association definition.
-     *          This is the custom association type if set, otherwise this is <code>dmx.core.composition</code>
-     *          or <code>dmx.core.aggregation</code> depending on this association definition's type.
+     *          That is the custom association type if set, otherwise <code>dmx.core.composition</code>.
      *          Is never <code>null</code>.
      */
     String getInstanceLevelAssocTypeUri();

@@ -506,8 +506,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     private boolean isAssocDef(AssociationModel assoc) {
         String typeUri = assoc.getTypeUri();
-        if (!typeUri.equals("dmx.core.aggregation_def") &&
-            !typeUri.equals("dmx.core.composition_def")) {
+        if (!typeUri.equals("dmx.core.composition_def")) {
             return false;
         }
         //

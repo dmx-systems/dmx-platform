@@ -18,7 +18,7 @@
                     "childTypeUri":         "dmx.contacts.organizational_role",
                     "childCardinalityUri":  "dmx.core.one",
                     "parentCardinalityUri": "dmx.core.many",
-                    "assocTypeUri":         "dmx.core.aggregation_def"
+                    "assocTypeUri":         "dmx.core.composition_def"
                 }
             ],
             "viewConfigTopics": [

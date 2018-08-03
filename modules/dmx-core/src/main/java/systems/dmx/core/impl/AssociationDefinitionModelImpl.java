@@ -300,9 +300,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     private String defaultInstanceLevelAssocTypeUri() {
-        if (typeUri.equals("dmx.core.aggregation_def")) {
-            return "dmx.core.aggregation";
-        } else if (typeUri.equals("dmx.core.composition_def")) {
+        if (typeUri.equals("dmx.core.composition_def")) {
             return "dmx.core.composition";
         } else {
             throw new RuntimeException("Unexpected association type URI: \"" + typeUri + "\"");

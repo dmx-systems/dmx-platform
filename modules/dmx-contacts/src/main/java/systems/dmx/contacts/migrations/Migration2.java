@@ -17,6 +17,8 @@ import java.util.logging.Logger;
  * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.6
+ *
+ * ### TODO: drop this
  */
 public class Migration2 extends Migration {
 

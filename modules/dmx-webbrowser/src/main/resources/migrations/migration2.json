@@ -9,7 +9,7 @@
                     "childTypeUri":         "dmx.webbrowser.url",
                     "childCardinalityUri":  "dmx.core.one",
                     "parentCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.aggregation_def"
+                    "assocTypeUri":         "dmx.core.composition_def"
                 }
             ],
             "viewConfigTopics": [
