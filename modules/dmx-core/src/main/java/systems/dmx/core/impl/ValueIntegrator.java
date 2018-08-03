@@ -198,10 +198,10 @@ class ValueIntegrator {
         TopicImpl _topic = pl.getTopicByValue(type.getUri(), newValue);     // TODO: let pl return models
         TopicModelImpl topic = _topic != null ? _topic.getModel() : null;   // TODO: drop
         if (topic != null) {
-            logger.info("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
+            logger.fine("Reusing simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri + "\")");
         } else {
             topic = createSimpleTopic();
-            logger.info("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
+            logger.fine("### Creating simple value " + topic.id + " \"" + newValue + "\" (typeUri=\"" + type.uri +
                 "\")");
         }
         return topic;
@@ -319,7 +319,7 @@ class ValueIntegrator {
                 return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris), identityAssocDefUris);
             } else {
                 DMXObjectModelImpl parent = createSimpleTopic();
-                logger.info("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
+                logger.fine("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
                     "\")");
                 return parent;
             }
@@ -349,7 +349,7 @@ class ValueIntegrator {
             }
             identityChildTopics.put(assocDefUri, childTopic);
         }
-        // logger.info("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
+        // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
         return identityChildTopics;
     }
 
@@ -409,7 +409,7 @@ class ValueIntegrator {
             oldValue.getRelatingAssociation().delete();
             // update memory
             if (newValueIsEmpty) {
-                logger.info("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                logger.fine("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
                     parent.id + " (typeUri=\"" + type.uri + "\")");
                 childTopics.remove(assocDefUri);
             }
@@ -448,7 +448,7 @@ class ValueIntegrator {
                                                                   String assocDefUri) {
         ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
-        // logger.info("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
+        // logger.fine("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
         for (UnifiedValue _unifiedChild : unifiedChilds) {
             TopicModel unifiedChild = (TopicModel) _unifiedChild.value;
             long originalId = _unifiedChild.originalId;
@@ -463,7 +463,7 @@ class ValueIntegrator {
             boolean deleted = false;
             if (originalId != -1 && (newId == -1 || originalId != newId)) {
                 if (newId == -1) {
-                    logger.info("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                    logger.fine("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
                         parent.id + " (typeUri=\"" + type.uri + "\")");
                 }
                 deleted = true;
@@ -539,7 +539,7 @@ class ValueIntegrator {
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
-        // logger.info("### candidates (" + candidates.size() + "): " + DMXUtils.idList(candidates));
+        // logger.fine("### candidates (" + candidates.size() + "): " + DMXUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
             UnifiedValue value = (UnifiedValue) childTopics.get(assocDefUri);
             eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
@@ -549,11 +549,11 @@ class ValueIntegrator {
         }
         switch (candidates.size()) {
         case 0:
-            // logger.info("### no composite found, childTopics=" + childTopics);
+            // logger.fine("### no composite found, childTopics=" + childTopics);
             return createCompositeTopic(childTopics);
         case 1:
             DMXObjectModelImpl comp = candidates.get(0);
-            logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
+            logger.fine("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
             throw new RuntimeException("ValueIntegrator ambiguity: there are " + candidates.size() +
@@ -573,7 +573,7 @@ class ValueIntegrator {
      */
     private List<RelatedTopicModelImpl> parentCandidates(Map<String, Object> childTopics) {
         String assocDefUri = childTopics.keySet().iterator().next();
-        // logger.info("### assocDefUri=\"" + assocDefUri + "\", childTopics=" + childTopics);
+        // logger.fine("### assocDefUri=\"" + assocDefUri + "\", childTopics=" + childTopics);
         // sanity check
         if (!type.getUri().equals(assocDef(assocDefUri).getParentTypeUri())) {
             throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", assoc def's parent type=\"" +
@@ -604,14 +604,14 @@ class ValueIntegrator {
                 // TODO: assoc parents?
                 if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dmx.core.parent", "dmx.core.child")
                         == null) {
-                    // logger.info("### eliminate (assoc doesn't exist)");
+                    // logger.fine("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
                 // TODO: assoc parents?
                 if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
-                    // logger.info("### eliminate (childs exist)");
+                    // logger.fine("### eliminate (childs exist)");
                     i.remove();
                 }
             }
@@ -639,9 +639,9 @@ class ValueIntegrator {
     private TopicModelImpl createCompositeTopic(Map<String, Object> childTopics) {
         // FIXME: construct the composite model first, then create topic as a whole. => NO! Endless recursion?
         // Otherwise the POST_CREATE_TOPIC event is fired too early, and e.g. Address topics get no geo coordinates.
-        // logger.info("### childTopics=" + childTopics);
+        // logger.fine("### childTopics=" + childTopics);
         TopicModelImpl topic = createSimpleTopic();
-        logger.info("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
+        logger.fine("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childTopics.keySet()) {
             if (isOne(assocDefUri)) {
                 DMXObjectModel childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
@@ -662,7 +662,7 @@ class ValueIntegrator {
 
     private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
                                                                                String assocDefUri, boolean deleted) {
-        logger.info("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
+        logger.fine("### " + (deleted ? "Reassigning" : "Assigning") + " child " + child.getId() + " (assocDefUri=\"" +
             assocDefUri + "\") to composite " + parent.getId() + " (typeUri=\"" + type.uri + "\")");
         return pl.createAssociation(assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             parent.createRoleModel("dmx.core.parent"),
