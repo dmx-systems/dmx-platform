@@ -1,58 +1,44 @@
 package systems.dmx.accesscontrol.migrations;
 
-import systems.dmx.core.Association;
-import systems.dmx.core.DMXObject;
+import systems.dmx.accesscontrol.AccessControlService;
+import systems.dmx.workspaces.WorkspacesService;
+
 import systems.dmx.core.Topic;
+import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.Migration;
 
-import java.util.logging.Logger;
 
 
-
+/**
+ * Creates the "System" workspace.
+ * Runs ALWAYS.
+ * <p>
+ * Part of DMX 5.0
+ */
 public class Migration2 extends Migration {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private long count;
+    @Inject
+    private AccessControlService acService;
 
-    private Logger logger = Logger.getLogger(getClass().getName());
+    @Inject
+    private WorkspacesService wsService;
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     @Override
     public void run() {
-        count = 0;
-        for (Topic topic : dmx.getAllTopics()) {
-            migrateObject(topic, "topic");
-        }
-        count = 0;
-        for (Association assoc : dmx.getAllAssociations()) {
-            migrateObject(assoc, "association");
-        }
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void migrateObject(DMXObject object, String type) {
-        try {
-            count++;
-            String info = "### Migrating " + type + " " + object.getId() + " (#" + count + ")";
-            if (object.hasProperty("creator")) {
-                logger.info(info);
-                renameProperty(object, "creator", "dmx.accesscontrol.creator", true);   // addToIndex=true
-                renameProperty(object, "owner",   "dmx.accesscontrol.owner",   true);   // addToIndex=true
-                renameProperty(object, "acl",     "dmx.accesscontrol.acl",     false);  // addToIndex=false
-            } else {
-                logger.info(info + " SKIPPED -- Access control information not availble");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Migrating " + type + " " + object.getId() + " failed (" + object + ")", e);
-        }
-    }
-
-    private void renameProperty(DMXObject object, String oldPropUri, String newPropUri, boolean addToIndex) {
-        String propValue = (String) object.getProperty(oldPropUri);
-        object.setProperty(newPropUri, propValue, addToIndex);
-        object.removeProperty(oldPropUri);
+        Topic systemWorkspace = wsService.createWorkspace(
+            AccessControlService.SYSTEM_WORKSPACE_NAME,
+            AccessControlService.SYSTEM_WORKSPACE_URI,
+            AccessControlService.SYSTEM_WORKSPACE_SHARING_MODE
+        );
+        // Note: at migration running time our plugin listeners are not yet registered
+        // (furthermore there is no user logged in). So we set the owner manually here.
+        acService.setWorkspaceOwner(systemWorkspace, AccessControlService.ADMIN_USERNAME);
+        // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
+        // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
+        // the System workspace is actually created by the system itself.
     }
 }

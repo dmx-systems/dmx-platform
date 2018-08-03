@@ -10,10 +10,13 @@ import systems.dmx.core.service.Migration;
 
 
 /**
- * Creates the "System" workspace.
+ * Creates the "Administration" workspace.
  * Runs ALWAYS.
  * <p>
- * Part of DM 4.5
+ * Part of DMX 5.0
+ *
+ * Note: the "admin" user account is created in migration 7. At this moment both must exist, the "Login enabled"
+ * config topic type (created in migration 6), and the "Administration" workspace (created here).
  */
 public class Migration3 extends Migration {
 
@@ -30,15 +33,15 @@ public class Migration3 extends Migration {
     @Override
     public void run() {
         Topic systemWorkspace = wsService.createWorkspace(
-            AccessControlService.SYSTEM_WORKSPACE_NAME,
-            AccessControlService.SYSTEM_WORKSPACE_URI,
-            AccessControlService.SYSTEM_WORKSPACE_SHARING_MODE
+            AccessControlService.ADMINISTRATION_WORKSPACE_NAME,
+            AccessControlService.ADMINISTRATION_WORKSPACE_URI,
+            AccessControlService.ADMINISTRATION_WORKSPACE_SHARING_MODE
         );
         // Note: at migration running time our plugin listeners are not yet registered
         // (furthermore there is no user logged in). So we set the owner manually here.
         acService.setWorkspaceOwner(systemWorkspace, AccessControlService.ADMIN_USERNAME);
-        // Note: we don't set a particular creator/modifier here as we don't want suggest that the System workspace has
-        // been created by the "admin" user. Instead the creator/modifier of the System workspace remain undefined as
-        // the System workspace is actually created by the system itself.
+        // Note: we don't set a particular creator/modifier here as we don't want suggest that the Administration
+        // workspace has been created by the "admin" user. Instead the creator/modifier of the Administration
+        // workspace remain undefined as the Administration workspace is actually created by the system itself.
     }
 }

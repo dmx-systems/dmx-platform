@@ -661,6 +661,9 @@ class AccessControlImpl implements AccessControl {
 
     /**
      * Fetches topics by owner, and filter by type.
+     *
+     * ### TODO: drop "typeUri" parameter. Throw if fetched topic is not a workspace.
+     * Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
      */
     private List<TopicModelImpl> fetchTopicsByOwner(String username, String typeUri) {
         List<TopicModelImpl> topics = new ArrayList();

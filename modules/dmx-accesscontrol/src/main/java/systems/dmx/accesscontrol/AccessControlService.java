@@ -195,10 +195,12 @@ public interface AccessControlService {
 
     Collection<Topic> getTopicsByCreator(String username);
 
+    // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
     Collection<Topic> getTopicsByOwner(String username);
 
     Collection<Association> getAssociationsByCreator(String username);
 
+    // ### TODO: drop it. Note: only for workspace topics the "dmx.accesscontrol.owner" property is set.
     Collection<Association> getAssociationsByOwner(String username);
 
 
