@@ -75,7 +75,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
         //
         // Event -> Address
         RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
-            "dmx.core.aggregation", "dmx.core.parent", "dmx.core.child", dmx);
+            "dmx.core.composition", "dmx.core.parent", "dmx.core.child", dmx);
         if (roles != null) {
             long eventId = roles[0].getPlayerId();
             Topic event = dmx.getTopic(eventId);

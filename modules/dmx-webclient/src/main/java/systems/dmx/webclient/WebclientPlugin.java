@@ -296,7 +296,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === View Configuration ===
 
     private void updateType(Topic viewConfig) {
-        Topic type = viewConfig.getRelatedTopic("dmx.core.aggregation", "dmx.core.view_config", "dmx.core.type", null);
+        Topic type = viewConfig.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type", null);
         if (type != null) {
             String typeUri = type.getTypeUri();
             if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {

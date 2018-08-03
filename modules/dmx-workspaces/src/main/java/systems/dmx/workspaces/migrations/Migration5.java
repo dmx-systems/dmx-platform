@@ -18,6 +18,8 @@ import java.util.logging.Logger;
  * Runs only in UPDATE mode.
  * <p>
  * Part of DM 4.5
+ *
+ * TODO: drop it
  */
 public class Migration5 extends Migration {
 

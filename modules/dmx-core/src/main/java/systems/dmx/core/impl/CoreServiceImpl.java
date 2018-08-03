@@ -507,9 +507,9 @@ public class CoreServiceImpl implements CoreService {
             // Create data type "Text"
             TopicModel text = mf.newTopicModel("dmx.core.text", "dmx.core.data_type", new SimpleValue("Text"));
             _createTopic(text);
-            // Create association type "Aggregation" -- needed to associate topic/association types with data types
-            TopicModel aggregation = mf.newAssociationTypeModel("dmx.core.aggregation", "Aggregation", "dmx.core.text");
-            _createTopic(aggregation);
+            // Create association type "Composition" -- needed to associate topic/association types with data types
+            TopicModel composition = mf.newAssociationTypeModel("dmx.core.composition", "Composition", "dmx.core.text");
+            _createTopic(composition);
             // Create association type "Instantiation" -- needed to associate topics with topic types
             TopicModel instn = mf.newAssociationTypeModel("dmx.core.instantiation", "Instantiation", "dmx.core.text");
             _createTopic(instn);
@@ -523,24 +523,24 @@ public class CoreServiceImpl implements CoreService {
             pl.createTopicInstantiation(a.getId(), a.getTypeUri());
             pl.createTopicInstantiation(dataType.getId(), dataType.getTypeUri());
             pl.createTopicInstantiation(text.getId(), text.getTypeUri());
-            pl.createTopicInstantiation(aggregation.getId(), aggregation.getTypeUri());
+            pl.createTopicInstantiation(composition.getId(), composition.getTypeUri());
             pl.createTopicInstantiation(instn.getId(), instn.getTypeUri());
             //
             // 2) Postponed data type association
             //
             // Note: associateDataType() creates the association by a *high-level* (service) call.
-            // This requires the association type (here: dmx.core.aggregation) to be fully constructed already.
+            // This requires the association type (here: dmx.core.composition) to be fully constructed already.
             // That's why the topic type associations (step 1) must be performed *before* the data type associations.
             // ### FIXDOC: not true anymore
             //
-            // Note: at time of the first associateDataType() call the required association type (dmx.core.aggregation)
+            // Note: at time of the first associateDataType() call the required association type (dmx.core.composition)
             // is *not* fully constructed yet! (it gets constructed through this very call). This works anyway because
             // the data type assigning association is created *before* the association type is fetched.
             // (see AssociationImpl.store(): storage.storeAssociation() is called before getType()
             // in DMXObjectImpl.store().)
             // ### FIXDOC: not true anymore
             //
-            // Important is that associateDataType("dmx.core.aggregation") is the first call here.
+            // Important is that associateDataType("dmx.core.composition") is the first call here.
             // ### FIXDOC: not true anymore
             //
             // Note: _associateDataType() creates the data type assigning association by a *low-level* (storage) call.
@@ -553,7 +553,7 @@ public class CoreServiceImpl implements CoreService {
             _associateDataType("dmx.core.assoc_type", "dmx.core.text");
             _associateDataType("dmx.core.data_type",  "dmx.core.text");
             //
-            _associateDataType("dmx.core.aggregation",   "dmx.core.text");
+            _associateDataType("dmx.core.composition",   "dmx.core.text");
             _associateDataType("dmx.core.instantiation", "dmx.core.text");
         } catch (Exception e) {
             throw new RuntimeException("Setting up the bootstrap content failed", e);
@@ -576,7 +576,7 @@ public class CoreServiceImpl implements CoreService {
      * Needed for bootstrapping.
      */
     private void _associateDataType(String typeUri, String dataTypeUri) {
-        AssociationModel assoc = mf.newAssociationModel("dmx.core.aggregation",
+        AssociationModel assoc = mf.newAssociationModel("dmx.core.composition",
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
             mf.newTopicRoleModel(dataTypeUri, "dmx.core.default"));
         pl.storeAssociation(assoc);

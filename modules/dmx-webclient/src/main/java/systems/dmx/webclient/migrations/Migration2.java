@@ -27,7 +27,6 @@ public class Migration2 extends Migration {
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
         // Update: this is because HSB is not the same as HSL. The values here are actually HSB, but CSS expects HSL.
         addColorToAssociationType("dmx.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);
-        addColorToAssociationType("dmx.core.aggregation",     "rgb(53, 223, 59)"   /*"hsl(120, 65%, 90%)"*/);
         addColorToAssociationType("dmx.core.composition",     "rgb(231, 62, 60)"   /*"hsl(  0, 65%, 90%)"*/);
         addColorToAssociationType("dmx.core.composition_def", "rgb(184, 51, 49)"   /*"hsl(  0, 65%, 75%)"*/);
         addColorToAssociationType("dmx.core.instantiation",   "rgb(41, 194, 225)"  /*"hsl(190, 65%, 90%)"*/);

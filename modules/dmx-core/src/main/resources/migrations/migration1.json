@@ -29,21 +29,16 @@
 
     "assoc_types": [
 
-        // Note: The association types "Aggregation" and "Instantiation" are created programmatically.
+        // Note: The association types "Composition" and "Instantiation" are created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
 
-        // Note: The association types "Aggregation Definition" and "Composition Definition" are created in migration 2.
+        // Note: The association type "Composition Definition" is created in migration 2.
 
         /*{
-            "value":       "Aggregation",
-            "uri":         "dmx.core.aggregation",
-            "dataTypeUri": "dmx.core.text"
-        },*/
-        {
             "value":       "Composition",
             "uri":         "dmx.core.composition",
             "dataTypeUri": "dmx.core.text"
-        },
+        },*/
         /*{
             "value":       "Instantiation",
             "uri":         "dmx.core.instantiation",

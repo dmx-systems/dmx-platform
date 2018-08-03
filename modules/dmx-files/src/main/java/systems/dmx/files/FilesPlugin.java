@@ -639,13 +639,13 @@ public class FilesPlugin extends PluginActivator implements FilesService, Static
     private void createFolderAssociation(final long folderTopicId, Topic topic) {
         try {
             final long topicId = topic.getId();
-            boolean exists = dmx.getAssociations(folderTopicId, topicId, "dmx.core.aggregation").size() > 0;
+            boolean exists = dmx.getAssociations(folderTopicId, topicId, "dmx.core.composition").size() > 0;
             if (!exists) {
                 // We suppress standard workspace assignment as the folder association requires a special assignment
                 Association assoc = dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Association>() {
                     @Override
                     public Association call() {
-                        return dmx.createAssociation(mf.newAssociationModel("dmx.core.aggregation",
+                        return dmx.createAssociation(mf.newAssociationModel("dmx.core.composition",
                             mf.newTopicRoleModel(folderTopicId, "dmx.core.parent"),
                             mf.newTopicRoleModel(topicId,       "dmx.core.child")
                         ));

@@ -338,7 +338,7 @@ class AccessControlImpl implements AccessControl {
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             // create assignment association
-            pl.createAssociation("dmx.core.aggregation",
+            pl.createAssociation("dmx.core.composition",
                 object.getModel().createRoleModel("dmx.core.parent"),
                 mf.newTopicRoleModel(workspaceId, "dmx.core.child")
             );
@@ -351,7 +351,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public boolean isWorkspaceAssignment(Association assoc) {
-        if (assoc.getTypeUri().equals("dmx.core.aggregation")) {
+        if (assoc.getTypeUri().equals("dmx.core.composition")) {
             DMXObjectModel topic = ((AssociationImpl) assoc).getModel().getPlayer("dmx.core.child");
             if (topic != null && topic.getTypeUri().equals("dmx.workspaces.workspace")) {
                 return true;
@@ -545,7 +545,7 @@ class AccessControlImpl implements AccessControl {
 
     private SharingMode getSharingMode(long workspaceId) {
         // Note: direct storage access is required here
-        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dmx.core.aggregation", "dmx.core.parent",
+        TopicModel sharingMode = pl.fetchTopicRelatedTopic(workspaceId, "dmx.core.composition", "dmx.core.parent",
             "dmx.core.child", "dmx.workspaces.sharing_mode");
         if (sharingMode == null) {
             throw new RuntimeException("No sharing mode is assigned to workspace " + workspaceId);

@@ -104,6 +104,7 @@ public interface AccessControlService {
 
     /**
      * Creates a Username topic and a private workspace.
+     * TODO: rename to createUsernameAndPrivateWorkspace?
      * 
      * @return  created "Username" topic.
      */
