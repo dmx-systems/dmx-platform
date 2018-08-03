@@ -1,11 +1,16 @@
 package systems.dmx.topicmaps.migrations;
 
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.service.Migration;
 
 
 
+/**
+ * Adds "Topicmap State" to Topicmap.
+ * <p>
+ * Part of DMX 5.0
+ * Runs ALWAYS
+ */
 public class Migration3 extends Migration {
 
     @Override
