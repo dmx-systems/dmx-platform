@@ -7,11 +7,11 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Adds "Date of Birth" to Person.
- * Runs ALWAYS.
  * <p>
  * Part of DM 4.8
+ * Runs ALWAYS
  */
-public class Migration4 extends Migration {
+public class Migration3 extends Migration {
 
     @Override
     public void run() {

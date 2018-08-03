@@ -10,9 +10,9 @@ import systems.dmx.core.service.accesscontrol.Credentials;
 
 /**
  * Creates the "admin" user account.
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  * <p>
  * Note: both must exist already, the "Login enabled" config topic type (created in migration 6), and the
  * "Administration" workspace (created in migration 3).

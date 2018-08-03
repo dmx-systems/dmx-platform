@@ -9,9 +9,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Creates the "DMX" workspace.
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration4 extends Migration {
 

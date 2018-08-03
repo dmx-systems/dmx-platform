@@ -10,9 +10,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Sets "admin" as the owner of the "DMX" workspace.
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration5 extends Migration {
 

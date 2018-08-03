@@ -6,9 +6,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Adds child type "Association Type" to association type "Composition Definition".
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration5 extends Migration {
 

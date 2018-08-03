@@ -6,9 +6,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Adds "Sharing Mode" to "Workspace".
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration3 extends Migration {
 

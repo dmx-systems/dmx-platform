@@ -7,9 +7,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Add index modes to Core types.
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration6 extends Migration {
 

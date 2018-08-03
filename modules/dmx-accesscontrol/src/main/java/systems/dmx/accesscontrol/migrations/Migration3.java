@@ -11,9 +11,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Creates the "Administration" workspace.
- * Runs ALWAYS.
  * <p>
  * Part of DMX 5.0
+ * Runs ALWAYS
  *
  * Note: the "admin" user account is created in migration 7. At this moment both must exist, the "Login enabled"
  * config topic type (created in migration 6), and the "Administration" workspace (created here).
