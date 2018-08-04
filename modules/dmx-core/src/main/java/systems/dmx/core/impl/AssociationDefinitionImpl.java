@@ -57,18 +57,6 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
         return getModel().getInstanceLevelAssocTypeUri();
     }
 
-    // --- Parent Cardinality ---
-
-    @Override
-    public String getParentCardinalityUri() {
-        return getModel().getParentCardinalityUri();
-    }
-
-    @Override
-    public void setParentCardinalityUri(String parentCardinalityUri) {
-        getModel().updateParentCardinalityUri(parentCardinalityUri);
-    }
-
     // --- Child Cardinality ---
 
     @Override

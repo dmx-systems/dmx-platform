@@ -103,7 +103,6 @@
                 {
                     "childTypeUri":         "dmx.webclient.icon",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def"
                 },
                 {
@@ -119,7 +118,6 @@
                 {
                     "childTypeUri":         "dmx.webclient.widget",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {

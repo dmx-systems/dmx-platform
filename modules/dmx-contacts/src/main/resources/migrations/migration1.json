@@ -26,7 +26,6 @@
                     {
                         "childTypeUri":         "dmx.contacts.phone_label",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "viewConfigTopics": [
                             {
@@ -49,7 +48,6 @@
                     {
                         "childTypeUri":         "dmx.contacts.address_label",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "viewConfigTopics": [
                             {
@@ -166,28 +164,24 @@
                     {
                         "childTypeUri":         "dmx.contacts.street",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "includeInLabel":       true
                     },
                     {
                         "childTypeUri":         "dmx.contacts.postal_code",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "includeInLabel":       true
                     },
                     {
                         "childTypeUri":         "dmx.contacts.city",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "includeInLabel":       true
                     },
                     {
                         "childTypeUri":         "dmx.contacts.country",
                         "childCardinalityUri":  "dmx.core.one",
-                        "parentCardinalityUri": "dmx.core.many",
                         "assocTypeUri":         "dmx.core.composition_def",
                         "includeInLabel":       true
                     }

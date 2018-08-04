@@ -52,7 +52,6 @@
                 {
                     "childTypeUri":         "dmx.workspaces.workspace",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def"
                 }
             ]

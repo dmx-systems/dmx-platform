@@ -32,7 +32,6 @@ class TypeStorage {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     // role types
-    private static final String PARENT_CARDINALITY = "dmx.core.parent_cardinality";
     private static final String CHILD_CARDINALITY  = "dmx.core.child_cardinality";
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -334,7 +333,6 @@ class TypeStorage {
         String childTypeUri = fetchChildTypeTopic(assoc).getUri();
         prepareAssocModel(model, parentTypeUri, childTypeUri);
         return mf.newAssociationDefinitionModel(model,
-            defaultCardinalityUri(assoc, PARENT_CARDINALITY),
             defaultCardinalityUri(assoc, CHILD_CARDINALITY),
             null    // viewConfig=null
         );
@@ -346,7 +344,6 @@ class TypeStorage {
         try {
             prepareAssocModel(assoc, parentTypeUri, childTypeUri);
             return mf.newAssociationDefinitionModel(assoc,
-                fetchCardinalityOrThrow(assoc.getId(), PARENT_CARDINALITY).getUri(),
                 fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri(),
                 null    // viewConfig=null
             );
@@ -438,9 +435,7 @@ class TypeStorage {
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
             // assignments already. These must be removed before assigning new cardinality.
-            removeCardinalityAssignmentIfExists(assocDefId, PARENT_CARDINALITY);
             removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
-            associateCardinality(assocDefId, PARENT_CARDINALITY, assocDef.getParentCardinalityUri());
             associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
@@ -527,10 +522,6 @@ class TypeStorage {
     }
 
     // --- Store ---
-
-    void storeParentCardinalityUri(long assocDefId, String parentCardinalityUri) {
-        storeCardinalityUri(assocDefId, PARENT_CARDINALITY, parentCardinalityUri);
-    }
 
     void storeChildCardinalityUri(long assocDefId, String childCardinalityUri) {
         storeCardinalityUri(assocDefId, CHILD_CARDINALITY, childCardinalityUri);

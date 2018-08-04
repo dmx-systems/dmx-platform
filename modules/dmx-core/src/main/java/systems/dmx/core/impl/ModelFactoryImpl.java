@@ -671,18 +671,18 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri) {
+                                                    String childCardinalityUri) {
         return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, false, parentTypeUri, childTypeUri,
-            parentCardinalityUri, childCardinalityUri, null);
+            childCardinalityUri, null);
     }
 
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
                                                     String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    String childCardinalityUri,
                                                     ViewConfigurationModel viewConfig) {
         return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, false, parentTypeUri, childTypeUri,
-            parentCardinalityUri, childCardinalityUri, viewConfig);
+            childCardinalityUri, viewConfig);
     }
 
     @Override
@@ -690,9 +690,9 @@ public class ModelFactoryImpl implements ModelFactory {
                                                     String customAssocTypeUri,
                                                     boolean isIdentityAttr, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
-                                                    String parentCardinalityUri, String childCardinalityUri) {
+                                                    String childCardinalityUri) {
         return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, isIdentityAttr, includeInLabel,
-            parentTypeUri, childTypeUri, parentCardinalityUri, childCardinalityUri, null);
+            parentTypeUri, childTypeUri, childCardinalityUri, null);
     }
 
     /**
@@ -701,10 +701,10 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModel assoc,
-                                                    String parentCardinalityUri, String childCardinalityUri,
+                                                    String childCardinalityUri,
                                                     ViewConfigurationModel viewConfig) {
-        return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, parentCardinalityUri,
-            childCardinalityUri, (ViewConfigurationModelImpl) viewConfig);
+        return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, childCardinalityUri,
+            (ViewConfigurationModelImpl) viewConfig);
     }
 
     @Override
@@ -717,12 +717,7 @@ public class ModelFactoryImpl implements ModelFactory {
                 null, childTopics(assocDef)
             );
             //
-            if (!assocDef.has("parentCardinalityUri") && !assoc.getTypeUri().equals("dmx.core.composition_def")) {
-                throw new RuntimeException("\"parentCardinalityUri\" is missing");
-            }
-            //
             return new AssociationDefinitionModelImpl(assoc,
-                assocDef.optString("parentCardinalityUri", "dmx.core.one"),
                 assocDef.getString("childCardinalityUri"),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
@@ -738,13 +733,13 @@ public class ModelFactoryImpl implements ModelFactory {
                                                                 String customAssocTypeUri,
                                                                 boolean isIdentityAttr, boolean includeInLabel,
                                                                 String parentTypeUri, String childTypeUri,
-                                                                String parentCardinalityUri, String childCardinalityUri,
+                                                                String childCardinalityUri,
                                                                 ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
             newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(customAssocTypeUri, isIdentityAttr, includeInLabel)       // value=null
             ),
-            parentCardinalityUri, childCardinalityUri,
+            childCardinalityUri,
             (ViewConfigurationModelImpl) viewConfig
         );
     }

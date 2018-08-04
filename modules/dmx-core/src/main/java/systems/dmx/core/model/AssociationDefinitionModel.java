@@ -29,15 +29,11 @@ public interface AssociationDefinitionModel extends AssociationModel {
 
     String getChildTypeUri();
 
-    String getParentCardinalityUri();
-
     String getChildCardinalityUri();
 
     ViewConfigurationModel getViewConfig();
 
     // ---
-
-    void setParentCardinalityUri(String parentCardinalityUri);
 
     void setChildCardinalityUri(String childCardinalityUri);
 

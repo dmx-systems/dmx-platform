@@ -27,21 +27,18 @@
                 {
                     "childTypeUri":         "dmx.datetime.month",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.day",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.year",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 }
@@ -68,14 +65,12 @@
                 {
                     "childTypeUri":         "dmx.datetime.hour",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.minute",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.many",
                     "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 }

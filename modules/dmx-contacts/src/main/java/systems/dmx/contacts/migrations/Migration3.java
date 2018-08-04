@@ -18,7 +18,7 @@ public class Migration3 extends Migration {
         dmx.getTopicType("dmx.contacts.person")
             .addAssocDefBefore(
                 mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.contacts.date_of_birth", false, false,
-                "dmx.contacts.person", "dmx.datetime.date", "dmx.core.one", "dmx.core.one"),
+                "dmx.contacts.person", "dmx.datetime.date", "dmx.core.one"),
             "dmx.contacts.phone_number#dmx.contacts.phone_entry");
     }
 }

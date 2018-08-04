@@ -137,11 +137,6 @@
             "typeUri": "dmx.core.role_type"
         },
         {
-            "value":   "Parent Cardinality",
-            "uri":     "dmx.core.parent_cardinality",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
             "value":   "Child Cardinality",
             "uri":     "dmx.core.child_cardinality",
             "typeUri": "dmx.core.role_type"

@@ -8,7 +8,6 @@
                 {
                     "childTypeUri":         "dmx.webbrowser.url",
                     "childCardinalityUri":  "dmx.core.one",
-                    "parentCardinalityUri": "dmx.core.one",
                     "assocTypeUri":         "dmx.core.composition_def"
                 }
             ],

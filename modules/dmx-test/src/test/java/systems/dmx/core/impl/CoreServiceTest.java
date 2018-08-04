@@ -71,7 +71,6 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
         assertEquals("dmx.core.composition_def",     assocDef.getTypeUri());
         assertEquals("dmx.core.plugin",              assocDef.getParentTypeUri());
         assertEquals("dmx.core.plugin_migration_nr", assocDef.getChildTypeUri());
-        assertEquals("dmx.core.one",                 assocDef.getParentCardinalityUri());
         assertEquals("dmx.core.one",                 assocDef.getChildCardinalityUri());
         DMXObject t1 = assocDef.getPlayer("dmx.core.parent_type");
         DMXObject t2 = assocDef.getPlayer("dmx.core.child_type");
@@ -274,7 +273,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
             // 2) create instances
@@ -307,16 +306,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // "Person Name" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def", null, false, true,
-                    "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one"
                 ))
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def", null, false, true,
-                    "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one"
                 ))
             );
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
             // 2) create instances
@@ -352,16 +351,16 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // "Person Name" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.person_name", "Person Name", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def", null, false, true,
-                    "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.person_name", "dmx.test.first_name", "dmx.core.one"
                 ))
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def", null, false, true,
-                    "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.person_name", "dmx.test.last_name", "dmx.core.one"
                 ))
             );
             // "Comment" (composite)
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.comment", "Comment", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.comment", "dmx.test.person_name", "dmx.core.one"
                 ))
             );
             // 2) create instances
@@ -399,7 +398,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.date", "Date", "dmx.core.text"));
             dmx.getTopicType("dmx.core.plugin").addAssocDef(
                 mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.core.plugin", "dmx.test.date", "dmx.core.one", "dmx.core.one"
+                    "dmx.core.plugin", "dmx.test.date", "dmx.core.one"
                 ));
             //
             // Note: the topic type must be re-get as getTopicType() creates
@@ -449,7 +448,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             TopicTypeImpl tt = dmx.createTopicType(
                 mf.newTopicTypeModel("dmx.test.person", "Person", "dmx.core.composite").addAssocDef(
                     mf.newAssociationDefinitionModel("dmx.core.composition_def", "dmx.test.birthday", false, false,
-                        "dmx.test.person", "dmx.test.date", "dmx.core.one", "dmx.core.one")));
+                        "dmx.test.person", "dmx.test.date", "dmx.core.one")));
             // test assoc def childs *before* set
             ChildTopics ct = tt.getAssocDef("dmx.test.date#dmx.test.birthday").getChildTopics();
             assertEquals(false, ct.getBoolean("dmx.core.include_in_label"));
@@ -654,7 +653,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
             // insert assoc def at pos 0
             dmx.getTopicType("dmx.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
-                "dmx.core.composition_def", "dmx.core.plugin", "dmx.test.name", "dmx.core.one", "dmx.core.one"
+                "dmx.core.composition_def", "dmx.core.plugin", "dmx.test.name", "dmx.core.one"
             ), "dmx.core.plugin_name");
             //
             // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
@@ -682,7 +681,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.name", "Name", "dmx.core.text"));
             // insert assoc def at pos 1
             dmx.getTopicType("dmx.core.plugin").addAssocDefBefore(mf.newAssociationDefinitionModel(
-                "dmx.core.composition_def", "dmx.core.plugin", "dmx.test.name", "dmx.core.one", "dmx.core.one"
+                "dmx.core.composition_def", "dmx.core.plugin", "dmx.test.name", "dmx.core.one"
             ), "dmx.core.plugin_symbolic_name");
             //
             // Note: the type manipulators (here: addAssocDefBefore()) operate on the *kernel* type model, while the
@@ -932,10 +931,10 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.composite", "Composite", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.test.composite", "dmx.test.name", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.composite", "dmx.test.name", "dmx.core.one"
                 ))
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.composite", "dmx.test.item", "dmx.core.many", "dmx.core.one"
+                    "dmx.test.composite", "dmx.test.item", "dmx.core.one"
                 ))
             );
             // 2) create example child instances
@@ -1002,7 +1001,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item", "Item", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.item_facet", "Item Facet", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.item_facet", "dmx.test.item", "dmx.core.many", "dmx.core.one"
+                    "dmx.test.item_facet", "dmx.test.item", "dmx.core.one"
                 ))
             );
             // 2) create example facet values
@@ -1069,7 +1068,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.many", "dmx.core.many"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
             // 2) create example child instance
@@ -1098,7 +1097,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.many", "dmx.core.many"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
             // 2) create child instance
@@ -1127,7 +1126,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             // parent type
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.many", "dmx.core.many"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.many"
                 ))
             );
             // 2) create composite instance
@@ -1152,7 +1151,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.many", "dmx.core.one"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );
             // 2) create parent instance
@@ -1182,7 +1181,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.composition_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );
             // 2) create child instance
@@ -1208,7 +1207,7 @@ public class CoreServiceTest extends CoreServiceTestEnvironment {
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.child", "Child", "dmx.core.text"));
             dmx.createTopicType(mf.newTopicTypeModel("dmx.test.parent", "Parent", "dmx.core.composite")
                 .addAssocDef(mf.newAssociationDefinitionModel("dmx.core.aggregation_def",
-                    "dmx.test.parent", "dmx.test.child", "dmx.core.one", "dmx.core.one"
+                    "dmx.test.parent", "dmx.test.child", "dmx.core.one"
                 ))
             );
             // 2) create child instance

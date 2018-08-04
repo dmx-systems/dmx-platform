@@ -34,12 +34,6 @@ public interface AssociationDefinition extends Association {
      */
     String getInstanceLevelAssocTypeUri();
 
-    // --- Parent Cardinality ---
-
-    String getParentCardinalityUri();
-
-    void setParentCardinalityUri(String parentCardinalityUri);
-
     // --- Child Cardinality ---
 
     String getChildCardinalityUri();

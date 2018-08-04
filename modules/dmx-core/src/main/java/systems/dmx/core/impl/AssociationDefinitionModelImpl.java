@@ -20,7 +20,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String parentCardinalityUri;
     private String childCardinalityUri;
 
     private ViewConfigurationModelImpl viewConfig;     // is never null
@@ -33,16 +32,15 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      * Remains partially uninitialzed. Only usable as an update-model (not as a create-model).
      */
     AssociationDefinitionModelImpl(AssociationModelImpl assoc) {
-        this(assoc, null, null, null);
+        this(assoc, null, null);
     }
 
     /**
      * @param   assoc   the underlying association.
      */
-    AssociationDefinitionModelImpl(AssociationModelImpl assoc, String parentCardinalityUri, String childCardinalityUri,
-                                                                                ViewConfigurationModelImpl viewConfig) {
+    AssociationDefinitionModelImpl(AssociationModelImpl assoc, String childCardinalityUri,
+                                                               ViewConfigurationModelImpl viewConfig) {
         super(assoc);
-        this.parentCardinalityUri = parentCardinalityUri;
         this.childCardinalityUri  = childCardinalityUri;
         this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
         // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
@@ -79,11 +77,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     @Override
-    public String getParentCardinalityUri() {
-        return parentCardinalityUri;
-    }
-
-    @Override
     public String getChildCardinalityUri() {
         return childCardinalityUri;
     }
@@ -94,11 +87,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     // ---
-
-    @Override
-    public void setParentCardinalityUri(String parentCardinalityUri) {
-        this.parentCardinalityUri = parentCardinalityUri;
-    }
 
     @Override
     public void setChildCardinalityUri(String childCardinalityUri) {
@@ -116,7 +104,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("parentCardinalityUri", parentCardinalityUri)
                 .put("childCardinalityUri", childCardinalityUri)
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
@@ -185,11 +172,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // === Update (memory + DB) ===
 
-    void updateParentCardinalityUri(String parentCardinalityUri) {
-        setParentCardinalityUri(parentCardinalityUri);                      // update memory
-        pl.typeStorage.storeParentCardinalityUri(id, parentCardinalityUri); // update DB
-    }
-
     void updateChildCardinalityUri(String childCardinalityUri) {
         setChildCardinalityUri(childCardinalityUri);                        // update memory
         pl.typeStorage.storeChildCardinalityUri(id, childCardinalityUri);   // update DB
@@ -257,24 +239,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     // === Update ===
 
     private void updateCardinality(AssociationDefinitionModel newAssocDef) {
-        updateParentCardinality(newAssocDef.getParentCardinalityUri());
         updateChildCardinality(newAssocDef.getChildCardinalityUri());
-    }
-
-    // ---
-
-    private void updateParentCardinality(String newParentCardinalityUri) {
-        // abort if no update is requested
-        if (newParentCardinalityUri == null) {
-            return;
-        }
-        //
-        String parentCardinalityUri = getParentCardinalityUri();
-        if (!parentCardinalityUri.equals(newParentCardinalityUri)) {
-            logger.info("### Changing parent cardinality URI: \"" + parentCardinalityUri + "\" -> \"" +
-                newParentCardinalityUri + "\"");
-            updateParentCardinalityUri(newParentCardinalityUri);
-        }
     }
 
     private void updateChildCardinality(String newChildCardinalityUri) {
