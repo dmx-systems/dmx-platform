@@ -21,7 +21,6 @@
                 {
                     "childTypeUri":        "dmx.notes.title",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",
@@ -34,7 +33,6 @@
                 {
                     "childTypeUri":        "dmx.notes.text",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",

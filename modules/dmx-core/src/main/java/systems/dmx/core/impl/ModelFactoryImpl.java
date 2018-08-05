@@ -42,6 +42,8 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
+    private static final String TYPE_COMP_DEF = "dmx.core.composition_def";
+
     private static final String REF_ID_PREFIX  = "ref_id:";
     private static final String REF_URI_PREFIX = "ref_uri:";
     private static final String DEL_ID_PREFIX  = "del_id:";
@@ -669,29 +671,29 @@ public class ModelFactoryImpl implements ModelFactory {
     // === AssociationDefinitionModel ===
 
     @Override
-    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(
                                                     String parentTypeUri, String childTypeUri,
                                                     String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, false, parentTypeUri, childTypeUri,
+        return newAssociationDefinitionModel(-1, null, null, false, false, parentTypeUri, childTypeUri,
             childCardinalityUri, null);
     }
 
     @Override
-    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(
                                                     String parentTypeUri, String childTypeUri,
                                                     String childCardinalityUri,
                                                     ViewConfigurationModel viewConfig) {
-        return newAssociationDefinitionModel(-1, null, assocTypeUri, null, false, false, parentTypeUri, childTypeUri,
+        return newAssociationDefinitionModel(-1, null, null, false, false, parentTypeUri, childTypeUri,
             childCardinalityUri, viewConfig);
     }
 
     @Override
-    public AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri,
+    public AssociationDefinitionModelImpl newAssociationDefinitionModel(
                                                     String customAssocTypeUri,
                                                     boolean isIdentityAttr, boolean includeInLabel,
                                                     String parentTypeUri, String childTypeUri,
                                                     String childCardinalityUri) {
-        return newAssociationDefinitionModel(-1, null, assocTypeUri, customAssocTypeUri, isIdentityAttr, includeInLabel,
+        return newAssociationDefinitionModel(-1, null, customAssocTypeUri, isIdentityAttr, includeInLabel,
             parentTypeUri, childTypeUri, childCardinalityUri, null);
     }
 
@@ -710,14 +712,13 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(JSONObject assocDef) {
         try {
-            AssociationModelImpl assoc = newAssociationModel(assocDef.optLong("id", -1), null,
-                assocDef.getString("assocTypeUri"),
-                parentRole(assocDef.getString("parentTypeUri")),
-                childRole(assocDef.getString("childTypeUri")),
-                null, childTopics(assocDef)
-            );
-            //
-            return new AssociationDefinitionModelImpl(assoc,
+            return new AssociationDefinitionModelImpl(
+                newAssociationModel(assocDef.optLong("id", -1), null,
+                    TYPE_COMP_DEF,
+                    parentRole(assocDef.getString("parentTypeUri")),
+                    childRole(assocDef.getString("childTypeUri")),
+                    null, childTopics(assocDef)
+                ),
                 assocDef.getString("childCardinalityUri"),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
@@ -729,14 +730,13 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
-    AssociationDefinitionModelImpl newAssociationDefinitionModel(long id, String uri, String assocTypeUri,
-                                                                String customAssocTypeUri,
-                                                                boolean isIdentityAttr, boolean includeInLabel,
-                                                                String parentTypeUri, String childTypeUri,
-                                                                String childCardinalityUri,
-                                                                ViewConfigurationModel viewConfig) {
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(long id, String uri, String customAssocTypeUri,
+                                                                 boolean isIdentityAttr, boolean includeInLabel,
+                                                                 String parentTypeUri, String childTypeUri,
+                                                                 String childCardinalityUri,
+                                                                 ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
-            newAssociationModel(id, uri, assocTypeUri, parentRole(parentTypeUri), childRole(childTypeUri),
+            newAssociationModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
                 null, childTopics(customAssocTypeUri, isIdentityAttr, includeInLabel)       // value=null
             ),
             childCardinalityUri,
@@ -747,8 +747,8 @@ public class ModelFactoryImpl implements ModelFactory {
     /**
      * Internal.
      */
-    AssociationDefinitionModelImpl newAssociationDefinitionModel(String assocTypeUri, ChildTopicsModel childTopics) {
-        return new AssociationDefinitionModelImpl(newAssociationModel(assocTypeUri, childTopics));
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
+        return new AssociationDefinitionModelImpl(newAssociationModel(childTopics));
     }
 
     // ---

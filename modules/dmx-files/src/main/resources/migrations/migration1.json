@@ -58,29 +58,24 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.files.file_content",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.files.file_name",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.files.path",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.files.media_type",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.files.size",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
             ],
             "viewConfigTopics": [
@@ -123,18 +118,15 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.files.folder_name",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.files.path",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.files.folder_content",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [

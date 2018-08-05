@@ -102,23 +102,19 @@
             "assocDefs": [
                 {
                     "childTypeUri":         "dmx.webclient.icon",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 },
                 {
                     "childTypeUri":         "dmx.webclient.color",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 },
                 {
                     "childTypeUri":         "dmx.webclient.show_in_create_menu",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 },
                 {
                     "childTypeUri":         "dmx.webclient.widget",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",
@@ -131,48 +127,39 @@
                 },
                 {
                     "childTypeUri":         "dmx.webclient.clearable",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 },
                 {
                     "childTypeUri":         "dmx.webclient.customizable",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.input_field_rows",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.hidden",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.locked",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.page_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.simple_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.multi_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.searchable_as_unit",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ]
         },
@@ -204,13 +191,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.webclient.search_term",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.search_result",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [

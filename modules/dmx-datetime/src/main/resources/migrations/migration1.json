@@ -27,19 +27,16 @@
                 {
                     "childTypeUri":         "dmx.datetime.month",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.day",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.year",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 }
             ]
@@ -65,13 +62,11 @@
                 {
                     "childTypeUri":         "dmx.datetime.hour",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 },
                 {
                     "childTypeUri":         "dmx.datetime.minute",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "includeInLabel":       true
                 }
             ]
@@ -85,13 +80,11 @@
                 {
                     "childTypeUri":        "dmx.datetime.date",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.datetime.time",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]

@@ -24,13 +24,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.core.identity_attr",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.core.include_in_label",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ]
         }

@@ -18,13 +18,11 @@
                 {
                     "childTypeUri":        "dmx.geomaps.longitude",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.geomaps.latitude",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]
@@ -36,8 +34,7 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.geomaps.geo_coordinate",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ]
         }

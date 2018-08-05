@@ -23,18 +23,15 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.core.plugin_name",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.core.plugin_symbolic_name",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.core.plugin_migration_nr",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ]
         }

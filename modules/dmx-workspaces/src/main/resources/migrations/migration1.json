@@ -25,13 +25,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.workspaces.name",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.workspaces.description",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [
@@ -51,8 +49,7 @@
             "assocDefs": [
                 {
                     "childTypeUri":         "dmx.workspaces.workspace",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def"
+                    "childCardinalityUri":  "dmx.core.one"
                 }
             ]
         }

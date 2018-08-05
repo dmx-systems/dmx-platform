@@ -20,13 +20,11 @@
                 {
                     "childTypeUri":        "dmx.topicmaps.translation_x",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.topicmaps.translation_y",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]
@@ -45,13 +43,11 @@
                 {
                     "childTypeUri":        "dmx.topicmaps.translation",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.topicmaps.zoom_level",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ],

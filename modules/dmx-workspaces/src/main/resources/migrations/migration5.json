@@ -44,31 +44,26 @@
                 {
                     "childTypeUri":        "dmx.workspaces.private.enabled",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.workspaces.confidential.enabled",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.workspaces.collaborative.enabled",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.workspaces.public.enabled",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.workspaces.common.enabled",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "includeInLabel":      true
                 }
             ]

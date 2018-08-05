@@ -207,17 +207,14 @@ public interface ModelFactory {
 
     // === AssociationDefinitionModel ===
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                             String parentTypeUri, String childTypeUri,
+    AssociationDefinitionModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                             String parentTypeUri, String childTypeUri,
+    AssociationDefinitionModel newAssociationDefinitionModel(String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri,
                                                              ViewConfigurationModel viewConfig);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(String assocTypeUri,
-                                                             String customAssocTypeUri,
+    AssociationDefinitionModel newAssociationDefinitionModel(String customAssocTypeUri,
                                                              boolean isIdentityAttr, boolean includeInLabel,
                                                              String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri);

@@ -43,7 +43,6 @@
                 {
                     "childTypeUri":        "dmx.accesscontrol.username",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",
@@ -56,7 +55,6 @@
                 {
                     "childTypeUri":        "dmx.accesscontrol.password",
                     "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",

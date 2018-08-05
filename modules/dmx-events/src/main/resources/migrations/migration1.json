@@ -48,35 +48,29 @@
                 "assocDefs": [
                     {
                         "childTypeUri":         "dmx.events.title",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def"
+                        "childCardinalityUri":  "dmx.core.one"
                     },
                     {
                         "childTypeUri":         "dmx.datetime",
                         "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def",
                         "customAssocTypeUri":   "dmx.events.from"
                     },
                     {
                         "childTypeUri":         "dmx.datetime",
                         "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def",
                         "customAssocTypeUri":   "dmx.events.to"
                     },
                     {
                         "childTypeUri":         "dmx.contacts.address",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def"
+                        "childCardinalityUri":  "dmx.core.one"
                     },
                     {
                         "childTypeUri":         "dmx.events.notes",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def"
+                        "childCardinalityUri":  "dmx.core.one"
                     },
                     {
                         "childTypeUri":         "dmx.webbrowser.url",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "assocTypeUri":         "dmx.core.composition_def"
+                        "childCardinalityUri":  "dmx.core.one"
                     }
                 ],
                 "viewConfigTopics": [

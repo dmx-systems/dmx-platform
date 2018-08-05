@@ -33,23 +33,19 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.topicmaps.name",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.topicmaps.description",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.topicmaps.topicmap_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one",
-                    "assocTypeUri":        "dmx.core.composition_def"
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":         "dmx.files.file",
                     "childCardinalityUri":  "dmx.core.one",
-                    "assocTypeUri":         "dmx.core.composition_def",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",
