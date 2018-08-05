@@ -2,6 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssociationDefinitionModel;
+import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -21,6 +22,13 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    TopicTypeModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
+                       String dataTypeUri, List<IndexMode> indexModes, List<AssociationDefinitionModelImpl> assocDefs,
+                       ViewConfigurationModelImpl viewConfig, PersistenceLayer pl) {
+        super(id, uri, typeUri, value, childTopics, dataTypeUri, indexModes, assocDefs, viewConfig, pl);
+    }
+
+    // TODO: drop it
     TopicTypeModelImpl(TypeModelImpl type) {
         super(type);
     }

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 
 
+// TODO: make it abstract
 class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -37,6 +38,17 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    TypeModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
+                  String dataTypeUri, List<IndexMode> indexModes, List<AssociationDefinitionModelImpl> assocDefs,
+                  ViewConfigurationModelImpl viewConfig, PersistenceLayer pl) {
+        super(id, uri, typeUri, value, childTopics, pl);
+        this.dataTypeUri  = dataTypeUri;
+        this.indexModes   = indexModes;
+        this.assocDefs    = toMap(assocDefs);
+        this.viewConfig   = viewConfig;
+    }
+
+    // TODO: drop it?
     TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
                   List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
@@ -46,6 +58,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         this.viewConfig   = viewConfig;
     }
 
+    // TODO: drop it?
     TypeModelImpl(TypeModelImpl type) {
         super(type);
         this.dataTypeUri  = type.getDataTypeUri();

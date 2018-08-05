@@ -5,6 +5,7 @@ import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RoleModel;
+import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
@@ -19,6 +20,12 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    TopicModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
+                                                                           PersistenceLayer pl) {
+        super(id, uri, typeUri, value, childTopics, pl);
+    }
+
+    // TODO: drop it
     TopicModelImpl(DMXObjectModelImpl object) {
         super(object);
     }

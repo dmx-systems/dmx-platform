@@ -37,7 +37,8 @@ import java.util.Map;
 
 
 
-// ### TODO: should methods return model *impl* objects? -> Yes!
+// accessed from systems.dmx.core.osgi.CoreActivator
+// TODO: inline "osgi" package and make this class package private?
 public class ModelFactoryImpl implements ModelFactory {
 
     // ------------------------------------------------------------------------------------------------------- Constants
