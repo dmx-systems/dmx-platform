@@ -18,7 +18,7 @@ public class ModelBuilderTest extends CoreServiceTestEnvironment {
 
     @Test
     public void topicModelDefaults() {
-        ModelBuilder mb = new ModelBuilder(); mb.pl = dmx.pl;
+        ModelBuilderImpl mb = new ModelBuilderImpl(); mb.pl = dmx.pl;
         TopicModel topic = mb.topicModel().build();
         assertEquals(0, topic.getId());
         assertSame(null, topic.getUri());
@@ -29,7 +29,7 @@ public class ModelBuilderTest extends CoreServiceTestEnvironment {
 
     @Test
     public void topicModel() {
-        ModelBuilder mb = new ModelBuilder(); mb.pl = dmx.pl;
+        ModelBuilderImpl mb = new ModelBuilderImpl(); mb.pl = dmx.pl;
         TopicModel topic = mb.topicModel().id(1234).uri("dmx.core").build();
         assertEquals(1234, topic.getId());
         assertSame("dmx.core", topic.getUri());
@@ -37,8 +37,9 @@ public class ModelBuilderTest extends CoreServiceTestEnvironment {
 
     @Test
     public void topicTypeModel() {
-        ModelBuilder mb = new ModelBuilder(); mb.pl = dmx.pl;
-        TopicTypeModel topicType = mb.topicTypeModel().dataType("dmx.core.text").build();
+        ModelBuilderImpl mb = new ModelBuilderImpl(); mb.pl = dmx.pl;
+        TopicTypeModel topicType = mb.topicTypeModel().id(1234).dataType("dmx.core.text").build();
+        assertEquals(1234, topicType.getId());
         assertSame("dmx.core.text", topicType.getDataTypeUri());
     }
 }

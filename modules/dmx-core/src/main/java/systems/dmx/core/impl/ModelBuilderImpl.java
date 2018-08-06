@@ -3,7 +3,12 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.IndexMode;
+import systems.dmx.core.model.ModelBuilder;
 import systems.dmx.core.model.SimpleValue;
+import systems.dmx.core.model.builder.DMXObjectModelBuilder;
+import systems.dmx.core.model.builder.TopicModelBuilder;
+import systems.dmx.core.model.builder.TypeModelBuilder;
+import systems.dmx.core.model.builder.TopicTypeModelBuilder;
 import systems.dmx.core.util.SequencedHashMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +16,7 @@ import java.util.List;
 
 
 // https://stackoverflow.com/questions/21086417/builder-pattern-and-inheritance
-class ModelBuilder {
+class ModelBuilderImpl implements ModelBuilder {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -19,17 +24,19 @@ class ModelBuilder {
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
-    TopicModelBuilder topicModel() {
-        return new TopicModelBuilder();
+    @Override
+    public TopicModelBuilder topicModel() {
+        return new TopicModelBuilderImpl();
     }
 
-    TopicTypeModelBuilder topicTypeModel() {
-        return new TopicTypeModelBuilder();
+    @Override
+    public TopicTypeModelBuilder topicTypeModel() {
+        return new TopicTypeModelBuilderImpl();
     }
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    abstract class DMXObjectModelBuilder<B extends DMXObjectModelBuilder<B>> {
+    abstract class DMXObjectModelBuilderImpl<B extends DMXObjectModelBuilder<B>> implements DMXObjectModelBuilder<B> {
 
         long id;
         String uri;
@@ -37,12 +44,14 @@ class ModelBuilder {
         SimpleValue value;
         ChildTopicsModelImpl childTopics;
 
-        B id(long id) {
+        @Override
+        public B id(long id) {
             this.id = id;
             return self();
         }
 
-        B uri(String uri) {
+        @Override
+        public B uri(String uri) {
             this.uri = uri;
             return self();
         }
@@ -52,10 +61,10 @@ class ModelBuilder {
         abstract B self();
     }
 
-    class TopicModelBuilder extends DMXObjectModelBuilder<TopicModelBuilder> {
+    class TopicModelBuilderImpl extends DMXObjectModelBuilderImpl<TopicModelBuilder> implements TopicModelBuilder {
 
-        // @Override
-        TopicModelImpl build() {
+        @Override
+        public TopicModelImpl build() {
             return new TopicModelImpl(id, uri, typeUri, value, childTopics, pl);
         }
 
@@ -65,23 +74,26 @@ class ModelBuilder {
         }
     }
 
-    abstract class TypeModelBuilder<B extends TypeModelBuilder<B>> extends DMXObjectModelBuilder<B> {
+    abstract class TypeModelBuilderImpl<B extends TypeModelBuilder<B>> extends DMXObjectModelBuilderImpl<B>
+                                                                                        implements TypeModelBuilder<B> {
 
         String dataTypeUri;
         List<IndexMode> indexModes;
         List<AssociationDefinitionModelImpl> assocDefs;
         ViewConfigurationModelImpl viewConfig;
 
-        B dataType(String dataTypeUri) {
+        @Override
+        public B dataType(String dataTypeUri) {
             this.dataTypeUri = dataTypeUri;
             return self();
         }
     }
 
-    class TopicTypeModelBuilder extends TypeModelBuilder<TopicTypeModelBuilder> {
+    class TopicTypeModelBuilderImpl extends TypeModelBuilderImpl<TopicTypeModelBuilder>
+                                                                                      implements TopicTypeModelBuilder {
 
-        // @Override
-        TopicTypeModelImpl build() {
+        @Override
+        public TopicTypeModelImpl build() {
             return new TopicTypeModelImpl(id, uri, typeUri, value, childTopics,
                 dataTypeUri, indexModes, new ArrayList() /* assocDefs */, viewConfig, pl);
         }
