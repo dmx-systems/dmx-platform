@@ -749,7 +749,7 @@ public class ModelFactoryImpl implements ModelFactory {
      * Internal.
      */
     AssociationDefinitionModelImpl newAssociationDefinitionModel(ChildTopicsModel childTopics) {
-        return new AssociationDefinitionModelImpl(newAssociationModel(childTopics));
+        return new AssociationDefinitionModelImpl(newAssociationModel(TYPE_COMP_DEF, childTopics));
     }
 
     // ---
