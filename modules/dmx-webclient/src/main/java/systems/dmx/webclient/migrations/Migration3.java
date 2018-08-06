@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 public class Migration3 extends Migration {
 
-    private long deepaMehtaWorkspaceId;
+    private long dmxWorkspaceId;
 
     private int[][] count = new int[2][2];
 
@@ -38,7 +38,7 @@ public class Migration3 extends Migration {
         initDMXWorkspaceId();
         //
         logger.info("########## Repairing types with missing \"View Config\" topic (" +
-            (deepaMehtaWorkspaceId == -1 ? "clean install" : "update") + " detected)");
+            (dmxWorkspaceId == -1 ? "clean install" : "update") + " detected)");
         //
         repair(dmx.getAllTopicTypes(), 0);
         repair(dmx.getAllAssociationTypes(), 1);
@@ -77,8 +77,8 @@ public class Migration3 extends Migration {
                 // activated *after* the Webclient module.
                 // In case of a UPDATE the DMX workspace exists already and we make the assignment here.
                 // Type-introduction of the Workspaces module will not perform as this module is installed already.
-                if (deepaMehtaWorkspaceId != -1 && isDMXStandardType(type)) {
-                    dmx.getAccessControl().assignToWorkspace(configTopic, deepaMehtaWorkspaceId);
+                if (dmxWorkspaceId != -1 && isDMXStandardType(type)) {
+                    dmx.getAccessControl().assignToWorkspace(configTopic, dmxWorkspaceId);
                 }
                 //
                 count[i][1]++;
@@ -90,8 +90,8 @@ public class Migration3 extends Migration {
     }
 
     private void initDMXWorkspaceId() {
-        Topic ws = dmx.getTopicByUri("dmx.workspaces.deepamehta");
-        deepaMehtaWorkspaceId = ws != null ? ws.getId() : -1;
+        Topic ws = dmx.getTopicByUri("dmx.workspaces.dmx");
+        dmxWorkspaceId = ws != null ? ws.getId() : -1;
     }
 
     // Copied from WorkspacePlugin.java

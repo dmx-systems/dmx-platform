@@ -55,7 +55,7 @@ class AccessControlImpl implements AccessControl {
 
     // Workspace URIs
     // ### TODO: copy in WorkspaceService.java
-    private static final String DMX_WORKSPACE_URI = "dmx.workspaces.deepamehta";
+    private static final String DMX_WORKSPACE_URI = "dmx.workspaces.dmx";
     // ### TODO: copy in AccessControlService.java
     private static final String ADMINISTRATION_WORKSPACE_URI = "dmx.workspaces.administration";
     private static final String SYSTEM_WORKSPACE_URI = "dmx.workspaces.system";
