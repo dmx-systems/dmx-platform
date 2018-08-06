@@ -5,10 +5,12 @@ import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.util.SequencedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 
 
+// https://stackoverflow.com/questions/21086417/builder-pattern-and-inheritance
 class ModelBuilder {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
@@ -21,9 +23,13 @@ class ModelBuilder {
         return new TopicModelBuilder();
     }
 
+    TopicTypeModelBuilder topicTypeModel() {
+        return new TopicTypeModelBuilder();
+    }
+
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    abstract class DMXObjectModelBuilder<B extends DMXObjectModelBuilder> {
+    abstract class DMXObjectModelBuilder<B extends DMXObjectModelBuilder<B>> {
 
         long id;
         String uri;
@@ -41,14 +47,14 @@ class ModelBuilder {
             return self();
         }
 
-        abstract DMXObjectModel build();
+        // abstract DMXObjectModel build();
 
         abstract B self();
     }
 
     class TopicModelBuilder extends DMXObjectModelBuilder<TopicModelBuilder> {
 
-        @Override
+        // @Override
         TopicModelImpl build() {
             return new TopicModelImpl(id, uri, typeUri, value, childTopics, pl);
         }
@@ -59,25 +65,25 @@ class ModelBuilder {
         }
     }
 
-    class TypeModelBuilder extends TopicModelBuilder {
+    abstract class TypeModelBuilder<B extends TypeModelBuilder<B>> extends DMXObjectModelBuilder<B> {
 
         String dataTypeUri;
         List<IndexMode> indexModes;
         List<AssociationDefinitionModelImpl> assocDefs;
         ViewConfigurationModelImpl viewConfig;
 
-        TypeModelBuilder dataType(String dataTypeUri) {
+        B dataType(String dataTypeUri) {
             this.dataTypeUri = dataTypeUri;
-            return this;
+            return self();
         }
     }
 
-    class TopicTypeModelBuilder extends TypeModelBuilder {
+    class TopicTypeModelBuilder extends TypeModelBuilder<TopicTypeModelBuilder> {
 
-        @Override
-        TopicModelImpl build() {
+        // @Override
+        TopicTypeModelImpl build() {
             return new TopicTypeModelImpl(id, uri, typeUri, value, childTopics,
-                dataTypeUri, indexModes, assocDefs, viewConfig, pl);
+                dataTypeUri, indexModes, new ArrayList() /* assocDefs */, viewConfig, pl);
         }
 
         @Override

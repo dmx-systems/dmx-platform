@@ -29,10 +29,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String dataTypeUri;     // may be null in models used for an update operation
-    private List<IndexMode> indexModes;
-    private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
-    private ViewConfigurationModelImpl viewConfig;                              // is never null
+    String dataTypeUri;     // may be null in models used for an update operation
+    List<IndexMode> indexModes;
+    SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
+    ViewConfigurationModelImpl viewConfig;                              // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
