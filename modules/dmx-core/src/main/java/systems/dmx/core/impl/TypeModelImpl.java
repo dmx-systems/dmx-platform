@@ -38,14 +38,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
-                  String dataTypeUri, List<IndexMode> indexModes, List<AssociationDefinitionModelImpl> assocDefs,
-                  ViewConfigurationModelImpl viewConfig, PersistenceLayer pl) {
-        super(id, uri, typeUri, value, childTopics, pl);
-        this.dataTypeUri  = dataTypeUri;
-        this.indexModes   = indexModes;
-        this.assocDefs    = toMap(assocDefs);
-        this.viewConfig   = viewConfig;
+    TypeModelImpl(ModelBuilderImpl.TypeModelBuilderImpl builder, PersistenceLayer pl) {
+        super(builder, pl);
+        this.dataTypeUri  = builder.dataTypeUri;
+        this.indexModes   = builder.indexModes;
+        this.assocDefs    = toMap(builder.assocDefs);
+        this.viewConfig   = builder.viewConfig;
     }
 
     // TODO: drop it?

@@ -22,10 +22,8 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicTypeModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
-                       String dataTypeUri, List<IndexMode> indexModes, List<AssociationDefinitionModelImpl> assocDefs,
-                       ViewConfigurationModelImpl viewConfig, PersistenceLayer pl) {
-        super(id, uri, typeUri, value, childTopics, dataTypeUri, indexModes, assocDefs, viewConfig, pl);
+    TopicTypeModelImpl(ModelBuilderImpl.TopicTypeModelBuilderImpl builder, PersistenceLayer pl) {
+        super(builder, pl);
     }
 
     // TODO: drop it

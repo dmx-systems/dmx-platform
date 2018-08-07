@@ -65,7 +65,7 @@ class ModelBuilderImpl implements ModelBuilder {
 
         @Override
         public TopicModelImpl build() {
-            return new TopicModelImpl(id, uri, typeUri, value, childTopics, pl);
+            return new TopicModelImpl(this, pl);
         }
 
         @Override
@@ -76,10 +76,11 @@ class ModelBuilderImpl implements ModelBuilder {
 
     abstract class TypeModelBuilderImpl<B extends TypeModelBuilder<B>> extends DMXObjectModelBuilderImpl<B>
                                                                                         implements TypeModelBuilder<B> {
-
+        // TODO: think about default values. Set them in builder, or in model constructor?
+        // Compare to DMXObjectModelImpl constructor.
         String dataTypeUri;
-        List<IndexMode> indexModes;
-        List<AssociationDefinitionModelImpl> assocDefs;
+        List<IndexMode> indexModes;     // TODO: default value?
+        List<AssociationDefinitionModelImpl> assocDefs = new ArrayList();
         ViewConfigurationModelImpl viewConfig;
 
         @Override
@@ -91,11 +92,9 @@ class ModelBuilderImpl implements ModelBuilder {
 
     class TopicTypeModelBuilderImpl extends TypeModelBuilderImpl<TopicTypeModelBuilder>
                                                                                       implements TopicTypeModelBuilder {
-
         @Override
         public TopicTypeModelImpl build() {
-            return new TopicTypeModelImpl(id, uri, typeUri, value, childTopics,
-                dataTypeUri, indexModes, new ArrayList() /* assocDefs */, viewConfig, pl);
+            return new TopicTypeModelImpl(this, pl);
         }
 
         @Override

@@ -20,9 +20,8 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TopicModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
-                                                                           PersistenceLayer pl) {
-        super(id, uri, typeUri, value, childTopics, pl);
+    TopicModelImpl(ModelBuilderImpl.DMXObjectModelBuilderImpl builder, PersistenceLayer pl) {
+        super(builder, pl);
     }
 
     // TODO: drop it

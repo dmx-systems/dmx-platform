@@ -57,6 +57,19 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
+    DMXObjectModelImpl(ModelBuilderImpl.DMXObjectModelBuilderImpl builder, PersistenceLayer pl) {
+        this.id          = builder.id;
+        this.uri         = builder.uri;
+        this.typeUri     = builder.typeUri;
+        this.value       = builder.value;
+        this.childTopics = builder.childTopics != null ? builder.childTopics : pl.mf.newChildTopicsModel();
+        //
+        this.pl          = pl;
+        this.em          = pl.em;
+        this.mf          = pl.mf;
+    }
+
+    // TODO: drop it
     DMXObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
                                                                                PersistenceLayer pl) {
         this.id          = id;
@@ -70,9 +83,9 @@ class DMXObjectModelImpl implements DMXObjectModel {
         this.mf          = pl.mf;
     }
 
+    // TODO: needed?
     DMXObjectModelImpl(DMXObjectModelImpl object) {
-        this(object.getId(), object.getUri(), object.getTypeUri(), object.getSimpleValue(),
-            object.getChildTopicsModel(), object.pl);
+        this(object.id, object.uri, object.typeUri, object.value, object.childTopics, object.pl);
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods
