@@ -40,12 +40,16 @@ public interface WorkspacesService {
     Topic getWorkspace(String uri);
 
     /**
-     * Returns the workspace a topic or association is assigned to.
+     * Returns the workspace the given topic/association is assigned to.
      *
-     * @param   id      a topic ID, or an association ID
+     * @param   objectId    a topic ID, or an association ID
      *
      * @return  The assigned workspace (a topic of type "Workspace"),
      *          or <code>null</code> if no workspace is assigned.
+     *
+     * @throws  RuntimeExeption     If no object with the given ID exists.
+     * @throws  RuntimeExeption     If the current user has no READ permission for the workspace (and thus for the given
+     *                              topic/association).
      */
     Topic getAssignedWorkspace(long objectId);
 

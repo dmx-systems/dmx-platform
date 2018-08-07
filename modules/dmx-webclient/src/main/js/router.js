@@ -167,17 +167,40 @@ function initialNavigation (route) {
       // console.log('### Initial navigation (no topicmap cookie present)')
     }
   }
+  // topicmap validity check
+  let workspaceId   // valid only if topicmapId is defined after validity check
+  let p             // a promise resolved once validity check is complete
+  if (topicmapId) {
+    console.log(`Checking workspace of topicmap ${topicmapId}`)
+    // Note: get-assigned-workspace responses are not cached by the browser.
+    // In contrast get-topic responses *are* cached by the browser.
+    // Doing get-assigned-workspace first avoids working with stale data.
+    p = getAssignedWorkspace(topicmapId).then(workspace => {
+      console.log('Workspace retrieved', workspace)
+      workspaceId = workspace.id
+      console.log(`Retrieving topic ${topicmapId}`)
+      return dm5.restClient.getTopic(topicmapId)
+    }).then(topic => {
+      console.log('Topic retrieved', topic)
+      if (topic.typeUri !== "dmx.topicmaps.topicmap") {
+        console.warn(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
+        topicmapId = undefined
+      }
+    }).catch(error => {
+      console.warn('Topicmap check failed', error)
+      topicmapId = undefined
+    })
+  } else {
+    p = Promise.resolve()
+  }
   // 2) select workspace
   // Note: at this stage a topicmap ID might be available or not. If available it is either obtained from URL or from
   // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required. On the other
   // hand, if obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
-  if (topicmapId) {
-    getAssignedWorkspace(topicmapId)
-      .then(workspace => {
-        // console.log('Topicmap', topicmapId, 'is assigned to workspace', workspace.id)
-        return store.dispatch('_selectWorkspace', workspace.id)       // no route push
-      })
-      .then(() => {
+  p.then(() => {
+    console.log('Initial topicmap/workspace', topicmapId, workspaceId)
+    if (topicmapId) {
+      store.dispatch('_selectWorkspace', workspaceId).then(() => {    // no route push
         // the workspace's topicmap topics are now available
         if (urlPresent) {
           // Note: 'displayTopicmap' relies on the topicmap topics in order to tell what topicmap renderer to use
@@ -191,9 +214,10 @@ function initialNavigation (route) {
           store.dispatch('callTopicmapRoute', topicmapId)             // push initial route
         }
       })
-  } else {
-    store.dispatch('selectFirstWorkspace')                            // push initial route (indirectly)
-  }
+    } else {
+      store.dispatch('selectFirstWorkspace')                          // push initial route (indirectly)
+    }
+  })
   // 3) setup detail panel
   const detail = route.params.detail
   if (detail) {

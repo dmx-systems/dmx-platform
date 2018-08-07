@@ -70,7 +70,7 @@ public interface AccessControl {
      * Note: a user can have more than one private workspace.
      * This method returns only the first one.
      * <p>
-     * This is a privileged method, it bypasses the access control system.
+     * Access control is bypassed.
      *
      * @throws  RuntimeException    if the user has no private workspace.
      *
@@ -154,10 +154,15 @@ public interface AccessControl {
 
     /**
      * Returns the ID of the workspace a topic or association is assigned to.
+     * <p>
+     * Access control is bypassed.
+     * READ permission is neither required for the given topic/association, nor for the returned workspace.
      *
      * @param   objectId    a topic ID, or an association ID
      *
      * @return  The workspace ID, or <code>-1</code> if no workspace is assigned.
+     *
+     * @throws  RuntimeExeption     If no object with the given ID exists.
      */
     long getAssignedWorkspaceId(long objectId);
 
@@ -203,7 +208,7 @@ public interface AccessControl {
     /**
      * Returns the configuration topic of the given type for the given topic.
      * <p>
-     * This is a privileged method, it bypasses the access control system.
+     * Access control is bypassed.
      *
      * @throws  RuntimeException    if no such configuration topic exists.
      */
@@ -219,7 +224,7 @@ public interface AccessControl {
      * The username is determined by traversing from the Email Address topic along a
      * <code>org.deepamehta.signup.user_mailbox</code> association.
      * <p>
-     * This is a privileged method, it bypasses the access control system.
+     * Access control is bypassed.
      *
      * @throws  RuntimeException    if no such Email Address topic exists in the DB, or
      *                              if more than one such Email Address topics exist in the DB, or
@@ -233,7 +238,7 @@ public interface AccessControl {
      * The email address is determined by traversing from the Username topic along a
      * <code>org.deepamehta.signup.user_mailbox</code> association.
      * <p>
-     * This is a privileged method, it bypasses the access control system.
+     * Access control is bypassed.
      *
      * @throws  RuntimeException    if no such Username topic exists in the DB, or
      *                              if the Username topic is not associated to an Email Address topic.
@@ -246,7 +251,7 @@ public interface AccessControl {
      * Returns true if an "Email Address" (dmx.contacts.email_address) topic with the given value exists,
      * false otherwise.
      * <p>
-     * This is a privileged method, it bypasses the access control system.
+     * Access control is bypassed.
      */
     boolean emailAddressExists(String emailAddress);
 }
