@@ -123,4 +123,12 @@ button {
 .el-dialog__footer {
   padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
 }
+
+/* Quill editor */
+
+.ql-topic-link {
+  font-size: 16px !important;
+  color: #ccc;
+}
+
 </style>

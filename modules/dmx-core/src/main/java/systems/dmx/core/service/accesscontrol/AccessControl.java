@@ -162,7 +162,7 @@ public interface AccessControl {
      *
      * @return  The workspace ID, or <code>-1</code> if no workspace is assigned.
      *
-     * @throws  RuntimeExeption     If no object with the given ID exists.
+     * @throws  RuntimeException     If no object with the given ID exists.
      */
     long getAssignedWorkspaceId(long objectId);
 

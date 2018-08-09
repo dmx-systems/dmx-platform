@@ -58,7 +58,7 @@ export default {
     // FIXME: handle multiple Quill instances
     const button = document.querySelector('button.ql-topic-link')
     button.textContent = 'T'    // TODO: use real (SVG) icon
-    button.setAttribute('title', 'Embed a topic link')
+    button.setAttribute('title', 'Insert topic link')
   },
 
   infoDOMReady (dom) {

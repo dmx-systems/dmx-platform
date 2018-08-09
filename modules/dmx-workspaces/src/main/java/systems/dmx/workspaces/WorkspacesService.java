@@ -47,8 +47,8 @@ public interface WorkspacesService {
      * @return  The assigned workspace (a topic of type "Workspace"),
      *          or <code>null</code> if no workspace is assigned.
      *
-     * @throws  RuntimeExeption     If no object with the given ID exists.
-     * @throws  RuntimeExeption     If the current user has no READ permission for the workspace (and thus for the given
+     * @throws  RuntimeException    If no object with the given ID exists.
+     * @throws  RuntimeException    If the current user has no READ permission for the workspace (and thus for the given
      *                              topic/association).
      */
     Topic getAssignedWorkspace(long objectId);
