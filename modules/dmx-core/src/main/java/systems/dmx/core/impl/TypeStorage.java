@@ -331,22 +331,18 @@ class TypeStorage {
         AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
         String childTypeUri = fetchChildTypeTopic(assoc).getUri();
-        prepareAssocModel(model, parentTypeUri, childTypeUri);
-        return mf.newAssociationDefinitionModel(model,
-            defaultCardinalityUri(assoc, CHILD_CARDINALITY),
-            null    // viewConfig=null
-        );
+        prepareAssocModel(model, parentTypeUri, childTypeUri, defaultCardinalityUri(assoc, CHILD_CARDINALITY));
+        return mf.newAssociationDefinitionModel(model, null);       // viewConfig=null
     }
 
     // Note: the assoc is **not** required to identify its players by URI (by ID is OK)
     private AssociationDefinitionModel fetchAssociationDefinition(AssociationModel assoc, String parentTypeUri,
                                                                                           String childTypeUri) {
         try {
-            prepareAssocModel(assoc, parentTypeUri, childTypeUri);
-            return mf.newAssociationDefinitionModel(assoc,
-                fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri(),
-                null    // viewConfig=null
+            prepareAssocModel(assoc, parentTypeUri, childTypeUri,
+                fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri()
             );
+            return mf.newAssociationDefinitionModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
                 "\", childTypeUri=\"" + childTypeUri + "\", " + assoc + ")", e);
@@ -355,12 +351,16 @@ class TypeStorage {
 
     /**
      * Prepares an assoc model for being used as the base for an assoc def model.
+     * <p>
+     * TODO: can we use model-driven assoc def retrieval?
      */
-    private void prepareAssocModel(AssociationModel assoc, String parentTypeUri, String childTypeUri) {
+    private void prepareAssocModel(AssociationModel assoc, String parentTypeUri, String childTypeUri,
+                                                                                 String cardinalityUri) {
         long assocDefId = assoc.getId();
         assoc.setRoleModel1(mf.newTopicRoleModel(parentTypeUri, "dmx.core.parent_type"));
         assoc.setRoleModel2(mf.newTopicRoleModel(childTypeUri,  "dmx.core.child_type"));
         ChildTopicsModel childTopics = assoc.getChildTopicsModel();
+        childTopics.putRef("dmx.core.cardinality", cardinalityUri);
         RelatedTopicModel customAssocType = fetchCustomAssocType(assocDefId);
         if (customAssocType != null) {
             childTopics.put("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);

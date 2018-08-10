@@ -23,6 +23,10 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
+                    "childTypeUri":        "dmx.core.cardinality",
+                    "childCardinalityUri": "dmx.core.one"
+                },
+                {
                     "childTypeUri":        "dmx.core.identity_attr",
                     "childCardinalityUri": "dmx.core.one"
                 },

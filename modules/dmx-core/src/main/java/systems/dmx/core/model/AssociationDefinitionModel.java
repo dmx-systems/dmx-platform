@@ -35,6 +35,7 @@ public interface AssociationDefinitionModel extends AssociationModel {
 
     // ---
 
+    // TODO: currently not supported. Drop from public API?
     void setChildCardinalityUri(String childCardinalityUri);
 
     void setViewConfig(ViewConfigurationModel viewConfig);

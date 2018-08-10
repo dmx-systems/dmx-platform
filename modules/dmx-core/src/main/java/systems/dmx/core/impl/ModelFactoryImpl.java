@@ -703,9 +703,8 @@ public class ModelFactoryImpl implements ModelFactory {
      */
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModel assoc,
-                                                    String childCardinalityUri,
-                                                    ViewConfigurationModel viewConfig) {
-        return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc, childCardinalityUri,
+                                                                        ViewConfigurationModel viewConfig) {
+        return new AssociationDefinitionModelImpl((AssociationModelImpl) assoc,
             (ViewConfigurationModelImpl) viewConfig);
     }
 
@@ -719,7 +718,6 @@ public class ModelFactoryImpl implements ModelFactory {
                     childRole(assocDef.getString("childTypeUri")),
                     null, childTopics(assocDef)
                 ),
-                assocDef.getString("childCardinalityUri"),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))
             );
         } catch (Exception e) {
@@ -737,9 +735,8 @@ public class ModelFactoryImpl implements ModelFactory {
                                                                  ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
             newAssociationModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
-                null, childTopics(customAssocTypeUri, isIdentityAttr, includeInLabel)       // value=null
+                null, childTopics(customAssocTypeUri, childCardinalityUri, isIdentityAttr, includeInLabel) // value=null
             ),
-            childCardinalityUri,
             (ViewConfigurationModelImpl) viewConfig
         );
     }
@@ -767,13 +764,16 @@ public class ModelFactoryImpl implements ModelFactory {
         return childTopics(
             // Note: getString()/optString() on a key with JSON null value would return the string "null"
             assocDef.isNull("customAssocTypeUri") ? null : assocDef.getString("customAssocTypeUri"),
+            assocDef.getString("childCardinalityUri"),
             assocDef.optBoolean("isIdentityAttr"),
             assocDef.optBoolean("includeInLabel")
         );
     }
 
-    private ChildTopicsModel childTopics(String customAssocTypeUri, boolean isIdentityAttr, boolean includeInLabel) {
+    private ChildTopicsModel childTopics(String customAssocTypeUri, String cardinalityUri, boolean isIdentityAttr,
+                                         boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
+            .putRef("dmx.core.cardinality", cardinalityUri)
             .put("dmx.core.identity_attr", isIdentityAttr)
             .put("dmx.core.include_in_label", includeInLabel);
         //

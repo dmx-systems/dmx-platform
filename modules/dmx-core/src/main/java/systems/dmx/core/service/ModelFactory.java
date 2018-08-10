@@ -219,9 +219,7 @@ public interface ModelFactory {
                                                              String parentTypeUri, String childTypeUri,
                                                              String childCardinalityUri);
 
-    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc,
-                                                             String childCardinalityUri,
-                                                             ViewConfigurationModel viewConfig);
+    AssociationDefinitionModel newAssociationDefinitionModel(AssociationModel assoc, ViewConfigurationModel viewConfig);
 
     AssociationDefinitionModel newAssociationDefinitionModel(JSONObject assocDef);
 

@@ -20,8 +20,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private String childCardinalityUri;
-
     private ViewConfigurationModelImpl viewConfig;     // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -32,16 +30,14 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      * Remains partially uninitialzed. Only usable as an update-model (not as a create-model).
      */
     AssociationDefinitionModelImpl(AssociationModelImpl assoc) {
-        this(assoc, null, null);
+        this(assoc, null);
     }
 
     /**
      * @param   assoc   the underlying association.
      */
-    AssociationDefinitionModelImpl(AssociationModelImpl assoc, String childCardinalityUri,
-                                                               ViewConfigurationModelImpl viewConfig) {
+    AssociationDefinitionModelImpl(AssociationModelImpl assoc, ViewConfigurationModelImpl viewConfig) {
         super(assoc);
-        this.childCardinalityUri  = childCardinalityUri;
         this.viewConfig = viewConfig != null ? viewConfig : mf.newViewConfigurationModel();
         // ### TODO: why null check? Compare to TypeModelImpl constructor -> see previous constructor
     }
@@ -78,7 +74,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String getChildCardinalityUri() {
-        return childCardinalityUri;
+        return _getCardinalityUri();
     }
 
     @Override
@@ -90,7 +86,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public void setChildCardinalityUri(String childCardinalityUri) {
-        this.childCardinalityUri = childCardinalityUri;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -104,7 +100,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     public JSONObject toJSON() {
         try {
             return super.toJSON()
-                .put("childCardinalityUri", childCardinalityUri)
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
@@ -160,26 +155,27 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
      *              Note: on post-update time updateModel and this (assoc def) model may differ at least because
      *                a) updateModel might contain only certain assoc def parts; this is called a "partial update"
      *                b) updateModel might contain refs and deletion-refs; this model never contains refs
+     *
+     * TODO: drop this method!
      */
     @Override
     void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
         super.postUpdate(updateModel, oldObject);
-        //
-        updateCardinality((AssociationDefinitionModel) updateModel);
     }
 
 
 
-    // === Update (memory + DB) ===
+    // === Read from ChildTopicsModel ===
 
-    void updateChildCardinalityUri(String childCardinalityUri) {
-        setChildCardinalityUri(childCardinalityUri);                        // update memory
-        pl.typeStorage.storeChildCardinalityUri(id, childCardinalityUri);   // update DB
+    final String _getCardinalityUri() {
+        TopicModelImpl cardinality = getChildTopicsModel().getTopicOrNull("dmx.core.cardinality");
+        if (cardinality == null) {
+            // ### TODO: should a cardinality topic always exist?
+            throw new RuntimeException("Assoc def \"" + getAssocDefUri() + "\" has no \"Cardinality\" topic");
+            // return false;
+        }
+        return cardinality.uri;
     }
-
-
-
-    // === Identity Configuration ===
 
     final boolean isIdentityAttr() {
         TopicModel isIdentityAttr = getChildTopicsModel().getTopicOrNull("dmx.core.identity_attr");
@@ -190,10 +186,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         }
         return isIdentityAttr.getSimpleValue().booleanValue();
     }
-
-
-
-    // === Label Configuration ===
 
     final boolean includeInLabel() {
         TopicModel includeInLabel = getChildTopicsModel().getTopicOrNull("dmx.core.include_in_label");
@@ -233,32 +225,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Update ===
-
-    private void updateCardinality(AssociationDefinitionModel newAssocDef) {
-        updateChildCardinality(newAssocDef.getChildCardinalityUri());
-    }
-
-    private void updateChildCardinality(String newChildCardinalityUri) {
-        // abort if no update is requested
-        if (newChildCardinalityUri == null) {
-            return;
-        }
-        //
-        String childCardinalityUri = getChildCardinalityUri();
-        if (!childCardinalityUri.equals(newChildCardinalityUri)) {
-            logger.info("### Changing child cardinality URI: \"" + childCardinalityUri + "\" -> \"" +
-                newChildCardinalityUri + "\"");
-            updateChildCardinalityUri(newChildCardinalityUri);
-        }
-    }
-
-
-
-    // ===
 
     private TopicModelImpl getCustomAssocType() {
         return getChildTopicsModel().getTopicOrNull("dmx.core.assoc_type#dmx.core.custom_assoc_type");

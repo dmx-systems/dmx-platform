@@ -66,7 +66,7 @@ class AssociationDefinitionImpl extends AssociationImpl implements AssociationDe
 
     @Override
     public void setChildCardinalityUri(String childCardinalityUri) {
-        getModel().updateChildCardinalityUri(childCardinalityUri);
+        throw new UnsupportedOperationException();
     }
 
     // ---

@@ -38,6 +38,7 @@ public interface AssociationDefinition extends Association {
 
     String getChildCardinalityUri();
 
+    // TODO: currently not supported
     void setChildCardinalityUri(String childCardinalityUri);
 
     // ---
