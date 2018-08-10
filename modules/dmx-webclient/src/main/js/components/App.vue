@@ -126,9 +126,8 @@ button {
 
 /* Quill editor */
 
-.ql-topic-link {
+button.ql-topic-link {
   font-size: 16px !important;
   color: #ccc;
 }
-
 </style>

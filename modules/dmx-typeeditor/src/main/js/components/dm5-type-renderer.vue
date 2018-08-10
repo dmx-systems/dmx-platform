@@ -2,6 +2,12 @@
   <div class="dm5-type-renderer">
     <!-- Generic Object -->
     <dm5-object :object="object" :level="0" :context="context"></dm5-object>
+    <!-- Type URI -->
+    <div class="field">
+      <div class="field-label">Type URI</div>
+      <div v-if="infoMode">{{object.uri}}</div>
+      <el-input v-else v-model="object.uri"></el-input>
+    </div>
     <!-- Data Type -->
     <div class="field">
       <div class="field-label">Data Type</div>
