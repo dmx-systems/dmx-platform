@@ -13,12 +13,12 @@ import java.util.logging.Logger;
 
 /**
  * Repairing types with missing "View Config" topic.
- * Runs ALWAYS.
  * <p>
  * Note: while a "clean install" the Core types, and other types created before Webclient is activated, are repaired.
  * While "update" all existing types are repaired, including the ones created by installed 3rd-party modules.
  * <p>
- * Part of DM 4.8.6
+ * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration3 extends Migration {
 

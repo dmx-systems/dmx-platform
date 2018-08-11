@@ -16,8 +16,18 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dmx.contacts.organizational_role",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.contacts.organizational_role",
+                    "childCardinalityUri": "dmx.core.one",
+                    "viewConfigTopics": [
+                        {
+                            "typeUri": "dmx.webclient.view_config",
+                            "childs": {
+                                "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                                "dmx.webclient.clearable": true,
+                                "dmx.webclient.customizable": true
+                            }
+                        }
+                    ]
                 }
             ],
             "viewConfigTopics": [
