@@ -1,5 +1,6 @@
 package systems.dmx.webclient.migrations;
 
+import systems.dmx.core.AssociationType;
 import systems.dmx.core.service.Migration;
 
 
@@ -32,7 +33,14 @@ public class Migration2 extends Migration {
         addColorToAssociationType("dmx.core.instantiation",   "rgb(41, 194, 225)"  /*"hsl(190, 65%, 90%)"*/);
         addColorToAssociationType("dmx.core.sequence",        "rgb(228, 223, 55)"  /*"hsl( 60, 65%, 90%)"*/);
         //
-        setSelectWidget("dmx.core.composition_def");
+        AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
+        compDef.getAssocDef("dmx.core.cardinality")
+            .getViewConfig()
+                .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select");
+        compDef.getAssocDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
+            .getViewConfig()
+                .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select")
+                .setConfigValue("dmx.webclient.view_config", "dmx.webclient.clearable", true);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -43,14 +51,5 @@ public class Migration2 extends Migration {
 
     private void addColorToAssociationType(String assocTypeUri, String color) {
         setAssocTypeViewConfigValue(assocTypeUri, "color", color);
-    }
-
-    // ---
-
-    private void setSelectWidget(String assocTypeUri) {
-        dmx.getAssociationType(assocTypeUri).getAssocDef("dmx.core.assoc_type#dmx.core.custom_assoc_type")
-            .getViewConfig()
-                .setConfigValueRef("dmx.webclient.view_config", "dmx.webclient.widget", "dmx.webclient.select")
-                .setConfigValue("dmx.webclient.view_config", "dmx.webclient.clearable", true);
     }
 }
