@@ -7,9 +7,9 @@ import systems.dmx.core.service.Migration;
 
 /**
  * Add view configs to Core types.
- * Runs ALWAYS.
  * <p>
- * Part of DM 4.0
+ * Part of DMX 5.0
+ * Runs ALWAYS
  */
 public class Migration2 extends Migration {
 
