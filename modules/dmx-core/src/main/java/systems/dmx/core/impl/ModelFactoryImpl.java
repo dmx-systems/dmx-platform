@@ -735,7 +735,7 @@ public class ModelFactoryImpl implements ModelFactory {
                                                                  ViewConfigurationModel viewConfig) {
         return new AssociationDefinitionModelImpl(
             newAssociationModel(id, uri, TYPE_COMP_DEF, parentRole(parentTypeUri), childRole(childTypeUri),
-                null, childTopics(customAssocTypeUri, childCardinalityUri, isIdentityAttr, includeInLabel) // value=null
+                null, childTopics(childCardinalityUri, customAssocTypeUri, isIdentityAttr, includeInLabel) // value=null
             ),
             (ViewConfigurationModelImpl) viewConfig
         );
@@ -762,15 +762,15 @@ public class ModelFactoryImpl implements ModelFactory {
 
     private ChildTopicsModel childTopics(JSONObject assocDef) throws JSONException {
         return childTopics(
+            assocDef.getString("childCardinalityUri"),
             // Note: getString()/optString() on a key with JSON null value would return the string "null"
             assocDef.isNull("customAssocTypeUri") ? null : assocDef.getString("customAssocTypeUri"),
-            assocDef.getString("childCardinalityUri"),
             assocDef.optBoolean("isIdentityAttr"),
             assocDef.optBoolean("includeInLabel")
         );
     }
 
-    private ChildTopicsModel childTopics(String customAssocTypeUri, String cardinalityUri, boolean isIdentityAttr,
+    private ChildTopicsModel childTopics(String cardinalityUri, String customAssocTypeUri, boolean isIdentityAttr,
                                          boolean includeInLabel) {
         ChildTopicsModel childTopics = newChildTopicsModel()
             .putRef("dmx.core.cardinality", cardinalityUri)

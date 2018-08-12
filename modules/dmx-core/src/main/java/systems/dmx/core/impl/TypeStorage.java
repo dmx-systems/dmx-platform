@@ -29,11 +29,6 @@ import java.util.logging.Logger;
  */
 class TypeStorage {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    // role types
-    private static final String CHILD_CARDINALITY  = "dmx.core.child_cardinality";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private Map<String, TypeModelImpl> typeCache = new HashMap();
@@ -269,17 +264,6 @@ class TypeStorage {
 
     // === Association Definitions ===
 
-    // Note: if the underlying association was an association definition before it has cardinality
-    // assignments already. These assignments are restored. Otherwise "One" is used as default.
-    private String defaultCardinalityUri(AssociationModel assoc, String cardinalityRoleTypeUri) {
-        RelatedTopicModel cardinality = fetchCardinality(assoc.getId(), cardinalityRoleTypeUri);
-        if (cardinality != null) {
-            return cardinality.getUri();
-        } else {
-            return "dmx.core.one";
-        }
-    }
-
     // --- Fetch ---
 
     private List<AssociationDefinitionModel> fetchAssociationDefinitions(TopicModelImpl typeTopic) {
@@ -310,7 +294,7 @@ class TypeStorage {
         // 2) create association definitions
         // Note: the returned map is an intermediate, hashed by ID. The actual type model is
         // subsequently build from it by sorting the assoc def's according to the sequence IDs.
-        for (RelatedTopicModel childType : childTypes) {
+        for (RelatedTopicModelImpl childType : childTypes) {
             AssociationDefinitionModel assocDef = fetchAssociationDefinition(childType.getRelatingAssociation(),
                 typeTopic.getUri(), childType.getUri());
             assocDefs.put(assocDef.getId(), assocDef);
@@ -321,7 +305,7 @@ class TypeStorage {
     // ---
 
     /**
-     * Creates an assoc def from an association which may or may not have been an assoc def before.
+     * Creates an assoc def model from an association which may or may not have been an assoc def before.
      * This is needed when an association becomes an assoc def through retyping.
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
@@ -331,17 +315,15 @@ class TypeStorage {
         AssociationModel model = mf.newAssociationModel(assoc);
         String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
         String childTypeUri = fetchChildTypeTopic(assoc).getUri();
-        prepareAssocModel(model, parentTypeUri, childTypeUri, defaultCardinalityUri(assoc, CHILD_CARDINALITY));
+        prepareAssocModel(model, parentTypeUri, childTypeUri, defaultCardinalityUri(assoc));
         return mf.newAssociationDefinitionModel(model, null);       // viewConfig=null
     }
 
     // Note: the assoc is **not** required to identify its players by URI (by ID is OK)
-    private AssociationDefinitionModel fetchAssociationDefinition(AssociationModel assoc, String parentTypeUri,
-                                                                                          String childTypeUri) {
+    private AssociationDefinitionModel fetchAssociationDefinition(AssociationModelImpl assoc, String parentTypeUri,
+                                                                                              String childTypeUri) {
         try {
-            prepareAssocModel(assoc, parentTypeUri, childTypeUri,
-                fetchCardinalityOrThrow(assoc.getId(), CHILD_CARDINALITY).getUri()
-            );
+            prepareAssocModel(assoc, parentTypeUri, childTypeUri, fetchCardinality(assoc).getUri());
             return mf.newAssociationDefinitionModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
@@ -434,9 +416,9 @@ class TypeStorage {
             //
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
-            // assignments already. These must be removed before assigning new cardinality.
-            removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
-            associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
+            // assignments already. These must be removed before assigning new cardinality. ### TODO?
+            // ### removeCardinalityAssignmentIfExists(assocDefId, CHILD_CARDINALITY);
+            // ### associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
             storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfig());
@@ -503,56 +485,31 @@ class TypeStorage {
 
     // === Cardinality ===
 
-    // --- Fetch ---
-
-    private RelatedTopicModelImpl fetchCardinality(long assocDefId, String cardinalityRoleTypeUri) {
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.assoc_def",
-            cardinalityRoleTypeUri, "dmx.core.cardinality");
-    }
-
-    private RelatedTopicModelImpl fetchCardinalityOrThrow(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+    private RelatedTopicModelImpl fetchCardinality(AssociationModelImpl assoc) {
+        RelatedTopicModelImpl cardinality = fetchCardinalityIfExists(assoc);
         // error check
         if (cardinality == null) {
-            throw new RuntimeException("DB inconsistency: assoc def " + assocDefId + " is missing a cardinality (\"" +
-                cardinalityRoleTypeUri + "\")");
+            throw new RuntimeException("DB inconsistency: assoc def " + assoc.id + " has no cardinality");
         }
         //
         return cardinality;
     }
 
-    // --- Store ---
-
-    void storeChildCardinalityUri(long assocDefId, String childCardinalityUri) {
-        storeCardinalityUri(assocDefId, CHILD_CARDINALITY, childCardinalityUri);
+    private RelatedTopicModelImpl fetchCardinalityIfExists(AssociationModelImpl assoc) {
+        // Note: we can't use model-driven retrieval -> Endless recursion while loading type "dmx.core.composition_def"
+        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
+            "dmx.core.cardinality");
     }
 
-    // ---
-
-    private void storeCardinalityUri(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
-        // remove current assignment
-        RelatedTopicModelImpl cardinality = fetchCardinalityOrThrow(assocDefId, cardinalityRoleTypeUri);
-        removeCardinalityAssignment(cardinality);
-        // create new assignment
-        associateCardinality(assocDefId, cardinalityRoleTypeUri, cardinalityUri);
-    }
-
-    private void removeCardinalityAssignmentIfExists(long assocDefId, String cardinalityRoleTypeUri) {
-        RelatedTopicModelImpl cardinality = fetchCardinality(assocDefId, cardinalityRoleTypeUri);
+    // Note: if the underlying association was an association definition before it has cardinality
+    // assignments already. These assignments are restored. Otherwise "One" is used as default.
+    private String defaultCardinalityUri(AssociationModelImpl assoc) {
+        RelatedTopicModel cardinality = fetchCardinalityIfExists(assoc);
         if (cardinality != null) {
-            removeCardinalityAssignment(cardinality);
+            return cardinality.getUri();
+        } else {
+            return "dmx.core.one";
         }
-    }
-
-    private void removeCardinalityAssignment(RelatedTopicModelImpl cardinalityAssignment) {
-        cardinalityAssignment.getRelatingAssociation().delete();
-    }
-
-    private void associateCardinality(long assocDefId, String cardinalityRoleTypeUri, String cardinalityUri) {
-        pl.createAssociation("dmx.core.composition",
-            mf.newTopicRoleModel(cardinalityUri, cardinalityRoleTypeUri),
-            mf.newAssociationRoleModel(assocDefId, "dmx.core.assoc_def")
-        );
     }
 
 
