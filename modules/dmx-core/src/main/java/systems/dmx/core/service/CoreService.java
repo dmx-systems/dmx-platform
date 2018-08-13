@@ -14,6 +14,7 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.storage.spi.DMXTransaction;
+import systems.dmx.core.util.PropertyUtils;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ import java.util.List;
  * Plugin developer notes: Inside the {@link PluginActivator} and {@link Migration} classes an instance of the
  * DMX core service is available through the <code>dmx</code> object.
  */
-public interface CoreService {
+public interface CoreService extends PropertyUtils {
 
 
 

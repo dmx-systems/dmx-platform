@@ -58,7 +58,7 @@ class DMXObjectModelImpl implements DMXObjectModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     DMXObjectModelImpl(long id, String uri, String typeUri, SimpleValue value, ChildTopicsModelImpl childTopics,
-                                                                                      PersistenceLayer pl) {
+                                                                               PersistenceLayer pl) {
         this.id          = id;
         this.uri         = uri;
         this.typeUri     = typeUri;

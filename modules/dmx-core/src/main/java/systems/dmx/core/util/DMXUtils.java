@@ -157,14 +157,27 @@ public class DMXUtils {
 
 
     /**
-     * Retypes the given association if its player types match the given topic types.
+     * Retypes the given association if its players match the given topic types. The given assoc model is modified
+     * in-place. Typically called from a plugin's {@link systems.dmx.core.service.event.PreCreateAssociationListener}.
+     *
+     * <p>Read the parameters as follows: if "assoc" connects a "topicTypeUri1" with a "topicTypeUri2" (regardless of
+     * 1,2 position) then retype it to "assocTypeUri" and use the role types "roleTypeUri1" and "roleTypeUri2".
+     * "roleTypeUri1" is used for the "topicTypeUri1" player, "roleTypeUri2" is used for the "topicTypeUri2" player.
+     *
+     * <p>Auto-typing is supported only for topic players, and only if they are identified by-ID. If the given assoc has
+     * at least one assoc player, or if a topic player is identfied by-URI, no retyping takes place (null is returned).
+     *
+     * @return  a 2-element {@link systems.dmx.core.model.RoleModel} array if auto-typing took place, <code>null</code>
+     *          otherwise. Convenience to access the assoc's roles after retyping. Element 0 is the role of the
+     *          "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
      */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                       String assocTypeUri, String roleTypeUri1, String roleTypeUri2, CoreService dmx) {
+                                                    String assocTypeUri, String roleTypeUri1, String roleTypeUri2,
+                                                    PropertyUtils propUtils) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dmx);
+        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, propUtils);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -176,19 +189,19 @@ public class DMXUtils {
     }
 
     public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                                                          CoreService dmx) {
+                                                                                          PropertyUtils propUtils) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
         // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
-        // is not yet available in case this association is part of the player's composite structure.
+        // is not yet available in case the association is part of the player's composite structure.
         // Compare to AssociationModelImpl.duplicateCheck()
         if (!(r1 instanceof TopicRoleModel) || ((TopicRoleModel) r1).topicIdentifiedByUri() ||
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
-        String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
-        String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
+        String t1 = (String) propUtils.getProperty(r1.getPlayerId(), "typeUri");
+        String t2 = (String) propUtils.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {
