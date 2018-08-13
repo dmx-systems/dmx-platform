@@ -129,6 +129,16 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // === Core Internal Hooks ===
 
+    @Override
+    void postCreate() {
+        // Note: defining an empty postCreate() hook suppresses Type Editor Support as invoked by the superclass's
+        // postCreate() hook.
+        // - When an assoc def is created *programmatically* (through a migration) a full AssociationDefinitionModel
+        //   is instantiated, and no further Type Editor Support must be executed.
+        // - When an assoc def is created *interactively* (by creating an association in conjunction with auto-typing)
+        //   a sole AssociationModel is instantiated, and Type editor support is required.
+    }
+
     /**
      * 2 assoc def specific tasks must be performed once the underlying association is updated:
      *   - Update the assoc def's cardinality (in type cache + DB). Cardinality is technically not part of the type

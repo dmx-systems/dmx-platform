@@ -9,6 +9,7 @@ import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
+import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -301,7 +302,20 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     @Override
     void preCreate() {
+        RoleModel[] roles = DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
+            "dmx.core.composition_def", "dmx.core.parent_type", "dmx.core.child_type", pl);
+        if (roles != null) {
+            childTopics.putRef("dmx.core.cardinality", "dmx.core.one");
+        }
+        //
         duplicateCheck();
+    }
+
+    @Override
+    void postCreate() {
+        if (isAssocDef(this)) {
+            createAssocDef();
+        }
     }
 
     @Override
@@ -479,8 +493,15 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // === Type Editor Support ===
 
-    // ### TODO: explain
+    // This 3 methods bridge between assoc and assoc def.
 
+    /**
+     * Creates an assoc def model based on this assoc model, and 1) puts it in the type cache, and 2) updates the
+     * DB sequence, and 3) adds an UPDATE_TYPE directive.
+     *
+     * Preconditions:
+     *   - The association is stored in DB
+     */
     private void createAssocDef() {
         TypeModelImpl parentType = fetchParentType();
         logger.info("##### Adding association definition " + id + " to type \"" + parentType.getUri() + "\"");

@@ -132,8 +132,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             assocDefs.putBefore(assocDefUri, (AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);
             return this;
         } catch (Exception e) {
-            throw new RuntimeException("Adding an assoc def to type \"" + uri + "\" before \"" + beforeAssocDefUri +
-                "\" failed" + assocDef, e);
+            throw new RuntimeException("Adding assoc def \"" + assocDef.getAssocDefUri() + "\" to type \"" + uri +
+                "\" failed (assocDef=" + assocDef + ", beforeAssocDefUri=\"" + beforeAssocDefUri + "\")", e);
         }
     }
 
@@ -342,8 +342,8 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
                 lastAssocDefId);
         } catch (Exception e) {
-            throw new RuntimeException("Adding an assoc def to type \"" + uri + "\" before \"" + beforeAssocDefUri +
-                "\" failed" + assocDef, e);
+            throw new RuntimeException("Adding assoc def \"" + assocDef.getAssocDefUri() + "\" to type \"" + uri +
+                "\" failed (assocDef=" + assocDef + ", beforeAssocDefUri=\"" + beforeAssocDefUri + "\")", e);
         }
     }
 
@@ -362,7 +362,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     final void _addAssocDef(AssociationModelImpl assoc) {
         _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
-        //
+        // FIXME: move addUpdateTypeDirective() call to _addAssocDefBefore()? At the moment when adding ab assoc def via
+        // TypeImpl no directives are added.
+        // (TypeImpl addAssocDef() and addAssocDefBefore() calls _addAssocDefBefore() directly.)
         addUpdateTypeDirective();
     }
 
@@ -601,7 +603,7 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             }
         }
         if (assocDefUris[0] == null) {
-            throw new RuntimeException("Assoc def with ID " + assocDefId + " not found in assoc defs of type \"" + uri +
+            throw new RuntimeException("Assoc def " + assocDefId + " not found in assoc defs of type \"" + uri +
                 "\" (" + assocDefs.keySet() + ")");
         }
         return assocDefUris;
