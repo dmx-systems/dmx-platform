@@ -26,8 +26,8 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private RoleModelImpl roleModel1;   // may be null in models used for an update operation
-    private RoleModelImpl roleModel2;   // may be null in models used for an update operation
+    RoleModelImpl roleModel1;   // may be null in update models
+    RoleModelImpl roleModel2;   // may be null in update models
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 

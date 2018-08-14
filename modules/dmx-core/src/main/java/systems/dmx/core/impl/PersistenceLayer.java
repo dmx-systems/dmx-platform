@@ -131,15 +131,15 @@ public final class PersistenceLayer extends StorageDecorator implements Property
 
     // ---
 
-    TopicImpl _createTopic(TopicModelImpl model) {
-        return _createTopic(model, null);   // uriPrefix=null
+    TopicImpl createSingleTopic(TopicModelImpl model) {
+        return createSingleTopic(model, null);   // uriPrefix=null
     }
 
     /**
-     * Creates a new topic in the DB.
+     * Creates a single topic in the DB.
      * No child topics are created.
      */
-    private TopicImpl _createTopic(TopicModelImpl model, String uriPrefix) {
+    private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix) {
         try {
             em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
             //
@@ -166,7 +166,8 @@ public final class PersistenceLayer extends StorageDecorator implements Property
             em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
             return topic;
         } catch (Exception e) {
-            throw new RuntimeException("Creating topic failed, model=" + model + ", uriPrefix=" + uriPrefix, e);
+            throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
+                "\"", e);
         }
     }
 
@@ -348,11 +349,14 @@ public final class PersistenceLayer extends StorageDecorator implements Property
             //
             // 1) store in DB
             storeAssociation(model);
-            updateValues(model, null);
-            createAssociationInstantiation(model.getId(), model.getTypeUri());
+            AssociationModelImpl _model = updateValues(model, null);
+            createAssociationInstantiation(_model.getId(), _model.getTypeUri());
             // 2) instantiate
-            AssociationImpl assoc = model.instantiate();
+            AssociationImpl assoc = _model.instantiate();
             //
+            // Note: the postCreate() hook is invoked on the update model, *not* on the value integration result
+            // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate()
+            // in AssociationDefinitionModelImpl). TODO: rethink this solution.
             model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
@@ -598,7 +602,7 @@ public final class PersistenceLayer extends StorageDecorator implements Property
             }
         }
         //
-        return _createTopic(model, URI_PREFIX_ROLE_TYPE);
+        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE);
     }
 
     // ---
@@ -871,12 +875,12 @@ public final class PersistenceLayer extends StorageDecorator implements Property
         // assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
-        _createTopic(typeTopic, uriPrefix);     // create generic topic
+        createSingleTopic(typeTopic, uriPrefix);    // create generic topic
         //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;
         //
-        typeStorage.storeType(model);           // store type-specific parts
+        typeStorage.storeType(model);               // store type-specific parts
     }
 
     private String typeUri(long objectId) {

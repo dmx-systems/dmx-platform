@@ -63,6 +63,11 @@ class ValueIntegrator {
     /**
      * Integrates new values into the DB and returns the unified value.
      *
+     * @param   newValues       the "update model": the values to be integrated.
+     * @param   targetObject    may be null. TODO: explain
+     * @param   assocDef        for facet value updates: the facet type's assoc def.
+     *                          <code>null</code> for non-facet updates.
+     *
      * @return  the unified value; never null; its "value" field is null if there was nothing to integrate.
      */
     <M extends DMXObjectModelImpl> UnifiedValue<M> integrate(M newValues, M targetObject,
@@ -93,9 +98,8 @@ class ValueIntegrator {
             // value integration
             // Note: because a facet type is composite by definition a facet update is always a composite operation,
             // even if the faceted object is a simple one.
-            DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ?
-                integrateSimple() :
-                integrateComposite();
+            DMXObjectModelImpl _value = !isFacetUpdate && newValues.isSimple() ? integrateSimple() :
+                                                                                 integrateComposite();
             // Note: UnifiedValue instantiation saves the new value's ID *before* it is overwritten
             UnifiedValue value = new UnifiedValue(_value);
             //
@@ -121,6 +125,8 @@ class ValueIntegrator {
         }
     }
 
+    // Sets the ID of the value integration result into the update model.
+    //
     // Note: this is a side effect, but we keep it for pragmatic reasons.
     //
     // In DM4 the create topic/assoc methods have the side effect of setting the generated ID into the update model.
@@ -155,8 +161,8 @@ class ValueIntegrator {
         try {
             if (isAssoc || isType) {
                 // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
-                // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still have
-                // different players.) An assoc's simple value is updated in-place.
+                // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still
+                // have different players.) An assoc's simple value is updated in-place.
                 // Note 2: a type's simple value is not unified. A type is updated in-place.
                 return storeAssocSimpleValue();
             } else if (newValues.getSimpleValue().toString().isEmpty()) {
@@ -312,7 +318,10 @@ class ValueIntegrator {
             if (newValues.id == -1) {
                 throw new RuntimeException("newValues has no ID set");
             }
-            return mf.newAssociationModel(newValues.id, null, newValues.typeUri, null, null);
+            // TODO: partial updates. URI and role models must not expected to be part of the update model.
+            AssociationModelImpl _newValues = (AssociationModelImpl) newValues;
+            return mf.newAssociationModel(newValues.id, newValues.uri, newValues.typeUri, _newValues.roleModel1,
+                                                                                          _newValues.roleModel2);
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
@@ -630,7 +639,7 @@ class ValueIntegrator {
             throw new RuntimeException("Tried to create a topic from an assoc model");
         }
         //
-        return pl._createTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
+        return pl.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
     }
 
     /**
