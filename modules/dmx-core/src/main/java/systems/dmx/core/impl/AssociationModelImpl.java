@@ -303,7 +303,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     @Override
     void preCreate() {
         RoleModel[] roles = DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
-            "dmx.core.composition_def", "dmx.core.parent_type", "dmx.core.child_type", pl);
+            "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type", pl);
         if (roles != null) {
             childTopics.putRef("dmx.core.cardinality", "dmx.core.one");
         }
