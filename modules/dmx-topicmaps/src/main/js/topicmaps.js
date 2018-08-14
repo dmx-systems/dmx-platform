@@ -246,8 +246,9 @@ const actions = {
     }
     console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
-      console.log(assoc)
+      console.log('Created', assoc)
       dispatch('revealAssoc', {assoc, select: true})
+      dispatch('_processDirectives', assoc.directives)
     })
   },
 
