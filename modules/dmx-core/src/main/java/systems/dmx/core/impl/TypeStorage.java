@@ -544,17 +544,17 @@ class TypeStorage {
 
     private RelatedAssociationModelImpl fetchSequenceStart(long typeId) {
         return pl.fetchTopicRelatedAssociation(typeId, "dmx.core.composition", "dmx.core.type",
-            "dmx.core.sequence_start", null);   // othersAssocTypeUri=null
+            "dmx.core.sequence_start", null);   // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssociationModelImpl fetchSuccessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.predecessor",
-            "dmx.core.successor", null);        // othersAssocTypeUri=null
+            "dmx.core.successor", null);        // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     private RelatedAssociationModelImpl fetchPredecessor(long assocDefId) {
         return pl.fetchAssociationRelatedAssociation(assocDefId, "dmx.core.sequence", "dmx.core.successor",
-            "dmx.core.predecessor", null);      // othersAssocTypeUri=null
+            "dmx.core.predecessor", null);      // othersAssocTypeUri=null ### TODO: set dmx.core.composition_def
     }
 
     // --- Store ---
