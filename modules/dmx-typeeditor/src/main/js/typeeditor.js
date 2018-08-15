@@ -2,7 +2,7 @@ import dm5 from 'dm5'
 
 function defaultType (name) {
   return {
-    // Note: no type "uri" is set here. A new  type gets its default URI at server-side.
+    // Note: no type "uri" is set here. A new type gets its default URI at server-side.
     // Also the "typeUri" is provided at server-side (see ModelFactoryImpl).
     value: name,
     dataTypeUri: 'dmx.core.text',
@@ -17,16 +17,12 @@ function defaultType (name) {
 }
 
 const actions = {
-  createTopicType ({dispatch}, name) {
+  createTopicType ({dispatch}, {name, pos}) {
     console.log('Creating topic type', name)
     dm5.restClient.createTopicType(defaultType(name)).then(topicType => {
-      console.log('Topic type', topicType)
+      console.log('Created', topicType)
       dispatch('putTopicType', topicType)
-      dispatch('revealTopic', {
-        topic: topicType,
-        pos: {x: 100, y: 100},   // TODO
-        select: true
-      })
+      dispatch('revealTopic', {topic: topicType, pos, select: true})
     })
   }
 }
