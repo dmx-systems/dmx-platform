@@ -169,7 +169,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     @Override
     public void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility) {
-        addTopicToTopicmap(topicmapId, topicId, new ViewProperties(x, y, visibility, false));   // pinned=false
+        addTopicToTopicmap(topicmapId, topicId, mf.newViewProperties(x, y, visibility, false));   // pinned=false
     }
 
     @POST
@@ -222,7 +222,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     // Note: it is an error if the association is already in the topicmap. In this case the topic is
                     // already in the topicmap too, and the Webclient would not send the request in the first place.
                     // ### TODO: rethink method contract. Do it analoguous to "add topic"?
-                    addAssociationToTopicmap(topicmapId, assocId, new ViewProperties().put(PROP_PINNED, false));
+                    addAssociationToTopicmap(topicmapId, assocId, mf.newViewProperties().put(PROP_PINNED, false));
                     return null;
                 }
             });
@@ -259,7 +259,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicPosition(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                    @PathParam("x") int x, @PathParam("y") int y) {
         try {
-            storeTopicViewProperties(topicmapId, topicId, new ViewProperties(x, y));
+            storeTopicViewProperties(topicmapId, topicId, mf.newViewProperties(x, y));
             me.setTopicPosition(topicmapId, topicId, x, y);
         } catch (Exception e) {
             throw new RuntimeException("Setting position of topic " + topicId + " in topicmap " + topicmapId +
@@ -284,7 +284,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 }
             }
             // show/hide topic
-            storeTopicViewProperties(topicmapId, topicId, new ViewProperties(visibility));
+            storeTopicViewProperties(topicmapId, topicId, mf.newViewProperties(visibility));
             // send message
             me.setTopicVisibility(topicmapId, topicId, visibility);
         } catch (Exception e) {
@@ -516,7 +516,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     private ViewProperties fetchTopicViewProperties(Association topicMapcontext) {
-        return new ViewProperties(
+        return mf.newViewProperties(
             (Integer) topicMapcontext.getProperty(PROP_X),
             (Integer) topicMapcontext.getProperty(PROP_Y),
             visibility(topicMapcontext),
@@ -525,7 +525,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private ViewProperties fetchAssocViewProperties(Association assocMapcontext) {
-        return new ViewProperties().put(PROP_PINNED, pinned(assocMapcontext));
+        return mf.newViewProperties().put(PROP_PINNED, pinned(assocMapcontext));
     }
 
     private boolean visibility(Association topicMapcontext) {

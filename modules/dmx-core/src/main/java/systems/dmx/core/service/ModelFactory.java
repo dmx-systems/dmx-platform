@@ -241,6 +241,16 @@ public interface ModelFactory {
 
     AssociationViewModel newAssociationViewModel(AssociationModel assoc, ViewProperties viewProps);
 
+    ViewProperties newViewProperties();
+
+    ViewProperties newViewProperties(int x, int y, boolean visibility, boolean pinned);
+
+    ViewProperties newViewProperties(int x, int y);
+
+    ViewProperties newViewProperties(boolean visibility);
+
+    ViewProperties newViewProperties(JSONObject viewProps);
+
 
 
     // === Facets ===

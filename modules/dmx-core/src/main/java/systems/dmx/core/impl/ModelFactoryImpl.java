@@ -840,6 +840,31 @@ public class ModelFactoryImpl implements ModelFactory {
         return new AssociationViewModelImpl((AssociationModelImpl) assoc, viewProps);
     }
 
+    @Override
+    public ViewProperties newViewProperties() {
+        return new ViewPropertiesImpl();
+    }
+
+    @Override
+    public ViewProperties newViewProperties(int x, int y, boolean visibility, boolean pinned) {
+        return new ViewPropertiesImpl(x, y, visibility, pinned);
+    }
+
+    @Override
+    public ViewProperties newViewProperties(int x, int y) {
+        return new ViewPropertiesImpl(x, y);
+    }
+
+    @Override
+    public ViewProperties newViewProperties(boolean visibility) {
+        return new ViewPropertiesImpl(visibility);
+    }
+
+    @Override
+    public ViewProperties newViewProperties(JSONObject viewProps) {
+        return new ViewPropertiesImpl(viewProps);
+    }
+
 
 
     // === Facets ===
