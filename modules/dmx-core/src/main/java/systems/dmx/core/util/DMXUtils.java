@@ -8,6 +8,7 @@ import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicRoleModel;
+import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -15,7 +16,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -172,12 +172,11 @@ public class DMXUtils {
      *          "topicTypeUri1" player, Element 1 is the role of the "topicTypeUri2" player.
      */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                    String assocTypeUri, String roleTypeUri1, String roleTypeUri2,
-                                                    CoreService dmx) {
+                                                    String assocTypeUri, String roleTypeUri1, String roleTypeUri2) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dmx);
+        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -188,18 +187,18 @@ public class DMXUtils {
         return roles;
     }
 
-    public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                                                          CoreService dmx) {
+    public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
-        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
-        // is not yet available in case the association is part of the player's composite structure.
-        // Compare to AssociationModelImpl.duplicateCheck()
         if (!(r1 instanceof TopicRoleModel) || ((TopicRoleModel) r1).topicIdentifiedByUri() ||
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
+        CoreService dmx = CoreActivator.getCoreService();
+        // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
+        // is not yet available in case the association is part of the player's composite structure.
+        // Compare to AssociationModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
         String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
