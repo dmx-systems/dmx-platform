@@ -173,11 +173,11 @@ public class DMXUtils {
      */
     public static RoleModel[] associationAutoTyping(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
                                                     String assocTypeUri, String roleTypeUri1, String roleTypeUri2,
-                                                    PropertyUtils propUtils) {
+                                                    CoreService dmx) {
         if (!assoc.getTypeUri().equals("dmx.core.association")) {
             return null;
         }
-        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, propUtils);
+        RoleModel[] roles = getRoleModels(assoc, topicTypeUri1, topicTypeUri2, dmx);
         if (roles != null) {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
@@ -189,7 +189,7 @@ public class DMXUtils {
     }
 
     public static RoleModel[] getRoleModels(AssociationModel assoc, String topicTypeUri1, String topicTypeUri2,
-                                                                                          PropertyUtils propUtils) {
+                                                                                          CoreService dmx) {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
@@ -200,8 +200,8 @@ public class DMXUtils {
             !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
             return null;
         }
-        String t1 = (String) propUtils.getProperty(r1.getPlayerId(), "typeUri");
-        String t2 = (String) propUtils.getProperty(r2.getPlayerId(), "typeUri");
+        String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
+        String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {

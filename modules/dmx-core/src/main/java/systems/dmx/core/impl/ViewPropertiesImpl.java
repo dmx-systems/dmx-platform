@@ -1,8 +1,7 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.model.topicmaps.ViewProperties;
-
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;

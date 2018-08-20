@@ -11,7 +11,6 @@ import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.accesscontrol.AccessControlException;
 import systems.dmx.core.storage.spi.DMXStorage;
-import systems.dmx.core.util.PropertyUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,7 +29,7 @@ import java.util.logging.Logger;
  * ### TODO: no instatiations here
  * ### TODO: hold storage object in instance variable (instead deriving) to make direct DB access more explicit
  */
-public final class PersistenceLayer extends StorageDecorator implements PropertyUtils {
+public final class PersistenceLayer extends StorageDecorator {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -728,13 +727,6 @@ public final class PersistenceLayer extends StorageDecorator implements Property
 
     List<Association> getAssociationsByPropertyRange(String propUri, Number from, Number to) {
         return checkReadAccessAndInstantiate(fetchAssociationsByPropertyRange(propUri, from, to));
-    }
-
-    // ---
-
-    @Override
-    public final Object getProperty(long id, String propUri) {
-        return fetchProperty(id, propUri);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods

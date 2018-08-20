@@ -7,6 +7,7 @@ import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.TypeModel;
+import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.util.DMXUtils;
@@ -303,7 +304,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     @Override
     void preCreate() {
         RoleModel[] roles = DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
-            "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type", pl);
+            "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type", CoreActivator.getCoreService());
         if (roles != null) {
             childTopics.putRef("dmx.core.cardinality", "dmx.core.one");
         }
