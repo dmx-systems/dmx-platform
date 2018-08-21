@@ -1,7 +1,6 @@
 <template>
   <div class="dm5-webclient">
     <div v-for="compDef in compDefs" :id="mountId(compDef)" :key="compDef.id"></div>
-    <dm5-search-widget :menu-topic-types="menuTopicTypes"></dm5-search-widget>
   </div>
 </template>
 
@@ -11,19 +10,8 @@ import dm5 from 'dm5'
 export default {
 
   computed: {
-
     compDefs () {
       return this.$store.state.compDefs.webclient
-    },
-
-    topicTypes () {
-      return this.$store.state.typeCache.topicTypes
-    },
-
-    menuTopicTypes () {
-      return dm5.utils.filter(this.topicTypes, topicType =>
-        topicType.getViewConfig('dmx.webclient.show_in_create_menu')
-      )
     }
   },
 
@@ -31,10 +19,6 @@ export default {
     mountId (compDef) {
       return `mount-${compDef.id}`
     }
-  },
-
-  components: {
-    'dm5-search-widget': require('dm5-search-widget').default
   }
 }
 </script>

@@ -305,7 +305,6 @@
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-typeeditor</module>
                 <module>modules/dmx-iconpicker</module>
-                <module>modules/dmx-typesearch</module>
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-filemanager</module>
@@ -398,7 +397,6 @@
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-typeeditor</module>
                 <module>modules/dmx-iconpicker</module>
-                <module>modules/dmx-typesearch</module>
                 <module>modules/dmx-topicmaps</module>
                 <module>modules/dmx-files</module>
                 <module>modules/dmx-filemanager</module>

@@ -171,17 +171,17 @@ function initialNavigation (route) {
   let workspaceId   // valid only if topicmapId is defined after validity check
   let p             // a promise resolved once validity check is complete
   if (topicmapId) {
-    console.log(`Checking workspace of topicmap ${topicmapId}`)
+    // console.log(`Checking workspace of topicmap ${topicmapId}`)
     // Note: get-assigned-workspace responses are not cached by the browser.
     // In contrast get-topic responses *are* cached by the browser.
     // Doing get-assigned-workspace first avoids working with stale data.
     p = getAssignedWorkspace(topicmapId).then(workspace => {
-      console.log('Workspace retrieved', workspace)
+      // console.log('Workspace retrieved', workspace)
       workspaceId = workspace.id
-      console.log(`Retrieving topic ${topicmapId}`)
+      // console.log(`Retrieving topic ${topicmapId}`)
       return dm5.restClient.getTopic(topicmapId)
     }).then(topic => {
-      console.log('Topic retrieved', topic)
+      // console.log('Topic retrieved', topic)
       if (topic.typeUri !== "dmx.topicmaps.topicmap") {
         console.warn(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
         topicmapId = undefined

@@ -3,6 +3,9 @@ import store from './store/webclient'
 
 export default {
   loadPlugins () {
+    // Note: dmx-typesearch provides the registerExtraMenuItems() action.
+    // dmx-typesearch must be inited *before* any plugin which registers extra menu items.
+    initPlugin(require('modules/dmx-typesearch/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
