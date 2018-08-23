@@ -8,7 +8,10 @@
     <artifactId>dmx-bundles</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <description>DeepaMehta bundles that make up the DMX Standard Distribution.</description>
+    <description>
+        List of DMX bundles that make up the DMX Standard Distribution.
+        Used by module `dmx-distribution` for assembling the distro zip.
+    </description>
 
     <parent>
         <groupId>systems.dmx</groupId>
@@ -71,11 +74,6 @@
         <dependency>
             <groupId>systems.dmx</groupId>
             <artifactId>dmx-iconpicker</artifactId>
-            <version>5.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>systems.dmx</groupId>
-            <artifactId>dmx-typesearch</artifactId>
             <version>5.0-SNAPSHOT</version>
         </dependency>
         <dependency>

@@ -198,7 +198,7 @@ function initialNavigation (route) {
   // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required. On the other
   // hand, if obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
   p.then(() => {
-    console.log('Initial topicmap/workspace', topicmapId, workspaceId)
+    console.log('[DMX] Initial topicmap/workspace', topicmapId, workspaceId)
     if (topicmapId) {
       store.dispatch('_selectWorkspace', workspaceId).then(() => {    // no route push
         // the workspace's topicmap topics are now available
