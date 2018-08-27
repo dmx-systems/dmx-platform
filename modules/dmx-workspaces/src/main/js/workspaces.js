@@ -5,6 +5,8 @@ const state = {
 
   workspaceId: undefined,         // ID of selected workspace (number)
 
+  isWritable: undefined,          // true if selected workspace is writable
+
   workspaceTopics: undefined,     // all workspace topics readable by current user (array of dm5.Topic)
 
   ready: fetchWorkspaceTopics()   // a promise resolved once the workspace topics are loaded
@@ -51,6 +53,16 @@ const actions = {
     state.workspaceId = id
     dm5.utils.setCookie('dmx_workspace_id', id)
     return dispatch('fetchTopicmapTopics')     // data for topicmap selector
+  },
+
+  _initWorkspaceIsWritable () {
+    // workspaceId might be uninitialized. Accesscontrol "username" state is inited *before* workspaceId state. TODO?
+    state.workspaceId && dm5.permCache.isTopicWritable(state.workspaceId).then(
+      writable => {
+        console.log('_initWorkspaceIsWritable', state.workspaceId, writable)
+        state.isWritable = writable
+      }
+    )
   },
 
   /**

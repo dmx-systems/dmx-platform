@@ -1,24 +1,35 @@
-export default store => ({
+export default store => {
+  return {
 
-  storeModule: {
-    name: 'workspaces',
-    module: require('./workspaces').default
-  },
+    storeModule: {
+      name: 'workspaces',
+      module: require('./workspaces').default
+    },
 
-  components: [{
-    comp: require('./components/dm5-workspace-select').default,
-    mount: 'toolbar-left'
-  }],
+    storeWatcher: [
+      {getter: state => state.workspaces.workspaceId, callback: initWritable},
+      {getter: state => state.accesscontrol.username, callback: initWritable}
+    ],
 
-  extraMenuItems: [{
-    uri: 'dmx.workspaces.workspace',
-    label: 'Workspace',
-    optionsComp: require('./components/dm5-workspace-options').default,
-    create: (name, data) => {
-      store.dispatch('createWorkspace', {
-        name,
-        sharingModeUri: data.sharingModeUri
-      })
-    }
-  }]
-})
+    components: [{
+      comp: require('./components/dm5-workspace-select').default,
+      mount: 'toolbar-left'
+    }],
+
+    extraMenuItems: [{
+      uri: 'dmx.workspaces.workspace',
+      label: 'Workspace',
+      optionsComp: require('./components/dm5-workspace-options').default,
+      create: (name, data) => {
+        store.dispatch('createWorkspace', {
+          name,
+          sharingModeUri: data.sharingModeUri
+        })
+      }
+    }]
+  }
+
+  function initWritable () {
+    store.dispatch('_initWorkspaceIsWritable')
+  }
+}

@@ -6,9 +6,11 @@ export default {
     // Note: dmx-search provides the registerExtraMenuItems() action.
     // dmx-search must be inited *before* any plugin which registers extra menu items.
     initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
+    // Note: dmx-accesscontrol must be inited *before* dmx-workspaces.
+    // dmx-workspaces watches dmx-accesscontrol's "username" store state.
+    initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
@@ -29,7 +31,7 @@ function initPlugin (expo) {
   // store module
   const storeModule = plugin.storeModule
   if (storeModule) {
-    console.log('Registering store module', storeModule.name)
+    console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
       storeModule.module

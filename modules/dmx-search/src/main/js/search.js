@@ -7,9 +7,7 @@ const state = {
   pos: undefined,             // search widget position in `model` and `render` coordinates
                               // (objects with 'x' and 'y' properties)
   options: {
-
-    noSelect: false,          // Optional: if trueish the revealed topic will not be selected.
-                              // Otherwise it will.
+    noSelect: false,          // Optional: if trueish the revealed topic will not be selected. Otherwise it will.
     topicHandler: undefined   // Optional: a handler that is invoked subsequently to "revealTopic".
                               // The revealed topic is passed.
   },
