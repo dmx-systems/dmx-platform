@@ -45,10 +45,16 @@ Continuous integration:
 <https://ci.deepamehta.de/jenkins/>
 
 
-Licensed under GNU General Public License, version 3.
+#### Licensing + Copyright
 
+DeepaMehta is available freely under the GNU General Public License, version 3.
 
-**+++DISCLAIMER+++**  
+All third party components incorporated into the DeepaMehta Software are licensed under the original license provided by the owner of the applicable component.
+
+The copyright of the DeepaMehta software is owned by its authors.
+
+#### Disclaimer
+
 DeepaMehta is under heavy development. While you can do productive work with it, DeepaMehta does not meet professional standards yet. At least there are lacks in a) security, b) robustness, and c) usability. Do not put sensitive data in DeepaMehta, in particular when you setup DeepaMehta for network access. Be aware that data loss may occur when you use DeepaMehta improperly. The DeepaMehta developers assume no liability for lost or compromised data. Please keep this in mind when using this software.
 
 
