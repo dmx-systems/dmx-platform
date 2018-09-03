@@ -82,13 +82,13 @@ Check requirements
 Download
 --------
 
-<http://download.deepamehta.de/deepamehta-4.9.1.zip> (7.2 MB)
+<http://download.deepamehta.de/deepamehta-4.9.2.zip> (7.2 MB)
 
 
 Install
 -------
 
-Unzip the downloaded file. A folder `deepamehta-4.9.1` is created.  
+Unzip the downloaded file. A folder `deepamehta-4.9.2` is created.  
 You can move that folder to any place you want.
 
 Update note: if you want update an existing DeepaMehta installation continue with "Updating DeepaMehta" now (see below).
@@ -97,7 +97,7 @@ Update note: if you want update an existing DeepaMehta installation continue wit
 Start
 -----
 
-Open the `deepamehta-4.9.1` folder and use the respective starter script for your platform:
+Open the `deepamehta-4.9.2` folder and use the respective starter script for your platform:
 
     deepamehta-linux.sh         # choose "Run in terminal"
     deepamehta-macosx.command   # double-click it
@@ -131,11 +131,11 @@ Auxiliary tasks follow:
 Updating
 --------
 
-You can update from DeepaMehta 4.1 or newer to 4.9.1 while keeping your existing DeepaMehta content:
+You can update from DeepaMehta 4.1 or newer to 4.9.2 while keeping your existing DeepaMehta content:
 
-1. Install DeepaMehta 4.9.1 (see steps 2. and 3. above).
-2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.9.1 if already started.)
-3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.9.1` folder.
+1. Install DeepaMehta 4.9.2 (see steps 2. and 3. above).
+2. Stop your previous DeepaMehta installation if running. (Also stop DeepaMehta 4.9.2 if already started.)
+3. Copy the `deepamehta-db` folder from your previous DeepaMehta installation into the `deepamehta-4.9.2` folder.
    (Replace as necessary.)
 4. Proceed with "Start" (see step 4. above).
 
@@ -144,7 +144,7 @@ IMPORTANT: generally you're not required to install all intermediate versions. H
     DeepaMehta 4.5
     DeepaMehta 4.7
 
-So, to update e.g. from DeepaMehta 4.3 to 4.9.1 you must install and run these versions consecutively: 4.5, 4.7, 4.9.1.
+So, to update e.g. from DeepaMehta 4.3 to 4.9.2 you must install and run these versions consecutively: 4.5, 4.7, 4.9.2.
 
 Updating from DeepaMehta 2 or 3 to DeepaMehta 4 is not supported. Even updating from 4.0.x is not supported.
 The first updatable DeepaMehta version is 4.1.
@@ -174,7 +174,7 @@ Uninstall
 ---------
 
 1. Stop DeepaMehta.
-2. Delete the entire `deepamehta-4.9.1` folder.
+2. Delete the entire `deepamehta-4.9.2` folder.
 
 This removes DeepaMehta completely from your computer, including all your DeepaMehta content.
 
@@ -195,6 +195,15 @@ The version history lists only the highlights of each release.
 For more changes and details see the release notes:  
 <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
+
+**4.9.2** -- Sep 3, 2018
+
+* Bug fix:
+    * Access control for type operations
+* README:
+    * Add 3rd party component license info
+* For more changes and details see the release notes:  
+  <https://trac.deepamehta.de/wiki/ReleaseNotes>
 
 **4.9.1** -- Feb 3, 2018
 
@@ -744,4 +753,4 @@ Version history of **DeepaMehta 1** and **DeepaMehta 2**:
 
 ------------
 Jörg Richter  
-Feb 3, 2018
+Sep 3, 2018
