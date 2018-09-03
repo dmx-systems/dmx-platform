@@ -1,4 +1,7 @@
 
+> This README applies to DeepaMehta 4. The master branch however represents DeepaMehta 5 (upcoming). For the DeepaMehta 4 codebase switch to the [dm4 branch](https://github.com/jri/deepamehta/tree/dm4).
+
+
 DeepaMehta 4
 ============
 
