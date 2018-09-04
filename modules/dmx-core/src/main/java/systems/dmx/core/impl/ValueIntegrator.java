@@ -158,20 +158,16 @@ class ValueIntegrator {
      *          The latter is the case if this.newValues is the empty string.
      */
     private DMXObjectModelImpl integrateSimple() {
-        try {
-            if (isAssoc || isType) {
-                // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
-                // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still
-                // have different players.) An assoc's simple value is updated in-place.
-                // Note 2: a type's simple value is not unified. A type is updated in-place.
-                return storeAssocSimpleValue();
-            } else if (newValues.getSimpleValue().toString().isEmpty()) {
-                return null;
-            } else {
-                return unifySimple();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Simple value integration failed, newValues=" + newValues, e);
+        if (isAssoc || isType) {
+            // Note 1: an assoc's simple value is not unified. In contrast to a topic an assoc can't be unified with
+            // another assoc. (Even if 2 assocs have the same type and value they are not the same as they still
+            // have different players.) An assoc's simple value is updated in-place.
+            // Note 2: a type's simple value is not unified. A type is updated in-place.
+            return storeAssocSimpleValue();
+        } else if (newValues.getSimpleValue().toString().isEmpty()) {
+            return null;
+        } else {
+            return unifySimple();
         }
     }
 
@@ -224,46 +220,42 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     private DMXObjectModelImpl integrateComposite() {
-        try {
-            Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
-            ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
-            // Iterate through type, not through newValues.
-            // newValues might contain childs not contained in the type def, e.g. "dmx.time.modified".
-            for (String assocDefUri : assocDefUris()) {
-                Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
-                if (isOne(assocDefUri)) {
-                    newChildValue = _childTopics.getTopicOrNull(assocDefUri);
-                } else {
-                    // TODO: if empty?
-                    newChildValue = _childTopics.getTopicsOrNull(assocDefUri);
-                }
-                // skip if not contained in update request
-                if (newChildValue == null) {
-                    continue;
-                }
-                //
-                Object childTopic = integrateChildValue(newChildValue, assocDefUri);
-                if (isOne(assocDefUri) && ((UnifiedValue) childTopic).value == null) {
-                    emptyValues.add(assocDefUri);
-                } else {
-                    childTopics.put(assocDefUri, childTopic);
-                }
+        Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
+        ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
+        // Iterate through type, not through newValues.
+        // newValues might contain childs not contained in the type def, e.g. "dmx.time.modified".
+        for (String assocDefUri : assocDefUris()) {
+            Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
+            if (isOne(assocDefUri)) {
+                newChildValue = _childTopics.getTopicOrNull(assocDefUri);
+            } else {
+                // TODO: if empty?
+                newChildValue = _childTopics.getTopicsOrNull(assocDefUri);
             }
-            DMXObjectModelImpl value = unifyComposite(childTopics);
-            //
-            // label calculation
-            if (!isFacetUpdate) {
-                if (value != null) {
-                    new LabelCalculation(value).calculate();
-                } else if (isAssoc) {
-                    storeAssocSimpleValue();
-                }
+            // skip if not contained in update request
+            if (newChildValue == null) {
+                continue;
             }
             //
-            return value;
-        } catch (Exception e) {
-            throw new RuntimeException("Composite value integration failed, newValues=" + newValues, e);
+            Object childTopic = integrateChildValue(newChildValue, assocDefUri);
+            if (isOne(assocDefUri) && ((UnifiedValue) childTopic).value == null) {
+                emptyValues.add(assocDefUri);
+            } else {
+                childTopics.put(assocDefUri, childTopic);
+            }
         }
+        DMXObjectModelImpl value = unifyComposite(childTopics);
+        //
+        // label calculation
+        if (!isFacetUpdate) {
+            if (value != null) {
+                new LabelCalculation(value).calculate();
+            } else if (isAssoc) {
+                storeAssocSimpleValue();
+            }
+        }
+        //
+        return value;
     }
 
     private Iterable<String> assocDefUris() {
@@ -372,9 +364,9 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
-     * @param   unifiedChilds     value: UnifiedValue or List<UnifiedValue>
+     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
      */
-    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> unifiedChilds) {
+    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childTopics) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
             throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\", parent type=\"" +
@@ -387,15 +379,14 @@ class ValueIntegrator {
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
             // levels) as it is build bottom-up (starting from the simple values at the leaves).
             parent.loadChildTopics(assocDef(assocDefUri), true);    // deep=true
-            Object unifiedChild = unifiedChilds.get(assocDefUri);
+            Object childTopic = childTopics.get(assocDefUri);
             if (isOne(assocDefUri)) {
-                TopicModel _unifiedChild = (TopicModel) (unifiedChild != null ? ((UnifiedValue) unifiedChild).value :
-                    null);
-                updateAssignmentsOne(parent, _unifiedChild, assocDefUri);
+                TopicModel _childTopic = (TopicModel) (childTopic != null ? ((UnifiedValue) childTopic).value : null);
+                updateAssignmentsOne(parent, _childTopic, assocDefUri);
             } else {
-                // Note: for partial create/update requests unifiedChild might be null
-                if (unifiedChild != null) {
-                    updateAssignmentsMany(parent, (List<UnifiedValue>) unifiedChild, assocDefUri);
+                // Note: for partial create/update requests childTopic might be null
+                if (childTopic != null) {
+                    updateAssignmentsMany(parent, (List<UnifiedValue>) childTopic, assocDefUri);
                 }
             }
         }
@@ -403,64 +394,68 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   unifiedChild    may be null
+     * @param   childTopic    may be null
      */
-    private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel unifiedChild, String assocDefUri) {
-        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
-        RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
-        boolean newValueIsEmpty = isEmptyValue(assocDefUri);
-        //
-        // 1) delete assignment if exists AND value has changed or emptied
-        //
-        boolean deleted = false;
-        if (oldValue != null && (newValueIsEmpty || unifiedChild != null && !oldValue.equals(unifiedChild))) {
-            // update DB
-            oldValue.getRelatingAssociation().delete();
-            // update memory
-            if (newValueIsEmpty) {
-                logger.fine("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
-                    parent.id + " (typeUri=\"" + type.uri + "\")");
-                childTopics.remove(assocDefUri);
+    private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel childTopic, String assocDefUri) {
+        try {
+            ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
+            RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
+            boolean newValueIsEmpty = isEmptyValue(assocDefUri);
+            //
+            // 1) delete assignment if exists AND value has changed or emptied
+            //
+            boolean deleted = false;
+            if (oldValue != null && (newValueIsEmpty || childTopic != null && !oldValue.equals(childTopic))) {
+                // update DB
+                oldValue.getRelatingAssociation().delete();
+                // update memory
+                if (newValueIsEmpty) {
+                    logger.fine("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
+                        parent.id + " (typeUri=\"" + type.uri + "\")");
+                    childTopics.remove(assocDefUri);
+                }
+                deleted = true;
             }
-            deleted = true;
-        }
-        // 2) create assignment if not exists OR value has changed
-        // a new value must be present
-        //
-        AssociationModelImpl assoc = null;
-        if (unifiedChild != null && (oldValue == null || !oldValue.equals(unifiedChild))) {
-            // update DB
-            assoc = createChildAssociation(parent, unifiedChild, assocDefUri, deleted);
-            // update memory
-            childTopics.put(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
-        }
-        // 3) update relating assoc
-        //
-        // Note: don't update an assoc's relating assoc
-        // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
-        if (!isAssoc) {
-            // take the old assoc if no new one is created, there is an old one, and it has not been deleted
-            if (assoc == null && oldValue != null && !deleted) {
-                assoc = oldValue.getRelatingAssociation();
+            // 2) create assignment if not exists OR value has changed
+            // a new value must be present
+            //
+            AssociationModelImpl assoc = null;
+            if (childTopic != null && (oldValue == null || !oldValue.equals(childTopic))) {
+                // update DB
+                assoc = createChildAssociation(parent, childTopic, assocDefUri, deleted);
+                // update memory
+                childTopics.put(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
-            if (assoc != null) {
-                RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
-                updateRelatingAssociation(assoc, assocDefUri, newChildValue);
+            // 3) update relating assoc
+            //
+            // Note: don't update an assoc's relating assoc
+            // TODO: condition needed? => yes, try remove child topic from rel assoc (e.g. "Phone Label")
+            if (!isAssoc) {
+                // take the old assoc if no new one is created, there is an old one, and it has not been deleted
+                if (assoc == null && oldValue != null && !deleted) {
+                    assoc = oldValue.getRelatingAssociation();
+                }
+                if (assoc != null) {
+                    RelatedTopicModelImpl newChildValue = newValues.getChildTopicsModel().getTopicOrNull(assocDefUri);
+                    updateRelatingAssociation(assoc, assocDefUri, newChildValue);
+                }
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating an one-assigment failed, parent=" + parent + ", childTopic=" +
+                childTopic + ", assocDefUri=\"" + assocDefUri + "\"", e);
         }
     }
 
     /**
-     * @param   unifiedChilds   never null; a UnifiedValue's "value" field may be null
+     * @param   childTopics   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> unifiedChilds,
-                                                                  String assocDefUri) {
-        ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
-        List<RelatedTopicModelImpl> oldValues = childTopics.getTopicsOrNull(assocDefUri);   // may be null
+    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childTopics, String assocDefUri) {
+        ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
+        List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(assocDefUri);   // may be null
         // logger.fine("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
-        for (UnifiedValue _unifiedChild : unifiedChilds) {
-            TopicModel unifiedChild = (TopicModel) _unifiedChild.value;
-            long originalId = _unifiedChild.originalId;
+        for (UnifiedValue childTopic : childTopics) {
+            TopicModel unifiedChild = (TopicModel) childTopic.value;
+            long originalId = childTopic.originalId;
             long newId = unifiedChild != null ? unifiedChild.getId() : -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
@@ -489,7 +484,7 @@ class ValueIntegrator {
                 // update DB
                 assoc = createChildAssociation(parent, unifiedChild, assocDefUri, deleted);
                 // update memory
-                childTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
+                oldChildTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
             }
             // 3) update relating assoc
             //
@@ -501,7 +496,7 @@ class ValueIntegrator {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) _unifiedChild._newValues;
+                    RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childTopic._newValues;
                     updateRelatingAssociation(assoc, assocDefUri, newValues);
                 }
             }
@@ -530,8 +525,8 @@ class ValueIntegrator {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Updating relating assoc " + assoc.id + " (assocDefUri=\"" + assocDefUri +
-                "\") failed, assoc=" + assoc, e);
+            throw new RuntimeException("Updating relating assoc " + assoc.id + " failed, assocDefUri=\"" + assocDefUri +
+                "\", assoc=" + assoc, e);
         }
     }
 

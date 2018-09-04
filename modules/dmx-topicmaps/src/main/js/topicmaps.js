@@ -28,7 +28,7 @@ const state = {
                               //       renderer:
                               //       mounted: callback
                               //     }
-                              //   {
+                              //   }
 }
 
 const actions = {

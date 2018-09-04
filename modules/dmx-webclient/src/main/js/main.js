@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2018/08/27')
+console.log('[DMX] 2018/09/04')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
@@ -20,7 +20,7 @@ const ready = dm5.init({
 })
 
 // 2) Create Vue root instance
-// In particular instantiates dm5-webclient component, and its child component dm5-search-widget.
+// In particular instantiates dm5-webclient component, and its child component dm5-search-widget. ### FIXDOC
 new Vue({
   el: '#app',
   store,
@@ -32,7 +32,7 @@ new Vue({
 // 3) Load plugins
 // Plugin loading (and initialization) must take place *after* the Vue root instance is created.
 // Plugins that provide entries for the create menu rely on the "registerExtraMenuItems" action,
-// which is only registered in dm5-search-widget's created() hook.
+// which is only registered in dm5-search-widget's created() hook. ### FIXDOC
 pluginManager.loadPlugins()
 // console.log('### Plugins loaded!')
 
