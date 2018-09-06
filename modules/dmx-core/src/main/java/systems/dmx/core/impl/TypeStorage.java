@@ -305,25 +305,35 @@ class TypeStorage {
     // ---
 
     /**
+     * Part of "Type Editor Support". See TypeModelImpl.
+     * Called when the user creates an assoc def interactively.
+     * <p>
      * Creates an assoc def model from an association which may or may not have been an assoc def before.
      * This is needed when an association becomes an assoc def through retyping.
      * <p>
      * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
      */
     AssociationDefinitionModelImpl newAssociationDefinition(AssociationModelImpl assoc) {
-        // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
-        AssociationModel model = mf.newAssociationModel(assoc);
-        String parentTypeUri = fetchParentTypeTopic(assoc).getUri();
-        String childTypeUri = fetchChildTypeTopic(assoc).getUri();
-        prepareAssocModel(model, parentTypeUri, childTypeUri, defaultCardinalityUri(assoc));
-        return mf.newAssociationDefinitionModel(model, null);       // viewConfig=null
+        // prepareAssocModel(model, parentTypeUri, childTypeUri, defaultCardinality(assoc)); ### drop it
+        return mf.newAssociationDefinitionModel(
+            setUriRoles(
+                // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
+                mf.newAssociationModel(assoc),
+                fetchParentTypeTopic(assoc).getUri(),
+                fetchChildTypeTopic(assoc).getUri()
+            ), null     // viewConfig=null
+        );
     }
 
-    // Note: the assoc is **not** required to identify its players by URI (by ID is OK)
+    /**
+     * Called when an assoc def is loaded from DB.
+     * <p>
+     * Note: the assoc is **not** required to identify its players by URI (by ID is OK)
+     */
     private AssociationDefinitionModel fetchAssociationDefinition(AssociationModelImpl assoc, String parentTypeUri,
                                                                                               String childTypeUri) {
         try {
-            prepareAssocModel(assoc, parentTypeUri, childTypeUri, fetchCardinality(assoc).getUri());
+            prepareAssocModel(assoc, parentTypeUri, childTypeUri, fetchCardinality(assoc));
             return mf.newAssociationDefinitionModel(assoc, null);   // viewConfig=null
         } catch (Exception e) {
             throw new RuntimeException("Fetching assoc def failed (parentTypeUri=\"" + parentTypeUri +
@@ -334,47 +344,67 @@ class TypeStorage {
     /**
      * Prepares an assoc model for being used as the base for an assoc def model.
      * <p>
-     * TODO: can we use model-driven assoc def retrieval?
+     * The assoc model is manipulated in-place:
+     *   - 2 roles (parent/child types, by-URI)
+     *   - cardinality
+     *   - custom assoc type
+     *   - identity-attr flag
+     *   - include-in-label flag
+     * <p>
+     * TODO: can we use model-driven assoc def retrieval? => NO! See below.
+     *
+     * @param   cardinality     must not null
      */
-    private void prepareAssocModel(AssociationModel assoc, String parentTypeUri, String childTypeUri,
-                                                                                 String cardinalityUri) {
-        long assocDefId = assoc.getId();
-        assoc.setRoleModel1(mf.newTopicRoleModel(parentTypeUri, "dmx.core.parent_type"));
-        assoc.setRoleModel2(mf.newTopicRoleModel(childTypeUri,  "dmx.core.child_type"));
+    private void prepareAssocModel(AssociationModelImpl assoc, String parentTypeUri, String childTypeUri,
+                                   RelatedTopicModel cardinality) {
         ChildTopicsModel childTopics = assoc.getChildTopicsModel();
-        childTopics.putRef("dmx.core.cardinality", cardinalityUri);
-        RelatedTopicModel customAssocType = fetchCustomAssocType(assocDefId);
+        // 2 roles
+        setUriRoles(assoc, parentTypeUri, childTypeUri);
+        // cardinality
+        childTopics.put("dmx.core.cardinality", cardinality);   // Note: putRef() would not be sufficient.
+                                                                // The assoc model must be fully initialized.
+                                                                // Otherwise update would fail. ### TODO: revise comment
+        // custom assoc type
+        RelatedTopicModel customAssocType = fetchCustomAssocType(assoc);
         if (customAssocType != null) {
             childTopics.put("dmx.core.assoc_type#dmx.core.custom_assoc_type", customAssocType);
         }
-        RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assocDefId);
+        // identity-attr flag
+        RelatedTopicModel isIdentityAttr = fetchIsIdentityAttr(assoc);
         if (isIdentityAttr != null) {   // ### TODO: should a isIdentityAttr topic always exist?
             childTopics.put("dmx.core.identity_attr", isIdentityAttr);
         }
-        RelatedTopicModel includeInLabel = fetchIncludeInLabel(assocDefId);
+        // include-in-label flag
+        RelatedTopicModel includeInLabel = fetchIncludeInLabel(assoc);
         if (includeInLabel != null) {   // ### TODO: should a includeInLabel topic always exist?
             childTopics.put("dmx.core.include_in_label", includeInLabel);
         }
     }
 
-    private RelatedTopicModel fetchCustomAssocType(long assocDefId) {
+    private AssociationModel setUriRoles(AssociationModel assoc, String parentTypeUri, String childTypeUri) {
+        assoc.setRoleModel1(mf.newTopicRoleModel(parentTypeUri, "dmx.core.parent_type"));
+        assoc.setRoleModel2(mf.newTopicRoleModel(childTypeUri,  "dmx.core.child_type"));
+        return assoc;
+    }
+
+    private RelatedTopicModel fetchCustomAssocType(AssociationModelImpl assoc) {
         // ### TODO: can we use model-driven retrieval? => NO!
-        // Fetching assoc type "Aggregation Definition" would run into an endless recursion while fetching
+        // Fetching assoc type "Composition Definition" would run into an endless recursion while fetching
         // its "Custom Association Type" assoc def.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.custom_assoc_type", "dmx.core.parent",
-            "dmx.core.child", "dmx.core.assoc_type");
+        return assoc.getRelatedTopic("dmx.core.custom_assoc_type", "dmx.core.parent", "dmx.core.child",
+            "dmx.core.assoc_type");
     }
 
-    private RelatedTopicModel fetchIsIdentityAttr(long assocDefId) {
+    private RelatedTopicModel fetchIsIdentityAttr(AssociationModelImpl assoc) {
         // ### TODO: can we use model-driven retrieval? => NO! See above.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.parent",
-            "dmx.core.child", "dmx.core.identity_attr");
+        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
+            "dmx.core.identity_attr");
     }
 
-    private RelatedTopicModel fetchIncludeInLabel(long assocDefId) {
+    private RelatedTopicModel fetchIncludeInLabel(AssociationModelImpl assoc) {
         // ### TODO: can we use model-driven retrieval?  => NO! See above.
-        return pl.fetchAssociationRelatedTopic(assocDefId, "dmx.core.composition", "dmx.core.parent",
-            "dmx.core.child", "dmx.core.include_in_label");
+        return assoc.getRelatedTopic("dmx.core.composition", "dmx.core.parent", "dmx.core.child",
+            "dmx.core.include_in_label");
     }
 
     // ---
@@ -501,14 +531,16 @@ class TypeStorage {
             "dmx.core.cardinality");
     }
 
-    // Note: if the underlying association was an association definition before it has cardinality
-    // assignments already. These assignments are restored. Otherwise "One" is used as default.
-    private String defaultCardinalityUri(AssociationModelImpl assoc) {
+    // Note: if the assoc was an assoc def before it has a cardinality assignment already.
+    // The assignment is restored. Otherwise "One" is used as default.
+    //
+    // ### TODO: drop it (dead code)
+    private RelatedTopicModel defaultCardinality(AssociationModelImpl assoc) {
         RelatedTopicModel cardinality = fetchCardinalityIfExists(assoc);
         if (cardinality != null) {
-            return cardinality.getUri();
+            return cardinality;
         } else {
-            return "dmx.core.one";
+            return mf.newRelatedTopicModel(pl.fetchTopic("uri", new SimpleValue("dmx.core.one")));  // ### FIXME
         }
     }
 

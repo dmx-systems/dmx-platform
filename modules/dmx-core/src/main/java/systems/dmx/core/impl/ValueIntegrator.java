@@ -398,8 +398,11 @@ class ValueIntegrator {
      */
     private void updateAssignmentsOne(DMXObjectModelImpl parent, TopicModel childTopic, String assocDefUri) {
         try {
-            ChildTopicsModelImpl childTopics = parent.getChildTopicsModel();
-            RelatedTopicModelImpl oldValue = childTopics.getTopicOrNull(assocDefUri);   // may be null
+            ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
+            RelatedTopicModelImpl oldValue = oldChildTopics.getTopicOrNull(assocDefUri);   // may be null
+            if (oldValue != null && oldValue.id == -1) {
+                throw new RuntimeException("Old value's ID is not initialized, oldValue=" + oldValue);
+            }
             boolean newValueIsEmpty = isEmptyValue(assocDefUri);
             //
             // 1) delete assignment if exists AND value has changed or emptied
@@ -412,7 +415,7 @@ class ValueIntegrator {
                 if (newValueIsEmpty) {
                     logger.fine("### Deleting assignment (assocDefUri=\"" + assocDefUri + "\") from composite " +
                         parent.id + " (typeUri=\"" + type.uri + "\")");
-                    childTopics.remove(assocDefUri);
+                    oldChildTopics.remove(assocDefUri);
                 }
                 deleted = true;
             }
@@ -424,7 +427,7 @@ class ValueIntegrator {
                 // update DB
                 assoc = createChildAssociation(parent, childTopic, assocDefUri, deleted);
                 // update memory
-                childTopics.put(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
+                oldChildTopics.put(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
             // 3) update relating assoc
             //
@@ -441,22 +444,22 @@ class ValueIntegrator {
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Updating an one-assigment failed, parent=" + parent + ", childTopic=" +
-                childTopic + ", assocDefUri=\"" + assocDefUri + "\"", e);
+            throw new RuntimeException("Updating assigment failed, parent=" + parent + ", childTopic=" + childTopic +
+                ", assocDefUri=\"" + assocDefUri + "\"", e);
         }
     }
 
     /**
-     * @param   childTopics   never null; a UnifiedValue's "value" field may be null
+     * @param   childValues   never null; a UnifiedValue's "value" field may be null
      */
-    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childTopics, String assocDefUri) {
+    private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String assocDefUri) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(assocDefUri);   // may be null
         // logger.fine("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
-        for (UnifiedValue childTopic : childTopics) {
-            TopicModel unifiedChild = (TopicModel) childTopic.value;
-            long originalId = childTopic.originalId;
-            long newId = unifiedChild != null ? unifiedChild.getId() : -1;
+        for (UnifiedValue childValue : childValues) {
+            TopicModel childTopic = (TopicModel) childValue.value;
+            long originalId = childValue.originalId;
+            long newId = childTopic != null ? childTopic.getId() : -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
                 oldValue = findTopic(oldValues, originalId);
@@ -482,9 +485,9 @@ class ValueIntegrator {
             AssociationModelImpl assoc = null;
             if (newId != -1 && (originalId == -1 || originalId != newId)) {
                 // update DB
-                assoc = createChildAssociation(parent, unifiedChild, assocDefUri, deleted);
+                assoc = createChildAssociation(parent, childTopic, assocDefUri, deleted);
                 // update memory
-                oldChildTopics.add(assocDefUri, mf.newRelatedTopicModel(unifiedChild, assoc));
+                oldChildTopics.add(assocDefUri, mf.newRelatedTopicModel(childTopic, assoc));
             }
             // 3) update relating assoc
             //
@@ -496,7 +499,7 @@ class ValueIntegrator {
                     assoc = oldValue.getRelatingAssociation();
                 }
                 if (assoc != null) {
-                    RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childTopic._newValues;
+                    RelatedTopicModelImpl newValues = (RelatedTopicModelImpl) childValue._newValues;
                     updateRelatingAssociation(assoc, assocDefUri, newValues);
                 }
             }

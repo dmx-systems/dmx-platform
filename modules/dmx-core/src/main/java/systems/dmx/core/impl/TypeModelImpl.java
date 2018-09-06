@@ -328,11 +328,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             //
             // 1) update memory
             // Note: the assoc def's custom association type is stored as a child topic. The meta model extension that
-            // adds "Association Type" as a child to the "Composition Definition" and "Aggregation Definition"
-            // association types has itself a custom association type (named "Custom Association Type"), see migration
-            // 5. It would not be stored as storage is model driven and the (meta) model doesn't know about custom
-            // associations as this very concept is introduced only by the assoc def being added here. So, the model
-            // must be updated (in-memory) *before* the assoc def is stored.
+            // adds "Association Type" as a child to the "Composition Definition" association type has itself a custom
+            // association type (named "Custom Association Type"), see migration 5. It would not be stored as storage is
+            // model driven and the (meta) model doesn't know about custom associations as this very concept is
+            // introduced only by the assoc def being added here. So, the model must be updated (in-memory) *before* the
+            // assoc def is stored.
             addAssocDefBefore(assocDef, beforeAssocDefUri);
             //
             // 2) update DB

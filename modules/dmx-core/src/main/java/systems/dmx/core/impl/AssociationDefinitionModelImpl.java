@@ -139,40 +139,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
         //   a sole AssociationModel is instantiated, and Type editor support is required.
     }
 
-    /**
-     * 2 assoc def specific tasks must be performed once the underlying association is updated:
-     *   - Update the assoc def's cardinality (in type cache + DB). Cardinality is technically not part of the type
-     *     model. So, it is not handled by the generic (model-driven) object update procedure.
-     *   - Possibly rehash the assoc def in type cache. Rehashing is required if the custom assoc type has changed.
-     * <p>
-     * Pre condition: these 3 assoc def parts are already up-to-date through the generic (model-driven) object update
-     * procedure:
-     *   - Assoc Def type (type URI).
-     *   - Custom assoc type (child topics).
-     *   - "Include in Label" flag (child topics).
-     * <p>
-     * Called when update() is called on an AssociationDefinitionModel object. This is in 2 cases:
-     *   - Edit a type interactively (a type topic is selected).
-     *   - Programmatically call getChildTopics().set() on an AssociationDefinitionModel object, e.g. from a migration.
-     * <p>
-     * <i>Not</i> called when an association which also acts as an assoc def is edited interactively (an association is
-     * selected). In this case:
-     *   - Cardinality doesn't need to be updated as Cardinality can't be edited interactively through an association.
-     *   - Rehashing is already performed in TypeModelImpl#_updateAssocDef (called from AssociationModelImpl#postUpdate)
-     *
-     * @param   updateModel
-     *              the update data/instructions.
-     *              Note: on post-update time updateModel and this (assoc def) model may differ at least because
-     *                a) updateModel might contain only certain assoc def parts; this is called a "partial update"
-     *                b) updateModel might contain refs and deletion-refs; this model never contains refs
-     *
-     * TODO: drop this method!
-     */
-    @Override
-    void postUpdate(DMXObjectModel updateModel, DMXObjectModel oldObject) {
-        super.postUpdate(updateModel, oldObject);
-    }
-
 
 
     // === Read from ChildTopicsModel ===

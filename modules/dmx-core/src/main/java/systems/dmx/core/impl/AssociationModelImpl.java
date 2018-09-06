@@ -302,9 +302,10 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     @Override
     void preCreate() {
-        RoleModel[] roles = DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
-            "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type");
-        if (roles != null) {
+        // Note: auto-typing only works for generic assocs (of type "Association") and for by-ID players.
+        // That's why auto-typing does not interfere with assoc defs created programmatically (through migration).
+        if (DMXUtils.associationAutoTyping(this, "dmx.core.topic_type", "dmx.core.topic_type",
+                "dmx.core.composition_def", "dmx.core.child_type", "dmx.core.parent_type") != null) {
             childTopics.putRef("dmx.core.cardinality", "dmx.core.one");
         }
         //
