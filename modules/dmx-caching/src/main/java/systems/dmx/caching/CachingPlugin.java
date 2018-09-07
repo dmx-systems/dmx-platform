@@ -84,7 +84,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     public void serviceResponseFilter(ContainerResponse response) {
         DMXObject object = responseObject(response);
         if (object != null) {
-            setCacheControlHeader(response, "max-age=0");
+            setCacheControlHeader(response, "no-store");
         }
     }
 
