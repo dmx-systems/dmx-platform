@@ -85,6 +85,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
         DMXObject object = responseObject(response);
         if (object != null) {
             setCacheControlHeader(response, "no-store");
+            // ### FIXME: support browser cache by using "max-age=0" instead (#35)
         }
     }
 
