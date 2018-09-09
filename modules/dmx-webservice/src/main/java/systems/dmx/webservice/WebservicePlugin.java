@@ -466,7 +466,7 @@ public class WebservicePlugin extends PluginActivator {
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersTopicTypeUri=\"" + othersTopicTypeUri + "\")";
         try {
-            logger.info(operation + " " + paramInfo);
+            logger.fine(operation + " " + paramInfo);
             return object.getRelatedTopics(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);
@@ -479,7 +479,7 @@ public class WebservicePlugin extends PluginActivator {
         String paramInfo = "(assocTypeUri=\"" + assocTypeUri + "\", myRoleTypeUri=\"" + myRoleTypeUri +
             "\", othersRoleTypeUri=\"" + othersRoleTypeUri + "\", othersAssocTypeUri=\"" + othersAssocTypeUri + "\")";
         try {
-            logger.info(operation + " " + paramInfo);
+            logger.fine(operation + " " + paramInfo);
             return object.getRelatedAssociations(assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersAssocTypeUri);
         } catch (Exception e) {
             throw new RuntimeException(operation + " failed " + paramInfo, e);

@@ -46,7 +46,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     }
 
     @Override
-    public void addConfigTopic(TopicModel configTopic) {
+    public ViewConfigurationModel addConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();
         // error check
         if (getConfigTopic(configTypeUri) != null) {
@@ -54,6 +54,7 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         }
         //
         configTopics.put(configTypeUri, (TopicModelImpl) configTopic);
+        return this;
     }
 
     @Override

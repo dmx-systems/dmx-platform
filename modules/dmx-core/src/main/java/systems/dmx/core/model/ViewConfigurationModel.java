@@ -26,7 +26,7 @@ public interface ViewConfigurationModel {
      *
      * @throws  RuntimeException    if this view config already contains a config topic with the same type URI.
      */
-    void addConfigTopic(TopicModel configTopic);
+    ViewConfigurationModel addConfigTopic(TopicModel configTopic);
 
     /**
      * Sets a single value of a certain config topic.
