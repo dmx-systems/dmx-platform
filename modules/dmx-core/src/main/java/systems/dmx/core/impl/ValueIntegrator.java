@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
@@ -12,6 +13,8 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicReferenceModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.util.DMXUtils;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import static java.util.Arrays.asList;
 import java.util.ArrayList;
@@ -455,7 +458,7 @@ class ValueIntegrator {
     private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String assocDefUri) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(assocDefUri);   // may be null
-        // logger.fine("### assocDefUri=\"" + assocDefUri + "\", oldValues=" + oldValues);
+        logger.info("### assocDefUri=\"" + assocDefUri + "\", childValues=" + childValues + ", oldValues=" + oldValues);
         for (UnifiedValue childValue : childValues) {
             TopicModel childTopic = (TopicModel) childValue.value;
             long originalId = childValue.originalId;
@@ -729,9 +732,9 @@ class ValueIntegrator {
 
     // -------------------------------------------------------------------------------------------------- Nested Classes
 
-    class UnifiedValue<M extends DMXObjectModelImpl> {
+    class UnifiedValue<M extends DMXObjectModelImpl> implements JSONEnabled {
 
-        M value;                            // the resulting unified value
+        M value;                            // the resulting unified value; may be null
         DMXObjectModelImpl _newValues;      // the original new values
         long originalId;                    // the original ID, saved here cause it is overwritten (see integrate())
 
@@ -742,6 +745,27 @@ class ValueIntegrator {
             this.value = value;
             this._newValues = newValues;
             this.originalId = newValues.id;
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            try {
+                return new JSONObject()
+                    .put("value", value != null ? value.toJSON() : null)
+                    .put("originalId", originalId);
+            } catch (Exception e) {
+                throw new RuntimeException("Serialization failed", e);
+            }
+        }
+
+        // TODO: copy in DMXObjectModelImpl
+        @Override
+        public String toString() {
+            try {
+                return getClass().getSimpleName() + " " + toJSON().toString(4);
+            } catch (Exception e) {
+                throw new RuntimeException("Prettyprinting failed", e);
+            }
         }
     }
 }

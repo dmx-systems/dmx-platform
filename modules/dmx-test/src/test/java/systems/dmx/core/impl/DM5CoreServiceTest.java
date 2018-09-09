@@ -11,6 +11,7 @@ import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.SimpleValue;
+import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
 import static org.junit.Assert.assertEquals;
@@ -38,12 +39,30 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     @Test
-    public void compositeModel() {
+    public void addRefOnModel() {
         DMXTransaction tx = dmx.beginTx();
         try {
             defineLottoModel();
             Topic num1 = dmx.createTopic(mf.newTopicModel("lotto.number", new SimpleValue(23)));
             Topic num2 = dmx.createTopic(mf.newTopicModel("lotto.number", new SimpleValue(42)));
+            //
+            Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .addRef("lotto.number", num1.getId())
+                .addRef("lotto.number", num2.getId())
+            ));
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void addRefOnObject() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineLottoModel();
+            Topic num1 = dmx.createTopic(mf.newTopicModel("lotto.number", new SimpleValue(23)));
+            Topic num2 = dmx.createTopic(mf.newTopicModel("lotto.number", new SimpleValue(42)));
+            //
             Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw"));
             draw.getChildTopics()
                 .addRef("lotto.number", num1.getId())

@@ -319,9 +319,13 @@ class TypeStorage {
             setUriRoles(
                 // Note: we must not manipulate the assoc model in-place. The Webclient expects by-ID roles.
                 mf.newAssociationModel(assoc),
-                fetchParentTypeTopic(assoc).getUri(),
-                fetchChildTypeTopic(assoc).getUri()
-            ), null     // viewConfig=null
+                fetchParentTypeTopic(assoc).uri,
+                fetchChildTypeTopic(assoc).uri
+            ), mf.newViewConfigurationModel().addConfigTopic(
+                // FIXME: the Core must not know about the Webclient
+                // FIXME: the view config topic label is not set
+                mf.newTopicModel("dmx.webclient.view_config", new SimpleValue("View Configuration"))
+            )
         );
     }
 
@@ -470,8 +474,8 @@ class TypeStorage {
      * @return  the parent type topic.
      *          A topic representing either a topic type or an association type.
      */
-    private TopicModel fetchParentTypeTopic(AssociationModelImpl assoc) {
-        TopicModel parentType = (TopicModel) assoc.getPlayer("dmx.core.parent_type");
+    private TopicModelImpl fetchParentTypeTopic(AssociationModelImpl assoc) {
+        TopicModelImpl parentType = (TopicModelImpl) assoc.getPlayer("dmx.core.parent_type");
         // error check
         if (parentType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dmx.core.parent_type\" is missing in " + assoc);
@@ -486,8 +490,8 @@ class TypeStorage {
      * @return  the child type topic.
      *          A topic representing a topic type.
      */
-    private TopicModel fetchChildTypeTopic(AssociationModelImpl assoc) {
-        TopicModel childType = (TopicModel) assoc.getPlayer("dmx.core.child_type");
+    private TopicModelImpl fetchChildTypeTopic(AssociationModelImpl assoc) {
+        TopicModelImpl childType = (TopicModelImpl) assoc.getPlayer("dmx.core.child_type");
         // error check
         if (childType == null) {
             throw new RuntimeException("DB inconsistency: topic role \"dmx.core.child_type\" is missing in " + assoc);
@@ -499,15 +503,14 @@ class TypeStorage {
     // ---
 
     TypeModelImpl fetchParentType(AssociationModelImpl assoc) {
-        TopicModel type = fetchParentTypeTopic(assoc);
-        String typeUri = type.getTypeUri();
-        if (typeUri.equals("dmx.core.topic_type")) {
-            return getTopicType(type.getUri());
-        } else if (typeUri.equals("dmx.core.assoc_type")) {
-            return getAssociationType(type.getUri());
+        TopicModelImpl type = fetchParentTypeTopic(assoc);
+        if (type.typeUri.equals("dmx.core.topic_type")) {
+            return getTopicType(type.uri);
+        } else if (type.typeUri.equals("dmx.core.assoc_type")) {
+            return getAssociationType(type.uri);
         } else {
             throw new RuntimeException("DB inconsistency: the \"dmx.core.parent_type\" player is not a type " +
-                "but of type \"" + typeUri + "\" in " + assoc);
+                "but of type \"" + type.typeUri + "\" in " + assoc);
         }
     }
 
