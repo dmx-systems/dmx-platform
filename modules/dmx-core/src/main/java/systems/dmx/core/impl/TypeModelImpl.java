@@ -99,6 +99,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     }
 
     @Override
+    public AssociationDefinitionModelImpl getAssocDef(long assocDefId) {
+        return getAssocDefOrThrow(assocDefId);
+    }
+
+    @Override
     public boolean hasAssocDef(String assocDefUri) {
         return _getAssocDef(assocDefUri) != null;
     }
@@ -656,8 +661,25 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         return assocDef;
     }
 
+    private AssociationDefinitionModelImpl getAssocDefOrThrow(long assocDefId) {
+        AssociationDefinitionModelImpl assocDef = _getAssocDef(assocDefId);
+        if (assocDef == null) {
+            throw new RuntimeException("Assoc def " + assocDefId + " not found in type \"" + uri + "\"");
+        }
+        return assocDef;
+    }
+
     private AssociationDefinitionModelImpl _getAssocDef(String assocDefUri) {
         return assocDefs.get(assocDefUri);
+    }
+
+    private AssociationDefinitionModelImpl _getAssocDef(long assocDefId) {
+        for (AssociationDefinitionModelImpl assocDef : assocDefs.values()) {
+            if (assocDef.id == assocDefId) {
+                return assocDef;
+            }
+        }
+        return null;
     }
 
     // ---
