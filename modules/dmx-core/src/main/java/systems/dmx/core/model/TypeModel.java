@@ -31,8 +31,6 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     AssociationDefinitionModel getAssocDef(String assocDefUri);
 
-    AssociationDefinitionModel getAssocDef(long assocDefId);
-
     boolean hasAssocDef(String assocDefUri);
 
     /**
