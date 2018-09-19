@@ -72,6 +72,61 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void childParentUpdate() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineSimpleNameIdentityModel();
+            String fullAssocDefUriToBeUpdated = "simple.name";
+            // create composite topic
+            ChildTopicsModel cm1 = mf.newChildTopicsModel().put(fullAssocDefUriToBeUpdated, "Test");
+            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", cm1));
+            assertTrue("Test".equals(topic.getSimpleValue().toString()));
+            // updating simple child text topic
+            TopicType parentType = dmx.getTopicType(topic.getTypeUri());
+            AssociationDefinition typeRelation = parentType.getAssocDef(fullAssocDefUriToBeUpdated);
+            ChildTopicsModel cm2 = mf.newChildTopicsModel().put(fullAssocDefUriToBeUpdated, "Test Studio");
+            topic.updateChildTopics(cm2, typeRelation);
+            // assert child topic value and parent value update
+            assertTrue("Test Studio".equals(topic.getChildTopics().getString(fullAssocDefUriToBeUpdated)));
+            assertTrue("Test Studio".equals(topic.getSimpleValue().toString()));
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void addChildTopics() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineManyNamesIdentityModel();
+            String fullAssocDefUriToBeUpdated = "simple.name";
+            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullAssocDefUriToBeUpdated,
+                    mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
+            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
+            Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
+            topic.getChildTopics().add(fullAssocDefUriToBeUpdated, futureChild.getModel());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void addRefChildTopics() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineManyNamesIdentityModel();
+            String fullAssocDefUriToBeUpdated = "simple.name";
+            ChildTopicsModel ctm = mf.newChildTopicsModel().add(fullAssocDefUriToBeUpdated,
+                    mf.newTopicModel("simple.name", new SimpleValue("Text 1")));
+            Topic topic = dmx.createTopic(mf.newTopicModel("simple.entity", ctm));
+            Topic futureChild = dmx.createTopic(mf.newTopicModel("simple.name", new SimpleValue("Text 2")));
+            topic.getChildTopics().addRef(fullAssocDefUriToBeUpdated, futureChild.getId());
+        } finally {
+            tx.finish();
+        }
+    }
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     private void defineLottoModel() {
@@ -82,4 +137,23 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             ))
         );
     }
+
+    private void defineSimpleNameIdentityModel() {
+        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
+            .addAssocDef(mf.newAssociationDefinitionModel(
+                "simple.entity", "simple.name", "dmx.core.one"
+            ))
+        );
+    }
+
+    private void defineManyNamesIdentityModel() {
+        dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
+        dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
+            .addAssocDef(mf.newAssociationDefinitionModel(
+                    "simple.entity", "simple.name", "dmx.core.many"
+            ))
+        );
+    }
+
 }
