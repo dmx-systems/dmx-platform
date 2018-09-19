@@ -9,6 +9,7 @@ import systems.dmx.core.Role;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfiguration;
+import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
@@ -295,43 +296,56 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === View Configuration ===
 
+    /**
+     * Updates type cache once a view config topic has been updated, and adds an UPDATE-TYPE directive.
+     */
     private void updateType(Topic viewConfig) {
+        // type to be updated
         Topic type = viewConfig.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type", null);
-        if (type != null) {
-            String typeUri = type.getTypeUri();
-            if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
-                updateTopicType(type, viewConfig);
-            } else if (typeUri.equals("dmx.core.assoc_type")) {
-                updateAssociationType(type, viewConfig);
-            } else {
-                throw new RuntimeException("View Configuration " + viewConfig.getId() + " is associated to an " +
-                    "unexpected topic (type=" + type + "\nviewConfig=" + viewConfig + ")");
+        // ID of the assoc def to be updated.
+        // -1 if the update does not target an assoc def (but a type)
+        long assocDefId = -1;
+        if (type == null) {
+            Association assocDef = viewConfig.getRelatedAssociation("dmx.core.composition", "dmx.core.view_config",
+                "dmx.core.assoc_def", null);
+            if (assocDef == null) {
+                throw new RuntimeException("Orphaned view config: " + viewConfig);
             }
+            type = (Topic) assocDef.getPlayer("dmx.core.parent_type");
+            assocDefId = assocDef.getId();
+        }
+        //
+        String typeUri = type.getTypeUri();
+        if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
+            updateType(
+                dmx.getTopicType(type.getUri()),
+                assocDefId, viewConfig, Directive.UPDATE_TOPIC_TYPE
+            );
+        } else if (typeUri.equals("dmx.core.assoc_type")) {
+            updateType(
+                dmx.getAssociationType(type.getUri()),
+                assocDefId, viewConfig, Directive.UPDATE_ASSOCIATION_TYPE
+            );
         } else {
-            // ### FIXME: handle association definitions
+            throw new RuntimeException("View config " + viewConfig.getId() + " is associated unexpectedly, type=" +
+                type + ", assocDefId=" + assocDefId + ", viewConfig=" + viewConfig);
         }
     }
 
-    // ---
-
-    private void updateTopicType(Topic type, Topic viewConfig) {
-        logger.info("### Updating view config of topic type \"" + type.getUri() + "\"");
-        TopicType topicType = dmx.getTopicType(type.getUri());
-        updateViewConfig(topicType, viewConfig);
-        Directives.get().add(Directive.UPDATE_TOPIC_TYPE, topicType);           // ### TODO: should be implicit
+    private void updateType(DMXType type, long assocDefId, Topic viewConfig, Directive dir) {
+        logger.info("### Updating view config of type \"" + type.getUri() + "\" (assocDefId=" + assocDefId + ")");
+        updateViewConfig(type, assocDefId, viewConfig);
+        Directives.get().add(dir, type);        // ### TODO: should be implicit
     }
 
-    private void updateAssociationType(Topic type, Topic viewConfig) {
-        logger.info("### Updating view config of assoc type \"" + type.getUri() + "\"");
-        AssociationType assocType = dmx.getAssociationType(type.getUri());
-        updateViewConfig(assocType, viewConfig);
-        Directives.get().add(Directive.UPDATE_ASSOCIATION_TYPE, assocType);     // ### TODO: should be implicit
-    }
-
-    // ---
-
-    private void updateViewConfig(DMXType type, Topic viewConfig) {
-        type.getModel().getViewConfig().updateConfigTopic(viewConfig.getModel());
+    private void updateViewConfig(DMXType type, long assocDefId, Topic viewConfig) {
+        ViewConfigurationModel vcm;
+        if (assocDefId == -1) {
+            vcm = type.getModel().getViewConfig();
+        } else {
+            vcm = getAssocDef(type.getModel(), assocDefId).getViewConfig();
+        }
+        vcm.updateConfigTopic(viewConfig.getModel());
     }
 
     // --- Label ---
@@ -414,5 +428,14 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
             return parentType.getAssocDef(childTypeUri).getInstanceLevelAssocTypeUri().equals(assocTypeUri);
         }
         return false;
+    }
+
+    private AssociationDefinitionModel getAssocDef(TypeModel type, long assocDefId) {
+        for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
+            if (assocDef.getId() == assocDefId) {
+                return assocDef;
+            }
+        }
+        throw new RuntimeException("Assoc def " + assocDefId + " not found in type \"" + type.getUri() + "\"");
     }
 }
