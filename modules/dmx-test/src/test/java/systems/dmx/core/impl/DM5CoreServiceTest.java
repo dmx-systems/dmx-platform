@@ -151,9 +151,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         dmx.createTopicType(mf.newTopicTypeModel("simple.name", "Simple Name", "dmx.core.text"));
         dmx.createTopicType(mf.newTopicTypeModel("simple.entity", "Simple Entity", "dmx.core.identity")
             .addAssocDef(mf.newAssociationDefinitionModel(
-                    "simple.entity", "simple.name", "dmx.core.many"
+                "simple.entity", "simple.name", "dmx.core.many"
             ))
         );
     }
-
 }

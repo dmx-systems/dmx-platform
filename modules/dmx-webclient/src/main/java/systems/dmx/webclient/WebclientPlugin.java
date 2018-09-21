@@ -303,7 +303,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         // type to be updated
         Topic type = viewConfig.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type", null);
         // ID of the assoc def to be updated.
-        // -1 if the update does not target an assoc def (but a type)
+        // -1 if the update does not target an assoc def (but a type).
         long assocDefId = -1;
         if (type == null) {
             Association assocDef = viewConfig.getRelatedAssociation("dmx.core.composition", "dmx.core.view_config",
