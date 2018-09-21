@@ -296,6 +296,10 @@ public class ModelFactoryImpl implements ModelFactory {
                 if (val.has("value")) {
                     RelatedTopicModel topicRef = createReferenceModel(val.get("value"), relatingAssoc);
                     if (topicRef != null) {
+                        if (val.has("id")) {
+                            // TODO: del refs
+                            ((TopicReferenceModelImpl) topicRef).originalId = val.getLong("id");
+                        }
                         return topicRef;
                     }
                 }

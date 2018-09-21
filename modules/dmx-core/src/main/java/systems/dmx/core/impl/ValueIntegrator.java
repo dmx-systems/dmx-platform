@@ -122,7 +122,7 @@ class ValueIntegrator {
         if (!ref.isEmptyRef()) {
             DMXObjectModelImpl object = ref.resolve();
             logger.fine("Referencing " + object);
-            return new UnifiedValue(object);
+            return new UnifiedValue(object, ref.originalId);
         } else {
             return new UnifiedValue(null);
         }
@@ -465,6 +465,10 @@ class ValueIntegrator {
             long newId = childTopic != null ? childTopic.getId() : -1;
             RelatedTopicModelImpl oldValue = null;
             if (originalId != -1) {
+                if (oldValues == null) {
+                    throw new RuntimeException("Tried to replace original topic " + originalId +
+                        " when there are no old topics (null)");
+                }
                 oldValue = findTopic(oldValues, originalId);
             }
             //
@@ -745,6 +749,12 @@ class ValueIntegrator {
             this.value = value;
             this._newValues = newValues;
             this.originalId = newValues.id;
+        }
+
+        private UnifiedValue(M value, long originalId) {
+            this.value = value;
+            this._newValues = newValues;
+            this.originalId = originalId;
         }
 
         @Override
