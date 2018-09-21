@@ -458,7 +458,6 @@ class ValueIntegrator {
     private void updateAssignmentsMany(DMXObjectModelImpl parent, List<UnifiedValue> childValues, String assocDefUri) {
         ChildTopicsModelImpl oldChildTopics = parent.getChildTopicsModel();
         List<RelatedTopicModelImpl> oldValues = oldChildTopics.getTopicsOrNull(assocDefUri);   // may be null
-        logger.info("### assocDefUri=\"" + assocDefUri + "\", childValues=" + childValues + ", oldValues=" + oldValues);
         for (UnifiedValue childValue : childValues) {
             TopicModel childTopic = (TopicModel) childValue.value;
             long originalId = childValue.originalId;

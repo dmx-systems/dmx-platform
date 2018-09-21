@@ -73,6 +73,35 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     @Test
+    public void addDeletionRef() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineLottoModel();
+            Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw"));
+            long drawId = draw.getId();
+            draw.getChildTopics()
+                .add("lotto.number", 23)
+                .add("lotto.number", 42);
+            //
+            draw = dmx.getTopic(drawId);
+            List<RelatedTopic> numbers = draw.getChildTopics().getTopics("lotto.number");
+            assertSame(2, numbers.size());
+            assertSame(23, numbers.get(0).getSimpleValue().intValue());
+            assertSame(42, numbers.get(1).getSimpleValue().intValue());
+            //
+            draw.getChildTopics().addDeletionRef("lotto.number", numbers.get(0).getId());
+            //
+            draw = dmx.getTopic(drawId);
+            numbers = draw.getChildTopics().getTopics("lotto.number");
+            assertSame(1, numbers.size());
+            assertSame(42, numbers.get(0).getSimpleValue().intValue());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    // Author: Malte Reißig
+    @Test
     public void childParentUpdate() {
         DMXTransaction tx = dmx.beginTx();
         try {
@@ -95,6 +124,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // Author: Malte Reißig
     @Test
     public void addChildTopics() {
         DMXTransaction tx = dmx.beginTx();
@@ -111,6 +141,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // Author: Malte Reißig
     @Test
     public void addRefChildTopics() {
         DMXTransaction tx = dmx.beginTx();
