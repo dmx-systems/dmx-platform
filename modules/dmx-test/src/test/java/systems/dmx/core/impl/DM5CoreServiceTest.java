@@ -100,6 +100,25 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    @Test
+    public void compositeValue() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineValueLottoModel();
+            Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+            ));
+            //
+            List<RelatedTopic> numbers = draw.getChildTopics().getTopics("lotto.number");
+            assertSame(2, numbers.size());
+            assertSame(23, numbers.get(0).getSimpleValue().intValue());
+            assertSame(42, numbers.get(1).getSimpleValue().intValue());
+        } finally {
+            tx.finish();
+        }
+    }
+
     // Author: Malte Reißig
     @Test
     public void childParentUpdate() {
@@ -167,6 +186,15 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     private void defineLottoModel() {
         dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.identity")
+            .addAssocDef(mf.newAssociationDefinitionModel(
+                "lotto.draw", "lotto.number", "dmx.core.many"
+            ))
+        );
+    }
+
+    private void defineValueLottoModel() {
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
             .addAssocDef(mf.newAssociationDefinitionModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
             ))

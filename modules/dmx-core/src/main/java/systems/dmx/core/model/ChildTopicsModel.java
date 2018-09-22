@@ -239,6 +239,8 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     ChildTopicsModel add(String assocDefUri, TopicModel value);
 
+    // ### TODO: ChildTopicsModel add(String assocDefUri, Object value);
+
     /**
      * Sets the values of a multiple-valued child.
      * Existing values are overwritten.
