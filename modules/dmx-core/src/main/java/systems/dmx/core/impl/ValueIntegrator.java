@@ -223,7 +223,7 @@ class ValueIntegrator {
      * @return  the unified value, or null if there was nothing to integrate.
      */
     private DMXObjectModelImpl integrateComposite() {
-        Map<String, Object> childTopics = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
+        Map<String, Object> childValues = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
         ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
         // Iterate through type, not through newValues.
         // newValues might contain childs not contained in the type def, e.g. "dmx.time.modified".
@@ -241,13 +241,14 @@ class ValueIntegrator {
             }
             //
             Object childTopic = integrateChildValue(newChildValue, assocDefUri);
+            // childTopic: UnifiedValue or List<UnifiedValue>; never null
             if (isOne(assocDefUri) && ((UnifiedValue) childTopic).value == null) {
                 emptyValues.add(assocDefUri);
             } else {
-                childTopics.put(assocDefUri, childTopic);
+                childValues.put(assocDefUri, childTopic);
             }
         }
-        DMXObjectModelImpl value = unifyComposite(childTopics);
+        DMXObjectModelImpl value = unifyComposite(childValues);
         //
         // label calculation
         if (!isFacetUpdate) {
@@ -262,7 +263,7 @@ class ValueIntegrator {
     }
 
     private Iterable<String> assocDefUris() {
-        return isFacetUpdate ? asList(assocDef.getAssocDefUri()) : type;
+        return !isFacetUpdate ? type : asList(assocDef.getAssocDefUri());
     }
 
     /**
@@ -290,22 +291,30 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
      *
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      */
-    private DMXObjectModelImpl unifyComposite(Map<String, Object> childTopics) {
+    private DMXObjectModelImpl unifyComposite(Map<String, Object> childValues) {
         // Note: because a facet does not contribute to the value of a value object
         // a facet update is always an in-place modification
-        if (!isFacetUpdate && isValueType()) {
-            return !childTopics.isEmpty() ? unifyChildTopics(childTopics, type) : null;
+        if (isValueType() && !isFacetUpdate) {
+            return !childValues.isEmpty() ? unifyChildTopics(childValues, type) : null;
         } else {
-            return updateAssignments(identifyParent(childTopics), childTopics);
+            return updateAssignments(identifyParent(childValues), childValues);
         }
     }
 
     /**
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * Identifies the parent to be updated in-place.
+     *
+     * Preconditions:
+     *   - this.newValues is composite
+     *   - this.type is an identity type OR this is a facet update
+     *
+     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     *
+     * @return  the parent object; never null
      */
-    private DMXObjectModelImpl identifyParent(Map<String, Object> childTopics) {
+    private DMXObjectModelImpl identifyParent(Map<String, Object> childValues) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
         if (targetObject != null) {
             return targetObject;
@@ -320,7 +329,7 @@ class ValueIntegrator {
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
-                return unifyChildTopics(identityChildTopics(childTopics, identityAssocDefUris), identityAssocDefUris);
+                return unifyChildTopics(identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris);
             } else {
                 DMXObjectModelImpl parent = createSimpleTopic();
                 logger.fine("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
@@ -331,17 +340,23 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * From the given child topics selects these one which made up the parent topic's identity.
      *
-     * @return  value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues             key: assocDefUri
+     *                                  value: UnifiedValue or List<UnifiedValue>
+     * @param   identityAssocDefUris    not empty
+     *
+     * @return  A map of the identity child topics; not empty
+     *              key: assocDefUri
+     *              value: UnifiedValue or List<UnifiedValue>
      */
-    private Map<String, Object> identityChildTopics(Map<String, Object> childTopics,
+    private Map<String, Object> identityChildTopics(Map<String, Object> childValues,
                                                     List<String> identityAssocDefUris) {
         Map<String, Object> identityChildTopics = new HashMap();
         for (String assocDefUri : identityAssocDefUris) {
             UnifiedValue childTopic;
             if (isOne(assocDefUri)) {
-                childTopic = (UnifiedValue) childTopics.get(assocDefUri);
+                childTopic = (UnifiedValue) childValues.get(assocDefUri);
             } else {
                 throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
             }
@@ -349,7 +364,7 @@ class ValueIntegrator {
             // If at least ONE is given it is sufficient.
             if (childTopic.value == null) {
                 throw new RuntimeException("Identity child topic \"" + assocDefUri + "\" is missing in " +
-                    childTopics.keySet());
+                    childValues.keySet());
             }
             identityChildTopics.put(assocDefUri, childTopic);
         }
@@ -362,14 +377,14 @@ class ValueIntegrator {
      *
      * Preconditions:
      *   - this.newValues is composite
-     *   - this.type is an identity type
+     *   - this.type is an identity type OR this is a facet update
      *   - parent's type is this.type
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      */
-    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childTopics) {
+    private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
         // sanity check
         if (!parent.getTypeUri().equals(type.getUri())) {
             throw new RuntimeException("Type mismatch: newValues type=\"" + type.getUri() + "\", parent type=\"" +
@@ -382,7 +397,7 @@ class ValueIntegrator {
             // assignment changes, a new subtree is attached. The subtree is fully constructed already (through all
             // levels) as it is build bottom-up (starting from the simple values at the leaves).
             parent.loadChildTopics(assocDef(assocDefUri), true);    // deep=true
-            Object childTopic = childTopics.get(assocDefUri);
+            Object childTopic = childValues.get(assocDefUri);
             if (isOne(assocDefUri)) {
                 TopicModel _childTopic = (TopicModel) (childTopic != null ? ((UnifiedValue) childTopic).value : null);
                 updateAssignmentsOne(parent, _childTopic, assocDefUri);
@@ -542,28 +557,40 @@ class ValueIntegrator {
     // ---
 
     /**
+     * Finds a parent topic in the DB that has the given child topics, or creates it.
+     *
      * Preconditions:
      *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
-     *   - childTopics map is not empty
      *
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     Child topics to unify; not empty
+     *                              key: assocDefUri
+     *                              value: UnifiedValue or List<UnifiedValue>
+     *
+     * @param   assocDefUris    only these child topics are respected
      */
-    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childTopics, Iterable<String> assocDefUris) {
-        List<RelatedTopicModelImpl> candidates = parentCandidates(childTopics);
+    private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
+        List<RelatedTopicModelImpl> candidates = parentCandidates(childValues);
         // logger.fine("### candidates (" + candidates.size() + "): " + DMXUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
-            UnifiedValue value = (UnifiedValue) childTopics.get(assocDefUri);
-            eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
+            if (isOne(assocDefUri)) {
+                UnifiedValue value = (UnifiedValue) childValues.get(assocDefUri);
+                // Note: value is null if added to emptyValues (see integrateComposite())
+                eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
+            } else {
+                // TODO
+                throw new RuntimeException("Unification of multi-values no yet implemented, " +
+                    childValues.get(assocDefUri));
+            }
             if (candidates.isEmpty()) {
                 break;
             }
         }
         switch (candidates.size()) {
         case 0:
-            // logger.fine("### no composite found, childTopics=" + childTopics);
-            return createCompositeTopic(childTopics);
+            // logger.fine("### no composite found, childValues=" + childValues);
+            return createCompositeTopic(childValues);
         case 1:
             DMXObjectModelImpl comp = candidates.get(0);
             logger.fine("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
@@ -571,22 +598,26 @@ class ValueIntegrator {
         default:
             throw new RuntimeException("ValueIntegrator ambiguity: there are " + candidates.size() +
                 " parents (typeUri=\"" + type.uri + "\", " + DMXUtils.idList(candidates) +
-                ") which have the same " + childTopics.values().size() + " child topics " + childTopics.values());
+                ") which have the same " + childValues.values().size() + " child topics " + childValues.values());
         }
     }
 
     /**
+     * Determine parent topics ("candidates") which might match the given child topics.
+     *
      * Preconditions:
      *   - this.newValues is composite
      *   - assocDef's parent type is this.type
      *   - childTopic's type is assocDef's child type
-     *   - childTopics map is not empty
      *
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     Child topics to unify; not empty
+     *                              key: assocDefUri
+     *                              value: UnifiedValue or List<UnifiedValue>
      */
-    private List<RelatedTopicModelImpl> parentCandidates(Map<String, Object> childTopics) {
-        String assocDefUri = childTopics.keySet().iterator().next();
-        // logger.fine("### assocDefUri=\"" + assocDefUri + "\", childTopics=" + childTopics);
+    private List<RelatedTopicModelImpl> parentCandidates(Map<String, Object> childValues) {
+        // TODO: drop "emptyValues" and search for the first non-null value.value
+        String assocDefUri = childValues.keySet().iterator().next();
+        // logger.fine("### assocDefUri=\"" + assocDefUri + "\", childValues=" + childValues);
         // sanity check
         if (!type.getUri().equals(assocDef(assocDefUri).getParentTypeUri())) {
             throw new RuntimeException("Type mismatch: type=\"" + type.getUri() + "\", assoc def's parent type=\"" +
@@ -595,16 +626,20 @@ class ValueIntegrator {
         //
         DMXObjectModel childTopic;
         if (isOne(assocDefUri)) {
-            childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
+            childTopic = ((UnifiedValue) childValues.get(assocDefUri)).value;
         } else {
-            throw new RuntimeException("Unification of cardinality \"many\" values not yet implemented");
+            childTopic = ((List<UnifiedValue>) childValues.get(assocDefUri)).get(0).value;
         }
         return pl.getTopicRelatedTopics(childTopic.getId(), assocDef(assocDefUri).getInstanceLevelAssocTypeUri(),
             "dmx.core.child", "dmx.core.parent", type.getUri());
     }
 
     /**
-     * @param   childTopic      may be null
+     * Eliminates parent candidates which do not match the given child topic.
+     *
+     * @param   candidates      the parent candidates; non-matching candidates are removed in-place.
+     * @param   childTopic      the child topic to check; may be null
+     * @param   assocDefUri     the assoc def underlying the child topic
      */
     private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, DMXObjectModel childTopic,
                                                                                    String assocDefUri) {
@@ -617,14 +652,14 @@ class ValueIntegrator {
                 // TODO: assoc parents?
                 if (pl.getAssociation(assocTypeUri, parentId, childTopic.getId(), "dmx.core.parent", "dmx.core.child")
                         == null) {
-                    // logger.fine("### eliminate (assoc doesn't exist)");
+                    // logger.info("### eliminate (assoc doesn't exist)");
                     i.remove();
                 }
             } else {
                 // TODO: assoc parents?
                 if (!pl.getTopicRelatedTopics(parentId, assocTypeUri, "dmx.core.parent", "dmx.core.child",
                         assocDef.getChildTypeUri()).isEmpty()) {
-                    // logger.fine("### eliminate (childs exist)");
+                    // logger.info("### eliminate (childs exist)");
                     i.remove();
                 }
             }
@@ -647,20 +682,20 @@ class ValueIntegrator {
     }
 
     /**
-     * @param   childTopics     value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      */
-    private TopicModelImpl createCompositeTopic(Map<String, Object> childTopics) {
+    private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
         // FIXME: construct the composite model first, then create topic as a whole. => NO! Endless recursion?
         // Otherwise the POST_CREATE_TOPIC event is fired too early, and e.g. Address topics get no geo coordinates.
-        // logger.fine("### childTopics=" + childTopics);
+        // logger.fine("### childValues=" + childValues);
         TopicModelImpl topic = createSimpleTopic();
         logger.fine("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
-        for (String assocDefUri : childTopics.keySet()) {
+        for (String assocDefUri : childValues.keySet()) {
             if (isOne(assocDefUri)) {
-                DMXObjectModel childTopic = ((UnifiedValue) childTopics.get(assocDefUri)).value;
+                DMXObjectModel childTopic = ((UnifiedValue) childValues.get(assocDefUri)).value;
                 createChildAssociation(topic, childTopic, assocDefUri);
             } else {
-                for (UnifiedValue value : (List<UnifiedValue>) childTopics.get(assocDefUri)) {
+                for (UnifiedValue value : (List<UnifiedValue>) childValues.get(assocDefUri)) {
                     createChildAssociation(topic, value.value, assocDefUri);
                 }
             }
@@ -710,14 +745,16 @@ class ValueIntegrator {
     // ---
 
     private AssociationDefinitionModel assocDef(String assocDefUri) {
-        if (isFacetUpdate) {
+        if (!isFacetUpdate) {
+            return type.getAssocDef(assocDefUri);
+        } else {
+            // sanity check
             if (!assocDefUri.equals(assocDef.getAssocDefUri())) {
                 throw new RuntimeException("URI mismatch: assocDefUri=\"" + assocDefUri + "\", facet assocDefUri=\"" +
                     assocDef.getAssocDefUri() + "\"");
             }
+            //
             return assocDef;
-        } else {
-            return type.getAssocDef(assocDefUri);
         }
     }
 
