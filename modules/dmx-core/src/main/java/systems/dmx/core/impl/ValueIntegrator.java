@@ -572,16 +572,15 @@ class ValueIntegrator {
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childValues);
-        // logger.fine("### candidates (" + candidates.size() + "): " + DMXUtils.idList(candidates));
+        // logger.info("### " + candidates.size() + " candidates " + DMXUtils.idList(candidates));
         for (String assocDefUri : assocDefUris) {
             if (isOne(assocDefUri)) {
                 UnifiedValue value = (UnifiedValue) childValues.get(assocDefUri);
                 // Note: value is null if added to emptyValues (see integrateComposite())
                 eliminateParentCandidates(candidates, value != null ? value.value : null, assocDefUri);
             } else {
-                // TODO
-                throw new RuntimeException("Unification of multi-values no yet implemented, " +
-                    childValues.get(assocDefUri));
+                List<UnifiedValue> values = (List<UnifiedValue>) childValues.get(assocDefUri);
+                eliminateParentCandidates(candidates, values, assocDefUri);
             }
             if (candidates.isEmpty()) {
                 break;
@@ -589,11 +588,11 @@ class ValueIntegrator {
         }
         switch (candidates.size()) {
         case 0:
-            // logger.fine("### no composite found, childValues=" + childValues);
+            // logger.info("### no composite found, childValues=" + childValues);
             return createCompositeTopic(childValues);
         case 1:
             DMXObjectModelImpl comp = candidates.get(0);
-            logger.fine("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
+            // logger.info("Reusing composite " + comp.getId() + " (typeUri=\"" + type.uri + "\")");
             return comp;
         default:
             throw new RuntimeException("ValueIntegrator ambiguity: there are " + candidates.size() +
@@ -662,6 +661,19 @@ class ValueIntegrator {
                     // logger.info("### eliminate (childs exist)");
                     i.remove();
                 }
+            }
+        }
+    }
+
+    private void eliminateParentCandidates(List<RelatedTopicModelImpl> candidates, List<UnifiedValue> childValues,
+                                                                                   String assocDefUri) {
+        Iterator<RelatedTopicModelImpl> i = candidates.iterator();
+        while (i.hasNext()) {
+            TopicModelImpl parent = i.next();
+            parent.loadChildTopics(assocDefUri, false);     // deep=false
+            List<? extends TopicModel> childTopics = parent.getChildTopicsModel().getTopics(assocDefUri);
+            if (!matches(childTopics, childValues)) {
+                i.remove();
             }
         }
     }
@@ -742,6 +754,10 @@ class ValueIntegrator {
         throw new RuntimeException("Topic " + topicId + " not found in " + topics);
     }
 
+    private static boolean matches(List<? extends TopicModel> topics, List<UnifiedValue> values) {
+        return topics.size() == values.size() && topics.containsAll(values);
+    }
+
     // ---
 
     private AssociationDefinitionModel assocDef(String assocDefUri) {
@@ -803,6 +819,20 @@ class ValueIntegrator {
                 throw new RuntimeException("Serialization failed", e);
             }
         }
+
+        // ---
+
+        // Note: we compare only to object models
+        @Override
+        public boolean equals(Object o) {
+            return ((DMXObjectModelImpl) o).id == value.id;
+        }
+
+        // TODO
+        /* @Override
+        public int hashCode() {
+            return ((Long) id).hashCode();
+        } */
 
         // TODO: copy in DMXObjectModelImpl
         @Override

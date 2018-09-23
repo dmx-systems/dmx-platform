@@ -10,6 +10,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.ChildTopicsModel;
+import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -100,6 +101,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         }
     }
 
+    // ---
+
     @Test
     public void compositeValue() {
         DMXTransaction tx = dmx.beginTx();
@@ -114,6 +117,70 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
             assertSame(2, numbers.size());
             assertSame(23, numbers.get(0).getSimpleValue().intValue());
             assertSame(42, numbers.get(1).getSimpleValue().intValue());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void compositeValueUnification1() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineValueLottoModel();
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+            ));
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(12)))
+            ));
+            //
+            assertSame(2, dmx.getTopicsByType("lotto.draw").size());
+            assertSame(3, dmx.getTopicsByType("lotto.number").size());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void compositeValueUnification2() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineValueLottoModel();
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+            ));
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+            ));
+            //
+            assertSame(1, dmx.getTopicsByType("lotto.draw").size());
+            assertSame(2, dmx.getTopicsByType("lotto.number").size());
+        } finally {
+            tx.finish();
+        }
+    }
+
+    @Test
+    public void compositeValueUnification3() {
+        DMXTransaction tx = dmx.beginTx();
+        try {
+            defineValueLottoModel();
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(12)))
+            ));
+            dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+            ));
+            //
+            assertSame(2, dmx.getTopicsByType("lotto.draw").size());
+            assertSame(3, dmx.getTopicsByType("lotto.number").size());
         } finally {
             tx.finish();
         }
@@ -193,7 +260,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void defineValueLottoModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"))
+            .addIndexMode(IndexMode.KEY);
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
             .addAssocDef(mf.newAssociationDefinitionModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"
