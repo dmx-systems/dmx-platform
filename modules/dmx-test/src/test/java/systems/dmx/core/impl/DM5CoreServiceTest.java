@@ -109,8 +109,8 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             defineValueLottoModel();
             Topic draw = dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", 23)
+                .add("lotto.number", 42)
             ));
             //
             List<RelatedTopic> numbers = draw.getChildTopics().getTopics("lotto.number");
@@ -128,12 +128,12 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             defineValueLottoModel();
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", 23)
+                .add("lotto.number", 42)
             ));
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(12)))
+                .add("lotto.number", 23)
+                .add("lotto.number", 12)
             ));
             //
             assertSame(2, dmx.getTopicsByType("lotto.draw").size());
@@ -149,12 +149,12 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             defineValueLottoModel();
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
+                .add("lotto.number", 23)
+                .add("lotto.number", 42)
             ));
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", 42)
+                .add("lotto.number", 23)
             ));
             //
             assertSame(1, dmx.getTopicsByType("lotto.draw").size());
@@ -170,13 +170,13 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
         try {
             defineValueLottoModel();
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(12)))
+                .add("lotto.number", 23)
+                .add("lotto.number", 42)
+                .add("lotto.number", 12)
             ));
             dmx.createTopic(mf.newTopicModel("lotto.draw", mf.newChildTopicsModel()
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(42)))
-                .add("lotto.number", mf.newTopicModel("lotto.number", new SimpleValue(23)))
+                .add("lotto.number", 42)
+                .add("lotto.number", 23)
             ));
             //
             assertSame(2, dmx.getTopicsByType("lotto.draw").size());

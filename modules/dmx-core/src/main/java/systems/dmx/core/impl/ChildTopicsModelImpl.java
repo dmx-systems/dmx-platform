@@ -99,12 +99,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Accesses a child generically, regardless of single-valued or multiple-valued.
-     * Returns null if there is no such child.
-     *
-     * @return  A RelatedTopicModel or List<RelatedTopicModel>, or null if there is no such child.
-     */
     @Override
     public final Object get(String assocDefUri) {
         return childTopics.get(assocDefUri);
@@ -114,19 +108,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // === Convenience Accessors ===
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final String getString(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().toString();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final String getString(String assocDefUri, String defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -135,19 +121,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final int getInt(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().intValue();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final int getInt(String assocDefUri, int defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -156,19 +134,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final long getLong(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().longValue();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final long getLong(String assocDefUri, long defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -177,19 +147,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final double getDouble(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().doubleValue();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final double getDouble(String assocDefUri, double defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -198,19 +160,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final boolean getBoolean(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().booleanValue();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final boolean getBoolean(String assocDefUri, boolean defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -219,19 +173,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final Object getObject(String assocDefUri) {
         return getTopic(assocDefUri).getSimpleValue().value();
     }
 
-    /**
-     * Convenience accessor for the *simple* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final Object getObject(String assocDefUri, Object defaultValue) {
         TopicModel topic = getTopicOrNull(assocDefUri);
@@ -240,19 +186,11 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Convenience accessor for the *composite* value of a single-valued child.
-     * Throws if the child doesn't exist.
-     */
     @Override
     public final ChildTopicsModel getChildTopicsModel(String assocDefUri) {
         return getTopic(assocDefUri).getChildTopicsModel();
     }
 
-    /**
-     * Convenience accessor for the *composite* value of a single-valued child.
-     * Returns a default value if the child doesn't exist.
-     */
     @Override
     public final ChildTopicsModel getChildTopicsModel(String assocDefUri, ChildTopicsModel defaultValue) {
         RelatedTopicModel topic = getTopicOrNull(assocDefUri);
@@ -267,10 +205,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // --- Single-valued Childs ---
 
-    /**
-     * Puts a value in a single-valued child.
-     * An existing value is overwritten.
-     */
     @Override
     public final ChildTopicsModel put(String assocDefUri, RelatedTopicModel value) {
         try {
@@ -292,16 +226,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return put(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
-    // ---
-
-    /**
-     * Convenience method to put a *simple* value in a single-valued child.
-     * An existing value is overwritten.
-     *
-     * @param   value   a String, Integer, Long, Double, or a Boolean.
-     *
-     * @return  this ChildTopicsModel.
-     */
     @Override
     public final ChildTopicsModel put(String assocDefUri, Object value) {
         try {
@@ -312,12 +236,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         }
     }
 
-    /**
-     * Convenience method to put a *composite* value in a single-valued child.
-     * An existing value is overwritten.
-     *
-     * @return  this ChildTopicsModel.
-     */
     @Override
     public final ChildTopicsModel put(String assocDefUri, ChildTopicsModel value) {
         return put(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), value));
@@ -325,20 +243,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Puts a by-ID topic reference in a single-valued child.
-     * An existing reference is overwritten.
-     */
     @Override
     public final ChildTopicsModel putRef(String assocDefUri, long refTopicId) {
         put(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
-    /**
-     * Puts a by-URI topic reference in a single-valued child.
-     * An existing reference is overwritten.
-     */
     @Override
     public final ChildTopicsModel putRef(String assocDefUri, String refTopicUri) {
         put(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
@@ -347,20 +257,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Puts a by-ID topic deletion reference to a single-valued child.
-     * An existing value is overwritten.
-     */
     @Override
     public final ChildTopicsModel putDeletionRef(String assocDefUri, long refTopicId) {
         put(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
-    /**
-     * Puts a by-URI topic deletion reference to a single-valued child.
-     * An existing value is overwritten.
-     */
     @Override
     public final ChildTopicsModel putDeletionRef(String assocDefUri, String refTopicUri) {
         put(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
@@ -369,9 +271,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Removes a single-valued child.
-     */
     @Override
     public final ChildTopicsModel remove(String assocDefUri) {
         childTopics.remove(assocDefUri);    // ### TODO: throw if not in map?
@@ -380,9 +279,6 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // --- Multiple-valued Childs ---
 
-    /**
-     * Adds a value to a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel add(String assocDefUri, RelatedTopicModel value) {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
@@ -402,19 +298,17 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
         return add(assocDefUri, mf.newRelatedTopicModel(value));
     }
 
-    /**
-     * Sets the values of a multiple-valued child.
-     * Existing values are overwritten.
-     */
+    @Override
+    public final ChildTopicsModel add(String assocDefUri, Object value) {
+        return add(assocDefUri, mf.newTopicModel(mf.childTypeUri(assocDefUri), new SimpleValue(value)));
+    }
+
     @Override
     public final ChildTopicsModel put(String assocDefUri, List<RelatedTopicModel> values) {
         childTopics.put(assocDefUri, values);
         return this;
     }
 
-    /**
-     * Removes a value from a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel remove(String assocDefUri, TopicModel value) {
         List<RelatedTopicModelImpl> topics = getTopicsOrNull(assocDefUri);
@@ -426,18 +320,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Adds a by-ID topic reference to a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel addRef(String assocDefUri, long refTopicId) {
         add(assocDefUri, mf.newTopicReferenceModel(refTopicId));
         return this;
     }
 
-    /**
-     * Adds a by-URI topic reference to a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel addRef(String assocDefUri, String refTopicUri) {
         add(assocDefUri, mf.newTopicReferenceModel(refTopicUri));
@@ -446,18 +334,12 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
     // ---
 
-    /**
-     * Adds a by-ID topic deletion reference to a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel addDeletionRef(String assocDefUri, long refTopicId) {
         add(assocDefUri, mf.newTopicDeletionModel(refTopicId));
         return this;
     }
 
-    /**
-     * Adds a by-URI topic deletion reference to a multiple-valued child.
-     */
     @Override
     public final ChildTopicsModel addDeletionRef(String assocDefUri, String refTopicUri) {
         add(assocDefUri, mf.newTopicDeletionModel(refTopicUri));
@@ -531,7 +413,7 @@ class ChildTopicsModelImpl implements ChildTopicsModel {
 
 
 
-    // === Mmemory Access ===
+    // === Memory Access ===
 
     // --- Read ---
 

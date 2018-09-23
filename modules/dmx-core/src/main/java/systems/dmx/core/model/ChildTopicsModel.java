@@ -175,13 +175,12 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     ChildTopicsModel put(String assocDefUri, TopicModel value);
 
-    // ---
-
     /**
      * Convenience method to put a *simple* value in a single-valued child.
      * An existing value is overwritten.
      *
-     * @param   value   a String, Integer, Long, Double, or a Boolean.
+     * @param   value   the simple value: a String, Integer, Long, Double, or a Boolean.
+     *                  Primitive values are auto-boxed.
      *
      * @return  this ChildTopicsModel.
      */
@@ -239,7 +238,15 @@ public interface ChildTopicsModel extends JSONEnabled, Iterable<String> {
 
     ChildTopicsModel add(String assocDefUri, TopicModel value);
 
-    // ### TODO: ChildTopicsModel add(String assocDefUri, Object value);
+    /**
+     * Convenience method to add a *simple* value to a multiple-valued child.
+     *
+     * @param   value   the simple value: a String, Integer, Long, Double, or a Boolean.
+     *                  Primitive values are auto-boxed.
+     *
+     * @return  this ChildTopicsModel.
+     */
+    ChildTopicsModel add(String assocDefUri, Object value);
 
     /**
      * Sets the values of a multiple-valued child.
