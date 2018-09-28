@@ -34,7 +34,7 @@ function initPlugin (expo) {
     console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
-      storeModule.module
+      typeof storeModule.module === 'function' ? storeModule.module({dm5}) : storeModule.module
     )
   }
   // store watcher
