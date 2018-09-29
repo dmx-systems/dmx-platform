@@ -36,7 +36,7 @@ const state = {
         }
       }
     },
-    // TODO: allow DM webclient plugins to provide Quill extensions
+    // TODO: allow DMX webclient plugins to provide Quill extensions
     extensions: [
       require('../topic-link').default
     ]
@@ -111,7 +111,7 @@ const actions = {
       for (let prop in compDef.props) {
         propsData[prop] = compDef.props[prop](store.state)    // call getter function
       }
-      // 2) instantiate
+      // 2) instantiate & mount
       // Note: to manually mounted components the store must be passed explicitly
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
       const comp = new Vue({store, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
