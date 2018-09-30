@@ -117,7 +117,7 @@ const actions = {
       const comp = new Vue({store, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
       // 3) make props reactive
       for (let prop in compDef.props) {
-        registerPropWatcher(comp, prop, compDef.props[prop])
+        watchProp(comp, prop, compDef.props[prop])
       }
       // 4) add event listeners
       for (let eventName in compDef.listeners) {
@@ -205,13 +205,16 @@ function _initWritable () {
 
 //
 
-function registerPropWatcher (comp, prop, getter) {
-  // console.log('registerPropWatcher', prop)
+function watchProp (comp, prop, getter) {
+  // console.log('watchProp', prop)
   store.watch(
     getter,
     val => {
       // console.log(`"${prop}" changed`, val)
-      comp.$props[prop] = val
+      // Note: the top-level webclient components follow the convention of mirroring its "props" through "data".
+      // To avoid the "Avoid mutating a prop directly" warning here we update the data, not the props.
+      // The components name the data like the prop but with an underscore appended.
+      comp.$data[prop + '_'] = val
     }
   )
 }
