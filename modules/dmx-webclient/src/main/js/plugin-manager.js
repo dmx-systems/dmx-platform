@@ -1,4 +1,6 @@
 import dm5 from 'dm5'
+import axios from 'axios'
+import Vue from 'vue'
 import store from './store/webclient'
 
 export default {
@@ -31,10 +33,11 @@ function initPlugin (expo) {
   // store module
   const storeModule = plugin.storeModule
   if (storeModule) {
+    const module = storeModule.module
     console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
-      typeof storeModule.module === 'function' ? storeModule.module({dm5}) : storeModule.module
+      typeof module === 'function' ? module({dm5, axios, Vue}) : module
     )
   }
   // store watcher
