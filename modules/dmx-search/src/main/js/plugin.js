@@ -1,6 +1,6 @@
 import dm5 from 'dm5'
 
-export default store => {
+export default ({store}) => {
   return {
 
     storeModule: {

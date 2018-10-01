@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-export default store => ({
+export default ({store}) => ({
 
   storeModule: {
     name: 'details',

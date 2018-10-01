@@ -23,13 +23,13 @@ export default {
 }
 
 /**
- * Registers a plugin's assets (store module, components, ...).
+ * Registers a plugin's assets (store module, webclient components, ...).
  *
  * @param   expo    The plugin.js default export.
  *                  Either an object or a function that returns an object.
  */
 function initPlugin (expo) {
-  const plugin = typeof expo === 'function' ? expo(store) : expo
+  const plugin = typeof expo === 'function' ? expo({store, dm5, axios, Vue}) : expo
   // store module
   const storeModule = plugin.storeModule
   if (storeModule) {
@@ -47,15 +47,15 @@ function initPlugin (expo) {
       store.watch(watcher.getter, watcher.callback)
     })
   }
-  // components
-  const components = plugin.components
+  // webclient components
+  const components = plugin.components    // TODO: rename prop to "webclient"
   if (components) {
     components.forEach(compDef => {
       store.dispatch('registerComponent', compDef)
     })
   }
   // detail panel
-  const renderers = plugin.detailPanel    // TODO: rename prop to "objectRenderers"
+  const renderers = plugin.detailPanel    // TODO: rename prop to "objectRenderers" or "detailRenderers"
   if (renderers) {
     for (let typeUri in renderers) {
       store.dispatch('registerObjectRenderer', {
