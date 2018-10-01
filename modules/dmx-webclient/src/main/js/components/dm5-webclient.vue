@@ -6,8 +6,14 @@
 
 <script>
 import dm5 from 'dm5'
+import axios from 'axios'
+import Vue from 'vue'
 
 export default {
+
+  provide: {
+    dm5, axios, Vue
+  },
 
   computed: {
     compDefs () {

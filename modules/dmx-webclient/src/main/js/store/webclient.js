@@ -97,7 +97,7 @@ const actions = {
   /**
    * Instantiates and mounts the registered components for mount point "webclient".
    */
-  mountComponents () {
+  mountComponents (_, parent) {
     state.compDefs.webclient.forEach(compDef => {
       // 1) init props
       // Note 1: props must be inited explicitly. E.g. the "objectRenderers" store state is populated while
@@ -114,7 +114,7 @@ const actions = {
       // 2) instantiate & mount
       // Note: to manually mounted components the store must be passed explicitly
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
-      const comp = new Vue({store, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
+      const comp = new Vue({parent, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
       // 3) make props reactive
       for (let prop in compDef.props) {
         watchProp(comp, prop, compDef.props[prop])

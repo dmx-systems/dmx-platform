@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2018/09/30')
+console.log('[DMX] 2018/10/01')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
@@ -21,13 +21,13 @@ const ready = dm5.init({
 
 // 2) Create Vue root instance
 // In particular instantiates dm5-webclient component, and its child component dm5-search-widget. ### FIXDOC
-new Vue({
+const root = new Vue({
   el: '#app',
   store,
   router,
   render: h => h(App)
 })
-// console.log('### Vue root instance created!')
+// console.log('### Vue root instance created!', root)
 
 // 3) Load plugins
 // Plugin loading (and initialization) must take place *after* the Vue root instance is created.
@@ -42,7 +42,8 @@ pluginManager.loadPlugins()
 // 4) Mount Webclient components (as provided by plugins)
 // Note: the mount point DOM is ready only on next tick.
 Vue.nextTick(() => {
-  store.dispatch('mountComponents')
+  const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
+  store.dispatch('mountComponents', webclient)
 })
 
 // 5) Initial navigation
