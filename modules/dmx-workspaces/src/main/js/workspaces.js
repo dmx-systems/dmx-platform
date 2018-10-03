@@ -59,7 +59,7 @@ const actions = {
     // workspaceId might be uninitialized. Accesscontrol "username" state is inited *before* workspaceId state. TODO?
     state.workspaceId && dm5.permCache.isTopicWritable(state.workspaceId).then(
       writable => {
-        console.log('_initWorkspaceIsWritable', state.workspaceId, writable)
+        // console.log('_initWorkspaceIsWritable', state.workspaceId, writable)
         state.isWritable = writable
       }
     )

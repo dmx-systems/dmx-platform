@@ -23,13 +23,13 @@ export default ({store}) => {
           // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => ({
             topic: [
-              {label: 'Hide',            handler: idLists => store.dispatch('hideMulti', idLists),   multi: true},
+              {label: 'Hide',            handler: idLists => store.dispatch('hideMulti',   idLists), multi: true},
               {label: 'Delete',          handler: idLists => store.dispatch('deleteMulti', idLists), multi: true},
               {label: 'Edit',            handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})},
               {label: "What's related?", handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})}
             ],
             assoc: [
-              {label: 'Hide',            handler: idLists => store.dispatch('hideMulti', idLists),   multi: true},
+              {label: 'Hide',            handler: idLists => store.dispatch('hideMulti',   idLists), multi: true},
               {label: 'Delete',          handler: idLists => store.dispatch('deleteMulti', idLists), multi: true},
               {label: 'Edit',            handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})},
               {label: "What's related?", handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})}

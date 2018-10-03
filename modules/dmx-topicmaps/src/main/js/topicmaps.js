@@ -4,7 +4,7 @@ import Selection from './selection'
 
 const state = {
 
-  topicmapTopics: {},         // Loaded topicmap topics (including childs), grouped by workspace ID:
+  topicmapTopics: {},         // Loaded topicmap topics (including childs), per-workspace:
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
                               //   }
@@ -15,12 +15,12 @@ const state = {
                               //     workspaceId: topicmapId
                               //   }
 
-  selections: {},             // Per-topicmap selection, keyed by topicmap ID:
+  selections: {},             // Per-topicmap selection:
                               //   {
                               //     topicmapId: Selection
                               //   }
 
-  topicmapTypes: {}           // Registered topicmap types, keyed by topicmap type URI:
+  topicmapTypes: {}           // Registered topicmap types:
                               //   {
                               //     topicmapTypeUri: {
                               //       uri:

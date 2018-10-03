@@ -26,6 +26,7 @@ export default ({store}) => ({
         visible:         state => state.details.visible,
         tab:             state => state.details.tab,
         mode:            state => state.details.mode,
+        markerIds:       (_, getters) => getters && getters.visibleTopicIds,
         objectRenderers: state => state.objectRenderers,
         quillConfig:     state => state.quillConfig
       },

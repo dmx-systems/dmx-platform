@@ -24,6 +24,8 @@
             "value": "Widget",
             "uri": "dmx.webclient.widget",
             "dataTypeUri": "dmx.core.text"
+            // TODO: set KEY index mode?
+            // Not stricly required as widget is always assigned by-ID, not by-value
         },
         {
             "value": "Clearable",
