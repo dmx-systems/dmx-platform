@@ -15,9 +15,10 @@ export default ({store}) => {
         props: {
           visible:        state => state.search.visible,
           pos:            state => state.search.pos,
-          createEnabled:  state => state.workspaces.isWritable,
           extraMenuItems: state => state.search.extraMenuItems,
-          menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes // TODO: why is getters undefined on 1st call?
+          createEnabled:  state => state.workspaces.isWritable,
+          markerIds:      (_, getters) => getters && getters.visibleTopicIds,
+          menuTopicTypes: (_, getters) => getters && getters.menuTopicTypes  // TODO: why is getters undefined on start?
         },
         listeners: {
           'topic-reveal': revealTopic,

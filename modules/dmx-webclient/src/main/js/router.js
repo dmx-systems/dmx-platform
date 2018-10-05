@@ -187,7 +187,7 @@ function initialNavigation (route) {
         topicmapId = undefined
       }
     }).catch(error => {
-      console.warn('Topicmap check failed', error)
+      console.warn(`Topicmap ${topicmapId} check failed`, error)
       topicmapId = undefined
     })
   } else {
