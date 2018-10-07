@@ -63,7 +63,7 @@ const actions = {
   },
 
   deleteMulti ({dispatch}, idLists) {
-    console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
+    // console.log('deleteMulti', idLists.topicIds, idLists.assocIds)
     // update client state + sync view (for immediate visual feedback)
     idLists.topicIds.forEach(id => dispatch('_deleteTopic', id))
     idLists.assocIds.forEach(id => dispatch('_deleteAssoc', id))

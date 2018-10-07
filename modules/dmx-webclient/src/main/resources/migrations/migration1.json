@@ -84,7 +84,7 @@
     ],
 
     // Note: the Widget instances must be created *before* the "View Configuration" composite.
-    // The Widget assoc def refers to a Widget instance.
+    // The Widget assoc def refers to a Widget instance. ### Not necessarily. See Icon assoc def.
 
     "topics": [
         // Widgets
@@ -103,20 +103,32 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dmx.webclient.icon",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.webclient.icon",
+                    "childCardinalityUri": "dmx.core.one",
+                    "viewConfigTopics": [
+                        {
+                            "typeUri": "dmx.webclient.view_config",
+                            "childs": {
+                                "dmx.webclient.widget": {
+                                    "value": "Iconpicker",
+                                    "uri": "dmx.webclient.iconpicker"
+                                },
+                                "dmx.webclient.clearable": true
+                            }
+                        }
+                    ]
                 },
                 {
-                    "childTypeUri":         "dmx.webclient.color",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.webclient.color",
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":         "dmx.webclient.show_in_create_menu",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.webclient.show_in_create_menu",
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":         "dmx.webclient.widget",
-                    "childCardinalityUri":  "dmx.core.one",
+                    "childTypeUri":        "dmx.webclient.widget",
+                    "childCardinalityUri": "dmx.core.one",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",
@@ -128,12 +140,12 @@
                     ]
                 },
                 {
-                    "childTypeUri":         "dmx.webclient.clearable",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.webclient.clearable",
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":         "dmx.webclient.customizable",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.webclient.customizable",
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.input_field_rows",
