@@ -15,7 +15,7 @@
         <bundle>mvn:commons-fileupload/commons-fileupload/1.2.2</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-io/1.3.2_5</bundle>
 
-        <!-- DeepaMehta platform -->
+        <!-- DeepaMehta platform ### TODO: update -->
         <bundle>mvn:systems.dmx/deepamehta-core/${project.version}</bundle>
         <bundle>mvn:systems.dmx/deepamehta-webservice/${project.version}</bundle>
         <bundle>mvn:systems.dmx/deepamehta-webclient/${project.version}</bundle>

@@ -14,8 +14,8 @@
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dmx.webclient.locked": true,
-                        "dmx.webclient.page_renderer_uri": "dmx.webbrowser.webpage_renderer"
+                        "dmx.webclient.locked": true
+                        // "dmx.webclient.page_renderer_uri": "dmx.webbrowser.webpage_renderer"     ### TODO
                     }
                 }
             ]

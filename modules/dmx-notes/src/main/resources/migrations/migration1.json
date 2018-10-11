@@ -20,28 +20,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.notes.title",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.simple_renderer_uri": "dmx.webclient.title_renderer"
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.notes.text",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.input_field_rows": 15,
-                                "dmx.webclient.simple_renderer_uri": "dmx.webclient.body_text_renderer"
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [

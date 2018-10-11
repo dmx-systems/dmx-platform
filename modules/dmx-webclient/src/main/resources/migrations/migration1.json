@@ -58,24 +58,6 @@
             "indexModeUris": ["dmx.core.key"]
         },
         {
-            "value": "Page Renderer URI",
-            "uri": "dmx.webclient.page_renderer_uri",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Simple Renderer URI",
-            "uri": "dmx.webclient.simple_renderer_uri",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Multi Renderer URI",
-            "uri": "dmx.webclient.multi_renderer_uri",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
             "value": "Searchable as Unit",
             "uri": "dmx.webclient.searchable_as_unit",
             "dataTypeUri": "dmx.core.boolean",
@@ -160,25 +142,13 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":        "dmx.webclient.page_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.simple_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.multi_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
                     "childTypeUri":        "dmx.webclient.searchable_as_unit",
                     "childCardinalityUri": "dmx.core.one"
                 }
             ]
         },
 
-        // Search
+        // Search ### TODO
 
         {
             "value": "Search Term",
@@ -188,15 +158,15 @@
         {
             "value": "Search Result",
             "uri": "dmx.webclient.search_result",
-            "dataTypeUri": "dmx.core.text",
-            "viewConfigTopics": [
+            "dataTypeUri": "dmx.core.text"
+            /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
                         "dmx.webclient.simple_renderer_uri": "dmx.webclient.search_result_renderer"
                     }
                 }
-            ]
+            ] */
         },
         {
             "value": "Search",

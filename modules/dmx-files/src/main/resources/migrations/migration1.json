@@ -10,15 +10,15 @@
             "value": "File Content",
             "uri": "dmx.files.file_content",
             "dataTypeUri": "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"],
-            "viewConfigTopics": [
+            "indexModeUris": ["dmx.core.fulltext"]
+            /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
                         "dmx.webclient.simple_renderer_uri": "dmx.files.file_content_renderer"
                     }
                 }
-            ]
+            ] */
         },
         {
             "value": "File Name",
@@ -41,15 +41,15 @@
         {
             "value": "Size",
             "uri": "dmx.files.size",
-            "dataTypeUri": "dmx.core.number",
-            "viewConfigTopics": [
+            "dataTypeUri": "dmx.core.number"
+            /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
                         "dmx.webclient.simple_renderer_uri": "dmx.files.file_size_renderer",
                     }
                 }
-            ]
+            ] */
         },
         {
             "value": "File",
@@ -101,15 +101,15 @@
             "value": "Folder Content",
             "uri": "dmx.files.folder_content",
             "dataTypeUri": "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"],
-            "viewConfigTopics": [
+            "indexModeUris": ["dmx.core.fulltext"]
+            /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
                         "dmx.webclient.simple_renderer_uri": "dmx.files.folder_content_renderer"
                     }
                 }
-            ]
+            ] */
         },
         {
             "value": "Folder",
