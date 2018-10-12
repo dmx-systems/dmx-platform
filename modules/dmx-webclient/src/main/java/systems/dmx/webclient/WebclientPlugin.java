@@ -2,10 +2,7 @@ package systems.dmx.webclient;
 
 import systems.dmx.core.Association;
 import systems.dmx.core.AssociationType;
-import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
-import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.Role;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.ViewConfiguration;
@@ -24,30 +21,13 @@ import systems.dmx.core.service.event.IntroduceAssociationTypeListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
 import systems.dmx.core.service.event.PreCreateTopicTypeListener;
 import systems.dmx.core.service.event.PreCreateAssociationTypeListener;
-import systems.dmx.core.service.Transactional;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 
 import java.awt.Desktop;
 import java.net.URI;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 
 
-@Path("/webclient")
-@Consumes("application/json")
-@Produces("application/json")
 public class WebclientPlugin extends PluginActivator implements AllPluginsActiveListener,
                                                                 IntroduceTopicTypeListener,
                                                                 IntroduceAssociationTypeListener,
@@ -66,76 +46,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
-
-
-
-    // *************************
-    // *** Webclient Service ***
-    // *************************
-
-    // Note: the client service is provided as REST service only (OSGi service not required for the moment).
-
-
-
-    /**
-     * Performs a fulltext search and creates a search result topic.
-     */
-    @GET
-    @Path("/search")
-    @Transactional
-    public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
-        try {
-            logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
-            List<Topic> topics = dmx.searchTopics(searchTerm, fieldUri);
-            logger.info(topics.size() + " topics found");
-            //
-            return createSearchTopic(searchTerm, topics);
-        } catch (Exception e) {
-            throw new RuntimeException("Searching topics failed", e);
-        }
-    }
-
-    /**
-     * Performs a by-type search and creates a search result topic.
-     * <p>
-     * Note: this resource method is actually part of the Type Search plugin.
-     * TODO: proper modularization. Either let the Type Search plugin provide its own REST service or make the
-     * Type Search plugin an integral part of the Webclient plugin.
-     */
-    @GET
-    @Path("/search/by_type/{type_uri}")
-    @Transactional
-    public Topic getTopics(@PathParam("type_uri") String typeUri) {
-        try {
-            logger.info("typeUri=\"" + typeUri + "\"");
-            String searchTerm = dmx.getTopicType(typeUri).getSimpleValue() + "(s)";
-            List<Topic> topics = dmx.getTopicsByType(typeUri);
-            //
-            return createSearchTopic(searchTerm, topics);
-        } catch (Exception e) {
-            throw new RuntimeException("Searching topics of type \"" + typeUri + "\" failed", e);
-        }
-    }
-
-    // ---
-
-    @GET
-    @Path("/object/{id}/related_topics")
-    public List<RelatedTopic> getRelatedTopics(@PathParam("id") long objectId) {
-        DMXObject object = dmx.getObject(objectId);
-        List<RelatedTopic> relTopics = object.getRelatedTopics(null);   // assocTypeUri=null
-        Iterator<RelatedTopic> i = relTopics.iterator();
-        int removed = 0;
-        while (i.hasNext()) {
-            RelatedTopic relTopic = i.next();
-            if (isDirectModelledChildTopic(object, relTopic)) {
-                i.remove();
-                removed++;
-            }
-        }
-        logger.fine("### " + removed + " topics are removed from result set of object " + objectId);
-        return relTopics;
-    }
 
 
 
@@ -216,53 +126,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-
-
-    // === Search ===
-
-    /**
-     * Creates a "Search" topic.
-     */
-    private Topic createSearchTopic(final String searchTerm, final Collection<Topic> resultItems) {
-        try {
-            // We suppress standard workspace assignment here as a Search topic requires a special assignment.
-            // That is done by the Access Control module. ### TODO: refactoring. Do the assignment here.
-            return dmx.getAccessControl().runWithoutWorkspaceAssignment(new Callable<Topic>() {
-                @Override
-                public Topic call() {
-                    Topic searchTopic = dmx.createTopic(mf.newTopicModel("dmx.webclient.search",
-                        mf.newChildTopicsModel().put("dmx.webclient.search_term", searchTerm)
-                    ));
-                    // associate result items
-                    for (Topic resultItem : resultItems) {
-                        dmx.createAssociation(mf.newAssociationModel("dmx.webclient.search_result_item",
-                            mf.newTopicRoleModel(searchTopic.getId(), "dmx.core.default"),
-                            mf.newTopicRoleModel(resultItem.getId(), "dmx.core.default")
-                        ));
-                    }
-                    //
-                    return searchTopic;
-                }
-            });
-        } catch (Exception e) {
-            throw new RuntimeException("Creating search topic for \"" + searchTerm + "\" failed", e);
-        }
-    }
-
-    /**
-     * Convenience method to lookup a Webclient view config value.
-     * <p>
-     * Compare to client-side counterpart: function get_view_config() in webclient.js
-     *
-     * @param   topicType   The topic type whose view configuration is used for lookup.
-     * @param   setting     Last component of the child type URI whose value to lookup, e.g. "icon".
-     *
-     * @return  The config value, or <code>null</code> if no value is set
-     */
-    private Object getViewConfigValue(TopicType topicType, String setting) {
-        return topicType.getViewConfigValue("dmx.webclient.view_config", "dmx.webclient." + setting);
-    }
 
 
 
@@ -375,32 +238,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
 
     // === Misc ===
-
-    private boolean isDirectModelledChildTopic(DMXObject parentObject, RelatedTopic childTopic) {
-        // association definition
-        if (hasAssocDef(parentObject, childTopic)) {
-            // role types
-            Association assoc = childTopic.getRelatingAssociation();
-            return assoc.matches("dmx.core.parent", parentObject.getId(), "dmx.core.child", childTopic.getId());
-        }
-        return false;
-    }
-
-    private boolean hasAssocDef(DMXObject parentObject, RelatedTopic childTopic) {
-        // Note: the user might have no explicit READ permission for the type.
-        // DMXObject's getType() has *implicit* READ permission.
-        DMXType parentType = parentObject.getType();
-        //
-        String childTypeUri = childTopic.getTypeUri();
-        String assocTypeUri = childTopic.getRelatingAssociation().getTypeUri();
-        String assocDefUri = childTypeUri + "#" + assocTypeUri;
-        if (parentType.hasAssocDef(assocDefUri)) {
-            return true;
-        } else if (parentType.hasAssocDef(childTypeUri)) {
-            return parentType.getAssocDef(childTypeUri).getInstanceLevelAssocTypeUri().equals(assocTypeUri);
-        }
-        return false;
-    }
 
     private AssociationDefinitionModel getAssocDef(TypeModel type, long assocDefId) {
         for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {

@@ -136,59 +136,6 @@
                     "childCardinalityUri": "dmx.core.one"
                 }
             ]
-        },
-
-        // Search ### TODO
-
-        {
-            "value": "Search Term",
-            "uri": "dmx.webclient.search_term",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value": "Search Result",
-            "uri": "dmx.webclient.search_result",
-            "dataTypeUri": "dmx.core.text"
-            /* "viewConfigTopics": [    ### TODO
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.simple_renderer_uri": "dmx.webclient.search_result_renderer"
-                    }
-                }
-            ] */
-        },
-        {
-            "value": "Search",
-            "uri": "dmx.webclient.search",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.webclient.search_term",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.search_result",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.icon": "/systems.dmx.webclient/images/balls.png",
-                        "dmx.webclient.locked": true
-                    }
-                }
-            ]
-        }
-    ],
-
-    "assoc_types": [
-        {
-            "value":       "Search Result Item",
-            "uri":         "dmx.webclient.search_result_item",
-            "dataTypeUri": "dmx.core.text"
         }
     ]
 }]

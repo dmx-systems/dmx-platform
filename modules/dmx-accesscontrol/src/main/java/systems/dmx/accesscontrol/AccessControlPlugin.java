@@ -553,15 +553,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     @Override
     public void postCreateTopic(Topic topic) {
-        String typeUri = topic.getTypeUri();
-        if (typeUri.equals("dmx.workspaces.workspace")) {
+        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
             setWorkspaceOwner(topic);
-        } else if (typeUri.equals("dmx.webclient.search")) {
-            // ### TODO: refactoring. The Access Control module must not know about the Webclient.
-            // Let the Webclient do the workspace assignment instead.
-            assignSearchTopic(topic);
         }
-        //
         setCreatorAndModifier(topic);
     }
 
@@ -651,20 +645,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     private void assignMembership(Association assoc) {
         wsService.assignToWorkspace(assoc, assoc.getTopicByType("dmx.workspaces.workspace").getId());
-    }
-
-    private void assignSearchTopic(Topic searchTopic) {
-        try {
-            Topic workspace;
-            if (getUsername() != null) {
-                workspace = getPrivateWorkspace();
-            } else {
-                workspace = wsService.getWorkspace(WorkspacesService.DMX_WORKSPACE_URI);
-            }
-            wsService.assignToWorkspace(searchTopic, workspace.getId());
-        } catch (Exception e) {
-            throw new RuntimeException("Assigning search topic to workspace failed", e);
-        }
     }
 
     // --- Disk quota ---
