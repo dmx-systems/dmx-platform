@@ -86,17 +86,27 @@
                             "typeUri": "dmx.webclient.view_config",
                             "childs": {
                                 "dmx.webclient.widget": {
-                                    "value": "Iconpicker",
-                                    "uri": "dmx.webclient.iconpicker"
-                                },
-                                "dmx.webclient.clearable": true
+                                    "value": "Icon Picker",
+                                    "uri": "dmx.webclient.icon_picker"
+                                }
                             }
                         }
                     ]
                 },
                 {
                     "childTypeUri":        "dmx.webclient.color",
-                    "childCardinalityUri": "dmx.core.one"
+                    "childCardinalityUri": "dmx.core.one",
+                    "viewConfigTopics": [
+                        {
+                            "typeUri": "dmx.webclient.view_config",
+                            "childs": {
+                                "dmx.webclient.widget": {
+                                    "value": "Color Picker",
+                                    "uri": "dmx.webclient.color_picker"
+                                }
+                            }
+                        }
+                    ]
                 },
                 {
                     "childTypeUri":        "dmx.webclient.add_to_create_menu",
