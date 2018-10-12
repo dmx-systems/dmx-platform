@@ -39,7 +39,7 @@ const actions = {
 const getters = {
   menuTopicTypes: (state, getters, rootState) => dm5.utils.filter(
     rootState.typeCache.topicTypes,
-    topicType => topicType.getViewConfig('dmx.webclient.show_in_create_menu')
+    topicType => topicType.getViewConfig('dmx.webclient.add_to_create_menu')
   )
 }
 

@@ -230,7 +230,7 @@
                         "typeUri": "dmx.webclient.view_config",
                         "childs": {
                             "dmx.webclient.icon": "\uf007",
-                            "dmx.webclient.show_in_create_menu": true
+                            "dmx.webclient.add_to_create_menu": true
                         }
                     }
                 ]
@@ -276,7 +276,7 @@
                         "typeUri": "dmx.webclient.view_config",
                         "childs": {
                             "dmx.webclient.icon": "\uf0c0",
-                            "dmx.webclient.show_in_create_menu": true
+                            "dmx.webclient.add_to_create_menu": true
                         }
                     }
                 ]

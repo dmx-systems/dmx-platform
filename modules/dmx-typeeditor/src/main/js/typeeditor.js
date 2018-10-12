@@ -34,7 +34,7 @@ const defaultTopicType = name => ({
   viewConfigTopics: [{
     typeUri: 'dmx.webclient.view_config',
     childs: {
-      'dmx.webclient.show_in_create_menu': true
+      'dmx.webclient.add_to_create_menu': true
     }
   }]
 })

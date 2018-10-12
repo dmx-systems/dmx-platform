@@ -15,8 +15,8 @@
             "indexModeUris": ["dmx.core.key"]
         },
         {
-            "value": "Show in Create Menu",
-            "uri": "dmx.webclient.show_in_create_menu",
+            "value": "Add to Create Menu",
+            "uri": "dmx.webclient.add_to_create_menu",
             "dataTypeUri": "dmx.core.boolean",
             "indexModeUris": ["dmx.core.key"]
         },
@@ -99,7 +99,7 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":        "dmx.webclient.show_in_create_menu",
+                    "childTypeUri":        "dmx.webclient.add_to_create_menu",
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
