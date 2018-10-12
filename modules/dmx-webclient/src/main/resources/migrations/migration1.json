@@ -56,12 +56,6 @@
             "uri": "dmx.webclient.locked",
             "dataTypeUri": "dmx.core.boolean",
             "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Searchable as Unit",
-            "uri": "dmx.webclient.searchable_as_unit",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
         }
     ],
 
@@ -139,10 +133,6 @@
                 },
                 {
                     "childTypeUri":        "dmx.webclient.locked",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webclient.searchable_as_unit",
                     "childCardinalityUri": "dmx.core.one"
                 }
             ]

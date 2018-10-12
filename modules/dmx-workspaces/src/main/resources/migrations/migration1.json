@@ -36,8 +36,7 @@
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dmx.webclient.icon": "\uf005",
-                        "dmx.webclient.searchable_as_unit": true
+                        "dmx.webclient.icon": "\uf005"
                     }
                 }
             ]

@@ -86,9 +86,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     public Topic searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field")  String fieldUri) {
         try {
             logger.info("searchTerm=\"" + searchTerm + "\", fieldUri=\"" + fieldUri + "\"");
-            List<Topic> singleTopics = dmx.searchTopics(searchTerm, fieldUri);
-            Set<Topic> topics = findSearchableUnits(singleTopics);
-            logger.info(singleTopics.size() + " single topics found, " + topics.size() + " searchable units");
+            List<Topic> topics = dmx.searchTopics(searchTerm, fieldUri);
+            logger.info(topics.size() + " topics found");
             //
             return createSearchTopic(searchTerm, topics);
         } catch (Exception e) {
@@ -222,25 +221,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Search ===
 
-    // ### TODO: use Collection instead of Set
-    private Set<Topic> findSearchableUnits(List<? extends Topic> topics) {
-        Set<Topic> searchableUnits = new LinkedHashSet();
-        for (Topic topic : topics) {
-            if (searchableAsUnit(topic)) {
-                searchableUnits.add(topic);
-            } else {
-                List<RelatedTopic> parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child",
-                    "dmx.core.parent", null);
-                if (parentTopics.isEmpty()) {
-                    searchableUnits.add(topic);
-                } else {
-                    searchableUnits.addAll(findSearchableUnits(parentTopics));
-                }
-            }
-        }
-        return searchableUnits;
-    }
-
     /**
      * Creates a "Search" topic.
      */
@@ -268,14 +248,6 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         } catch (Exception e) {
             throw new RuntimeException("Creating search topic for \"" + searchTerm + "\" failed", e);
         }
-    }
-
-    // ---
-
-    private boolean searchableAsUnit(Topic topic) {
-        TopicType topicType = dmx.getTopicType(topic.getTypeUri());
-        Boolean searchableAsUnit = (Boolean) getViewConfigValue(topicType, "searchable_as_unit");
-        return searchableAsUnit != null ? searchableAsUnit.booleanValue() : false;  // default is false
     }
 
     /**
