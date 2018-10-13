@@ -54,8 +54,8 @@ function initPlugin (expo) {
       store.dispatch('registerComponent', compDef)
     })
   }
-  // detail panel
-  const renderers = plugin.detailPanel    // TODO: rename prop to "objectRenderers" or "detailRenderers"
+  // object renderers
+  const renderers = plugin.pageRenderers  // TODO: "detailRenderers"
   if (renderers) {
     for (let typeUri in renderers) {
       store.dispatch('registerObjectRenderer', {

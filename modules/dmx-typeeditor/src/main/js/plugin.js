@@ -5,7 +5,7 @@ export default ({store}) => ({
     module: require('./typeeditor').default
   },
 
-  detailPanel: {
+  pageRenderers: {
     'dmx.core.topic_type': require('./components/dm5-type-renderer').default,
     'dmx.core.assoc_type': require('./components/dm5-type-renderer').default
   },
