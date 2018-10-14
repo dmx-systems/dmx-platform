@@ -80,33 +80,11 @@
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.webclient.icon",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.widget": {
-                                    "value": "Icon Picker",
-                                    "uri": "dmx.webclient.icon_picker"
-                                }
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.color",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.widget": {
-                                    "value": "Color Picker",
-                                    "uri": "dmx.webclient.color_picker"
-                                }
-                            }
-                        }
-                    ]
+                    "childCardinalityUri": "dmx.core.one"
                 },
                 {
                     "childTypeUri":        "dmx.webclient.add_to_create_menu",

@@ -29,7 +29,19 @@ const root = new Vue({
 })
 // console.log('### Vue root instance created!', root)
 
-// 3) Load plugins
+// 3) Register own renderers
+store.dispatch('registerObjectRenderer', {
+  renderer: 'detail',
+  typeUri: 'dmx.webclient.icon',
+  component: require('./components/dm5-icon-picker').default
+})
+store.dispatch('registerObjectRenderer', {
+  renderer: 'detail',
+  typeUri: 'dmx.webclient.color',
+  component: require('./components/dm5-color-picker').default
+})
+
+// 4) Load plugins
 // Plugin loading (and initialization) must take place *after* the Vue root instance is created.
 // Plugins that provide entries for the create menu rely on the "registerExtraMenuItems" action,
 // which is only registered in dm5-search-widget's created() hook. ### FIXDOC
@@ -39,14 +51,14 @@ pluginManager.loadPlugins()
 // TODO: synchronize initial navigation with loading the external plugins?
 // (Note: the standard plugins are "loaded" synchronously anyways.)
 
-// 4) Mount Webclient components (as provided by plugins)
+// 5) Mount Webclient components (as provided by plugins)
 // Note: the mount point DOM is ready only on next tick.
 Vue.nextTick(() => {
   const webclient = root.$children[0].$children[0]    // child level 1 is <router-view>, level 2 is <dm5-webclient>
   store.dispatch('mountComponents', webclient)
 })
 
-// 5) Initial navigation
+// 6) Initial navigation
 // Initial navigation must take place *after* the webclient plugins are loaded.
 // The "workspaces" store module is registered by the Workspaces plugin.
 Promise.all([
