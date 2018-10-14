@@ -14,10 +14,10 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  objectRenderers: {},      // Registered object renderers:
-                            //   {
-                            //     typeUri: component
-                            //   }
+  objectRenderers: {        // Registered object renderers:
+    page: {},               //   {
+    detail: {}              //     typeUri: component
+  },                        //   }
 
   compDefs: {},             // Registered webclient components
 
@@ -84,8 +84,11 @@ const actions = {
 
   // ---
 
-  registerObjectRenderer (_, {typeUri, component}) {
-    state.objectRenderers[typeUri] = component
+  /**
+   * @param   render    "page" or "detail"
+   */
+  registerObjectRenderer (_, {renderer, typeUri, component}) {
+    state.objectRenderers[renderer][typeUri] = component
   },
 
   registerComponent (_, compDef) {
@@ -112,7 +115,7 @@ const actions = {
         propsData[prop] = compDef.props[prop](store.state)    // call getter function
       }
       // 2) instantiate & mount
-      // Note: to manually mounted components the store must be passed explicitly
+      // Note: to manually mounted components the store must be passed explicitly resp. "parent" must be set.
       // https://forum.vuejs.org/t/this-store-undefined-in-manually-mounted-vue-component/8756
       const comp = new Vue({parent, propsData, ...compDef.comp}).$mount(`#mount-${compDef.id}`)
       // 3) make props reactive

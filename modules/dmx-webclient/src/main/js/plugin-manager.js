@@ -55,15 +55,9 @@ function initPlugin (expo) {
     })
   }
   // object renderers
-  const renderers = plugin.pageRenderers  // TODO: "detailRenderers"
-  if (renderers) {
-    for (let typeUri in renderers) {
-      store.dispatch('registerObjectRenderer', {
-        typeUri,
-        component: renderers[typeUri]
-      })
-    }
-  }
+  registerObjectRenderers(plugin.pageRenderers, 'page')
+  registerObjectRenderers(plugin.detailRenderers, 'detail')
+  //
   // extra menu items
   const extraMenuItems = plugin.extraMenuItems
   if (extraMenuItems) {
@@ -73,6 +67,14 @@ function initPlugin (expo) {
   const topicmapType = plugin.topicmapType
   if (topicmapType) {
     store.dispatch('registerTopicmapType', topicmapType)
+  }
+}
+
+function registerObjectRenderers (renderers, renderer) {
+  if (renderers) {
+    for (let typeUri in renderers) {
+      store.dispatch('registerObjectRenderer', {renderer, typeUri, component: renderers[typeUri]})
+    }
   }
 }
 
