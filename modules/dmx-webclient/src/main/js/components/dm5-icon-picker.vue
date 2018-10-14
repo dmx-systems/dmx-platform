@@ -1,5 +1,5 @@
 <template>
-  <div class="dm5-icon-field">
+  <div class="dm5-icon-picker">
     <div v-if="infoMode" class="fa icon">{{object.value}}</div>
     <div v-else>
       <el-button @click="open" class="fa icon">{{object.value}}</el-button>
@@ -52,7 +52,7 @@ export default {
 </script>
 
 <style>
-.dm5-icon-field .icon {
+.dm5-icon-picker .icon {
   font-size: 24px !important;
   color: var(--color-topic-icon);
 }
