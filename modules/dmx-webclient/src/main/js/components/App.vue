@@ -37,6 +37,7 @@
   --color-topic-hover: #36a;    /* topicmap panel */
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
+  --field-spacing: 1.2em;       /* vertical spacing between data fields */
   --highlight-color: #409eff;         /* see --color-primary */
   --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
   --background-color-darker: #ebeef5;

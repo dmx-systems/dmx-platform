@@ -1,36 +1,32 @@
 <template>
   <div class="dm5-type-renderer">
-    <!-- Generic Object -->
+    <!-- Generic Value -->
     <dm5-object-value :object="object" :level="0" :context="context"></dm5-object-value>
     <!-- Type URI -->
-    <div class="field">
-      <div class="field-label">Type URI</div>
-      <div v-if="infoMode">{{object.uri}}</div>
-      <el-input v-else v-model="object.uri"></el-input>
-    </div>
+    <div class="field-label">Type URI</div>
+    <div v-if="infoMode">{{object.uri}}</div>
+    <el-input v-else v-model="object.uri"></el-input>
     <!-- Data Type -->
-    <div class="field">
-      <div class="field-label">Data Type</div>
-      <div v-if="infoMode">{{dataType.value}}</div>
-      <el-select v-else v-model="object.dataTypeUri">
-        <el-option-group label="Simple">
-          <el-option :label="dataTypes['dmx.core.text'].value"     :value="dataTypes['dmx.core.text'].uri">
-          </el-option>
-          <el-option :label="dataTypes['dmx.core.number'].value"   :value="dataTypes['dmx.core.number'].uri">
-          </el-option>
-          <el-option :label="dataTypes['dmx.core.boolean'].value"  :value="dataTypes['dmx.core.boolean'].uri">
-          </el-option>
-          <el-option :label="dataTypes['dmx.core.html'].value"     :value="dataTypes['dmx.core.html'].uri">
-          </el-option>
-        </el-option-group>
-        <el-option-group label="Composite">
-          <el-option :label="dataTypes['dmx.core.value'].value"    :value="dataTypes['dmx.core.value'].uri">
-          </el-option>
-          <el-option :label="dataTypes['dmx.core.identity'].value" :value="dataTypes['dmx.core.identity'].uri">
-          </el-option>
-        </el-option-group>
-      </el-select>
-    </div>
+    <div class="field-label">Data Type</div>
+    <div v-if="infoMode">{{dataType.value}}</div>
+    <el-select v-else v-model="object.dataTypeUri">
+      <el-option-group label="Simple">
+        <el-option :label="dataTypes['dmx.core.text'].value"     :value="dataTypes['dmx.core.text'].uri">
+        </el-option>
+        <el-option :label="dataTypes['dmx.core.number'].value"   :value="dataTypes['dmx.core.number'].uri">
+        </el-option>
+        <el-option :label="dataTypes['dmx.core.boolean'].value"  :value="dataTypes['dmx.core.boolean'].uri">
+        </el-option>
+        <el-option :label="dataTypes['dmx.core.html'].value"     :value="dataTypes['dmx.core.html'].uri">
+        </el-option>
+      </el-option-group>
+      <el-option-group label="Composite">
+        <el-option :label="dataTypes['dmx.core.value'].value"    :value="dataTypes['dmx.core.value'].uri">
+        </el-option>
+        <el-option :label="dataTypes['dmx.core.identity'].value" :value="dataTypes['dmx.core.identity'].uri">
+        </el-option>
+      </el-option-group>
+    </el-select>
   </div>
 </template>
 
@@ -73,4 +69,7 @@ export default {
 </script>
 
 <style>
+.dm5-type-renderer > .field-label {
+  margin-top: var(--field-spacing);
+}
 </style>
