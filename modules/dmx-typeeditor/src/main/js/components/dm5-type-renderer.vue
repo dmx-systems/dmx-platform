@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-type-renderer">
     <!-- Generic Object -->
-    <dm5-object :object="object" :level="0" :context="context"></dm5-object>
+    <dm5-object-value :object="object" :level="0" :context="context"></dm5-object-value>
     <!-- Type URI -->
     <div class="field">
       <div class="field-label">Type URI</div>
@@ -67,7 +67,7 @@ export default {
   },
 
   components: {
-    'dm5-object': require('dm5-object-renderer/src/components/dm5-object').default
+    'dm5-object-value': require('dm5-object-renderer/src/components/dm5-object-value').default
   }
 }
 </script>
