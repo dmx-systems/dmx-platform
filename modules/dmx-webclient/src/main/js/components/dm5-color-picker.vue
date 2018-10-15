@@ -1,8 +1,13 @@
 <template>
   <div :class="['dm5-color-picker', mode]">
-    <div class="color-box" v-if="infoMode" :style="style"></div>
-    <el-color-picker v-else v-model="object.value" size="medium"></el-color-picker>
-    <div class="color-value">{{object.value}}</div>
+    <template v-if="infoMode">
+      <div class="color-box" :style="style"></div>
+      <div class="color-value">{{object.value}}</div>
+    </template>
+    <template v-else>
+      <el-color-picker v-model="object.value" size="medium"></el-color-picker>
+      <el-input class="color-value" v-model="object.value"></el-input>
+    </template>
   </div>
 </template>
 
@@ -15,11 +20,9 @@ export default {
     require('./mixins/info-mode').default
   ],
 
-  data () {
-    return {
-      style: {
-        'background-color': this.object.value
-      }
+  computed: {
+    style () {
+      return {'background-color': this.object.value}
     }
   }
 }
@@ -44,7 +47,8 @@ export default {
 }
 
 .dm5-color-picker.form .color-value {
-  margin-left: 7px;
-  margin-right: 12px;
+  width: 12em;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 </style>
