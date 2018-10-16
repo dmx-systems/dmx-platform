@@ -5,7 +5,7 @@
       <div class="color-value">{{object.value}}</div>
     </template>
     <template v-else>
-      <el-color-picker v-model="object.value" size="medium"></el-color-picker>
+      <el-color-picker v-model="object.value" :predefine="colors" size="medium"></el-color-picker>
       <el-input class="color-value" v-model="object.value"></el-input>
     </template>
   </div>
@@ -19,6 +19,31 @@ export default {
     require('./mixins/mode').default,
     require('./mixins/info-mode').default
   ],
+
+  data: () => ({
+    colors: [
+      'hsl( 88, 80%, 50%)',
+      'hsl(180, 80%, 50%)',
+      'hsl(198, 80%, 50%)',
+      'hsl(230, 80%, 50%)',
+      'hsl(273, 80%, 50%)',
+      'hsl(300, 80%, 50%)',
+      'hsl( 10, 80%, 50%)',
+      'hsl( 40, 80%, 50%)',
+      'hsl( 60, 80%, 50%)',
+      'hsl(  0,  0%, 80%)',
+      'hsl( 88, 65%, 85%)',
+      'hsl(180, 65%, 85%)',
+      'hsl(198, 65%, 85%)',
+      'hsl(230, 65%, 85%)',
+      'hsl(273, 65%, 85%)',
+      'hsl(300, 65%, 85%)',
+      'hsl( 10, 65%, 85%)',
+      'hsl( 40, 65%, 85%)',
+      'hsl( 60, 65%, 85%)',
+      'hsl(  0,  0%, 90%)'
+    ]
+  }),
 
   computed: {
     style () {
