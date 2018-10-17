@@ -14,7 +14,7 @@ const state = {
 
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
-  objectRenderers: {        // Registered object renderers:
+  detailRenderers: {        // Registered detail renderers:
     object: {},             //   {
     value: {}               //     typeUri: component
   },                        //   }
@@ -88,7 +88,7 @@ const actions = {
    * @param   render    "object" or "value"
    */
   registerDetailRenderer (_, {renderer, typeUri, component}) {
-    state.objectRenderers[renderer][typeUri] = component
+    state.detailRenderers[renderer][typeUri] = component
   },
 
   registerComponent (_, compDef) {
@@ -103,7 +103,7 @@ const actions = {
   mountComponents (_, parent) {
     state.compDefs.webclient.forEach(compDef => {
       // 1) init props
-      // Note 1: props must be inited explicitly. E.g. the "objectRenderers" store state is populated while
+      // Note 1: props must be inited explicitly. E.g. the "detailRenderers" store state is populated while
       // loading plugins and does not change afterwards. The watcher (see step 3) would not fire as it is
       // registered *after* the plugins are loaded.
       // TODO: think about startup order: instantiating the Webclient component vs. loading the plugins.

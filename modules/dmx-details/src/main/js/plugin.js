@@ -27,7 +27,7 @@ export default ({store}) => ({
         tab:             state => state.details.tab,
         mode:            state => state.details.mode,
         markerIds:       (_, getters) => getters && getters.visibleTopicIds,
-        objectRenderers: state => state.objectRenderers,
+        detailRenderers: state => state.detailRenderers,
         quillConfig:     state => state.quillConfig
       },
       listeners: {
