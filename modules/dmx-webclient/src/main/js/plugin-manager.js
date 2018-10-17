@@ -54,9 +54,9 @@ function initPlugin (expo) {
       store.dispatch('registerComponent', compDef)
     })
   }
-  // object renderers
-  registerObjectRenderers(plugin.pageRenderers, 'page')
-  registerObjectRenderers(plugin.detailRenderers, 'detail')
+  // detail renderers
+  registerDetailRenderers(plugin.objectRenderers, 'object')
+  registerDetailRenderers(plugin.valueRenderers,  'value')
   //
   // extra menu items
   const extraMenuItems = plugin.extraMenuItems
@@ -70,10 +70,10 @@ function initPlugin (expo) {
   }
 }
 
-function registerObjectRenderers (renderers, renderer) {
+function registerDetailRenderers (renderers, renderer) {
   if (renderers) {
     for (let typeUri in renderers) {
-      store.dispatch('registerObjectRenderer', {renderer, typeUri, component: renderers[typeUri]})
+      store.dispatch('registerDetailRenderer', {renderer, typeUri, component: renderers[typeUri]})
     }
   }
 }

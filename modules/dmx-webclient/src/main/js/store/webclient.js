@@ -15,8 +15,8 @@ const state = {
   writable: undefined,      // True if the current user has WRITE permission for the selected object.
 
   objectRenderers: {        // Registered object renderers:
-    page: {},               //   {
-    detail: {}              //     typeUri: component
+    object: {},             //   {
+    value: {}               //     typeUri: component
   },                        //   }
 
   compDefs: {},             // Registered webclient components
@@ -85,9 +85,9 @@ const actions = {
   // ---
 
   /**
-   * @param   render    "page" or "detail"
+   * @param   render    "object" or "value"
    */
-  registerObjectRenderer (_, {renderer, typeUri, component}) {
+  registerDetailRenderer (_, {renderer, typeUri, component}) {
     state.objectRenderers[renderer][typeUri] = component
   },
 

@@ -9,7 +9,7 @@ import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2018/10/15')
+console.log('[DMX] 2018/10/17')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
@@ -30,13 +30,13 @@ const root = new Vue({
 // console.log('### Vue root instance created!', root)
 
 // 3) Register own renderers
-store.dispatch('registerObjectRenderer', {
-  renderer: 'detail',
+store.dispatch('registerDetailRenderer', {
+  renderer: 'value',
   typeUri: 'dmx.webclient.icon',
   component: require('./components/dm5-icon-picker').default
 })
-store.dispatch('registerObjectRenderer', {
-  renderer: 'detail',
+store.dispatch('registerDetailRenderer', {
+  renderer: 'value',
   typeUri: 'dmx.webclient.color',
   component: require('./components/dm5-color-picker').default
 })
