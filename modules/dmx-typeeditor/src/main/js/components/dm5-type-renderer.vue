@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-type-renderer">
     <!-- Generic Value -->
-    <dm5-object-value :object="object" :level="0" :context="context"></dm5-object-value>
+    <dm5-value-renderer :object="object" :level="0" :context="context"></dm5-value-renderer>
     <!-- Type URI -->
     <div class="field-label">Type URI</div>
     <div v-if="infoMode">{{object.uri}}</div>
@@ -63,7 +63,7 @@ export default {
   },
 
   components: {
-    'dm5-object-value': require('dm5-object-renderer/src/components/dm5-object-value').default
+    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default
   }
 }
 </script>
