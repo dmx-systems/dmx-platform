@@ -73,11 +73,7 @@ export default ({store}) => {
     topicmapType: {
       uri: 'dmx.webclient.default_topicmap_renderer',
       name: "Topicmap",
-      renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */),
-      mounted () {
-        // TODO: sync styles dynamically when assoc type view config changes
-        store.dispatch('syncStyles', assocTypeColors())
-      }
+      renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */)
     }
   }
 
@@ -85,15 +81,5 @@ export default ({store}) => {
     if (viewTopic.typeUri === 'dmx.topicmaps.topicmap') {
       store.dispatch('selectTopicmap', viewTopic.id)
     }
-  }
-
-  function assocTypeColors() {
-    return Object.values(store.state.typeCache.assocTypes).reduce((colors, assocType) => {
-      const color = assocType.getColor()
-      if (color) {
-        colors[assocType.uri] = color
-      }
-      return colors
-    }, {})
   }
 }
