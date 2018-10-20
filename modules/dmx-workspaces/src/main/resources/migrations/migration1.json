@@ -13,8 +13,8 @@
             "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
         },
         {
-            "value":          "Description",
-            "uri":            "dmx.workspaces.description",
+            "value":          "Notes",
+            "uri":            "dmx.workspaces.notes",
             "dataTypeUri":    "dmx.core.html",
             "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"]
         },
@@ -28,7 +28,7 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":        "dmx.workspaces.description",
+                    "childTypeUri":        "dmx.workspaces.notes",
                     "childCardinalityUri": "dmx.core.one"
                 }
             ],

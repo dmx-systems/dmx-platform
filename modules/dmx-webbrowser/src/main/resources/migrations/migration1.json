@@ -8,8 +8,8 @@
             // TODO: index
         },
         {
-            "value": "Description",
-            "uri": "dmx.webbrowser.web_resource_description",
+            "value": "Notes",
+            "uri": "dmx.webbrowser.notes",
             "dataTypeUri": "dmx.core.html",
             "indexModeUris": ["dmx.core.fulltext"]
         },
@@ -23,7 +23,7 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":        "dmx.webbrowser.web_resource_description",
+                    "childTypeUri":        "dmx.webbrowser.notes",
                     "childCardinalityUri": "dmx.core.one"
                 }
             ],

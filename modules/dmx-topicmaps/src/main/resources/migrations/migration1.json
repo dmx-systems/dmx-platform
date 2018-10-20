@@ -7,8 +7,8 @@
             "indexModeUris": ["dmx.core.fulltext", "dmx.core.fulltext_key"]
         },
         {
-            "value":          "Description",
-            "uri":            "dmx.topicmaps.description",
+            "value":          "Notes",
+            "uri":            "dmx.topicmaps.notes",
             "dataTypeUri":    "dmx.core.html",
             "indexModeUris": ["dmx.core.fulltext"]
         },
@@ -36,7 +36,7 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":        "dmx.topicmaps.description",
+                    "childTypeUri":        "dmx.topicmaps.notes",
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {

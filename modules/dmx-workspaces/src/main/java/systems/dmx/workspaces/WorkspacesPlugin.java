@@ -350,10 +350,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (workspaceAssignmentIsSuppressed(topic)) {
             return;
         }
-        // Note: we must avoid a vicious circle that would occur when editing a workspace. A Description topic
-        // would be created (as no description is set when the workspace is created) and be assigned to the
+        // Note: we must avoid a vicious circle that would occur when editing a workspace. A Notes topic
+        // would be created (as no notes are set when the workspace is created) and be assigned to the
         // workspace itself. This would create an endless recursion while bubbling the modification timestamp.
-        if (isWorkspaceDescription(topic)) {
+        if (isWorkspaceNotes(topic)) {
             return;
         }
         //
@@ -485,8 +485,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dmx.");
     }
 
-    private boolean isWorkspaceDescription(Topic topic) {
-        return topic.getTypeUri().equals("dmx.workspaces.description");
+    private boolean isWorkspaceNotes(Topic topic) {
+        return topic.getTypeUri().equals("dmx.workspaces.notes");
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
