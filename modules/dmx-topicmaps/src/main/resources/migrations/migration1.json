@@ -1,7 +1,7 @@
 {
     "topic_types": [
         {
-            "value":          "Name",
+            "value":          "Topicmap Name",
             "uri":            "dmx.topicmaps.name",
             "dataTypeUri":    "dmx.core.text",
             "indexModeUris": ["dmx.core.fulltext", "dmx.core.fulltext_key"]

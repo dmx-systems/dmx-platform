@@ -7,7 +7,7 @@
         // Workspace ###
 
         {
-            "value":          "Name",
+            "value":          "Workspace Name",
             "uri":            "dmx.workspaces.name",
             "dataTypeUri":    "dmx.core.text",
             "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
