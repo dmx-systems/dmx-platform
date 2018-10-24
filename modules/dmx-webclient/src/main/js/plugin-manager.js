@@ -15,6 +15,7 @@ export default {
     initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
+    initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
     // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
     // So, they are not init'ed again. ### TODO: explain better

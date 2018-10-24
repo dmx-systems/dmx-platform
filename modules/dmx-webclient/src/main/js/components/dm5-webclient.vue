@@ -49,6 +49,6 @@ export default {
   box-sizing: border-box;
   padding: 0 12px 12px 12px;
   background-color: var(--background-color);
-  border-left: 1px solid var(--border-color-lighter);
+  border-left: 1px solid var(--border-color);
 }
 </style>
