@@ -10,7 +10,7 @@
 export default {
 
   created () {
-    console.log('dm5-date-picker created', this.assocDef)
+    // console.log('dm5-date-picker created', this.assocDef)
   },
 
   mixins: [
@@ -40,20 +40,20 @@ export default {
 
       get () {
         console.log('date getter', this.object)
-        const d = this.object.childs
-        return new Date(
-          d['dmx.datetime.year'].value,
-          d['dmx.datetime.month'].value - 1,
-          d['dmx.datetime.day'].value
-        )
+        const c = this.object.childs
+        const y = c['dmx.datetime.year'].value
+        const m = c['dmx.datetime.month'].value
+        const d = c['dmx.datetime.day'].value
+        return y && m && d && new Date(y, m - 1, d)
       },
 
       set (date) {
-        console.log('date setter', date.getFullYear(), date.getMonth() + 1, date.getDate())
+        console.log('date setter', date)
+        // Note: if date field is cleared null is passed
         const d = this.object.childs
-        d['dmx.datetime.year'].value  = date.getFullYear()
-        d['dmx.datetime.month'].value = date.getMonth() + 1
-        d['dmx.datetime.day'].value   = date.getDate()
+        d['dmx.datetime.year'].value  = date && date.getFullYear()  || ''
+        d['dmx.datetime.month'].value = date && date.getMonth() + 1 || ''
+        d['dmx.datetime.day'].value   = date && date.getDate()      || ''
       }
     }
   }
