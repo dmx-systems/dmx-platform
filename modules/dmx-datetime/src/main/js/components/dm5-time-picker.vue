@@ -1,8 +1,8 @@
 <template>
-  <div class="dm5-date-picker">
+  <div class="dm5-time-picker">
     <div class="field-label">{{fieldLabel}}</div>
     <div v-if="infoMode">{{object.value}}</div>
-    <el-date-picker v-else v-model="date"></el-date-picker>
+    <el-time-picker v-else v-model="time"></el-time-picker>
   </div>
 </template>
 
@@ -10,7 +10,7 @@
 export default {
 
   created () {
-    // console.log('dm5-date-picker created', this.assocDef)
+    // console.log('dm5-time-picker created', this.assocDef)
   },
 
   mixins: [
@@ -36,27 +36,25 @@ export default {
       return this.context.mode
     },
 
-    date: {
+    time: {
 
       get () {
-        console.log('date getter', this.object)
+        console.log('time getter', this.object)
         const c = this.object.childs
-        const y = c['dmx.datetime.year'].value
-        const m = c['dmx.datetime.month'].value
-        const d = c['dmx.datetime.day'].value
+        const h = c['dmx.datetime.hour'].value
+        const m = c['dmx.datetime.minute'].value
         // Topics created through "filling" have empty string values. If any topic is empty we don't create a
         // Date object but return an empty string. The Element UI Date Picker interprets that as "not set".
-        return y && m && d && new Date(y, m - 1, d)
+        return h && m && new Date(0, 0, 0, h, m)
       },
 
-      set (date) {
-        console.log('date setter', date)
-        // Note: if a date field is cleared in the GUI we receive null here. To clear a field at server-side an empty
+      set (time) {
+        console.log('time setter', time)
+        // Note: if a time field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
         const c = this.object.childs
-        c['dmx.datetime.year'].value  = date && date.getFullYear()  || ''
-        c['dmx.datetime.month'].value = date && date.getMonth() + 1 || ''
-        c['dmx.datetime.day'].value   = date && date.getDate()      || ''
+        c['dmx.datetime.hour'].value   = time && time.getHours()   || ''
+        c['dmx.datetime.minute'].value = time && time.getMinutes() || ''
       }
     }
   }

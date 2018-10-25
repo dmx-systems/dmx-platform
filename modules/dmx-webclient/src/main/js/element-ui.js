@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import {
   Button, Input, Select, Option, OptionGroup, Checkbox, Radio, RadioGroup, Dialog, Tabs, TabPane, Autocomplete,
-  ColorPicker, DatePicker, Loading, Notification
+  ColorPicker, DatePicker, TimePicker, Loading, Notification
 } from 'element-ui'
 import locale from 'element-ui/lib/locale'
 
@@ -28,6 +28,7 @@ Vue.use(TabPane)
 Vue.use(Autocomplete)
 Vue.use(ColorPicker)
 Vue.use(DatePicker)
+Vue.use(TimePicker)
 
 Vue.use(Loading.directive)
 
