@@ -59,6 +59,13 @@ export default {
         c['dmx.datetime.day'].value   = date && date.getDate()      || ''
       }
     }
+  },
+
+  components: {
+    'el-date-picker': () => {
+      import('element-ui/lib/theme-chalk/date-picker.css' /* webpackChunkName: "el-date-picker" */)
+      return import('element-ui/lib/date-picker.js'       /* webpackChunkName: "el-date-picker" */)
+    }
   }
 }
 </script>

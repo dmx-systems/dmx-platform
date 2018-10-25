@@ -44,7 +44,7 @@ export default {
         const h = c['dmx.datetime.hour'].value
         const m = c['dmx.datetime.minute'].value
         // Topics created through "filling" have empty string values. If any topic is empty we don't create a
-        // Date object but return an empty string. The Element UI Date Picker interprets that as "not set".
+        // Date object but return an empty string. The Element UI Time Picker interprets that as "not set".
         return h && m && new Date(0, 0, 0, h, m)
       },
 
@@ -56,6 +56,13 @@ export default {
         c['dmx.datetime.hour'].value   = time && time.getHours()   || ''
         c['dmx.datetime.minute'].value = time && time.getMinutes() || ''
       }
+    }
+  },
+
+  components: {
+    'el-time-picker': () => {
+      import('element-ui/lib/theme-chalk/time-picker.css' /* webpackChunkName: "el-time-picker" */)
+      return import('element-ui/lib/time-picker.js'       /* webpackChunkName: "el-time-picker" */)
     }
   }
 }
