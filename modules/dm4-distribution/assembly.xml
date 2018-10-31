@@ -23,6 +23,7 @@
             <includes>
                 <include>de.deepamehta:*:jar</include>
                 <include>com.sun.jersey:*</include>
+                <include>javax.xml.bind:*</include>
                 <include>commons-fileupload:*</include>
                 <include>org.apache.felix:org.apache.felix.configadmin</include>
                 <include>org.apache.felix:org.apache.felix.eventadmin</include>

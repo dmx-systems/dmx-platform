@@ -8,7 +8,11 @@
     <artifactId>3rd-party-bundles</artifactId>
     <version>4.9.1</version>
     <packaging>pom</packaging>
-    <description>3rd-party (= non-DeepaMehta) libraries to be provisioned in the OSGi runtime.</description>
+    <description>
+        3rd-party (= non-DeepaMehta) libraries to be
+        1) provisioned in the OSGi runtime
+        2) included in the distro
+    </description>
 
     <parent>
         <groupId>de.deepamehta</groupId>
@@ -46,6 +50,12 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-servlet</artifactId>
             <version>1.14</version>
+        </dependency>
+        <!-- JAXB API (required by Jersey) -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
         </dependency>
         <!-- Jettison -->
         <dependency>
