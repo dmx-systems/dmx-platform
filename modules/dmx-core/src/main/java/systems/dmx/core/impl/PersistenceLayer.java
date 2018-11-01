@@ -140,8 +140,6 @@ public final class PersistenceLayer extends StorageDecorator {
      */
     private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix) {
         try {
-            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-            //
             model.preCreate();
             //
             // 1) store in DB
@@ -157,13 +155,10 @@ public final class PersistenceLayer extends StorageDecorator {
             if (uriPrefix != null && model.getUri().equals("")) {
                 model.updateUri(uriPrefix + model.getId());     // update memory + DB
             }
-            // 3) instantiate
-            TopicImpl topic = model.instantiate();
             //
             model.postCreate();
             //
-            em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
-            return topic;
+            return model.instantiate();
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
                 "\"", e);

@@ -697,22 +697,22 @@ class ValueIntegrator {
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
-        // FIXME: construct the composite model first, then create topic as a whole. => NO! Endless recursion?
-        // Otherwise the POST_CREATE_TOPIC event is fired too early, and e.g. Address topics get no geo coordinates.
-        // logger.fine("### childValues=" + childValues);
-        TopicModelImpl topic = createSimpleTopic();
-        logger.fine("### Creating composite " + topic.id + " (typeUri=\"" + type.uri + "\")");
+        TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
+        pl.em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+        Topic topic = pl.createSingleTopic(model);
+        logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childValues.keySet()) {
             if (isOne(assocDefUri)) {
                 DMXObjectModel childTopic = ((UnifiedValue) childValues.get(assocDefUri)).value;
-                createChildAssociation(topic, childTopic, assocDefUri);
+                createChildAssociation(model, childTopic, assocDefUri);
             } else {
                 for (UnifiedValue value : (List<UnifiedValue>) childValues.get(assocDefUri)) {
-                    createChildAssociation(topic, value.value, assocDefUri);
+                    createChildAssociation(model, value.value, assocDefUri);
                 }
             }
         }
-        return topic;
+        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+        return model;
     }
 
     private AssociationModelImpl createChildAssociation(DMXObjectModel parent, DMXObjectModel child,
