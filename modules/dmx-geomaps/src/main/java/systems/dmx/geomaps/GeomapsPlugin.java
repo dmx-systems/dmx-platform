@@ -202,7 +202,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 //
                 facetsService.addFacetTypeToTopic(topic.getId(), "dmx.geomaps.geo_coordinate_facet");
                 //
-                Address address = new Address(topic.getChildTopics().getModel());
+                Address address = new Address(topic /* .getChildTopics().getModel() */);    // ### TODO
                 if (!address.isEmpty()) {
                     logger.info("### New " + address);
                     geocodeAndStoreFacet(address, topic);
@@ -216,7 +216,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dmx.contacts.address")) {
-            if (!abortGeocoding(topic)) {
+            // Note: Address is a value type. An address is immutable ### TODO
+            throw new RuntimeException("postUpdateTopic() invoked for an Address topic: " + topic);
+            /* if (!abortGeocoding(topic)) {
                 Address address    = new Address(topic.getChildTopics().getModel());
                 Address oldAddress = new Address(oldTopic.getChildTopicsModel());
                 if (!address.equals(oldAddress)) {
@@ -225,7 +227,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 } else {
                     logger.info("Address not changed");
                 }
-            }
+            } */
         }
     }
 
@@ -346,6 +348,21 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             postalCode = address.getString("dmx.contacts.postal_code", "");
             city       = address.getString("dmx.contacts.city", "");
             country    = address.getString("dmx.contacts.country", "");
+        }
+
+        // TODO: drop it
+        Address(Topic address) {
+            // Note: some Address child topics might be deleted (resp. do not exist), so we use ""
+            // as defaults here. Otherwise "Invalid access to ChildTopicsModel" would be thrown.
+            ChildTopics childs = address.getChildTopics();
+            String st = childs.getStringOrNull("dmx.contacts.street");
+            String po = childs.getStringOrNull("dmx.contacts.postal_code");
+            String ci = childs.getStringOrNull("dmx.contacts.city");
+            String co = childs.getStringOrNull("dmx.contacts.country");
+            street     = st != null ? st : "";
+            postalCode = po != null ? po : "";
+            city       = ci != null ? ci : "";
+            country    = co != null ? co : "";
         }
 
         // ---
