@@ -6,7 +6,7 @@
     <name>3rd Party Bundles</name>
     <groupId>de.deepamehta</groupId>
     <artifactId>3rd-party-bundles</artifactId>
-    <version>4.9.1</version>
+    <version>4.9.2</version>
     <packaging>pom</packaging>
     <description>
         3rd-party (= non-DeepaMehta) libraries to be
@@ -17,7 +17,7 @@
     <parent>
         <groupId>de.deepamehta</groupId>
         <artifactId>deepamehta-provision</artifactId>
-        <version>4.9.1</version>
+        <version>4.9.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -28,7 +28,7 @@
         <!--dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-storage-neo4j</artifactId>
-            <version>4.9.1</version>
+            <version>4.9.2</version>
         </dependency-->
         <!-- Jersey -->
         <!--dependency> - needed by Jersey 1.19
