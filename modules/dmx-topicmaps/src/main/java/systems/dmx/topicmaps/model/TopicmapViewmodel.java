@@ -20,6 +20,8 @@ import java.util.logging.Logger;
  * <p>
  * Features:
  * - Serialization to JSON.
+ *
+ * ### TODO: rename to Topicmap
  */
 public class TopicmapViewmodel implements JSONEnabled {
 

@@ -5,12 +5,9 @@ import systems.dmx.geomaps.model.Geomap;
 import systems.dmx.topicmaps.TopicmapsService;
 import systems.dmx.facets.FacetsService;
 
-import systems.dmx.core.Association;
-import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.ChildTopics;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
@@ -22,6 +19,7 @@ import systems.dmx.core.service.event.PostCreateTopicListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
 import systems.dmx.core.service.event.PreSendTopicListener;
 import systems.dmx.core.util.ContextTracker;
+import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -29,7 +27,6 @@ import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -37,7 +34,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -82,7 +81,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Path("/{id}")
     @Override
     public Geomap getGeomap(@PathParam("id") long geomapId) {
-        return new Geomap(geomapId, dmx);
+        logger.info("Loading geomap " + geomapId);
+        // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
+        // child topic loading is not applied. We must load the child topics manually here.
+        Topic geomapTopic = dmx.getTopic(geomapId).loadChildTopics();
+        Map<Long, TopicModel> geoCoords = fetchGeoCoordinates(geomapTopic);
+        //
+        return new Geomap(geomapTopic, geoCoords);
     }
 
     // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
@@ -256,6 +261,21 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private Map<Long, TopicModel> fetchGeoCoordinates(Topic geomapTopic) {
+        Map<Long, TopicModel> geoCoords = new HashMap();
+        for (Topic geoCoord : _fetchGeoCoordinates(geomapTopic)) {
+            geoCoords.put(geoCoord.getId(), geoCoord.getModel());
+        }
+        return geoCoords;
+    }
+
+    private List<RelatedTopic> _fetchGeoCoordinates(Topic geomapTopic) {
+        return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
+            "dmx.core.default", "dmx.topicmaps.topicmap_topic", "dmx.geomaps.geo_coordinate"));
+    }
+
+    // ---
+
     /**
      * Returns the Geo Coordinate topic (including its child topics) of a geo-facetted topic (e.g. an Address),
      * or <code>null</code> if no geo coordinate is stored.
@@ -385,10 +405,11 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     throw new RuntimeException("Address not found");
                 }
                 JSONObject result = results.getJSONObject(0);
-                double lon = result.getDouble("lon");
-                double lat = result.getDouble("lat");
                 // create result
-                GeoCoordinate geoCoord = new GeoCoordinate(lon, lat);
+                GeoCoordinate geoCoord = new GeoCoordinate(
+                    result.getDouble("lon"),
+                    result.getDouble("lat")
+                );
                 logger.info("=> " + geoCoord);
                 return geoCoord;
             } catch (Exception e) {
