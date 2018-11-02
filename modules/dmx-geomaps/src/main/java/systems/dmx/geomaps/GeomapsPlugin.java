@@ -24,6 +24,7 @@ import systems.dmx.core.service.event.PreSendTopicListener;
 import systems.dmx.core.util.ContextTracker;
 import systems.dmx.core.util.JavaUtils;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
 import javax.ws.rs.GET;
@@ -50,8 +51,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                                                                               PostUpdateTopicListener,
                                                                               PreSendTopicListener {
 
-    private static final String GEOCODER_URL = "http://maps.googleapis.com/maps/api/geocode/json?" +
-        "address=%s&sensor=false";
+    private static final String GEOCODER_URL = "https://nominatim.openstreetmap.org/search?" +
+        "street=%s&postalcode=%s&city=%s&country=%s&format=json&limit=1";
 
     private static final String COOKIE_NO_GEOCODING = "dmx_no_geocoding";
 
@@ -371,26 +372,27 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
             URL url = null;
             try {
                 // perform request
-                String address = street + ", " + postalCode + " " + city + ", " + country;
-                url = new URL(String.format(GEOCODER_URL, JavaUtils.encodeURIComponent(address)));
-                logger.info("Geocoding \"" + address + "\"\n    url=\"" + url + "\"");
-                JSONObject response = new JSONObject(JavaUtils.readTextURL(url));
-                // check response status
-                String status = response.getString("status");
-                if (!status.equals("OK")) {
-                    throw new RuntimeException(status);
-                }
+                url = new URL(String.format(GEOCODER_URL,
+                    JavaUtils.encodeURIComponent(street),
+                    JavaUtils.encodeURIComponent(postalCode),
+                    JavaUtils.encodeURIComponent(city),
+                    JavaUtils.encodeURIComponent(country)
+                ));
+                logger.info("Geocoding url=\"" + url + "\"");
                 // parse response
-                JSONObject location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry")
-                    .getJSONObject("location");
-                double lng = location.getDouble("lng");
-                double lat = location.getDouble("lat");
+                JSONArray results = new JSONArray(JavaUtils.readTextURL(url));
+                if (results.length() == 0) {
+                    throw new RuntimeException("Address not found");
+                }
+                JSONObject result = results.getJSONObject(0);
+                double lon = result.getDouble("lon");
+                double lat = result.getDouble("lat");
                 // create result
-                GeoCoordinate geoCoord = new GeoCoordinate(lng, lat);
+                GeoCoordinate geoCoord = new GeoCoordinate(lon, lat);
                 logger.info("=> " + geoCoord);
                 return geoCoord;
             } catch (Exception e) {
-                throw new RuntimeException("Geocoding failed (url=\"" + url + "\")", e);
+                throw new RuntimeException("Geocoding failed, url=\"" + url + "\"", e);
             }
         }
 
