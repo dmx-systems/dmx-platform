@@ -191,6 +191,8 @@ class ValueIntegrator {
     }
 
     /**
+     * Finds a simple topic by-value in the DB, or creates it.
+     *
      * Preconditions:
      *   - this.newValues is simple
      *   - this.newValues is not empty
@@ -304,7 +306,7 @@ class ValueIntegrator {
     }
 
     /**
-     * Identifies the parent to be updated in-place.
+     * Identifies the parent to be updated in-place, or creates it.
      *
      * Preconditions:
      *   - this.newValues is composite
@@ -331,6 +333,8 @@ class ValueIntegrator {
             if (identityAssocDefUris.size() > 0) {
                 return unifyChildTopics(identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris);
             } else {
+                // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
+                // Note: for value-types this is fixed meanwhile, but not for identity-types.
                 DMXObjectModelImpl parent = createSimpleTopic();
                 logger.fine("### Creating composite (w/o identity attrs) " + parent.id + " (typeUri=\"" + type.uri +
                     "\")");
@@ -690,7 +694,11 @@ class ValueIntegrator {
             throw new RuntimeException("Tried to create a topic from an assoc model");
         }
         //
-        return pl.createSingleTopic(mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value)).getModel();
+        TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
+        pl.em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+        Topic topic = pl.createSingleTopic(model);
+        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+        return model;
     }
 
     /**
