@@ -130,16 +130,21 @@ public final class PersistenceLayer extends StorageDecorator {
 
     // ---
 
-    TopicImpl createSingleTopic(TopicModelImpl model) {
-        return createSingleTopic(model, null);   // uriPrefix=null
+    // ### TODO: drop "firePostCreate" param
+    TopicImpl createSingleTopic(TopicModelImpl model, boolean firePostCreate) {
+        return createSingleTopic(model, null, firePostCreate);   // uriPrefix=null
     }
 
     /**
      * Creates a single topic in the DB.
      * No child topics are created.
+     *
+     * ### TODO: drop "firePostCreate" param
      */
-    private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix) {
+    private TopicImpl createSingleTopic(TopicModelImpl model, String uriPrefix, boolean firePostCreate) {
         try {
+            em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
+            //
             model.preCreate();
             //
             // 1) store in DB
@@ -158,7 +163,11 @@ public final class PersistenceLayer extends StorageDecorator {
             //
             model.postCreate();
             //
-            return model.instantiate();
+            TopicImpl topic = model.instantiate();
+            if (firePostCreate) {
+                em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+            }
+            return topic;
         } catch (Exception e) {
             throw new RuntimeException("Creating single topic failed, model=" + model + ", uriPrefix=\"" + uriPrefix +
                 "\"", e);
@@ -596,7 +605,7 @@ public final class PersistenceLayer extends StorageDecorator {
             }
         }
         //
-        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE);
+        return createSingleTopic(model, URI_PREFIX_ROLE_TYPE, true);
     }
 
     // ---
@@ -862,7 +871,7 @@ public final class PersistenceLayer extends StorageDecorator {
         // assoc defs not readable by the current user. But at the time the type topic is stored in the DB its assoc
         // defs are not yet stored, and the readability check would fail.
         TopicModelImpl typeTopic = mf.newTopicModel(model);
-        createSingleTopic(typeTopic, uriPrefix);    // create generic topic
+        createSingleTopic(typeTopic, uriPrefix, true);    // create generic topic
         //
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;

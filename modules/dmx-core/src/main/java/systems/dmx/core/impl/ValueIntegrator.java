@@ -695,9 +695,7 @@ class ValueIntegrator {
         }
         //
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
-        pl.em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-        Topic topic = pl.createSingleTopic(model);
-        pl.em.fireEvent(CoreEvent.POST_CREATE_TOPIC, topic);
+        pl.createSingleTopic(model, true);
         return model;
     }
 
@@ -706,8 +704,7 @@ class ValueIntegrator {
      */
     private TopicModelImpl createCompositeTopic(Map<String, Object> childValues) {
         TopicModelImpl model = mf.newTopicModel(newValues.uri, newValues.typeUri, newValues.value);
-        pl.em.fireEvent(CoreEvent.PRE_CREATE_TOPIC, model);
-        Topic topic = pl.createSingleTopic(model);
+        Topic topic = pl.createSingleTopic(model, false);
         logger.info("### Creating composite " + model.id + " (typeUri=\"" + type.uri + "\")");
         for (String assocDefUri : childValues.keySet()) {
             if (isOne(assocDefUri)) {
