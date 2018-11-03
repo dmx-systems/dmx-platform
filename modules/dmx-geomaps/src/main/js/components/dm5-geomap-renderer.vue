@@ -48,9 +48,19 @@ export default {
 
   computed: {
     geoCoordTopics () {
-      // Note: the geomap is loaded *after* the topicmap renderer is installed (see topicmap-panel.js)
-      const geomap = this.$store.state['dmx.geomaps.geomap_renderer'].geomap
-      return geomap && geomap.geoCoordTopics
+      // Note: the geomap renderer might be unavailable while renderer switching (see topicmap-panel.js)
+      const renderer = this.$store.state['dmx.geomaps.geomap_renderer']
+      if (!renderer) {
+        console.log('Geomap renderer already gone')
+        return
+      }
+      // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
+      const geomap = renderer.geomap
+      if (!geomap) {
+        console.log('Geomap not yet available')
+        return
+      }
+      return geomap.geoCoordTopics
     }
   },
 
