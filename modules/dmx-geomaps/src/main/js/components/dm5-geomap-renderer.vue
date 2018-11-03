@@ -2,14 +2,23 @@
   <div class="dm5-geomap-renderer">
     <l-map :center="center" :zoom="zoom" :options="options">
       <l-tile-layer :url="url"></l-tile-layer>
+      <l-marker v-for="topic in geoCoordTopics" :lat-lng="latLng(topic)" :key="topic.id"></l-marker>
     </l-map>
   </div>
 </template>
 
 <script>
+import { LMap, LTileLayer, LMarker } from 'vue2-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-var {LMap, LTileLayer} = require('vue2-leaflet')
+// stupid hack so that leaflet's images work after going through webpack
+// https://github.com/PaulLeCam/react-leaflet/issues/255
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+    iconUrl:       require('leaflet/dist/images/marker-icon.png'),
+    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+    shadowUrl:     require('leaflet/dist/images/marker-shadow.png')
+})
 
 export default {
 
@@ -27,7 +36,7 @@ export default {
 
   data () {
     return {
-      center: [51, 11],
+      center: [51, 5],
       zoom: 6,
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       options: {
@@ -37,8 +46,25 @@ export default {
     }
   },
 
+  computed: {
+    geoCoordTopics () {
+      // Note: the geomap is loaded *after* the topicmap renderer is installed (see topicmap-panel.js)
+      const geomap = this.$store.state['dmx.geomaps.geomap_renderer'].geomap
+      return geomap && geomap.geoCoordTopics
+    }
+  },
+
+  methods: {
+    latLng (geoCoordTopic) {
+      return L.latLng(
+        geoCoordTopic.childs['dmx.geomaps.latitude'].value,
+        geoCoordTopic.childs['dmx.geomaps.longitude'].value
+      )
+    }
+  },
+
   components: {
-    LMap, LTileLayer
+    LMap, LTileLayer, LMarker
   }
 }
 </script>
