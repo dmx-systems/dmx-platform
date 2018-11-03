@@ -64,42 +64,42 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Topics ===
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}")
     public Topic getTopic(@PathParam("id") long topicId) {
         return dmx.getTopic(topicId);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_uri/{uri}")
     public Topic getTopicByUri(@PathParam("uri") String uri) {
         return dmx.getTopicByUri(uri);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.getTopicByValue(key, value);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> getTopicsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.getTopicsByValue(key, value);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/by_type/{topic_type_uri}")
     public List<Topic> getTopicsByType(@PathParam("topic_type_uri") String topicTypeUri) {
         return dmx.getTopicsByType(topicTypeUri);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic")
     public List<Topic> searchTopics(@QueryParam("search") String searchTerm, @QueryParam("field") String fieldUri) {
@@ -137,21 +137,21 @@ public class WebservicePlugin extends PluginActivator {
 
     // === Associations ===
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}")
     public Association getAssociation(@PathParam("id") long assocId) {
         return dmx.getAssociation(assocId);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/by_value/{key}/{value}")
     public Association getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
         return dmx.getAssociationByValue(key, value);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
     public List<Association> getAssociationsByValue(@PathParam("key") String key,
@@ -159,7 +159,7 @@ public class WebservicePlugin extends PluginActivator {
         return dmx.getAssociationsByValue(key, value);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{assoc_type_uri}/{topic1_id}/{topic2_id}/{role_type1_uri}/{role_type2_uri}")
     public Association getAssociation(@PathParam("assoc_type_uri") String assocTypeUri,
@@ -170,7 +170,7 @@ public class WebservicePlugin extends PluginActivator {
 
     // ---
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
@@ -178,7 +178,7 @@ public class WebservicePlugin extends PluginActivator {
         return dmx.getAssociations(topic1Id, topic2Id);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/multiple/{topic1_id}/{topic2_id}/{assoc_type_uri}")
     public List<Association> getAssociations(@PathParam("topic1_id") long topic1Id,
@@ -337,7 +337,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_topics")
     public List<RelatedTopic> getTopicRelatedTopics(@PathParam("id")                     long topicId,
@@ -349,7 +349,7 @@ public class WebservicePlugin extends PluginActivator {
         return getRelatedTopics(topic, "topic", assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/topic/{id}/related_assocs")
     public List<RelatedAssociation> getTopicRelatedAssociations(@PathParam("id")            long topicId,
@@ -370,7 +370,7 @@ public class WebservicePlugin extends PluginActivator {
 
 
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_topics")
     public List<RelatedTopic> getAssociationRelatedTopics(@PathParam("id")                  long assocId,
@@ -383,7 +383,7 @@ public class WebservicePlugin extends PluginActivator {
             othersTopicTypeUri);
     }
 
-    // Note: the "include_childs" query paramter is handled by the core's JerseyResponseFilter
+    // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
     @Path("/association/{id}/related_assocs")
     public List<RelatedAssociation> getAssociationRelatedAssociations(@PathParam("id")      long assocId,
