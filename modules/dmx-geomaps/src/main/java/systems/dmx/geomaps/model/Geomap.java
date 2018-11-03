@@ -54,7 +54,7 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
         try {
             return new JSONObject()
                 .put("info", geomapTopic.toJSON())
-                .put("topics", DMXUtils.toJSONArray(geoCoords.values()));
+                .put("geoCoordTopics", DMXUtils.toJSONArray(geoCoords.values()));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }

@@ -269,9 +269,12 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         return geoCoords;
     }
 
-    private List<RelatedTopic> _fetchGeoCoordinates(Topic geomapTopic) {
-        return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
-            "dmx.core.default", "dmx.topicmaps.topicmap_topic", "dmx.geomaps.geo_coordinate"));
+    private List<? extends Topic> _fetchGeoCoordinates(Topic geomapTopic) {
+        // Note: temporarily we retrieve just *all* geo coordinates
+        return DMXUtils.loadChildTopics(dmx.getTopicsByType("dmx.geomaps.geo_coordinate"));
+        // TODO: retrieve per-topicmap
+        // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
+        //     "dmx.core.default", "dmx.topicmaps.topicmap_topic", "dmx.geomaps.geo_coordinate"));
     }
 
     // ---
