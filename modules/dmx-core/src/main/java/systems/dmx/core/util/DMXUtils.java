@@ -201,6 +201,8 @@ public class DMXUtils {
         // Compare to AssociationModelImpl.duplicateCheck()
         String t1 = (String) dmx.getProperty(r1.getPlayerId(), "typeUri");
         String t2 = (String) dmx.getProperty(r2.getPlayerId(), "typeUri");
+        // ### FIXME: if topicTypeUri1 equals topicTypeUri2 and in the assoc only *one* player matches this type
+        // both getRoleModel() calls return the *same* player. Auto-typing is accidentally performed then.
         RoleModel roleModel1 = getRoleModel(r1, r2, t1, t2, topicTypeUri1, 1);
         RoleModel roleModel2 = getRoleModel(r1, r2, t1, t2, topicTypeUri2, 2);
         if (roleModel1 != null && roleModel2 != null) {
