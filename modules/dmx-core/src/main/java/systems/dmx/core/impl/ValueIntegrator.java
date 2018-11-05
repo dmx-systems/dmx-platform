@@ -573,6 +573,8 @@ class ValueIntegrator {
      *                              value: UnifiedValue or List<UnifiedValue>
      *
      * @param   assocDefUris    only these child topics are respected
+     *
+     * @return  the found (or created) parent topic
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childValues);

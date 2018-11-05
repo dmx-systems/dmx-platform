@@ -83,7 +83,7 @@ export default {
 
     popupOpen (geoCoordId) {
       // console.log('popupOpen', geoCoordId)
-      dm5.restClient.getDomainTopic(geoCoordId, true).then(topic => {
+      dm5.restClient.getDomainTopic(geoCoordId, true, true).then(topic => {
         // console.log('domain topic', topic)
         this.object = topic
       })
