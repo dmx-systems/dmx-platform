@@ -8,7 +8,7 @@
           <div><!-- popup needs at least one element, otherwise reactivity doesn't work -->
             <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
             </dm5-object-renderer>
-            <dm5-topic-list v-else-if="domainTopics" :topics="domainTopics" @topic-click="showDetails"></dm5-topic-list>
+            <dm5-topic-list v-else :topics="domainTopics" no-sort-menu @topic-click="showDetails"></dm5-topic-list>
           </div>
         </l-popup>
       </l-marker>
@@ -52,7 +52,7 @@ export default {
     return {
       // popup details
       domainTopic: undefined,
-      domainTopics: undefined,
+      domainTopics: [],
       // map options
       center: [51, 5],
       zoom: 6,
@@ -69,7 +69,7 @@ export default {
       // Note: the geomap renderer might be unavailable while renderer switching (see topicmap-panel.js)
       const renderer = this.$store.state['dmx.geomaps.geomap_renderer']
       if (!renderer) {
-        console.log('Geomap renderer not available')
+        // console.log('Geomap renderer not available')
         return
       }
       // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
