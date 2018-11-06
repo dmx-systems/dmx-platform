@@ -6,7 +6,9 @@
           @popupopen="popupOpen(topic.id)">
         <l-popup>
           <div><!-- popup needs at least one element, otherwise reactivity doesn't work -->
-            <dm5-object-renderer v-if="object" :object="object" :quill-config="quillConfig"></dm5-object-renderer>
+            <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
+            </dm5-object-renderer>
+            <dm5-topic-list v-else-if="domainTopics" :topics="domainTopics" @topic-click="showDetails"></dm5-topic-list>
           </div>
         </l-popup>
       </l-marker>
@@ -49,7 +51,8 @@ export default {
   data () {
     return {
       // popup details
-      object: undefined,
+      domainTopic: undefined,
+      domainTopics: undefined,
       // map options
       center: [51, 5],
       zoom: 6,
@@ -72,7 +75,7 @@ export default {
       // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
       const geomap = renderer.geomap
       if (!geomap) {
-        console.log('Geomap not available')
+        // console.log('Geomap not available')
         return
       }
       return geomap.geoCoordTopics
@@ -83,9 +86,23 @@ export default {
 
     popupOpen (geoCoordId) {
       // console.log('popupOpen', geoCoordId)
-      dm5.restClient.getDomainTopic(geoCoordId, true, true).then(topic => {
+      dm5.restClient.getDomainTopics(geoCoordId).then(topics => {
         // console.log('domain topic', topic)
-        this.object = topic
+        switch (topics.length) {
+        case 0:
+          throw Error(`No domain topics for geo coord topic ${geoCoordId}`)
+        case 1:
+          this.showDetails(topics[0]); break
+        default:
+          this.domainTopics = topics
+          this.domainTopic = undefined
+        }
+      })
+    },
+
+    showDetails (topic) {
+      dm5.restClient.getTopic(topic.id, true, true).then(topic => {
+        this.domainTopic = topic
       })
     },
 
@@ -99,7 +116,8 @@ export default {
 
   components: {
     LMap, LTileLayer, LMarker, LPopup,
-    'dm5-object-renderer': require('dm5-object-renderer').default
+    'dm5-object-renderer': require('dm5-object-renderer').default,
+    'dm5-topic-list':      require('dm5-topic-list').default
   }
 }
 </script>
