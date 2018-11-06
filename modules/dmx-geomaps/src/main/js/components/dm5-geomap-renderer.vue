@@ -3,13 +3,11 @@
     <l-map :center="center" :zoom="zoom" :options="options">
       <l-tile-layer :url="url"></l-tile-layer>
       <l-marker v-for="topic in geoCoordTopics" :lat-lng="latLng(topic)" :key="topic.id"
-          @popupopen="popupOpen(topic.id)">
-        <l-popup>
-          <div><!-- popup needs at least one element, otherwise reactivity doesn't work -->
-            <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
-            </dm5-object-renderer>
-            <dm5-topic-list v-else :topics="domainTopics" no-sort-menu @topic-click="showDetails"></dm5-topic-list>
-          </div>
+          @popupopen="popupOpen(topic.id, $event)">
+        <l-popup v-loading="loading">
+          <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
+          </dm5-object-renderer>
+          <dm5-topic-list v-else :topics="domainTopics" no-sort-menu @topic-click="showDetails"></dm5-topic-list>
         </l-popup>
       </l-marker>
     </l-map>
@@ -50,17 +48,18 @@ export default {
 
   data () {
     return {
-      // popup details
-      domainTopic: undefined,
-      domainTopics: [],
-      // map options
+      // map
       center: [51, 5],
       zoom: 6,
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       options: {
         zoomControl: false,
         attributionControl: false
-      }
+      },
+      // popup
+      domainTopic: undefined,     // has precedence
+      domainTopics: [],
+      loading: undefined
     }
   },
 
@@ -84,8 +83,11 @@ export default {
 
   methods: {
 
-    popupOpen (geoCoordId) {
-      // console.log('popupOpen', geoCoordId)
+    popupOpen (geoCoordId, event) {
+      console.log('popupOpen', geoCoordId, event.popup)
+      this.domainTopic = undefined
+      this.domainTopics = []
+      this.loading = true
       dm5.restClient.getDomainTopics(geoCoordId).then(topics => {
         // console.log('domain topic', topic)
         switch (topics.length) {
@@ -95,14 +97,16 @@ export default {
           this.showDetails(topics[0]); break
         default:
           this.domainTopics = topics
-          this.domainTopic = undefined
+          this.loading = false
         }
       })
     },
 
     showDetails (topic) {
+      this.loading = true
       dm5.restClient.getTopic(topic.id, true, true).then(topic => {
         this.domainTopic = topic
+        this.loading = false
       })
     },
 
@@ -134,6 +138,7 @@ export default {
 }
 
 .leaflet-popup-content {
-  min-width: 200px;
+  min-width:  200px;
+  min-height:  42px;     /* see --loading-spinner-size in element-ui/packages/theme-chalk/src/common/var.scss */
 }
 </style>
