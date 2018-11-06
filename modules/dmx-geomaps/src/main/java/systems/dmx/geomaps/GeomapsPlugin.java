@@ -65,6 +65,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     // used for geocoding suppression
     private ContextTracker contextTracker = new ContextTracker();
 
+    private Messenger me = new Messenger("systems.dmx.webclient");
+
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
@@ -211,6 +213,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                     logger.info("New empty address");
                 }
             }
+        } else if (topic.getTypeUri().equals("dmx.geomaps.geo_coordinate")) {
+            logger.info("### New geo coordinate: " + topic.loadChildTopics());
+            me.newGeoCoord(topic.loadChildTopics());
         }
     }
 
@@ -457,6 +462,36 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         public String toString() {
             return "address (street=\"" + street + "\", postalCode=\"" + postalCode +
                 "\", city=\"" + city + "\", country=\"" + country + "\")";
+        }
+    }
+
+    private class Messenger {
+
+        private String pluginUri;
+
+        private Messenger(String pluginUri) {
+            this.pluginUri = pluginUri;
+        }
+
+        // ---
+
+        private void newGeoCoord(Topic geoCoordTopic) {
+            try {
+                messageToAll(new JSONObject()
+                    .put("type", "newGeoCoord")
+                    .put("args", new JSONObject()
+                        .put("geoCoordTopic", geoCoordTopic.toJSON())
+                    )
+                );
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Error while sending a \"newGeoCoord\" message:", e);
+            }
+        }
+
+        // ---
+
+        private void messageToAll(JSONObject message) {
+            dmx.getWebSocketsService().messageToAll(pluginUri, message.toString());
         }
     }
 }
