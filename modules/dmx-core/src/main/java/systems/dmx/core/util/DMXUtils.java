@@ -160,7 +160,7 @@ public class DMXUtils {
      * Finds all parent topics of the given topic by traversing along the child->parent relationship.
      * Only the leaves are returned.
      * <p>
-     * If the given topic has no parent topic the returned list contains only the given topic.
+     * If the given topic has no parent topics the returned list contains only the given topic.
      */
     public static List<Topic> getParentTopics(Topic topic) {
         List<Topic> parentTopics = new ArrayList();

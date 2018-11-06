@@ -4,6 +4,7 @@ import systems.dmx.geomaps.model.GeoCoordinate;
 import systems.dmx.geomaps.model.Geomap;
 import systems.dmx.core.Topic;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 
@@ -13,9 +14,9 @@ public interface GeomapsService {
     Geomap getGeomap(long geomapId);
 
     /**
-     * Finds the domain topic that corresponds to a Geo Coordinate topic.
+     * Finds the domain topics (e.g. Persons, Organizations, Events) that correspond to a Geo Coordinate topic.
      */
-    Topic getDomainTopic(long geoCoordId);
+    List<Topic> getDomainTopics(long geoCoordId);
 
     /**
      * Returns the geo coordinate of a geo-facetted topic (e.g. an Address),

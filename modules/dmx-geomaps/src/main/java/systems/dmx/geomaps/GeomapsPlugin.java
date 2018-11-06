@@ -92,18 +92,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
     @GET
-    @Path("/topic/{id}")
+    @Path("/coord/{geo_coord_id}")
     @Override
-    public Topic getDomainTopic(@PathParam("id") long geoCoordId) {
+    public List<Topic> getDomainTopics(@PathParam("geo_coord_id") long geoCoordId) {
         try {
-            Topic topic = dmx.getTopic(geoCoordId);
-            RelatedTopic parentTopic;
-            while ((parentTopic = topic.getRelatedTopic(null, "dmx.core.child", "dmx.core.parent", null)) != null) {
-                topic = parentTopic;
-            }
-            return topic;
+            return DMXUtils.getParentTopics(dmx.getTopic(geoCoordId));
         } catch (Exception e) {
-            throw new RuntimeException("Finding domain topic failed (geoCoordId=" + geoCoordId + ")", e);
+            throw new RuntimeException("Finding domain topics failed (geoCoordId=" + geoCoordId + ")", e);
         }
     }
 
@@ -130,6 +125,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         );
     }
 
+    // TODO: rename path segment "topic" to "coord"
     @PUT
     @Path("/{id}/topic/{geo_coord_id}")
     @Transactional
