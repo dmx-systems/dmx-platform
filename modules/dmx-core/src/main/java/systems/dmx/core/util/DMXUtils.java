@@ -3,10 +3,10 @@ package systems.dmx.core.util;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Identifiable;
 import systems.dmx.core.JSONEnabled;
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.RoleModel;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.osgi.CoreActivator;
 import systems.dmx.core.service.CoreService;
@@ -146,6 +146,34 @@ public class DMXUtils {
             array.put(item.toJSON());
         }
         return array;
+    }
+
+
+
+    // *****************
+    // *** Traversal ***
+    // *****************
+
+
+
+    /**
+     * Finds all parent topics of the given topic by traversing along the child->parent relationship.
+     * Only the leaves are returned.
+     * <p>
+     * If the given topic has no parent topic the returned list contains only the given topic.
+     */
+    public static List<Topic> getParentTopics(Topic topic) {
+        List<Topic> parentTopics = new ArrayList();
+        List<RelatedTopic> _parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child", "dmx.core.parent",
+            null);
+        if (_parentTopics.isEmpty()) {
+            parentTopics.add(topic);
+        } else {
+            for (Topic _topic : _parentTopics) {
+                parentTopics.addAll(getParentTopics(_topic));
+            }
+        }
+        return parentTopics;
     }
 
 
