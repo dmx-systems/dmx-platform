@@ -28,6 +28,8 @@ L.Icon.Default.mergeOptions({
     shadowUrl:     require('leaflet/dist/images/marker-shadow.png')
 })
 
+let popup
+
 export default {
 
   created () {
@@ -84,9 +86,10 @@ export default {
   methods: {
 
     popupOpen (geoCoordId, event) {
-      console.log('popupOpen', geoCoordId, event.popup)
-      this.domainTopic = undefined
-      this.domainTopics = []
+      // console.log('popupOpen', geoCoordId, event.popup)
+      popup = event.popup
+      this.domainTopic = undefined    // clear popup
+      this.domainTopics = []          // clear popup
       this.loading = true
       dm5.restClient.getDomainTopics(geoCoordId).then(topics => {
         // console.log('domain topic', topic)
@@ -98,6 +101,7 @@ export default {
         default:
           this.domainTopics = topics
           this.loading = false
+          this.updatePopup()
         }
       })
     },
@@ -107,7 +111,19 @@ export default {
       dm5.restClient.getTopic(topic.id, true, true).then(topic => {
         this.domainTopic = topic
         this.loading = false
+        this.updatePopup()
       })
+    },
+
+    updatePopup () {
+      setTimeout(() => popup.update(), 300)
+      /* does not work
+      this.$nextTick()
+        .then(() => {
+          console.log('showDetail', popup)
+          popup.update()
+        })
+      */
     },
 
     latLng (geoCoordTopic) {
