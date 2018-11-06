@@ -67,14 +67,8 @@ export default {
 
   computed: {
     geoCoordTopics () {
-      // Note: the geomap renderer might be unavailable while renderer switching (see topicmap-panel.js)
-      const renderer = this.$store.state['dmx.geomaps.geomap_renderer']
-      if (!renderer) {
-        // console.log('Geomap renderer not available')
-        return
-      }
       // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
-      const geomap = renderer.geomap
+      const geomap = this.$store.state.geomaps.geomap
       if (!geomap) {
         // console.log('Geomap not available')
         return

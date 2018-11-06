@@ -1,9 +1,5 @@
 import dm5 from 'dm5'
 
-const state = {
-  geomap: undefined       // the rendered geomap (dm5.Geomap)
-}
-
 const actions = {
 
   fetchTopicmap (_, id) {
@@ -11,12 +7,11 @@ const actions = {
     return dm5.restClient.getGeomap(id)
   },
 
-  renderTopicmap (_, {topicmap, writable, selection}) {
-    state.geomap = topicmap
+  renderTopicmap ({rootState}, {topicmap, writable, selection}) {
+    rootState.geomaps.geomap = topicmap
   }
 }
 
 export default {
-  state,
   actions
 }
