@@ -8,7 +8,7 @@ import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Inject;
 import systems.dmx.core.service.event.PreCreateAssociationListener;
 import systems.dmx.core.util.DMXUtils;
-import systems.dmx.time.TimeService;
+import systems.dmx.timestamps.TimestampsService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,7 +29,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
-    private TimeService timeService;
+    private TimestampsService timestampsService;
 
     private static final Logger logger = Logger.getLogger(EventsPlugin.class.getName());
 
@@ -80,7 +80,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
             long eventId = roles[0].getPlayerId();
             Topic event = dmx.getTopic(eventId);
             event.getChildTopics().getTopic("dmx.contacts.address").getRelatingAssociation().delete();
-            timeService.setModified(event);
+            timestampsService.setModified(event);
         }
     }
 }

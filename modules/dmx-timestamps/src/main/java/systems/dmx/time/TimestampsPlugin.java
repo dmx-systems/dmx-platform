@@ -1,4 +1,4 @@
-package systems.dmx.time;
+package systems.dmx.timestamps;
 
 import systems.dmx.core.Association;
 import systems.dmx.core.DMXObject;
@@ -41,14 +41,14 @@ import java.util.logging.Logger;
 @Path("/time")
 @Consumes("application/json")
 @Produces("application/json")
-public class TimePlugin extends PluginActivator implements TimeService, PostCreateTopicListener,
-                                                                        PostCreateAssociationListener,
-                                                                        PostUpdateTopicListener,
-                                                                        PostUpdateTopicRequestListener,
-                                                                        PostUpdateAssociationListener,
-                                                                        PreSendTopicListener,
-                                                                        PreSendAssociationListener,
-                                                                        ServiceResponseFilterListener {
+public class TimestampsPlugin extends PluginActivator implements TimestampsService, PostCreateTopicListener,
+                                                                                    PostCreateAssociationListener,
+                                                                                    PostUpdateTopicListener,
+                                                                                    PostUpdateTopicRequestListener,
+                                                                                    PostUpdateAssociationListener,
+                                                                                    PreSendTopicListener,
+                                                                                    PreSendAssociationListener,
+                                                                                    ServiceResponseFilterListener {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -67,9 +67,9 @@ public class TimePlugin extends PluginActivator implements TimeService, PostCrea
 
 
 
-    // **********************************
-    // *** TimeService Implementation ***
-    // **********************************
+    // ****************************************
+    // *** TimestampsService Implementation ***
+    // ****************************************
 
 
 

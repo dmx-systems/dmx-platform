@@ -1,3 +1,4 @@
+// This is dead DM4 code. TODO: adapt to DM5
 dm4c.add_plugin("systems.dmx.help", function() {
 
     dm4c.toolbar.special_menu.add_item({

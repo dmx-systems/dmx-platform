@@ -1,4 +1,4 @@
-package systems.dmx.time;
+package systems.dmx.timestamps;
 
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 
 
-public class TimeTest {
+public class TimestampsTest {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

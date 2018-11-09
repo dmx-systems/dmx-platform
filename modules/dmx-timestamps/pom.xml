@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DMX Time</name>
+    <name>DMX Timestamps</name>
     <groupId>systems.dmx</groupId>
-    <artifactId>dmx-time</artifactId>
+    <artifactId>dmx-timestamps</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
@@ -25,7 +25,7 @@
                 <configuration>
                     <instructions>
                         <Bundle-Activator>
-                            systems.dmx.time.TimePlugin
+                            systems.dmx.timestamps.TimestampsPlugin
                         </Bundle-Activator>
                     </instructions>
                 </configuration>

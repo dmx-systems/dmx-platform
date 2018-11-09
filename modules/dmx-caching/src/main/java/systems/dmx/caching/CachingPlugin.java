@@ -1,6 +1,6 @@
 package systems.dmx.caching;
 
-import systems.dmx.time.TimeService;
+import systems.dmx.timestamps.TimestampsService;
 
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.osgi.PluginActivator;
@@ -41,7 +41,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     @Inject
-    private TimeService timeService;
+    private TimestampsService timestampsService;
 
     @Context
     HttpServletRequest req;
@@ -64,11 +64,11 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
     public void serviceRequestFilter(ContainerRequest request) {
         long objectId = requestObjectId(request);
         if (objectId != -1) {
-            if (timeService == null) {
+            if (timestampsService == null) {
                 throw new RuntimeException("Time service is not available");
             }
             //
-            long time = timeService.getModificationTime(objectId);
+            long time = timestampsService.getModificationTime(objectId);
             Response.ResponseBuilder builder = request.evaluatePreconditions(new Date(time));
             if (builder != null) {
                 Response response = builder.build();
@@ -116,7 +116,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
     // ---
 
-    // ### FIXME: copy in TimePlugin
+    // ### FIXME: copy in TimestampsPlugin
     private DMXObject responseObject(ContainerResponse response) {
         Object entity = response.getEntity();
         return entity instanceof DMXObject ? (DMXObject) entity : null;
@@ -126,7 +126,7 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
         setHeader(response, HEADER_CACHE_CONTROL, value);
     }
 
-    // ### FIXME: copy in TimePlugin
+    // ### FIXME: copy in TimestampsPlugin
     private void setHeader(ContainerResponse response, String header, String value) {
         MultivaluedMap headers = response.getHttpHeaders();
         //

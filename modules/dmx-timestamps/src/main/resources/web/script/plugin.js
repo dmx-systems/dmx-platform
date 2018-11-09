@@ -1,4 +1,5 @@
-dm4c.add_plugin("systems.dmx.time", function() {
+// This is dead DM4 code. TODO: adapt to DM5
+dm4c.add_plugin("systems.dmx.timestamps", function() {
 
     // === REST Client Extension ===
 

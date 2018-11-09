@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>systems.dmx</groupId>
-            <artifactId>dmx-time</artifactId>
+            <artifactId>dmx-timestamps</artifactId>
             <version>5.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

@@ -1,4 +1,4 @@
-package systems.dmx.time;
+package systems.dmx.timestamps;
 
 import systems.dmx.core.Association;
 import systems.dmx.core.DMXObject;
@@ -8,7 +8,7 @@ import java.util.Collection;
 
 
 
-public interface TimeService {
+public interface TimestampsService {
 
     // === Timestamps ===
 

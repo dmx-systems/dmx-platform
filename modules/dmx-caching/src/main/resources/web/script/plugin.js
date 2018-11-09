@@ -1,3 +1,4 @@
+// This is dead DM4 code. TODO: adapt to DM5
 dm4c.add_plugin("systems.dmx.caching", function() {
 
     var CACHABLE_PATH = /^\/core\/(topic|association)\/(\d+)(\?.*)?$/
