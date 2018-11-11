@@ -514,7 +514,7 @@ public class Neo4jStorage implements DMXStorage {
 
     @Override
     public void indexAssociationProperty(long assocId, String propUri, Object propValue) {
-        storeAndIndexExactValue(fetchAssociationNode(assocId), propUri, propValue, assocContentExact);
+        indexExactValue(fetchAssociationNode(assocId), propUri, propValue, assocContentExact);
     }
 
     // ---
