@@ -1,17 +1,15 @@
 <template>
-  <div class="dm5-geomap-renderer">
-    <l-map :center="center" :zoom="zoom" :options="options">
-      <l-tile-layer :url="url"></l-tile-layer>
-      <l-marker v-for="topic in geoCoordTopics" :lat-lng="latLng(topic)" :key="topic.id"
-          @popupopen="popupOpen(topic.id, $event)">
-        <l-popup v-loading="loading">
-          <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
-          </dm5-object-renderer>
-          <dm5-topic-list v-else :topics="domainTopics" no-sort-menu @topic-click="showDetails"></dm5-topic-list>
-        </l-popup>
-      </l-marker>
-    </l-map>
-  </div>
+  <l-map class="dm5-geomap-renderer" :center="center" :zoom="zoom" :options="options">
+    <l-tile-layer :url="url"></l-tile-layer>
+    <l-marker v-for="topic in geoCoordTopics" :lat-lng="latLng(topic)" :key="topic.id"
+        @popupopen="popupOpen(topic.id, $event)">
+      <l-popup v-loading="loading">
+        <dm5-object-renderer v-if="domainTopic" :object="domainTopic" :quill-config="quillConfig">
+        </dm5-object-renderer>
+        <dm5-topic-list v-else :topics="domainTopics" no-sort-menu @topic-click="showDetails"></dm5-topic-list>
+      </l-popup>
+    </l-marker>
+  </l-map>
 </template>
 
 <script>
@@ -137,10 +135,6 @@ export default {
 </script>
 
 <style>
-.dm5-geomap-renderer {
-  height: 100%;
-}
-
 /* Leaflet overrides */
 
 .leaflet-container {

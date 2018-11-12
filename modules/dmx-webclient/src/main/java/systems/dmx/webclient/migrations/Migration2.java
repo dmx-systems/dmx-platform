@@ -17,13 +17,13 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dmx.core.meta_type",   "\uf111");
-        addIconToTopicType("dmx.core.topic_type",  "\uf111");
-        addIconToTopicType("dmx.core.assoc_type",  "\uf111");
-        addIconToTopicType("dmx.core.data_type",   "\uf111");
-        addIconToTopicType("dmx.core.cardinality", "\uf111");
-        addIconToTopicType("dmx.core.index_mode",  "\uf111");
-        addIconToTopicType("dmx.core.plugin",      "\uf12e");
+        addIconToTopicType("dmx.core.meta_type",   "\uf10c");       // fa-circle-o
+        addIconToTopicType("dmx.core.topic_type",  "\uf10c");       // fa-circle-o
+        addIconToTopicType("dmx.core.assoc_type",  "\uf192");       // fa-dot-circle-o
+        addIconToTopicType("dmx.core.data_type",   "\uf10c");       // fa-circle-o
+        addIconToTopicType("dmx.core.cardinality", "\uf10c");       // fa-circle-o
+        addIconToTopicType("dmx.core.index_mode",  "\uf10c");       // fa-circle-o
+        addIconToTopicType("dmx.core.plugin",      "\uf12e");       // fa-puzzle-piece
         //
         // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
         // Update: this is because HSB is not the same as HSL. The values here are actually HSB, but CSS expects HSL.
