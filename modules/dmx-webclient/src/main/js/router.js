@@ -205,7 +205,7 @@ function initialNavigation (route) {
         if (urlPresent) {
           // Note: 'displayTopicmap' relies on the topicmap topics in order to tell what topicmap renderer to use
           const p = store.dispatch('displayTopicmap', topicmapId)     // no route push
-          topicId && fetchTopic(topicId, p)                           // FIXME: 0 is a valid topic ID
+          topicId !== undefined && fetchTopic(topicId, p)             // Note: 0 is a valid topic ID
           assocId && fetchAssoc(assocId, p)
         } else {
           // Note: when the topicmap changes '_selectWorkspace' is dispatched again (see navigate() below).
