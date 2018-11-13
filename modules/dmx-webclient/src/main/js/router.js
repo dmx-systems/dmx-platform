@@ -254,7 +254,7 @@ function navigate (to, from) {
   const assocId = id(to.params.assocId)
   const oldTopicId = id(from.params.topicId)
   const oldAssocId = id(from.params.assocId)
-  const oldId = oldTopicId || oldAssocId
+  const oldId = oldAssocId || oldTopicId        // Note: oldAssocId is checked first as oldId must be a number
   const topicChanged = topicId !== oldTopicId
   const assocChanged = assocId !== oldAssocId
   if (topicChanged && topicId !== undefined) {                                  // Note: 0 is a valid topic ID
