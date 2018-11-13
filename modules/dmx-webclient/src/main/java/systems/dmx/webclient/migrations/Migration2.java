@@ -25,7 +25,7 @@ public class Migration2 extends Migration {
         addIconToTopicType("dmx.core.index_mode",  "\uf10c");       // fa-circle-o
         addIconToTopicType("dmx.core.plugin",      "\uf12e");       // fa-puzzle-piece
         // colors match dm5-color-picker
-        // Note: color value columns are not aligned by extra spaces. Cytoscape style parsing would fail.
+        // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
         addColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 80%)");
         addColorToAssociationType("dmx.core.composition",     "hsl(10, 80%, 50%)");
         addColorToAssociationType("dmx.core.composition_def", "hsl(230, 80%, 50%)");

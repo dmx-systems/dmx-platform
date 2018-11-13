@@ -257,13 +257,13 @@ function navigate (to, from) {
   const oldId = oldTopicId || oldAssocId
   const topicChanged = topicId !== oldTopicId
   const assocChanged = assocId !== oldAssocId
-  if (topicChanged && topicId) {                                    // FIXME: 0 is a valid topic ID
+  if (topicChanged && topicId !== undefined) {                                  // Note: 0 is a valid topic ID
     fetchTopic(topicId, p)
   }
   if (assocChanged && assocId) {
     fetchAssoc(assocId, p)
   }
-  if ((topicChanged || assocChanged) && !topicId && !assocId) {     // FIXME: 0 is a valid topic ID
+  if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {    // Note: 0 is a valid topic ID
     // detail panel
     store.dispatch('emptyDisplay')
     // topicmap panel
@@ -341,6 +341,6 @@ function id (v) {
   } else if (typeof v === 'string') {
     return Number(v)
   } else if (v !== undefined && v !== null) {
-    throw Error(`id() expects one of [number|string|undefined|null], but got ${v}`)
+    throw Error(`id() expects one of [number|string|undefined|null], got ${v}`)
   }
 }
