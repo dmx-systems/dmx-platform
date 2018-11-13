@@ -24,14 +24,12 @@ public class Migration2 extends Migration {
         addIconToTopicType("dmx.core.cardinality", "\uf10c");       // fa-circle-o
         addIconToTopicType("dmx.core.index_mode",  "\uf10c");       // fa-circle-o
         addIconToTopicType("dmx.core.plugin",      "\uf12e");       // fa-puzzle-piece
-        //
-        // Note: on the canvas HSL-specified colors are rendered pale (Safari and Firefox).
-        // Update: this is because HSB is not the same as HSL. The values here are actually HSB, but CSS expects HSL.
-        addColorToAssociationType("dmx.core.association",     "rgb(178, 178, 178)" /*"hsl(  0,  0%, 75%)"*/);
-        addColorToAssociationType("dmx.core.composition",     "rgb(231, 62, 60)"   /*"hsl(  0, 65%, 90%)"*/);
-        addColorToAssociationType("dmx.core.composition_def", "rgb(184, 51, 49)"   /*"hsl(  0, 65%, 75%)"*/);
-        addColorToAssociationType("dmx.core.instantiation",   "rgb(41, 194, 225)"  /*"hsl(190, 65%, 90%)"*/);
-        addColorToAssociationType("dmx.core.sequence",        "rgb(228, 223, 55)"  /*"hsl( 60, 65%, 90%)"*/);
+        // colors match dm5-color-picker
+        addColorToAssociationType("dmx.core.association",     "hsl(  0,  0%, 80%)");
+        addColorToAssociationType("dmx.core.composition",     "hsl( 10, 80%, 50%)");
+        addColorToAssociationType("dmx.core.composition_def", "hsl(230, 80%, 50%)");
+        addColorToAssociationType("dmx.core.instantiation",   "hsl(180, 80%, 50%)");
+        addColorToAssociationType("dmx.core.sequence",        "hsl( 60, 80%, 50%)");
         //
         AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
         compDef.getAssocDef("dmx.core.cardinality")
