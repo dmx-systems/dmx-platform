@@ -27,10 +27,10 @@ public class Migration2 extends Migration {
         // colors match dm5-color-picker
         // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
         addColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 80%)");
-        addColorToAssociationType("dmx.core.composition",     "hsl(10, 80%, 50%)");
-        addColorToAssociationType("dmx.core.composition_def", "hsl(230, 80%, 50%)");
-        addColorToAssociationType("dmx.core.instantiation",   "hsl(180, 80%, 50%)");
-        addColorToAssociationType("dmx.core.sequence",        "hsl(60, 80%, 50%)");
+        addColorToAssociationType("dmx.core.composition",     "hsl(5, 50%, 55%)");
+        addColorToAssociationType("dmx.core.composition_def", "hsl(210, 50%, 55%)");
+        addColorToAssociationType("dmx.core.instantiation",   "hsl(180, 50%, 55%)");
+        addColorToAssociationType("dmx.core.sequence",        "hsl(60, 70%, 55%)");
         //
         AssociationType compDef = dmx.getAssociationType("dmx.core.composition_def");
         compDef.getAssocDef("dmx.core.cardinality")

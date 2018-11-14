@@ -32,18 +32,18 @@
       Helvetica Neue, sans-serif;
   --main-font-size: 14px;
   --label-font-size: 12px;
-  --label-color: #909399;       /* see --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
-  --color-topic-icon: #36a;     /* topicmap panel */
-  --color-topic-hover: #36a;    /* topicmap panel */
+  --label-color: #909399;   /* matches --color-text-secondary in element-ui/packages/theme-chalk/src/common/var.scss */
+  --color-topic-icon:  hsl(210, 50%, 55%);    /* matches dm5-color-picker blue */
+  --color-topic-hover: hsl(210, 50%, 55%);    /* matches dm5-color-picker blue */
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
-  --field-spacing: 1.2em;       /* vertical spacing between data fields */
-  --highlight-color: #409eff;         /* see --color-primary */
-  --background-color: #f5f7fa;        /* detail panel background, map topics background, see --background-color-base */
+  --field-spacing: 1.2em;         /* vertical spacing between data fields */
+  --highlight-color: #409eff;     /* matches --color-primary */
+  --background-color: #f5f7fa;    /* detail panel background, map topics background, matches --background-color-base */
   --background-color-darker: #ebeef5;
-  --color-danger: #f56c6c;            /* see --color-danger */
-  --border-color: #dcdfe6;            /* see --border-color-base */
-  --border-color-lighter: #ebeef5;    /* see --border-color-lighter */
+  --color-danger: #f56c6c;                    /* matches --color-danger */
+  --border-color: #dcdfe6;                    /* matches --border-color-base */
+  --border-color-lighter: #ebeef5;            /* matches --border-color-lighter */
   --shadow-hover: inset 0px 0px 0px 1px;
 }
 
