@@ -1,17 +1,12 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.IndexMode;
-import systems.dmx.core.model.RelatedAssociationModel;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.service.ModelFactory;
 import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.core.storage.spi.DMXStorage;
 
-import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -119,20 +114,20 @@ class StorageDecorator {
     // ---
 
     /**
-     * Convenience method (no indexing).
+     * Convenience method (no index value).
      */
-    final void storeTopicValue(long topicId, SimpleValue value) {
-        storeTopicValue(topicId, value, asList(IndexMode.OFF), null, null);
+    final void storeTopicValue(long topicId, SimpleValue value, String indexKey) {
+        storeTopicValue(topicId, value, indexKey, null);
     }
 
     /**
-     * Stores and indexes the topic's value. ### TODO: separate storing/indexing?
+     * Stores and indexes a topic value.
      */
-    final void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
-                                                                                            SimpleValue indexValue) {
-        storage.storeTopicValue(topicId, value, indexModes, indexKey, indexValue);
+    final void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+        storage.storeTopicValue(topicId, value, indexKey, indexValue);
     }
 
+    // TODO: drop it
     final void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
         storage.indexTopicValue(topicId, indexMode, indexKey, indexValue);
     }
@@ -271,20 +266,20 @@ class StorageDecorator {
     // ---
 
     /**
-     * Convenience method (no indexing).
+     * Convenience method (no index value).
      */
-    final void storeAssociationValue(long assocId, SimpleValue value) {
-        storeAssociationValue(assocId, value, asList(IndexMode.OFF), null, null);
+    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey) {
+        storeAssociationValue(assocId, value, indexKey, null);
     }
 
     /**
-     * Stores and indexes the association's value. ### TODO: separate storing/indexing?
+     * Stores and indexes an association value.
      */
-    final void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
-                                                                                               SimpleValue indexValue) {
-        storage.storeAssociationValue(assocId, value, indexModes, indexKey, indexValue);
+    final void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+        storage.storeAssociationValue(assocId, value, indexKey, indexValue);
     }
 
+    // TODO: drop it
     final void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
         storage.indexAssociationValue(assocId, indexMode, indexKey, indexValue);
     }

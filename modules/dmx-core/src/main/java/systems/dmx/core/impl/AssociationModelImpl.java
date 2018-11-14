@@ -224,8 +224,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     @Override
     final void storeSimpleValue() {
-        TypeModel type = getType();
-        pl.storeAssociationValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
+        pl.storeAssociationValue(id, value, getType().getUri(), getIndexValue());
     }
 
     @Override

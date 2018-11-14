@@ -3,7 +3,6 @@ package systems.dmx.core.impl;
 import systems.dmx.core.Association;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
-import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssociationModel;
@@ -568,7 +567,7 @@ public class CoreServiceImpl implements CoreService {
      */
     private void _createTopic(TopicModel model) {
         pl.storeTopic(model);
-        pl.storeTopicValue(model.getId(), model.getSimpleValue());
+        pl.storeTopicValue(model.getId(), model.getSimpleValue(), model.getTypeUri());
     }
 
     /**
@@ -580,6 +579,6 @@ public class CoreServiceImpl implements CoreService {
             mf.newTopicRoleModel(typeUri,     "dmx.core.type"),
             mf.newTopicRoleModel(dataTypeUri, "dmx.core.default"));
         pl.storeAssociation(assoc);
-        pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+        pl.storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
     }
 }

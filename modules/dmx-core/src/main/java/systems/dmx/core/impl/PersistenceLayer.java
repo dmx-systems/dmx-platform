@@ -438,7 +438,7 @@ public final class PersistenceLayer extends StorageDecorator {
                 mf.newTopicRoleModel(topicTypeUri, "dmx.core.type"),
                 mf.newTopicRoleModel(topicId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
             createAssociationInstantiation(assoc.getId(), assoc.getTypeUri());
         } catch (Exception e) {
             throw new RuntimeException("Associating topic " + topicId + " with topic type \"" +
@@ -452,7 +452,7 @@ public final class PersistenceLayer extends StorageDecorator {
                 mf.newTopicRoleModel(assocTypeUri, "dmx.core.type"),
                 mf.newAssociationRoleModel(assocId, "dmx.core.instance"));
             storeAssociation(assoc);   // direct storage calls used here ### explain
-            storeAssociationValue(assoc.getId(), assoc.getSimpleValue());
+            storeAssociationValue(assoc.getId(), assoc.getSimpleValue(), assoc.getTypeUri());
         } catch (Exception e) {
             throw new RuntimeException("Associating association " + assocId + " with association type \"" +
                 assocTypeUri + "\" failed", e);

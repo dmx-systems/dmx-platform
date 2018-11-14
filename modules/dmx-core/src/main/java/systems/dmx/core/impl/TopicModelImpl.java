@@ -113,8 +113,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final void storeSimpleValue() {
-        TypeModel type = getType();
-        pl.storeTopicValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
+        pl.storeTopicValue(id, value, getType().getUri(), getIndexValue());
     }
 
     @Override

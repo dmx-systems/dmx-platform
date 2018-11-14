@@ -64,6 +64,10 @@ public class Neo4jStorage implements DMXStorage {
     private static final String KEY_PLAYER_ID       = "playerId";           // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TYPE_URI = "playerTypeUri";      // "1" or "2" is appended programatically
 
+    private static final List<IndexMode> ALL_INDEX_MODES = asList(
+        IndexMode.KEY, IndexMode.FULLTEXT, IndexMode.FULLTEXT_KEY
+    );
+
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
             GraphDatabaseService neo4j = null;
@@ -188,13 +192,16 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes,
-                                                                 String indexKey, SimpleValue indexValue) {
+    public void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+        if (indexKey == null) {
+            throw new IllegalArgumentException("indexKey must be not null (value=\"" + value + "\")");
+        }
+        //
         Node topicNode = fetchTopicNode(topicId);
         // store
         topicNode.setProperty(KEY_VALUE, value.value());
         // index
-        indexTopicNodeValue(topicNode, indexModes, indexKey, getIndexValue(value, indexValue));
+        indexTopicNodeValue(topicNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
     }
 
     @Override
@@ -314,13 +321,16 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes,
-                                                                       String indexKey, SimpleValue indexValue) {
+    public void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue) {
+        if (indexKey == null) {
+            throw new IllegalArgumentException("indexKey must be not null (value=\"" + value + "\")");
+        }
+        //
         Node assocNode = fetchAssociationNode(assocId);
         // store
         assocNode.setProperty(KEY_VALUE, value.value());
         // index
-        indexAssociationNodeValue(assocNode, indexModes, indexKey, getIndexValue(value, indexValue));
+        indexAssociationNodeValue(assocNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
     }
 
     @Override

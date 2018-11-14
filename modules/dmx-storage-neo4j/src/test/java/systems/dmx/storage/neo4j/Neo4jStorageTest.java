@@ -3,7 +3,6 @@ package systems.dmx.storage.neo4j;
 import systems.dmx.core.impl.ModelFactoryImpl;
 import systems.dmx.core.impl.PersistenceLayer;
 import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
@@ -247,16 +246,15 @@ public class Neo4jStorageTest {
             //
             // Fulltext indexing
             //
-            createTopic("note-1", "dmx.notes.note",
-                "DMX is a platform for collaboration and knowledge management", IndexMode.FULLTEXT, null);
-            createTopic("note-2", "dmx.notes.note",
-                "Lead developer of DMX is Jörg Richter", IndexMode.FULLTEXT, null);
+            createTopic("note-1", "dmx.notes.note", "DMX is a platform for collaboration and knowledge management",
+                null);
+            createTopic("note-2", "dmx.notes.note", "Lead developer of DMX is Jörg Richter", null);
             //
             // Fulltext HTML indexing
             //
             String htmlText = "Java and Oracle is no fun anymore. I'm learning <b>Haskell</b> now.";
-            createTopic("note-3", "dmx.notes.note", htmlText, IndexMode.FULLTEXT, null);
-            createTopic("note-4", "dmx.notes.note", htmlText, IndexMode.FULLTEXT, JavaUtils.stripHTML(htmlText));
+            createTopic("note-3", "dmx.notes.note", htmlText, null);
+            createTopic("note-4", "dmx.notes.note", htmlText, JavaUtils.stripHTML(htmlText));
             //
             // Property indexing
             //
@@ -274,10 +272,10 @@ public class Neo4jStorageTest {
     // ---
 
     private long createTopic(String uri, String typeUri, String value) {
-        return createTopic(uri, typeUri, value, IndexMode.OFF, null);
+        return createTopic(uri, typeUri, value, null);
     }
 
-    private long createTopic(String uri, String typeUri, String value, IndexMode indexMode, String indexValue) {
+    private long createTopic(String uri, String typeUri, String value, String indexValue) {
         TopicModel topic = mf.newTopicModel(uri, typeUri, new SimpleValue(value));
         assertEquals(-1, topic.getId());
         //
@@ -286,7 +284,7 @@ public class Neo4jStorageTest {
         long topicId = topic.getId();
         assertTrue(topicId != -1);
         //
-        storage.storeTopicValue(topicId, topic.getSimpleValue(), asList(indexMode), null,
+        storage.storeTopicValue(topicId, topic.getSimpleValue(), typeUri,
             indexValue != null ? new SimpleValue(indexValue) : null);
         //
         return topicId;
@@ -312,7 +310,7 @@ public class Neo4jStorageTest {
         long assocId = assoc.getId();
         assertTrue(assocId != -1);
         //
-        storage.storeAssociationValue(assocId, new SimpleValue(""), asList(IndexMode.OFF), null, null);
+        storage.storeAssociationValue(assocId, new SimpleValue(""), typeUri, null);
         //
         return assocId;
     }
