@@ -5,16 +5,14 @@
     {
         "topic_types": [
             {
-                "value":          "Phone Label",
-                "uri":            "dmx.contacts.phone_label",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Phone Label",
+                "uri":         "dmx.contacts.phone_label",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Address Label",
-                "uri":            "dmx.contacts.address_label",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Address Label",
+                "uri":         "dmx.contacts.address_label",
+                "dataTypeUri": "dmx.core.text"
             }
         ],
         "assoc_types": [
@@ -68,22 +66,19 @@
             // Person Name
 
             {
-                "value":          "First Name",
-                "uri":            "dmx.contacts.first_name",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "First Name",
+                "uri":         "dmx.contacts.first_name",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Last Name",
-                "uri":            "dmx.contacts.last_name",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Last Name",
+                "uri":         "dmx.contacts.last_name",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Person Name",
-                "uri":            "dmx.contacts.person_name",
-                "dataTypeUri":    "dmx.core.value",
-                "indexModeUris": ["dmx.core.fulltext", "dmx.core.fulltext_key"],
+                "value":       "Person Name",
+                "uri":         "dmx.contacts.person_name",
+                "dataTypeUri": "dmx.core.value",
                 "assocDefs": [
                     {
                         "childTypeUri":        "dmx.contacts.first_name",
@@ -101,81 +96,73 @@
             // Institution Name
 
             {
-                "value":          "Institution Name",
-                "uri":            "dmx.contacts.institution_name",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Institution Name",
+                "uri":         "dmx.contacts.institution_name",
+                "dataTypeUri": "dmx.core.text"
             },
 
             // Phone
 
             {
-                "value":          "Phone",
-                "uri":            "dmx.contacts.phone_number",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Phone",
+                "uri":         "dmx.contacts.phone_number",
+                "dataTypeUri": "dmx.core.text"
             },
 
             // Email Address
 
             {
-                "value":          "Email Address",
-                "uri":            "dmx.contacts.email_address",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Email Address",
+                "uri":         "dmx.contacts.email_address",
+                "dataTypeUri": "dmx.core.text"
             },
 
             // Address
 
             {
-                "value":          "Street",
-                "uri":            "dmx.contacts.street",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Street",
+                "uri":         "dmx.contacts.street",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Postal Code",
-                "uri":            "dmx.contacts.postal_code",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Postal Code",
+                "uri":         "dmx.contacts.postal_code",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "City",
-                "uri":            "dmx.contacts.city",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "City",
+                "uri":         "dmx.contacts.city",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Country",
-                "uri":            "dmx.contacts.country",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+                "value":       "Country",
+                "uri":         "dmx.contacts.country",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Address",
-                "uri":            "dmx.contacts.address",
-                "dataTypeUri":    "dmx.core.value",
-                "indexModeUris": ["dmx.core.fulltext", "dmx.core.fulltext_key"],
+                "value":       "Address",
+                "uri":         "dmx.contacts.address",
+                "dataTypeUri": "dmx.core.value",
                 "assocDefs": [
                     {
-                        "childTypeUri":         "dmx.contacts.street",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "includeInLabel":       true
+                        "childTypeUri":        "dmx.contacts.street",
+                        "childCardinalityUri": "dmx.core.one",
+                        "includeInLabel":      true
                     },
                     {
-                        "childTypeUri":         "dmx.contacts.postal_code",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "includeInLabel":       true
+                        "childTypeUri":        "dmx.contacts.postal_code",
+                        "childCardinalityUri": "dmx.core.one",
+                        "includeInLabel":      true
                     },
                     {
-                        "childTypeUri":         "dmx.contacts.city",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "includeInLabel":       true
+                        "childTypeUri":        "dmx.contacts.city",
+                        "childCardinalityUri": "dmx.core.one",
+                        "includeInLabel":      true
                     },
                     {
-                        "childTypeUri":         "dmx.contacts.country",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "includeInLabel":       true
+                        "childTypeUri":        "dmx.contacts.country",
+                        "childCardinalityUri": "dmx.core.one",
+                        "includeInLabel":      true
                     }
                 ]
             },
@@ -183,19 +170,17 @@
             // Notes
 
             {
-                "value":          "Notes",
-                "uri":            "dmx.contacts.notes",
-                "dataTypeUri":    "dmx.core.html",
-                "indexModeUris": ["dmx.core.fulltext"]
+                "value":       "Notes",
+                "uri":         "dmx.contacts.notes",
+                "dataTypeUri": "dmx.core.html"
             },
 
             // Person
 
             {
-                "value":          "Person",
-                "uri":            "dmx.contacts.person",
-                "dataTypeUri":    "dmx.core.identity",
-                "indexModeUris": ["dmx.core.fulltext"],
+                "value":       "Person",
+                "uri":         "dmx.contacts.person",
+                "dataTypeUri": "dmx.core.identity",
                 "assocDefs": [
                     {
                         "childTypeUri":        "dmx.contacts.person_name",
@@ -242,7 +227,6 @@
                 "value":       "Institution",
                 "uri":         "dmx.contacts.institution",
                 "dataTypeUri": "dmx.core.identity",
-                "indexModeUris": ["dmx.core.fulltext"],
                 "assocDefs": [
                     {
                         "childTypeUri":        "dmx.contacts.institution_name",

@@ -7,10 +7,9 @@
         // User Account
 
         {
-            "value":          "Username",
-            "uri":            "dmx.accesscontrol.username",
-            "dataTypeUri":    "dmx.core.text",
-            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"],
+            "value":       "Username",
+            "uri":         "dmx.accesscontrol.username",
+            "dataTypeUri": "dmx.core.text",
             "viewConfigTopics": [
                 {
                     "typeUri": "dmx.webclient.view_config",
@@ -35,10 +34,9 @@
             ]
         },
         {
-            "value":          "User Account",
-            "uri":            "dmx.accesscontrol.user_account",
-            "dataTypeUri":    "dmx.core.identity",
-            "indexModeUris": ["dmx.core.key"],
+            "value":       "User Account",
+            "uri":         "dmx.accesscontrol.user_account",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.accesscontrol.username",

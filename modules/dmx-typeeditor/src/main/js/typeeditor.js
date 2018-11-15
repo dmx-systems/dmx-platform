@@ -30,7 +30,6 @@ const defaultTopicType = name => ({
   // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
   value: name,
   dataTypeUri: 'dmx.core.text',
-  indexModeUris: ['dmx.core.key', 'dmx.core.fulltext', 'dmx.core.fulltext_key'],
   viewConfigTopics: [{
     typeUri: 'dmx.webclient.view_config',
     childs: {
@@ -43,6 +42,5 @@ const defaultAssocType = name => ({
   // Note: a new type gets its default URI at server-side.
   // Also "typeUri" is provided at server-side (see ModelFactoryImpl).
   value: name,
-  dataTypeUri: 'dmx.core.text',
-  indexModeUris: ['dmx.core.key', 'dmx.core.fulltext', 'dmx.core.fulltext_key']
+  dataTypeUri: 'dmx.core.text'
 })

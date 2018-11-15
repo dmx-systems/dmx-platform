@@ -30,16 +30,14 @@
         "topic_types": [
             # Event
             {
-                "value":          "Title",
-                "uri":            "dmx.events.title",
-                "dataTypeUri":    "dmx.core.text",
-                "indexModeUris": ["dmx.core.fulltext"]
+                "value":       "Title",
+                "uri":         "dmx.events.title",
+                "dataTypeUri": "dmx.core.text"
             },
             {
-                "value":          "Notes",
-                "uri":            "dmx.events.notes",
-                "dataTypeUri":    "dmx.core.html",
-                "indexModeUris": ["dmx.core.fulltext"]
+                "value":       "Notes",
+                "uri":         "dmx.events.notes",
+                "dataTypeUri": "dmx.core.html"
             },
             {
                 "value":       "Event",
@@ -47,30 +45,30 @@
                 "dataTypeUri": "dmx.core.identity",
                 "assocDefs": [
                     {
-                        "childTypeUri":         "dmx.events.title",
-                        "childCardinalityUri":  "dmx.core.one"
+                        "childTypeUri":        "dmx.events.title",
+                        "childCardinalityUri": "dmx.core.one"
                     },
                     {
-                        "childTypeUri":         "dmx.datetime",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "customAssocTypeUri":   "dmx.events.from"
+                        "childTypeUri":        "dmx.datetime",
+                        "childCardinalityUri": "dmx.core.one",
+                        "customAssocTypeUri":  "dmx.events.from"
                     },
                     {
-                        "childTypeUri":         "dmx.datetime",
-                        "childCardinalityUri":  "dmx.core.one",
-                        "customAssocTypeUri":   "dmx.events.to"
+                        "childTypeUri":        "dmx.datetime",
+                        "childCardinalityUri": "dmx.core.one",
+                        "customAssocTypeUri":  "dmx.events.to"
                     },
                     {
-                        "childTypeUri":         "dmx.contacts.address",
-                        "childCardinalityUri":  "dmx.core.one"
+                        "childTypeUri":        "dmx.contacts.address",
+                        "childCardinalityUri": "dmx.core.one"
                     },
                     {
-                        "childTypeUri":         "dmx.events.notes",
-                        "childCardinalityUri":  "dmx.core.one"
+                        "childTypeUri":        "dmx.events.notes",
+                        "childCardinalityUri": "dmx.core.one"
                     },
                     {
-                        "childTypeUri":         "dmx.webbrowser.url",
-                        "childCardinalityUri":  "dmx.core.one"
+                        "childTypeUri":        "dmx.webbrowser.url",
+                        "childCardinalityUri": "dmx.core.one"
                     }
                 ],
                 "viewConfigTopics": [

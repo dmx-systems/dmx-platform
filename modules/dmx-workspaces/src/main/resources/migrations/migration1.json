@@ -7,16 +7,14 @@
         // Workspace ###
 
         {
-            "value":          "Workspace Name",
-            "uri":            "dmx.workspaces.name",
-            "dataTypeUri":    "dmx.core.text",
-            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext", "dmx.core.fulltext_key"]
+            "value":       "Workspace Name",
+            "uri":         "dmx.workspaces.name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value":          "Notes",
-            "uri":            "dmx.workspaces.notes",
-            "dataTypeUri":    "dmx.core.html",
-            "indexModeUris": ["dmx.core.key", "dmx.core.fulltext"]
+            "value":       "Notes",
+            "uri":         "dmx.workspaces.notes",
+            "dataTypeUri": "dmx.core.html"
         },
         {
             "value":       "Workspace",
@@ -47,8 +45,8 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dmx.workspaces.workspace",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.workspaces.workspace",
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ]
         }
