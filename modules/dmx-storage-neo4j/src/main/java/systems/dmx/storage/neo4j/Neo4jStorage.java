@@ -3,7 +3,6 @@ package systems.dmx.storage.neo4j;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
@@ -64,7 +63,13 @@ public class Neo4jStorage implements DMXStorage {
     private static final String KEY_PLAYER_ID       = "playerId";           // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TYPE_URI = "playerTypeUri";      // "1" or "2" is appended programatically
 
-    // TODO: drop it
+    // Note: URIs, type URIs, and properties are only KEY indexed.
+    // Topic/assoc values are indexed using all 3 modes.
+
+    private enum IndexMode {
+        KEY, FULLTEXT, FULLTEXT_KEY;
+    }
+
     private static final List<IndexMode> ALL_INDEX_MODES = asList(
         IndexMode.KEY, IndexMode.FULLTEXT, IndexMode.FULLTEXT_KEY
     );
@@ -620,6 +625,7 @@ public class Neo4jStorage implements DMXStorage {
      * <code>IndexMode.KEY</code> is used for indexing.
      * <p>
      * Used for URIs, type URIs, and properties.
+     * Note: for URIs and type URIs indexing is mandatory, for properties indexing is optional.
      *
      * @param   node        a topic node, or an association node.
      * @param   exactIndex  the index to add the value to. If <code>null</code> no indexing is performed.
@@ -633,6 +639,14 @@ public class Neo4jStorage implements DMXStorage {
         }
     }
 
+    /**
+     * Indexes a node value under the specified key. <code>IndexMode.KEY</code> is used.
+     * <p>
+     * Used for URIs, type URIs, and properties.
+     *
+     * @param   node        a topic node, or an association node.
+     * @param   exactIndex  the index to use. Must not be <code>null</code>.
+     */
     private void indexExactValue(Node node, String key, Object value, Index<Node> exactIndex) {
         // Note: numbers are indexed numerically to allow range queries.
         if (value instanceof Number) {
@@ -665,9 +679,7 @@ public class Neo4jStorage implements DMXStorage {
     private void indexNodeValue(Node node, Object value, List<IndexMode> indexModes, String indexKey,
                                                          Index<Node> exactIndex, Index<Node> fulltextIndex) {
         for (IndexMode indexMode : indexModes) {
-            if (indexMode == IndexMode.OFF) {
-                return;
-            } else if (indexMode == IndexMode.KEY) {
+            if (indexMode == IndexMode.KEY) {
                 exactIndex.remove(node, indexKey);              // remove old
                 exactIndex.add(node, indexKey, value);          // index new
             } else if (indexMode == IndexMode.FULLTEXT) {
