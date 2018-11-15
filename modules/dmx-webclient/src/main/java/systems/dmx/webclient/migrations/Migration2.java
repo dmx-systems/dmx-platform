@@ -17,13 +17,10 @@ public class Migration2 extends Migration {
 
     @Override
     public void run() {
-        addIconToTopicType("dmx.core.meta_type",   "\uf10c");       // fa-circle-o
-        addIconToTopicType("dmx.core.topic_type",  "\uf10c");       // fa-circle-o
-        addIconToTopicType("dmx.core.assoc_type",  "\uf192");       // fa-dot-circle-o
-        addIconToTopicType("dmx.core.data_type",   "\uf10c");       // fa-circle-o
-        addIconToTopicType("dmx.core.cardinality", "\uf10c");       // fa-circle-o
-        addIconToTopicType("dmx.core.index_mode",  "\uf10c");       // fa-circle-o
-        addIconToTopicType("dmx.core.plugin",      "\uf12e");       // fa-puzzle-piece
+        addIconToTopicType("dmx.core.meta_type",  "\uf10c");    // fa-circle-o
+        addIconToTopicType("dmx.core.topic_type", "\uf10c");    // fa-circle-o
+        addIconToTopicType("dmx.core.assoc_type", "\uf192");    // fa-dot-circle-o
+        addIconToTopicType("dmx.core.plugin",     "\uf12e");    // fa-puzzle-piece
         // colors match dm5-color-picker
         // Note: color values are not aligned by extra spaces. Cytoscape style parsing would fail.
         addColorToAssociationType("dmx.core.association",     "hsl(0, 0%, 80%)");

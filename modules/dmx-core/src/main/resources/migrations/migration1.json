@@ -19,11 +19,6 @@
             "value":       "Cardinality",
             "uri":         "dmx.core.cardinality",
             "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Index Mode",
-            "uri":         "dmx.core.index_mode",
-            "dataTypeUri": "dmx.core.text"
         }
     ],
 
@@ -168,29 +163,6 @@
             "value":   "Many",
             "uri":     "dmx.core.many",
             "typeUri": "dmx.core.cardinality"
-        },
-
-        // Index Modes
-
-        {
-            "value":   "Off",
-            "uri":     "dmx.core.off",
-            "typeUri": "dmx.core.index_mode"
-        },
-        {
-            "value":   "Key",
-            "uri":     "dmx.core.key",
-            "typeUri": "dmx.core.index_mode"
-        },
-        {
-            "value":   "Fulltext",
-            "uri":     "dmx.core.fulltext",
-            "typeUri": "dmx.core.index_mode"
-        },
-        {
-            "value":   "Fulltext Key",
-            "uri":     "dmx.core.fulltext_key",
-            "typeUri": "dmx.core.index_mode"
         }
     ]
 }

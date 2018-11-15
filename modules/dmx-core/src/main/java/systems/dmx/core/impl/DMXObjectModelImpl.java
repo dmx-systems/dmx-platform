@@ -285,7 +285,6 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     /**
      * Stores and indexes the simple value of this object model.
-     * Determines the index key and index modes.
      */
     void storeSimpleValue() {
         throw new UnsupportedOperationException();
