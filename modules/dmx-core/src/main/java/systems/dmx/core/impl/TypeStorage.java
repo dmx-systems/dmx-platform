@@ -1,20 +1,15 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.util.DMXUtils;
 
-import static java.util.Arrays.asList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -101,13 +96,11 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, topicTypeUri, "topic type").getUri();
-            List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
-            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, null);   // viewConfig=null
-            putInTypeCache(topicType);
+            TopicTypeModelImpl topicType = mf.newTopicTypeModel(typeTopic, dataTypeUri, assocDefs, null);
+            putInTypeCache(topicType);                                                             // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
@@ -134,13 +127,11 @@ class TypeStorage {
             //
             // fetch type-specific parts
             String dataTypeUri = fetchDataTypeTopic(typeId, assocTypeUri, "association type").getUri();
-            List<IndexMode> indexModes = fetchIndexModes(typeId);
             List<AssociationDefinitionModel> assocDefs = fetchAssociationDefinitions(typeTopic);
             //
             // create and cache type model
-            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, indexModes,
-                assocDefs, null);   // viewConfig=null
-            putInTypeCache(assocType);
+            AssociationTypeModelImpl assocType = mf.newAssociationTypeModel(typeTopic, dataTypeUri, assocDefs, null);
+            putInTypeCache(assocType);                                                                // viewConfig=null
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
@@ -193,7 +184,6 @@ class TypeStorage {
         //
         // 2) store type-specific parts
         storeDataType(type.getUri(), type.getDataTypeUri());
-        storeIndexModes(type.getUri(), type.getIndexModes());
         storeAssocDefs(type.getId(), type.getAssocDefs());
         storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
     }
@@ -231,33 +221,6 @@ class TypeStorage {
             throw new RuntimeException("Associating type \"" + typeUri + "\" with data type \"" + dataTypeUri +
                 "\" failed", e);
         }
-    }
-
-
-
-    // === Index Modes ===
-
-    // --- Fetch ---
-
-    private List<IndexMode> fetchIndexModes(long typeId) {
-        List<RelatedTopicModelImpl> indexModes = pl.fetchTopicRelatedTopics(typeId, "dmx.core.composition",
-            "dmx.core.type", "dmx.core.default", "dmx.core.index_mode");
-        return IndexMode.fromTopics(indexModes);
-    }
-
-    // --- Store ---
-
-    private void storeIndexModes(String typeUri, List<IndexMode> indexModes) {
-        for (IndexMode indexMode : indexModes) {
-            storeIndexMode(typeUri, indexMode);
-        }
-    }
-
-    void storeIndexMode(String typeUri, IndexMode indexMode) {
-        pl.createAssociation("dmx.core.composition",
-            mf.newTopicRoleModel(typeUri,           "dmx.core.type"),
-            mf.newTopicRoleModel(indexMode.toUri(), "dmx.core.default")
-        );
     }
 
 

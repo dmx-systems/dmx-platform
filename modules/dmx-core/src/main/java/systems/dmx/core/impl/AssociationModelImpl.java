@@ -3,7 +3,6 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.TypeModel;
@@ -225,11 +224,6 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
     @Override
     final void storeSimpleValue() {
         pl.storeAssociationValue(id, value, getType().getUri(), getIndexValue());
-    }
-
-    @Override
-    final void indexSimpleValue(IndexMode indexMode) {
-        pl.indexAssociationValue(id, indexMode, typeUri, getIndexValue());
     }
 
     @Override

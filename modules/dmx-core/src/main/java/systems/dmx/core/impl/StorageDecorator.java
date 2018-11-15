@@ -1,7 +1,6 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -125,11 +124,6 @@ class StorageDecorator {
      */
     final void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue) {
         storage.storeTopicValue(topicId, value, indexKey, indexValue);
-    }
-
-    // TODO: drop it
-    final void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
-        storage.indexTopicValue(topicId, indexMode, indexKey, indexValue);
     }
 
     // ---
@@ -277,11 +271,6 @@ class StorageDecorator {
      */
     final void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue) {
         storage.storeAssociationValue(assocId, value, indexKey, indexValue);
-    }
-
-    // TODO: drop it
-    final void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
-        storage.indexAssociationValue(assocId, indexMode, indexKey, indexValue);
     }
 
     // ---

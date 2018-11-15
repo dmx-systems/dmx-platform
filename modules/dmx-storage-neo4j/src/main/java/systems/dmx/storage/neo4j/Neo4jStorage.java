@@ -64,6 +64,7 @@ public class Neo4jStorage implements DMXStorage {
     private static final String KEY_PLAYER_ID       = "playerId";           // "1" or "2" is appended programatically
     private static final String KEY_PLAYER_TYPE_URI = "playerTypeUri";      // "1" or "2" is appended programatically
 
+    // TODO: drop it
     private static final List<IndexMode> ALL_INDEX_MODES = asList(
         IndexMode.KEY, IndexMode.FULLTEXT, IndexMode.FULLTEXT_KEY
     );
@@ -204,11 +205,6 @@ public class Neo4jStorage implements DMXStorage {
         indexTopicNodeValue(topicNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
     }
 
-    @Override
-    public void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
-        indexTopicNodeValue(fetchTopicNode(topicId), asList(indexMode), indexKey, indexValue.value());
-    }
-
     // ---
 
     @Override
@@ -331,11 +327,6 @@ public class Neo4jStorage implements DMXStorage {
         assocNode.setProperty(KEY_VALUE, value.value());
         // index
         indexAssociationNodeValue(assocNode, ALL_INDEX_MODES, indexKey, getIndexValue(value, indexValue));
-    }
-
-    @Override
-    public void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue) {
-        indexAssociationNodeValue(fetchAssociationNode(assocId), asList(indexMode), indexKey, indexValue.value());
     }
 
     @Override

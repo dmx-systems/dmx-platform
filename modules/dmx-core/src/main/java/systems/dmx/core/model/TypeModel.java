@@ -17,14 +17,6 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
 
 
-    // === Index Modes ===
-
-    List<IndexMode> getIndexModes();
-
-    void addIndexMode(IndexMode indexMode);
-
-
-
     // === Association Definitions ===
 
     Collection<? extends AssociationDefinitionModel> getAssocDefs();
