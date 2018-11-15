@@ -11,7 +11,7 @@
                 {
                     "typeUri": "dmx.webclient.view_config",
                     "childs": {
-                        "dmx.webclient.color": "hsl(40, 60%, 55%)"
+                        "dmx.webclient.color": "hsl(40, 70%, 53%)"
                     }
                 }
             ]

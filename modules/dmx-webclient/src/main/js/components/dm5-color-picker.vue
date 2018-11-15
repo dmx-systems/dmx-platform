@@ -22,21 +22,21 @@ export default {
 
   data: () => ({
     colors: [
-      'hsl( 70, 60%, 55%)',   // light green
-      'hsl(120, 50%, 55%)',   // green
-      'hsl(180, 50%, 55%)',   // cyan
-      'hsl(210, 50%, 55%)',   // blue         hue (210) matches Element UI --color-primary
-      'hsl(270, 50%, 55%)',   // purple
-      'hsl(300, 50%, 55%)',   // pink
-      'hsl(  5, 50%, 55%)',   // red
-      'hsl( 40, 60%, 55%)',   // orange
-      'hsl( 60, 70%, 55%)',   // yellow
+      'hsl( 70, 60%, 53%)',   // light green
+      'hsl(120, 50%, 53%)',   // green
+      'hsl(180, 50%, 53%)',   // cyan
+      'hsl(210, 50%, 53%)',   // blue         hue (210) matches Element UI --color-primary
+      'hsl(255, 43%, 53%)',   // purple
+      'hsl(300, 50%, 53%)',   // pink
+      'hsl(  5, 50%, 53%)',   // red
+      'hsl( 40, 70%, 53%)',   // orange
+      'hsl( 60, 80%, 53%)',   // yellow
       'hsl(  0,  0%, 80%)',   // gray
       'hsl( 70, 65%, 85%)',
       'hsl(120, 65%, 85%)',
       'hsl(180, 65%, 85%)',
       'hsl(210, 65%, 85%)',
-      'hsl(270, 65%, 85%)',
+      'hsl(255, 65%, 85%)',
       'hsl(300, 65%, 85%)',
       'hsl(  5, 65%, 85%)',
       'hsl( 40, 65%, 85%)',
