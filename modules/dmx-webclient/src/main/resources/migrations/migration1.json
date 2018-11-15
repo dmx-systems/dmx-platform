@@ -3,59 +3,49 @@
 
     "topic_types": [
         {
-            "value": "Icon",
-            "uri": "dmx.webclient.icon",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Color",
-            "uri": "dmx.webclient.color",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Add to Create Menu",
-            "uri": "dmx.webclient.add_to_create_menu",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
-        },
-        {
-            "value": "Widget",
-            "uri": "dmx.webclient.widget",
+            "value":       "Icon",
+            "uri":         "dmx.webclient.icon",
             "dataTypeUri": "dmx.core.text"
-            // TODO: set KEY index mode?
-            // Not stricly required as widget is always assigned by-ID, not by-value
         },
         {
-            "value": "Clearable",
-            "uri": "dmx.webclient.clearable",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Color",
+            "uri":         "dmx.webclient.color",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Customizable",
-            "uri": "dmx.webclient.customizable",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Add to Create Menu",
+            "uri":         "dmx.webclient.add_to_create_menu",
+            "dataTypeUri": "dmx.core.boolean"
         },
         {
-            "value": "Input Field Rows",
-            "uri": "dmx.webclient.input_field_rows",
-            "dataTypeUri": "dmx.core.number",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Widget",
+            "uri":         "dmx.webclient.widget",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Hidden",
-            "uri": "dmx.webclient.hidden",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Clearable",
+            "uri":         "dmx.webclient.clearable",
+            "dataTypeUri": "dmx.core.boolean"
         },
         {
-            "value": "Locked",
-            "uri": "dmx.webclient.locked",
-            "dataTypeUri": "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Customizable",
+            "uri":         "dmx.webclient.customizable",
+            "dataTypeUri": "dmx.core.boolean"
+        },
+        {
+            "value":       "Input Field Rows",
+            "uri":         "dmx.webclient.input_field_rows",
+            "dataTypeUri": "dmx.core.number"
+        },
+        {
+            "value":       "Hidden",
+            "uri":         "dmx.webclient.hidden",
+            "dataTypeUri": "dmx.core.boolean"
+        },
+        {
+            "value":       "Locked",
+            "uri":         "dmx.webclient.locked",
+            "dataTypeUri": "dmx.core.boolean"
         }
     ],
 
@@ -74,8 +64,8 @@
 {
     "topic_types": [
         {
-            "value": "View Configuration",
-            "uri": "dmx.webclient.view_config",
+            "value":       "View Configuration",
+            "uri":         "dmx.webclient.view_config",
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {

@@ -1,12 +1,9 @@
 package systems.dmx.core;
 
 import systems.dmx.core.model.AssociationDefinitionModel;
-import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.TypeModel;
 
 import java.util.Collection;
-import java.util.List;
 
 
 
@@ -19,14 +16,6 @@ public interface DMXType extends Topic {
     String getDataTypeUri();
 
     DMXType setDataTypeUri(String dataTypeUri);
-
-
-
-    // === Index Modes ===
-
-    List<IndexMode> getIndexModes();
-
-    DMXType addIndexMode(IndexMode indexMode);
 
 
 

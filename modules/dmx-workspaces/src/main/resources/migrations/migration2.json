@@ -8,10 +8,9 @@
         // Sharing Mode
 
         {
-            "value":          "Sharing Mode",
-            "uri":            "dmx.workspaces.sharing_mode",
-            "dataTypeUri":    "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Sharing Mode",
+            "uri":         "dmx.workspaces.sharing_mode",
+            "dataTypeUri": "dmx.core.text"
         }
     ],
 

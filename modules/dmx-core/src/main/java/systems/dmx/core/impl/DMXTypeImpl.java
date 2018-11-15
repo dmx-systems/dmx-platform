@@ -4,7 +4,6 @@ import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.DMXType;
 import systems.dmx.core.ViewConfiguration;
 import systems.dmx.core.model.AssociationDefinitionModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TypeModel;
 
@@ -41,21 +40,6 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     @Override
     public final DMXType setDataTypeUri(String dataTypeUri) {
         _getModel().updateDataTypeUri(dataTypeUri);     // TODO: should call _updateDataTypeUri()
-        return this;
-    }
-
-
-
-    // === Index Modes ===
-
-    @Override
-    public final List<IndexMode> getIndexModes() {
-        return getModel().getIndexModes();
-    }
-
-    @Override
-    public final DMXType addIndexMode(IndexMode indexMode) {
-        _getModel()._addIndexMode(indexMode);
         return this;
     }
 

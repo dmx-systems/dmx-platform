@@ -2,17 +2,10 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.AssociationDefinitionModel;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicDeletionModel;
-import systems.dmx.core.model.TopicReferenceModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 import systems.dmx.core.service.Directives;
@@ -20,8 +13,6 @@ import systems.dmx.core.util.JavaUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -294,18 +285,8 @@ class DMXObjectModelImpl implements DMXObjectModel {
 
     /**
      * Stores and indexes the simple value of this object model.
-     * Determines the index key and index modes.
      */
     void storeSimpleValue() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Indexes the simple value of the given object model according to the given index mode.
-     * <p>
-     * Called to index existing topics/associations once an index mode has been added to a type definition.
-     */
-    void indexSimpleValue(IndexMode indexMode) {
         throw new UnsupportedOperationException();
     }
 

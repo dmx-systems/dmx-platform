@@ -6,7 +6,6 @@ import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
@@ -24,7 +23,6 @@ import systems.dmx.core.model.topicmaps.TopicViewModel;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.List;
@@ -184,7 +182,7 @@ public interface ModelFactory {
     // === TopicTypeModel ===
 
     TopicTypeModel newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                     List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                     List<AssociationDefinitionModel> assocDefs,
                                      ViewConfigurationModel viewConfig);
 
     TopicTypeModel newTopicTypeModel(String uri, String value, String dataTypeUri);
@@ -196,7 +194,7 @@ public interface ModelFactory {
     // === AssociationTypeModel ===
 
     AssociationTypeModel newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                                 List<AssociationDefinitionModel> assocDefs,
                                                  ViewConfigurationModel viewConfig);
 
     AssociationTypeModel newAssociationTypeModel(String uri, String value, String dataTypeUri);

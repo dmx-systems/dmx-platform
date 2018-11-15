@@ -10,7 +10,6 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
@@ -260,8 +259,7 @@ public class DM5CoreServiceTest extends CoreServiceTestEnvironment {
     }
 
     private void defineValueLottoModel() {
-        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"))
-            .addIndexMode(IndexMode.KEY);
+        dmx.createTopicType(mf.newTopicTypeModel("lotto.number", "Lotto Number", "dmx.core.number"));
         dmx.createTopicType(mf.newTopicTypeModel("lotto.draw", "Lotto Draw", "dmx.core.value")
             .addAssocDef(mf.newAssociationDefinitionModel(
                 "lotto.draw", "lotto.number", "dmx.core.many"

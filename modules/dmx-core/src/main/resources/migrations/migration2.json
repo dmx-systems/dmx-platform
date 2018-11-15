@@ -3,16 +3,14 @@
     // Otherwise the data type "Boolean" does not exist. ### TODO: not true anymore
     "topic_types": [
         {
-            "value":          "Identity Attribute",
-            "uri":            "dmx.core.identity_attr",
-            "dataTypeUri":    "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Identity Attribute",
+            "uri":         "dmx.core.identity_attr",
+            "dataTypeUri": "dmx.core.boolean"
         },
         {
-            "value":          "Include in Label",
-            "uri":            "dmx.core.include_in_label",
-            "dataTypeUri":    "dmx.core.boolean",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Include in Label",
+            "uri":         "dmx.core.include_in_label",
+            "dataTypeUri": "dmx.core.boolean"
         }
     ],
 

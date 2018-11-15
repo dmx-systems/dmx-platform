@@ -1,21 +1,18 @@
 {
     "topic_types": [
         {
-            "value": "URL",
-            "uri": "dmx.webbrowser.url",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.fulltext", "dmx.core.key"]
-            // TODO: index
+            "value":       "URL",
+            "uri":         "dmx.webbrowser.url",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Notes",
-            "uri": "dmx.webbrowser.notes",
-            "dataTypeUri": "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "Notes",
+            "uri":         "dmx.webbrowser.notes",
+            "dataTypeUri": "dmx.core.html"
         },
         {
-            "value": "Web Resource",
-            "uri": "dmx.webbrowser.web_resource",
+            "value":       "Web Resource",
+            "uri":         "dmx.webbrowser.web_resource",
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {

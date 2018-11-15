@@ -1,25 +1,24 @@
 {
     "topic_types": [
         {
-            "value":          "Plugin Name",
-            "uri":            "dmx.core.plugin_name",
-            "dataTypeUri":    "dmx.core.text"
+            "value":       "Plugin Name",
+            "uri":         "dmx.core.plugin_name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value":          "Symbolic Name",
-            "uri":            "dmx.core.plugin_symbolic_name",
-            "dataTypeUri":    "dmx.core.text"
+            "value":       "Symbolic Name",
+            "uri":         "dmx.core.plugin_symbolic_name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value":          "Migration Nr.",
-            "uri":            "dmx.core.plugin_migration_nr",
-            "dataTypeUri":    "dmx.core.number",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Migration Nr.",
+            "uri":         "dmx.core.plugin_migration_nr",
+            "dataTypeUri": "dmx.core.number"
         },
         {
-            "value":          "Plugin",
-            "uri":            "dmx.core.plugin",
-            "dataTypeUri":    "dmx.core.identity",
+            "value":       "Plugin",
+            "uri":         "dmx.core.plugin",
+            "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.core.plugin_name",

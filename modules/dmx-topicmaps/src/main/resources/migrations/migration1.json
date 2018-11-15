@@ -1,16 +1,14 @@
 {
     "topic_types": [
         {
-            "value":          "Topicmap Name",
-            "uri":            "dmx.topicmaps.name",
-            "dataTypeUri":    "dmx.core.text",
-            "indexModeUris": ["dmx.core.fulltext", "dmx.core.fulltext_key"]
+            "value":       "Topicmap Name",
+            "uri":         "dmx.topicmaps.name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value":          "Notes",
-            "uri":            "dmx.topicmaps.notes",
-            "dataTypeUri":    "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "Notes",
+            "uri":         "dmx.topicmaps.notes",
+            "dataTypeUri": "dmx.core.html"
         },
         {
             "value":       "Topicmap Renderer URI",                 # TODO: rename to "Topicmap Type URI"
@@ -44,8 +42,8 @@
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {
-                    "childTypeUri":         "dmx.files.file",
-                    "childCardinalityUri":  "dmx.core.one",
+                    "childTypeUri":        "dmx.files.file",
+                    "childCardinalityUri": "dmx.core.one",
                     "viewConfigTopics": [
                         {
                             "typeUri": "dmx.webclient.view_config",

@@ -2,7 +2,6 @@ package systems.dmx.core.storage.spi;
 
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
@@ -58,12 +57,10 @@ public interface DMXStorage {
     /**
      * Stores and indexes a topic value.
      *
+     * @param   indexKey    must not null
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
-    void storeTopicValue(long topicId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
-                                                                                      SimpleValue indexValue);
-
-    void indexTopicValue(long topicId, IndexMode indexMode, String indexKey, SimpleValue indexValue);
+    void storeTopicValue(long topicId, SimpleValue value, String indexKey, SimpleValue indexValue);
 
     // ---
 
@@ -100,12 +97,10 @@ public interface DMXStorage {
     /**
      * Stores and indexes an association value.
      *
+     * @param   indexKey    must not null
      * @param   indexValue  Optional: the value to be indexed. If indexValue is not specified, value is used.
      */
-    void storeAssociationValue(long assocId, SimpleValue value, List<IndexMode> indexModes, String indexKey,
-                                                                                            SimpleValue indexValue);
-
-    void indexAssociationValue(long assocId, IndexMode indexMode, String indexKey, SimpleValue indexValue);
+    void storeAssociationValue(long assocId, SimpleValue value, String indexKey, SimpleValue indexValue);
 
     void storeRoleTypeUri(long assocId, long playerId, String roleTypeUri);
 

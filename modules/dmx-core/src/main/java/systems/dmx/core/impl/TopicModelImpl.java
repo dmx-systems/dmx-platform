@@ -1,13 +1,9 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.IndexMode;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicTypeModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.Directive;
 
@@ -113,13 +109,7 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
 
     @Override
     final void storeSimpleValue() {
-        TypeModel type = getType();
-        pl.storeTopicValue(id, value, type.getIndexModes(), type.getUri(), getIndexValue());
-    }
-
-    @Override
-    final void indexSimpleValue(IndexMode indexMode) {
-        pl.indexTopicValue(id, indexMode, typeUri, getIndexValue());
+        pl.storeTopicValue(id, value, getType().getUri(), getIndexValue());
     }
 
     @Override

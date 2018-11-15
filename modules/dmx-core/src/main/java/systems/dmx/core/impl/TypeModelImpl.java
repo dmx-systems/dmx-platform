@@ -4,9 +4,6 @@ import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
-import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.service.Directive;
@@ -29,7 +26,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private String dataTypeUri;     // may be null in models used for an update operation
-    private List<IndexMode> indexModes;
     private SequencedHashMap<String, AssociationDefinitionModelImpl> assocDefs; // is never null, may be empty
     private ViewConfigurationModelImpl viewConfig;                              // is never null
 
@@ -37,11 +33,10 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<IndexMode> indexModes,
-                  List<AssociationDefinitionModel> assocDefs, ViewConfigurationModelImpl viewConfig) {
+    TypeModelImpl(TopicModelImpl typeTopic, String dataTypeUri, List<AssociationDefinitionModel> assocDefs,
+                                                                ViewConfigurationModelImpl viewConfig) {
         super(typeTopic);
         this.dataTypeUri  = dataTypeUri;
-        this.indexModes   = indexModes;
         this.assocDefs    = toMap(assocDefs);
         this.viewConfig   = viewConfig;
     }
@@ -49,7 +44,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     TypeModelImpl(TypeModelImpl type) {
         super(type);
         this.dataTypeUri  = type.getDataTypeUri();
-        this.indexModes   = type.getIndexModes();
         this.assocDefs    = toMap(type.getAssocDefs());
         this.viewConfig   = type.getViewConfig();
     }
@@ -68,20 +62,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public void setDataTypeUri(String dataTypeUri) {
         this.dataTypeUri = dataTypeUri;
-    }
-
-
-
-    // === Index Modes ===
-
-    @Override
-    public List<IndexMode> getIndexModes() {
-        return indexModes;
-    }
-
-    @Override
-    public void addIndexMode(IndexMode indexMode) {
-        indexModes.add(indexMode);
     }
 
 
@@ -195,7 +175,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         try {
             return super.toJSON()
                 .put("dataTypeUri", dataTypeUri)
-                .put("indexModeUris", toJSONArray(indexModes))
                 .put("assocDefs", toJSONArray(assocDefs.values()))
                 .put("viewConfigTopics", viewConfig.toJSONArray());
         } catch (Exception e) {
@@ -310,14 +289,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     final void updateDataTypeUri(String dataTypeUri) {
         setDataTypeUri(dataTypeUri);    // update memory
         storeDataTypeUri();             // update DB
-    }
-
-    final void _addIndexMode(IndexMode indexMode) {
-        // update memory
-        addIndexMode(indexMode);
-        // update DB
-        pl.typeStorage.storeIndexMode(uri, indexMode);
-        indexAllInstances(indexMode);
     }
 
     // ---
@@ -558,25 +529,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
         pl.typeStorage.storeDataType(uri, dataTypeUri);
     }
 
-    private void indexAllInstances(IndexMode indexMode) {
-        List<? extends DMXObjectModelImpl> objects = getAllInstances();
-        //
-        String str = "\"" + value + "\" (" + uri + ") instances";
-        if (indexModes.size() > 0) {
-            if (objects.size() > 0) {
-                logger.info("### Indexing " + objects.size() + " " + str + " (indexMode=" + indexMode + ")");
-            } else {
-                logger.info("### Indexing " + str + " SKIPPED -- no instances in DB");
-            }
-        } else {
-            logger.info("### Indexing " + str + " SKIPPED -- no index mode set");
-        }
-        //
-        for (DMXObjectModelImpl obj : objects) {
-            obj.indexSimpleValue(indexMode);
-        }
-    }
-
 
 
     // === Association Definitions (memory access) ===
@@ -725,14 +677,6 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
 
     // === Serialization ===
-
-    private JSONArray toJSONArray(List<IndexMode> indexModes) {
-        JSONArray indexModeUris = new JSONArray();
-        for (IndexMode indexMode : indexModes) {
-            indexModeUris.put(indexMode.toUri());
-        }
-        return indexModeUris;
-    }
 
     private JSONArray toJSONArray(Collection<? extends AssociationDefinitionModel> assocDefs) {
         JSONArray _assocDefs = new JSONArray();

@@ -7,10 +7,9 @@
         ### File ###
 
         {
-            "value": "File Content",
-            "uri": "dmx.files.file_content",
+            "value":       "File Content",
+            "uri":         "dmx.files.file_content",
             "dataTypeUri": "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"]
             /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
@@ -21,26 +20,23 @@
             ] */
         },
         {
-            "value": "File Name",
-            "uri": "dmx.files.file_name",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "File Name",
+            "uri":         "dmx.files.file_name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Path",
-            "uri": "dmx.files.path",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.key"]
+            "value":       "Path",
+            "uri":         "dmx.files.path",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Media Type",
-            "uri": "dmx.files.media_type",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "Media Type",
+            "uri":         "dmx.files.media_type",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Size",
-            "uri": "dmx.files.size",
+            "value":       "Size",
+            "uri":         "dmx.files.size",
             "dataTypeUri": "dmx.core.number"
             /* "viewConfigTopics": [    ### TODO
                 {
@@ -52,8 +48,8 @@
             ] */
         },
         {
-            "value": "File",
-            "uri": "dmx.files.file",
+            "value":       "File",
+            "uri":         "dmx.files.file",
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
@@ -92,16 +88,14 @@
         ### Folder ###
 
         {
-            "value": "Folder Name",
-            "uri": "dmx.files.folder_name",
-            "dataTypeUri": "dmx.core.text",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "Folder Name",
+            "uri":         "dmx.files.folder_name",
+            "dataTypeUri": "dmx.core.text"
         },
         {
-            "value": "Folder Content",
-            "uri": "dmx.files.folder_content",
-            "dataTypeUri": "dmx.core.html",
-            "indexModeUris": ["dmx.core.fulltext"]
+            "value":       "Folder Content",
+            "uri":         "dmx.files.folder_content",
+            "dataTypeUri": "dmx.core.html"
             /* "viewConfigTopics": [    ### TODO
                 {
                     "typeUri": "dmx.webclient.view_config",
@@ -112,8 +106,8 @@
             ] */
         },
         {
-            "value": "Folder",
-            "uri": "dmx.files.folder",
+            "value":       "Folder",
+            "uri":         "dmx.files.folder",
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {

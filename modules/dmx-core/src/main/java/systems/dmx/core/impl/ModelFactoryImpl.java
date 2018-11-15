@@ -2,12 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.AssociationDefinitionModel;
-import systems.dmx.core.model.AssociationRoleModel;
-import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.IndexMode;
-import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
@@ -15,15 +10,12 @@ import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicDeletionModel;
 import systems.dmx.core.model.TopicReferenceModel;
 import systems.dmx.core.model.TopicRoleModel;
-import systems.dmx.core.model.TopicTypeModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.AssociationViewModel;
 import systems.dmx.core.model.topicmaps.TopicViewModel;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.service.ModelFactory;
-import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -570,9 +562,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public TopicTypeModelImpl newTopicTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
+                                                List<AssociationDefinitionModel> assocDefs,
                                                 ViewConfigurationModel viewConfig) {
-        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+        return new TopicTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -596,9 +588,9 @@ public class ModelFactoryImpl implements ModelFactory {
 
     @Override
     public AssociationTypeModelImpl newAssociationTypeModel(TopicModel typeTopic, String dataTypeUri,
-                                                 List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                                                 ViewConfigurationModel viewConfig) {
-        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, indexModes, assocDefs,
+                                                            List<AssociationDefinitionModel> assocDefs,
+                                                            ViewConfigurationModel viewConfig) {
+        return new AssociationTypeModelImpl(newTypeModel(typeTopic, dataTypeUri, assocDefs,
             (ViewConfigurationModelImpl) viewConfig));
     }
 
@@ -621,14 +613,13 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // === TypeModel ===
 
-    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri,
-                               List<IndexMode> indexModes, List<AssociationDefinitionModel> assocDefs,
-                               ViewConfigurationModelImpl viewConfig) {
-        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, indexModes, assocDefs, viewConfig);
+    TypeModelImpl newTypeModel(TopicModel typeTopic, String dataTypeUri, List<AssociationDefinitionModel> assocDefs,
+                                                                         ViewConfigurationModelImpl viewConfig) {
+        return new TypeModelImpl((TopicModelImpl) typeTopic, dataTypeUri, assocDefs, viewConfig);
     }
 
     TypeModelImpl newTypeModel(String uri, String typeUri, SimpleValue value, String dataTypeUri) {
-        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, new ArrayList(), new ArrayList(),
+        return new TypeModelImpl(newTopicModel(uri, typeUri, value), dataTypeUri, new ArrayList(),
             newViewConfigurationModel());
     }
 
@@ -636,26 +627,11 @@ public class ModelFactoryImpl implements ModelFactory {
         TopicModelImpl typeTopic = newTopicModel(typeModel);
         return new TypeModelImpl(typeTopic,
             typeModel.optString("dataTypeUri", null),
-            parseIndexModes(typeModel.optJSONArray("indexModeUris")),                   // optJSONArray may return null
             parseAssocDefs(typeModel.optJSONArray("assocDefs"), typeTopic.getUri()),    // optJSONArray may return null
             newViewConfigurationModel(typeModel.optJSONArray("viewConfigTopics")));     // optJSONArray may return null
     }
 
     // ---
-
-    private List<IndexMode> parseIndexModes(JSONArray indexModeUris) {
-        try {
-            List<IndexMode> indexModes = new ArrayList();
-            if (indexModeUris != null) {
-                for (int i = 0; i < indexModeUris.length(); i++) {
-                    indexModes.add(IndexMode.fromUri(indexModeUris.getString(i)));
-                }
-            }
-            return indexModes;
-        } catch (Exception e) {
-            throw parsingFailed(indexModeUris, e, "List<IndexMode>");
-        }
-    }
 
     private List<AssociationDefinitionModel> parseAssocDefs(JSONArray assocDefs, String parentTypeUri) throws
                                                                                                        JSONException {
