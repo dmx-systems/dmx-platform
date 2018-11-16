@@ -1,6 +1,6 @@
 <template>
   <div class="dm5-type-renderer">
-    <!-- Generic Value -->
+    <!-- Type Value -->
     <dm5-value-renderer :object="object" :level="0" :context="context"></dm5-value-renderer>
     <!-- Type URI -->
     <div class="field-label">Type URI</div>

@@ -28,6 +28,10 @@ export default ({store}) => ({
         mode:            state => state.details.mode,
         markerIds:       (_, getters) => getters && getters.visibleTopicIds,
         detailRenderers: state => state.detailRenderers,
+        types:           state => ({
+                           assocTypes: state.typeCache.assocTypes,
+                           roleTypes:  state.typeCache.roleTypes
+                         }),
         quillConfig:     state => state.quillConfig
       },
       listeners: {
