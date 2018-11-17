@@ -35,7 +35,7 @@ function initPlugin (expo) {
   const storeModule = plugin.storeModule
   if (storeModule) {
     const module = storeModule.module
-    console.log('[DMX] Registering store module', storeModule.name)
+    // console.log('[DMX] Registering store module', storeModule.name)
     store.registerModule(
       storeModule.name,
       typeof module === 'function' ? module({dm5, axios, Vue}) : module

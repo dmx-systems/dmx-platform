@@ -1,4 +1,4 @@
-export default {
+export default ({store}) => ({
 
   storeModule: {
     name: 'accesscontrol',
@@ -14,5 +14,19 @@ export default {
       comp: require('./components/dm5-login-state').default,
       mount: 'toolbar-right'
     }
-  ]
-}
+  ],
+
+  extraMenuItems: [{
+    uri: 'dmx.accesscontrol.user_account',
+    label: 'User Account',
+    optionsComp: require('./components/dm5-user-account-options').default,
+    create: (username, options, pos) => {
+      store.dispatch('createUserAccount', {
+        username,
+        password: options.password
+      }).then(topic =>
+        store.dispatch('revealTopic', {topic, pos, select: true})
+      )
+    }
+  }]
+})

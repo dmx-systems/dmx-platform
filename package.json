@@ -22,7 +22,7 @@
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "vue-font-awesome-search": "https://github.com/jri/vue-font-awesome-search.git",
-    "element-ui": "^2.4.9",
+    "element-ui": "^2.4.10",
     "font-awesome": "^4.7.0",
     "vue": "^2.5.17",
     "vue-router": "^2.8.1",

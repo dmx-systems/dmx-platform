@@ -1,4 +1,7 @@
 import dm5 from 'dm5'
+import SHA256 from './lib/sha256'
+
+const ENCODED_PASSWORD_PREFIX = '-SHA256-'
 
 const state = {
 
@@ -40,6 +43,10 @@ const actions = {
 
   closeLoginDialog () {
     state.visible = false
+  },
+
+  createUserAccount (_, {username, password}) {
+    return dm5.restClient.createUserAccount(username, encodePassword(password))
   }
 }
 
@@ -49,10 +56,14 @@ dm5.restClient.getUsername().then(username => {
   state.username = username
 })
 
-// state helper
+// helper
 
 function setUsername (username) {
   state.username = username
+}
+
+function encodePassword (password) {
+    return ENCODED_PASSWORD_PREFIX + SHA256(password)
 }
 
 //
