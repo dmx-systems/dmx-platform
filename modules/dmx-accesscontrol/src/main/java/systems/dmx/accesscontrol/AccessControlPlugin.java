@@ -39,7 +39,6 @@ import systems.dmx.core.service.event.PostCreateAssociationListener;
 import systems.dmx.core.service.event.PostCreateTopicListener;
 import systems.dmx.core.service.event.PostUpdateAssociationListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PreCreateTopicListener;
 import systems.dmx.core.service.event.PreUpdateTopicListener;
 import systems.dmx.core.service.event.ServiceRequestFilterListener;
 import systems.dmx.core.service.event.StaticResourceFilterListener;
@@ -53,9 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -83,7 +80,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                                                                                     CheckTopicWriteAccessListener,
                                                                                     CheckAssociationReadAccessListener,
                                                                                     CheckAssociationWriteAccessListener,
-                                                                                    PreCreateTopicListener,
                                                                                     PreUpdateTopicListener,
                                                                                     PostCreateTopicListener,
                                                                                     PostCreateAssociationListener,
@@ -275,16 +271,24 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             logger.info("Creating username topic \"" + username + "\"");
             AccessControl ac = dmx.getAccessControl();
             //
-            // 1) create username topic
+            // 1) check username uniqueness
+            // Note: we can't do this check in the preCreateTopic() listener. If such an username topic exists already
+            // the DM5 value integrator will reuse this one instead of trying to create a new one. The preCreateTopic()
+            // listener will not trigger.
+            Topic usernameTopic = getUsernameTopic(username);
+            if (usernameTopic != null) {
+                throw new RuntimeException("Username \"" + username + "\" exists already");
+            }
+            // 2) create username topic
             // We suppress standard workspace assignment here as a username topic require special assignment.
             // See step 3) below.
-            Topic usernameTopic = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
+            usernameTopic = ac.runWithoutWorkspaceAssignment(new Callable<Topic>() {
                 @Override
                 public Topic call() {
                     return dmx.createTopic(mf.newTopicModel("dmx.accesscontrol.username", new SimpleValue(username)));
                 }
             });
-            // 2) create private workspace
+            // 3) create private workspace
             setWorkspaceOwner(
                 wsService.createWorkspace(DEFAULT_PRIVATE_WORKSPACE_NAME, null, SharingMode.PRIVATE),
                 username
@@ -539,17 +543,6 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     }
 
     // ---
-
-    @Override
-    public void preCreateTopic(TopicModel model) {
-        if (model.getTypeUri().equals("dmx.accesscontrol.username")) {
-            String username = model.getSimpleValue().toString();
-            Topic usernameTopic = getUsernameTopic(username);
-            if (usernameTopic != null) {
-                throw new RuntimeException("Username \"" + username + "\" exists already");
-            }
-        }
-    }
 
     @Override
     public void postCreateTopic(Topic topic) {
