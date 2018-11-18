@@ -11,19 +11,23 @@
     <div v-if="infoMode">{{dataType.value}}</div>
     <el-select v-else v-model="object.dataTypeUri">
       <el-option-group label="Simple">
-        <el-option :label="dataTypes['dmx.core.text'].value"     :value="dataTypes['dmx.core.text'].uri">
+        <el-option :label="dataTypes['dmx.core.text'].value"       :value="dataTypes['dmx.core.text'].uri">
         </el-option>
-        <el-option :label="dataTypes['dmx.core.number'].value"   :value="dataTypes['dmx.core.number'].uri">
+        <el-option :label="dataTypes['dmx.core.number'].value"     :value="dataTypes['dmx.core.number'].uri">
         </el-option>
-        <el-option :label="dataTypes['dmx.core.boolean'].value"  :value="dataTypes['dmx.core.boolean'].uri">
+        <el-option :label="dataTypes['dmx.core.boolean'].value"    :value="dataTypes['dmx.core.boolean'].uri">
         </el-option>
-        <el-option :label="dataTypes['dmx.core.html'].value"     :value="dataTypes['dmx.core.html'].uri">
+        <el-option :label="dataTypes['dmx.core.html'].value"       :value="dataTypes['dmx.core.html'].uri">
         </el-option>
       </el-option-group>
       <el-option-group label="Composite">
-        <el-option :label="dataTypes['dmx.core.value'].value"    :value="dataTypes['dmx.core.value'].uri">
-        </el-option>
-        <el-option :label="dataTypes['dmx.core.identity'].value" :value="dataTypes['dmx.core.identity'].uri">
+        <template v-if="isTopicType">
+          <el-option :label="dataTypes['dmx.core.value'].value"    :value="dataTypes['dmx.core.value'].uri">
+          </el-option>
+          <el-option :label="dataTypes['dmx.core.identity'].value" :value="dataTypes['dmx.core.identity'].uri">
+          </el-option>
+        </template>
+        <el-option :label="dataTypes['dmx.core.composite'].value"  :value="dataTypes['dmx.core.composite'].uri" v-else>
         </el-option>
       </el-option-group>
     </el-select>
@@ -51,6 +55,10 @@ export default {
 
     mode () {
       return this.context.mode
+    },
+
+    isTopicType () {
+      return this.object.isTopicType()
     },
 
     dataType () {
