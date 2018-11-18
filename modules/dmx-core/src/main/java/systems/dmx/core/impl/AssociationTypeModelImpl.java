@@ -1,11 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.AssociationType;
 import systems.dmx.core.model.AssociationDefinitionModel;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.AssociationTypeModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.Directive;
 
 import java.util.List;
@@ -23,6 +20,10 @@ public class AssociationTypeModelImpl extends TypeModelImpl implements Associati
 
     AssociationTypeModelImpl(TypeModelImpl type) {
         super(type);
+        if (type.dataTypeUri.equals("dmx.core.value") || type.dataTypeUri.equals("dmx.core.identity")) {
+            throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for an assoc " +
+                "type. Use \"dmx.core.composite\" instead. " + type);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

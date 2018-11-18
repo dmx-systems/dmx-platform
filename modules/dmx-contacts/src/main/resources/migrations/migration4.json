@@ -13,7 +13,7 @@
         {
             "value":       "Organization Association",
             "uri":         "dmx.contacts.organization_association",
-            "dataTypeUri": "dmx.core.identity",
+            "dataTypeUri": "dmx.core.composite",
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.contacts.organizational_role",

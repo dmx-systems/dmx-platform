@@ -109,7 +109,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // Type URIs
     private static final String LOGIN_ENABLED_TYPE = "dmx.accesscontrol.login_enabled";
-    private static final String MEMBERSHIP_TYPE = "dmx.accesscontrol.membership";
+    private static final String MEMBERSHIP_TYPE    = "dmx.accesscontrol.membership";
 
     // Property URIs
     private static final String PROP_CREATOR  = "dmx.accesscontrol.creator";
@@ -298,7 +298,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
             // creator/modifier (via postCreateTopic() listener). In case of the "admin" user account the creator/
             // modifier remain undefined as it is actually created by the system itself.
             //
-            // 3) assign username topic to "System" workspace
+            // 4) assign username topic to "System" workspace
             // Note: user <anonymous> has no READ access to the System workspace. So we must use privileged calls here.
             // This is to support the "DM4 Sign-up" 3rd-party plugin.
             ac.assignToWorkspace(usernameTopic, ac.getSystemWorkspaceId());

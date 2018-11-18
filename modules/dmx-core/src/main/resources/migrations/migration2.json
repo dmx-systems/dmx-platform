@@ -18,7 +18,7 @@
         {
             "value":       "Composition Definition",
             "uri":         "dmx.core.composition_def",
-            "dataTypeUri": "dmx.core.identity",
+            "dataTypeUri": "dmx.core.composite",
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.core.cardinality",

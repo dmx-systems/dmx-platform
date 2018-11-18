@@ -1,11 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.SimpleValue;
-import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.TopicTypeModel;
-import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.service.Directive;
 
 import java.util.List;
@@ -23,6 +20,10 @@ class TopicTypeModelImpl extends TypeModelImpl implements TopicTypeModel {
 
     TopicTypeModelImpl(TypeModelImpl type) {
         super(type);
+        if (type.dataTypeUri.equals("dmx.core.composite")) {
+            throw new IllegalArgumentException("\"" + type.dataTypeUri + "\" is an illegal data type for a topic " +
+                "type. Use \"dmx.core.value\" or \"dmx.core.identity\" instead. " + type);
+        }
     }
 
     // -------------------------------------------------------------------------------------------------- Public Methods

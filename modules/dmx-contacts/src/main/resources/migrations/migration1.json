@@ -19,7 +19,7 @@
             {
                 "value":       "Phone Entry",
                 "uri":         "dmx.contacts.phone_entry",
-                "dataTypeUri": "dmx.core.identity",
+                "dataTypeUri": "dmx.core.composite",
                 "assocDefs": [
                     {
                         "childTypeUri":         "dmx.contacts.phone_label",
@@ -40,7 +40,7 @@
             {
                 "value":       "Address Entry",
                 "uri":         "dmx.contacts.address_entry",
-                "dataTypeUri": "dmx.core.identity",
+                "dataTypeUri": "dmx.core.composite",
                 "assocDefs": [
                     {
                         "childTypeUri":         "dmx.contacts.address_label",

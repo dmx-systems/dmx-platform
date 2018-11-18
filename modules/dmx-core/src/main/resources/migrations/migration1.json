@@ -79,6 +79,11 @@
             "typeUri": "dmx.core.data_type"
         },
         {
+            "value":   "Composite",
+            "uri":     "dmx.core.composite",
+            "typeUri": "dmx.core.data_type"
+        },
+        {
             "value":   "Value",
             "uri":     "dmx.core.value",
             "typeUri": "dmx.core.data_type"
