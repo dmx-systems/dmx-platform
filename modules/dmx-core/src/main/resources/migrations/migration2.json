@@ -1,6 +1,4 @@
 {
-    // Note: Boolean topic types must be created *after* migration 1 has run.
-    // Otherwise the data type "Boolean" does not exist. ### TODO: not true anymore
     "topic_types": [
         {
             "value":       "Identity Attribute",
@@ -16,13 +14,25 @@
 
     "assoc_types": [
         {
+            "value":       "Custom Association Type",
+            "uri":         "dmx.core.custom_assoc_type",
+            "dataTypeUri": "dmx.core.text"
+        },
+        {
             "value":       "Composition Definition",
             "uri":         "dmx.core.composition_def",
             "dataTypeUri": "dmx.core.composite",
             "assocDefs": [
                 {
                     "childTypeUri":        "dmx.core.cardinality",
-                    "childCardinalityUri": "dmx.core.one"
+                    "childCardinalityUri": "dmx.core.one",
+                    "includeInLabel":      true
+                },
+                {
+                    "childTypeUri":        "dmx.core.assoc_type",
+                    "childCardinalityUri": "dmx.core.one",
+                    "customAssocTypeUri":  "dmx.core.custom_assoc_type",
+                    "includeInLabel":      true
                 },
                 {
                     "childTypeUri":        "dmx.core.identity_attr",

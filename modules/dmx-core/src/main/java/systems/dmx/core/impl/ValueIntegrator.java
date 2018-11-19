@@ -197,7 +197,7 @@ class ValueIntegrator {
      *   - this.newValues is simple
      *   - this.newValues is not empty
      *
-     * @return  the unified value. Is never null.
+     * @return  the unified value; never null.
      */
     private TopicModelImpl unifySimple() {
         SimpleValue newValue = newValues.getSimpleValue();
@@ -273,7 +273,7 @@ class ValueIntegrator {
      *
      * @param   childValue      RelatedTopicModelImpl or List<RelatedTopicModelImpl>
      *
-     * @return  UnifiedValue or List<UnifiedValue>; never null;
+     * @return  UnifiedValue or List<UnifiedValue>; never null.
      */
     private Object integrateChildValue(Object childValue, String assocDefUri) {
         if (isOne(assocDefUri)) {
@@ -294,6 +294,8 @@ class ValueIntegrator {
      *   - childTopic's type is assocDef's child type
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     *
+     * @return  the unified value, or null if there was nothing to integrate.
      */
     private DMXObjectModelImpl unifyComposite(Map<String, Object> childValues) {
         // Note: because a facet does not contribute to the value of a value object
@@ -314,7 +316,7 @@ class ValueIntegrator {
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  the parent object; never null
+     * @return  the parent object; never null.
      */
     private DMXObjectModelImpl identifyParent(Map<String, Object> childValues) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
@@ -574,7 +576,7 @@ class ValueIntegrator {
      *
      * @param   assocDefUris    only these child topics are respected
      *
-     * @return  the found (or created) parent topic
+     * @return  the found (or created) parent topic; never null.
      */
     private DMXObjectModelImpl unifyChildTopics(Map<String, Object> childValues, Iterable<String> assocDefUris) {
         List<RelatedTopicModelImpl> candidates = parentCandidates(childValues);
