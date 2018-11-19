@@ -9,7 +9,7 @@
     <!-- Data Type -->
     <div class="field-label">Data Type</div>
     <div v-if="infoMode">{{dataType.value}}</div>
-    <el-select v-else v-model="object.dataTypeUri">
+    <el-select v-else v-model="type.dataTypeUri">
       <el-option-group label="Simple">
         <el-option :label="dataTypes['dmx.core.text'].value"       :value="dataTypes['dmx.core.text'].uri">
         </el-option>
@@ -31,6 +31,7 @@
         </el-option>
       </el-option-group>
     </el-select>
+    <dm5-topic-list :topics="childTypes" no-sort-menu no-sort></dm5-topic-list>
   </div>
 </template>
 
@@ -53,31 +54,44 @@ export default {
 
   computed: {
 
+    type () {
+      return this.object
+    },
+
     mode () {
       return this.context.mode
     },
 
     isTopicType () {
-      return this.object.isTopicType()
+      return this.type.isTopicType()
     },
 
     dataType () {
-      return this.object.getDataType()
+      return this.type.getDataType()
     },
 
     dataTypes () {
       return this.$store.state.typeCache.dataTypes
+    },
+
+    childTypes () {
+      return this.type.assocDefs.map(assocDef => {
+        const type = assocDef.getChildType()
+        type.assoc = assocDef     // FIXME: this is a type cache side effect! Not a problem?
+        return type
+      })
     }
   },
 
   components: {
-    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default
+    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default,
+    'dm5-topic-list': require('dm5-topic-list').default
   }
 }
 </script>
 
 <style>
-.dm5-type-renderer > .field-label {
+.dm5-type-renderer .field-label {
   margin-top: var(--field-spacing);
 }
 </style>
