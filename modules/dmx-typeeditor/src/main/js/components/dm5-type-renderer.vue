@@ -31,7 +31,8 @@
         </el-option>
       </el-option-group>
     </el-select>
-    <dm5-topic-list :topics="childTypes" no-sort-menu no-sort></dm5-topic-list>
+    <!-- Assoc Defs -->
+    <dm5-assoc-def-list :assoc-defs="assocDefs"></dm5-assoc-def-list>
   </div>
 </template>
 
@@ -74,18 +75,14 @@ export default {
       return this.$store.state.typeCache.dataTypes
     },
 
-    childTypes () {
-      return this.type.assocDefs.map(assocDef => {
-        const type = assocDef.getChildType()
-        type.assoc = assocDef     // FIXME: this is a type cache side effect! Not a problem?
-        return type
-      })
+    assocDefs () {
+      return this.type.assocDefs
     }
   },
 
   components: {
-    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default,
-    'dm5-topic-list': require('dm5-topic-list').default
+    'dm5-assoc-def-list': require('./dm5-assoc-def-list').default,
+    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default
   }
 }
 </script>
