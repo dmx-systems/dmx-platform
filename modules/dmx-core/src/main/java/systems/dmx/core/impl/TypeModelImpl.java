@@ -101,12 +101,11 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
     @Override
     public TypeModel addAssocDefBefore(AssociationDefinitionModel assocDef, String beforeAssocDefUri) {
         try {
-            // error check
             String assocDefUri = assocDef.getAssocDefUri();
+            // error check
             AssociationDefinitionModel existing = _getAssocDef(assocDefUri);
             if (existing != null) {
-                throw new RuntimeException("Ambiguity: type \"" + uri + "\" has more than one \"" + assocDefUri +
-                    "\" assoc defs");
+                throw new RuntimeException("Type \"" + uri + "\" has a \"" + assocDefUri + "\" assoc def already");
             }
             //
             assocDefs.putBefore(assocDefUri, (AssociationDefinitionModelImpl) assocDef, beforeAssocDefUri);

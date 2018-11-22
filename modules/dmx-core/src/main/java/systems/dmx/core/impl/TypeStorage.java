@@ -46,7 +46,7 @@ class TypeStorage {
 
 
 
-    // === Type Model Cache ===
+    // === Type Cache ===
 
     TopicTypeModelImpl getTopicType(String topicTypeUri) {
         TopicTypeModelImpl topicType = (TopicTypeModelImpl) getType(topicTypeUri);
@@ -177,8 +177,8 @@ class TypeStorage {
      * Called to store a newly created topic type or association type.
      */
     void storeType(TypeModelImpl type) {
-        // 1) put in type model cache
-        // Note: an association type must be put in type model cache *before* storing its association definitions.
+        // 1) put in type cache
+        // Note: an association type must be put in type cache *before* storing its association definitions.
         // Consider creation of association type "Composition Definition": it has a composition definition itself.
         putInTypeCache(type);
         //

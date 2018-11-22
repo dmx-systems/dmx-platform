@@ -357,9 +357,15 @@ public final class PersistenceLayer extends StorageDecorator {
             // 2) instantiate
             AssociationImpl assoc = _model.instantiate();
             //
-            // Note: the postCreate() hook is invoked on the update model, *not* on the value integration result
-            // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate()
-            // in AssociationDefinitionModelImpl). TODO: rethink this solution.
+            // Note 1: the postCreate() hook is invoked on the update model, *not* on the value integration result
+            // (_model). Otherwise the programmatic vs. interactive detection would not work (see postCreate() comment
+            // at AssociationDefinitionModelImpl). "model" might be an AssociationDefinitionModel while "_model" is
+            // always an AssociationModel.
+            // Note 2: postCreate() creates and caches the assoc def based on "model". Cached assoc defs need an
+            // up-to-date value (as being displayed in webclient's type editor). The value is calculated while
+            // value integration. We must transfer that value to "model".
+            // TODO: rethink this solution.
+            model.value = _model.value;
             model.postCreate();
             //
             em.fireEvent(CoreEvent.POST_CREATE_ASSOCIATION, assoc);
@@ -876,7 +882,7 @@ public final class PersistenceLayer extends StorageDecorator {
         model.id = typeTopic.id;
         model.uri = typeTopic.uri;
         //
-        typeStorage.storeType(model);               // store type-specific parts
+        typeStorage.storeType(model);                     // store type-specific parts
     }
 
     private String typeUri(long objectId) {
