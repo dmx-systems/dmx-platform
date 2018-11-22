@@ -1,11 +1,11 @@
 <template>
-  <div class="dm5-assoc-def-list">
+  <div :class="['dm5-assoc-def-list', mode]">
     <div class="field-label">Child Types ({{size}})</div>
-    <div>
+    <draggable :list="assocDefs" :options="options">
       <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :marked="marked(assocDef)"
         :key="assocDef.assocDefUri" @click.native="click(assocDef)">
       </dm5-assoc-def>
-    </div>
+    </draggable>
   </div>
 </template>
 
@@ -15,8 +15,13 @@ import dm5 from 'dm5'
 export default {
 
   created () {
-    // console.log('dm5-assoc-def-list created', this.markerIds)
+    // console.log('dm5-assoc-def-list created')
   },
+
+  mixins: [
+    require('./mixins/mode').default,
+    require('./mixins/info-mode').default
+  ],
 
   props: {
     assocDefs: {type: Array, required: true},
@@ -24,8 +29,15 @@ export default {
   },
 
   computed: {
+
     size () {
       return this.assocDefs.length
+    },
+
+    options () {
+      return {
+        disabled: this.infoMode
+      }
     }
   },
 
@@ -43,7 +55,8 @@ export default {
   },
 
   components: {
-    'dm5-assoc-def': require('./dm5-assoc-def').default
+    'dm5-assoc-def': require('./dm5-assoc-def').default,
+    'draggable': require('vuedraggable')    // Note: no .default as it's a CommonJS export
   }
 }
 </script>
@@ -61,7 +74,11 @@ export default {
   border-top: 1px solid var(--border-color);
 }
 
-.dm5-assoc-def-list .dm5-assoc-def:hover {
+.dm5-assoc-def-list.info .dm5-assoc-def:hover {
   background-color: var(--background-color-darker);
+}
+
+.dm5-assoc-def-list.form .dm5-assoc-def:hover {
+  cursor: ns-resize;
 }
 </style>

@@ -32,7 +32,7 @@
       </el-option-group>
     </el-select>
     <!-- Assoc Defs -->
-    <dm5-assoc-def-list :assoc-defs="assocDefs"></dm5-assoc-def-list>
+    <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode"></dm5-assoc-def-list>
   </div>
 </template>
 
