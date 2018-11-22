@@ -9,28 +9,7 @@
     <!-- Data Type -->
     <div class="field-label">Data Type</div>
     <div v-if="infoMode">{{dataType.value}}</div>
-    <el-select v-else v-model="type.dataTypeUri">
-      <el-option-group label="Simple">
-        <el-option :label="dataTypes['dmx.core.text'].value"       :value="dataTypes['dmx.core.text'].uri">
-        </el-option>
-        <el-option :label="dataTypes['dmx.core.number'].value"     :value="dataTypes['dmx.core.number'].uri">
-        </el-option>
-        <el-option :label="dataTypes['dmx.core.boolean'].value"    :value="dataTypes['dmx.core.boolean'].uri">
-        </el-option>
-        <el-option :label="dataTypes['dmx.core.html'].value"       :value="dataTypes['dmx.core.html'].uri">
-        </el-option>
-      </el-option-group>
-      <el-option-group label="Composite">
-        <template v-if="isTopicType">
-          <el-option :label="dataTypes['dmx.core.value'].value"    :value="dataTypes['dmx.core.value'].uri">
-          </el-option>
-          <el-option :label="dataTypes['dmx.core.identity'].value" :value="dataTypes['dmx.core.identity'].uri">
-          </el-option>
-        </template>
-        <el-option :label="dataTypes['dmx.core.composite'].value"  :value="dataTypes['dmx.core.composite'].uri" v-else>
-        </el-option>
-      </el-option-group>
-    </el-select>
+    <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
     <!-- Assoc Defs -->
     <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode"></dm5-assoc-def-list>
   </div>
@@ -63,16 +42,8 @@ export default {
       return this.context.mode
     },
 
-    isTopicType () {
-      return this.type.isTopicType()
-    },
-
     dataType () {
       return this.type.getDataType()
-    },
-
-    dataTypes () {
-      return this.$store.state.typeCache.dataTypes
     },
 
     assocDefs () {
@@ -81,8 +52,9 @@ export default {
   },
 
   components: {
-    'dm5-assoc-def-list': require('./dm5-assoc-def-list').default,
-    'dm5-value-renderer': require('dm5-object-renderer/src/components/dm5-value-renderer').default
+    'dm5-data-type-select': require('./dm5-data-type-select').default,
+    'dm5-assoc-def-list':   require('./dm5-assoc-def-list').default,
+    'dm5-value-renderer':   require('dm5-object-renderer/src/components/dm5-value-renderer').default
   }
 }
 </script>
