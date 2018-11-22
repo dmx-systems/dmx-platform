@@ -36,7 +36,8 @@ export default {
 
     options () {
       return {
-        disabled: this.infoMode
+        disabled: this.infoMode,
+        animation: 300
       }
     }
   },
