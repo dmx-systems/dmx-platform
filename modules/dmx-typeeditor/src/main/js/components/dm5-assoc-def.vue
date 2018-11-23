@@ -1,9 +1,12 @@
 <template>
-  <div :class="['dm5-assoc-def', {marked}]">
-    <div class="fa icon">{{icon}}</div>
-    <div>
-      <div>{{childType.value}}</div>
-      <div class="info label">{{info}}</div>
+  <div class="dm5-assoc-def">
+    <div class="card label">{{card}}</div>
+    <div class="types">
+      <div class="fa icon">{{icon}}</div>
+      <div>
+        <div>{{childType.value}}</div>
+        <div class="info label" v-if="info">{{info}}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -14,11 +17,14 @@ import dm5 from 'dm5'
 export default {
 
   props: {
-    assocDef: {type: dm5.AssocDef, required: true},
-    marked: Boolean   // optional: if truish the topic is rendered as "marked"
+    assocDef: {type: dm5.AssocDef, required: true}
   },
 
   computed: {
+
+    card () {
+      return this.assocDef.isOne() ? "One" : "Many"     // TODO: do not hardcode?
+    },
 
     childType () {
       return this.assocDef.getChildType()
@@ -29,21 +35,21 @@ export default {
     },
 
     info () {
-      return this.assocDef.value
+      const type = this.assocDef.getCustomAssocType()
+      return type && type.value
     }
   }
 }
 </script>
 
 <style>
-.dm5-assoc-def {
-  display: flex;
-  align-items: baseline;
-  border-right: 3px solid var(--border-color);
+.dm5-assoc-def .card {
+  margin-bottom: 6px;
 }
 
-.dm5-assoc-def.marked {
-  border-right-color: var(--color-topic-icon);
+.dm5-assoc-def .types {
+  display: flex;
+  align-items: baseline;
 }
 
 .dm5-assoc-def .icon {

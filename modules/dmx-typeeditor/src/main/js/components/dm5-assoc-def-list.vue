@@ -2,7 +2,7 @@
   <div :class="['dm5-assoc-def-list', mode]">
     <div class="field-label">Child Types ({{size}})</div>
     <draggable :list="assocDefs" :options="options">
-      <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :marked="marked(assocDef)"
+      <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
         :key="assocDef.assocDefUri" @click.native="click(assocDef)">
       </dm5-assoc-def>
     </draggable>
@@ -63,6 +63,7 @@ export default {
 .dm5-assoc-def-list .dm5-assoc-def {
   border-bottom: 1px solid var(--border-color);
   border-left:   1px solid var(--border-color);
+  border-right:  3px solid var(--border-color);
   background-color: white;
   transition: background-color 0.25s;
   padding: 8px;
@@ -70,6 +71,10 @@ export default {
 
 .dm5-assoc-def-list .dm5-assoc-def:nth-child(1) {
   border-top: 1px solid var(--border-color);
+}
+
+.dm5-assoc-def-list .dm5-assoc-def.marked {
+  border-right-color: var(--color-topic-icon);
 }
 
 .dm5-assoc-def-list.info .dm5-assoc-def:hover {
