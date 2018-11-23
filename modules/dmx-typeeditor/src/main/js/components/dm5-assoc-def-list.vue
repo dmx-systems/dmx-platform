@@ -49,9 +49,8 @@ export default {
       return this.markerIds && this.markerIds.includes(topic.id)
     },
 
-    // TODO
-    click (topic) {
-      this.$emit('topic-click', topic)
+    click (assocDef) {
+      this.$emit('assoc-def-click', assocDef)
     }
   },
 

@@ -11,7 +11,7 @@
     <div v-if="infoMode">{{dataType.value}}</div>
     <dm5-data-type-select v-else :type="type"></dm5-data-type-select>
     <!-- Assoc Defs -->
-    <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode"></dm5-assoc-def-list>
+    <dm5-assoc-def-list :assoc-defs="assocDefs" :mode="mode" @assoc-def-click="click"></dm5-assoc-def-list>
   </div>
 </template>
 
@@ -48,6 +48,22 @@ export default {
 
     assocDefs () {
       return this.type.assocDefs
+    }
+  },
+
+  methods: {
+    click (assocDef) {
+      const childType = assocDef.getChildType()
+      //
+      childType.assoc = assocDef    // ugly type cache side effect
+      //
+      // Note: a Cytoscape edge can only be build on an assoc whose players are specified by-ID. But assoc def
+      // players are specified by-URI. We set the IDs manually here. This is an ugly type cache side effect.
+      // TODO: think about it.
+      assocDef.getRole('dmx.core.parent_type').topicId = this.type.id
+      assocDef.getRole('dmx.core.child_type').topicId = childType.id
+      //
+      this.$store.dispatch('revealRelatedTopic', childType)
     }
   },
 
