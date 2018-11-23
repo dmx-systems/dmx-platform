@@ -24,8 +24,7 @@ export default {
   ],
 
   props: {
-    assocDefs: {type: Array, required: true},
-    markerIds: Array      // IDs of topics to render as "marked"
+    assocDefs: {type: Array, required: true}
   },
 
   computed: {
@@ -44,9 +43,8 @@ export default {
 
   methods: {
 
-    // TODO
-    marked (topic) {
-      return this.markerIds && this.markerIds.includes(topic.id)
+    marked (assocDef) {
+      return this.$store.getters.visibleAssocIds.includes(assocDef.id)
     },
 
     click (assocDef) {
