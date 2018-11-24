@@ -1,13 +1,7 @@
 <template>
   <div class="dm5-assoc-def">
     <div class="card label">{{card}}</div>
-    <div class="types">
-      <div class="fa icon">{{icon}}</div>
-      <div>
-        <div>{{childType.value}}</div>
-        <div class="info label" v-if="info">{{info}}</div>
-      </div>
-    </div>
+    <span class="fa icon">{{icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
   </div>
 </template>
 
@@ -36,7 +30,7 @@ export default {
 
     info () {
       const type = this.assocDef.getCustomAssocType()
-      return type && type.value
+      return type && `(${type.value})`
     }
   }
 }
@@ -47,17 +41,17 @@ export default {
   margin-bottom: 6px;
 }
 
-.dm5-assoc-def .types {
-  display: flex;
-  align-items: baseline;
-}
-
 .dm5-assoc-def .icon {
   color: var(--color-topic-icon);
   margin-right: 7px;
 }
 
+.dm5-assoc-def .type {
+  line-height: var(--line-height);
+}
+
 .dm5-assoc-def .info {
-  margin-top: 6px;
+  color: var(--label-color);
+  margin-left: 7px;
 }
 </style>
