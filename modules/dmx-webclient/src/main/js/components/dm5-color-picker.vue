@@ -26,8 +26,8 @@ export default {
       'hsl(120, 50%, 53%)',   // green
       'hsl(180, 50%, 53%)',   // cyan
       'hsl(210, 50%, 53%)',   // blue         hue (210) matches Element UI --color-primary
-      'hsl(255, 43%, 53%)',   // purple
-      'hsl(300, 50%, 53%)',   // pink
+      'hsl(255, 40%, 53%)',   // purple
+      'hsl(300, 43%, 53%)',   // pink
       'hsl(  5, 50%, 53%)',   // red
       'hsl( 40, 70%, 53%)',   // orange
       'hsl( 60, 80%, 53%)',   // yellow
