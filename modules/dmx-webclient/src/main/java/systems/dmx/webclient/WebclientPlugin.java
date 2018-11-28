@@ -108,8 +108,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dmx.webclient.view_config")) {
+            setDefaultConfigTopicLabel(topic);
             updateType(topic);
-            setConfigTopicLabel(topic);
         }
     }
 
@@ -173,6 +173,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         Directives.get().add(dir, type);        // ### TODO: should be implicit
     }
 
+    /**
+     * Overrides the cached view config topic for the given type/assoc def with the given view config topic.
+     */
     private void updateViewConfig(DMXType type, long assocDefId, Topic viewConfig) {
         ViewConfigurationModel vcm;
         if (assocDefId == -1) {
@@ -187,11 +190,11 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     private void setViewConfigLabel(ViewConfiguration viewConfig) {
         for (Topic configTopic : viewConfig.getConfigTopics()) {
-            setConfigTopicLabel(configTopic);
+            setDefaultConfigTopicLabel(configTopic);
         }
     }
 
-    private void setConfigTopicLabel(Topic viewConfig) {
+    private void setDefaultConfigTopicLabel(Topic viewConfig) {
         viewConfig.setSimpleValue(VIEW_CONFIG_LABEL);
     }
 
@@ -233,6 +236,9 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // === Misc ===
 
+    /**
+     * Looks up an assoc def by ID.
+     */
     private AssociationDefinitionModel getAssocDef(TypeModel type, long assocDefId) {
         for (AssociationDefinitionModel assocDef : type.getAssocDefs()) {
             if (assocDef.getId() == assocDefId) {

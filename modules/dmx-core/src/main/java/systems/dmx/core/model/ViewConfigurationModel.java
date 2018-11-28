@@ -40,7 +40,11 @@ public interface ViewConfigurationModel {
 
     ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
 
-    // ### TODO: drop method?
+    /**
+     * Overrides a config topic with the given one.
+     *
+     * @throws  RuntimeException    if this view config does not contain a config topic with the same type URI.
+     */
     void updateConfigTopic(TopicModel configTopic);
 
     // ---

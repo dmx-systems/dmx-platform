@@ -86,13 +86,13 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     @Override
     public void updateConfigTopic(TopicModel configTopic) {
         String configTypeUri = configTopic.getTypeUri();
-        TopicModel confTopic = getConfigTopic(configTypeUri);
+        TopicModel _configTopic = getConfigTopic(configTypeUri);    // existing view config topic
         // error check
-        if (confTopic == null) {
+        if (_configTopic == null) {
             throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
-        confTopic.set(configTopic);
+        _configTopic.set(configTopic);
     }
 
     // ---

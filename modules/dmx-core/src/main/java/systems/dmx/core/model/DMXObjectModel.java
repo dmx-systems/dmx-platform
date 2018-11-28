@@ -49,6 +49,7 @@ public interface DMXObjectModel extends Identifiable, JSONEnabled, Cloneable {
 
     // --- misc ---
 
+    // ### TODO: drop it?
     void set(DMXObjectModel object);
 
     // ---
