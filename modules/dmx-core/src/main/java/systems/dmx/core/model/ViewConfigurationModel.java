@@ -24,9 +24,16 @@ public interface ViewConfigurationModel {
     /**
      * Adds a config topic to this view config.
      *
-     * @throws  RuntimeException    if this view config already contains a config topic with the same type URI.
+     * @throws  RuntimeException    if this view config already contains a config topic for that type URI.
      */
     ViewConfigurationModel addConfigTopic(TopicModel configTopic);
+
+    /**
+     * Overrides a config topic with the given one.
+     *
+     * @throws  RuntimeException    if this view config does not contain a config topic for that type URI.
+     */
+    void updateConfigTopic(TopicModel configTopic);
 
     /**
      * Sets a single value of a certain config topic.
@@ -39,13 +46,6 @@ public interface ViewConfigurationModel {
     ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value);
 
     ViewConfigurationModel setConfigValueRef(String configTypeUri, String childTypeUri, Object topicIdOrUri);
-
-    /**
-     * Overrides a config topic with the given one.
-     *
-     * @throws  RuntimeException    if this view config does not contain a config topic with the same type URI.
-     */
-    void updateConfigTopic(TopicModel configTopic);
 
     // ---
 

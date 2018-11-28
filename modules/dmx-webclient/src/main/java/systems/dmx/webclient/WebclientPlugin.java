@@ -103,13 +103,13 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     /**
-     * Once a view configuration is updated in the DB we must update the cached view configuration model.
+     * Once a view config topic is updated we must update the cached view config.
      */
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {
         if (topic.getTypeUri().equals("dmx.webclient.view_config")) {
             setDefaultConfigTopicLabel(topic);
-            updateType(topic);
+            updateTypeCacheAndAddDirective(topic);
         }
     }
 
@@ -132,19 +132,23 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // === View Configuration ===
 
     /**
-     * Updates type cache once a view config topic has been updated, and adds an UPDATE-TYPE directive.
+     * Updates type cache according to the given view config topic, and adds an UPDATE-TYPE directive.
+     * Called once a view config topic has been updated.
+     *
+     * Determines the type and possibly the assoc def the given view config topic belongs to.
      */
-    private void updateType(Topic viewConfig) {
+    private void updateTypeCacheAndAddDirective(Topic viewConfigTopic) {
         // type to be updated
-        Topic type = viewConfig.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type", null);
+        Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type",
+            null);
         // ID of the assoc def to be updated.
         // -1 if the update does not target an assoc def (but a type).
         long assocDefId = -1;
         if (type == null) {
-            Association assocDef = viewConfig.getRelatedAssociation("dmx.core.composition", "dmx.core.view_config",
+            Association assocDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.view_config",
                 "dmx.core.assoc_def", null);
             if (assocDef == null) {
-                throw new RuntimeException("Orphaned view config: " + viewConfig);
+                throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }
             type = (Topic) assocDef.getPlayer("dmx.core.parent_type");
             assocDefId = assocDef.getId();
@@ -152,38 +156,38 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         //
         String typeUri = type.getTypeUri();
         if (typeUri.equals("dmx.core.topic_type") || typeUri.equals("dmx.core.meta_type")) {
-            updateType(
+            _updateTypeCacheAndAddDirective(
                 dmx.getTopicType(type.getUri()),
-                assocDefId, viewConfig, Directive.UPDATE_TOPIC_TYPE
+                assocDefId, viewConfigTopic, Directive.UPDATE_TOPIC_TYPE
             );
         } else if (typeUri.equals("dmx.core.assoc_type")) {
-            updateType(
+            _updateTypeCacheAndAddDirective(
                 dmx.getAssociationType(type.getUri()),
-                assocDefId, viewConfig, Directive.UPDATE_ASSOCIATION_TYPE
+                assocDefId, viewConfigTopic, Directive.UPDATE_ASSOCIATION_TYPE
             );
         } else {
-            throw new RuntimeException("View config " + viewConfig.getId() + " is associated unexpectedly, type=" +
-                type + ", assocDefId=" + assocDefId + ", viewConfig=" + viewConfig);
+            throw new RuntimeException("View config " + viewConfigTopic.getId() + " is associated unexpectedly, type=" +
+                type + ", assocDefId=" + assocDefId + ", viewConfigTopic=" + viewConfigTopic);
         }
     }
 
-    private void updateType(DMXType type, long assocDefId, Topic viewConfig, Directive dir) {
+    private void _updateTypeCacheAndAddDirective(DMXType type, long assocDefId, Topic viewConfigTopic, Directive dir) {
         logger.info("### Updating view config of type \"" + type.getUri() + "\" (assocDefId=" + assocDefId + ")");
-        updateViewConfig(type, assocDefId, viewConfig);
+        updateTypeCache(type.getModel(), assocDefId, viewConfigTopic.getModel());
         Directives.get().add(dir, type);        // ### TODO: should be implicit
     }
 
     /**
      * Overrides the cached view config topic for the given type/assoc def with the given view config topic.
      */
-    private void updateViewConfig(DMXType type, long assocDefId, Topic viewConfig) {
+    private void updateTypeCache(TypeModel type, long assocDefId, TopicModel viewConfigTopic) {
         ViewConfigurationModel vcm;
         if (assocDefId == -1) {
-            vcm = type.getModel().getViewConfig();
+            vcm = type.getViewConfig();
         } else {
-            vcm = getAssocDef(type.getModel(), assocDefId).getViewConfig();
+            vcm = getAssocDef(type, assocDefId).getViewConfig();
         }
-        vcm.updateConfigTopic(viewConfig.getModel());
+        vcm.updateConfigTopic(viewConfigTopic);
     }
 
     // --- Label ---
@@ -194,8 +198,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         }
     }
 
-    private void setDefaultConfigTopicLabel(Topic viewConfig) {
-        viewConfig.setSimpleValue(VIEW_CONFIG_LABEL);
+    private void setDefaultConfigTopicLabel(Topic viewConfigTopic) {
+        viewConfigTopic.setSimpleValue(VIEW_CONFIG_LABEL);
     }
 
     // --- Default Value ---

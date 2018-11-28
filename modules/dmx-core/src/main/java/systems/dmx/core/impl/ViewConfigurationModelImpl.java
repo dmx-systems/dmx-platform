@@ -47,14 +47,25 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
 
     @Override
     public ViewConfigurationModel addConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
         // error check
+        String configTypeUri = configTopic.getTypeUri();
         if (getConfigTopic(configTypeUri) != null) {
             throw new RuntimeException("There is already a view configuration topic of type \"" + configTypeUri + "\"");
         }
         //
-        configTopics.put(configTypeUri, (TopicModelImpl) configTopic);
+        putConfigTopic(configTopic);
         return this;
+    }
+
+    @Override
+    public void updateConfigTopic(TopicModel configTopic) {
+        // error check
+        String configTypeUri = configTopic.getTypeUri();
+        if (getConfigTopic(configTypeUri) == null) {
+            throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
+        }
+        //
+        putConfigTopic(configTopic);
     }
 
     @Override
@@ -81,18 +92,6 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
             configTopic.getChildTopicsModel().put(childTypeUri, valueRef);
         }
         return this;
-    }
-
-    @Override
-    public void updateConfigTopic(TopicModel configTopic) {
-        String configTypeUri = configTopic.getTypeUri();
-        TopicModel _configTopic = getConfigTopic(configTypeUri);    // existing view config topic
-        // error check
-        if (_configTopic == null) {
-            throw new RuntimeException("There is no view configuration topic of type \"" + configTypeUri + "\"");
-        }
-        //
-        _configTopic.set(configTopic);
     }
 
     // ---
@@ -124,5 +123,11 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
     @Override
     public String toString() {
         return "view configuration " + configTopics;
+    }
+
+    // ------------------------------------------------------------------------------------------------- Private Methods
+
+    public void putConfigTopic(TopicModel configTopic) {
+        configTopics.put(configTopic.getTypeUri(), (TopicModelImpl) configTopic);
     }
 }
