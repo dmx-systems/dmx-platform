@@ -103,7 +103,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     }
 
     /**
-     * Once a view config topic is updated we must update the cached view config.
+     * Once a view config topic is updated we must update the cached view config and inform the webclient.
      */
     @Override
     public void postUpdateTopic(Topic topic, TopicModel updateModel, TopicModel oldTopic) {

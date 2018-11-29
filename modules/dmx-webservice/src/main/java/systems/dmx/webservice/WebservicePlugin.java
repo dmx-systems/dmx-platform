@@ -72,6 +72,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template to "/topic/uri/{uri}"
     @GET
     @Path("/topic/by_uri/{uri}")
     public Topic getTopicByUri(@PathParam("uri") String uri) {
@@ -79,6 +80,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
     @GET
     @Path("/topic/by_value/{key}/{value}")
     public Topic getTopicByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
@@ -86,6 +88,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
     @GET
     @Path("/topic/multi/by_value/{key}/{value}")
     public List<Topic> getTopicsByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
@@ -93,6 +96,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
     @GET
     @Path("/topic/by_type/{topic_type_uri}")
     public List<Topic> getTopicsByType(@PathParam("topic_type_uri") String topicTypeUri) {
@@ -145,6 +149,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
     @GET
     @Path("/assoc/by_value/{key}/{value}")
     public Association getAssociationByValue(@PathParam("key") String key, @PathParam("value") SimpleValue value) {
@@ -152,6 +157,7 @@ public class WebservicePlugin extends PluginActivator {
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
+    // ### TODO: change URI template
     @GET
     @Path("/assoc/multi/by_value/{key}/{value}")
     public List<Association> getAssociationsByValue(@PathParam("key") String key,
