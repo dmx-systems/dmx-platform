@@ -168,8 +168,10 @@ const getters = {
   // The detail panel updates when a type is renamed.
   object: state => {
     // console.log('object getter', state.object, state.object && state.typeCache.topicTypes[state.object.uri])
-    return state.object && (state.object.isType()     ? state.object.asType() :
-                            state.object.isAssocDef() ? state.object.asAssocDef() : state.object)
+    // ### FIXME: the asAssocDef() approach does not work at the moment. Editing an assoc def would send an
+    // update model with by-URI players while the server expects by-ID players.
+    return state.object && (state.object.isType()     ? state.object.asType() /* :
+                            state.object.isAssocDef() ? state.object.asAssocDef() */ : state.object)
     // logical copy in createDetail()/updateDetail() (topicmap-model.js of dm5-cytoscape-renderer module)
   }
 }
