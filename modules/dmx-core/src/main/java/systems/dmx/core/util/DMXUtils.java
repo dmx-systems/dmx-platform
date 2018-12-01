@@ -219,8 +219,7 @@ public class DMXUtils {
         RoleModel r1 = assoc.getRoleModel1();
         RoleModel r2 = assoc.getRoleModel2();
         // ### FIXME: auto-typing is supported only for topic players, and if they are identified by-ID.
-        if (!(r1 instanceof TopicRoleModel) || ((TopicRoleModel) r1).topicIdentifiedByUri() ||
-            !(r2 instanceof TopicRoleModel) || ((TopicRoleModel) r2).topicIdentifiedByUri()) {
+        if (!(r1 instanceof TopicRoleModel) || !(r2 instanceof TopicRoleModel)) {
             return null;
         }
         CoreService dmx = CoreActivator.getCoreService();

@@ -27,16 +27,9 @@ class TopicRoleImpl extends RoleImpl implements TopicRole {
         return (Topic) getPlayer();
     }
 
-    // ---
-
     @Override
     public String getTopicUri() {
         return getModel().getTopicUri();
-    }
-
-    @Override
-    public boolean topicIdentifiedByUri() {
-        return getModel().topicIdentifiedByUri();
     }
 
 

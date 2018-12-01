@@ -397,17 +397,13 @@ public class ModelFactoryImpl implements ModelFactory {
             String topicUri    = topicRoleModel.optString("topicUri", null);
             String roleTypeUri = topicRoleModel.getString("roleTypeUri");
             //
-            if (topicId == -1 && topicUri == null) {
-                throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
-            }
-            if (topicId != -1 && topicUri != null) {
-                throw new IllegalArgumentException("\"topicId\" and \"topicUri\" must not be set at the same time");
-            }
-            //
+            // FIXME: init ID and URI at the same time?
             if (topicId != -1) {
                 return newTopicRoleModel(topicId, roleTypeUri);
-            } else {
+            } else if (topicUri != null) {
                 return newTopicRoleModel(topicUri, roleTypeUri);
+            } else {
+                throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
         } catch (Exception e) {
             throw parsingFailed(topicRoleModel, e, "TopicRoleModelImpl");

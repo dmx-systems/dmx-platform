@@ -9,7 +9,7 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    long playerId;                  // id of the player (a topic, or an association)
+    long playerId = -1;             // id of the player (a topic, or an association)
     String roleTypeUri;             // is never null
 
     PersistenceLayer pl;
@@ -32,6 +32,9 @@ abstract class RoleModelImpl implements RoleModel {
 
     @Override
     public long getPlayerId() {
+        if (playerId == -1) {
+            throw new IllegalStateException("Player ID is not set (" + this + ")");
+        }
         return playerId;
     }
 
@@ -59,7 +62,10 @@ abstract class RoleModelImpl implements RoleModel {
 
     // ---
 
-    // Note: refsSameObject() remain abstract
+    @Override
+    public boolean refsSameObject(RoleModel model) {
+        return getPlayerId() == model.getPlayerId();
+    }
 
 
 

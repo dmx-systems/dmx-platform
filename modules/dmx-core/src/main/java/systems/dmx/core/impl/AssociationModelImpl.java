@@ -388,8 +388,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
         // Note: we can't call roleModel.getPlayer() as this would build an entire object model, but its "value"
         // is not yet available in case this association is part of the player's composite structure.
         // Compare to DMXUtils.associationAutoTyping()
-        if (!(roleModel1 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel1).topicIdentifiedByUri() ||
-            !(roleModel2 instanceof TopicRoleModel) || ((TopicRoleModel) roleModel2).topicIdentifiedByUri()) {
+        if (!(roleModel1 instanceof TopicRoleModel) || !(roleModel2 instanceof TopicRoleModel)) {
             return;
         }
         // Note: only readable assocs (access control) are considered

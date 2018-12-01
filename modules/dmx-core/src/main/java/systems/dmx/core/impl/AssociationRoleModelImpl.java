@@ -1,9 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.Role;
-import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.AssociationRoleModel;
-import systems.dmx.core.model.RoleModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -24,19 +22,10 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
     // === Implementation of abstract RoleModel methods ===
 
     @Override
-    public boolean refsSameObject(RoleModel model) {
-        if (model instanceof AssociationRoleModel) {
-            AssociationRoleModel assocRole = (AssociationRoleModel) model;
-            return assocRole.getPlayerId() == playerId;
-        }
-        return false;
-    }
-
-    @Override
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("assocId", playerId)
+                .put("assocId", playerId)       // TODO: call getPlayerId() but results in endless recursion if thwows
                 .put("roleTypeUri", roleTypeUri);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
@@ -56,6 +45,6 @@ class AssociationRoleModelImpl extends RoleModelImpl implements AssociationRoleM
 
     @Override
     RelatedAssociationModelImpl getPlayer(AssociationModelImpl assoc) {
-        return mf.newRelatedAssociationModel(pl.fetchAssociation(playerId), assoc);
+        return mf.newRelatedAssociationModel(pl.fetchAssociation(getPlayerId()), assoc);
     }
 }

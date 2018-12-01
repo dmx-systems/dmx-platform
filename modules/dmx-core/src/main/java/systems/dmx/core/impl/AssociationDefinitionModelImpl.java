@@ -26,9 +26,6 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    /**
-     * Remains partially uninitialzed. Only usable as an update-model (not as a create-model).
-     */
     AssociationDefinitionModelImpl(AssociationModelImpl assoc) {
         this(assoc, null);
     }
