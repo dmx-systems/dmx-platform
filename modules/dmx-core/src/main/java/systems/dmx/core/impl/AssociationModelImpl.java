@@ -419,16 +419,22 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
      * @param   nr      used only for logging
      */
     private void updateRole(RoleModel updateModel, int nr) {
-        if (updateModel != null) {     // abort if no update is requested
-            // Note: We must lookup the roles individually.
-            // The role order (getRole1(), getRole2()) is undeterministic and not fix.
-            RoleModelImpl role = getRole(updateModel);
-            String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
-            String roleTypeUri = role.getRoleTypeUri();             // current value
-            if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
-                logger.info("### Changing role type " + nr + ": \"" + roleTypeUri + "\" -> \"" + newRoleTypeUri + "\"");
-                updateRoleTypeUri(role, newRoleTypeUri);
+        try {
+            if (updateModel != null) {     // abort if no update is requested
+                // Note: We must lookup the roles individually.
+                // The role order (getRole1(), getRole2()) is undeterministic and not fix.
+                RoleModelImpl role = getRole(updateModel);
+                String newRoleTypeUri = updateModel.getRoleTypeUri();   // new value
+                String roleTypeUri = role.getRoleTypeUri();             // current value
+                if (!roleTypeUri.equals(newRoleTypeUri)) {              // has changed?
+                    logger.info("### Changing role type " + nr + " of association " + id + ": \"" + roleTypeUri +
+                        "\" -> \"" + newRoleTypeUri + "\"");
+                    updateRoleTypeUri(role, newRoleTypeUri);
+                }
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Updating role " + nr + " of association " + id + " failed, updateModel=" +
+                updateModel, e);
         }
     }
 
@@ -438,7 +444,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     /**
      * Returns this association's role which refers to the same object as the given role model.
-     * The role returned is found by comparing topic IDs, topic URIs, or association IDs.
+     * The role returned is found by comparing topic IDs, topic URIs, or association IDs. ### FIXDOC
      * The role types are <i>not</i> compared.
      * <p>
      * If the object refered by the given role model is not a player in this association an exception is thrown.

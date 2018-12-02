@@ -2,16 +2,11 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -61,12 +56,12 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String getParentTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dmx.core.parent_type")).getTopicUri();
+        return ((TopicRoleModelImpl) getRoleModel("dmx.core.parent_type")).topicUri;
     }
 
     @Override
     public String getChildTypeUri() {
-        return ((TopicRoleModel) getRoleModel("dmx.core.child_type")).getTopicUri();
+        return ((TopicRoleModelImpl) getRoleModel("dmx.core.child_type")).topicUri;
     }
 
     @Override
@@ -196,6 +191,20 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
             throw new RuntimeException("Checking assoc def READability failed (" + this + ")", e);
         }
     }
+
+
+
+    // === Helper ===
+
+    TypeModelImpl getParentType() {
+        return pl.typeStorage.getType(getParentTypeUri());
+    }
+
+    TypeModelImpl getChildType() {
+        return pl.typeStorage.getType(getChildTypeUri());
+    }
+
+
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 

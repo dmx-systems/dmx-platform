@@ -30,7 +30,7 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     @Override
     public String getTopicUri() {
         if (topicUri == null) {
-            throw new IllegalStateException("Topic player URI is not set (" + this + ")");
+            throw new IllegalStateException("Player URI is not set in " + this);
         }
         return topicUri;
     }

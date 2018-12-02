@@ -33,7 +33,7 @@ abstract class RoleModelImpl implements RoleModel {
     @Override
     public long getPlayerId() {
         if (playerId == -1) {
-            throw new IllegalStateException("Player ID is not set (" + this + ")");
+            throw new IllegalStateException("Player ID is not set in " + this);
         }
         return playerId;
     }
