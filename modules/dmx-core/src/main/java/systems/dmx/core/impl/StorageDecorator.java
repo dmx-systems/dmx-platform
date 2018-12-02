@@ -47,6 +47,10 @@ class StorageDecorator {
         return (TopicModelImpl) storage.fetchTopic(topicId);
     }
 
+    final TopicModelImpl fetchTopicByUri(String uri) {
+        return fetchTopic("uri", new SimpleValue(uri));
+    }
+
     /**
      * Looks up a single topic by exact value.
      * <p>
