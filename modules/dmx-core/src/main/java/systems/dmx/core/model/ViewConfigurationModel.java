@@ -35,6 +35,8 @@ public interface ViewConfigurationModel {
      */
     void updateConfigTopic(TopicModel configTopic);
 
+    // ---
+
     /**
      * Sets a single value of a certain config topic.
      * If no such config topic exists in this view config it is created.

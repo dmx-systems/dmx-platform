@@ -68,6 +68,8 @@ class ViewConfigurationModelImpl implements ViewConfigurationModel {
         putConfigTopic(configTopic);
     }
 
+    // ---
+
     @Override
     public ViewConfigurationModel setConfigValue(String configTypeUri, String childTypeUri, Object value) {
         TopicModel configTopic = getConfigTopic(configTypeUri);

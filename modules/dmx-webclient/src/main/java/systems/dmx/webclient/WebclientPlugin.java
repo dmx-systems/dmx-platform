@@ -205,15 +205,22 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
     // --- Default Value ---
 
     /**
-     * Add a default view config topic to the given type model in case no one is set already.
+     * Adds a default view config topic to the given type (and its assoc defs) in case no one is set already.
      * <p>
      * This ensures a programmatically created type (through a migration) will
      * have a view config in any case, for being edited interactively afterwards.
      */
     private void addDefaultViewConfig(TypeModel typeModel) {
-        ViewConfigurationModel viewConfig = typeModel.getViewConfig();
-        TopicModel configTopic = viewConfig.getConfigTopic("dmx.webclient.view_config");
-        if (configTopic == null) {
+        // type
+        addDefaultViewConfigTopic(typeModel.getViewConfig());
+        // assoc defs
+        for (String assocDefUri : typeModel) {
+            addDefaultViewConfigTopic(typeModel.getAssocDef(assocDefUri).getViewConfig());
+        }
+    }
+
+    private void addDefaultViewConfigTopic(ViewConfigurationModel viewConfig) {
+        if (viewConfig.getConfigTopic("dmx.webclient.view_config") == null) {
             viewConfig.addConfigTopic(mf.newTopicModel("dmx.webclient.view_config"));
         }
     }
