@@ -117,12 +117,12 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     @Override
     public void introduceTopicType(TopicType topicType) {
-        setViewConfigLabel(topicType.getViewConfig());
+        setViewConfigLabel(topicType);
     }
 
     @Override
     public void introduceAssociationType(AssociationType assocType) {
-        setViewConfigLabel(assocType.getViewConfig());
+        setViewConfigLabel(assocType);
     }
 
     // ------------------------------------------------------------------------------------------------- Private Methods
@@ -192,6 +192,15 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
 
     // --- Label ---
 
+    private void setViewConfigLabel(DMXType type) {
+        // type
+        setViewConfigLabel(type.getViewConfig());
+        // assoc defs
+        for (String assocDefUri : type) {
+            setViewConfigLabel(type.getAssocDef(assocDefUri).getViewConfig());
+        }
+    }
+
     private void setViewConfigLabel(ViewConfiguration viewConfig) {
         for (Topic configTopic : viewConfig.getConfigTopics()) {
             setDefaultConfigTopicLabel(configTopic);
@@ -202,7 +211,7 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         viewConfigTopic.setSimpleValue(VIEW_CONFIG_LABEL);
     }
 
-    // --- Default Value ---
+    // --- Default Config Topic ---
 
     /**
      * Adds a default view config topic to the given type (and its assoc defs) in case no one is set already.
