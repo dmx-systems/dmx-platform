@@ -15,7 +15,7 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private ViewConfigurationModelImpl viewConfig;     // is never null
+    ViewConfigurationModelImpl viewConfig;     // is never null
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

@@ -496,7 +496,7 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
 
     // === Type Editor Support ===
 
-    // This 3 methods bridge between assoc and assoc def.
+    // 3 methods to bridge between assoc and assoc def
 
     /**
      * Creates an assoc def model based on this assoc model, and 1) puts it in the type cache, and 2) updates the

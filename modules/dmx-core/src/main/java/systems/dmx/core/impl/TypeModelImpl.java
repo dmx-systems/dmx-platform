@@ -292,6 +292,13 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // ---
 
+    /**
+     * Adds an assoc def to this type model and to the DB sequence.
+     *
+     * Preconditions:
+     * - The underlying assoc exists in DB already
+     * - The assoc def's view config is stored in DB already
+     */
     final void _addAssocDefBefore(AssociationDefinitionModelImpl assocDef, String beforeAssocDefUri) {
         try {
             long lastAssocDefId = lastAssocDefId();     // must be determined *before* memory is updated
@@ -306,11 +313,9 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
             addAssocDefBefore(assocDef, beforeAssocDefUri);
             //
             // 2) update DB
-            pl.typeStorage.storeAssociationDefinition(assocDef);
             long beforeAssocDefId = beforeAssocDefUri != null ? getAssocDef(beforeAssocDefUri).getId() : -1;
             long firstAssocDefId = firstAssocDefId();   // must be determined *after* memory is updated
-            pl.typeStorage.addAssocDefToSequence(getId(), assocDef.getId(), beforeAssocDefId, firstAssocDefId,
-                lastAssocDefId);
+            pl.typeStorage.addAssocDefToSequence(id, assocDef.id, beforeAssocDefId, firstAssocDefId, lastAssocDefId);
         } catch (Exception e) {
             throw new RuntimeException("Adding assoc def \"" + assocDef.getAssocDefUri() + "\" to type \"" + uri +
                 "\" failed (assocDef=" + assocDef + ", beforeAssocDefUri=\"" + beforeAssocDefUri + "\")", e);
@@ -330,8 +335,12 @@ class TypeModelImpl extends TopicModelImpl implements TypeModel {
 
     // === Type Editor Support ===
 
+    // 3 methods to bridge between assoc and assoc def
+
     final void _addAssocDef(AssociationModelImpl assoc) {
-        _addAssocDefBefore(pl.typeStorage.newAssociationDefinition(assoc), null);    // beforeAssocDefUri=null
+        AssociationDefinitionModelImpl assocDef = pl.typeStorage.newAssociationDefinitionModel(assoc);
+        pl.typeStorage.storeViewConfig(assocDef);
+        _addAssocDefBefore(assocDef, null);      // beforeAssocDefUri=null
         // FIXME: move addUpdateTypeDirective() call to _addAssocDefBefore()? At the moment when adding ab assoc def via
         // TypeImpl no directives are added.
         // (TypeImpl addAssocDef() and addAssocDefBefore() calls _addAssocDefBefore() directly.)

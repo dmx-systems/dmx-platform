@@ -184,7 +184,7 @@ class TypeStorage {
         // 2) store type-specific parts
         storeDataType(type.getUri(), type.getDataTypeUri());
         storeAssocDefs(type.getId(), type.getAssocDefs());
-        storeViewConfig(newTypeRole(type.getId()), type.getViewConfig());
+        storeViewConfig(type);
     }
 
 
@@ -267,15 +267,15 @@ class TypeStorage {
     // ---
 
     /**
-     * Creates an assoc def model from an assoc model created interactively.
+     * Creates an assoc def model from an assoc model. Determines the parent/child type URIs and adds them in-place.
      * Note: the assoc may or may not have been an assoc def before.
      *
      * Part of "Type Editor Support". See TypeModelImpl.
      * Called when the user creates an assoc def interactively.
      *
-     * @param   assoc   the assoc as created interactively, that is players are ref'd by-ID
+     * @param   assoc   an assoc whose players are ref'd by-ID
      */
-    AssociationDefinitionModelImpl newAssociationDefinition(AssociationModelImpl assoc) {
+    AssociationDefinitionModelImpl newAssociationDefinitionModel(AssociationModelImpl assoc) {
         return mf.newAssociationDefinitionModel(
             addPlayerUris(assoc, fetchParentTypeTopic(assoc).uri, fetchChildTypeTopic(assoc).uri),
             mf.newViewConfigurationModel().addConfigTopic(
@@ -364,9 +364,10 @@ class TypeStorage {
         return assoc;
     }
 
-    private void addPlayerIds(AssociationDefinitionModelImpl assocDef) {
+    private AssociationDefinitionModelImpl addPlayerIds(AssociationDefinitionModelImpl assocDef) {
         assocDef.getRoleModel("dmx.core.parent_type").playerId = assocDef.getParentType().id;
         assocDef.getRoleModel("dmx.core.child_type").playerId  = assocDef.getChildType().id;
+        return assocDef;
     }
 
     // ---
@@ -397,16 +398,8 @@ class TypeStorage {
 
     void storeAssociationDefinition(AssociationDefinitionModelImpl assocDef) {
         try {
-            long assocDefId = assocDef.getId();
-            //
             // 1) create association
-            // Note: if the association definition has been created interactively the underlying association
-            // exists already. We must not create it again. We detect this case by inspecting the ID.
-            // ### TODO: refactoring. Drop the ID check.
-            if (assocDefId == -1) {
-                addPlayerIds(assocDef);
-                assocDefId = pl.createAssociation(assocDef).getId();
-            }
+            pl.createAssociation(addPlayerIds(assocDef));
             //
             // 2) cardinality
             // Note: if the underlying association was an association definition before it has cardinality
@@ -415,7 +408,7 @@ class TypeStorage {
             // ### associateCardinality(assocDefId, CHILD_CARDINALITY,  assocDef.getChildCardinalityUri());
             //
             // 3) view config
-            storeViewConfig(newAssocDefRole(assocDefId), assocDef.getViewConfig());
+            storeViewConfig(assocDef);
         } catch (Exception e) {
             throw new RuntimeException("Storing assoc def \"" + assocDef.getAssocDefUri() +
                 "\" failed (parent type \"" + assocDef.getParentTypeUri() + "\")", e);
@@ -693,7 +686,15 @@ class TypeStorage {
 
     // --- Store ---
 
-    private void storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
+    private void storeViewConfig(TypeModelImpl type) {
+        _storeViewConfig(newTypeRole(type.id), type.viewConfig);
+    }
+
+    void storeViewConfig(AssociationDefinitionModelImpl assocDef) {
+        _storeViewConfig(newAssocDefRole(assocDef.id), assocDef.viewConfig);
+    }
+
+    private void _storeViewConfig(RoleModel configurable, ViewConfigurationModelImpl viewConfig) {
         try {
             for (TopicModelImpl configTopic : viewConfig.getConfigTopics()) {
                 storeViewConfigTopic(configurable, configTopic);

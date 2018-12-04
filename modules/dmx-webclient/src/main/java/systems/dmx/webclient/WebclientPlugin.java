@@ -102,6 +102,8 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
         addDefaultViewConfig(model);
     }
 
+    // ---
+
     /**
      * Once a view config topic is updated we must update the cached view config and inform the webclient.
      */
