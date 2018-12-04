@@ -19,6 +19,7 @@ public interface TypeModel extends TopicModel, Iterable<String> {
 
     // === Association Definitions ===
 
+    // TODO: drop it? We're Iterable meanwhile
     Collection<? extends AssociationDefinitionModel> getAssocDefs();
 
     AssociationDefinitionModel getAssocDef(String assocDefUri);

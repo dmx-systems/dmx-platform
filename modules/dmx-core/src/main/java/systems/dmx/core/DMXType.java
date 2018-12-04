@@ -7,7 +7,7 @@ import java.util.Collection;
 
 
 
-public interface DMXType extends Topic {
+public interface DMXType extends Topic, Iterable<String> {
 
 
 
@@ -21,6 +21,7 @@ public interface DMXType extends Topic {
 
     // === Association Definitions ===
 
+    // TODO: drop it? We're Iterable meanwhile
     Collection<AssociationDefinition> getAssocDefs();
 
     AssociationDefinition getAssocDef(String assocDefUri);

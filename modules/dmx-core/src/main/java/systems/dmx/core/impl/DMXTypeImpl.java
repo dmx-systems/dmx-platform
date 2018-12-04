@@ -8,6 +8,7 @@ import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.TypeModel;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -24,9 +25,9 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
 
 
 
-    // *************************************
+    // ******************************
     // *** DMXType Implementation ***
-    // *************************************
+    // ******************************
 
 
 
@@ -108,6 +109,18 @@ abstract class DMXTypeImpl extends TopicImpl implements DMXType {
     @Override
     public TypeModelImpl getModel() {
         return (TypeModelImpl) model;
+    }
+
+
+
+    // === Iterable Implementation ===
+
+    /**
+     * Returns an interator which iterates this Type's assoc def URIs.
+     */
+    @Override
+    public Iterator<String> iterator() {
+        return getModel().iterator();
     }
 
 
