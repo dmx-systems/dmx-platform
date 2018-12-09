@@ -40,7 +40,8 @@ module.exports = (env = {}) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: 'modules/dmx-webclient/src/main/resources/index.html'
+        template: 'modules/dmx-webclient/src/main/resources/index.html',
+        favicon:  'modules/dmx-webclient/src/main/resources/favicon.png'
       }),
       new MiniCssExtractPlugin({
         filename: env.dev ? '[name].css' : '[contenthash].[name].css'
