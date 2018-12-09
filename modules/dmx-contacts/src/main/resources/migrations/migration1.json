@@ -98,11 +98,11 @@
                 ]
             },
 
-            // Institution Name
+            // Organization Name
 
             {
-                "value":       "Institution Name",
-                "uri":         "dmx.contacts.institution_name",
+                "value":       "Organization Name",
+                "uri":         "dmx.contacts.organization_name",
                 "dataTypeUri": "dmx.core.text"
             },
 
@@ -231,15 +231,15 @@
                 ]
             },
 
-            // Institution
+            // Organization
 
             {
-                "value":       "Institution",
-                "uri":         "dmx.contacts.institution",
+                "value":       "Organization",
+                "uri":         "dmx.contacts.organization",
                 "dataTypeUri": "dmx.core.identity",
                 "assocDefs": [
                     {
-                        "childTypeUri":        "dmx.contacts.institution_name",
+                        "childTypeUri":        "dmx.contacts.organization_name",
                         "childCardinalityUri": "dmx.core.one"
                     },
                     {
@@ -269,7 +269,7 @@
                     {
                         "typeUri": "dmx.webclient.view_config",
                         "childs": {
-                            "dmx.webclient.icon": "\uf0c0",
+                            "dmx.webclient.icon": "\uf0e8",
                             "dmx.webclient.add_to_create_menu": true
                         }
                     }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ContactsService {
 
-    List<RelatedTopic> getInstitutions(long personId);
+    List<RelatedTopic> getOrganizations(long personId);
 
-    List<RelatedTopic> getPersons(long instId);
+    List<RelatedTopic> getPersons(long organizationId);
 }

@@ -15,7 +15,7 @@ import java.util.List;
 
 
 
-@Path("/contact")
+@Path("/contacts")
 @Produces("application/json")
 public class ContactsPlugin extends PluginActivator implements ContactsService, PreCreateAssociationListener {
 
@@ -30,19 +30,19 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
 
 
     @GET
-    @Path("/{id}/institutions")
+    @Path("/person/{id}/organizations")
     @Override
-    public List<RelatedTopic> getInstitutions(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_association", "dmx.core.default",
-            "dmx.core.default", "dmx.contacts.institution");
+    public List<RelatedTopic> getOrganizations(@PathParam("id") long personId) {
+        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_association",
+            "dmx.core.default", "dmx.core.default", "dmx.contacts.organization");
     }
 
     @GET
-    @Path("/{id}/persons")
+    @Path("/organization/{id}/persons")
     @Override
-    public List<RelatedTopic> getPersons(@PathParam("id") long instId) {
-        return dmx.getTopic(instId).getRelatedTopics("dmx.contacts.organization_association", "dmx.core.default",
-            "dmx.core.default", "dmx.contacts.person");
+    public List<RelatedTopic> getPersons(@PathParam("id") long organizationId) {
+        return dmx.getTopic(organizationId).getRelatedTopics("dmx.contacts.organization_association",
+            "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
 
@@ -55,8 +55,8 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
 
     @Override
     public void preCreateAssociation(AssociationModel assoc) {
-        // Person <-> Institution
-        DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.institution",
+        // Person <-> Organization
+        DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
             "dmx.contacts.organization_association", "dmx.core.default", "dmx.core.default");
     }
 }
