@@ -17,6 +17,11 @@
         ],
         "assoc_types": [
             {
+                "value":       "Date of Birth",
+                "uri":         "dmx.contacts.date_of_birth",
+                "dataTypeUri": "dmx.core.text"
+            },
+            {
                 "value":       "Phone Entry",
                 "uri":         "dmx.contacts.phone_entry",
                 "dataTypeUri": "dmx.core.composite",
@@ -186,6 +191,11 @@
                         "childTypeUri":        "dmx.contacts.person_name",
                         "childCardinalityUri": "dmx.core.one",
                         "isIdentityAttr":      true
+                    },
+                    {
+                        "childTypeUri":        "dmx.datetime.date",
+                        "childCardinalityUri": "dmx.core.one",
+                        "customAssocTypeUri":  "dmx.contacts.date_of_birth"
                     },
                     {
                         "childTypeUri":        "dmx.contacts.phone_number",
