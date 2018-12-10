@@ -1,0 +1,9 @@
+{
+  "topic_types": [
+    {
+      "value":       "Description",
+      "uri":         "dmx.base.description",
+      "dataTypeUri": "dmx.core.html"
+    }
+  ]
+}
