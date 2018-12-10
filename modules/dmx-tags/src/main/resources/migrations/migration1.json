@@ -1,0 +1,29 @@
+{
+  "topic_types": [
+    {
+      "value":       "Tag Name",
+      "uri":         "dmx.tags.tag_name",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Tag",
+      "uri":         "dmx.tags.tag",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.tags.tag_name",
+          "childCardinalityUri": "dmx.core.one",
+          "isIdentityAttr":      true
+        }
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf02b"
+          }
+        }
+      ]
+    }
+  ]
+}

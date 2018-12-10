@@ -302,6 +302,7 @@
                 <module>modules/dmx-notes</module>
                 <module>modules/dmx-contacts</module>
                 <module>modules/dmx-events</module>
+                <module>modules/dmx-tags</module>
                 <module>modules/dmx-datetime</module>
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-topicmaps</module>
@@ -393,6 +394,7 @@
                 <module>modules/dmx-notes</module>
                 <module>modules/dmx-contacts</module>
                 <module>modules/dmx-events</module>
+                <module>modules/dmx-tags</module>
                 <module>modules/dmx-datetime</module>
                 <module>modules/dmx-workspaces</module>
                 <module>modules/dmx-topicmaps</module>
