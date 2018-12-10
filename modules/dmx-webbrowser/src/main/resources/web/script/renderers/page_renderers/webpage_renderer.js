@@ -1,3 +1,4 @@
+// This is dead DM4 code. TODO: adapt to DM5
 (function() {
 
     var TRAILBLAZER_FEATURE = false                 // trailblazer is switched off
@@ -8,7 +9,7 @@
         // === Page Renderer Implementation ===
 
         render_page: function(topic) {
-            var url = js.absolute_http_url(topic.get("dmx.webbrowser.url"))
+            var url = js.absolute_http_url(topic.get("dmx.base.url"))
             var iframe = $("<iframe>").attr({width: "100%", height: "100%", frameborder: 0})
             //
             if (TRAILBLAZER_FEATURE) {
@@ -33,7 +34,7 @@
                 }
 
                 function follow_link(url) {
-                    var webpage = dm4c.create_topic("dmx.webbrowser.webpage", {"dmx.webbrowser.url": url})
+                    var webpage = dm4c.create_topic("dmx.webbrowser.webpage", {"dmx.base.url": url})
                     dm4c.create_association("dmx.core.association",
                         {topic_id: topic.id, role_type_uri: "dmx.core.default"},
                         {topic_id: webpage.id, role_type_uri: "dmx.core.default"}

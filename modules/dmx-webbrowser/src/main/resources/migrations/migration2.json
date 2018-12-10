@@ -6,8 +6,8 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dmx.webbrowser.url",
-                    "childCardinalityUri":  "dmx.core.one"
+                    "childTypeUri":        "dmx.base.url",
+                    "childCardinalityUri": "dmx.core.one"
                 }
             ],
             "viewConfigTopics": [

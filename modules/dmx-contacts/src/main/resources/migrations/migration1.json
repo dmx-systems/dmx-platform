@@ -207,7 +207,7 @@
                         "childCardinalityUri": "dmx.core.many"
                     },
                     {
-                        "childTypeUri":        "dmx.webbrowser.url",
+                        "childTypeUri":        "dmx.base.url",
                         "childCardinalityUri": "dmx.core.many"
                     },
                     {
@@ -252,7 +252,7 @@
                         "childCardinalityUri": "dmx.core.many"
                     },
                     {
-                        "childTypeUri":        "dmx.webbrowser.url",
+                        "childTypeUri":        "dmx.base.url",
                         "childCardinalityUri": "dmx.core.many"
                     },
                     {

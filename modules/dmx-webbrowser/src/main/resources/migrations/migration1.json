@@ -1,11 +1,6 @@
 {
     "topic_types": [
         {
-            "value":       "URL",
-            "uri":         "dmx.webbrowser.url",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
             "value":       "Notes",
             "uri":         "dmx.webbrowser.notes",
             "dataTypeUri": "dmx.core.html"
@@ -16,7 +11,7 @@
             "dataTypeUri": "dmx.core.identity",
             "assocDefs": [
                 {
-                    "childTypeUri":        "dmx.webbrowser.url",
+                    "childTypeUri":        "dmx.base.url",
                     "childCardinalityUri": "dmx.core.one"
                 },
                 {

@@ -67,7 +67,7 @@
                         "childCardinalityUri": "dmx.core.one"
                     },
                     {
-                        "childTypeUri":        "dmx.webbrowser.url",
+                        "childTypeUri":        "dmx.base.url",
                         "childCardinalityUri": "dmx.core.one"
                     }
                 ],
