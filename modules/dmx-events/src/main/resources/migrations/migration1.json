@@ -2,16 +2,6 @@
     {
         "assoc_types": [
             {
-                "value":       "From",
-                "uri":         "dmx.events.from",
-                "dataTypeUri": "dmx.core.text"
-            },
-            {
-                "value":       "To",
-                "uri":         "dmx.events.to",
-                "dataTypeUri": "dmx.core.text"
-            },
-            {
                 "value":       "Participant",
                 "uri":         "dmx.events.participant",
                 "dataTypeUri": "dmx.core.text",
@@ -51,12 +41,12 @@
                     {
                         "childTypeUri":        "dmx.datetime",
                         "childCardinalityUri": "dmx.core.one",
-                        "customAssocTypeUri":  "dmx.events.from"
+                        "customAssocTypeUri":  "dmx.datetime.from"
                     },
                     {
                         "childTypeUri":        "dmx.datetime",
                         "childCardinalityUri": "dmx.core.one",
-                        "customAssocTypeUri":  "dmx.events.to"
+                        "customAssocTypeUri":  "dmx.datetime.to"
                     },
                     {
                         "childTypeUri":        "dmx.contacts.address",

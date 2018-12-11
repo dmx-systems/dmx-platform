@@ -85,6 +85,18 @@
             ]
         }
     ],
+    "assoc_types": [
+        {
+            "value":       "From",
+            "uri":         "dmx.datetime.from",
+            "dataTypeUri": "dmx.core.text"
+        },
+        {
+            "value":       "To",
+            "uri":         "dmx.datetime.to",
+            "dataTypeUri": "dmx.core.text"
+        }
+    ],
     "topics": [
         # Months
         {"value":  1, "typeUri": "dmx.datetime.month"},
