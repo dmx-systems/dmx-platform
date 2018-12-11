@@ -67,9 +67,7 @@
     },
     {
         "topic_types": [
-
             // Person Name
-
             {
                 "value":       "First Name",
                 "uri":         "dmx.contacts.first_name",
@@ -97,33 +95,25 @@
                     }
                 ]
             },
-
             // Organization Name
-
             {
                 "value":       "Organization Name",
                 "uri":         "dmx.contacts.organization_name",
                 "dataTypeUri": "dmx.core.text"
             },
-
             // Phone
-
             {
                 "value":       "Phone",
                 "uri":         "dmx.contacts.phone_number",
                 "dataTypeUri": "dmx.core.text"
             },
-
             // Email Address
-
             {
                 "value":       "Email Address",
                 "uri":         "dmx.contacts.email_address",
                 "dataTypeUri": "dmx.core.text"
             },
-
             // Address
-
             {
                 "value":       "Street",
                 "uri":         "dmx.contacts.street",
@@ -137,6 +127,11 @@
             {
                 "value":       "City",
                 "uri":         "dmx.contacts.city",
+                "dataTypeUri": "dmx.core.text"
+            },
+            {
+                "value":       "Region",
+                "uri":         "dmx.contacts.region",
                 "dataTypeUri": "dmx.core.text"
             },
             {
@@ -165,23 +160,24 @@
                         "includeInLabel":      true
                     },
                     {
+                        "childTypeUri":        "dmx.contacts.region",
+                        "childCardinalityUri": "dmx.core.one",
+                        "includeInLabel":      true
+                    },
+                    {
                         "childTypeUri":        "dmx.contacts.country",
                         "childCardinalityUri": "dmx.core.one",
                         "includeInLabel":      true
                     }
                 ]
             },
-
             // Notes
-
             {
                 "value":       "Notes",
                 "uri":         "dmx.contacts.notes",
                 "dataTypeUri": "dmx.core.html"
             },
-
             // Person
-
             {
                 "value":       "Person",
                 "uri":         "dmx.contacts.person",
@@ -230,9 +226,7 @@
                     }
                 ]
             },
-
             // Organization
-
             {
                 "value":       "Organization",
                 "uri":         "dmx.contacts.organization",
@@ -276,11 +270,8 @@
                 ]
             }
         ],
-
         "topics": [
-
             // Phone Labels
-
             {
                 "value":   "work",
                 "uri":     "dmx.contacts.work_phone",
@@ -306,9 +297,7 @@
                 "uri":     "dmx.contacts.home_fax",
                 "typeUri": "dmx.contacts.phone_label"
             },
-
             // Address Labels
-
             {
                 "value":   "work",
                 "uri":     "dmx.contacts.work_address",

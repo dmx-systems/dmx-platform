@@ -1,6 +1,6 @@
 {
     "topic_types": [
-        # Date
+        // Date
         {
             "value":       "Month",
             "uri":         "dmx.datetime.month",
@@ -38,7 +38,7 @@
                 }
             ]
         },
-        # Time
+        // Time
         {
             "value":       "Hour",
             "uri":         "dmx.datetime.hour",
@@ -55,18 +55,18 @@
             "dataTypeUri": "dmx.core.value",
             "assocDefs": [
                 {
-                    "childTypeUri":         "dmx.datetime.hour",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "includeInLabel":       true
+                    "childTypeUri":        "dmx.datetime.hour",
+                    "childCardinalityUri": "dmx.core.one",
+                    "includeInLabel":      true
                 },
                 {
-                    "childTypeUri":         "dmx.datetime.minute",
-                    "childCardinalityUri":  "dmx.core.one",
-                    "includeInLabel":       true
+                    "childTypeUri":        "dmx.datetime.minute",
+                    "childCardinalityUri": "dmx.core.one",
+                    "includeInLabel":      true
                 }
             ]
         },
-        # Date/Time
+        // Date/Time
         {
             "value":       "Date/Time",
             "uri":         "dmx.datetime",
@@ -96,92 +96,5 @@
             "uri":         "dmx.datetime.to",
             "dataTypeUri": "dmx.core.text"
         }
-    ],
-    "topics": [
-        # Months
-        {"value":  1, "typeUri": "dmx.datetime.month"},
-        {"value":  2, "typeUri": "dmx.datetime.month"},
-        {"value":  3, "typeUri": "dmx.datetime.month"},
-        {"value":  4, "typeUri": "dmx.datetime.month"},
-        {"value":  5, "typeUri": "dmx.datetime.month"},
-        {"value":  6, "typeUri": "dmx.datetime.month"},
-        {"value":  7, "typeUri": "dmx.datetime.month"},
-        {"value":  8, "typeUri": "dmx.datetime.month"},
-        {"value":  9, "typeUri": "dmx.datetime.month"},
-        {"value": 10, "typeUri": "dmx.datetime.month"},
-        {"value": 11, "typeUri": "dmx.datetime.month"},
-        {"value": 12, "typeUri": "dmx.datetime.month"},
-        # Days
-        {"value":  1, "typeUri": "dmx.datetime.day"},
-        {"value":  2, "typeUri": "dmx.datetime.day"},
-        {"value":  3, "typeUri": "dmx.datetime.day"},
-        {"value":  4, "typeUri": "dmx.datetime.day"},
-        {"value":  5, "typeUri": "dmx.datetime.day"},
-        {"value":  6, "typeUri": "dmx.datetime.day"},
-        {"value":  7, "typeUri": "dmx.datetime.day"},
-        {"value":  8, "typeUri": "dmx.datetime.day"},
-        {"value":  9, "typeUri": "dmx.datetime.day"},
-        {"value": 10, "typeUri": "dmx.datetime.day"},
-        {"value": 11, "typeUri": "dmx.datetime.day"},
-        {"value": 12, "typeUri": "dmx.datetime.day"},
-        {"value": 13, "typeUri": "dmx.datetime.day"},
-        {"value": 14, "typeUri": "dmx.datetime.day"},
-        {"value": 15, "typeUri": "dmx.datetime.day"},
-        {"value": 16, "typeUri": "dmx.datetime.day"},
-        {"value": 17, "typeUri": "dmx.datetime.day"},
-        {"value": 18, "typeUri": "dmx.datetime.day"},
-        {"value": 19, "typeUri": "dmx.datetime.day"},
-        {"value": 20, "typeUri": "dmx.datetime.day"},
-        {"value": 21, "typeUri": "dmx.datetime.day"},
-        {"value": 22, "typeUri": "dmx.datetime.day"},
-        {"value": 23, "typeUri": "dmx.datetime.day"},
-        {"value": 24, "typeUri": "dmx.datetime.day"},
-        {"value": 25, "typeUri": "dmx.datetime.day"},
-        {"value": 26, "typeUri": "dmx.datetime.day"},
-        {"value": 27, "typeUri": "dmx.datetime.day"},
-        {"value": 28, "typeUri": "dmx.datetime.day"},
-        {"value": 29, "typeUri": "dmx.datetime.day"},
-        {"value": 30, "typeUri": "dmx.datetime.day"},
-        {"value": 31, "typeUri": "dmx.datetime.day"},
-        # Years
-        {"value": 2017, "typeUri": "dmx.datetime.year"},
-        # Hours
-        {"value":  0, "typeUri": "dmx.datetime.hour"},
-        {"value":  1, "typeUri": "dmx.datetime.hour"},
-        {"value":  2, "typeUri": "dmx.datetime.hour"},
-        {"value":  3, "typeUri": "dmx.datetime.hour"},
-        {"value":  4, "typeUri": "dmx.datetime.hour"},
-        {"value":  5, "typeUri": "dmx.datetime.hour"},
-        {"value":  6, "typeUri": "dmx.datetime.hour"},
-        {"value":  7, "typeUri": "dmx.datetime.hour"},
-        {"value":  8, "typeUri": "dmx.datetime.hour"},
-        {"value":  9, "typeUri": "dmx.datetime.hour"},
-        {"value": 10, "typeUri": "dmx.datetime.hour"},
-        {"value": 11, "typeUri": "dmx.datetime.hour"},
-        {"value": 12, "typeUri": "dmx.datetime.hour"},
-        {"value": 13, "typeUri": "dmx.datetime.hour"},
-        {"value": 14, "typeUri": "dmx.datetime.hour"},
-        {"value": 15, "typeUri": "dmx.datetime.hour"},
-        {"value": 16, "typeUri": "dmx.datetime.hour"},
-        {"value": 17, "typeUri": "dmx.datetime.hour"},
-        {"value": 18, "typeUri": "dmx.datetime.hour"},
-        {"value": 19, "typeUri": "dmx.datetime.hour"},
-        {"value": 20, "typeUri": "dmx.datetime.hour"},
-        {"value": 21, "typeUri": "dmx.datetime.hour"},
-        {"value": 22, "typeUri": "dmx.datetime.hour"},
-        {"value": 23, "typeUri": "dmx.datetime.hour"},
-        # Minutes
-        {"value":  0, "typeUri": "dmx.datetime.minute"},
-        {"value":  5, "typeUri": "dmx.datetime.minute"},
-        {"value": 10, "typeUri": "dmx.datetime.minute"},
-        {"value": 15, "typeUri": "dmx.datetime.minute"},
-        {"value": 20, "typeUri": "dmx.datetime.minute"},
-        {"value": 25, "typeUri": "dmx.datetime.minute"},
-        {"value": 30, "typeUri": "dmx.datetime.minute"},
-        {"value": 35, "typeUri": "dmx.datetime.minute"},
-        {"value": 40, "typeUri": "dmx.datetime.minute"},
-        {"value": 45, "typeUri": "dmx.datetime.minute"},
-        {"value": 50, "typeUri": "dmx.datetime.minute"},
-        {"value": 55, "typeUri": "dmx.datetime.minute"}
     ]
 }
