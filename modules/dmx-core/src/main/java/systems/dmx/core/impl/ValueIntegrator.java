@@ -303,7 +303,8 @@ class ValueIntegrator {
         if (isValueType() && !isFacetUpdate) {
             return !childValues.isEmpty() ? unifyChildTopics(childValues, type) : null;
         } else {
-            return updateAssignments(identifyParent(childValues), childValues);
+            DMXObjectModelImpl parent = identifyParent(childValues);
+            return parent != null ? updateAssignments(parent, childValues) : null;
         }
     }
 
@@ -316,7 +317,7 @@ class ValueIntegrator {
      *
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
      *
-     * @return  the parent object; never null.
+     * @return  the parent object, or null if there is no parent
      */
     private DMXObjectModelImpl identifyParent(Map<String, Object> childValues) {
         // TODO: 1st check identity attrs THEN target object?? => NO!
@@ -333,7 +334,8 @@ class ValueIntegrator {
         } else {
             List<String> identityAssocDefUris = type.getIdentityAttrs();
             if (identityAssocDefUris.size() > 0) {
-                return unifyChildTopics(identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris);
+                return !childValues.isEmpty() ? unifyChildTopics(
+                    identityChildTopics(childValues, identityAssocDefUris), identityAssocDefUris) : null;
             } else {
                 // FIXME: when the POST_CREATE_TOPIC event is fired, the child topics should exist already.
                 // Note: for value-types this is fixed meanwhile, but not for identity-types.
@@ -346,36 +348,43 @@ class ValueIntegrator {
     }
 
     /**
-     * From the given child topics selects these one which made up the parent topic's identity.
+     * From the given child topics selects these ones which made up the parent topic's identity.
      *
-     * @param   childValues             key: assocDefUri
-     *                                  value: UnifiedValue or List<UnifiedValue>
+     * @param   childValues             the map of the child topics to select from; not empty
+     *                                      key: assocDefUri
+     *                                      value: UnifiedValue or List<UnifiedValue>
      * @param   identityAssocDefUris    not empty
      *
      * @return  A map of the identity child topics; not empty
      *              key: assocDefUri
-     *              value: UnifiedValue or List<UnifiedValue>
+     *              value: UnifiedValue
      */
     private Map<String, Object> identityChildTopics(Map<String, Object> childValues,
                                                     List<String> identityAssocDefUris) {
-        Map<String, Object> identityChildTopics = new HashMap();
-        for (String assocDefUri : identityAssocDefUris) {
-            UnifiedValue childTopic;
-            if (isOne(assocDefUri)) {
-                childTopic = (UnifiedValue) childValues.get(assocDefUri);
-            } else {
-                throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
+        try {
+            Map<String, Object> identityChildTopics = new HashMap();
+            for (String assocDefUri : identityAssocDefUris) {
+                if (!isOne(assocDefUri)) {
+                    throw new RuntimeException("Cardinality \"many\" identity attributes not supported");
+                }
+                UnifiedValue childTopic = (UnifiedValue) childValues.get(assocDefUri);
+                if (childTopic == null) {
+                    throw new RuntimeException("Identity value \"" + assocDefUri + "\" is missing in " +
+                        childValues.keySet() + " (childTopic=null)");
+                }
+                if (childTopic.value == null) {
+                    // FIXME: can this happen?
+                    throw new RuntimeException("Identity value \"" + assocDefUri + "\" is missing in " +
+                        childValues.keySet() + " (childTopic.value=null)");
+                }
+                identityChildTopics.put(assocDefUri, childTopic);
             }
-            // FIXME: only throw if NO identity child topic is given.
-            // If at least ONE is given it is sufficient.
-            if (childTopic.value == null) {
-                throw new RuntimeException("Identity child topic \"" + assocDefUri + "\" is missing in " +
-                    childValues.keySet());
-            }
-            identityChildTopics.put(assocDefUri, childTopic);
+            // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
+            return identityChildTopics;
+        } catch (Exception e) {
+            throw new RuntimeException("Selecting identity childs " + identityAssocDefUris + " failed, childValues=" +
+                childValues, e);
         }
-        // logger.fine("### type=\"" + type.uri + "\" ### identityChildTopics=" + identityChildTopics);
-        return identityChildTopics;
     }
 
     /**
@@ -388,7 +397,10 @@ class ValueIntegrator {
      *   - assocDef's parent type is this.type
      *   - newChildTopic's type is assocDef's child type
      *
+     * @param   parent          to parent to be updated; not null
      * @param   childValues     value: UnifiedValue or List<UnifiedValue>
+     *
+     * @return  the updated parent (passed through)
      */
     private DMXObjectModelImpl updateAssignments(DMXObjectModelImpl parent, Map<String, Object> childValues) {
         // sanity check

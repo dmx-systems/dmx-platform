@@ -49,12 +49,12 @@ class TypeStorage {
     // === Type Cache ===
 
     TopicTypeModelImpl getTopicType(String topicTypeUri) {
-        TopicTypeModelImpl topicType = (TopicTypeModelImpl) getType(topicTypeUri);
+        TopicTypeModelImpl topicType = (TopicTypeModelImpl) getTypeIfExists(topicTypeUri);
         return topicType != null ? topicType : fetchTopicType(topicTypeUri);
     }
 
     AssociationTypeModelImpl getAssociationType(String assocTypeUri) {
-        AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getType(assocTypeUri);
+        AssociationTypeModelImpl assocType = (AssociationTypeModelImpl) getTypeIfExists(assocTypeUri);
         return assocType != null ? assocType : fetchAssociationType(assocTypeUri);
     }
 
@@ -74,6 +74,14 @@ class TypeStorage {
     // ---
 
     TypeModelImpl getType(String typeUri) {
+        TypeModelImpl type = getTypeIfExists(typeUri);
+        if (type == null) {
+            throw new RuntimeException("Type \"" + typeUri + "\" not found in type cache");
+        }
+        return type;
+    }
+
+    private TypeModelImpl getTypeIfExists(String typeUri) {
         return typeCache.get(typeUri);
     }
 
