@@ -1,76 +1,73 @@
-[
+{
+  "topic_types": [
+    // Event
     {
-        "assoc_types": [
-            {
-                "value":       "Participant",
-                "uri":         "dmx.events.participant",
-                "dataTypeUri": "dmx.core.text",
-                "viewConfigTopics": [
-                    {
-                        "typeUri": "dmx.webclient.view_config",
-                        "childs": {
-                            "dmx.webclient.color": "hsl(300, 43%, 53%)"
-                        }
-                    }
-                ]
-            }
-        ]
+      "value":       "Event Name",
+      "uri":         "dmx.events.event_name",
+      "dataTypeUri": "dmx.core.text"
     },
     {
-        "topic_types": [
-            # Event
-            {
-                "value":       "Title",
-                "uri":         "dmx.events.title",
-                "dataTypeUri": "dmx.core.text"
-            },
-            {
-                "value":       "Notes",
-                "uri":         "dmx.events.notes",
-                "dataTypeUri": "dmx.core.html"
-            },
-            {
-                "value":       "Event",
-                "uri":         "dmx.events.event",
-                "dataTypeUri": "dmx.core.identity",
-                "assocDefs": [
-                    {
-                        "childTypeUri":        "dmx.events.title",
-                        "childCardinalityUri": "dmx.core.one"
-                    },
-                    {
-                        "childTypeUri":        "dmx.datetime",
-                        "childCardinalityUri": "dmx.core.one",
-                        "customAssocTypeUri":  "dmx.datetime.from"
-                    },
-                    {
-                        "childTypeUri":        "dmx.datetime",
-                        "childCardinalityUri": "dmx.core.one",
-                        "customAssocTypeUri":  "dmx.datetime.to"
-                    },
-                    {
-                        "childTypeUri":        "dmx.contacts.address",
-                        "childCardinalityUri": "dmx.core.one"
-                    },
-                    {
-                        "childTypeUri":        "dmx.events.notes",
-                        "childCardinalityUri": "dmx.core.one"
-                    },
-                    {
-                        "childTypeUri":        "dmx.base.url",
-                        "childCardinalityUri": "dmx.core.one"
-                    }
-                ],
-                "viewConfigTopics": [
-                    {
-                        "typeUri": "dmx.webclient.view_config",
-                        "childs": {
-                            "dmx.webclient.icon": "\uf133",
-                            "dmx.webclient.add_to_create_menu": true
-                        }
-                    }
-                ]
-            }
-        ]
+      "value":       "Event Description",
+      "uri":         "dmx.events.event_description",
+      "dataTypeUri": "dmx.core.html"
+    },
+    {
+      "value":       "Event",
+      "uri":         "dmx.events.event",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.events.event_name",
+          "childCardinalityUri": "dmx.core.one",
+          "isIdentityAttr":      true
+        },
+        {
+          "childTypeUri":        "dmx.datetime",
+          "childCardinalityUri": "dmx.core.one",
+          "customAssocTypeUri":  "dmx.datetime.from"
+        },
+        {
+          "childTypeUri":        "dmx.datetime",
+          "childCardinalityUri": "dmx.core.one",
+          "customAssocTypeUri":  "dmx.datetime.to"
+        },
+        {
+          "childTypeUri":        "dmx.events.event_description",
+          "childCardinalityUri": "dmx.core.one"
+        },
+        {
+          "childTypeUri":        "dmx.contacts.address",
+          "childCardinalityUri": "dmx.core.one"
+        },
+        {
+          "childTypeUri":        "dmx.base.url",
+          "childCardinalityUri": "dmx.core.one"
+        }
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf133",
+            "dmx.webclient.add_to_create_menu": true
+          }
+        }
+      ]
     }
-]
+  ],
+  "assoc_types": [
+    {
+      "value":       "Participant",
+      "uri":         "dmx.events.participant",
+      "dataTypeUri": "dmx.core.text",
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.color": "hsl(300, 43%, 53%)"
+          }
+        }
+      ]
+    }
+  ]
+}
