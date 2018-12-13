@@ -1,65 +1,65 @@
+# Part of DMX 5.0
+# Runs ALWAYS
+
 {
-    "topic_types": [
+  "topic_types": [
+    {
+      "value":       "Translation X",
+      "uri":         "dmx.topicmaps.translation_x",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Translation Y",
+      "uri":         "dmx.topicmaps.translation_y",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Translation",
+      "uri":         "dmx.topicmaps.translation",
+      "dataTypeUri": "dmx.core.value",
+      "assocDefs": [
         {
-            "value":       "X",
-            "uri":         "dmx.topicmaps.translation_x",
-            "dataTypeUri": "dmx.core.number"
-            // TODO: index
+          "childTypeUri":        "dmx.topicmaps.translation_x",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         },
         {
-            "value":       "Y",
-            "uri":         "dmx.topicmaps.translation_y",
-            "dataTypeUri": "dmx.core.number"
-            // TODO: index
-        },
-        {
-            "value":       "Translation",
-            "uri":         "dmx.topicmaps.translation",
-            "dataTypeUri": "dmx.core.value",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.topicmaps.translation_x",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.topicmaps.translation_y",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                }
-            ]
-        },
-        {
-            "value":       "Zoom Level",
-            "uri":         "dmx.topicmaps.zoom_level",
-            "dataTypeUri": "dmx.core.number"
-            // TODO: index
-        },
-        {
-            "value":       "Topicmap State",
-            "uri":         "dmx.topicmaps.state",
-            "dataTypeUri": "dmx.core.value",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.topicmaps.translation",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                },
-                {
-                    "childTypeUri":        "dmx.topicmaps.zoom_level",
-                    "childCardinalityUri": "dmx.core.one",
-                    "includeInLabel":      true
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.hidden": true,
-                        "dmx.webclient.locked": true
-                    }
-                }
-            ]
+          "childTypeUri":        "dmx.topicmaps.translation_y",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
         }
-    ]
+      ]
+    },
+    {
+      "value":       "Zoom Level",
+      "uri":         "dmx.topicmaps.zoom_level",
+      "dataTypeUri": "dmx.core.number"
+    },
+    {
+      "value":       "Topicmap State",
+      "uri":         "dmx.topicmaps.topicmap_state",
+      "dataTypeUri": "dmx.core.value",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.topicmaps.translation",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        },
+        {
+          "childTypeUri":        "dmx.topicmaps.zoom_level",
+          "childCardinalityUri": "dmx.core.one",
+          "includeInLabel":      true
+        }
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.hidden": true,
+            "dmx.webclient.locked": true
+          }
+        }
+      ]
+    }
+  ]
 }

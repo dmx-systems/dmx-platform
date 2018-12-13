@@ -15,7 +15,7 @@ public class Migration3 extends Migration {
     @Override
     public void run() {
         dmx.getTopicType("dmx.topicmaps.topicmap").addAssocDef(
-            mf.newAssociationDefinitionModel("dmx.topicmaps.topicmap", "dmx.topicmaps.state", "dmx.core.one")
+            mf.newAssociationDefinitionModel("dmx.topicmaps.topicmap", "dmx.topicmaps.topicmap_state", "dmx.core.one")
         );
     }
 }

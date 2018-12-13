@@ -1,94 +1,95 @@
+# Part of DMX 5.0
+# Runs ALWAYS
+
 {
-    "topic_types": [
+  "topic_types": [
+    {
+      "value":       "Topicmap Name",
+      "uri":         "dmx.topicmaps.topicmap_name",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Topicmap Description",
+      "uri":         "dmx.topicmaps.topicmap_description",
+      "dataTypeUri": "dmx.core.html"
+    },
+    {
+      "value":       "Topicmap Renderer URI",                 // TODO: rename to "Topicmap Type URI"
+      "uri":         "dmx.topicmaps.topicmap_renderer_uri",   // TODO: rename to "dmx.topicmaps.topicmap_type_uri"
+      "dataTypeUri": "dmx.core.text",
+      "viewConfigTopics": [
         {
-            "value":       "Topicmap Name",
-            "uri":         "dmx.topicmaps.name",
-            "dataTypeUri": "dmx.core.text"
-        },
-        {
-            "value":       "Notes",
-            "uri":         "dmx.topicmaps.notes",
-            "dataTypeUri": "dmx.core.html"
-        },
-        {
-            "value":       "Topicmap Renderer URI",                 # TODO: rename to "Topicmap Type URI"
-            "uri":         "dmx.topicmaps.topicmap_renderer_uri",   # TODO: rename to "dmx.topicmaps.topicmap_type_uri"
-            "dataTypeUri": "dmx.core.text",
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.hidden": true,
-                        "dmx.webclient.locked": true
-                    }
-                }
-            ]
-        },
-        {
-            "value":       "Topicmap",
-            "uri":         "dmx.topicmaps.topicmap",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.topicmaps.name",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.topicmaps.notes",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.topicmaps.topicmap_renderer_uri",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.files.file",
-                    "childCardinalityUri": "dmx.core.one",
-                    "viewConfigTopics": [
-                        {
-                            "typeUri": "dmx.webclient.view_config",
-                            "childs": {
-                                "dmx.webclient.hidden": true
-                            }
-                        }
-                    ]
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.icon": "\uf069"
-                    }
-                }
-            ]
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.hidden": true,
+            "dmx.webclient.locked": true
+          }
         }
-    ],
-
-    "assoc_types": [
+      ]
+    },
+    {
+      "value":       "Topicmap",
+      "uri":         "dmx.topicmaps.topicmap",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
         {
-            "value":       "Topic Mapcontext",
-            "uri":         "dmx.topicmaps.topic_mapcontext",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.topicmaps.topicmap_name",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":       "Association Mapcontext",
-            "uri":         "dmx.topicmaps.association_mapcontext",
-            "dataTypeUri": "dmx.core.text"
-        }
-    ],
-
-    "topics": [
-        ### Role Types ###
-        {
-            "value":   "Topicmap Topic",
-            "uri":     "dmx.topicmaps.topicmap_topic",
-            "typeUri": "dmx.core.role_type"
+          "childTypeUri":        "dmx.topicmaps.topicmap_description",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":   "Topicmap Association",
-            "uri":     "dmx.topicmaps.topicmap_association",
-            "typeUri": "dmx.core.role_type"
+          "childTypeUri":        "dmx.topicmaps.topicmap_renderer_uri",
+          "childCardinalityUri": "dmx.core.one"
+        },
+        {
+          "childTypeUri":        "dmx.files.file",
+          "childCardinalityUri": "dmx.core.one",
+          "viewConfigTopics": [
+            {
+              "typeUri": "dmx.webclient.view_config",
+              "childs": {
+                "dmx.webclient.hidden": true
+              }
+            }
+          ]
         }
-    ]
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf069"
+          }
+        }
+      ]
+    }
+  ],
+  "assoc_types": [
+    {
+      "value":       "Topic Mapcontext",
+      "uri":         "dmx.topicmaps.topic_mapcontext",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Association Mapcontext",
+      "uri":         "dmx.topicmaps.association_mapcontext",
+      "dataTypeUri": "dmx.core.text"
+    }
+  ],
+  "topics": [
+    // Role Types
+    {
+      "value":   "Topicmap Topic",
+      "uri":     "dmx.topicmaps.topicmap_topic",
+      "typeUri": "dmx.core.role_type"
+    },
+    {
+      "value":   "Topicmap Association",
+      "uri":     "dmx.topicmaps.topicmap_association",
+      "typeUri": "dmx.core.role_type"
+    }
+  ]
 }

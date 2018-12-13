@@ -102,10 +102,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
             "\", isPrivate=" + isPrivate +")");
         Topic topicmapTopic = dmx.createTopic(mf.newTopicModel("dmx.topicmaps.topicmap", mf.newChildTopicsModel()
-            .put("dmx.topicmaps.name", name)
+            .put("dmx.topicmaps.topicmap_name", name)
             .put("dmx.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dmx.topicmaps.private", isPrivate)
-            .put("dmx.topicmaps.state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))));
+            .put("dmx.topicmaps.topicmap_state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))))
+            .put("dmx.topicmaps.private", isPrivate);
         me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
         return topicmapTopic;
     }
@@ -364,7 +364,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                                                                          @PathParam("y") int transY) {
         try {
             ChildTopicsModel topicmapState = mf.newChildTopicsModel()
-                .put("dmx.topicmaps.state", mf.newChildTopicsModel()
+                .put("dmx.topicmaps.topicmap_state", mf.newChildTopicsModel()
                     .put("dmx.topicmaps.translation", mf.newChildTopicsModel()
                         .put("dmx.topicmaps.translation_x", transX)
                         .put("dmx.topicmaps.translation_y", transY)));

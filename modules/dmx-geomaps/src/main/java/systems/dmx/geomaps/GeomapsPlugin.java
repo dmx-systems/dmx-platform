@@ -148,7 +148,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
         ChildTopicsModel geomapState = mf.newChildTopicsModel().put(
-            "dmx.topicmaps.state", mf.newChildTopicsModel().put(
+            "dmx.topicmaps.topicmap_state", mf.newChildTopicsModel().put(
                 "dmx.topicmaps.translation", mf.newChildTopicsModel().put(
                     "dmx.topicmaps.translation_x", lon).put(
                     "dmx.topicmaps.translation_y", lat)).put(
