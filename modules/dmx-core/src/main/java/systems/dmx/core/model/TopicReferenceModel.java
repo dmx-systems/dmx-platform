@@ -18,7 +18,7 @@ public interface TopicReferenceModel extends RelatedTopicModel {
     // ---
 
     /**
-     * Checks weather this reference refers to the given topic.
+     * Checks whether this reference refers to the given topic.
      */
     boolean isReferingTo(TopicModel topic);
 

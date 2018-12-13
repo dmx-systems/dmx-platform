@@ -118,7 +118,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // 1) create workspace
                     Topic workspace = dmx.createTopic(
                         mf.newTopicModel(uri, "dmx.workspaces.workspace", mf.newChildTopicsModel()
-                            .put("dmx.workspaces.name", name)
+                            .put("dmx.workspaces.workspace_name", name)
                             .putRef("dmx.workspaces.sharing_mode", sharingMode.getUri())));
                     //
                     // 2) create default topicmap and assign to workspace
@@ -353,7 +353,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         // Note: we must avoid a vicious circle that would occur when editing a workspace. A Notes topic
         // would be created (as no notes are set when the workspace is created) and be assigned to the
         // workspace itself. This would create an endless recursion while bubbling the modification timestamp.
-        if (isWorkspaceNotes(topic)) {
+        if (isWorkspaceDescription(topic)) {
             return;
         }
         //
@@ -485,8 +485,8 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dmx.");
     }
 
-    private boolean isWorkspaceNotes(Topic topic) {
-        return topic.getTypeUri().equals("dmx.workspaces.notes");
+    private boolean isWorkspaceDescription(Topic topic) {
+        return topic.getTypeUri().equals("dmx.workspaces.workspace_description");
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {

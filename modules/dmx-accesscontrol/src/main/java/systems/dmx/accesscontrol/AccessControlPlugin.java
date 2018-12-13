@@ -724,7 +724,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     // ---
 
     /**
-     * Checks weather the credentials are valid and if the user account is enabled, and if both checks are positive
+     * Checks whether the credentials are valid and if the user account is enabled, and if both checks are positive
      * logs the user in.
      *
      * @return  true if the user has logged in.

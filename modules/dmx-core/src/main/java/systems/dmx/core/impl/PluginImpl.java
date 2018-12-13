@@ -665,7 +665,7 @@ public class PluginImpl implements Plugin, EventHandler {
     }
 
     /**
-     * Checks weather this plugin is a listener for the given event, and if so, dispatches the event to this plugin.
+     * Checks whether this plugin is a listener for the given event, and if so, dispatches the event to this plugin.
      * Otherwise nothing is performed.
      * <p>
      * Called internally to dispatch the INTRODUCE_TOPIC_TYPE and INTRODUCE_ASSOCIATION_TYPE events.

@@ -39,7 +39,7 @@ public interface AccessControlService {
     // === User Session ===
 
     /**
-     * Checks weather the credentials in the authorization string match an existing User Account,
+     * Checks whether the credentials in the authorization string match an existing User Account,
      * and if so, creates an HTTP session. ### FIXDOC
      *
      * @param   authHeader  the authorization string containing the credentials. ### FIXDOC

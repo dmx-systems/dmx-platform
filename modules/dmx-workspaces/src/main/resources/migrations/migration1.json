@@ -1,54 +1,52 @@
 # Part of DMX 5.0
 # Runs ALWAYS
 
+// Workspace
 {
-    "topic_types": [
-
-        // Workspace ###
-
+  "topic_types": [
+    {
+      "value":       "Workspace Name",
+      "uri":         "dmx.workspaces.workspace_name",
+      "dataTypeUri": "dmx.core.text"
+    },
+    {
+      "value":       "Workspace Description",
+      "uri":         "dmx.workspaces.workspace_description",
+      "dataTypeUri": "dmx.core.html"
+    },
+    {
+      "value":       "Workspace",
+      "uri":         "dmx.workspaces.workspace",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
         {
-            "value":       "Workspace Name",
-            "uri":         "dmx.workspaces.name",
-            "dataTypeUri": "dmx.core.text"
+          "childTypeUri":        "dmx.workspaces.workspace_name",
+          "childCardinalityUri": "dmx.core.one"
         },
         {
-            "value":       "Notes",
-            "uri":         "dmx.workspaces.notes",
-            "dataTypeUri": "dmx.core.html"
-        },
-        {
-            "value":       "Workspace",
-            "uri":         "dmx.workspaces.workspace",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.workspaces.name",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.workspaces.notes",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.icon": "\uf005"
-                    }
-                }
-            ]
-        },
-        {
-            "value":       "Workspace Facet",
-            "uri":         "dmx.workspaces.workspace_facet",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.workspaces.workspace",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ]
+          "childTypeUri":        "dmx.workspaces.workspace_description",
+          "childCardinalityUri": "dmx.core.one"
         }
-    ]
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf005"
+          }
+        }
+      ]
+    },
+    {
+      "value":       "Workspace Facet",
+      "uri":         "dmx.workspaces.workspace_facet",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.workspaces.workspace",
+          "childCardinalityUri": "dmx.core.one"
+        }
+      ]
+    }
+  ]
 }

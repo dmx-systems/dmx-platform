@@ -1,44 +1,41 @@
 # Part of DMX 5.0
 # Runs ALWAYS
 
-// TODO: rethink weather "Sharing Mode" should be defined in the Access Control module
+// TODO: rethink whether "Sharing Mode" should be defined in the Access Control module
 {
-    "topic_types": [
-
-        // Sharing Mode
-
-        {
-            "value":       "Sharing Mode",
-            "uri":         "dmx.workspaces.sharing_mode",
-            "dataTypeUri": "dmx.core.text"
-        }
-    ],
-
-    "topics": [
-        {
-            "value":   "Private",
-            "uri":     "dmx.workspaces.private",
-            "typeUri": "dmx.workspaces.sharing_mode"
-        },
-        {
-            "value":   "Confidential",
-            "uri":     "dmx.workspaces.confidential",
-            "typeUri": "dmx.workspaces.sharing_mode"
-        },
-        {
-            "value":   "Collaborative",
-            "uri":     "dmx.workspaces.collaborative",
-            "typeUri": "dmx.workspaces.sharing_mode"
-        },
-        {
-            "value":   "Public",
-            "uri":     "dmx.workspaces.public",
-            "typeUri": "dmx.workspaces.sharing_mode"
-        },
-        {
-            "value":   "Common",
-            "uri":     "dmx.workspaces.common",
-            "typeUri": "dmx.workspaces.sharing_mode"
-        }
-    ]
+  "topic_types": [
+    // Sharing Mode
+    {
+      "value":       "Sharing Mode",
+      "uri":         "dmx.workspaces.sharing_mode",
+      "dataTypeUri": "dmx.core.text"
+    }
+  ],
+  "topics": [
+    {
+      "value":   "Private",
+      "uri":     "dmx.workspaces.private",
+      "typeUri": "dmx.workspaces.sharing_mode"
+    },
+    {
+      "value":   "Confidential",
+      "uri":     "dmx.workspaces.confidential",
+      "typeUri": "dmx.workspaces.sharing_mode"
+    },
+    {
+      "value":   "Collaborative",
+      "uri":     "dmx.workspaces.collaborative",
+      "typeUri": "dmx.workspaces.sharing_mode"
+    },
+    {
+      "value":   "Public",
+      "uri":     "dmx.workspaces.public",
+      "typeUri": "dmx.workspaces.sharing_mode"
+    },
+    {
+      "value":   "Common",
+      "uri":     "dmx.workspaces.common",
+      "typeUri": "dmx.workspaces.sharing_mode"
+    }
+  ]
 }
