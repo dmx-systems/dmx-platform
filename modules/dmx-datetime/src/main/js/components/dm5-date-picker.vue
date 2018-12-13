@@ -39,7 +39,7 @@ export default {
     date: {
 
       get () {
-        console.log('date getter', this.object)
+        // console.log('date getter', this.object)
         const c = this.object.childs
         const y = c['dmx.datetime.year'].value
         const m = c['dmx.datetime.month'].value

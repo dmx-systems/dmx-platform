@@ -1,33 +1,34 @@
 {
-    "topic_types": [
+  "topic_types": [
+    {
+      "value":       "Bookmark Description",
+      "uri":         "dmx.bookmarks.description",
+      "dataTypeUri": "dmx.core.html"
+    },
+    {
+      "value":       "Bookmark",
+      "uri":         "dmx.bookmarks.bookmark",
+      "dataTypeUri": "dmx.core.identity",
+      "assocDefs": [
         {
-            "value":       "Notes",
-            "uri":         "dmx.webbrowser.notes",
-            "dataTypeUri": "dmx.core.html"
+          "childTypeUri":        "dmx.base.url",
+          "childCardinalityUri": "dmx.core.one",
+          "isIdentityAttr":      true
         },
         {
-            "value":       "Web Resource",
-            "uri":         "dmx.webbrowser.web_resource",
-            "dataTypeUri": "dmx.core.identity",
-            "assocDefs": [
-                {
-                    "childTypeUri":        "dmx.base.url",
-                    "childCardinalityUri": "dmx.core.one"
-                },
-                {
-                    "childTypeUri":        "dmx.webbrowser.notes",
-                    "childCardinalityUri": "dmx.core.one"
-                }
-            ],
-            "viewConfigTopics": [
-                {
-                    "typeUri": "dmx.webclient.view_config",
-                    "childs": {
-                        "dmx.webclient.icon": "\uf08e",
-                        "dmx.webclient.add_to_create_menu": true
-                    }
-                }
-            ]
+          "childTypeUri":        "dmx.bookmarks.description",
+          "childCardinalityUri": "dmx.core.one"
         }
-    ]
+      ],
+      "viewConfigTopics": [
+        {
+          "typeUri": "dmx.webclient.view_config",
+          "childs": {
+            "dmx.webclient.icon": "\uf08e",
+            "dmx.webclient.add_to_create_menu": true
+          }
+        }
+      ]
+    }
+  ]
 }
