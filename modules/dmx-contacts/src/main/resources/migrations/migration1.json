@@ -171,13 +171,12 @@
           }
         ]
       },
-      // Notes
+      // Person
       {
-        "value":       "Notes",
-        "uri":         "dmx.contacts.notes",
+        "value":       "Person Description",
+        "uri":         "dmx.contacts.person_description",
         "dataTypeUri": "dmx.core.html"
       },
-      // Person
       {
         "value":       "Person",
         "uri":         "dmx.contacts.person",
@@ -212,7 +211,7 @@
             "customAssocTypeUri":  "dmx.contacts.address_entry"
           },
           {
-            "childTypeUri":        "dmx.contacts.notes",
+            "childTypeUri":        "dmx.contacts.person_description",
             "childCardinalityUri": "dmx.core.one"
           }
         ],
@@ -227,6 +226,11 @@
         ]
       },
       // Organization
+      {
+        "value":       "Organization Description",
+        "uri":         "dmx.contacts.organization_description",
+        "dataTypeUri": "dmx.core.html"
+      },
       {
         "value":       "Organization",
         "uri":         "dmx.contacts.organization",
@@ -255,7 +259,7 @@
             "customAssocTypeUri":  "dmx.contacts.address_entry"
           },
           {
-            "childTypeUri":        "dmx.contacts.notes",
+            "childTypeUri":        "dmx.contacts.organization_description",
             "childCardinalityUri": "dmx.core.one"
           }
         ],
