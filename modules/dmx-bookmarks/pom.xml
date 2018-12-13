@@ -4,9 +4,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>DMX Webbrowser</name>
+    <name>DMX Bookmarks</name>
     <groupId>systems.dmx</groupId>
-    <artifactId>dmx-webbrowser</artifactId>
+    <artifactId>dmx-bookmarks</artifactId>
     <version>5.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
 

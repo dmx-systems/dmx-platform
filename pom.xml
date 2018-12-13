@@ -297,9 +297,9 @@
                 <module>modules/dmx-core</module>
                 <module>modules/dmx-webservice</module>
                 <module>modules/dmx-webclient</module>
-                <module>modules/dmx-webbrowser</module>
                 <module>modules/dmx-base</module>
                 <module>modules/dmx-notes</module>
+                <module>modules/dmx-bookmarks</module>
                 <module>modules/dmx-contacts</module>
                 <module>modules/dmx-events</module>
                 <module>modules/dmx-tags</module>
@@ -389,9 +389,9 @@
                 <module>modules/dmx-core</module>
                 <module>modules/dmx-webservice</module>
                 <module>modules/dmx-webclient</module>
-                <module>modules/dmx-webbrowser</module>
                 <module>modules/dmx-base</module>
                 <module>modules/dmx-notes</module>
+                <module>modules/dmx-bookmarks</module>
                 <module>modules/dmx-contacts</module>
                 <module>modules/dmx-events</module>
                 <module>modules/dmx-tags</module>
