@@ -50,7 +50,7 @@ export default {
       },
 
       set (date) {
-        console.log('date setter', date)
+        // console.log('date setter', date)
         // Note: if a date field is cleared in the GUI we receive null here. To clear a field at server-side an empty
         // string must be sent. null would deserialize as JSONObject$Null causing the SimpleValue constructor to fail.
         const c = this.object.childs
