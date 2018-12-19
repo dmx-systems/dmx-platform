@@ -47,16 +47,16 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/participant/{id}")
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.events.participant", "dmx.core.default", "dmx.core.default",
-            "dmx.events.event");
+        return dmx.getTopic(personId).getRelatedTopics("dmx.events.participation",
+            "dmx.core.default", "dmx.core.default", "dmx.events.event");
     }
 
     @GET
     @Path("/{id}/participants")
     @Override
     public List<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
-        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.participant", "dmx.core.default", "dmx.core.default",
-            "dmx.contacts.person");
+        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.participation",
+            "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
 
@@ -71,7 +71,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     public void preCreateAssociation(AssociationModel assoc) {
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
-            "dmx.events.participant", "dmx.core.default", "dmx.core.default");
+            "dmx.events.participation", "dmx.core.default", "dmx.core.default");
         //
         // Event -> Address
         RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
