@@ -20,6 +20,10 @@ import dm5 from 'dm5'
 
 export default {
 
+  created () {
+    // console.log('dm5-type-renderer created', this.type)
+  },
+
   mixins: [
     require('./mixins/info-mode').default,
     require('./mixins/context').default
@@ -61,8 +65,7 @@ export default {
 
   components: {
     'dm5-data-type-select': require('./dm5-data-type-select').default,
-    'dm5-assoc-def-list':   require('./dm5-assoc-def-list').default,
-    'dm5-value-renderer':   require('dm5-object-renderer/src/components/dm5-value-renderer').default
+    'dm5-assoc-def-list':   require('./dm5-assoc-def-list').default
   }
 }
 </script>

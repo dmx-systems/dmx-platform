@@ -16,12 +16,15 @@ class TopicRoleModelImpl extends RoleModelImpl implements TopicRoleModel {
     // ---------------------------------------------------------------------------------------------------- Constructors
 
     TopicRoleModelImpl(long topicId, String roleTypeUri, PersistenceLayer pl) {
-        super(topicId, roleTypeUri, pl);
-        this.topicUri = null;
+        this(topicId, null, roleTypeUri, pl);
     }
 
     TopicRoleModelImpl(String topicUri, String roleTypeUri, PersistenceLayer pl) {
-        super(-1, roleTypeUri, pl);
+        this(-1, topicUri, roleTypeUri, pl);
+    }
+
+    TopicRoleModelImpl(long topicId, String topicUri, String roleTypeUri, PersistenceLayer pl) {
+        super(topicId, roleTypeUri, pl);
         this.topicUri = topicUri;
     }
 

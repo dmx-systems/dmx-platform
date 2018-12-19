@@ -111,6 +111,8 @@ public interface ModelFactory {
 
     TopicRoleModel newTopicRoleModel(String topicUri, String roleTypeUri);
 
+    TopicRoleModel newTopicRoleModel(long topicId, String topicUri, String roleTypeUri);
+
     TopicRoleModel newTopicRoleModel(JSONObject topicRoleModel);
 
 

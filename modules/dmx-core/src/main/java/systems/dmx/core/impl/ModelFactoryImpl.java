@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
 
@@ -44,6 +45,8 @@ public class ModelFactoryImpl implements ModelFactory {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     PersistenceLayer pl;
+
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
@@ -174,10 +177,7 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationModelImpl newAssociationModel(JSONObject assoc) {
         try {
-            return new AssociationModelImpl(newDMXObjectModel(assoc),
-                assoc.has("role1") ? parseRole(assoc.getJSONObject("role1")) : null,
-                assoc.has("role2") ? parseRole(assoc.getJSONObject("role2")) : null
-            );
+            return new AssociationModelImpl(newDMXObjectModel(assoc), parseRole1(assoc), parseRole2(assoc));
         } catch (Exception e) {
             throw parsingFailed(assoc, e, "AssociationModelImpl");
         }
@@ -185,7 +185,25 @@ public class ModelFactoryImpl implements ModelFactory {
 
     // ---
 
-    private RoleModelImpl parseRole(JSONObject roleModel) {
+    /**
+     * @return  maybe null
+     */
+    private RoleModelImpl parseRole1(JSONObject assoc) throws JSONException {
+        return parseRole(assoc, "role1");
+    }
+
+    /**
+     * @return  maybe null
+     */
+    private RoleModelImpl parseRole2(JSONObject assoc) throws JSONException {
+        return parseRole(assoc, "role2");
+    }
+
+    private RoleModelImpl parseRole(JSONObject assoc, String key) throws JSONException {
+        return assoc.has(key) ? _parseRole(assoc.getJSONObject(key)) : null;
+    }
+
+    private RoleModelImpl _parseRole(JSONObject roleModel) {
         try {
             if (roleModel.has("topicId") || roleModel.has("topicUri")) {
                 return newTopicRoleModel(roleModel);
@@ -391,20 +409,21 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     @Override
+    public TopicRoleModelImpl newTopicRoleModel(long topicId, String topicUri, String roleTypeUri) {
+        return new TopicRoleModelImpl(topicId, topicUri, roleTypeUri, pl());
+    }
+
+    @Override
     public TopicRoleModelImpl newTopicRoleModel(JSONObject topicRoleModel) {
         try {
             long topicId       = topicRoleModel.optLong("topicId", -1);
             String topicUri    = topicRoleModel.optString("topicUri", null);
             String roleTypeUri = topicRoleModel.getString("roleTypeUri");
             //
-            // FIXME: init ID and URI at the same time?
-            if (topicId != -1) {
-                return newTopicRoleModel(topicId, roleTypeUri);
-            } else if (topicUri != null) {
-                return newTopicRoleModel(topicUri, roleTypeUri);
-            } else {
+            if (topicId == -1 && topicUri == null) {
                 throw new IllegalArgumentException("Neiter \"topicId\" nor \"topicUri\" is set");
             }
+            return newTopicRoleModel(topicId, topicUri, roleTypeUri);
         } catch (Exception e) {
             throw parsingFailed(topicRoleModel, e, "TopicRoleModelImpl");
         }
@@ -687,11 +706,17 @@ public class ModelFactoryImpl implements ModelFactory {
     @Override
     public AssociationDefinitionModelImpl newAssociationDefinitionModel(JSONObject assocDef) {
         try {
+            RoleModel role1 = parseRole1(assocDef);     // may be null
+            RoleModel role2 = parseRole2(assocDef);     // may be null
+            // Note: the canonic assoc def JSON format does not require explicit assoc roles. Assoc defs declared in
+            // JSON migrations support a simplified format. In contrast assoc defs contained in a request may include
+            // explicit assoc roles already. In that case we use these ones as they contain both, the ID-ref and the
+            // URI-ref. In specific situations one or the other is needed.
             return new AssociationDefinitionModelImpl(
                 newAssociationModel(assocDef.optLong("id", -1), null,
                     TYPE_COMP_DEF,
-                    parentRole(assocDef.getString("parentTypeUri")),
-                    childRole(assocDef.getString("childTypeUri")),
+                    role1 != null ? role1 : parentRole(assocDef.getString("parentTypeUri")),
+                    role2 != null ? role2 : childRole(assocDef.getString("childTypeUri")),
                     null, childTopics(assocDef)
                 ),
                 newViewConfigurationModel(assocDef.optJSONArray("viewConfigTopics"))

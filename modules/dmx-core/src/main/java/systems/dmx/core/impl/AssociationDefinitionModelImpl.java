@@ -3,6 +3,7 @@ package systems.dmx.core.impl;
 import systems.dmx.core.model.AssociationDefinitionModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -56,12 +57,12 @@ class AssociationDefinitionModelImpl extends AssociationModelImpl implements Ass
 
     @Override
     public String getParentTypeUri() {
-        return ((TopicRoleModelImpl) getRoleModel("dmx.core.parent_type")).topicUri;
+        return ((TopicRoleModel) getRoleModel("dmx.core.parent_type")).getTopicUri();
     }
 
     @Override
     public String getChildTypeUri() {
-        return ((TopicRoleModelImpl) getRoleModel("dmx.core.child_type")).topicUri;
+        return ((TopicRoleModel) getRoleModel("dmx.core.child_type")).getTopicUri();
     }
 
     @Override
