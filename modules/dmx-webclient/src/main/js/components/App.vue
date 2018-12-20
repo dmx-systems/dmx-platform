@@ -39,6 +39,7 @@
   --line-height: 1.6em;
   --paragraph-spacing: 0.6em;
   --field-spacing: 1.2em;                     /* vertical spacing between data fields */
+  --icon-spacing: 7px;                        /* horizontal spacing between icon and label */
   --highlight-color: #409eff;                 /* matches --color-primary */
   --background-color: #f5f7fa;                /* matches --background-color-base (used for detail panel background) */
   --background-color-darker: #ebeef5;
