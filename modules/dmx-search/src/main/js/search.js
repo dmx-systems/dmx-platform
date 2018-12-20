@@ -37,10 +37,12 @@ const actions = {
 }
 
 const getters = {
-  menuTopicTypes: (state, getters, rootState) => dm5.utils.filter(
-    rootState.typeCache.topicTypes,
-    topicType => topicType.getViewConfig('dmx.webclient.add_to_create_menu')
-  )
+  menuTopicTypes: (state, getters, rootState) => {
+    const topicTypes = rootState.typeCache.topicTypes     // undefined while webclient launch
+    return topicTypes && Object.values(topicTypes)
+      .filter(topicType => topicType.getViewConfig('dmx.webclient.add_to_create_menu'))
+      .sort((tt1, tt2) => tt1.value.localeCompare(tt2.value))
+  }
 }
 
 export default {
