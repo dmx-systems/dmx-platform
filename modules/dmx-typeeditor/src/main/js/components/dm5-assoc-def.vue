@@ -1,7 +1,7 @@
 <template>
   <div class="dm5-assoc-def">
     <div class="card label">{{card}}</div>
-    <span class="fa icon">{{icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
+    <span class="fa icon">{{childType.icon}}</span><span class="type">{{childType.value}}</span><span class="info" v-if="info">{{info}}</span>
   </div>
 </template>
 
@@ -17,15 +17,11 @@ export default {
   computed: {
 
     card () {
-      return this.assocDef.isOne() ? "One" : "Many"     // TODO: do not hardcode?
+      return this.assocDef.isOne() ? "One" : "Many"     // TODO: do not hardcode labels?
     },
 
     childType () {
       return this.assocDef.getChildType()
-    },
-
-    icon () {
-      return this.childType.getIcon()
     },
 
     info () {
@@ -43,7 +39,7 @@ export default {
 
 .dm5-assoc-def .icon {
   color: var(--color-topic-icon);
-  margin-right: 7px;
+  margin-right: var(--icon-spacing);
 }
 
 .dm5-assoc-def .type {
