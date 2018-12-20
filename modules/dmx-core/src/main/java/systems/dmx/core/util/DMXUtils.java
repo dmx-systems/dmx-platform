@@ -1,5 +1,6 @@
 package systems.dmx.core.util;
 
+import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Identifiable;
 import systems.dmx.core.JSONEnabled;
@@ -209,6 +210,7 @@ public class DMXUtils {
             logger.info("### Auto typing association into \"" + assocTypeUri +
                 "\" (\"" + topicTypeUri1 + "\" <-> \"" + topicTypeUri2 + "\")");
             assoc.setTypeUri(assocTypeUri);
+            setAssocValue(assoc);
             roles[0].setRoleTypeUri(roleTypeUri1);
             roles[1].setRoleTypeUri(roleTypeUri2);
         }
@@ -248,5 +250,12 @@ public class DMXUtils {
             return nr == 1 ? r1 : r2;
         }
         return m1 ? r1 : m2 ? r2 : null;
+    }
+
+    // Note: this is experimental
+    // ### TODO: do it only for simple assoc types? Drop it, and let the application do this?
+    private static void setAssocValue(AssociationModel assoc) {
+        AssociationType assocType = CoreActivator.getCoreService().getAssociationType(assoc.getTypeUri());
+        assoc.setSimpleValue(assocType.getSimpleValue());
     }
 }
