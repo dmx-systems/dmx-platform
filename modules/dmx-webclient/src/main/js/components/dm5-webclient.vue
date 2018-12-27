@@ -9,7 +9,6 @@ import dm5 from 'dm5'
 import axios from 'axios'
 import Vue from 'vue'
 
-Vue.component('dm5-assoc-role',      require('dm5-object-renderer/src/components/dm5-assoc-role').default)
 Vue.component('dm5-assoc',           require('dm5-object-renderer/src/components/dm5-assoc').default)
 Vue.component('dm5-boolean-field',   require('dm5-object-renderer/src/components/dm5-boolean-field').default)
 Vue.component('dm5-child-topic',     require('dm5-object-renderer/src/components/dm5-child-topic').default)
@@ -17,6 +16,7 @@ Vue.component('dm5-child-topics',    require('dm5-object-renderer/src/components
 Vue.component('dm5-html-field',      require('dm5-object-renderer/src/components/dm5-html-field').default)
 Vue.component('dm5-number-field',    require('dm5-object-renderer/src/components/dm5-number-field').default)
 Vue.component('dm5-object-renderer', require('dm5-object-renderer/src/components/dm5-object-renderer').default)
+Vue.component('dm5-player',          require('dm5-object-renderer/src/components/dm5-player').default)
 Vue.component('dm5-select-field',    require('dm5-object-renderer/src/components/dm5-select-field').default)
 Vue.component('dm5-spinner',         require('dm5-object-renderer/src/components/dm5-spinner').default)
 Vue.component('dm5-text-field',      require('dm5-object-renderer/src/components/dm5-text-field').default)
