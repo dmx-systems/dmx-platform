@@ -204,16 +204,12 @@ public class ModelFactoryImpl implements ModelFactory {
     }
 
     private RoleModelImpl _parseRole(JSONObject roleModel) {
-        try {
-            if (roleModel.has("topicId") || roleModel.has("topicUri")) {
-                return newTopicRoleModel(roleModel);
-            } else if (roleModel.has("assocId")) {
-                return newAssociationRoleModel(roleModel);
-            } else {
-                throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
-            }
-        } catch (Exception e) {
-            throw parsingFailed(roleModel, e, "RoleModelImpl");
+        if (roleModel.has("topicId") || roleModel.has("topicUri")) {
+            return newTopicRoleModel(roleModel);
+        } else if (roleModel.has("assocId")) {
+            return newAssociationRoleModel(roleModel);
+        } else {
+            throw new RuntimeException("One of \"topicId\"/\"topicUri\"/\"assocId\" is expected");
         }
     }
 
