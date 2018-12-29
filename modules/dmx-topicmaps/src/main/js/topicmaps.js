@@ -237,12 +237,12 @@ const actions = {
     })
   },
 
-  createAssoc ({dispatch}, {topicId1, topicId2}) {
+  createAssoc ({dispatch}, {playerId1, playerId2}) {
     // TODO: display search/create widget; initiate assoc creation there
     const assocModel = {
       typeUri: 'dmx.core.association',
-      role1: {topicId: topicId1, roleTypeUri: 'dmx.core.default'},
-      role2: {topicId: topicId2, roleTypeUri: 'dmx.core.default'}
+      role1: {roleTypeUri: 'dmx.core.default', ...playerId1},
+      role2: {roleTypeUri: 'dmx.core.default', ...playerId2}
     }
     console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
