@@ -1,6 +1,8 @@
 maven-build:
   stage: build
   script:
+    - node -v
+    - npm -v
     - mvn clean install -P all,dist -DskipTests
   artifacts:
     paths:
