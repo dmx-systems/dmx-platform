@@ -19,7 +19,13 @@ export default {
     initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
     //
-    loadPluginsFromServer()
+    if (DEV) {
+      console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot loaded from file ' +
+        'system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add it to ' +
+        'modules/dmx-webclient/src/main/js/plugin_manager.js')
+    } else {
+      loadPluginsFromServer()
+    }
   }
 }
 
@@ -91,7 +97,7 @@ function registerDetailRenderers (renderers, renderer) {
 function loadPluginsFromServer () {
   dm5.restClient.getPlugins().then(pluginInfos => {
     pluginInfos.filter(pluginInfo => pluginInfo.hasPluginFile).forEach(pluginInfo => {
-      console.log('Fetching frontend code', pluginInfo.pluginUri)
+      console.log('[DMX] Fetching frontend code of plugin', pluginInfo.pluginUri)
       loadPlugin(pluginInfo.pluginUri).then(initPlugin)
     })
   })

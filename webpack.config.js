@@ -2,6 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+const { DefinePlugin } = require('webpack')
 
 module.exports = (env = {}) => {
 
@@ -49,7 +50,10 @@ module.exports = (env = {}) => {
       new CleanWebpackPlugin([
         'modules/dmx-webclient/src/main/resources/web'
       ]),
-      new VueLoaderPlugin()
+      new VueLoaderPlugin(),
+      new DefinePlugin({
+        DEV: env.dev
+      })
     ],
     stats: {
       entrypoints: false,
