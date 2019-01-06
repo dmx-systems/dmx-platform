@@ -5,11 +5,12 @@ import store from './store/webclient'
 
 export default {
   loadPlugins () {
-    // Note: dmx-search provides the registerExtraMenuItems() action.
-    // dmx-search must be inited *before* any plugin which registers extra menu items.
+    // Init order notes:
+    //  1. dmx-search provides the registerExtraMenuItems() action.
+    //     dmx-search must be inited *before* any plugin which registers extra menu items.
+    //  2. dmx-accesscontrol must be inited *before* dmx-workspaces.
+    //     dmx-workspaces watches dmx-accesscontrol's "username" store state.
     initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
-    // Note: dmx-accesscontrol must be inited *before* dmx-workspaces.
-    // dmx-workspaces watches dmx-accesscontrol's "username" store state.
     initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
@@ -17,22 +18,21 @@ export default {
     initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
     initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
-    // Note: the standard plugin jar files don't contain a plugin file (/web/plugin.js).
-    // So, they are not init'ed again. ### TODO: explain better
+    //
     loadPluginsFromServer()
   }
 }
 
 /**
- * Registers a plugin's assets (store module, webclient components, ...).
+ * Registers a plugin's assets (store module, webclient components, renderers, ...).
  *
- * @param   expo    The plugin.js default export.
- *                  Either an object or a function that returns an object.
+ * @param   pluginConfig    either a plugin configuration object or a function that returns a plugin configuration
+ *                          object.
  */
-function initPlugin (expo) {
-  const plugin = typeof expo === 'function' ? expo({store, dm5, axios, Vue}) : expo
+function initPlugin (pluginConfig) {
+  const _pluginConfig = typeof pluginConfig === 'function' ? pluginConfig({store, dm5, axios, Vue}) : pluginConfig
   // store module
-  const storeModule = plugin.storeModule
+  const storeModule = _pluginConfig.storeModule
   if (storeModule) {
     const module = storeModule.module
     // console.log('[DMX] Registering store module', storeModule.name)
@@ -42,30 +42,30 @@ function initPlugin (expo) {
     )
   }
   // store watcher
-  const storeWatcher = plugin.storeWatcher
+  const storeWatcher = _pluginConfig.storeWatcher
   if (storeWatcher) {
     storeWatcher.forEach(watcher => {
       store.watch(watcher.getter, watcher.callback)
     })
   }
   // webclient components
-  const components = plugin.components    // TODO: rename prop to "webclient"
+  const components = _pluginConfig.components    // TODO: rename prop to "webclient"
   if (components) {
     components.forEach(compDef => {
       store.dispatch('registerComponent', compDef)
     })
   }
   // detail renderers
-  registerDetailRenderers(plugin.objectRenderers, 'object')
-  registerDetailRenderers(plugin.valueRenderers,  'value')
+  registerDetailRenderers(_pluginConfig.objectRenderers, 'object')
+  registerDetailRenderers(_pluginConfig.valueRenderers,  'value')
   //
   // extra menu items
-  const extraMenuItems = plugin.extraMenuItems
+  const extraMenuItems = _pluginConfig.extraMenuItems
   if (extraMenuItems) {
     store.dispatch('registerExtraMenuItems', extraMenuItems)
   }
   // topicmap type
-  const topicmapType = plugin.topicmapType
+  const topicmapType = _pluginConfig.topicmapType
   if (topicmapType) {
     store.dispatch('registerTopicmapType', topicmapType)
   }
@@ -81,29 +81,36 @@ function registerDetailRenderers (renderers, renderer) {
 
 // --- Load from server ---
 
+/**
+ * Fetches the list of installed plugins from the server, then fetches the frontend code (`/web/plugin.js`) of those
+ * plugins which provide one.
+ * Note: only frontend code of *external* plugins (not included in the DMX standard distro) is fetched. In contrast the
+ * frontend code of the *standard* plugins is bundled along with the webclient at build time. For the standard plugins
+ * no individual `plugin.js` files exist.
+ */
 function loadPluginsFromServer () {
-  dm5.restClient.getPlugins().then(plugins => {
-    plugins.forEach(pluginInfo => {
-      if (pluginInfo.hasPluginFile) {
-        loadPlugin(pluginInfo.pluginUri, function (plugin) {
-          initPlugin(plugin.default)
-        })
-      }
+  dm5.restClient.getPlugins().then(pluginInfos => {
+    pluginInfos.filter(pluginInfo => pluginInfo.hasPluginFile).forEach(pluginInfo => {
+      console.log('Fetching frontend code', pluginInfo.pluginUri)
+      loadPlugin(pluginInfo.pluginUri).then(initPlugin)
     })
   })
 }
 
-function loadPlugin (pluginUri, callback) {
-  installCallback(pluginUri, callback)
+function loadPlugin (pluginUri) {
+  const p = installCallback(pluginUri)
   loadScript(pluginURL(pluginUri))
+  return p
 }
 
-function installCallback (pluginUri, callback) {
-  var _pluginIdent = pluginIdent(pluginUri)
-  window[_pluginIdent] = function (exports) {
-    delete window[_pluginIdent]
-    callback(exports)
-  }
+function installCallback (pluginUri) {
+  return new Promise(resolve => {
+    const _pluginIdent = pluginIdent(pluginUri)
+    window[_pluginIdent] = pluginExports => {
+      delete window[_pluginIdent]
+      resolve(pluginExports.default)
+    }
+  })
 }
 
 function pluginIdent (pluginUri) {
@@ -115,10 +122,8 @@ function pluginURL (pluginUri) {
 }
 
 function loadScript (url) {
-  var script = document.createElement('script')
+  const script = document.createElement('script')
   script.src = url
-  script.onload = function () {
-    document.head.removeChild(script)
-  }
+  script.onload = () => document.head.removeChild(script)
   document.head.appendChild(script)
 }
