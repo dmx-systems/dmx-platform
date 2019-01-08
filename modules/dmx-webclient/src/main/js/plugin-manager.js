@@ -88,20 +88,30 @@ function registerDetailRenderers (renderers, renderer) {
 // --- Load from server ---
 
 /**
- * Fetches the list of installed plugins from the server, then fetches the frontend code (`/web/plugin.js`) of those
+ * Fetches the list of installed plugins from the server, then fetches the frontend script and style of those
  * plugins which provide one.
- * Note: only frontend code of *external* plugins (not included in the DMX standard distro) is fetched. In contrast the
- * frontend code of the *standard* plugins is bundled along with the webclient at build time. For the standard plugins
- * no individual `plugin.js` files exist.
+ * Note: only frontend script/style of *external* plugins (not included in the DMX standard distro) is fetched.
+ * In contrast the frontend script/style of the *standard* plugins is bundled along with the webclient at build time.
+ * For the standard plugins no individual `plugin.js` files exist.
  */
 function loadPluginsFromServer () {
   dm5.restClient.getPlugins().then(pluginInfos => {
+    console.group("[DMX] Fetching plugins from server")
     pluginInfos.forEach(pluginInfo => {
-      if (pluginInfo.pluginFile) {
-        console.log('[DMX] Fetching frontend code of plugin', pluginInfo.pluginUri)
-        loadPlugin(pluginInfo).then(initPlugin)
+      if (pluginInfo.pluginFile || pluginInfo.styleFile) {
+        console.group(pluginInfo.pluginUri)
+        if (pluginInfo.pluginFile) {
+          console.log('script', pluginInfo.pluginFile)
+          loadPlugin(pluginInfo).then(initPlugin)
+        }
+        if (pluginInfo.styleFile) {
+          console.log('stylesheet', pluginInfo.styleFile)
+          loadCSS(styleURL(pluginInfo))
+        }
+        console.groupEnd()
       }
     })
+    console.groupEnd()
   })
 }
 
@@ -126,7 +136,11 @@ function pluginIdent (pluginUri) {
 }
 
 function pluginURL (pluginInfo) {
-  return '/' + pluginUri + '/' + pluginInfo.pluginFile
+  return '/' + pluginInfo.pluginUri + '/' + pluginInfo.pluginFile
+}
+
+function styleURL (pluginInfo) {
+  return '/' + pluginInfo.pluginUri + '/' + pluginInfo.styleFile
 }
 
 function loadScript (url) {
@@ -134,4 +148,11 @@ function loadScript (url) {
   script.src = url
   script.onload = () => document.head.removeChild(script)
   document.head.appendChild(script)
+}
+
+function loadCSS (url) {
+  const link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.href = url
+  document.head.appendChild(link)
 }
