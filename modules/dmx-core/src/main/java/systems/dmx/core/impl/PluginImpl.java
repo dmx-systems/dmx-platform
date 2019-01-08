@@ -1,10 +1,8 @@
 package systems.dmx.core.impl;
 
-import systems.dmx.core.Association;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
-import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.osgi.PluginContext;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.DMXEvent;
