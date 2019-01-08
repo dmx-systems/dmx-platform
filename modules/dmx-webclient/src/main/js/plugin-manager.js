@@ -20,9 +20,9 @@ export default {
     initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
     //
     if (DEV) {
-      console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot loaded from file ' +
-        'system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add it to ' +
-        'modules/dmx-webclient/src/main/js/plugin_manager.js')
+      console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
+        'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add ' +
+        'it to modules/dmx-webclient/src/main/js/plugin_manager.js')
     } else {
       loadPluginsFromServer()
     }
@@ -96,16 +96,18 @@ function registerDetailRenderers (renderers, renderer) {
  */
 function loadPluginsFromServer () {
   dm5.restClient.getPlugins().then(pluginInfos => {
-    pluginInfos.filter(pluginInfo => pluginInfo.hasPluginFile).forEach(pluginInfo => {
-      console.log('[DMX] Fetching frontend code of plugin', pluginInfo.pluginUri)
-      loadPlugin(pluginInfo.pluginUri).then(initPlugin)
+    pluginInfos.forEach(pluginInfo => {
+      if (pluginInfo.pluginFile) {
+        console.log('[DMX] Fetching frontend code of plugin', pluginInfo.pluginUri)
+        loadPlugin(pluginInfo).then(initPlugin)
+      }
     })
   })
 }
 
-function loadPlugin (pluginUri) {
-  const p = installCallback(pluginUri)
-  loadScript(pluginURL(pluginUri))
+function loadPlugin (pluginInfo) {
+  const p = installCallback(pluginInfo.pluginUri)
+  loadScript(pluginURL(pluginInfo))
   return p
 }
 
@@ -123,8 +125,8 @@ function pluginIdent (pluginUri) {
   return '_' + pluginUri.replace(/[.-]/g, '_')
 }
 
-function pluginURL (pluginUri) {
-  return '/' + pluginUri + '/plugin' + '.js'
+function pluginURL (pluginInfo) {
+  return '/' + pluginUri + '/' + pluginInfo.pluginFile
 }
 
 function loadScript (url) {

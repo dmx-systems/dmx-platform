@@ -2,28 +2,26 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.service.PluginInfo;
 import org.codehaus.jettison.json.JSONObject;
-import org.osgi.framework.Bundle;
 
 
 
 class PluginInfoImpl implements PluginInfo {
 
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String PLUGIN_FILE = "/web/plugin.js";
-
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Bundle pluginBundle;
     private JSONObject pluginInfo = new JSONObject();
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    PluginInfoImpl(String pluginUri, Bundle pluginBundle) {
-        this.pluginBundle = pluginBundle;
+    /**
+     * @param   pluginFile      file name or empty
+     * @param   styleFile       file name or empty
+     */
+    PluginInfoImpl(String pluginUri, String pluginFile, String styleFile) {
         try {
             pluginInfo.put("pluginUri", pluginUri);
-            pluginInfo.put("hasPluginFile", hasPluginFile());
+            pluginInfo.put("pluginFile", pluginFile);
+            pluginInfo.put("styleFile", styleFile);
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);
         }
@@ -34,11 +32,5 @@ class PluginInfoImpl implements PluginInfo {
     @Override
     public JSONObject toJSON() {
         return pluginInfo;
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private boolean hasPluginFile() {
-        return pluginBundle.getEntry(PLUGIN_FILE) != null;
     }
 }

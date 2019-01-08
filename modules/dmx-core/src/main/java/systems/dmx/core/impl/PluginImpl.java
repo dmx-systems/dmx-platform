@@ -22,6 +22,7 @@ import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -57,7 +58,7 @@ public class PluginImpl implements Plugin, EventHandler {
     private String       pluginUri;             // This bundle's symbolic name, e.g. "systems.dmx.webclient"
 
     private Properties   pluginProperties;      // Read from file "plugin.properties"
-    private String       pluginPackage;
+    private String       pluginPackage;         // This plugin's Java package name
     private PluginInfo   pluginInfo;
     private List<String> pluginDependencies;    // plugin URIs as read from "dmx.plugin.activate_after" property
     private Topic        pluginTopic;           // Represents this plugin in DB. Holds plugin migration number.
@@ -99,7 +100,7 @@ public class PluginImpl implements Plugin, EventHandler {
         this.pluginProperties = readConfigFile();
         this.pluginPackage = getConfigProperty("dmx.plugin.main_package", pluginContext.getClass().getPackage()
             .getName());
-        this.pluginInfo = new PluginInfoImpl(pluginUri, pluginBundle);
+        this.pluginInfo = pluginInfo();
         this.pluginDependencies = pluginDependencies();
         //
         this.providedServiceInterface = providedServiceInterface();
@@ -278,6 +279,29 @@ public class PluginImpl implements Plugin, EventHandler {
         } catch (Exception e) {
             throw new RuntimeException("Reading config file \"" + PLUGIN_CONFIG_FILE + "\" for " + this + " failed", e);
         }
+    }
+
+
+
+    // === Plugin Info ===
+
+    private PluginInfo pluginInfo() {
+        return new PluginInfoImpl(pluginUri,
+            getSingleResource("/web", ".plugin.js"),
+            getSingleResource("/web", ".style.css")
+        );
+    }
+
+    private String getSingleResource(String path, String suffix) {
+        String resource = "";
+        List<String> resources = scanResources(path, suffix);
+        int size = resources.size();
+        if (size == 1) {
+            resource = resources.get(0);
+        } else if (size > 1) {
+            throw new RuntimeException("Ambiguity: found " + size + " *" + suffix + " files in " + path);
+        }
+        return resource;
     }
 
 
@@ -943,6 +967,29 @@ public class PluginImpl implements Plugin, EventHandler {
 
     // ---
 
+    private List<String> scanResources(String path, String suffix) {
+        List<String> fileNames = new ArrayList();
+        Enumeration<String> e = pluginBundle.getEntryPaths(path);
+        if (e != null) {
+            while (e.hasMoreElements()) {
+                String entryPath = e.nextElement();
+                logger.fine("  # Found resource: \"" + entryPath + "\"");
+                if (entryPath.endsWith(suffix)) {
+                    String fileName = new File(entryPath).getName();
+                    fileNames.add(fileName);
+                }
+            }
+        }
+        return fileNames;
+    }
+
+    /**
+     * Scans the bundle contents for classes, starting at a relative path.
+     *
+     * @param   relativePath    relative to plugin main package, e.g. "/provider"
+     *
+     * @return  A list of fully qualified class names
+     */
     private List<String> scanPackage(String relativePath) {
         List<String> classNames = new ArrayList();
         Enumeration<String> e = getPluginPaths(relativePath);
