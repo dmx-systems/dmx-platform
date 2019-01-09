@@ -3,13 +3,13 @@ import App from './components/App'
 import dm5 from 'dm5'
 import store from './store/webclient'
 import router from './router'
-import pluginManager from './plugin-manager'
+import loadPlugins from './plugin-manager'
 import onHttpError from './error-handler'
 import 'font-awesome/css/font-awesome.css'
 import './element-ui'
 import './websocket'
 
-console.log('[DMX] 2019/01/08')
+console.log('[DMX] 2019/01/09')
 
 // 1) Init dm5 library
 // The dm5 library must be inited *before* the dm5-webclient component is created.
@@ -45,7 +45,7 @@ store.dispatch('registerDetailRenderer', {
 // Plugin loading (and initialization) must take place *after* the Vue root instance is created.
 // Plugins that provide entries for the create menu rely on the "registerExtraMenuItems" action,
 // which is only registered in dm5-search-widget's created() hook. ### FIXDOC
-pluginManager.loadPlugins()
+loadPlugins()
 // console.log('### Plugins loaded!')
 
 // TODO: synchronize initial navigation with loading the external plugins?

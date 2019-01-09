@@ -1,31 +1,32 @@
+import store from './store/webclient'
 import dm5 from 'dm5'
 import axios from 'axios'
 import Vue from 'vue'
-import store from './store/webclient'
 
-export default {
-  loadPlugins () {
-    // Init order notes:
-    //  1. dmx-search provides the registerExtraMenuItems() action.
-    //     dmx-search must be inited *before* any plugin which registers extra menu items.
-    //  2. dmx-accesscontrol must be inited *before* dmx-workspaces.
-    //     dmx-workspaces watches dmx-accesscontrol's "username" store state.
-    initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
-    initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
-    //
-    if (DEV) {
-      console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
-        'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add ' +
-        'it to modules/dmx-webclient/src/main/js/plugin_manager.js')
-    } else {
-      loadPluginsFromServer()
-    }
+export default () => {
+  // Init order notes:
+  //  1. dmx-search provides the registerExtraMenuItems() action.
+  //     dmx-search must be inited *before* any plugin which registers extra menu items.
+  //  2. dmx-accesscontrol must be inited *before* dmx-workspaces.
+  //     dmx-workspaces watches dmx-accesscontrol's "username" store state.
+  initPlugin(require('modules/dmx-search/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-accesscontrol/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-workspaces/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-topicmaps/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-details/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-typeeditor/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
+  initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
+  //
+  // while development add your plugins here ...
+  initPlugin(require('modules-external/swctn/src/main/js/plugin.js').default)
+  //
+  if (DEV) {
+    console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
+      'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add ' +
+      'it to modules/dmx-webclient/src/main/js/plugin_manager.js')
+  } else {
+    loadPluginsFromServer()
   }
 }
 
