@@ -19,7 +19,7 @@ export default () => {
   initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
   //
   // while development add your plugins here ...
-  initPlugin(require('modules-external/swctn/src/main/js/plugin.js').default)
+  // initPlugin(require('modules-external/my-plugin/src/main/js/plugin.js').default)
   //
   if (DEV) {
     console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
