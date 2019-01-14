@@ -18,13 +18,13 @@ export default () => {
   initPlugin(require('modules/dmx-datetime/src/main/js/plugin.js').default)
   initPlugin(require('modules/dmx-geomaps/src/main/js/plugin.js').default)
   //
-  // while development add your plugins here ...
+  // while development add your plugins here
   // initPlugin(require('modules-external/my-plugin/src/main/js/plugin.js').default)
   //
   if (DEV) {
     console.info('[DMX] You are running the webclient in development mode.\nFrontend code is hot reloaded from ' +
-      'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement for your plugin add ' +
-      'it to modules/dmx-webclient/src/main/js/plugin_manager.js')
+      'file system (instead fetched from DMX backend server).\nTo get Hot Module Replacement add your plugin to ' +
+      'modules/dmx-webclient/src/main/js/plugin_manager.js')
   } else {
     loadPluginsFromServer()
   }

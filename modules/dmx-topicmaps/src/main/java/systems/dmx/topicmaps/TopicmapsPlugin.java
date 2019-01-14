@@ -424,7 +424,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
-    // --- Fetch ---
+    // --- Fetch Topicmap ---
 
     private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewModel> topics = new HashMap();
@@ -471,7 +471,70 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    // ---
+    // --- Fetch View Properties ---
+
+    private ViewProperties fetchTopicViewProperties(Association topicMapcontext) {
+        return mf.newViewProperties(
+            (Integer) topicMapcontext.getProperty(PROP_X),
+            (Integer) topicMapcontext.getProperty(PROP_Y),
+            visibility(topicMapcontext),
+            pinned(topicMapcontext)
+        );
+    }
+
+    private ViewProperties fetchAssocViewProperties(Association assocMapcontext) {
+        return mf.newViewProperties().put(PROP_PINNED, pinned(assocMapcontext));
+    }
+
+    private boolean visibility(Association topicMapcontext) {
+        return (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
+    }
+
+    private boolean pinned(Association mapcontext) {
+        return (Boolean) mapcontext.getProperty(PROP_PINNED);
+    }
+
+    // --- Store View Properties ---
+
+    /**
+     * Convenience.
+     */
+    private void storeTopicViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
+        try {
+            Association topicMapcontext = fetchTopicMapcontext(topicmapId, topicId);
+            if (topicMapcontext == null) {
+                throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
+            }
+            storeViewProperties(topicMapcontext, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        }
+    }
+
+    /**
+     * Convenience.
+     */
+    private void storeAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps) {
+        try {
+            Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
+            if (assocMapcontext == null) {
+                throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
+            }
+            storeViewProperties(assocMapcontext, viewProps);
+        } catch (Exception e) {
+            throw new RuntimeException("Storing view properties of association " + assocId + " failed " +
+                "(viewProps=" + viewProps + ")", e);
+        }
+    }
+
+    private void storeViewProperties(Association mapcontext, ViewProperties viewProps) {
+        for (String propUri : viewProps) {
+            mapcontext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
+        }
+    }
+
+    // --- Mapcontexts ---
 
     private Association fetchTopicMapcontext(long topicmapId, long topicId) {
         return dmx.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
@@ -512,69 +575,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deleting a mapcontext association is a privileged operation.
         dmx.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
-    }
-
-    // ---
-
-    private ViewProperties fetchTopicViewProperties(Association topicMapcontext) {
-        return mf.newViewProperties(
-            (Integer) topicMapcontext.getProperty(PROP_X),
-            (Integer) topicMapcontext.getProperty(PROP_Y),
-            visibility(topicMapcontext),
-            pinned(topicMapcontext)
-        );
-    }
-
-    private ViewProperties fetchAssocViewProperties(Association assocMapcontext) {
-        return mf.newViewProperties().put(PROP_PINNED, pinned(assocMapcontext));
-    }
-
-    private boolean visibility(Association topicMapcontext) {
-        return (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
-    }
-
-    private boolean pinned(Association mapcontext) {
-        return (Boolean) mapcontext.getProperty(PROP_PINNED);
-    }
-
-    // --- Store ---
-
-    /**
-     * Convenience.
-     */
-    private void storeTopicViewProperties(long topicmapId, long topicId, ViewProperties viewProps) {
-        try {
-            Association topicMapcontext = fetchTopicMapcontext(topicmapId, topicId);
-            if (topicMapcontext == null) {
-                throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
-            }
-            storeViewProperties(topicMapcontext, viewProps);
-        } catch (Exception e) {
-            throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
-        }
-    }
-
-    /**
-     * Convenience.
-     */
-    private void storeAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps) {
-        try {
-            Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
-            if (assocMapcontext == null) {
-                throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
-            }
-            storeViewProperties(assocMapcontext, viewProps);
-        } catch (Exception e) {
-            throw new RuntimeException("Storing view properties of association " + assocId + " failed " +
-                "(viewProps=" + viewProps + ")", e);
-        }
-    }
-
-    private void storeViewProperties(Association mapcontext, ViewProperties viewProps) {
-        for (String propUri : viewProps) {
-            mapcontext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
-        }
     }
 
     // --- Viewmodel Customizers ---

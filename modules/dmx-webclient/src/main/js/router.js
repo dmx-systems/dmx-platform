@@ -195,8 +195,8 @@ function initialNavigation (route) {
   }
   // 2) select workspace
   // Note: at this stage a topicmap ID might be available or not. If available it is either obtained from URL or from
-  // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required. On the other
-  // hand, if obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
+  // cookie. If obtained from URL the route is already up-to-date, no (further) route push is required.
+  // If obtained from cookie or if no topicmapId is available, an initial route still needs to be pushed.
   p.then(() => {
     // console.log('[DMX] Initial topicmap/workspace', topicmapId, workspaceId)
     if (topicmapId) {
@@ -206,7 +206,7 @@ function initialNavigation (route) {
           // Note: 'displayTopicmap' relies on the topicmap topics in order to tell what topicmap renderer to use
           const p = store.dispatch('displayTopicmap', topicmapId)     // no route push
           topicId !== undefined && fetchTopic(topicId, p)             // Note: 0 is a valid topic ID
-          assocId && fetchAssoc(assocId, p)
+          assocId               && fetchAssoc(assocId, p)
         } else {
           // Note: when the topicmap changes '_selectWorkspace' is dispatched again (see navigate() below).
           // Calling the topicmap route only when the topicmap topics are available avoids loading them twice.
