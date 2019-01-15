@@ -1,16 +1,12 @@
 package systems.dmx.topicmaps;
 
-import systems.dmx.topicmaps.model.TopicmapViewmodel;
-
 import systems.dmx.core.Association;
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
-import systems.dmx.core.model.AssociationRoleModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.topicmaps.AssociationViewModel;
 import systems.dmx.core.model.topicmaps.TopicViewModel;
 import systems.dmx.core.model.topicmaps.ViewProperties;
@@ -19,9 +15,9 @@ import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
+import systems.dmx.topicmaps.model.TopicmapViewmodel;
 
-import org.codehaus.jettison.json.JSONObject;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -32,8 +28,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-
-import javax.servlet.http.HttpServletRequest;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -88,9 +82,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // ***************************************
-    // *** TopicmapsService Implementation ***
-    // ***************************************
+    // ************************
+    // *** TopicmapsService ***
+    // ************************
 
 
 
@@ -276,14 +270,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
-            // remove associations
             if (!visibility) {
-                for (Association assoc : dmx.getTopic(topicId).getAssociations()) {
-                    Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assoc.getId());
-                    if (assocMapcontext != null) {
-                        deleteAssociationMapcontext(assocMapcontext);
-                    }
-                }
+                // remove topic's associations
+                deleteAllAssociationMapcontexts(dmx.getTopic(topicId), topicmapId);
             }
             // show/hide topic
             storeTopicViewProperties(topicmapId, topicId, mf.newViewProperties(visibility));
@@ -301,6 +290,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void removeAssociationFromTopicmap(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId) {
         try {
+            // remove assoc's associations
+            deleteAllAssociationMapcontexts(dmx.getAssociation(assocId), topicmapId);
+            // remove assoc itself
             Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
             // Note: idempotence of remove-assoc-from-topicmap is needed for delete-muti
             if (assocMapcontext != null) {
@@ -423,9 +415,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
-    // ***************************************
-    // *** MessengerContext Implementation ***
-    // ***************************************
+    // ************************
+    // *** MessengerContext ***
+    // ************************
 
 
 
@@ -589,6 +581,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     // ---
+
+    private void deleteAllAssociationMapcontexts(DMXObject object, long topicmapId) {
+        for (Association assoc : object.getAssociations()) {
+            Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assoc.getId());
+            if (assocMapcontext != null) {
+                deleteAssociationMapcontext(assocMapcontext);
+            }
+        }
+    }
 
     private void deleteAssociationMapcontext(Association assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
