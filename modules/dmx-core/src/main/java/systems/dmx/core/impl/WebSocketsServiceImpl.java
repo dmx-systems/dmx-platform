@@ -58,6 +58,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     @Override
     public void messageToAllButOne(HttpServletRequest request, String pluginUri, String message) {
+        if (request == null) {
+            throw new IllegalArgumentException("request must not be null");
+        }
         WebSocketConnection connection = getConnection(request, pluginUri);
         if (connection != null) {
             broadcast(pluginUri, message, connection);
@@ -66,6 +69,9 @@ class WebSocketsServiceImpl implements WebSocketsService {
 
     @Override
     public void messageToOne(HttpServletRequest request, String pluginUri, String message) {
+        if (request == null) {
+            throw new IllegalArgumentException("request must not be null");
+        }
         WebSocketConnection connection = getConnection(request, pluginUri);
         if (connection != null) {
             queueMessage(connection, message);

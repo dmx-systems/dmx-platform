@@ -15,6 +15,7 @@ import systems.dmx.core.model.topicmaps.AssociationViewModel;
 import systems.dmx.core.model.topicmaps.TopicViewModel;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.osgi.PluginActivator;
+import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
@@ -48,7 +49,7 @@ import java.util.logging.Logger;
 @Path("/topicmap")
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService {
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, MessengerContext {
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
@@ -68,7 +69,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
-    private Messenger me = new Messenger("systems.dmx.webclient");
+    private Messenger me = new Messenger(this);
 
     @Context
     private HttpServletRequest request;
@@ -422,6 +423,24 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
 
+    // ***************************************
+    // *** MessengerContext Implementation ***
+    // ***************************************
+
+
+
+    @Override
+    public CoreService getCoreService() {
+        return dmx;
+    }
+
+    @Override
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+
+
     // ------------------------------------------------------------------------------------------------- Private Methods
 
     // --- Fetch Topicmap ---
@@ -611,112 +630,5 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private InputStream invokeWebclient() {
         return dmx.getPlugin("systems.dmx.webclient").getStaticResource("/web/index.html");
-    }
-
-    // ------------------------------------------------------------------------------------------------- Private Classes
-
-    private class Messenger {
-
-        private String pluginUri;
-
-        private Messenger(String pluginUri) {
-            this.pluginUri = pluginUri;
-        }
-
-        // ---
-
-        private void newTopicmap(Topic topicmapTopic) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "newTopicmap")
-                    .put("args", new JSONObject()
-                        .put("topicmapTopic", topicmapTopic.toJSON())
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"newTopicmap\" message:", e);
-            }
-        }
-
-        private void addTopicToTopicmap(long topicmapId, TopicViewModel topic) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "addTopicToTopicmap")
-                    .put("args", new JSONObject()
-                        .put("topicmapId", topicmapId)
-                        .put("viewTopic", topic.toJSON())
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"addTopicToTopicmap\" message:", e);
-            }
-        }
-
-        private void addAssociationToTopicmap(long topicmapId, AssociationModel assoc) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "addAssocToTopicmap")
-                    .put("args", new JSONObject()
-                        .put("topicmapId", topicmapId)
-                        .put("assoc", assoc.toJSON())
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"addAssocToTopicmap\" message:", e);
-            }
-        }
-
-        private void setTopicPosition(long topicmapId, long topicId, int x, int y) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "setTopicPosition")
-                    .put("args", new JSONObject()
-                        .put("topicmapId", topicmapId)
-                        .put("topicId", topicId)
-                        .put("pos", new JSONObject()
-                            .put("x", x)
-                            .put("y", y)
-                        )
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"setTopicPosition\" message:", e);
-            }
-        }
-
-        private void setTopicVisibility(long topicmapId, long topicId, boolean visibility) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "setTopicVisibility")
-                    .put("args", new JSONObject()
-                        .put("topicmapId", topicmapId)
-                        .put("topicId", topicId)
-                        .put("visibility", visibility)
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"setTopicVisibility\" message:", e);
-            }
-        }
-
-        private void removeAssociationFromTopicmap(long topicmapId, long assocId) {
-            try {
-                messageToAllButOne(new JSONObject()
-                    .put("type", "removeAssocFromTopicmap")
-                    .put("args", new JSONObject()
-                        .put("topicmapId", topicmapId)
-                        .put("assocId", assocId)
-                    )
-                );
-            } catch (Exception e) {
-                logger.log(Level.WARNING, "Error while sending a \"removeAssocFromTopicmap\" message:", e);
-            }
-        }
-
-        // ---
-
-        private void messageToAllButOne(JSONObject message) {
-            dmx.getWebSocketsService().messageToAllButOne(request, pluginUri, message.toString());
-        }
     }
 }
