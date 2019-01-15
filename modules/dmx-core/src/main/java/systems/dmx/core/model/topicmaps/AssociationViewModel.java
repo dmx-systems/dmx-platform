@@ -10,4 +10,6 @@ import systems.dmx.core.model.AssociationModel;
  * ### TODO: rename to ViewAssoc
  */
 public interface AssociationViewModel extends AssociationModel {
+
+    // ViewProperties getViewProperties();      // TODO: needed?
 }

@@ -576,7 +576,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ));
         storeViewProperties(assocMapcontext, viewProps);
         //
-        AssociationModel assoc = dmx.getAssociation(assocId).getModel();    // TODO: view props
+        AssociationViewModel assoc = mf.newAssociationViewModel(dmx.getAssociation(assocId).getModel(), viewProps);
         me.addAssociationToTopicmap(topicmapId, assoc);
     }
 

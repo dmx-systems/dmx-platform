@@ -1,7 +1,7 @@
 package systems.dmx.topicmaps;
 
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.topicmaps.AssociationViewModel;
 import systems.dmx.core.model.topicmaps.TopicViewModel;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -58,13 +58,13 @@ class Messenger {
         }
     }
 
-    void addAssociationToTopicmap(long topicmapId, AssociationModel assoc) {
+    void addAssociationToTopicmap(long topicmapId, AssociationViewModel assoc) {
         try {
             messageToAllButOne(new JSONObject()
                 .put("type", "addAssocToTopicmap")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
-                    .put("assoc", assoc.toJSON())
+                    .put("viewAssoc", assoc.toJSON())
                 )
             );
         } catch (Exception e) {
