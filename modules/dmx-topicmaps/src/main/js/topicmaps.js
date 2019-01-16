@@ -70,7 +70,7 @@ const actions = {
     // update state
     Vue.set(state.selectedTopicmapId, _workspaceId(rootState), id)    // Vue.set() recalculates "topicmapId" getter
     dm5.utils.setCookie('dmx_topicmap_id', id)
-    // update state + sync view
+    // update state + update view
     return _displayTopicmap(getters, rootState, dispatch)
   },
 
@@ -165,8 +165,8 @@ const actions = {
    */
   setTopicSelection ({getters, dispatch}, {id, p}) {
     // console.log('setTopicSelection', _topicmapId(getters), id, getters.selection.topicIds)
-    // sync view          // Note: view must be synced before state is updated
-    dispatch('syncSelect', {id, p})
+    // update view          // Note: view must be updated before state is updated
+    dispatch('renderAsSelected', {id, p})
     _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setTopic(id)
@@ -187,8 +187,8 @@ const actions = {
    */
   setAssocSelection ({getters, dispatch}, {id, p}) {
     // console.log('setAssocSelection', _topicmapId(getters), id)
-    // sync view          // Note: view must be synced before state is updated
-    dispatch('syncSelect', {id, p})
+    // update view          // Note: view must be updated before state is updated
+    dispatch('renderAsSelected', {id, p})
     _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setAssoc(id)
@@ -213,18 +213,18 @@ const actions = {
     if (typeof id !== 'number') {
       throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
     }
-    dispatch('syncUnselect')          // sync view
+    dispatch('renderAsUnselected')          // update view
     if (selection.isSingle()) {
       // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
       // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
       // is up-to-date already.
-      selection.empty()               // update state
+      selection.empty()                     // update state
     } else if (selection.isMulti()) {
       // If a single selection is extended to a multi selection the URL's selection part is stripped, causing the router
       // to remove the single selection from state and view. The former single selection must be visually restored in
-      // order to match the multi selection state. The low-level '_syncSelect' action manipulates the view only. The
-      // normal 'syncSelect' action would display the in-map details.
-      dispatch('_syncSelect', id)     // sync view
+      // order to match the multi selection state. The low-level '_renderAsSelected' action manipulates the view only.
+      // The normal 'renderAsSelected' action would display the in-map details.
+      dispatch('_renderAsSelected', id)     // update view
     }
   },
 
@@ -287,10 +287,10 @@ const actions = {
     console.log('reloadTopicmap', _topicmapId(getters))
     dispatch('clearTopicmapCache')
     _displayTopicmap(getters, rootState, dispatch).then(() => {
-      // sync view
+      // update view
       const selection = getters.selection
       if (selection.isSingle()) {
-        dispatch('syncSelect', {
+        dispatch('renderAsSelected', {
           id: selection.getObjectId(),
           p: Promise.resolve()
         })
@@ -443,7 +443,7 @@ function _syncSelectMulti (selection, dispatch) {
   // console.log('_syncSelectMulti', selection.topicIds, selection.assocIds)
   if (selection.isMulti()) {
     selection.forEachId(id => {
-      dispatch('_syncSelect', id)
+      dispatch('_renderAsSelected', id)
     })
   }
 }
@@ -454,7 +454,7 @@ function _syncUnselectMulti (selection, dispatch) {
   // visually removed. In contrast when changing the selection by topicmap interaction the view is up-to-date already.
   if (selection.isMulti()) {
     selection.forEachId(id => {
-      dispatch('_syncUnselect', id)     // TODO: pinned multi selection?
+      dispatch('_renderAsUnselected', id)     // TODO: pinned multi selection?
     })
   }
 }

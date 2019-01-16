@@ -302,6 +302,8 @@ function fetchTopic (id, p) {
   // topicmap panel
   p.then(() => {
     store.dispatch('setTopicSelection', {id, p: p2})
+  }).catch(error => {
+    console.error(`Rendering topic ${id} as selected failed`, error)
   })
 }
 
@@ -322,6 +324,8 @@ function fetchAssoc (id, p) {
   // topicmap panel
   p.then(() => {
     store.dispatch('setAssocSelection', {id, p: p2})
+  }).catch(error => {
+    console.error(`Rendering assoc ${id} as selected failed`, error)
   })
 }
 
