@@ -4,6 +4,8 @@ import Selection from './selection'
 
 const state = {
 
+  topicmap: undefined,        // the rendered topicmap (dm5.Topicmap)
+
   topicmapTopics: {},         // Loaded topicmap topics (including childs), per-workspace:
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
@@ -436,7 +438,10 @@ function _displayTopicmap (getters, rootState, dispatch) {
   const selection = getters.selection
   return topicmapTopic.isWritable()
     .then(writable => dispatch('showTopicmap', {topicmapTopic, writable, selection}))
-    .then(() => _syncSelectMulti(selection, dispatch))
+    .then(topicmap => {
+      state.topicmap = topicmap
+      _syncSelectMulti(selection, dispatch)
+    })
 }
 
 function _syncSelectMulti (selection, dispatch) {

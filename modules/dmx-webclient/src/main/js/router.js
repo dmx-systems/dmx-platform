@@ -183,8 +183,7 @@ function initialNavigation (route) {
     }).then(topic => {
       // console.log('Topic retrieved', topic)
       if (topic.typeUri !== "dmx.topicmaps.topicmap") {
-        console.warn(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
-        topicmapId = undefined
+        throw Error(`${topicmapId} is not a topicmap (but a ${topic.typeUri})`)
       }
     }).catch(error => {
       console.warn(`Topicmap ${topicmapId} check failed`, error)
@@ -303,6 +302,8 @@ function fetchTopic (id, p) {
   p.then(() => {
     store.dispatch('setTopicSelection', {id, p: p2})
   }).catch(error => {
+    // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
+    // If the topicmap panel fails to render the topic as selected the detail panel is supposed to stay empty.
     console.error(`Rendering topic ${id} as selected failed`, error)
   })
 }
@@ -325,6 +326,8 @@ function fetchAssoc (id, p) {
   p.then(() => {
     store.dispatch('setAssocSelection', {id, p: p2})
   }).catch(error => {
+    // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
+    // If the topicmap panel fails to render the assoc as selected the detail panel is supposed to stay empty.
     console.error(`Rendering assoc ${id} as selected failed`, error)
   })
 }
