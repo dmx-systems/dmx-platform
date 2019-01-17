@@ -366,19 +366,25 @@ const actions = {
     }
   },
 
+  // Note: the Cytoscape Renderer module processes this message as well. We must perform first as the renderer removes
+  // the assocs we need to traverse here. Fortunately it seems we actually perform first. TODO: make this sure.
   _setTopicVisibility ({getters, dispatch}, {topicmapId, topicId, visibility}) {
+    console.log('_setTopicVisibility (Topicmaps Module)')
     if (topicmapId === _topicmapId(getters)) {
-      // update state
       if (!visibility) {
-        dispatch('unselectIf', topicId)
+        // update state
+        unselectIf(topicId, dispatch)
       }
     }
   },
 
+  // Note: the Cytoscape Renderer module processes this message as well. We must perform first as the renderer removes
+  // the assocs we need to traverse here. Fortunately it seems we actually perform first. TODO: make this sure.
   _removeAssocFromTopicmap ({getters, dispatch}, {topicmapId, assocId}) {
+    console.log('_removeAssocFromTopicmap (Topicmaps Module)')
     if (topicmapId === _topicmapId(getters)) {
       // update state
-      dispatch('unselectIf', assocId)
+      unselectIf(assocId, dispatch)
     }
   },
 
@@ -483,6 +489,16 @@ function selectionHandler (dispatch) {
       dispatch('stripSelectionFromRoute')
     }
   }
+}
+
+// ---
+
+function unselectIf(id, dispatch) {
+  console.log('unselectIf', state.topicmap.getAssocsWithPlayer(id).map(assoc => assoc.id))
+  state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
+    dispatch('unselectIf', assoc.id)
+  })
+  dispatch('unselectIf', id)
 }
 
 // Process directives

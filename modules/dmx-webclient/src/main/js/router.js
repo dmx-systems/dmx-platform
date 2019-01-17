@@ -303,7 +303,7 @@ function fetchTopic (id, p) {
     store.dispatch('setTopicSelection', {id, p: p2})
   }).catch(error => {
     // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
-    // If the topicmap panel fails to render the topic as selected the detail panel is supposed to stay empty.
+    // If the topicmap panel fails to render the topic the detail panel is supposed to stay empty.
     console.error(`Rendering topic ${id} as selected failed`, error)
   })
 }
@@ -327,7 +327,7 @@ function fetchAssoc (id, p) {
     store.dispatch('setAssocSelection', {id, p: p2})
   }).catch(error => {
     // FIXME: do not just report the crash! Instead return the promise and attach the error handler at a higher level.
-    // If the topicmap panel fails to render the assoc as selected the detail panel is supposed to stay empty.
+    // If the topicmap panel fails to render the assoc the detail panel is supposed to stay empty.
     console.error(`Rendering assoc ${id} as selected failed`, error)
   })
 }
