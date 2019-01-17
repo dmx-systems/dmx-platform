@@ -256,12 +256,12 @@ const actions = {
 
   _hideTopic ({dispatch}, id) {
     // update state
-    dispatch('unselectIf', id)
+    unselectIfCascade(id, dispatch)
   },
 
   _hideAssoc ({dispatch}, id) {
     // update state
-    dispatch('unselectIf', id)
+    unselectIfCascade(id, dispatch)
   },
 
   //
@@ -373,7 +373,7 @@ const actions = {
     if (topicmapId === _topicmapId(getters)) {
       if (!visibility) {
         // update state
-        unselectIf(topicId, dispatch)
+        unselectIfCascade(topicId, dispatch)
       }
     }
   },
@@ -384,7 +384,7 @@ const actions = {
     console.log('_removeAssocFromTopicmap (Topicmaps Module)')
     if (topicmapId === _topicmapId(getters)) {
       // update state
-      unselectIf(assocId, dispatch)
+      unselectIfCascade(assocId, dispatch)
     }
   },
 
@@ -493,12 +493,12 @@ function selectionHandler (dispatch) {
 
 // ---
 
-function unselectIf(id, dispatch) {
-  console.log('unselectIf', state.topicmap.getAssocsWithPlayer(id).map(assoc => assoc.id))
-  state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
-    dispatch('unselectIf', assoc.id)
-  })
+function unselectIfCascade(id, dispatch) {
+  console.log('unselectIfCascade', id)
   dispatch('unselectIf', id)
+  state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
+    unselectIfCascade(assoc.id, dispatch)      // recursion
+  })
 }
 
 // Process directives

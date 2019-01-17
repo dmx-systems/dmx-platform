@@ -587,6 +587,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assoc.getId());
             if (assocMapcontext != null) {
                 deleteAssociationMapcontext(assocMapcontext);
+                deleteAllAssociationMapcontexts(assoc, topicmapId);     // recursion
             }
         }
     }
