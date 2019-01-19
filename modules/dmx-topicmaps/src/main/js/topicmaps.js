@@ -494,7 +494,7 @@ function selectionHandler (dispatch) {
 // ---
 
 function unselectIfCascade(id, dispatch) {
-  console.log('unselectIfCascade', id)
+  // console.log('unselectIfCascade', id)
   dispatch('unselectIf', id)
   state.topicmap.getAssocsWithPlayer(id).forEach(assoc => {
     unselectIfCascade(assoc.id, dispatch)      // recursion

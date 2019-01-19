@@ -59,7 +59,6 @@ export default ({store}) => {
 
     extraMenuItems: [{
       uri: 'dmx.topicmaps.topicmap',
-      label: 'Topicmap',
       optionsComp: require('./components/dm5-topicmap-options').default,
       create: (name, data) => {
         store.dispatch('createTopicmap', {

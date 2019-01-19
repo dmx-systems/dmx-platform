@@ -18,7 +18,6 @@ export default ({store}) => ({
 
   extraMenuItems: [{
     uri: 'dmx.accesscontrol.user_account',
-    label: 'User Account',
     optionsComp: require('./components/dm5-user-account-options').default,
     create: (username, options, pos) => {
       store.dispatch('createUserAccount', {

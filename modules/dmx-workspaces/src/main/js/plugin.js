@@ -18,7 +18,6 @@ export default ({store}) => {
 
     extraMenuItems: [{
       uri: 'dmx.workspaces.workspace',
-      label: 'Workspace',
       optionsComp: require('./components/dm5-workspace-options').default,
       create: (name, data) => {
         store.dispatch('createWorkspace', {

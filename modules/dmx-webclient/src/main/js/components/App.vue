@@ -84,7 +84,7 @@ button {
   margin-bottom: 0.2em;
 }
 
-/* Element UI Overrides */
+/* Element UI */
 
 /*
   Element UI font sizes     Default   small     mini
@@ -125,6 +125,12 @@ button {
 
 .el-dialog__footer {
   padding: 5px 15px 15px !important;              /* was 10px 20px 20px */
+}
+
+/* Note: this is a global rule as el-selects are <body> mounted */
+.el-select-dropdown__item .icon {
+  color: var(--color-topic-icon);
+  margin-right: var(--icon-spacing);
 }
 
 /* Quill editor */
