@@ -1,8 +1,9 @@
 <template>
   <div class="dm5-topicmap-select">
-    <div class="field-label">Topicmap</div>
     <el-select v-model="topicmapId">
-      <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+      <el-option-group label="Topicmap">
+        <el-option v-for="topic in topics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+      </el-option-group>
     </el-select>
     <el-button type="text" icon="el-icon-info" @click="revealTopicmap"></el-button>
   </div>

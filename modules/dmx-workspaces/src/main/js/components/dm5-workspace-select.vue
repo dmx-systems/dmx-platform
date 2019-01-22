@@ -1,8 +1,9 @@
 <template>
   <div class="dm5-workspace-select">
-    <div class="field-label">Workspace</div>
     <el-select v-model="workspaceId">
-      <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+      <el-option-group label="Workspace">
+        <el-option v-for="topic in workspaceTopics" :label="topic.value" :value="topic.id" :key="topic.id"></el-option>
+      </el-option-group>
     </el-select>
     <el-button type="text" icon="el-icon-info" @click="revealWorkspace"></el-button>
   </div>
