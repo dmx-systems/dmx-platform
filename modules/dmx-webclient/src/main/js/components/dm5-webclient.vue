@@ -63,5 +63,6 @@ export default {
   padding: 0 12px 12px 12px;
   background-color: var(--background-color);
   border-left: 1px solid var(--border-color);
+  box-shadow: 5px 0 8px;
 }
 </style>

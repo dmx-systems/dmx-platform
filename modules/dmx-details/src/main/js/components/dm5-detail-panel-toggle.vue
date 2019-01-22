@@ -41,6 +41,5 @@
 <style>
 .dm5-detail-panel-toggle {
   font-size: 18px !important;
-  align-self: flex-start;
 }
 </style>
