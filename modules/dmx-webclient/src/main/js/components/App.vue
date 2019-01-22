@@ -114,8 +114,8 @@ button {
 }
 
 .el-dialog__headerbtn {
-  top: 15px !important;                           /* was 20px */
-  right: 15px !important;                         /* was 20px */
+  top: 3px !important;                            /* was 20px */
+  right: 5px !important;                          /* was 20px */
 }
 
 .el-dialog__body {
