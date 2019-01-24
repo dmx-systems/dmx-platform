@@ -44,7 +44,7 @@ const actions = {
     dm5.restClient.createTopicmap(name, topicmapTypeUri, isPrivate).then(topic => {
       console.log('Topicmap topic', topic)
       // update state
-      state.topicmapTopics[_workspaceId(rootState)].push(topic)
+      topicmapTopics(rootState).push(topic)
       initSelection(topic.id, dispatch)
       //
       dispatch('callTopicmapRoute', topic.id)
@@ -392,12 +392,15 @@ const actions = {
     }
   },
 
-  _processDirectives ({dispatch}, directives) {
+  _processDirectives ({getters, rootState, dispatch}, directives) {
     // console.log(`Topicmaps: processing ${directives.length} directives`)
     directives.forEach(dir => {
       switch (dir.type) {
       case "UPDATE_TOPIC":
         updateTopic(dir.arg)    // FIXME: construct dm5.Topic?
+        break
+      case "DELETE_TOPIC":
+        deleteTopic(dir.arg, getters, rootState, dispatch)
         break
       }
     })
@@ -522,6 +525,41 @@ function updateTopic (topic) {
   })
 }
 
+/**
+ * Processes a DELETE_TOPIC directive.
+ */
+function deleteTopic (topic, getters, rootState, dispatch) {
+  // console.log('deleteTopic', topic)
+  if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+    return
+  }
+  // update "topicmapTopics" state
+  findTopicmapTopic(topic.id, (topics, i) => {
+    topics.splice(i, 1)
+  })
+  // update "selections" state
+  delete state.selections[topic.id]
+  //
+  recoverAfterTopicmapDeletion(topic.id, getters, rootState, dispatch)
+}
+
+function recoverAfterTopicmapDeletion (id, getters, rootState, dispatch) {
+  if (getters.topicmapId === id) {
+    console.log('Deleting CURRENT topicmap', id)
+    const topicmapTopic = topicmapTopics(rootState)[0]
+    if (topicmapTopic) {
+      console.log('Selecting topicmap', topicmapTopic.id)
+      dispatch('selectTopicmap', topicmapTopic.id)
+    } else {
+      dispatch('createTopicmap', {})
+    }
+  } else {
+    console.log('Deleting OTHER topicmap', id)
+    // FIXME: update "selectedTopicmapId" state if the deleted topicmap is currently selected in its workspace
+    // FIXME: create default topicmap in that workspace if deleted topicmap was the last one
+  }
+}
+
 // Helper
 
 /**
@@ -570,6 +608,10 @@ function _topicmapId (getters) {
     throw Error('no selected topicmap known')
   }
   return getters.topicmapId
+}
+
+function topicmapTopics (rootState) {
+  return state.topicmapTopics[_workspaceId(rootState)]
 }
 
 function _workspaceId (rootState) {
