@@ -6,13 +6,13 @@ const state = {
 
   topicmap: undefined,        // the rendered topicmap (dm5.Topicmap)
 
-  topicmapTopics: {},         // Loaded topicmap topics (including childs), per-workspace:
+  topicmapTopics: {},         // Per-workspace loaded topicmap topics (including childs):
                               //   {
                               //     workspaceId: [topicmapTopic]    # array of dm5.Topic
                               //   }
                               // TODO: make the array a map, key by topicmap ID?
 
-  selectedTopicmapId: {},     // Selected topicmap, per-workspace:
+  selectedTopicmapId: {},     // Per-workspace selected topicmap:
                               //   {
                               //     workspaceId: topicmapId
                               //   }
@@ -36,6 +36,10 @@ const state = {
 const actions = {
 
   createTopicmap ({rootState, dispatch}, {name, topicmapTypeUri, isPrivate}) {
+    name            = name            || 'untitled'
+    topicmapTypeUri = topicmapTypeUri || 'dmx.webclient.default_topicmap_renderer'
+    isPrivate       = isPrivate       || false
+    //
     console.log('Creating topicmap', name)
     dm5.restClient.createTopicmap(name, topicmapTypeUri, isPrivate).then(topic => {
       console.log('Topicmap topic', topic)
@@ -509,6 +513,10 @@ function unselectIfCascade(id, dispatch) {
  */
 function updateTopic (topic) {
   // console.log('updateTopic', topic)
+  if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+    return
+  }
+  // update "topicmapTopics" state
   findTopicmapTopic(topic.id, (topics, i) => {
     Vue.set(topics, i, topic)
   })

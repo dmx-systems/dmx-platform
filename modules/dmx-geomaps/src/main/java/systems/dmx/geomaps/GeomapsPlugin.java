@@ -73,9 +73,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
 
-    // *************************************
-    // *** GeomapsService Implementation ***
-    // *************************************
+    // **********************
+    // *** GeomapsService ***
+    // **********************
 
 
 
@@ -179,9 +179,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
 
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
@@ -192,9 +192,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 
@@ -214,7 +214,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
                 }
             }
         } else if (topic.getTypeUri().equals("dmx.geomaps.geo_coordinate")) {
-            logger.info("### New geo coordinate: " + topic.loadChildTopics());
+            // logger.info("### New geo coordinate: " + topic.loadChildTopics());
             me.newGeoCoord(topic.loadChildTopics());
         }
     }
