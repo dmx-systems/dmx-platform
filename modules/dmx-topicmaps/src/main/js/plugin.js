@@ -24,7 +24,8 @@ export default ({store}) => {
           contextCommands: state => ({
             topic: [
               {label: 'Hide',            handler: idLists => store.dispatch('hideMulti',   idLists), multi: true},
-              {label: 'Delete',          handler: idLists => store.dispatch('deleteMulti', idLists), multi: true},
+              {label: 'Delete',          handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
+                                         disabled: deleteDisabled},
               {label: 'Edit',            handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})},
               {label: "What's related?", handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})}
             ],
@@ -40,7 +41,7 @@ export default ({store}) => {
         listeners: {
           'topic-select':         id          => store.dispatch('selectTopic', id),
           'topic-unselect':       id          => store.dispatch('unselectTopic', id),
-          'topic-double-click':   viewTopic   => selectTopicmapIf(viewTopic),
+          'topic-double-click':   topic       => selectTopicmapIf(topic),
           'topic-drag':           ({id, pos}) => store.dispatch('setTopicPosition', {id, pos}),
           'topics-drag':          coords      => store.dispatch('setTopicPositions', coords),
           'assoc-create':         playerIds   => store.dispatch('createAssoc', playerIds),
@@ -76,9 +77,17 @@ export default ({store}) => {
     }
   }
 
-  function selectTopicmapIf (viewTopic) {
-    if (viewTopic.typeUri === 'dmx.topicmaps.topicmap') {
-      store.dispatch('selectTopicmap', viewTopic.id)
+  function deleteDisabled (idLists) {
+    return idLists.topicIds.some(id => {
+      const topicmap = store.state.topicmaps.topicmap
+      const topic = topicmap.getTopic(id)
+      return topic.typeUri === 'dmx.topicmaps.topicmap' && topic.id !== topicmap.id
+    })
+  }
+
+  function selectTopicmapIf (topic) {
+    if (topic.typeUri === 'dmx.topicmaps.topicmap') {
+      store.dispatch('selectTopicmap', topic.id)
     }
   }
 }

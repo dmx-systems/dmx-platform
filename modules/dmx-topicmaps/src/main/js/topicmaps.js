@@ -395,12 +395,19 @@ const actions = {
   _processDirectives ({getters, rootState, dispatch}, directives) {
     // console.log(`Topicmaps: processing ${directives.length} directives`)
     directives.forEach(dir => {
+      let topic
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateTopic(dir.arg)    // FIXME: construct dm5.Topic?
+        topic = new dm5.Topic(dir.arg)
+        if (topic.typeUri === 'dmx.topicmaps.topicmap') {
+          updateTopicmap(topic)
+        }
         break
       case "DELETE_TOPIC":
-        deleteTopic(dir.arg, getters, rootState, dispatch)
+        topic = new dm5.Topic(dir.arg)
+        if (topic.typeUri === 'dmx.topicmaps.topicmap') {
+          deleteTopicmap(topic, getters, rootState, dispatch)
+        }
         break
       }
     })
@@ -514,11 +521,8 @@ function unselectIfCascade(id, dispatch) {
  * Processes an UPDATE_TOPIC directive.
  * Updates the topicmap menu when a topicmap is renamed.
  */
-function updateTopic (topic) {
-  // console.log('updateTopic', topic)
-  if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-    return
-  }
+function updateTopicmap (topic) {
+  // console.log('updateTopicmap', topic)
   // update "topicmapTopics" state
   findTopicmapTopic(topic.id, (topics, i) => {
     Vue.set(topics, i, topic)
@@ -528,11 +532,8 @@ function updateTopic (topic) {
 /**
  * Processes a DELETE_TOPIC directive.
  */
-function deleteTopic (topic, getters, rootState, dispatch) {
-  // console.log('deleteTopic', topic)
-  if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
-    return
-  }
+function deleteTopicmap (topic, getters, rootState, dispatch) {
+  // console.log('deleteTopicmap', topic)
   // update "topicmapTopics" state
   findTopicmapTopic(topic.id, (topics, i) => {
     topics.splice(i, 1)
@@ -544,19 +545,16 @@ function deleteTopic (topic, getters, rootState, dispatch) {
 }
 
 function recoverAfterTopicmapDeletion (id, getters, rootState, dispatch) {
-  if (getters.topicmapId === id) {
-    console.log('Deleting CURRENT topicmap', id)
-    const topicmapTopic = topicmapTopics(rootState)[0]
-    if (topicmapTopic) {
-      console.log('Selecting topicmap', topicmapTopic.id)
-      dispatch('selectTopicmap', topicmapTopic.id)
-    } else {
-      dispatch('createTopicmap', {})
-    }
+  if (getters.topicmapId !== id) {
+    throw Error(`topicmap ${id} can't be deleted as it is not selected`)
+  }
+  console.log('Deleting topicmap', id)
+  const topicmapTopic = topicmapTopics(rootState)[0]
+  if (topicmapTopic) {
+    console.log('Selecting topicmap', topicmapTopic.id)
+    dispatch('selectTopicmap', topicmapTopic.id)
   } else {
-    console.log('Deleting OTHER topicmap', id)
-    // FIXME: update "selectedTopicmapId" state if the deleted topicmap is currently selected in its workspace
-    // FIXME: create default topicmap in that workspace if deleted topicmap was the last one
+    dispatch('createTopicmap', {})
   }
 }
 

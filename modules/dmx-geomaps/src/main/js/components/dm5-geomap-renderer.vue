@@ -87,7 +87,7 @@ export default {
         // console.log('domain topic', topic)
         switch (topics.length) {
         case 0:
-          throw Error(`No domain topics for geo coord topic ${geoCoordId}`)
+          throw Error(`no domain topics for geo coord topic ${geoCoordId}`)
         case 1:
           this.showDetails(topics[0]); break
         default:
