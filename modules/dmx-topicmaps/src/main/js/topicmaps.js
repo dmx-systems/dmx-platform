@@ -270,6 +270,24 @@ const actions = {
     unselectIfCascade(id, dispatch)
   },
 
+  _deleteTopic ({rootState, dispatch}, id) {
+    const topic = state.topicmap.getTopic(id)
+    if (topic.typeUri !== 'dmx.topicmaps.topicmap') {
+      return
+    }
+    if (state.topicmap.id !== id) {
+      throw Error(`topicmap ${id} can't be deleted as it is not selected`)
+    }
+    console.log('Deleting topicmap', id)
+    const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
+    if (topicmapTopic) {
+      console.log('Selecting topicmap', topicmapTopic.id)
+      dispatch('selectTopicmap', topicmapTopic.id)
+    } else {
+      dispatch('createTopicmap', {})
+    }
+  },
+
   //
 
   /**
@@ -394,7 +412,7 @@ const actions = {
     }
   },
 
-  _processDirectives ({getters, rootState, dispatch}, directives) {
+  _processDirectives (_, directives) {
     // console.log(`Topicmaps: processing ${directives.length} directives`)
     directives.forEach(dir => {
       let topic
@@ -408,7 +426,7 @@ const actions = {
       case "DELETE_TOPIC":
         topic = new dm5.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
-          deleteTopicmap(topic, getters, rootState, dispatch)
+          deleteTopicmap(topic)
         }
         break
       }
@@ -534,7 +552,7 @@ function updateTopicmap (topic) {
 /**
  * Processes a DELETE_TOPIC directive.
  */
-function deleteTopicmap (topic, getters, rootState, dispatch) {
+function deleteTopicmap (topic) {
   // console.log('deleteTopicmap', topic)
   // update "topicmapTopics" state
   findTopicmapTopic(topic.id, (topics, i) => {
@@ -542,22 +560,6 @@ function deleteTopicmap (topic, getters, rootState, dispatch) {
   })
   // update "selections" state
   delete state.selections[topic.id]
-  //
-  recoverAfterTopicmapDeletion(topic.id, getters, rootState, dispatch)
-}
-
-function recoverAfterTopicmapDeletion (id, getters, rootState, dispatch) {
-  if (getters.topicmapId !== id) {
-    throw Error(`topicmap ${id} can't be deleted as it is not selected`)
-  }
-  console.log('Deleting topicmap', id)
-  const topicmapTopic = topicmapTopics(rootState)[0]
-  if (topicmapTopic) {
-    console.log('Selecting topicmap', topicmapTopic.id)
-    dispatch('selectTopicmap', topicmapTopic.id)
-  } else {
-    dispatch('createTopicmap', {})
-  }
 }
 
 // Helper
