@@ -19,7 +19,7 @@ const actions = {
     dm5.restClient.createWorkspace(name, undefined, sharingModeUri).then(topic => {     // uri=undefined
       console.log('Workspace', topic)
       state.workspaceTopics.push(topic)
-      dispatch('selectWorkspace', topic.id)
+      selectWorkspace(topic.id, dispatch)
     })
   },
 
@@ -28,11 +28,18 @@ const actions = {
    * - the route is *not* yet set.
    */
   selectWorkspace ({dispatch}, id) {
-    // console.log('selectWorkspace', id)
-    dispatch('_selectWorkspace', id).then(() => {
-      // the workspace's topicmap topics are now available
-      dispatch('selectTopicmapForWorkspace')
-    })
+    selectWorkspace(id, dispatch)
+  },
+
+  /**
+   * Dispatched for initial navigation (see router.js), after workspace deletion,
+   * and after logout (see loggedOut() below).
+   *
+   * Preconditions:
+   * - the route is *not* yet set.
+   */
+  selectFirstWorkspace ({dispatch}) {
+    selectFirstWorkspace(dispatch)
   },
 
   /**
@@ -49,10 +56,7 @@ const actions = {
    *          At this time the "topicmapTopics" state is up-to-date (see topicmaps module).
    */
   _selectWorkspace ({dispatch}, id) {
-    // console.log('_selectWorkspace', id)
-    state.workspaceId = id
-    dm5.utils.setCookie('dmx_workspace_id', id)
-    return dispatch('fetchTopicmapTopics')     // data for topicmap selector
+    return _selectWorkspace(id, dispatch)
   },
 
   _initWorkspaceIsWritable () {
@@ -63,17 +67,6 @@ const actions = {
         state.isWritable = writable
       }
     )
-  },
-
-  /**
-   * Low-level action as dispatched for initial navigation (see router.js)
-   * and after logout (see loggedOut() below).
-   *
-   * Preconditions:
-   * - the route is *not* yet set.
-   */
-  selectFirstWorkspace ({dispatch}) {
-    dispatch('selectWorkspace', state.workspaceTopics[0].id)
   },
 
   //
@@ -89,7 +82,7 @@ const actions = {
       } else {
         console.log('Workspace not readable anymore')
         dispatch('clearTopicmapCache')
-        dispatch('selectFirstWorkspace')
+        selectFirstWorkspace(dispatch)
       }
     })
   },
@@ -100,7 +93,7 @@ const actions = {
     state.workspaceTopics.push(workspace)
   },
 
-  _processDirectives (_, directives) {
+  _processDirectives ({dispatch}, directives) {
     // console.log(`Workspaces: processing ${directives.length} directives`)
     directives.forEach(dir => {
       let topic
@@ -114,7 +107,7 @@ const actions = {
       case "DELETE_TOPIC":
         topic = new dm5.Topic(dir.arg)
         if (topic.typeUri === 'dmx.workspaces.workspace') {
-          deleteWorkspace(topic)
+          deleteWorkspace(topic, dispatch)
         }
         break
       }
@@ -127,6 +120,27 @@ export default {
   actions
 }
 
+// Actions
+
+function selectFirstWorkspace (dispatch) {
+  selectWorkspace(state.workspaceTopics[0].id, dispatch)
+}
+
+function selectWorkspace (id, dispatch) {
+  // console.log('selectWorkspace', id)
+  _selectWorkspace(id, dispatch).then(() => {
+    // the workspace's topicmap topics are now available
+    dispatch('selectTopicmapForWorkspace')
+  })
+}
+
+function _selectWorkspace (id, dispatch) {
+  // console.log('_selectWorkspace', id)
+  state.workspaceId = id
+  dm5.utils.setCookie('dmx_workspace_id', id)
+  return dispatch('fetchTopicmapTopics')     // data for topicmap selector
+}
+
 // State helper
 
 function fetchWorkspaceTopics () {
@@ -134,6 +148,13 @@ function fetchWorkspaceTopics () {
     // console.log('### Workspaces ready!')
     state.workspaceTopics = topics
   })
+}
+
+function findWorkspaceTopic (id, callback) {
+  const i = state.workspaceTopics.findIndex(topic => topic.id === id)
+  if (i !== -1) {
+    callback(state.workspaceTopics, i)
+  }
 }
 
 function isWorkspaceReadable () {
@@ -153,15 +174,9 @@ function updateWorkspace (topic) {
 /**
  * Processes a DELETE_TOPIC directive.
  */
-function deleteWorkspace (topic) {
+function deleteWorkspace (topic, dispatch) {
   findWorkspaceTopic(topic.id, (topics, i) => topics.splice(i, 1))
-}
-
-// Helper
-
-function findWorkspaceTopic (id, callback) {
-  const i = state.workspaceTopics.findIndex(topic => topic.id === id)
-  if (i !== -1) {
-    callback(state.workspaceTopics, i)
+  if (topic.id === state.workspaceId) {
+    selectFirstWorkspace(dispatch)
   }
 }

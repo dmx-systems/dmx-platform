@@ -282,6 +282,7 @@ const actions = {
     const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
     if (topicmapTopic) {
       console.log('Selecting topicmap', topicmapTopic.id)
+      // FIXME: potentially *all* clients must select another topicmap, not just the original client
       dispatch('selectTopicmap', topicmapTopic.id)
     } else {
       dispatch('createTopicmap', {})
