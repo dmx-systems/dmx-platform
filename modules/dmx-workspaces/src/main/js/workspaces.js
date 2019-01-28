@@ -3,13 +3,13 @@ import dm5 from 'dm5'
 
 const state = {
 
-  workspaceId: undefined,         // ID of selected workspace (number)
+  workspaceId: undefined,           // ID of selected workspace (number)
 
-  isWritable: undefined,          // true if selected workspace is writable
+  isWritable: undefined,            // true if selected workspace is writable
 
-  workspaceTopics: undefined,     // all workspace topics readable by current user (array of dm5.Topic)
+  workspaceTopics: undefined,       // all workspace topics readable by current user (array of dm5.Topic)
 
-  ready: fetchWorkspaceTopics()   // a promise resolved once the workspace topics are loaded
+  ready: fetchWorkspaceTopics()     // a promise resolved once the workspace topics are loaded
 }
 
 const actions = {
@@ -103,9 +103,19 @@ const actions = {
   _processDirectives (_, directives) {
     // console.log(`Workspaces: processing ${directives.length} directives`)
     directives.forEach(dir => {
+      let topic
       switch (dir.type) {
       case "UPDATE_TOPIC":
-        updateTopic(dir.arg)    // FIXME: construct dm5.Topic?
+        topic = new dm5.Topic(dir.arg)
+        if (topic.typeUri === 'dmx.workspaces.workspace') {
+          updateWorkspace(topic)
+        }
+        break
+      case "DELETE_TOPIC":
+        topic = new dm5.Topic(dir.arg)
+        if (topic.typeUri === 'dmx.workspaces.workspace') {
+          deleteWorkspace(topic)
+        }
         break
       }
     })
@@ -136,9 +146,22 @@ function isWorkspaceReadable () {
  * Processes an UPDATE_TOPIC directive.
  * Updates the workspace menu when a workspace is renamed.
  */
-function updateTopic (topic) {
-  const i = state.workspaceTopics.findIndex(_topic => _topic.id === topic.id)
+function updateWorkspace (topic) {
+  findWorkspaceTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
+}
+
+/**
+ * Processes a DELETE_TOPIC directive.
+ */
+function deleteWorkspace (topic) {
+  findWorkspaceTopic(topic.id, (topics, i) => topics.splice(i, 1))
+}
+
+// Helper
+
+function findWorkspaceTopic (id, callback) {
+  const i = state.workspaceTopics.findIndex(topic => topic.id === id)
   if (i !== -1) {
-    Vue.set(state.workspaceTopics, i, topic)
+    callback(state.workspaceTopics, i)
   }
 }

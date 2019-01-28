@@ -15,11 +15,11 @@
 export default {
 
   created () {
-    console.log('dm5-workspace-options created')
+    // console.log('dm5-workspace-options created')
   },
 
   mounted () {
-    console.log('dm5-workspace-options mounted')
+    // console.log('dm5-workspace-options mounted')
   },
 
   data () {
