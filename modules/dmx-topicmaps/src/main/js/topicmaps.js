@@ -222,6 +222,13 @@ const actions = {
       throw Error(`id is expected to be a number, got ${typeof id} (${id})`)
     }
     dispatch('renderAsUnselected')          // update view
+    if (!selection) {
+      // This can happen while workspace deletion. The workspace topic is removed from the topicmap, causing
+      // unsetSelection(). The topicmap might be deleted aleady in the course of deleting the workspace content.
+      // The requested topicmap update (unsetSelection()) is now obsolete. TODO: rethink this in-depth.
+      // console.warn(`Can't unselect topic/assoc ${id}; topicmap already gone`)
+      return
+    }
     if (selection.isSingle()) {
       // If there is a single selection and history navigation leads to a selection-less route, the "selection" state
       // must be emptied manually. In contrast when removing the selection by topicmap interaction the "selection" state
