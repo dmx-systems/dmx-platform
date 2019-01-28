@@ -94,9 +94,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
-    // ****************************************
-    // *** WorkspacesService Implementation ***
-    // ****************************************
+    // *************************
+    // *** WorkspacesService ***
+    // *************************
 
 
 
@@ -256,9 +256,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
@@ -292,9 +292,9 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 
@@ -350,10 +350,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         if (workspaceAssignmentIsSuppressed(topic)) {
             return;
         }
-        // Note: we must avoid a vicious circle that would occur when editing a workspace. A Notes topic
-        // would be created (as no notes are set when the workspace is created) and be assigned to the
-        // workspace itself. This would create an endless recursion while bubbling the modification timestamp.
-        if (isWorkspaceDescription(topic)) {
+        // Note: when editing a workspace its parts ("Workspace Name" and "Workspace Description") must not be assigned
+        // to the workspace itself. This would create an endless recursion while bubbling the modification timestamp.
+        // ### TODO: introduce dedicated "Workspace Assignment" assoc type and drop this exceptional treatment.
+        if (isWorkspacePart(topic)) {
             return;
         }
         //
@@ -485,8 +485,10 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         return type.getUri().startsWith("dmx.");
     }
 
-    private boolean isWorkspaceDescription(Topic topic) {
-        return topic.getTypeUri().equals("dmx.workspaces.workspace_description");
+    private boolean isWorkspacePart(Topic topic) {
+        String typeUri = topic.getTypeUri();
+        return typeUri.equals("dmx.workspaces.workspace_name") ||
+               typeUri.equals("dmx.workspaces.workspace_description");
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
