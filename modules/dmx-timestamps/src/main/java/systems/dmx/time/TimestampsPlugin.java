@@ -192,7 +192,14 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     @Override
     public void postUpdateTopicRequest(Topic topic) {
-        storeParentsTimestamp(topic);
+        // We don't want update modification timestamps for entire workspace content. Note that the workspace
+        // assignment is technically a parent-child relationship (the workspace being the child).
+        // TODO: reconceptualization. The Timestamps plugin should not know about the Workspaces plugin.
+        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
+            return;
+        }
+        //
+        updateParentTimestamps(topic);
     }
 
     // ---
@@ -221,6 +228,14 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private void updateParentTimestamps(Topic topic) {
+        for (DMXObject object : getParents(topic)) {
+            storeTimestamp(object);
+        }
+    }
+
+    // ---
+
     private void storeTimestamps(DMXObject object) {
         long time = System.currentTimeMillis();
         storeCreationTime(object, time);
@@ -230,14 +245,6 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     private void storeTimestamp(DMXObject object) {
         long time = System.currentTimeMillis();
         storeModificationTime(object, time);
-    }
-
-    // ---
-
-    private void storeParentsTimestamp(Topic topic) {
-        for (DMXObject object : getParents(topic)) {
-            storeTimestamp(object);
-        }
     }
 
     // ---
@@ -294,6 +301,8 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
      * Returns all parent topics/associations of the given topic (recursively).
      * Traversal is informed by the "parent" and "child" role types.
      * Traversal stops when no parent exists or when an association is met.
+     *
+     * @param   topic   topic from where to start the traversal. That topic is *not* included in the result set.
      */
     private Set<DMXObject> getParents(Topic topic) {
         Set<DMXObject> parents = new LinkedHashSet();
