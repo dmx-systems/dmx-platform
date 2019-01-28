@@ -174,14 +174,6 @@ public interface AccessControl {
      */
     void assignToWorkspace(DMXObject object, long workspaceId);
 
-    /**
-     * Checks if an association represents a workspace assignment.
-     * <p>
-     * This is a privileged method: it works also if the current user has no READ permission for the potential
-     * workspace.
-     */
-    boolean isWorkspaceAssignment(Association assoc);
-
     // ---
 
     /**

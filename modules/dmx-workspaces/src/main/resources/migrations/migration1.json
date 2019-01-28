@@ -2,51 +2,71 @@
 # Runs ALWAYS
 
 // Workspace
-{
-  "topic_types": [
-    {
-      "value":       "Workspace Name",
-      "uri":         "dmx.workspaces.workspace_name",
-      "dataTypeUri": "dmx.core.text"
-    },
-    {
-      "value":       "Workspace Description",
-      "uri":         "dmx.workspaces.workspace_description",
-      "dataTypeUri": "dmx.core.html"
-    },
-    {
-      "value":       "Workspace",
-      "uri":         "dmx.workspaces.workspace",
-      "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
-        {
-          "childTypeUri":        "dmx.workspaces.workspace_name",
-          "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.workspaces.workspace_description",
-          "childCardinalityUri": "dmx.core.one"
-        }
-      ],
-      "viewConfigTopics": [
-        {
-          "typeUri": "dmx.webclient.view_config",
-          "childs": {
-            "dmx.webclient.icon": "\uf005"
+[
+  {
+    "assoc_types": [
+      {
+        "value":       "Workspace Assignment",
+        "uri":         "dmx.workspaces.workspace_assignment",
+        "dataTypeUri": "dmx.core.text",
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "childs": {
+              "dmx.webclient.color": "hsl(255, 40%, 53%)"
+            }
           }
-        }
-      ]
-    },
-    {
-      "value":       "Workspace Facet",
-      "uri":         "dmx.workspaces.workspace_facet",
-      "dataTypeUri": "dmx.core.identity",
-      "assocDefs": [
-        {
-          "childTypeUri":        "dmx.workspaces.workspace",
-          "childCardinalityUri": "dmx.core.one"
-        }
-      ]
-    }
-  ]
-}
+        ]
+      }
+    ]
+  },
+  {
+    "topic_types": [
+      {
+        "value":       "Workspace Name",
+        "uri":         "dmx.workspaces.workspace_name",
+        "dataTypeUri": "dmx.core.text"
+      },
+      {
+        "value":       "Workspace Description",
+        "uri":         "dmx.workspaces.workspace_description",
+        "dataTypeUri": "dmx.core.html"
+      },
+      {
+        "value":       "Workspace",
+        "uri":         "dmx.workspaces.workspace",
+        "dataTypeUri": "dmx.core.identity",
+        "assocDefs": [
+          {
+            "childTypeUri":        "dmx.workspaces.workspace_name",
+            "childCardinalityUri": "dmx.core.one"
+          },
+          {
+            "childTypeUri":        "dmx.workspaces.workspace_description",
+            "childCardinalityUri": "dmx.core.one"
+          }
+        ],
+        "viewConfigTopics": [
+          {
+            "typeUri": "dmx.webclient.view_config",
+            "childs": {
+              "dmx.webclient.icon": "\uf005"
+            }
+          }
+        ]
+      },
+      {
+        "value":       "Workspace Facet",
+        "uri":         "dmx.workspaces.workspace_facet",
+        "dataTypeUri": "dmx.core.identity",
+        "assocDefs": [
+          {
+            "childTypeUri":        "dmx.workspaces.workspace",
+            "childCardinalityUri": "dmx.core.one",
+            "customAssocTypeUri":  "dmx.workspaces.workspace_assignment"
+          }
+        ]
+      }
+    ]
+  }
+]

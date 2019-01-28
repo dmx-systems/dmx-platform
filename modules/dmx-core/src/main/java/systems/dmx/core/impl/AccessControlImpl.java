@@ -338,7 +338,7 @@ class AccessControlImpl implements AccessControl {
     public void assignToWorkspace(DMXObject object, long workspaceId) {
         try {
             // create assignment association
-            pl.createAssociation("dmx.core.composition",
+            pl.createAssociation("dmx.workspaces.workspace_assignment",
                 object.getModel().createRoleModel("dmx.core.parent"),
                 mf.newTopicRoleModel(workspaceId, "dmx.core.child")
             );
@@ -347,17 +347,6 @@ class AccessControlImpl implements AccessControl {
         } catch (Exception e) {
             throw new RuntimeException("Assigning " + object + " to workspace " + workspaceId + " failed", e);
         }
-    }
-
-    @Override
-    public boolean isWorkspaceAssignment(Association assoc) {
-        if (assoc.getTypeUri().equals("dmx.core.composition")) {
-            DMXObjectModel topic = ((AssociationImpl) assoc).getModel().getPlayer("dmx.core.child");
-            if (topic != null && topic.getTypeUri().equals("dmx.workspaces.workspace")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // ---

@@ -352,7 +352,6 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
         }
         // Note: when editing a workspace its parts ("Workspace Name" and "Workspace Description") must not be assigned
         // to the workspace itself. This would create an endless recursion while bubbling the modification timestamp.
-        // ### TODO: introduce dedicated "Workspace Assignment" assoc type and drop this exceptional treatment.
         if (isWorkspacePart(topic)) {
             return;
         }
@@ -439,7 +438,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     private void _assignToWorkspace(DMXObject object, long workspaceId) {
         // 1) create assignment association
         facetsService.updateFacet(object, "dmx.workspaces.workspace_facet",
-            mf.newFacetValueModel("dmx.workspaces.workspace").putRef(workspaceId)
+            mf.newFacetValueModel("dmx.workspaces.workspace#dmx.workspaces.workspace_assignment").putRef(workspaceId)
         );
         // Note: we are refering to an existing workspace. So we must put a topic *reference* (using putRef()).
         //
@@ -492,9 +491,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
     }
 
     private boolean isWorkspaceAssignment(Association assoc) {
-        // Note: the current user might have no READ permission for the potential workspace.
-        // This is the case e.g. when a newly created User Account is assigned to the new user's private workspace.
-        return dmx.getAccessControl().isWorkspaceAssignment(assoc);
+        return assoc.getTypeUri().equals("dmx.workspaces.workspace_assignment");
     }
 
     // ---
