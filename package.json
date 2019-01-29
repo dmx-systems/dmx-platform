@@ -1,9 +1,9 @@
 {
   "name": "dm5-webclient",
   "version": "5.0.0-SNAPSHOT",
-  "description": "",
-  "author": "Jörg Richter",
-  "license": "MIT",
+  "description": "The DeepaMehta 5 Webclient",
+  "author": "Jörg Richter <jri@dmx.berlin>",
+  "license": "GPL-3.0-or-later",
   "repository": {
     "type": "git",
     "url": "https://github.com/jri/deepamehta.git"
