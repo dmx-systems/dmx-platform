@@ -305,6 +305,7 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
      * @param   topic   topic from where to start the traversal. That topic is *not* included in the result set.
      */
     private Set<DMXObject> getParents(Topic topic) {
+        // logger.info("### " + topic.getId() + " \"" + topic.getSimpleValue() + "\" \"" + topic.getTypeUri() + "\"");
         Set<DMXObject> parents = new LinkedHashSet();
         //
         List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child",

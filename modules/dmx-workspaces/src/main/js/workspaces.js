@@ -168,6 +168,7 @@ function isWorkspaceReadable () {
  * Updates the workspace menu when a workspace is renamed.
  */
 function updateWorkspace (topic) {
+  // update state
   findWorkspaceTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
 }
 
@@ -175,7 +176,9 @@ function updateWorkspace (topic) {
  * Processes a DELETE_TOPIC directive.
  */
 function deleteWorkspace (topic, dispatch) {
+  // update state
   findWorkspaceTopic(topic.id, (topics, i) => topics.splice(i, 1))
+  // redirect
   if (topic.id === state.workspaceId) {
     selectFirstWorkspace(dispatch)
   }

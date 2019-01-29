@@ -91,22 +91,7 @@ const actions = {
    * This allows for cross-workspace browser history navigation.
    */
   selectTopicmap ({dispatch}, id) {
-    const selection = state.selections[id]
-    // console.log('selectTopicmap', id, selection)
-    // Note: for cross-workspace jumps the workspace's map topics might not yet be loaded and no selection object
-    // available. In that case we call the topicmap route. It will load the map topics and init the selection objects.
-    if (selection && selection.isSingle()) {
-      const type = selection.getType()
-      dispatch('callRoute', {
-        name: type,
-        params: {
-          topicmapId: id,
-          [`${type}Id`]: selection.getObjectId()
-        }
-      })
-    } else {
-      dispatch('callTopicmapRoute', id)
-    }
+    _selectTopicmap(id, dispatch)
   },
 
   /**
@@ -285,13 +270,14 @@ const actions = {
     if (state.topicmap.id !== id) {
       throw Error(`topicmap ${id} can't be deleted as it is not selected`)
     }
-    console.log('Deleting topicmap', id)
+    console.log('_deleteTopic', id)
     const topicmapTopic = topicmapTopics(rootState).filter(topic => topic.id !== id)[0]
     if (topicmapTopic) {
-      console.log('Selecting topicmap', topicmapTopic.id)
-      // FIXME: potentially *all* clients must select another topicmap, not just the original client
-      dispatch('selectTopicmap', topicmapTopic.id)
+      // Note: selecting a new topicmap is not strictly required. It would be selected while directives processing
+      // anyways. But we do it here (before the delete request is actually sent) for quick user feedback.
+      _selectTopicmap(topicmapTopic.id, dispatch)
     } else {
+      // FIXME: synchronization. Create topicmap *before* processing response of delete request
       dispatch('createTopicmap', {})
     }
   },
@@ -314,7 +300,7 @@ const actions = {
     if (!topicmapId) {
       topicmapId = state.topicmapTopics[workspaceId][0].id
     }
-    dispatch('selectTopicmap', topicmapId)
+    _selectTopicmap(topicmapId, dispatch)
   },
 
   reloadTopicmap ({getters, rootState, dispatch}) {
@@ -420,7 +406,7 @@ const actions = {
     }
   },
 
-  _processDirectives (_, directives) {
+  _processDirectives ({getters, rootState, dispatch}, directives) {
     // console.log(`Topicmaps: processing ${directives.length} directives`)
     directives.forEach(dir => {
       let topic
@@ -434,7 +420,7 @@ const actions = {
       case "DELETE_TOPIC":
         topic = new dm5.Topic(dir.arg)
         if (topic.typeUri === 'dmx.topicmaps.topicmap') {
-          deleteTopicmap(topic)
+          deleteTopicmap(topic, getters, rootState, dispatch)
         }
         break
       }
@@ -468,6 +454,27 @@ export default {
   state,
   actions,
   getters
+}
+
+// Actions
+
+function _selectTopicmap (id, dispatch) {
+  const selection = state.selections[id]
+  console.log('_selectTopicmap', id, selection)
+  // Note: for cross-workspace jumps the workspace's map topics might not yet be loaded and no selection object
+  // available. In that case we call the topicmap route. It will load the map topics and init the selection objects.
+  if (selection && selection.isSingle()) {
+    const type = selection.getType()
+    dispatch('callRoute', {
+      name: type,
+      params: {
+        topicmapId: id,
+        [`${type}Id`]: selection.getObjectId()
+      }
+    })
+  } else {
+    dispatch('callTopicmapRoute', id)
+  }
 }
 
 /**
@@ -551,26 +558,25 @@ function unselectIfCascade(id, dispatch) {
  */
 function updateTopicmap (topic) {
   // console.log('updateTopicmap', topic)
-  // update "topicmapTopics" state
-  findTopicmapTopic(topic.id, (topics, i) => {
-    Vue.set(topics, i, topic)
-  })
+  // update state
+  findTopicmapTopic(topic.id, (topics, i) => Vue.set(topics, i, topic))
 }
 
 /**
  * Processes a DELETE_TOPIC directive.
  */
-function deleteTopicmap (topic) {
-  // console.log('deleteTopicmap', topic)
-  // update "topicmapTopics" state
-  findTopicmapTopic(topic.id, (topics, i) => {
-    topics.splice(i, 1)
-  })
-  // update "selections" state
+function deleteTopicmap (topic, getters, rootState, dispatch) {
+  // update state
+  findTopicmapTopic(topic.id, (topics, i) => topics.splice(i, 1))
   delete state.selections[topic.id]
+  // redirect
+  console.log('deleteTopicmap', topic.id, _topicmapId(getters))
+  if (topic.id === _topicmapId(getters)) {
+    _selectTopicmap(firstTopicmapTopic(rootState).id, dispatch)
+  }
 }
 
-// Helper
+// State helper
 
 /**
  * Returns the selected topicmap topic, according to current state.
@@ -618,6 +624,14 @@ function _topicmapId (getters) {
     throw Error('no selected topicmap known')
   }
   return getters.topicmapId
+}
+
+function firstTopicmapTopic (rootState) {
+  const topic = topicmapTopics(rootState)[0]
+  if (!topic) {
+    throw Error(`workspace ${__workspaceId(rootState)} has no topicmap`)
+  }
+  return topic
 }
 
 function topicmapTopics (rootState) {
