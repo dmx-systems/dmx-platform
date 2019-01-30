@@ -16,7 +16,7 @@ Project website:
 Company website:  
 <https://dmx.systems>
 
-Live demo:  
+Live demo (login as "admin" with no password):  
 <https://demo.dmx.systems>
 
 Download:  
