@@ -1,4 +1,4 @@
-> Note that DeepaMehta 5 is rebranded "DMX". DeepaMehta 5 and DMX is the same; same code, same license. The master branch represents DeepaMehta 5. DeepaMehta 5 is still beta, with no upgrade path guaranteed. The current stable is DeepaMehta 4. For DeepaMehta 4 switch to the [dm4 branch](https://github.com/jri/deepamehta/tree/dm4).
+> Note that DeepaMehta 5 is rebranded as "DMX". DeepaMehta 5 and DMX is the same; same code, same features, same license. The master branch represents DeepaMehta 5. DeepaMehta 5 is still beta, with no upgrade path guaranteed. The current stable is DeepaMehta 4. For DeepaMehta 4 switch to the [dm4 branch](https://github.com/jri/deepamehta/tree/dm4).
 
 
 DeepaMehta 5
@@ -7,7 +7,7 @@ DeepaMehta 5
 DeepaMehta is a platform for collaboration and knowledge management. The vision of DeepaMehta is a Post-Desktop Metaphor user interface that abolishes applications, windows, files, and folders in favor of stable personal views of contextual content.
 
 Technically DeepaMehta 5 is made of  
-Server-side: Java, Neo4j, Lucene, Felix (OSGi), Jetty, Jetty WebSocket, Jersey (JAX-RS).  
+Server-side: Java, Felix (OSGi), Neo4j, Lucene, Jetty, Jetty WebSocket, Jersey (JAX-RS).  
 Client-side: Vue.js, Vuex, Vue-Router, Element UI, Cytoscape, Quill, Leaflet.
 
 Project website:  
@@ -26,7 +26,7 @@ Documentation:
 <https://docs.dmx.systems>
 
 Mailing lists:  
-<https://lists.deepamehta.de/>
+<https://lists.deepamehta.de>
 
 Issue tracker:  
 <https://github.com/jri/deepamehta/issues> (public)  
