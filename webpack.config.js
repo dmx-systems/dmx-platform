@@ -15,7 +15,7 @@ module.exports = (env = {}) => {
     resolve: {
       extensions: [".js", ".vue"],
       alias: {
-        // needed by plugin-manager.js
+        // used by plugin-manager.js
         'modules':          __dirname + '/modules',
         'modules-external': __dirname + '/modules-external'
       }
