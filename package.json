@@ -24,7 +24,7 @@
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
     "element-ui": "^2.5.4",
     "font-awesome": "^4.7.0",
-    "vue": "^2.5.22",
+    "vue": "^2.6.2",
     "vue-font-awesome-search": "https://github.com/jri/vue-font-awesome-search.git",
     "vue-router": "^3.0.2",
     "vue2-leaflet": "^1.2.3",
@@ -45,10 +45,10 @@
     "mini-css-extract-plugin": "^0.5.0",
     "style-loader": "^0.23.1",
     "vue-loader": "^15.6.2",
-    "vue-template-compiler": "^2.5.22",
-    "webpack": "^4.29.0",
+    "vue-template-compiler": "^2.6.2",
+    "webpack": "^4.29.1",
     "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^3.2.1",
+    "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14"
   }
 }
