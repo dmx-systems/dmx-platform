@@ -36,11 +36,11 @@
           "childCardinalityUri": "dmx.core.one"
         },
         {
-          "childTypeUri":        "dmx.contacts.address",
+          "childTypeUri":        "dmx.base.url",
           "childCardinalityUri": "dmx.core.one"
         },
         {
-          "childTypeUri":        "dmx.base.url",
+          "childTypeUri":        "dmx.contacts.address",
           "childCardinalityUri": "dmx.core.one"
         }
       ],
