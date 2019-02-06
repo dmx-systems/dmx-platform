@@ -41,6 +41,7 @@
     }
   ],
   "topics": [
+    // Organizational Roles
     {
       "value":   "Executive Director",
       "typeUri": "dmx.contacts.organizational_role"

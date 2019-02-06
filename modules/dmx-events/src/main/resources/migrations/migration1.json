@@ -53,13 +53,35 @@
           }
         }
       ]
+    },
+    // Event Involvement
+    {
+      "value":       "Role",
+      "uri":         "dmx.events.role",
+      "dataTypeUri": "dmx.core.text"
     }
   ],
   "assoc_types": [
     {
-      "value":       "Participation",
-      "uri":         "dmx.events.participation",
-      "dataTypeUri": "dmx.core.text",
+      "value":       "Event Involvement",
+      "uri":         "dmx.events.event_involvement",
+      "dataTypeUri": "dmx.core.composite",
+      "assocDefs": [
+        {
+          "childTypeUri":        "dmx.events.role",
+          "childCardinalityUri": "dmx.core.one",
+          "viewConfigTopics": [
+            {
+              "typeUri": "dmx.webclient.view_config",
+              "childs": {
+                "dmx.webclient.widget": "ref_uri:dmx.webclient.select",
+                "dmx.webclient.clearable": true,
+                "dmx.webclient.customizable": true
+              }
+            }
+          ]
+        }
+      ],
       "viewConfigTopics": [
         {
           "typeUri": "dmx.webclient.view_config",
@@ -68,6 +90,25 @@
           }
         }
       ]
+    }
+  ],
+  "topics": [
+    // Roles
+    {
+      "value":   "Participant",
+      "typeUri": "dmx.events.role"
+    },
+    {
+      "value":   "Organizer",
+      "typeUri": "dmx.events.role"
+    },
+    {
+      "value":   "Host",
+      "typeUri": "dmx.events.role"
+    },
+    {
+      "value":   "Sponsor",
+      "typeUri": "dmx.events.role"
     }
   ]
 }

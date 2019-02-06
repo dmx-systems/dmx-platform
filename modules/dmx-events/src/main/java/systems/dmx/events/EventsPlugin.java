@@ -37,9 +37,9 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
 
 
 
-    // ************************************
-    // *** EventsService Implementation ***
-    // ************************************
+    // *********************
+    // *** EventsService ***
+    // *********************
 
 
 
@@ -47,7 +47,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/participant/{id}")
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.events.participation",
+        return dmx.getTopic(personId).getRelatedTopics("dmx.events.event_involvement",
             "dmx.core.default", "dmx.core.default", "dmx.events.event");
     }
 
@@ -55,15 +55,15 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     @Path("/{id}/participants")
     @Override
     public List<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
-        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.participation",
+        return dmx.getTopic(eventId).getRelatedTopics("dmx.events.event_involvement",
             "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 
@@ -71,7 +71,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     public void preCreateAssociation(AssociationModel assoc) {
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
-            "dmx.events.participation", "dmx.core.default", "dmx.core.default");
+            "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
         //
         // Event -> Address
         RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",

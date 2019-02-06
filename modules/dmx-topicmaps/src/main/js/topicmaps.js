@@ -460,7 +460,7 @@ export default {
 
 function _selectTopicmap (id, dispatch) {
   const selection = state.selections[id]
-  console.log('_selectTopicmap', id, selection)
+  console.log('_selectTopicmap', id)
   // Note: for cross-workspace jumps the workspace's map topics might not yet be loaded and no selection object
   // available. In that case we call the topicmap route. It will load the map topics and init the selection objects.
   if (selection && selection.isSingle()) {
