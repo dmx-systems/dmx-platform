@@ -10,5 +10,5 @@ public interface EventsService {
 
     List<RelatedTopic> getEvents(long personId);
 
-    List<RelatedTopic> getParticipants(long eventId);
+    List<RelatedTopic> getPersons(long eventId);
 }

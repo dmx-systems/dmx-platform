@@ -44,7 +44,7 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
 
 
     @GET
-    @Path("/participant/{id}")
+    @Path("/person/{id}")
     @Override
     public List<RelatedTopic> getEvents(@PathParam("id") long personId) {
         return dmx.getTopic(personId).getRelatedTopics("dmx.events.event_involvement",
@@ -52,9 +52,9 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
     }
 
     @GET
-    @Path("/{id}/participants")
+    @Path("/{id}/persons")
     @Override
-    public List<RelatedTopic> getParticipants(@PathParam("id") long eventId) {
+    public List<RelatedTopic> getPersons(@PathParam("id") long eventId) {
         return dmx.getTopic(eventId).getRelatedTopics("dmx.events.event_involvement",
             "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
