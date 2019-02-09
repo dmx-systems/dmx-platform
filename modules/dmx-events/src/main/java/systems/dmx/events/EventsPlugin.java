@@ -72,6 +72,9 @@ public class EventsPlugin extends PluginActivator implements EventsService, PreC
         // Event <-> Person
         DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.person",
             "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
+        // Event <-> Organization
+        DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.organization",
+            "dmx.events.event_involvement", "dmx.core.default", "dmx.core.default");
         //
         // Event -> Address
         RoleModel[] roles = DMXUtils.associationAutoTyping(assoc, "dmx.events.event", "dmx.contacts.address",
