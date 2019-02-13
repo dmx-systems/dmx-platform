@@ -9,7 +9,7 @@ import systems.dmx.core.service.event.ServiceRequestFilterListener;
 import systems.dmx.core.service.event.ServiceResponseFilterListener;
 import systems.dmx.core.util.JavaUtils;
 
-// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 
@@ -54,9 +54,9 @@ public class CachingPlugin extends PluginActivator implements ServiceRequestFilt
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 

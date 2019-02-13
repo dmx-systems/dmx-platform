@@ -44,7 +44,7 @@ import systems.dmx.core.service.event.ServiceRequestFilterListener;
 import systems.dmx.core.service.event.StaticResourceFilterListener;
 import systems.dmx.core.util.JavaUtils;
 
-// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
 
 import javax.servlet.http.HttpServletRequest;
@@ -164,9 +164,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // *******************************************
-    // *** AccessControlService Implementation ***
-    // *******************************************
+    // ****************************
+    // *** AccessControlService ***
+    // ****************************
 
 
 
@@ -459,9 +459,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
@@ -489,9 +489,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // ****************************************
-    // *** ConfigCustomizer Implementations ***
-    // ****************************************
+    // ************************
+    // *** ConfigCustomizer ***
+    // ************************
 
 
 
@@ -510,9 +510,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 

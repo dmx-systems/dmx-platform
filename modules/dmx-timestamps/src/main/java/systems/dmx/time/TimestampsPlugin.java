@@ -16,7 +16,7 @@ import systems.dmx.core.service.event.PreSendAssociationListener;
 import systems.dmx.core.service.event.PreSendTopicListener;
 import systems.dmx.core.service.event.ServiceResponseFilterListener;
 
-// ### TODO: hide Jersey internals. Move to JAX-RS 2.0.
+// ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.ws.rs.GET;
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/time")
+@Path("/timestamps")
 @Consumes("application/json")
 @Produces("application/json")
 public class TimestampsPlugin extends PluginActivator implements TimestampsService, PostCreateTopicListener,
@@ -52,8 +52,8 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String PROP_CREATED  = "dmx.time.created";
-    private static String PROP_MODIFIED = "dmx.time.modified";
+    private static String PROP_CREATED  = "dmx.time.created";       // ### TODO: rename
+    private static String PROP_MODIFIED = "dmx.time.modified";      // ### TODO: rename
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 
@@ -67,9 +67,9 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
 
 
-    // ****************************************
-    // *** TimestampsService Implementation ***
-    // ****************************************
+    // *************************
+    // *** TimestampsService ***
+    // *************************
 
 
 
@@ -145,9 +145,9 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
 
 
-    // ****************************
-    // *** Hook Implementations ***
-    // ****************************
+    // *************
+    // *** Hooks ***
+    // *************
 
 
 
@@ -162,9 +162,9 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
 
 
-    // ********************************
-    // *** Listener Implementations ***
-    // ********************************
+    // *****************
+    // *** Listeners ***
+    // *****************
 
 
 
