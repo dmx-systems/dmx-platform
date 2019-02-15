@@ -1,10 +1,12 @@
 package systems.dmx.topicmaps;
 
-import systems.dmx.topicmaps.model.TopicmapViewmodel;
-
+import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.util.IdList;
+import systems.dmx.topicmaps.model.TopicmapViewmodel;
+
+import java.util.List;
 
 
 
@@ -34,6 +36,16 @@ public interface TopicmapsService {
     boolean isTopicInTopicmap(long topicmapId, long topicId);
 
     boolean isAssociationInTopicmap(long topicmapId, long assocId);
+
+    /**
+     * Returns all topicmaps which contain the given topic/assoc.
+     * Only those topicmaps are returned in which the given topic/assoc is <i>visible</i> (not hidden).
+     *
+     * @param   objectId    a topic ID or an assoc ID
+     *
+     * @return  topics of type Topicmap
+     */
+    List<RelatedTopic> getTopicmapTopics(long objectId);
 
     // ---
 

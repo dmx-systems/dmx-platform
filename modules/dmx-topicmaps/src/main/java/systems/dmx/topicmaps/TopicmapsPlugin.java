@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/topicmap")
+@Path("/topicmap")      // TODO: rename "/topicmaps"
 @Consumes("application/json")
 @Produces("application/json")
 public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, MessengerContext {
@@ -135,6 +135,26 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public boolean isAssociationInTopicmap(long topicmapId, long assocId) {
         return fetchAssociationMapcontext(topicmapId, assocId) != null;
+    }
+
+    @GET
+    @Path("/object/{id}")
+    @Override
+    public List<RelatedTopic> getTopicmapTopics(@PathParam("id") long objectId) {
+        try {
+            List<RelatedTopic> topicmapTopics = new ArrayList();
+            DMXObject object = dmx.getObject(objectId);
+            boolean isAssoc = object instanceof Association;
+            for (RelatedTopic topic : object.getRelatedTopics((String) null, null, ROLE_TYPE_TOPICMAP,
+                                                                                   "dmx.topicmaps.topicmap")) {
+                if (isAssoc || visibility(topic.getRelatingAssociation())) {
+                    topicmapTopics.add(topic);
+                }
+            }
+            return topicmapTopics;
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching topicmap topics of topic/assoc " + objectId + " failed", e);
+        }
     }
 
     // ---
@@ -439,8 +459,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, TopicViewModel> topics = new HashMap();
-        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT, "dmx.core.default",
-            "dmx.topicmaps.topicmap_topic", null);  // othersTopicTypeUri=null
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, null);         // othersTopicTypeUri=null
         if (includeChilds) {
             DMXUtils.loadChildTopics(relTopics);
         }
@@ -453,7 +473,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     private Map<Long, AssociationViewModel> fetchAssociations(Topic topicmapTopic) {
         Map<Long, AssociationViewModel> assocs = new HashMap();
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
-            "dmx.core.default", "dmx.topicmaps.topicmap_association", null);
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, null);   // othersAsspcTypeUri=null
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), createAssocViewModel(assoc));
         }
