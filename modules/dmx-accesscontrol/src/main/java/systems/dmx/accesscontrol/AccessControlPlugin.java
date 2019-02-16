@@ -136,14 +136,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    @Inject
-    private WorkspacesService wsService;
-
-    @Inject
-    private FilesService filesService;
-
-    @Inject
-    private ConfigService configService;
+    @Inject private WorkspacesService wsService;
+    @Inject private FilesService filesService;
+    @Inject private ConfigService configService;
 
     @Context
     private HttpServletRequest request;
@@ -351,7 +346,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
                 mf.newTopicRoleModel(getUsernameTopicOrThrow(username).getId(), "dmx.core.default"),
                 mf.newTopicRoleModel(workspaceId, "dmx.core.default")
             ));
-            assignMembership(assoc);
+            assignMembershipToWorkspace(assoc);
         } catch (Exception e) {
             throw new RuntimeException("Creating membership for user \"" + username + "\" and workspace " +
                 workspaceId + " failed", e);
@@ -579,7 +574,7 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     @Override
     public void postUpdateAssociation(Association assoc, AssociationModel updateModel, AssociationModel oldAssoc) {
         if (isMembership(assoc.getModel()) && !isMembership(oldAssoc)) {
-            assignMembership(assoc);
+            assignMembershipToWorkspace(assoc);
         }
         //
         setModifier(assoc);
@@ -636,8 +631,21 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
         return assoc.getTypeUri().equals(MEMBERSHIP_TYPE);
     }
 
-    private void assignMembership(Association assoc) {
-        wsService.assignToWorkspace(assoc, assoc.getTopicByType("dmx.workspaces.workspace").getId());
+    /**
+     * Assigns a Membership to its workspace player.
+     *
+     * @throws  RuntimeException    if the given assoc has no workspace player
+     */
+    private void assignMembershipToWorkspace(Association assoc) {
+        try {
+            Topic workspace = assoc.getTopicByType("dmx.workspaces.workspace");
+            if (workspace == null) {
+                throw new RuntimeException("Association " + assoc.getId() + " has no workspace player");
+            }
+            wsService.assignToWorkspace(assoc, workspace.getId());
+        } catch (Exception e) {
+            throw new RuntimeException("Assigning membership " + assoc.getId() + " to a workspace failed", e);
+        }
     }
 
     // --- Disk quota ---

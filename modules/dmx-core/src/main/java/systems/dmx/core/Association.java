@@ -61,6 +61,7 @@ public interface Association extends DMXObject {
 
     /**
      * ### TODO: make it work for assoc players as well or drop it
+     * ### TODO: rename it to "getPlayerByType"
      *
      * @return  this association's topic which has the given type.
      *          If there is no such topic, null is returned.
