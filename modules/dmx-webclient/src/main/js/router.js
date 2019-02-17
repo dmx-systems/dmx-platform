@@ -1,7 +1,7 @@
 /**
  * The router.
- * - Adapts app state when route changes.
  * - Sets up initial app state according to start URL.
+ * - Adapts app state when route changes.
  */
 
 import Vue from 'vue'
@@ -256,10 +256,10 @@ function navigate (to, from) {
   const oldId = oldAssocId || oldTopicId        // Note: oldAssocId is checked first as oldId must be a number
   const topicChanged = topicId !== oldTopicId
   const assocChanged = assocId !== oldAssocId
-  if (topicChanged && topicId !== undefined) {                                  // Note: 0 is a valid topic ID
+  if ((topicChanged || topicmapChanged) && topicId !== undefined) {             // Note: 0 is a valid topic ID
     fetchTopic(topicId, p)
   }
-  if (assocChanged && assocId) {
+  if ((assocChanged || topicmapChanged) && assocId) {
     fetchAssoc(assocId, p)
   }
   if ((topicChanged || assocChanged) && topicId === undefined && !assocId) {    // Note: 0 is a valid topic ID
