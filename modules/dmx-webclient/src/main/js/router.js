@@ -1,7 +1,7 @@
 /**
  * The router.
- * - Sets up initial app state according to start URL.
- * - Adapts app state when route changes.
+ * - Initializes app state according to start URL.
+ * - Adapts app state when URL changes.
  */
 
 import Vue from 'vue'

@@ -218,9 +218,9 @@ function watchProp (comp, prop, getter) {
     val => {
       // console.log(`"${prop}" changed`, val)
       // Note: the top-level webclient components follow the convention of mirroring its "props" through "data".
-      // To avoid the "Avoid mutating a prop directly" warning here we update the data, not the props.
+      // To avoid the "Avoid mutating a prop directly" Vue warning here we update the data, not the props.
       // The components name the data like the prop but with an underscore appended.
-      comp.$data[prop + '_'] = val
+      comp[prop + '_'] = val
     }
   )
 }

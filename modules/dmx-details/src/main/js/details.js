@@ -19,8 +19,8 @@ const actions = {
   },
 
   setDetailPanelVisibility (_, visible) {
-    // Note: we expect actual boolean values (not truish/falsish) as the watcher
-    // is supposed to fire only on actual visibility changes (see plugin.js).
+    // Note: we expect actual boolean values (not truish/falsish).
+    // The watcher is supposed to fire only on actual visibility changes (see plugin.js).
     if (typeof visible !== 'boolean') {
       throw Error(`boolean expexted, got ${typeof visible}`)
     }
