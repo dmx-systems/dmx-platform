@@ -35,14 +35,15 @@ export default ({store}) => ({
         quillConfig:     state => state.quillConfig
       },
       listeners: {
-        'tab-click':           tab             => {store.dispatch('callDetailRoute', tab)},
-        'edit':                ()              => {store.dispatch('callDetailRoute', 'edit')},
+        'tab-click':           tab             =>  store.dispatch('callDetailRoute', tab),
+        'edit':                ()              =>  store.dispatch('callDetailRoute', 'edit'),
         'submit':              object          => {store.dispatch('submit', object)
                                                    store.dispatch('callDetailRoute', 'info')},
-        'submit-inline':       object          => {store.dispatch('submit', object)},
-        'submit-view-config':  viewConfigTopic => {store.dispatch('submit', viewConfigTopic)},
-        'child-topic-reveal':  relTopic        => {store.dispatch('revealRelatedTopic', relTopic)},
-        'related-topic-click': relTopic        => {store.dispatch('revealRelatedTopic', relTopic)}
+        'submit-inline':       object          =>  store.dispatch('submit', object),
+        'submit-view-config':  viewConfigTopic =>  store.dispatch('submit', viewConfigTopic),
+        'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', relTopic),
+        'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', relTopic),
+        'close':               ()              =>  store.dispatch('stripDetailFromRoute')
       }
     },
     {

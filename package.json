@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "webpack -p --hide-modules",
-    "dev": "webpack-dev-server -d --env.dev --hot",
+    "dev": "webpack-dev-server --env.dev --hot",
     "stats": "webpack -p --json > stats.json && webpack-bundle-analyzer stats.json modules/dmx-webclient/src/main/resources/web"
   },
   "dependencies": {
@@ -49,6 +49,6 @@
     "webpack": "^4.29.5",
     "webpack-bundle-analyzer": "^3.0.4",
     "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.1.14"
+    "webpack-dev-server": "^3.2.0"
   }
 }
