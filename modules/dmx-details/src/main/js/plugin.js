@@ -45,10 +45,6 @@ export default ({store}) => ({
         'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', relTopic),
         'close':               ()              =>  store.dispatch('stripDetailFromRoute')
       }
-    },
-    {
-      comp: require('./components/dm5-detail-panel-toggle').default,
-      mount: 'toolbar-right'
     }
   ]
 })

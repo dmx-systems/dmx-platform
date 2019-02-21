@@ -10,14 +10,7 @@ const state = {
 
 const actions = {
 
-  toggleDetailPanelVisibility ({dispatch}) {
-    if (state.visible) {
-      dispatch('stripDetailFromRoute')
-    } else {
-      dispatch('callDetailRoute', state.tab)
-    }
-  },
-
+  // TODO: combine with selectDetail action?
   setDetailPanelVisibility (_, visible) {
     // Note: we expect actual boolean values (not truish/falsish).
     // The watcher is supposed to fire only on actual visibility changes (see plugin.js).
