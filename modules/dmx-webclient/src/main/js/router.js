@@ -276,6 +276,10 @@ function navigate (to, from) {
     store.dispatch('setDetailPanelVisibility', detail !== undefined)
     if (detail) {
       store.dispatch('selectDetail', detail)
+    } else {
+      if (topicId !== undefined || assocId) {
+        store.dispatch('_showDetail')
+      }
     }
   }
 }
