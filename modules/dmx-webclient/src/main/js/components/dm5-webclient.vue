@@ -58,9 +58,7 @@ export default {
 .dm5-webclient .dm5-detail-panel {
   flex-grow: 1;
   flex-basis: 30%;
-  overflow: auto;
   box-sizing: border-box;
-  padding: 0 12px 12px 12px;
   background-color: var(--background-color);
   border-left: 1px solid var(--border-color);
   box-shadow: 5px 0 8px;
