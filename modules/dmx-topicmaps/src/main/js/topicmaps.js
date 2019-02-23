@@ -156,10 +156,10 @@ const actions = {
    *
    * @param   p   a promise resolved once topic data has arrived (global "object" state is up-to-date).
    */
-  setTopicSelection ({getters, dispatch}, {id, p}) {
+  setTopicSelection ({getters, rootState, dispatch}, {id, p}) {
     // console.log('setTopicSelection', _topicmapId(getters), id, getters.selection.topicIds)
     // update view          // Note: view must be updated before state is updated
-    dispatch('renderAsSelected', {id, p})
+    dispatch('renderAsSelected', {id, p, showDetails: showDetails(rootState)})
     _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setTopic(id)
@@ -178,10 +178,10 @@ const actions = {
    *
    * @param   p   a promise resolved once assoc data has arrived (global "object" state is up-to-date).
    */
-  setAssocSelection ({getters, dispatch}, {id, p}) {
+  setAssocSelection ({getters, rootState, dispatch}, {id, p}) {
     // console.log('setAssocSelection', _topicmapId(getters), id)
     // update view          // Note: view must be updated before state is updated
-    dispatch('renderAsSelected', {id, p})
+    dispatch('renderAsSelected', {id, p, showDetails: showDetails(rootState)})
     _syncUnselectMulti(getters.selection, dispatch)
     // update state
     getters.selection.setAssoc(id)
@@ -312,7 +312,7 @@ const actions = {
       if (selection.isSingle()) {
         dispatch('renderAsSelected', {
           id: selection.getObjectId(),
-          p: Promise.resolve()
+          showDetails: showDetails(rootState)
         })
       } else {
         // Note: a multi selection is visually restored by _displayTopicmap() already
@@ -648,4 +648,8 @@ function _workspaceId (rootState) {
 
 function __workspaceId (rootState) {
   return rootState.workspaces.workspaceId
+}
+
+function showDetails (rootState) {
+  return !rootState.details.visible
 }
