@@ -254,6 +254,7 @@ function navigate (to, from) {
   const oldTopicId = id(from.params.topicId)
   const oldAssocId = id(from.params.assocId)
   const oldId = oldAssocId || oldTopicId        // Note: oldAssocId is checked first as oldId must be a number
+  const newId = assocId    || topicId           // Note: assocId    is checked first as newId must be a number
   const topicChanged = topicId !== oldTopicId
   const assocChanged = assocId !== oldAssocId
   if ((topicChanged || topicmapChanged) && topicId !== undefined) {             // Note: 0 is a valid topic ID
@@ -271,11 +272,15 @@ function navigate (to, from) {
     }
   }
   // 3) detail
-  const detail = to.params.detail
-  if (detail != from.params.detail) {
+  const detail    = to.params.detail
+  const oldDetail = from.params.detail
+  if (detail != oldDetail) {
     store.dispatch('setDetailPanelVisibility', detail !== undefined)
     if (detail) {
       store.dispatch('selectDetail', detail)
+      if (!oldDetail && oldId === newId) {
+        store.dispatch('_removeDetail')
+      }
     } else {
       if (topicId !== undefined || assocId) {
         store.dispatch('_showDetail')
