@@ -43,7 +43,7 @@ export default ({store}) => ({
         'submit-view-config':  viewConfigTopic =>  store.dispatch('submit', viewConfigTopic),
         'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', relTopic),
         'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', relTopic),
-        'close':               ()              =>  store.dispatch('stripDetailFromRoute')
+        'close':               ()              =>  store.dispatch('stripSelectionFromRoute')
       }
     }
   ]

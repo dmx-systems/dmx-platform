@@ -281,10 +281,6 @@ function navigate (to, from) {
       if (!oldDetail && oldId === newId) {
         store.dispatch('_removeDetail')
       }
-    } else {
-      if (topicId !== undefined || assocId) {
-        store.dispatch('_showDetail')
-      }
     }
   }
 }
