@@ -37,7 +37,7 @@ const actions = {
 
   createTopicmap ({rootState, dispatch}, {name, topicmapTypeUri, isPrivate}) {
     name            = name            || 'untitled'
-    topicmapTypeUri = topicmapTypeUri || 'dmx.webclient.default_topicmap_renderer'
+    topicmapTypeUri = topicmapTypeUri || 'dmx.topicmaps.topicmap'
     isPrivate       = isPrivate       || false
     //
     console.log('Creating topicmap', name)

@@ -5,8 +5,7 @@ import systems.dmx.core.service.ModelFactory;
 
 
 
-// ### TODO: rename to "TopicmapType"
-public interface TopicmapRenderer {
+public interface TopicmapType {
 
     String getUri();
 

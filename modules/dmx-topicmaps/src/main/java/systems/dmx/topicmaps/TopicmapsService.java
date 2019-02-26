@@ -15,16 +15,14 @@ public interface TopicmapsService {
     // ------------------------------------------------------------------------------------------------------- Constants
 
     static final String DEFAULT_TOPICMAP_NAME     = "untitled";
-    static final String DEFAULT_TOPICMAP_RENDERER = "dmx.webclient.default_topicmap_renderer";
+    static final String DEFAULT_TOPICMAP_TYPE_URI = "dmx.topicmaps.topicmap";
 
     // -------------------------------------------------------------------------------------------------- Public Methods
 
     /**
      * @return  the created Topicmap topic.
-     *
-     * ### TODO: rename 2nd param into "topicmapTypeUri"
      */
-    Topic createTopicmap(String name, String topicmapRendererUri, boolean isPrivate);
+    Topic createTopicmap(String name, String topicmapTypeUri, boolean isPrivate);
 
     // ---
 
@@ -105,7 +103,7 @@ public interface TopicmapsService {
     // ---
 
     // ### TODO: refactor to registerTopicmapType(TopicmapType topicmapType)
-    void registerTopicmapRenderer(TopicmapRenderer renderer);
+    void registerTopicmapType(TopicmapType renderer);
 
     // ### TODO: unregister needed? Might a renderer hold a stale dmx instance?
 

@@ -124,7 +124,7 @@ public class WorkspacesPlugin extends PluginActivator implements WorkspacesServi
                     // 2) create default topicmap and assign to workspace
                     Topic topicmap = topicmapsService.createTopicmap(
                         TopicmapsService.DEFAULT_TOPICMAP_NAME,
-                        TopicmapsService.DEFAULT_TOPICMAP_RENDERER, false       // isPrivate=false
+                        TopicmapsService.DEFAULT_TOPICMAP_TYPE_URI, false       // isPrivate=false
                     );
                     // Note: user <anonymous> has no READ access to the workspace just created as it has no owner.
                     // So we must use the privileged assignToWorkspace() call here. This is to support the

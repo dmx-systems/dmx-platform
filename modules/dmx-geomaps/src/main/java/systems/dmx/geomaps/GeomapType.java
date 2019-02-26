@@ -2,17 +2,15 @@ package systems.dmx.geomaps;
 
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.service.ModelFactory;
-import systems.dmx.topicmaps.TopicmapRenderer;
+import systems.dmx.topicmaps.TopicmapType;
 
 
 
-// ### TODO: rename to Geomap
-class GeomapRenderer implements TopicmapRenderer {
+class GeomapType implements TopicmapType {
 
     @Override
     public String getUri() {
-        // ### TODO: change to "dmx.geomaps.geomap"
-        return "dmx.geomaps.geomap_renderer";
+        return "dmx.geomaps.geomap";
     }
 
     @Override

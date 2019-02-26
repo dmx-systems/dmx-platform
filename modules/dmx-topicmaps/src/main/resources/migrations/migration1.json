@@ -14,8 +14,8 @@
       "dataTypeUri": "dmx.core.html"
     },
     {
-      "value":       "Topicmap Renderer URI",                 // TODO: rename to "Topicmap Type URI"
-      "uri":         "dmx.topicmaps.topicmap_renderer_uri",   // TODO: rename to "dmx.topicmaps.topicmap_type_uri"
+      "value":       "Topicmap Type URI",
+      "uri":         "dmx.topicmaps.topicmap_type_uri",
       "dataTypeUri": "dmx.core.text",
       "viewConfigTopics": [
         {
@@ -41,7 +41,7 @@
           "childCardinalityUri": "dmx.core.one"
         },
         {
-          "childTypeUri":        "dmx.topicmaps.topicmap_renderer_uri",
+          "childTypeUri":        "dmx.topicmaps.topicmap_type_uri",
           "childCardinalityUri": "dmx.core.one"
         },
         {

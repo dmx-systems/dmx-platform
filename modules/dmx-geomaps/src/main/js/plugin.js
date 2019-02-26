@@ -6,7 +6,7 @@ export default {
   },
 
   topicmapType: {
-    uri: 'dmx.geomaps.geomap_renderer',
+    uri: 'dmx.geomaps.geomap',
     name: "Geomap",
     renderer: () => import('./dm5-geomap-renderer' /* webpackChunkName: "leaflet" */)
   }

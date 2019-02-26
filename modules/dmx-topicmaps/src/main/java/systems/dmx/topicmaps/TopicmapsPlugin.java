@@ -61,7 +61,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    private Map<String, TopicmapRenderer> topicmapRenderers = new HashMap();
+    private Map<String, TopicmapType> topicmapTypes = new HashMap();
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
     private Messenger me = new Messenger(this);
 
@@ -75,9 +75,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
 
     public TopicmapsPlugin() {
-        // Note: registering the default renderer in the init() hook would be too late.
-        // The renderer is already needed at install-in-DB time ### Still true? Use preInstall() hook?
-        registerTopicmapRenderer(new DefaultTopicmapRenderer());
+        // Note: registering the default topicmap type in the init() hook would be too late.
+        // The topicmap type is already needed at install-in-DB time ### Still true? Use preInstall() hook?
+        registerTopicmapType(new DefaultTopicmapType());
     }
 
 
@@ -92,14 +92,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Transactional
     @Override
     public Topic createTopicmap(@QueryParam("name") String name,
-                                @QueryParam("renderer_uri") String topicmapRendererUri,
+                                @QueryParam("topicmap_type_uri") String topicmapTypeUri,
                                 @QueryParam("private") boolean isPrivate) {
-        logger.info("Creating topicmap \"" + name + "\" (topicmapRendererUri=\"" + topicmapRendererUri +
-            "\", isPrivate=" + isPrivate +")");
+        logger.info("Creating topicmap \"" + name + "\" (topicmapTypeUri=\"" + topicmapTypeUri + "\", isPrivate=" +
+            isPrivate +")");
         Topic topicmapTopic = dmx.createTopic(mf.newTopicModel("dmx.topicmaps.topicmap", mf.newChildTopicsModel()
             .put("dmx.topicmaps.topicmap_name", name)
-            .put("dmx.topicmaps.topicmap_renderer_uri", topicmapRendererUri)
-            .put("dmx.topicmaps.topicmap_state", getTopicmapRenderer(topicmapRendererUri).initialTopicmapState(mf))
+            .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
+            .put("dmx.topicmaps.topicmap_state", getTopicmapType(topicmapTypeUri).initialTopicmapState(mf))
             .put("dmx.topicmaps.private", isPrivate)
         ));
         me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
@@ -391,9 +391,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // ---
 
     @Override
-    public void registerTopicmapRenderer(TopicmapRenderer renderer) {
-        logger.info("### Registering topicmap renderer \"" + renderer.getClass().getName() + "\"");
-        topicmapRenderers.put(renderer.getUri(), renderer);
+    public void registerTopicmapType(TopicmapType topicmapType) {
+        logger.info("### Registering topicmap type \"" + topicmapType.getClass().getName() + "\"");
+        topicmapTypes.put(topicmapType.getUri(), topicmapType);
     }
 
     // ---
@@ -635,16 +635,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    // --- Topicmap Renderers ---
+    // --- Topicmap Types ---
 
-    private TopicmapRenderer getTopicmapRenderer(String rendererUri) {
-        TopicmapRenderer renderer = topicmapRenderers.get(rendererUri);
+    private TopicmapType getTopicmapType(String topicmapTypeUri) {
+        TopicmapType topicmapType = topicmapTypes.get(topicmapTypeUri);
         //
-        if (renderer == null) {
-            throw new RuntimeException("\"" + rendererUri + "\" is an unknown topicmap renderer");
+        if (topicmapType == null) {
+            throw new RuntimeException("Topicmap type \"" + topicmapTypeUri + "\" not registered");
         }
         //
-        return renderer;
+        return topicmapType;
     }
 
     // ---

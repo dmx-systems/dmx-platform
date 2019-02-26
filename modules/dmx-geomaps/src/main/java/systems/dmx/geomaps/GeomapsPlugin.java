@@ -187,7 +187,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     @Override
     public void init() {
-        topicmapsService.registerTopicmapRenderer(new GeomapRenderer());
+        topicmapsService.registerTopicmapType(new GeomapType());
     }
 
 

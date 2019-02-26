@@ -5,13 +5,11 @@ import systems.dmx.core.service.ModelFactory;
 
 
 
-// ### TODO: rename to "DefaultTopicmap"
-class DefaultTopicmapRenderer implements TopicmapRenderer {
+class DefaultTopicmapType implements TopicmapType {
 
     @Override
     public String getUri() {
-        // ### TODO: change to "dmx.topicmaps.default_topicmap"
-        return "dmx.webclient.default_topicmap_renderer";
+        return "dmx.topicmaps.topicmap";
     }
 
     @Override
