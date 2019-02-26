@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.topicmaps.ViewTopic;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -14,18 +14,18 @@ class ViewTopicImpl extends TopicModelImpl implements ViewTopic {
 
     // --- Instance Variables ---
 
-    private ViewProperties viewProps;
+    private ViewProps viewProps;
 
     // --- Constructors ---
 
-    ViewTopicImpl(TopicModelImpl topic, ViewProperties viewProps) {
+    ViewTopicImpl(TopicModelImpl topic, ViewProps viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }
 
     // --- Public Methods ---
 
-    public ViewProperties getViewProperties() {
+    public ViewProps getViewProps() {
         return viewProps;
     }
 

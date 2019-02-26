@@ -1,11 +1,11 @@
 package systems.dmx.topicmaps;
 
 import systems.dmx.core.RelatedTopic;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 
 
 
 public interface ViewmodelCustomizer {
 
-    void enrichViewProperties(RelatedTopic topic, ViewProperties viewProps);
+    void enrichViewProps(RelatedTopic topic, ViewProps viewProps);
 }

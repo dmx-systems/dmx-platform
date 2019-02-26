@@ -2,7 +2,7 @@ package systems.dmx.topicmaps;
 
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.util.IdList;
 import systems.dmx.topicmaps.model.Topicmap;
 
@@ -52,7 +52,7 @@ public interface TopicmapsService {
     /**
      * Adds a topic to a topicmap. If the topic is added already an exception is thrown.
      */
-    void addTopicToTopicmap(long topicmapId, long topicId, ViewProperties viewProps);
+    void addTopicToTopicmap(long topicmapId, long topicId, ViewProps viewProps);
 
     /**
      * Convenience method to add a topic with the standard view properties.
@@ -62,17 +62,17 @@ public interface TopicmapsService {
     /**
      * Adds an association to a topicmap. If the association is added already an exception is thrown.
      */
-    void addAssociationToTopicmap(long topicmapId, long assocId, ViewProperties viewProps);
+    void addAssociationToTopicmap(long topicmapId, long assocId, ViewProps viewProps);
 
     // Note: this is needed in order to reveal a related topic in a *single* request. Otherwise client-sync might fail
     // due to asynchronicity. A client might receive the "addAssoc" WebSocket message *before* the "addTopic" message.
-    void addRelatedTopicToTopicmap(long topicmapId, long topicId, long assocId, ViewProperties viewProps);
+    void addRelatedTopicToTopicmap(long topicmapId, long topicId, long assocId, ViewProps viewProps);
 
     // ---
 
-    void setTopicViewProperties(long topicmapId, long topicId, ViewProperties viewProps);
+    void setTopicViewProps(long topicmapId, long topicId, ViewProps viewProps);
 
-    void setAssociationViewProperties(long topicmapId, long assocId, ViewProperties viewProps);
+    void setAssociationViewProps(long topicmapId, long assocId, ViewProps viewProps);
 
     /**
      * Convenience method to update the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.

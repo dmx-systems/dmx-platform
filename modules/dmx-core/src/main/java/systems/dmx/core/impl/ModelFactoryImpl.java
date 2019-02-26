@@ -14,7 +14,7 @@ import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.service.ModelFactory;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -828,38 +828,38 @@ public class ModelFactoryImpl implements ModelFactory {
     // === Topicmaps ===
 
     @Override
-    public ViewTopic newViewTopic(TopicModel topic, ViewProperties viewProps) {
+    public ViewTopic newViewTopic(TopicModel topic, ViewProps viewProps) {
         return new ViewTopicImpl((TopicModelImpl) topic, viewProps);
     }
 
     @Override
-    public ViewAssoc newViewAssoc(AssociationModel assoc, ViewProperties viewProps) {
+    public ViewAssoc newViewAssoc(AssociationModel assoc, ViewProps viewProps) {
         return new ViewAssocImpl((AssociationModelImpl) assoc, viewProps);
     }
 
     @Override
-    public ViewProperties newViewProperties() {
-        return new ViewPropertiesImpl();
+    public ViewProps newViewProps() {
+        return new ViewPropsImpl();
     }
 
     @Override
-    public ViewProperties newViewProperties(int x, int y, boolean visibility, boolean pinned) {
-        return new ViewPropertiesImpl(x, y, visibility, pinned);
+    public ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned) {
+        return new ViewPropsImpl(x, y, visibility, pinned);
     }
 
     @Override
-    public ViewProperties newViewProperties(int x, int y) {
-        return new ViewPropertiesImpl(x, y);
+    public ViewProps newViewProps(int x, int y) {
+        return new ViewPropsImpl(x, y);
     }
 
     @Override
-    public ViewProperties newViewProperties(boolean visibility) {
-        return new ViewPropertiesImpl(visibility);
+    public ViewProps newViewProps(boolean visibility) {
+        return new ViewPropsImpl(visibility);
     }
 
     @Override
-    public ViewProperties newViewProperties(JSONObject viewProps) {
-        return new ViewPropertiesImpl(viewProps);
+    public ViewProps newViewProps(JSONObject viewProps) {
+        return new ViewPropsImpl(viewProps);
     }
 
 

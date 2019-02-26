@@ -2,7 +2,7 @@ package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 
 import org.codehaus.jettison.json.JSONObject;
 
@@ -14,11 +14,11 @@ class ViewAssocImpl extends AssociationModelImpl implements ViewAssoc {
 
     // --- Instance Variables ---
 
-    private ViewProperties viewProps;
+    private ViewProps viewProps;
 
     // --- Constructors ---
 
-    ViewAssocImpl(AssociationModelImpl assoc, ViewProperties viewProps) {
+    ViewAssocImpl(AssociationModelImpl assoc, ViewProps viewProps) {
         super(assoc);
         this.viewProps = viewProps;
     }

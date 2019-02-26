@@ -4,11 +4,11 @@ import systems.dmx.core.JSONEnabled;
 
 
 
-public interface ViewProperties extends Iterable<String>, JSONEnabled {
+public interface ViewProps extends Iterable<String>, JSONEnabled {
 
     Object get(String propUri);
 
-    ViewProperties put(String propUri, Object value);
+    ViewProps put(String propUri, Object value);
 
     // ---
 

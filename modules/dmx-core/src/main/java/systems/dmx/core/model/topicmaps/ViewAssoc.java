@@ -9,5 +9,5 @@ import systems.dmx.core.model.AssociationModel;
  */
 public interface ViewAssoc extends AssociationModel {
 
-    // ViewProperties getViewProperties();      // TODO: needed?
+    // ViewProps getViewProps();      // TODO: needed?
 }

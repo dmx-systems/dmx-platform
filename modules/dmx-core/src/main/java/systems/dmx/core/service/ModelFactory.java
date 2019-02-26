@@ -20,7 +20,7 @@ import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
 import systems.dmx.core.model.topicmaps.ViewTopic;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
@@ -237,19 +237,19 @@ public interface ModelFactory {
 
     // === Topicmaps ===
 
-    ViewTopic newViewTopic(TopicModel topic, ViewProperties viewProps);
+    ViewTopic newViewTopic(TopicModel topic, ViewProps viewProps);
 
-    ViewAssoc newViewAssoc(AssociationModel assoc, ViewProperties viewProps);
+    ViewAssoc newViewAssoc(AssociationModel assoc, ViewProps viewProps);
 
-    ViewProperties newViewProperties();
+    ViewProps newViewProps();
 
-    ViewProperties newViewProperties(int x, int y, boolean visibility, boolean pinned);
+    ViewProps newViewProps(int x, int y, boolean visibility, boolean pinned);
 
-    ViewProperties newViewProperties(int x, int y);
+    ViewProps newViewProps(int x, int y);
 
-    ViewProperties newViewProperties(boolean visibility);
+    ViewProps newViewProps(boolean visibility);
 
-    ViewProperties newViewProperties(JSONObject viewProps);
+    ViewProps newViewProps(JSONObject viewProps);
 
 
 

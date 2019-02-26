@@ -13,7 +13,7 @@ import systems.dmx.core.model.TopicModel;
  */
 public interface ViewTopic extends TopicModel {
 
-    ViewProperties getViewProperties();
+    ViewProps getViewProps();
 
     // ---
 

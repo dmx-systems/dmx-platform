@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.model.topicmaps.ViewProperties;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 
-class ViewPropertiesImpl implements ViewProperties {
+class ViewPropsImpl implements ViewProps {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
@@ -23,20 +23,20 @@ class ViewPropertiesImpl implements ViewProperties {
     /**
      * Note: invoked from JAX-RS message body reader (see Webservice's ObjectProvider.java).
      */
-    ViewPropertiesImpl(JSONObject viewProps) {
+    ViewPropsImpl(JSONObject viewProps) {
         DMXUtils.toMap(viewProps, this.viewProps);
     }
 
     // ---
 
-    ViewPropertiesImpl() {
+    ViewPropsImpl() {
     }
 
     /**
      * Convenience constructor that initializes the "dmx.topicmaps.x", "dmx.topicmaps.y", "dmx.topicmaps.visibility",
      * and "dmx.topicmaps.pinned" standard view properties.
      */
-    ViewPropertiesImpl(int x, int y, boolean visibility, boolean pinned) {
+    ViewPropsImpl(int x, int y, boolean visibility, boolean pinned) {
         initPos(x, y);
         initVisibility(visibility);
         initPinned(pinned);
@@ -45,14 +45,14 @@ class ViewPropertiesImpl implements ViewProperties {
     /**
      * Convenience constructor that initializes the "dmx.topicmaps.x" and "dmx.topicmaps.y" standard view properties.
      */
-    ViewPropertiesImpl(int x, int y) {
+    ViewPropsImpl(int x, int y) {
         initPos(x, y);
     }
 
     /**
      * Convenience constructor that initializes the "dmx.topicmaps.visibility" standard view property.
      */
-    ViewPropertiesImpl(boolean visibility) {
+    ViewPropsImpl(boolean visibility) {
         initVisibility(visibility);
     }
 
@@ -64,7 +64,7 @@ class ViewPropertiesImpl implements ViewProperties {
     }
 
     @Override
-    public ViewProperties put(String propUri, Object value) {
+    public ViewProps put(String propUri, Object value) {
         viewProps.put(propUri, value);
         return this;
     }
