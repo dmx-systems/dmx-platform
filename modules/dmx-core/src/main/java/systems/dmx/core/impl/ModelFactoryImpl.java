@@ -12,8 +12,8 @@ import systems.dmx.core.model.TopicReferenceModel;
 import systems.dmx.core.model.TopicRoleModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
-import systems.dmx.core.model.topicmaps.AssociationViewModel;
-import systems.dmx.core.model.topicmaps.TopicViewModel;
+import systems.dmx.core.model.topicmaps.ViewAssoc;
+import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.service.ModelFactory;
 
@@ -828,13 +828,13 @@ public class ModelFactoryImpl implements ModelFactory {
     // === Topicmaps ===
 
     @Override
-    public TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps) {
-        return new TopicViewModelImpl((TopicModelImpl) topic, viewProps);
+    public ViewTopic newViewTopic(TopicModel topic, ViewProperties viewProps) {
+        return new ViewTopicImpl((TopicModelImpl) topic, viewProps);
     }
 
     @Override
-    public AssociationViewModel newAssociationViewModel(AssociationModel assoc, ViewProperties viewProps) {
-        return new AssociationViewModelImpl((AssociationModelImpl) assoc, viewProps);
+    public ViewAssoc newViewAssoc(AssociationModel assoc, ViewProperties viewProps) {
+        return new ViewAssocImpl((AssociationModelImpl) assoc, viewProps);
     }
 
     @Override

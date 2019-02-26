@@ -12,6 +12,7 @@ const actions = {
 
   // TODO: combine with selectDetail action?
   setDetailPanelVisibility (_, visible) {
+    // console.log('setDetailPanelVisibility', visible)
     // Note: we expect actual boolean values (not truish/falsish).
     // The watcher is supposed to fire only on actual visibility changes (see plugin.js).
     if (typeof visible !== 'boolean') {

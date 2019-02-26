@@ -2,8 +2,8 @@ package systems.dmx.topicmaps.model;
 
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.topicmaps.AssociationViewModel;
-import systems.dmx.core.model.topicmaps.TopicViewModel;
+import systems.dmx.core.model.topicmaps.ViewAssoc;
+import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -20,23 +20,20 @@ import java.util.logging.Logger;
  * <p>
  * Features:
  * - Serialization to JSON.
- *
- * ### TODO: rename to Topicmap
  */
-public class TopicmapViewmodel implements JSONEnabled {
+public class Topicmap implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicModel topicmapTopic;
-    private Map<Long, TopicViewModel> topics;
-    private Map<Long, AssociationViewModel> assocs;
+    private Map<Long, ViewTopic> topics;
+    private Map<Long, ViewAssoc> assocs;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public TopicmapViewmodel(TopicModel topicmapTopic, Map<Long, TopicViewModel> topics,
-                                                       Map<Long, AssociationViewModel> assocs) {
+    public Topicmap(TopicModel topicmapTopic, Map<Long, ViewTopic> topics, Map<Long, ViewAssoc> assocs) {
         this.topicmapTopic = topicmapTopic;
         this.topics = topics;
         this.assocs = assocs;
@@ -50,21 +47,21 @@ public class TopicmapViewmodel implements JSONEnabled {
 
     // ---
 
-    public Iterable<TopicViewModel> getTopics() {
+    public Iterable<ViewTopic> getTopics() {
         return topics.values();
     }
 
-    public Iterable<AssociationViewModel> getAssociations() {
+    public Iterable<ViewAssoc> getAssociations() {
         return assocs.values();
     }
 
     // ---
 
-    public TopicViewModel getTopic(long id) {
+    public ViewTopic getTopic(long id) {
         return topics.get(id);
     }
 
-    public AssociationViewModel getAssociation(long id) {
+    public ViewAssoc getAssociation(long id) {
         return assocs.get(id);
     }
 
@@ -129,7 +126,7 @@ public class TopicmapViewmodel implements JSONEnabled {
 
         private Point findStartPostition() {
             int maxY = MIN_Y;
-            for (TopicViewModel topic : topics.values()) {
+            for (ViewTopic topic : topics.values()) {
                 if (topic.getY() > maxY) {
                     maxY = topic.getY();
                 }

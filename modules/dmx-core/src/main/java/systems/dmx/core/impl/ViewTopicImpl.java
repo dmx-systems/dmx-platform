@@ -1,7 +1,7 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.model.TopicModel;
-import systems.dmx.core.model.topicmaps.TopicViewModel;
+import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -10,7 +10,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 // TODO: rethink inheritance. Can we have a common "ObjectViewModel" for both, topics and assocs?
 // Is this a case for Java 8 interfaces, which can have a default implementation?
-class TopicViewModelImpl extends TopicModelImpl implements TopicViewModel {
+class ViewTopicImpl extends TopicModelImpl implements ViewTopic {
 
     // --- Instance Variables ---
 
@@ -18,7 +18,7 @@ class TopicViewModelImpl extends TopicModelImpl implements TopicViewModel {
 
     // --- Constructors ---
 
-    TopicViewModelImpl(TopicModelImpl topic, ViewProperties viewProps) {
+    ViewTopicImpl(TopicModelImpl topic, ViewProperties viewProps) {
         super(topic);
         this.viewProps = viewProps;
     }

@@ -18,8 +18,8 @@ import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.model.TypeModel;
 import systems.dmx.core.model.ViewConfigurationModel;
 import systems.dmx.core.model.facets.FacetValueModel;
-import systems.dmx.core.model.topicmaps.AssociationViewModel;
-import systems.dmx.core.model.topicmaps.TopicViewModel;
+import systems.dmx.core.model.topicmaps.ViewAssoc;
+import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -237,9 +237,9 @@ public interface ModelFactory {
 
     // === Topicmaps ===
 
-    TopicViewModel newTopicViewModel(TopicModel topic, ViewProperties viewProps);
+    ViewTopic newViewTopic(TopicModel topic, ViewProperties viewProps);
 
-    AssociationViewModel newAssociationViewModel(AssociationModel assoc, ViewProperties viewProps);
+    ViewAssoc newViewAssoc(AssociationModel assoc, ViewProperties viewProps);
 
     ViewProperties newViewProperties();
 

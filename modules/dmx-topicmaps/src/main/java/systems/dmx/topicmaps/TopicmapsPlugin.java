@@ -7,15 +7,15 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.topicmaps.AssociationViewModel;
-import systems.dmx.core.model.topicmaps.TopicViewModel;
+import systems.dmx.core.model.topicmaps.ViewAssoc;
+import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
-import systems.dmx.topicmaps.model.TopicmapViewmodel;
+import systems.dmx.topicmaps.model.Topicmap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -111,17 +111,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @GET
     @Path("/{id}")
     @Override
-    public TopicmapViewmodel getTopicmap(@PathParam("id") long topicmapId,
-                                         @QueryParam("include_childs") boolean includeChilds) {
+    public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("include_childs") boolean includeChilds) {
         try {
             logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
-            // Note: a TopicmapViewmodel is not a DMXObject. So the JerseyResponseFilter's automatic
+            // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
-            Map<Long, TopicViewModel> topics = fetchTopics(topicmapTopic, includeChilds);
-            Map<Long, AssociationViewModel> assocs = fetchAssociations(topicmapTopic);
+            Map<Long, ViewTopic> topics = fetchTopics(topicmapTopic, includeChilds);
+            Map<Long, ViewAssoc> assocs = fetchAssociations(topicmapTopic);
             //
-            return new TopicmapViewmodel(topicmapTopic.getModel(), topics, assocs);
+            return new Topicmap(topicmapTopic.getModel(), topics, assocs);
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
@@ -457,21 +456,21 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch Topicmap ---
 
-    private Map<Long, TopicViewModel> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
-        Map<Long, TopicViewModel> topics = new HashMap();
+    private Map<Long, ViewTopic> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
+        Map<Long, ViewTopic> topics = new HashMap();
         List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, null);         // othersTopicTypeUri=null
         if (includeChilds) {
             DMXUtils.loadChildTopics(relTopics);
         }
         for (RelatedTopic topic : relTopics) {
-            topics.put(topic.getId(), createTopicViewModel(topic));
+            topics.put(topic.getId(), createViewTopic(topic));
         }
         return topics;
     }
 
-    private Map<Long, AssociationViewModel> fetchAssociations(Topic topicmapTopic) {
-        Map<Long, AssociationViewModel> assocs = new HashMap();
+    private Map<Long, ViewAssoc> fetchAssociations(Topic topicmapTopic) {
+        Map<Long, ViewAssoc> assocs = new HashMap();
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, null);   // othersAsspcTypeUri=null
         for (RelatedAssociation assoc : relAssocs) {
@@ -482,21 +481,21 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
-    private TopicViewModel createTopicViewModel(RelatedTopic topic) {
+    private ViewTopic createViewTopic(RelatedTopic topic) {
         try {
             ViewProperties viewProps = fetchTopicViewProperties(topic.getRelatingAssociation());
             invokeViewmodelCustomizers(topic, viewProps);
-            return mf.newTopicViewModel(topic.getModel(), viewProps);
+            return mf.newViewTopic(topic.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Creating viewmodel for topic " + topic.getId() + " failed", e);
         }
     }
 
-    private AssociationViewModel createAssocViewModel(RelatedAssociation assoc) {
+    private ViewAssoc createAssocViewModel(RelatedAssociation assoc) {
         try {
             ViewProperties viewProps = fetchAssocViewProperties(assoc.getRelatingAssociation());
             // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
-            return mf.newAssociationViewModel(assoc.getModel(), viewProps);
+            return mf.newViewAssoc(assoc.getModel(), viewProps);
         } catch (Exception e) {
             throw new RuntimeException("Creating viewmodel for association " + assoc.getId() + " failed", e);
         }
@@ -585,7 +584,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ));
         storeViewProperties(topicMapcontext, viewProps);
         //
-        TopicViewModel topic = mf.newTopicViewModel(dmx.getTopic(topicId).getModel(), viewProps);
+        ViewTopic topic = mf.newViewTopic(dmx.getTopic(topicId).getModel(), viewProps);
         me.addTopicToTopicmap(topicmapId, topic);
     }
 
@@ -596,7 +595,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         ));
         storeViewProperties(assocMapcontext, viewProps);
         //
-        AssociationViewModel assoc = mf.newAssociationViewModel(dmx.getAssociation(assocId).getModel(), viewProps);
+        ViewAssoc assoc = mf.newViewAssoc(dmx.getAssociation(assocId).getModel(), viewProps);
         me.addAssociationToTopicmap(topicmapId, assoc);
     }
 

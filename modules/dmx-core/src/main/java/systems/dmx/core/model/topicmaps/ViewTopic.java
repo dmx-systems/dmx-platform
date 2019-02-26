@@ -10,10 +10,8 @@ import systems.dmx.core.model.TopicModel;
  * That is a generic topic model enriched by view properties. Standard view properties are "dmx.topicmaps.x",
  * "dmx.topicmaps.y", and "dmx.topicmaps.visibility". Additional view properties can be added by plugins (by
  * implementing a Viewmodel Customizer).
- *
- * ### TODO: rename to ViewTopic
  */
-public interface TopicViewModel extends TopicModel {
+public interface ViewTopic extends TopicModel {
 
     ViewProperties getViewProperties();
 

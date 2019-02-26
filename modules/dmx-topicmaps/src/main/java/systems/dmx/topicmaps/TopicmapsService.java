@@ -4,7 +4,7 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewProperties;
 import systems.dmx.core.util.IdList;
-import systems.dmx.topicmaps.model.TopicmapViewmodel;
+import systems.dmx.topicmaps.model.Topicmap;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public interface TopicmapsService {
     /**
      * @param   includeChilds   if true the topics contained in the topicmap will include their child topics.
      */
-    TopicmapViewmodel getTopicmap(long topicmapId, boolean includeChilds);
+    Topicmap getTopicmap(long topicmapId, boolean includeChilds);
 
     boolean isTopicInTopicmap(long topicmapId, long topicId);
 
