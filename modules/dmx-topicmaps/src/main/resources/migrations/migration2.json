@@ -1,7 +1,7 @@
 # Part of DMX 5.0
 # Runs ALWAYS
 
-// TODO: convert state type into props?
+// TODO: convert state type into props
 {
   "topic_types": [
     {

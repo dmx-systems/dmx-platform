@@ -136,7 +136,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
         AssociationModel model = mf.newAssociationModel("dmx.geomaps.geotopic_mapcontext",
             mf.newTopicRoleModel(geomapId,   "dmx.core.default"),
-            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_topic")
+            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")
         );
         dmx.createAssociation(model);
     }
@@ -274,7 +274,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
         return DMXUtils.loadChildTopics(dmx.getTopicsByType("dmx.geomaps.geo_coordinate"));
         // TODO: retrieve per-topicmap
         // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
-        //     "dmx.core.default", "dmx.topicmaps.topicmap_topic", "dmx.geomaps.geo_coordinate"));
+        //     "dmx.core.default", "dmx.topicmaps.topicmap_content", "dmx.geomaps.geo_coordinate"));
     }
 
     // ---

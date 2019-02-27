@@ -69,26 +69,16 @@
   ],
   "assoc_types": [
     {
-      "value":       "Topic Mapcontext",
-      "uri":         "dmx.topicmaps.topic_mapcontext",
-      "dataTypeUri": "dmx.core.text"
-    },
-    {
-      "value":       "Association Mapcontext",
-      "uri":         "dmx.topicmaps.association_mapcontext",
+      "value":       "Topicmap Context",
+      "uri":         "dmx.topicmaps.topicmap_context",
       "dataTypeUri": "dmx.core.text"
     }
   ],
   "topics": [
     // Role Types
     {
-      "value":   "Topicmap Topic",
-      "uri":     "dmx.topicmaps.topicmap_topic",
-      "typeUri": "dmx.core.role_type"
-    },
-    {
-      "value":   "Topicmap Association",
-      "uri":     "dmx.topicmaps.topicmap_association",
+      "value":   "Topicmap Content",
+      "uri":     "dmx.topicmaps.topicmap_content",
       "typeUri": "dmx.core.role_type"
     }
   ]

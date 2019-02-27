@@ -47,12 +47,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    // association type semantics ### TODO: to be dropped. Model-driven manipulators required.
-    private static final String TOPIC_MAPCONTEXT       = "dmx.topicmaps.topic_mapcontext";
-    private static final String ASSOCIATION_MAPCONTEXT = "dmx.topicmaps.association_mapcontext";
-    private static final String ROLE_TYPE_TOPICMAP     = "dmx.core.default";
-    private static final String ROLE_TYPE_TOPIC        = "dmx.topicmaps.topicmap_topic";
-    private static final String ROLE_TYPE_ASSOCIATION  = "dmx.topicmaps.topicmap_association";
+    private static final String TOPICMAP_CONTEXT   = "dmx.topicmaps.topicmap_context";
+    private static final String ROLE_TYPE_TOPICMAP = "dmx.core.default";
+    private static final String ROLE_TYPE_CONTENT  = "dmx.topicmaps.topicmap_content";
 
     private static final String PROP_X          = "dmx.topicmaps.x";
     private static final String PROP_Y          = "dmx.topicmaps.y";
@@ -458,8 +455,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, ViewTopic> fetchTopics(Topic topicmapTopic, boolean includeChilds) {
         Map<Long, ViewTopic> topics = new HashMap();
-        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPIC_MAPCONTEXT,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC, null);         // othersTopicTypeUri=null
+        List<RelatedTopic> relTopics = topicmapTopic.getRelatedTopics(TOPICMAP_CONTEXT,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersTopicTypeUri=null
         if (includeChilds) {
             DMXUtils.loadChildTopics(relTopics);
         }
@@ -471,8 +468,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private Map<Long, ViewAssoc> fetchAssociations(Topic topicmapTopic) {
         Map<Long, ViewAssoc> assocs = new HashMap();
-        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(ASSOCIATION_MAPCONTEXT,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION, null);   // othersAsspcTypeUri=null
+        List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(TOPICMAP_CONTEXT,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
         for (RelatedAssociation assoc : relAssocs) {
             assocs.put(assoc.getId(), createAssocViewModel(assoc));
         }
@@ -567,20 +564,20 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Mapcontexts ---
 
     private Association fetchTopicMapcontext(long topicmapId, long topicId) {
-        return dmx.getAssociation(TOPIC_MAPCONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_TOPIC);
+        return dmx.getAssociation(TOPICMAP_CONTEXT, topicmapId, topicId, ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     private Association fetchAssociationMapcontext(long topicmapId, long assocId) {
-        return dmx.getAssociationBetweenTopicAndAssociation(ASSOCIATION_MAPCONTEXT, topicmapId, assocId,
-            ROLE_TYPE_TOPICMAP, ROLE_TYPE_ASSOCIATION);
+        return dmx.getAssociationBetweenTopicAndAssociation(TOPICMAP_CONTEXT, topicmapId, assocId,
+            ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT);
     }
 
     // ---
 
     private void createTopicMapcontext(long topicmapId, long topicId, ViewProps viewProps) {
-        Association topicMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPIC_MAPCONTEXT,
+        Association topicMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPICMAP_CONTEXT,
             mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
-            mf.newTopicRoleModel(topicId,    ROLE_TYPE_TOPIC)
+            mf.newTopicRoleModel(topicId,    ROLE_TYPE_CONTENT)
         ));
         storeViewProps(topicMapcontext, viewProps);
         //
@@ -589,9 +586,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void createAssociationMapcontext(long topicmapId, long assocId, ViewProps viewProps) {
-        Association assocMapcontext = dmx.createAssociation(mf.newAssociationModel(ASSOCIATION_MAPCONTEXT,
+        Association assocMapcontext = dmx.createAssociation(mf.newAssociationModel(TOPICMAP_CONTEXT,
             mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
-            mf.newAssociationRoleModel(assocId, ROLE_TYPE_ASSOCIATION)
+            mf.newAssociationRoleModel(assocId, ROLE_TYPE_CONTENT)
         ));
         storeViewProps(assocMapcontext, viewProps);
         //

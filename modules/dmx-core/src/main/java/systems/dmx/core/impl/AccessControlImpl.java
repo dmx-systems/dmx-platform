@@ -32,10 +32,10 @@ class AccessControlImpl implements AccessControl {
     // Type URIs
     // ### TODO: move to dmx.core namespace?
     // ### TODO: copy in AccessControlPlugin.java
-    private static final String TYPE_MEMBERSHIP    = "dmx.accesscontrol.membership";
-    private static final String TYPE_USERNAME      = "dmx.accesscontrol.username";
+    private static final String TYPE_MEMBERSHIP = "dmx.accesscontrol.membership";
+    private static final String TYPE_USERNAME   = "dmx.accesscontrol.username";
     // ### TODO: copy in TopicmapsPlugin.java
-    private static final String ASSOCIATION_MAPCONTEXT = "dmx.topicmaps.association_mapcontext";
+    private static final String TOPICMAP_CONTEXT = "dmx.topicmaps.topicmap_context";
     //
     private static final String TYPE_EMAIL_ADDRESS = "dmx.contacts.email_address";
     // ### TODO: copy in ConfigPlugin.java
@@ -367,7 +367,7 @@ class AccessControlImpl implements AccessControl {
 
     @Override
     public void deleteAssociationMapcontext(Association assoc) {
-        if (!assoc.getTypeUri().equals(ASSOCIATION_MAPCONTEXT)) {
+        if (!assoc.getTypeUri().equals(TOPICMAP_CONTEXT)) {
             throw new RuntimeException("Association " + assoc.getId() + " not eligible for privileged deletion (" +
                 assoc + ")");
         }
