@@ -1,7 +1,7 @@
 <template>
   <div :class="['dm5-assoc-def-list', mode]">
     <div class="field-label">Child Types ({{size}})</div>
-    <draggable :list="assocDefs" :options="options">
+    <draggable :list="assocDefs" :disabled="infoMode" :animation="300">
       <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
         :key="assocDef.assocDefUri" @click.native="click(assocDef)">
       </dm5-assoc-def>
@@ -28,16 +28,8 @@ export default {
   },
 
   computed: {
-
     size () {
       return this.assocDefs.length
-    },
-
-    options () {
-      return {
-        disabled: this.infoMode,
-        animation: 300
-      }
     }
   },
 
