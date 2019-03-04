@@ -227,14 +227,21 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                         createTopicMapcontext(topicmapId, topicId, viewProps);
                     } else {
                         if (!visibility(topicMapcontext)) {
-                            setTopicVisibility(topicmapId, topicId, true);
+                            setTopicVisibility(topicmapId, topicId, true);      // TODO: don't refetch mapcontext
                         }
                     }
                     // 2) add association
-                    // Note: it is an error if the association is already in the topicmap. In this case the topic is
-                    // already in the topicmap too, and the Webclient would not send the request in the first place.
-                    // ### TODO: rethink method contract. Do it analoguous to "add topic"?
-                    addAssociationToTopicmap(topicmapId, assocId, mf.newViewProps().put(PROP_PINNED, false));
+                    Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
+                    if (assocMapcontext == null) {
+                        createAssociationMapcontext(topicmapId, assocId, mf.newViewProps()
+                            .put(PROP_VISIBILITY, false)
+                            .put(PROP_PINNED, false)
+                        );
+                    } else {
+                        if (!visibility(assocMapcontext)) {
+                            setAssocVisibility(topicmapId, assocId, true);      // TODO: don't refetch mapcontext
+                        }
+                    }
                     return null;
                 }
             });
@@ -461,7 +468,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             DMXUtils.loadChildTopics(relTopics);
         }
         for (RelatedTopic topic : relTopics) {
-            topics.put(topic.getId(), createViewTopic(topic));
+            topics.put(topic.getId(), buildViewTopic(topic));
         }
         return topics;
     }
@@ -471,14 +478,14 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         List<RelatedAssociation> relAssocs = topicmapTopic.getRelatedAssociations(TOPICMAP_CONTEXT,
             ROLE_TYPE_TOPICMAP, ROLE_TYPE_CONTENT, null);       // othersAsspcTypeUri=null
         for (RelatedAssociation assoc : relAssocs) {
-            assocs.put(assoc.getId(), createAssocViewModel(assoc));
+            assocs.put(assoc.getId(), buildViewAssoc(assoc));
         }
         return assocs;
     }
 
     // ---
 
-    private ViewTopic createViewTopic(RelatedTopic topic) {
+    private ViewTopic buildViewTopic(RelatedTopic topic) {
         try {
             ViewProps viewProps = fetchTopicViewProps(topic.getRelatingAssociation());
             invokeViewmodelCustomizers(topic, viewProps);
@@ -488,7 +495,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    private ViewAssoc createAssocViewModel(RelatedAssociation assoc) {
+    private ViewAssoc buildViewAssoc(RelatedAssociation assoc) {
         try {
             ViewProps viewProps = fetchAssocViewProps(assoc.getRelatingAssociation());
             // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
@@ -500,25 +507,27 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // --- Fetch View Properties ---
 
-    private ViewProps fetchTopicViewProps(Association topicMapcontext) {
+    private ViewProps fetchTopicViewProps(Association topicmapContext) {
         return mf.newViewProps(
-            (Integer) topicMapcontext.getProperty(PROP_X),
-            (Integer) topicMapcontext.getProperty(PROP_Y),
-            visibility(topicMapcontext),
-            pinned(topicMapcontext)
+            (Integer) topicmapContext.getProperty(PROP_X),
+            (Integer) topicmapContext.getProperty(PROP_Y),
+            visibility(topicmapContext),
+            pinned(topicmapContext)
         );
     }
 
-    private ViewProps fetchAssocViewProps(Association assocMapcontext) {
-        return mf.newViewProps().put(PROP_PINNED, pinned(assocMapcontext));
+    private ViewProps fetchAssocViewProps(Association topicmapContext) {
+        return mf.newViewProps()
+            .put(PROP_VISIBILITY, visibility(topicmapContext))
+            .put(PROP_PINNED, pinned(topicmapContext));
     }
 
-    private boolean visibility(Association topicMapcontext) {
-        return (Boolean) topicMapcontext.getProperty(PROP_VISIBILITY);
+    private boolean visibility(Association topicmapContext) {
+        return (Boolean) topicmapContext.getProperty(PROP_VISIBILITY);
     }
 
-    private boolean pinned(Association mapcontext) {
-        return (Boolean) mapcontext.getProperty(PROP_PINNED);
+    private boolean pinned(Association topicmapContext) {
+        return (Boolean) topicmapContext.getProperty(PROP_PINNED);
     }
 
     // --- Store View Properties ---
