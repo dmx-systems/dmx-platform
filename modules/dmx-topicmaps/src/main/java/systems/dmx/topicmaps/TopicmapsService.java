@@ -83,10 +83,10 @@ public interface TopicmapsService {
     void setTopicVisibility(long topicmapId, long topicId, boolean visibility);
 
     /**
-     * Removes an association from a topicmap.
-     * If the associationn is not contained in the topicmap nothing is performed.
+     * Convenience method to update the "dmx.topicmaps.visibility" standard view property.
+     * ### FIXME: idempotence? If the associationn is not contained in the topicmap nothing is performed.
      */
-    void removeAssociationFromTopicmap(long topicmapId, long assocId);
+    void setAssocVisibility(long topicmapId, long assocId, boolean visibility);
 
     // ---
 

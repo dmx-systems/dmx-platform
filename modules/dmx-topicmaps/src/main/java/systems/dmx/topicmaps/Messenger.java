@@ -105,17 +105,18 @@ class Messenger {
         }
     }
 
-    void removeAssociationFromTopicmap(long topicmapId, long assocId) {
+    void setAssocVisibility(long topicmapId, long assocId, boolean visibility) {
         try {
             messageToAllButOne(new JSONObject()
-                .put("type", "removeAssocFromTopicmap")
+                .put("type", "setAssocVisibility")
                 .put("args", new JSONObject()
                     .put("topicmapId", topicmapId)
                     .put("assocId", assocId)
+                    .put("visibility", visibility)
                 )
             );
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error while sending a \"removeAssocFromTopicmap\" message:", e);
+            logger.log(Level.WARNING, "Error while sending a \"setAssocVisibility\" message:", e);
         }
     }
 

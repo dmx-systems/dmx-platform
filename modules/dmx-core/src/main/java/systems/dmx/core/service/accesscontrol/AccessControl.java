@@ -191,6 +191,7 @@ public interface AccessControl {
 
     // === Topicmaps ===
 
+    // TODO: drop it? (currently not in use)
     void deleteAssociationMapcontext(Association assoc);
 
 
