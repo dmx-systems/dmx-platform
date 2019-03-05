@@ -49,9 +49,7 @@ module.exports = (env = {}) => {
       new MiniCssExtractPlugin({
         filename: env.dev ? '[name].css' : '[contenthash].[name].css'
       }),
-      new CleanWebpackPlugin([
-        'modules/dmx-webclient/src/main/resources/web'
-      ]),
+      new CleanWebpackPlugin(),
       new VueLoaderPlugin(),
       new DefinePlugin({
         DEV: env.dev
