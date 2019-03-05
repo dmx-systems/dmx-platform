@@ -384,25 +384,21 @@ const actions = {
     }
   },
 
-  // Note: the Cytoscape Renderer module processes this message as well. We must perform first as the renderer removes
-  // the assocs we need to traverse here. Fortunately it seems we actually perform first. TODO: make this sure.
   _setTopicVisibility ({getters, dispatch}, {topicmapId, topicId, visibility}) {
-    console.log('_setTopicVisibility (Topicmaps Module)')
+    // console.log('_setTopicVisibility (Topicmaps Module)', topicmapId, topicId, visibility)
     if (topicmapId === _topicmapId(getters)) {
       if (!visibility) {
-        // update state
-        unselectIfCascade(topicId, dispatch)
+        unselectIfCascade(topicId, dispatch)      // update state
       }
     }
   },
 
-  // Note: the Cytoscape Renderer module processes this message as well. We must perform first as the renderer removes
-  // the assocs we need to traverse here. Fortunately it seems we actually perform first. TODO: make this sure.
-  _removeAssocFromTopicmap ({getters, dispatch}, {topicmapId, assocId}) {
-    console.log('_removeAssocFromTopicmap (Topicmaps Module)')
+  _setAssocVisibility ({getters, dispatch}, {topicmapId, assocId, visibility}) {
+    // console.log('_setAssocVisibility (Topicmaps Module)', topicmapId, assocId, visibility)
     if (topicmapId === _topicmapId(getters)) {
-      // update state
-      unselectIfCascade(assocId, dispatch)
+      if (!visibility) {
+        unselectIfCascade(assocId, dispatch)      // update state
+      }
     }
   },
 
