@@ -28,7 +28,6 @@ const state = {
                               //       uri:
                               //       name:
                               //       renderer:
-                              //       mounted: callback
                               //     }
                               //   }
 }

@@ -8,8 +8,6 @@ import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
 
-import java.awt.Point;
-
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -82,67 +80,5 @@ public class Topicmap implements JSONEnabled {
     @Override
     public String toString() {
         return "topicmap " + getId();
-    }
-
-    // -------------------------------------------------------------------------------------------------- Nested Classes
-
-    // Note: there is a client-side equivalent in canvas_view.js (deepamehta-webclient plugin)
-    public class GridPositioning {
-
-        // Settings
-        private final int GRID_DIST_X = 220;    // MAX_TOPIC_LABEL_WIDTH + 20 pixel padding
-        private final int GRID_DIST_Y = 80;
-        private final int START_X;
-        private final int START_Y = 50;
-        private final int MIN_Y = -9999;
-
-        private final int canvasWidth;
-        private final int transX;
-
-        private int gridX;
-        private int gridY;
-
-        // --- Constructors ---
-
-        public GridPositioning(int canvasWidth, int transX) {
-            this.canvasWidth = canvasWidth;
-            this.transX = transX;
-            START_X = 50 - transX;
-            //
-            Point startPos = findStartPostition();
-            gridX = startPos.x;
-            gridY = startPos.y;
-        }
-
-        // --- Public Methods ---
-
-        public Point nextPosition() {
-            Point pos = new Point(gridX, gridY);
-            advancePosition();
-            return pos;
-        }
-
-        // --- Private Methods ---
-
-        private Point findStartPostition() {
-            int maxY = MIN_Y;
-            for (ViewTopic topic : topics.values()) {
-                if (topic.getY() > maxY) {
-                    maxY = topic.getY();
-                }
-            }
-            int x = START_X;
-            int y = maxY != MIN_Y ? maxY + GRID_DIST_Y : START_Y;
-            return new Point(x, y);
-        }
-
-        private void advancePosition() {
-            if (gridX + GRID_DIST_X + transX > canvasWidth) {
-                gridX = START_X;
-                gridY += GRID_DIST_Y;
-            } else {
-                gridX += GRID_DIST_X;
-            }
-        }
     }
 }
