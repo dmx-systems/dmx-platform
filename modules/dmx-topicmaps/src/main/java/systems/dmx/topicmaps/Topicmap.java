@@ -3,6 +3,7 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.model.topicmaps.ViewAssoc;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.model.topicmaps.ViewTopic;
 import systems.dmx.core.util.DMXUtils;
 
@@ -24,6 +25,7 @@ public class Topicmap implements JSONEnabled {
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
     private TopicModel topicmapTopic;
+    private ViewProps viewProps;
     private Map<Long, ViewTopic> topics;
     private Map<Long, ViewAssoc> assocs;
 
@@ -31,8 +33,9 @@ public class Topicmap implements JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Topicmap(TopicModel topicmapTopic, Map<Long, ViewTopic> topics, Map<Long, ViewAssoc> assocs) {
+    Topicmap(TopicModel topicmapTopic, ViewProps viewProps, Map<Long, ViewTopic> topics, Map<Long, ViewAssoc> assocs) {
         this.topicmapTopic = topicmapTopic;
+        this.viewProps = viewProps;
         this.topics = topics;
         this.assocs = assocs;
     }
@@ -69,7 +72,8 @@ public class Topicmap implements JSONEnabled {
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("info", topicmapTopic.toJSON())
+                .put("topic", topicmapTopic.toJSON())
+                .put("viewProps", viewProps.toJSON())
                 .put("topics", DMXUtils.toJSONArray(topics.values()))
                 .put("assocs", DMXUtils.toJSONArray(assocs.values()));
         } catch (Exception e) {

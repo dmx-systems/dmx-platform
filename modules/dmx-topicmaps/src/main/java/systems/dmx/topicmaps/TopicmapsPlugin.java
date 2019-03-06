@@ -42,27 +42,21 @@ import java.util.logging.Logger;
 @Path("/topicmap")      // TODO: rename "/topicmaps"
 @Consumes("application/json")
 @Produces("application/json")
-public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, MessengerContext {
-
-    // ------------------------------------------------------------------------------------------------------- Constants
-
-    private static final String TOPICMAP_CONTEXT   = "dmx.topicmaps.topicmap_context";
-    private static final String ROLE_TYPE_TOPICMAP = "dmx.core.default";
-    private static final String ROLE_TYPE_CONTENT  = "dmx.topicmaps.topicmap_content";
-
-    private static final String PROP_X          = "dmx.topicmaps.x";
-    private static final String PROP_Y          = "dmx.topicmaps.y";
-    private static final String PROP_VISIBILITY = "dmx.topicmaps.visibility";
-    private static final String PROP_PINNED     = "dmx.topicmaps.pinned";
+public class TopicmapsPlugin extends PluginActivator implements TopicmapsService, TopicmapsConstants, MessengerContext {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
+    /**
+     * Topicmap Type registry.
+     */
     private Map<String, TopicmapType> topicmapTypes = new HashMap();
+
     private List<ViewmodelCustomizer> viewmodelCustomizers = new ArrayList();
+
     private Messenger me = new Messenger(this);
 
     @Context
-    private HttpServletRequest request;
+    private HttpServletRequest request;     // required by Messenger
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -113,14 +107,16 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public Topicmap getTopicmap(@PathParam("id") long topicmapId, @QueryParam("include_childs") boolean includeChilds) {
         try {
-            logger.info("Loading topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
+            logger.info("Fetching topicmap " + topicmapId + " (includeChilds=" + includeChilds + ")");
             // Note: a Topicmap is not a DMXObject. So the JerseyResponseFilter's automatic
             // child topic loading is not applied. We must load the child topics manually here.
             Topic topicmapTopic = dmx.getTopic(topicmapId).loadChildTopics();
-            Map<Long, ViewTopic> topics = fetchTopics(topicmapTopic, includeChilds);
-            Map<Long, ViewAssoc> assocs = fetchAssociations(topicmapTopic);
-            //
-            return new Topicmap(topicmapTopic.getModel(), topics, assocs);
+            return new Topicmap(
+                topicmapTopic.getModel(),
+                fetchTopicmapViewProps(topicmapTopic),
+                fetchTopics(topicmapTopic, includeChilds),
+                fetchAssociations(topicmapTopic)
+            );
         } catch (Exception e) {
             throw new RuntimeException("Fetching topicmap " + topicmapId + " failed", e);
         }
@@ -494,7 +490,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             invokeViewmodelCustomizers(topic, viewProps);
             return mf.newViewTopic(topic.getModel(), viewProps);
         } catch (Exception e) {
-            throw new RuntimeException("Creating viewmodel for topic " + topic.getId() + " failed", e);
+            throw new RuntimeException("Building ViewTopic " + topic.getId() + " failed", e);
         }
     }
 
@@ -504,11 +500,18 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             // invokeViewmodelCustomizers(assoc, viewProps);    // TODO: assoc customizers?
             return mf.newViewAssoc(assoc.getModel(), viewProps);
         } catch (Exception e) {
-            throw new RuntimeException("Creating viewmodel for association " + assoc.getId() + " failed", e);
+            throw new RuntimeException("Building ViewAssoc " + assoc.getId() + " failed", e);
         }
     }
 
     // --- Fetch View Properties ---
+
+    private ViewProps fetchTopicmapViewProps(Topic topicmapTopic) {
+        return mf.newViewProps()
+            .put(PROP_PAN_X, topicmapTopic.getProperty(PROP_PAN_X))
+            .put(PROP_PAN_Y, topicmapTopic.getProperty(PROP_PAN_Y))
+            .put(PROP_ZOOM,  topicmapTopic.getProperty(PROP_ZOOM));
+    }
 
     private ViewProps fetchTopicViewProps(Association topicmapContext) {
         return mf.newViewProps(
@@ -567,9 +570,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         }
     }
 
-    private void storeViewProps(Association topicmapContext, ViewProps viewProps) {
+    private void storeViewProps(DMXObject object, ViewProps viewProps) {
         for (String propUri : viewProps) {
-            topicmapContext.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
+            object.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
         }
     }
 
