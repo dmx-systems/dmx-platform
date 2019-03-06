@@ -1,4 +1,4 @@
-package systems.dmx.geomaps.model;
+package systems.dmx.geomaps;
 
 
 

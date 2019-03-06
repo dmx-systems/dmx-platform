@@ -1,7 +1,5 @@
 package systems.dmx.geomaps;
 
-import systems.dmx.geomaps.model.GeoCoordinate;
-import systems.dmx.geomaps.model.Geomap;
 import systems.dmx.core.Topic;
 
 import java.util.List;

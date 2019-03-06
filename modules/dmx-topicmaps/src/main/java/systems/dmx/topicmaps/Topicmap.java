@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 
 /**
- * A topicmap viewmodel: a collection of topics and associations plus their view properties.
+ * A topicmap model: a collection of topics and associations plus their view properties.
  * <p>
  * Features:
  * - Serialization to JSON.

@@ -1,8 +1,8 @@
-package systems.dmx.geomaps.model;
+package systems.dmx.geomaps;
 
 import systems.dmx.core.JSONEnabled;
-import systems.dmx.core.Topic;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.util.DMXUtils;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -24,15 +24,17 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
 
     // ---------------------------------------------------------------------------------------------- Instance Variables
 
-    protected Topic geomapTopic;
-    protected Map<Long, TopicModel> geoCoords;
+    private TopicModel geomapTopic;
+    private ViewProps viewProps;
+    private Map<Long, TopicModel> geoCoords;
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
     // ---------------------------------------------------------------------------------------------------- Constructors
 
-    public Geomap(Topic geomapTopic, Map<Long, TopicModel> geoCoords) {
+    Geomap(TopicModel geomapTopic, ViewProps viewProps, Map<Long, TopicModel> geoCoords) {
         this.geomapTopic = geomapTopic;
+        this.viewProps = viewProps;
         this.geoCoords = geoCoords;
     }
 
@@ -53,7 +55,8 @@ public class Geomap implements Iterable<TopicModel>, JSONEnabled {
     public JSONObject toJSON() {
         try {
             return new JSONObject()
-                .put("info", geomapTopic.toJSON())
+                .put("topic", geomapTopic.toJSON())
+                .put("viewProps", viewProps.toJSON())
                 .put("geoCoordTopics", DMXUtils.toJSONArray(geoCoords.values()));
         } catch (Exception e) {
             throw new RuntimeException("Serialization failed", e);

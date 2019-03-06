@@ -1,16 +1,15 @@
 package systems.dmx.geomaps;
 
-import systems.dmx.geomaps.model.GeoCoordinate;
-import systems.dmx.geomaps.model.Geomap;
+import systems.dmx.topicmaps.TopicmapsConstants;
 import systems.dmx.topicmaps.TopicmapsService;
 import systems.dmx.facets.FacetsService;
 
 import systems.dmx.core.ChildTopics;
-import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.ChildTopicsModel;
 import systems.dmx.core.model.TopicModel;
+import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.osgi.PluginActivator;
 import systems.dmx.core.service.Cookies;
 import systems.dmx.core.service.Inject;
@@ -46,7 +45,8 @@ import java.util.logging.Logger;
 @Path("/geomap")
 @Consumes("application/json")
 @Produces("application/json")
-public class GeomapsPlugin extends PluginActivator implements GeomapsService, PostCreateTopicListener,
+public class GeomapsPlugin extends PluginActivator implements GeomapsService, TopicmapsConstants,
+                                                                              PostCreateTopicListener,
                                                                               PostUpdateTopicListener,
                                                                               PreSendTopicListener {
 
@@ -83,13 +83,19 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     @Path("/{id}")
     @Override
     public Geomap getGeomap(@PathParam("id") long geomapId) {
-        logger.info("Loading geomap " + geomapId);
-        // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
-        // child topic loading is not applied. We must load the child topics manually here.
-        Topic geomapTopic = dmx.getTopic(geomapId).loadChildTopics();
-        Map<Long, TopicModel> geoCoords = fetchGeoCoordinates(geomapTopic);
-        //
-        return new Geomap(geomapTopic, geoCoords);
+        try {
+            logger.info("Fetching geomap " + geomapId);
+            // Note: a Geomap is not a DMXObject. So the JerseyResponseFilter's automatic
+            // child topic loading is not applied. We must load the child topics manually here.
+            Topic geomapTopic = dmx.getTopic(geomapId).loadChildTopics();
+            return new Geomap(
+                geomapTopic.getModel(),
+                fetchGeomapViewProps(geomapTopic),
+                fetchGeoCoordinates(geomapTopic)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Fetching geomap " + geomapId + " failed", e);
+        }
     }
 
     // Note: the "include_childs" query parameter is handled by the core's JerseyResponseFilter
@@ -261,6 +267,13 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
 
     // ------------------------------------------------------------------------------------------------- Private Methods
 
+    private ViewProps fetchGeomapViewProps(Topic geomapTopic) {
+        return mf.newViewProps()
+            .put(PROP_PAN_X, geomapTopic.getProperty(PROP_PAN_X))
+            .put(PROP_PAN_Y, geomapTopic.getProperty(PROP_PAN_Y))
+            .put(PROP_ZOOM,  geomapTopic.getProperty(PROP_ZOOM));
+    }
+
     private Map<Long, TopicModel> fetchGeoCoordinates(Topic geomapTopic) {
         Map<Long, TopicModel> geoCoords = new HashMap();
         for (Topic geoCoord : _fetchGeoCoordinates(geomapTopic)) {
@@ -270,9 +283,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Po
     }
 
     private List<? extends Topic> _fetchGeoCoordinates(Topic geomapTopic) {
-        // Note: temporarily we retrieve just *all* geo coordinates
+        // Note: we retrieve just *all* (readable) geo coordinates
         return DMXUtils.loadChildTopics(dmx.getTopicsByType("dmx.geomaps.geo_coordinate"));
-        // TODO: retrieve per-topicmap
+        // TODO: retrieve per-topicmap?
         // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
         //     "dmx.core.default", "dmx.topicmaps.topicmap_content", "dmx.geomaps.geo_coordinate"));
     }
