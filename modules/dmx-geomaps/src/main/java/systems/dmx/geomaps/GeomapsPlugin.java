@@ -153,6 +153,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, To
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
+        // TODO: adapt to DB-props
         ChildTopicsModel geomapState = mf.newChildTopicsModel().put(
             "dmx.topicmaps.topicmap_state", mf.newChildTopicsModel().put(
                 "dmx.topicmaps.translation", mf.newChildTopicsModel().put(

@@ -379,6 +379,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
                                                                          @PathParam("y") int transY) {
         try {
+            // TODO: adapt to DB-props
             ChildTopicsModel topicmapState = mf.newChildTopicsModel()
                 .put("dmx.topicmaps.topicmap_state", mf.newChildTopicsModel()
                     .put("dmx.topicmaps.translation", mf.newChildTopicsModel()

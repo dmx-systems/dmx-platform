@@ -21,11 +21,16 @@
         {
           "typeUri": "dmx.webclient.view_config",
           "childs": {
-            "dmx.webclient.hidden": true,
-            "dmx.webclient.locked": true
+            "dmx.webclient.hidden": true,       # TODO: move to ass def
+            "dmx.webclient.locked": true        # TODO: move to ass def
           }
         }
       ]
+    },
+    {
+      "value":       "Private",                 # TODO: implement in webclient
+      "uri":         "dmx.topicmaps.private",
+      "dataTypeUri": "dmx.core.boolean"
     },
     {
       "value":       "Topicmap",
@@ -42,6 +47,10 @@
         },
         {
           "childTypeUri":        "dmx.topicmaps.topicmap_type_uri",
+          "childCardinalityUri": "dmx.core.one"
+        },
+        {
+          "childTypeUri":        "dmx.topicmaps.private",
           "childCardinalityUri": "dmx.core.one"
         },
         {
