@@ -4,7 +4,6 @@ import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.util.IdList;
-import systems.dmx.topicmaps.model.Topicmap;
 
 import java.util.List;
 

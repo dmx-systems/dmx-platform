@@ -15,7 +15,6 @@ import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.Transactional;
 import systems.dmx.core.util.DMXUtils;
 import systems.dmx.core.util.IdList;
-import systems.dmx.topicmaps.model.Topicmap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;

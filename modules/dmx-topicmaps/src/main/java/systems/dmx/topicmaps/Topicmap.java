@@ -1,4 +1,4 @@
-package systems.dmx.topicmaps.model;
+package systems.dmx.topicmaps;
 
 import systems.dmx.core.JSONEnabled;
 import systems.dmx.core.model.TopicModel;
