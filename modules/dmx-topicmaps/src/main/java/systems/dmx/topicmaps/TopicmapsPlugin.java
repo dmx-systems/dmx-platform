@@ -233,7 +233,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                     Association assocMapcontext = fetchAssociationMapcontext(topicmapId, assocId);
                     if (assocMapcontext == null) {
                         createAssociationMapcontext(topicmapId, assocId, mf.newViewProps()
-                            .put(PROP_VISIBILITY, false)
+                            .put(PROP_VISIBILITY, true)
                             .put(PROP_PINNED, false)
                         );
                     } else {
