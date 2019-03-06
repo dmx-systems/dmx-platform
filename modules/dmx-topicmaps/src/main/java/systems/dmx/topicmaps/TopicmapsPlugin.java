@@ -95,9 +95,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         Topic topicmapTopic = dmx.createTopic(mf.newTopicModel("dmx.topicmaps.topicmap", mf.newChildTopicsModel()
             .put("dmx.topicmaps.topicmap_name", name)
             .put("dmx.topicmaps.topicmap_type_uri", topicmapTypeUri)
-            .put("dmx.topicmaps.topicmap_state", getTopicmapType(topicmapTypeUri).initialTopicmapState(mf))
             .put("dmx.topicmaps.private", isPrivate)
         ));
+        // init topicmap state
+        ViewProps viewProps = mf.newViewProps();
+        getTopicmapType(topicmapTypeUri).initTopicmapState(viewProps);
+        storeViewProps(topicmapTopic, viewProps);
+        //
         me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
         return topicmapTopic;
     }

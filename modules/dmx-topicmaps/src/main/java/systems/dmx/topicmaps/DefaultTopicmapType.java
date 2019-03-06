@@ -1,11 +1,10 @@
 package systems.dmx.topicmaps;
 
-import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.service.ModelFactory;
+import systems.dmx.core.model.topicmaps.ViewProps;
 
 
 
-class DefaultTopicmapType implements TopicmapType {
+class DefaultTopicmapType implements TopicmapType, TopicmapsConstants {
 
     @Override
     public String getUri() {
@@ -13,11 +12,10 @@ class DefaultTopicmapType implements TopicmapType {
     }
 
     @Override
-    public ChildTopicsModel initialTopicmapState(ModelFactory mf) {
-        return mf.newChildTopicsModel()
-            .put("dmx.topicmaps.translation", mf.newChildTopicsModel()
-                .put("dmx.topicmaps.translation_x", 0)
-                .put("dmx.topicmaps.translation_y", 0)
-            );
+    public void initTopicmapState(ViewProps viewProps) {
+        viewProps
+            .put(PROP_PAN_X, 0)
+            .put(PROP_PAN_Y, 0)
+            .put(PROP_ZOOM, 1);
     }
 }
