@@ -94,7 +94,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         // init topicmap state
         ViewProps viewProps = mf.newViewProps();
         getTopicmapType(topicmapTypeUri).initTopicmapState(viewProps);
-        storeViewProps(topicmapTopic, viewProps);
+        viewProps.store(topicmapTopic);
         //
         me.newTopicmap(topicmapTopic);      // FIXME: broadcast to eligible users only
         return topicmapTopic;
@@ -378,7 +378,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     @Override
     public void setTopicmapPan(@PathParam("id") long topicmapId, @PathParam("x") int x, @PathParam("y") int y) {
         try {
-            storeViewProps(dmx.getTopic(topicmapId), mf.newViewProps(x, y));
+            mf.newViewProps()
+                .put(PROP_PAN_X, x)
+                .put(PROP_PAN_Y, y)
+                .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
             throw new RuntimeException("Setting pan of topicmap " + topicmapId + " failed (x=" + x + ", y=" + y + ")",
                 e);
@@ -541,7 +544,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             if (topicmapContext == null) {
                 throw new RuntimeException("Topic " + topicId + " is not contained in topicmap " + topicmapId);
             }
-            storeViewProps(topicmapContext, viewProps);
+            viewProps.store(topicmapContext);
         } catch (Exception e) {
             throw new RuntimeException("Storing view properties of topic " + topicId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
@@ -557,16 +560,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             if (topicmapContext == null) {
                 throw new RuntimeException("Association " + assocId + " is not contained in topicmap " + topicmapId);
             }
-            storeViewProps(topicmapContext, viewProps);
+            viewProps.store(topicmapContext);
         } catch (Exception e) {
             throw new RuntimeException("Storing view properties of association " + assocId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
-        }
-    }
-
-    private void storeViewProps(DMXObject object, ViewProps viewProps) {
-        for (String propUri : viewProps) {
-            object.setProperty(propUri, viewProps.get(propUri), false);    // addToIndex = false
         }
     }
 
@@ -589,7 +586,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             mf.newTopicRoleModel(topicmapId, ROLE_TYPE_TOPICMAP),
             mf.newTopicRoleModel(topicId,    ROLE_TYPE_CONTENT)
         ));
-        storeViewProps(topicMapcontext, viewProps);
+        viewProps.store(topicMapcontext);
         //
         ViewTopic topic = mf.newViewTopic(dmx.getTopic(topicId).getModel(), viewProps);
         me.addTopicToTopicmap(topicmapId, topic);
@@ -600,7 +597,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             mf.newTopicRoleModel(topicmapId,    ROLE_TYPE_TOPICMAP),
             mf.newAssociationRoleModel(assocId, ROLE_TYPE_CONTENT)
         ));
-        storeViewProps(assocMapcontext, viewProps);
+        viewProps.store(assocMapcontext);
         //
         ViewAssoc assoc = mf.newViewAssoc(dmx.getAssociation(assocId).getModel(), viewProps);
         me.addAssociationToTopicmap(topicmapId, assoc);
@@ -612,7 +609,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         for (Association assoc : player.getAssociations()) {
             Association topicmapContext = fetchAssociationMapcontext(topicmapId, assoc.getId());
             if (topicmapContext != null) {
-                storeViewProps(topicmapContext, mf.newViewProps(false));
+                mf.newViewProps(false).store(topicmapContext);
                 hideAssocsWithPlayer(assoc, topicmapId);     // recursion
             }
         }

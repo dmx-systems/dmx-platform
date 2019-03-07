@@ -1,5 +1,6 @@
 package systems.dmx.core.model.topicmaps;
 
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.JSONEnabled;
 
 
@@ -12,6 +13,8 @@ public interface ViewProps extends Iterable<String>, JSONEnabled {
     Object get(String propUri);
 
     ViewProps put(String propUri, Object value);
+
+    void store(DMXObject object);
 
     // ---
 

@@ -1,5 +1,6 @@
 package systems.dmx.core.impl;
 
+import systems.dmx.core.DMXObject;
 import systems.dmx.core.model.topicmaps.ViewProps;
 import systems.dmx.core.util.DMXUtils;
 
@@ -66,6 +67,13 @@ class ViewPropsImpl implements ViewProps {
     public ViewProps put(String propUri, Object value) {
         viewProps.put(propUri, value);
         return this;
+    }
+
+    @Override
+    public void store(DMXObject object) {
+        for (String propUri : this) {
+            object.setProperty(propUri, get(propUri), false);       // addToIndex = false
+        }
     }
 
     // ---
