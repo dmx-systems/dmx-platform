@@ -99,7 +99,7 @@ public interface TopicmapsService {
 
     void setClusterPosition(long topicmapId, ClusterCoords coords);
 
-    void setTopicmapTranslation(long topicmapId, int transX, int transY);
+    void setTopicmapPan(long topicmapId, int x, int y);
 
     // ---
 

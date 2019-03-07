@@ -373,22 +373,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/translation/{x}/{y}")
+    @Path("/{id}/pan/{x}/{y}")
     @Transactional
     @Override
-    public void setTopicmapTranslation(@PathParam("id") long topicmapId, @PathParam("x") int transX,
-                                                                         @PathParam("y") int transY) {
+    public void setTopicmapPan(@PathParam("id") long topicmapId, @PathParam("x") int x, @PathParam("y") int y) {
         try {
-            // TODO: adapt to DB-props
-            ChildTopicsModel topicmapState = mf.newChildTopicsModel()
-                .put("dmx.topicmaps.topicmap_state", mf.newChildTopicsModel()
-                    .put("dmx.topicmaps.translation", mf.newChildTopicsModel()
-                        .put("dmx.topicmaps.translation_x", transX)
-                        .put("dmx.topicmaps.translation_y", transY)));
-            dmx.updateTopic(mf.newTopicModel(topicmapId, topicmapState));
+            storeViewProps(dmx.getTopic(topicmapId), mf.newViewProps(x, y));
         } catch (Exception e) {
-            throw new RuntimeException("Setting translation of topicmap " + topicmapId + " failed (transX=" +
-                transX + ", transY=" + transY + ")", e);
+            throw new RuntimeException("Setting pan of topicmap " + topicmapId + " failed (x=" + x + ", y=" + y + ")",
+                e);
         }
     }
 
