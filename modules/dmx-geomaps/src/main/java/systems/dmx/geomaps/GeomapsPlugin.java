@@ -1,6 +1,5 @@
 package systems.dmx.geomaps;
 
-import systems.dmx.topicmaps.TopicmapsConstants;
 import systems.dmx.topicmaps.TopicmapsService;
 import systems.dmx.facets.FacetsService;
 
@@ -45,7 +44,7 @@ import java.util.logging.Logger;
 @Path("/geomap")
 @Consumes("application/json")
 @Produces("application/json")
-public class GeomapsPlugin extends PluginActivator implements GeomapsService, TopicmapsConstants,
+public class GeomapsPlugin extends PluginActivator implements GeomapsService, GeomapsConstants,
                                                                               PostCreateTopicListener,
                                                                               PostUpdateTopicListener,
                                                                               PreSendTopicListener {
@@ -142,7 +141,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, To
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
         AssociationModel model = mf.newAssociationModel("dmx.geomaps.geotopic_mapcontext",
             mf.newTopicRoleModel(geomapId,   "dmx.core.default"),
-            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")
+            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")  // TODO: use "dmx.core.default" instead?
         );
         dmx.createAssociation(model);
     }
@@ -153,15 +152,16 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, To
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
                                @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
-        // TODO: adapt to DB-props
-        ChildTopicsModel geomapState = mf.newChildTopicsModel().put(
-            "dmx.topicmaps.topicmap_state", mf.newChildTopicsModel().put(
-                "dmx.topicmaps.translation", mf.newChildTopicsModel().put(
-                    "dmx.topicmaps.translation_x", lon).put(
-                    "dmx.topicmaps.translation_y", lat)).put(
-                "dmx.topicmaps.zoom_level", zoom)
-        );
-        dmx.updateTopic(mf.newTopicModel(geomapId, geomapState));
+        try {
+            mf.newViewProps()
+                .put(PROP_LONGITUDE, lon)
+                .put(PROP_LATITUDE, lat)
+                .put(PROP_ZOOM, zoom)
+                .store(dmx.getTopic(geomapId));
+        } catch (Exception e) {
+            throw new RuntimeException("Setting state of geomap " + geomapId + " failed (lon=" + lon + ", lat=" + lat +
+                ", zoom=" + zoom + ")", e);
+        }
     }
 
     @GET
@@ -270,9 +270,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, To
 
     private ViewProps fetchGeomapViewProps(Topic geomapTopic) {
         return mf.newViewProps()
-            .put(PROP_PAN_X, geomapTopic.getProperty(PROP_PAN_X))
-            .put(PROP_PAN_Y, geomapTopic.getProperty(PROP_PAN_Y))
-            .put(PROP_ZOOM,  geomapTopic.getProperty(PROP_ZOOM));
+            .put(PROP_LONGITUDE, geomapTopic.getProperty(PROP_LONGITUDE))
+            .put(PROP_LATITUDE,  geomapTopic.getProperty(PROP_LATITUDE))
+            .put(PROP_ZOOM,      geomapTopic.getProperty(PROP_ZOOM));
     }
 
     private Map<Long, TopicModel> fetchGeoCoordinates(Topic geomapTopic) {
