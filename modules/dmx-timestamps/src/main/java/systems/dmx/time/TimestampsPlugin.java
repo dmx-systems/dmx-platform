@@ -11,7 +11,6 @@ import systems.dmx.core.service.event.PostCreateAssociationListener;
 import systems.dmx.core.service.event.PostCreateTopicListener;
 import systems.dmx.core.service.event.PostUpdateAssociationListener;
 import systems.dmx.core.service.event.PostUpdateTopicListener;
-import systems.dmx.core.service.event.PostUpdateTopicRequestListener;
 import systems.dmx.core.service.event.PreSendAssociationListener;
 import systems.dmx.core.service.event.PreSendTopicListener;
 import systems.dmx.core.service.event.ServiceResponseFilterListener;
@@ -44,7 +43,6 @@ import java.util.logging.Logger;
 public class TimestampsPlugin extends PluginActivator implements TimestampsService, PostCreateTopicListener,
                                                                                     PostCreateAssociationListener,
                                                                                     PostUpdateTopicListener,
-                                                                                    PostUpdateTopicRequestListener,
                                                                                     PostUpdateAssociationListener,
                                                                                     PreSendTopicListener,
                                                                                     PreSendAssociationListener,
@@ -191,20 +189,6 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
     // ---
 
     @Override
-    public void postUpdateTopicRequest(Topic topic) {
-        // We don't want update modification timestamps for entire workspace content. Note that the workspace
-        // assignment is technically a parent-child relationship (the workspace being the child).
-        // TODO: reconceptualization. The Timestamps plugin should not know about the Workspaces plugin.
-        if (topic.getTypeUri().equals("dmx.workspaces.workspace")) {
-            return;
-        }
-        //
-        updateParentTimestamps(topic);
-    }
-
-    // ---
-
-    @Override
     public void preSendTopic(Topic topic) {
         enrichWithTimestamp(topic);
     }
@@ -227,14 +211,6 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    private void updateParentTimestamps(Topic topic) {
-        for (DMXObject object : getParents(topic)) {
-            storeTimestamp(object);
-        }
-    }
-
-    // ---
 
     private void storeTimestamps(DMXObject object) {
         long time = System.currentTimeMillis();
@@ -293,32 +269,5 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
         }
         //
         headers.putSingle(header, value);
-    }
-
-    // ---
-
-    /**
-     * Returns all parent topics/associations of the given topic (recursively).
-     * Traversal is informed by the "parent" and "child" role types.
-     * Traversal stops when no parent exists or when an association is met.
-     *
-     * @param   topic   topic from where to start the traversal. That topic is *not* included in the result set.
-     */
-    private Set<DMXObject> getParents(Topic topic) {
-        // logger.info("### " + topic.getId() + " \"" + topic.getSimpleValue() + "\" \"" + topic.getTypeUri() + "\"");
-        Set<DMXObject> parents = new LinkedHashSet();
-        //
-        List<? extends Topic> parentTopics = topic.getRelatedTopics((String) null, "dmx.core.child",
-            "dmx.core.parent", null);
-        List<? extends Association> parentAssocs = topic.getRelatedAssociations(null, "dmx.core.child",
-            "dmx.core.parent", null);
-        parents.addAll(parentTopics);
-        parents.addAll(parentAssocs);
-        //
-        for (Topic parentTopic : parentTopics) {
-            parents.addAll(getParents(parentTopic));
-        }
-        //
-        return parents;
     }
 }
