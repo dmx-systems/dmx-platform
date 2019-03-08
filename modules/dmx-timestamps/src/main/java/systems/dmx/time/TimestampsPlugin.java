@@ -50,8 +50,8 @@ public class TimestampsPlugin extends PluginActivator implements TimestampsServi
 
     // ------------------------------------------------------------------------------------------------------- Constants
 
-    private static String PROP_CREATED  = "dmx.time.created";       // ### TODO: rename
-    private static String PROP_MODIFIED = "dmx.time.modified";      // ### TODO: rename
+    private static String PROP_CREATED  = "dmx.timestamps.created";
+    private static String PROP_MODIFIED = "dmx.timestamps.modified";
 
     private static String HEADER_LAST_MODIFIED = "Last-Modified";
 

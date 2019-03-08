@@ -228,7 +228,7 @@ class ValueIntegrator {
         Map<String, Object> childValues = new HashMap();    // value: UnifiedValue or List<UnifiedValue>
         ChildTopicsModel _childTopics = newValues.getChildTopicsModel();
         // Iterate through type, not through newValues.
-        // newValues might contain childs not contained in the type def, e.g. "dmx.time.modified".
+        // newValues might contain childs not contained in the type def, e.g. "dmx.timestamps.modified".
         for (String assocDefUri : assocDefUris()) {
             Object newChildValue;    // RelatedTopicModelImpl or List<RelatedTopicModelImpl>
             if (isOne(assocDefUri)) {
