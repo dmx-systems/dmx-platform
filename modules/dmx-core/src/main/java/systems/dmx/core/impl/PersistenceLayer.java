@@ -184,13 +184,10 @@ public final class PersistenceLayer extends StorageDecorator {
 
     void updateTopic(TopicModelImpl updateModel) {
         try {
-            TopicModelImpl model = fetchTopic(updateModel.getId());
-            updateTopic(model, updateModel);
-            //
-            // Note: POST_UPDATE_TOPIC_REQUEST is fired only once per update request.
-            // On the other hand TopicModel's update() method is called multiple times while updating the child topics
-            // (see ChildTopicsModelImpl).
-            em.fireEvent(CoreEvent.POST_UPDATE_TOPIC_REQUEST, model.instantiate());
+            updateTopic(
+                fetchTopic(updateModel.getId()),
+                updateModel
+            );
         } catch (Exception e) {
             throw new RuntimeException("Fetching and updating topic " + updateModel.getId() + " failed", e);
         }
