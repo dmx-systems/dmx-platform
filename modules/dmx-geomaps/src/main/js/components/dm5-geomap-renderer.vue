@@ -54,6 +54,7 @@ export default {
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       options: {
         zoomControl: false,
+        zoomSnap: 0,
         attributionControl: false
       },
       // popup

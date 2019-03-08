@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 
 
 
-@Path("/geomap")
+@Path("/geomap")    // TODO: change to "/geomaps"
 @Consumes("application/json")
 @Produces("application/json")
 public class GeomapsPlugin extends PluginActivator implements GeomapsService, GeomapsConstants,
@@ -132,6 +132,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
         );
     }
 
+    // Note: not in use at the moment, see _fetchGeoCoordinates() below
     // TODO: rename path segment "topic" to "coord"
     @PUT
     @Path("/{id}/topic/{geo_coord_id}")
@@ -139,11 +140,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
-        AssociationModel model = mf.newAssociationModel("dmx.geomaps.geotopic_mapcontext",
+        dmx.createAssociation(mf.newAssociationModel("dmx.geomaps.geotopic_mapcontext",
             mf.newTopicRoleModel(geomapId,   "dmx.core.default"),
-            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")  // TODO: use "dmx.core.default" instead?
-        );
-        dmx.createAssociation(model);
+            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")      // TODO: use "dmx.core.default"
+        ));
     }
 
     @PUT
@@ -284,7 +284,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     }
 
     private List<? extends Topic> _fetchGeoCoordinates(Topic geomapTopic) {
-        // Note: we retrieve just *all* (readable) geo coordinates
+        // Experimental: we retrieve just *all* (readable) geo coordinates
         return DMXUtils.loadChildTopics(dmx.getTopicsByType("dmx.geomaps.geo_coordinate"));
         // TODO: retrieve per-topicmap?
         // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",

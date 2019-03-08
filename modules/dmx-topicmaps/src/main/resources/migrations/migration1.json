@@ -21,14 +21,14 @@
         {
           "typeUri": "dmx.webclient.view_config",
           "childs": {
-            "dmx.webclient.hidden": true,       # TODO: move to ass def
-            "dmx.webclient.locked": true        # TODO: move to ass def
+            "dmx.webclient.hidden": true,       // TODO: move to assoc def?
+            "dmx.webclient.locked": true        // TODO: move to assoc def?
           }
         }
       ]
     },
     {
-      "value":       "Private",                 # TODO: implement in webclient
+      "value":       "Private",                 // TODO: implement in webclient
       "uri":         "dmx.topicmaps.private",
       "dataTypeUri": "dmx.core.boolean"
     },
