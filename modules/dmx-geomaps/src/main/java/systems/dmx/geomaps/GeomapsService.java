@@ -34,7 +34,7 @@ public interface GeomapsService {
      */
     void addCoordinateToGeomap(long geomapId, long geoCoordId);
 
-    void setGeomapState(long geomapId, double lon, double lat, int zoom);
+    void setGeomapState(long geomapId, double lon, double lat, double zoom);
 
     /**
      * Calculates the distance between 2 geo coordinates in kilometer.

@@ -17,6 +17,6 @@ class GeomapType implements TopicmapType, GeomapsConstants {
         viewProps
             .put(PROP_LONGITUDE, 11.0)      // default region is "Germany"
             .put(PROP_LATITUDE, 51.0)
-            .put(PROP_ZOOM, 6);
+            .put(PROP_ZOOM, 6.0);
     }
 }

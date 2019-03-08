@@ -151,7 +151,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     @Transactional
     @Override
     public void setGeomapState(@PathParam("id") long geomapId, @PathParam("lon") double lon,
-                               @PathParam("lat") double lat, @PathParam("zoom") int zoom) {
+                               @PathParam("lat") double lat, @PathParam("zoom") double zoom) {
         try {
             mf.newViewProps()
                 .put(PROP_LONGITUDE, lon)

@@ -16,6 +16,6 @@ class DefaultTopicmapType implements TopicmapType, TopicmapsConstants {
         viewProps
             .put(PROP_PAN_X, 0)
             .put(PROP_PAN_Y, 0)
-            .put(PROP_ZOOM, 1);
+            .put(PROP_ZOOM, 1.0);
     }
 }
