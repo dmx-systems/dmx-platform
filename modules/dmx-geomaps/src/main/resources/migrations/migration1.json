@@ -42,8 +42,8 @@
 
     "assoc_types": [
         {
-            "value":       "Geotopic Mapcontext",               // TODO: wording
-            "uri":         "dmx.geomaps.geotopic_mapcontext",   // TODO: wording
+            "value":       "Geomap Context",
+            "uri":         "dmx.geomaps.geomap_context",
             "dataTypeUri": "dmx.core.text"
         }
     ]

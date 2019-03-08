@@ -127,8 +127,8 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     public GeoCoordinate geoCoordinate(Topic geoCoordTopic) {
         ChildTopics childTopics = geoCoordTopic.getChildTopics();
         return new GeoCoordinate(
-            childTopics.getDouble("dmx.geomaps.longitude"),
-            childTopics.getDouble("dmx.geomaps.latitude")
+            childTopics.getDouble(LONGITUDE),
+            childTopics.getDouble(LATITUDE)
         );
     }
 
@@ -140,9 +140,9 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     @Override
     public void addCoordinateToGeomap(@PathParam("id") long geomapId, @PathParam("geo_coord_id") long geoCoordId) {
         logger.info("### Adding geo coordinate topic " + geoCoordId + " to geomap " + geomapId);
-        dmx.createAssociation(mf.newAssociationModel("dmx.geomaps.geotopic_mapcontext",
-            mf.newTopicRoleModel(geomapId,   "dmx.core.default"),
-            mf.newTopicRoleModel(geoCoordId, "dmx.topicmaps.topicmap_content")      // TODO: use "dmx.core.default"
+        dmx.createAssociation(mf.newAssociationModel(GEOMAP_CONTEXT,
+            mf.newTopicRoleModel(geomapId,   ROLE_TYPE_GEOMAP),
+            mf.newTopicRoleModel(geoCoordId, ROLE_TYPE_CONTENT)
         ));
     }
 
@@ -210,7 +210,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
         if (topic.getTypeUri().equals("dmx.contacts.address")) {
             if (!abortGeocoding(topic)) {
                 //
-                facetsService.addFacetTypeToTopic(topic.getId(), "dmx.geomaps.geo_coordinate_facet");
+                facetsService.addFacetTypeToTopic(topic.getId(), GEO_COORDINATE_FACET);
                 //
                 Address address = new Address(topic /* .getChildTopics().getModel() */);    // ### TODO
                 if (!address.isEmpty()) {
@@ -220,7 +220,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
                     logger.info("New empty address");
                 }
             }
-        } else if (topic.getTypeUri().equals("dmx.geomaps.geo_coordinate")) {
+        } else if (topic.getTypeUri().equals(GEO_COORDINATE)) {
             // logger.info("### New geo coordinate: " + topic.loadChildTopics());
             me.newGeoCoord(topic.loadChildTopics());
         }
@@ -257,7 +257,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
             Topic geoCoordTopic = getGeoCoordinateTopic(address);
             if (geoCoordTopic != null) {
                 logger.info(operation);
-                address.getChildTopics().getModel().put("dmx.geomaps.geo_coordinate", geoCoordTopic.getModel());
+                address.getChildTopics().getModel().put(GEO_COORDINATE, geoCoordTopic.getModel());
             } else {
                 logger.info(operation + " SKIPPED -- no geo coordinate in DB");
             }
@@ -285,10 +285,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
 
     private List<? extends Topic> _fetchGeoCoordinates(Topic geomapTopic) {
         // Experimental: we retrieve just *all* (readable) geo coordinates
-        return DMXUtils.loadChildTopics(dmx.getTopicsByType("dmx.geomaps.geo_coordinate"));
+        return DMXUtils.loadChildTopics(dmx.getTopicsByType(GEO_COORDINATE));
         // TODO: retrieve per-topicmap?
-        // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics("dmx.geomaps.geotopic_mapcontext",
-        //     "dmx.core.default", "dmx.topicmaps.topicmap_content", "dmx.geomaps.geo_coordinate"));
+        // return DMXUtils.loadChildTopics(geomapTopic.getRelatedTopics(GEOMAP_CONTEXT,
+        //     ROLE_TYPE_GEOMAP, ROLE_TYPE_CONTENT, GEO_COORDINATE));
     }
 
     // ---
@@ -298,7 +298,7 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
      * or <code>null</code> if no geo coordinate is stored.
      */
     private Topic getGeoCoordinateTopic(Topic geoTopic) {
-        Topic geoCoordTopic = facetsService.getFacet(geoTopic, "dmx.geomaps.geo_coordinate_facet");
+        Topic geoCoordTopic = facetsService.getFacet(geoTopic, GEO_COORDINATE_FACET);
         return geoCoordTopic != null ? geoCoordTopic.loadChildTopics() : null;
     }
 
@@ -326,11 +326,10 @@ public class GeomapsPlugin extends PluginActivator implements GeomapsService, Ge
     private void storeGeoCoordinate(Topic address, GeoCoordinate geoCoord) {
         try {
             logger.info("Storing geo coordinate (" + geoCoord + ") of address topic " + address.getId());
-            facetsService.updateFacet(address, "dmx.geomaps.geo_coordinate_facet",
-                mf.newFacetValueModel("dmx.geomaps.geo_coordinate")
+            facetsService.updateFacet(address, GEO_COORDINATE_FACET, mf.newFacetValueModel(GEO_COORDINATE)
                 .put(mf.newChildTopicsModel()
-                    .put("dmx.geomaps.longitude", geoCoord.lon)
-                    .put("dmx.geomaps.latitude",  geoCoord.lat)
+                    .put(LONGITUDE, geoCoord.lon)
+                    .put(LATITUDE,  geoCoord.lat)
                 )
             );
         } catch (Exception e) {
