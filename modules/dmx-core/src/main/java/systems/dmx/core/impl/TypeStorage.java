@@ -111,8 +111,8 @@ class TypeStorage {
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
-            topicType.setViewConfig(fetchTypeViewConfig(typeTopic));
-            fetchAssocDefsViewConfig(assocDefs);
+            topicType.setViewConfig(fetchViewConfigOfType(typeTopic));
+            fetchViewConfigOfAssocDefs(assocDefs);
             //
             return topicType;
         } catch (Exception e) {
@@ -142,8 +142,8 @@ class TypeStorage {
             //
             // Note: the topic type "View Config" can have view configs itself. In order to avoid endless recursions
             // the topic type "View Config" must be available in type cache *before* the view configs are fetched.
-            assocType.setViewConfig(fetchTypeViewConfig(typeTopic));
-            fetchAssocDefsViewConfig(assocDefs);
+            assocType.setViewConfig(fetchViewConfigOfType(typeTopic));
+            fetchViewConfigOfAssocDefs(assocDefs);
             //
             return assocType;
         } catch (Exception e) {
@@ -652,32 +652,29 @@ class TypeStorage {
 
     // --- Fetch ---
 
-    private void fetchAssocDefsViewConfig(List<AssociationDefinitionModel> assocDefs) {
+    private void fetchViewConfigOfAssocDefs(List<AssociationDefinitionModel> assocDefs) {
         for (AssociationDefinitionModel assocDef : assocDefs) {
-            assocDef.setViewConfig(fetchAssocDefViewConfig(assocDef));
+            assocDef.setViewConfig(fetchViewConfigOfAssocDef(assocDef));
         }
     }
 
     // ---
 
-    private ViewConfigurationModel fetchTypeViewConfig(TopicModel typeTopic) {
+    private ViewConfigurationModel fetchViewConfigOfType(TopicModel typeTopic) {
         try {
-            // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             return viewConfigModel(pl.fetchTopicRelatedTopics(typeTopic.getId(), "dmx.core.composition",
-                "dmx.core.type", "dmx.core.view_config", null));
+                "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for type \"" + typeTopic.getUri() +
-                "\" failed", e);
+            throw new RuntimeException("Fetching view config of type \"" + typeTopic.getUri() + "\" failed", e);
         }
     }
 
-    private ViewConfigurationModel fetchAssocDefViewConfig(AssociationModel assocDef) {
+    private ViewConfigurationModel fetchViewConfigOfAssocDef(AssociationModel assocDef) {
         try {
-            // Note: othersTopicTypeUri=null, the view config's topic type is unknown (it is client-specific)
             return viewConfigModel(pl.fetchAssociationRelatedTopics(assocDef.getId(), "dmx.core.composition",
-                "dmx.core.assoc_def", "dmx.core.view_config", null));
+                "dmx.core.parent", "dmx.core.child", "dmx.webclient.view_config"));
         } catch (Exception e) {
-            throw new RuntimeException("Fetching view configuration for assoc def " + assocDef.getId() + " failed", e);
+            throw new RuntimeException("Fetching view config of assoc def " + assocDef.getId() + " failed", e);
         }
     }
 
@@ -715,8 +712,11 @@ class TypeStorage {
 
     void storeViewConfigTopic(RoleModel configurable, TopicModelImpl configTopic) {
         pl.createTopic(configTopic);
-        pl.createAssociation("dmx.core.composition", configurable,
-            mf.newTopicRoleModel(configTopic.getId(), "dmx.core.view_config"));
+        pl.createAssociation(
+            "dmx.core.composition",
+            configurable,
+            mf.newTopicRoleModel(configTopic.getId(), "dmx.core.child")
+        );
     }
 
     // --- Helper ---
@@ -730,11 +730,11 @@ class TypeStorage {
     // ---
 
     RoleModel newTypeRole(long typeId) {
-        return mf.newTopicRoleModel(typeId, "dmx.core.type");
+        return mf.newTopicRoleModel(typeId, "dmx.core.parent");
     }
 
     RoleModel newAssocDefRole(long assocDefId) {
-        return mf.newAssociationRoleModel(assocDefId, "dmx.core.assoc_def");
+        return mf.newAssociationRoleModel(assocDefId, "dmx.core.parent");
     }
 
 

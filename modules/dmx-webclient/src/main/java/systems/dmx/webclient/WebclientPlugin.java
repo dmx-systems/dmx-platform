@@ -140,15 +140,13 @@ public class WebclientPlugin extends PluginActivator implements AllPluginsActive
      * Determines the type and possibly the assoc def the given view config topic belongs to.
      */
     private void updateTypeCacheAndAddDirective(Topic viewConfigTopic) {
-        // type to be updated
-        Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.view_config", "dmx.core.type",
-            null);
-        // ID of the assoc def to be updated.
-        // -1 if the update does not target an assoc def (but a type).
+        // type to be updated (topic type or assoc type)
+        Topic type = viewConfigTopic.getRelatedTopic("dmx.core.composition", "dmx.core.child", "dmx.core.parent", null);
+        // ID of the assoc def to be updated. -1 if the update does not target an assoc def (but a type).
         long assocDefId = -1;
         if (type == null) {
-            Association assocDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.view_config",
-                "dmx.core.assoc_def", null);
+            Association assocDef = viewConfigTopic.getRelatedAssociation("dmx.core.composition", "dmx.core.child",
+                "dmx.core.parent", "dmx.core.composition_def");
             if (assocDef == null) {
                 throw new RuntimeException("Orphaned view config topic: " + viewConfigTopic);
             }

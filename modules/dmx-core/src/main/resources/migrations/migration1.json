@@ -1,10 +1,8 @@
 {
     "topic_types": [
-
         // Note: The meta types "Topic Type" and "Association Type",
         // and the topic type "Data Type" are created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
-
         /*{
             "value":       "Data Type",
             "uri":         "dmx.core.data_type",
@@ -21,14 +19,11 @@
             "dataTypeUri": "dmx.core.text"
         }
     ],
-
     "assoc_types": [
-
         // Note: The association types "Composition" and "Instantiation" are created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
-
+        //
         // Note: The association type "Composition Definition" is created in migration 2.
-
         /*{
             "value":       "Composition",
             "uri":         "dmx.core.composition",
@@ -50,14 +45,11 @@
             "dataTypeUri": "dmx.core.text"
         }
     ],
-
     "topics": [
-
         // Data Types
-
+        //
         // Note: The data type "Text" is created while bootstrap.
         // See CoreServiceImpl.setupBootstrapContent()
-
         /*{
             "value":   "Text",
             "uri":     "dmx.core.text",
@@ -93,9 +85,7 @@
             "uri":     "dmx.core.identity",
             "typeUri": "dmx.core.data_type"
         },
-
         // Role Types
-
         {
             "value":   "Default",
             "uri":     "dmx.core.default",
@@ -109,11 +99,6 @@
         {
             "value":   "Instance",
             "uri":     "dmx.core.instance",
-            "typeUri": "dmx.core.role_type"
-        },
-        {
-            "value":   "Association Definition",
-            "uri":     "dmx.core.assoc_def",
             "typeUri": "dmx.core.role_type"
         },
         {
@@ -151,14 +136,7 @@
             "uri":     "dmx.core.sequence_start",
             "typeUri": "dmx.core.role_type"
         },
-        {
-            "value":   "View Configuration",
-            "uri":     "dmx.core.view_config",
-            "typeUri": "dmx.core.role_type"
-        },
-
         // Cardinalities
-
         {
             "value":   "One",
             "uri":     "dmx.core.one",
