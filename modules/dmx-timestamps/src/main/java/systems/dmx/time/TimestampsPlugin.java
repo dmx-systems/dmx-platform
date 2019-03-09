@@ -28,10 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 
