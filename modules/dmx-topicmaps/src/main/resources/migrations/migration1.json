@@ -52,18 +52,6 @@
         {
           "childTypeUri":        "dmx.topicmaps.private",
           "childCardinalityUri": "dmx.core.one"
-        },
-        {
-          "childTypeUri":        "dmx.files.file",
-          "childCardinalityUri": "dmx.core.one",
-          "viewConfigTopics": [
-            {
-              "typeUri": "dmx.webclient.view_config",
-              "childs": {
-                "dmx.webclient.hidden": true
-              }
-            }
-          ]
         }
       ],
       "viewConfigTopics": [
