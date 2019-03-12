@@ -59,7 +59,7 @@ export default {
     click (assocDef) {
       const childType = assocDef.getChildType()
       childType.assoc = assocDef    // type cache side effect ### FIXME
-      this.$store.dispatch('revealRelatedTopic', childType)
+      this.$store.dispatch('revealRelatedTopic', {relTopic: childType, select: true})
     }
   },
 

@@ -29,7 +29,7 @@
     "vue-font-awesome-search": "https://github.com/jri/vue-font-awesome-search.git",
     "vue-router": "^3.0.2",
     "vue2-leaflet": "^2.0.2",
-    "vuedraggable": "^2.19.1",
+    "vuedraggable": "^2.19.2",
     "vuex": "^3.1.0"
   },
   "devDependencies": {
