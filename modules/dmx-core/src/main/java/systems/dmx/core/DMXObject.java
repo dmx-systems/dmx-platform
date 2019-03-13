@@ -102,6 +102,9 @@ public interface DMXObject extends Identifiable, JSONEnabled {
     RelatedTopic getRelatedTopic(String assocTypeUri, String myRoleTypeUri, String othersRoleTypeUri,
                                  String othersTopicTypeUri);
 
+    /**
+     * @param   assocTypeUri        may be null
+     */
     List<RelatedTopic> getRelatedTopics(String assocTypeUri);
 
     /**
