@@ -294,8 +294,9 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setTopicVisibility(@PathParam("id") long topicmapId, @PathParam("topic_id") long topicId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
-            if (!visibility) {
-                // hide topic's associations
+            if (visibility) {
+                autoRevealAssocs(topicId, topicmapId);
+            } else {
                 hideAssocsWithPlayer(dmx.getTopic(topicId), topicmapId);
             }
             // show/hide topic
@@ -315,8 +316,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     public void setAssocVisibility(@PathParam("id") long topicmapId, @PathParam("assoc_id") long assocId,
                                                                      @PathParam("visibility") boolean visibility) {
         try {
-            if (!visibility) {
-                // hide assoc's associations
+            if (!visibility) {      // TODO: auto reveal assocs
                 hideAssocsWithPlayer(dmx.getAssociation(assocId), topicmapId);
             }
             // show/hide topic ### FIXME: idempotence of remove-assoc-from-topicmap is needed for delete-muti
@@ -538,7 +538,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     // --- Store View Properties ---
 
     /**
-     * Convenience.
+     * Convenience when you don't have a topicmap context already.
      */
     private void storeTopicViewProps(long topicmapId, long topicId, ViewProps viewProps) {
         try {
@@ -554,7 +554,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     /**
-     * Convenience.
+     * Convenience when you don't have a topicmap context already.
      */
     private void storeAssociationViewProps(long topicmapId, long assocId, ViewProps viewProps) {
         try {
@@ -611,8 +611,8 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         for (Association assoc : player.getAssociations()) {
             Association topicmapContext = fetchAssocMapcontext(topicmapId, assoc.getId());
             if (topicmapContext != null) {
-                mf.newViewProps(false).store(topicmapContext);  // visibility=false
-                hideAssocsWithPlayer(assoc, topicmapId);        // recursion
+                mf.newViewProps(false).store(topicmapContext);      // visibility=false
+                hideAssocsWithPlayer(assoc, topicmapId);            // recursion
             }
         }
     }
@@ -624,11 +624,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 Association assoc = topic.getRelatingAssociation();
                 Association assocMapcontext = fetchAssocMapcontext(topicmapId, assoc.getId());
                 if (assocMapcontext != null && !visibility(assocMapcontext)) {
-                    setAssocVisibility(topicmapId, assoc.getId(), true);      // TODO: don't refetch mapcontext
+                    mf.newViewProps(true).store(assocMapcontext);   // visibility=true
                 }
             }
         }
-        // TODO: don't send messages
         // TODO: do the same for the related assocs
     }
 
