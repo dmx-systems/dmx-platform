@@ -30,9 +30,9 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
 
 
-    // ****************************
-    // *** Topic Implementation ***
-    // ****************************
+    // *************
+    // *** Topic ***
+    // *************
 
 
 
@@ -78,24 +78,15 @@ class TopicImpl extends DMXObjectImpl implements Topic {
 
 
 
-    // ***************************************
-    // *** DMXObject Implementation ***
-    // ***************************************
+    // *****************
+    // *** DMXObject ***
+    // *****************
 
 
 
     // === Traversal ===
 
     // ### TODO: consider adding model convenience, would require model renamings (get -> fetch)
-
-    // --- Topic Retrieval ---
-
-    @Override
-    public final List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.instantiate(pl.getTopicRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri));
-    }
 
     // --- Association Retrieval ---
 

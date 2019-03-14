@@ -37,9 +37,9 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
 
 
-    // **********************************
-    // *** Association Implementation ***
-    // **********************************
+    // *******************
+    // *** Association ***
+    // *******************
 
 
 
@@ -155,24 +155,15 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
 
 
-    // ***************************************
-    // *** DMXObject Implementation ***
-    // ***************************************
+    // *****************
+    // *** DMXObject ***
+    // *****************
 
 
 
     // === Traversal ===
 
     // ### TODO: consider adding model convenience, would require model renamings (get -> fetch)
-
-    // --- Topic Retrieval ---
-
-    @Override
-    public final List<RelatedTopic> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                     String othersRoleTypeUri, String othersTopicTypeUri) {
-        return pl.instantiate(pl.getAssociationRelatedTopics(getId(), assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri));
-    }
 
     // --- Association Retrieval ---
 
@@ -208,8 +199,6 @@ class AssociationImpl extends DMXObjectImpl implements Association {
 
 
     // ------------------------------------------------------------------------------------------------- Private Methods
-
-    // --- Helper ---
 
     // ### TODO: move to model
     private final TopicRole filterRole(Role role, TopicRoleModel roleModel) {

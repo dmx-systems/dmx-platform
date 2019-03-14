@@ -3,10 +3,9 @@ package systems.dmx.core.impl;
 import systems.dmx.core.AssociationDefinition;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.DMXType;
+import systems.dmx.core.RelatedAssociation;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.model.ChildTopicsModel;
-import systems.dmx.core.model.DMXObjectModel;
-import systems.dmx.core.model.RelatedTopicModel;
 import systems.dmx.core.model.SimpleValue;
 
 import org.codehaus.jettison.json.JSONObject;
@@ -48,9 +47,9 @@ abstract class DMXObjectImpl implements DMXObject {
 
 
 
-    // ***************************************
-    // *** DMXObject Implementation ***
-    // ***************************************
+    // *****************
+    // *** DMXObject ***
+    // *****************
 
 
 
@@ -183,8 +182,8 @@ abstract class DMXObjectImpl implements DMXObject {
     }
 
     @Override
-    public final List<RelatedTopic> getRelatedTopics(String assocTypeUri) {
-        return getRelatedTopics(assocTypeUri, null, null, null);
+    public final List<RelatedTopic> getRelatedTopics() {
+        return getRelatedTopics(null, null, null, null);
     }
 
     @Override
@@ -195,12 +194,16 @@ abstract class DMXObjectImpl implements DMXObject {
         return pl.checkReadAccessAndInstantiate(topics);
     }
 
-    // Note: this method is implemented in the subclasses (this is an abstract class):
-    //     getRelatedTopics(List assocTypeUris, ...)
-
     // --- Association Retrieval ---
 
+    @Override
+    public final List<RelatedAssociation> getRelatedAssociations() {
+        return getRelatedAssociations(null, null, null, null);
+    }
+
     // Note: these methods are implemented in the subclasses (this is an abstract class):
+    //     getRelatedAssociation(...)
+    //     getRelatedAssociations(...)
     //     getAssociation(...)
     //     getAssociations()
 
@@ -239,9 +242,9 @@ abstract class DMXObjectImpl implements DMXObject {
 
 
 
-    // **********************************
-    // *** JSONEnabled Implementation ***
-    // **********************************
+    // *******************
+    // *** JSONEnabled ***
+    // *******************
 
 
 

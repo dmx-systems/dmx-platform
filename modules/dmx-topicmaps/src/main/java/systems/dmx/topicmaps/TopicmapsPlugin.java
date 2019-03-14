@@ -545,10 +545,10 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void autoRevealAssocs(DMXObject object, long topicmapId) {
-        for (RelatedTopic topic : object.getRelatedTopics(null)) {      // assocTypeUri=null
+        for (RelatedTopic topic : object.getRelatedTopics()) {
             _autoRevealAssocs(topic, _fetchTopicMapcontext(topicmapId, topic.getId()), topicmapId);
         }
-        for (RelatedAssociation assoc : object.getRelatedAssociations(null, null, null, null)) {
+        for (RelatedAssociation assoc : object.getRelatedAssociations()) {
             _autoRevealAssocs(assoc, _fetchAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
         }
     }
