@@ -49,14 +49,14 @@ public interface TopicmapsService {
     // ---
 
     /**
-     * Adds a topic to a topicmap. If the topic is added already an exception is thrown.
-     */
-    void addTopicToTopicmap(long topicmapId, long topicId, ViewProps viewProps);
-
-    /**
      * Convenience method to add a topic with the standard view properties.
      */
     void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility);
+
+    /**
+     * Adds a topic to a topicmap. If the topic is added already an exception is thrown.
+     */
+    void addTopicToTopicmap(long topicmapId, long topicId, ViewProps viewProps);
 
     /**
      * Adds an association to a topicmap. If the association is added already an exception is thrown.

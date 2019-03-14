@@ -3,6 +3,7 @@ package systems.dmx.topicmaps;
 import systems.dmx.core.Association;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.RelatedAssociation;
+import systems.dmx.core.RelatedObject;
 import systems.dmx.core.RelatedTopic;
 import systems.dmx.core.Topic;
 import systems.dmx.core.model.AssociationModel;
@@ -154,6 +155,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     // ---
 
+    @Override
+    public void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility) {
+        addTopicToTopicmap(topicmapId, topicId, mf.newViewProps(x, y, visibility, false));   // pinned=false
+    }
+
     @POST
     @Path("/{id}/topic/{topic_id}")
     @Transactional
@@ -176,11 +182,6 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             throw new RuntimeException("Adding topic " + topicId + " to topicmap " + topicmapId + " failed " +
                 "(viewProps=" + viewProps + ")", e);
         }
-    }
-
-    @Override
-    public void addTopicToTopicmap(long topicmapId, long topicId, int x, int y, boolean visibility) {
-        addTopicToTopicmap(topicmapId, topicId, mf.newViewProps(x, y, visibility, false));   // pinned=false
     }
 
     @POST
@@ -531,10 +532,11 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     private void _setAssocVisibility(long topicmapId, long assocId, boolean visibility, Association topicmapContext) {
+        Association assoc = dmx.getAssociation(assocId);
         if (visibility) {
-            // TODO: auto reveal assocs
+            autoRevealAssocs(assoc, topicmapId);
         } else {
-            autoHideAssocs(dmx.getAssociation(assocId), topicmapId);
+            autoHideAssocs(assoc, topicmapId);
         }
         // update DB ### FIXME: idempotence of remove-assoc-from-topicmap is needed for delete-muti
         mf.newViewProps(visibility).store(topicmapContext);
@@ -544,17 +546,24 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void autoRevealAssocs(DMXObject object, long topicmapId) {
         for (RelatedTopic topic : object.getRelatedTopics(null)) {      // assocTypeUri=null
-            Association topicMapcontext = _fetchTopicMapcontext(topicmapId, topic.getId());
-            if (topicMapcontext != null && visibility(topicMapcontext)) {
-                Association assoc = topic.getRelatingAssociation();
-                Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
-                if (assocMapcontext != null && !visibility(assocMapcontext)) {
-                    // update DB
-                    mf.newViewProps(true).store(assocMapcontext);       // visibility=true
-                }
+            _autoRevealAssocs(topic, _fetchTopicMapcontext(topicmapId, topic.getId()), topicmapId);
+        }
+        for (RelatedAssociation assoc : object.getRelatedAssociations(null, null, null, null)) {
+            _autoRevealAssocs(assoc, _fetchAssocMapcontext(topicmapId, assoc.getId()), topicmapId);
+        }
+    }
+
+    private void _autoRevealAssocs(RelatedObject object, Association topicmapContext, long topicmapId) {
+        if (topicmapContext != null && visibility(topicmapContext)) {
+            Association assoc = object.getRelatingAssociation();
+            Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
+            if (assocMapcontext != null && !visibility(assocMapcontext)) {
+                // update DB
+                mf.newViewProps(true).store(assocMapcontext);       // visibility=true
+                // recursion
+                autoRevealAssocs(assoc, topicmapId);
             }
         }
-        // TODO: do the same for the related assocs
     }
 
     private void autoHideAssocs(DMXObject object, long topicmapId) {
