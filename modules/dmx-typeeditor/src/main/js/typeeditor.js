@@ -7,7 +7,7 @@ const actions = {
     dm5.restClient.createTopicType(defaultTopicType(name)).then(topicType => {
       console.log('Created', topicType)
       dispatch('putTopicType', topicType)
-      dispatch('revealTopic', {topic: topicType, pos, select: true})
+      dispatch('revealTopic', {topic: topicType, pos})
     })
   },
 
@@ -16,7 +16,7 @@ const actions = {
     dm5.restClient.createAssocType(defaultAssocType(name)).then(assocType => {
       console.log('Created', assocType)
       dispatch('putAssocType', assocType)
-      dispatch('revealTopic', {topic: assocType, pos, select: true})
+      dispatch('revealTopic', {topic: assocType, pos})
     })
   }
 }

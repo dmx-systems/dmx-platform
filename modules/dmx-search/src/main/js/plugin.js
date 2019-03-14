@@ -35,7 +35,7 @@ export default ({store}) => {
     store.dispatch('revealTopic', {
       topic,
       pos: state.pos.model,
-      select: !(state.options && state.options.noSelect)
+      noSelect: state.options && state.options.noSelect
     })
     state.options && state.options.topicHandler && state.options.topicHandler(topic)
   }

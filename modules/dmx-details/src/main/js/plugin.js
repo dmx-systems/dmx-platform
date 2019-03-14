@@ -41,9 +41,9 @@ export default ({store}) => ({
                                                    store.dispatch('callDetailRoute', 'info')},
         'submit-inline':       object          =>  store.dispatch('submit', object),
         'submit-view-config':  viewConfigTopic =>  store.dispatch('submit', viewConfigTopic),
-        'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, select: true}),
-        'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, select: true}),
-        'related-icon-click':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
+        'child-topic-reveal':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
+        'related-topic-click': relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic}),
+        'related-icon-click':  relTopic        =>  store.dispatch('revealRelatedTopic', {relTopic, noSelect: true}),
         'close':               ()              =>  store.dispatch('stripSelectionFromRoute')
       }
     }

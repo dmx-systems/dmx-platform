@@ -24,7 +24,7 @@ export default ({store}) => ({
         username,
         password: options.password
       }).then(topic =>
-        store.dispatch('revealTopic', {topic, pos, select: true})
+        store.dispatch('revealTopic', {topic, pos})
       )
     }
   }]

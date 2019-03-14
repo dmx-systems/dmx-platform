@@ -229,11 +229,31 @@ const actions = {
 
   revealTopicById ({dispatch}, topicId) {
     dm5.restClient.getTopic(topicId).then(topic => {
-      dispatch('revealTopic', {
-        topic,
-        select: true
-      })
+      dispatch('revealTopic', {topic})
     })
+  },
+
+  /**
+   * Reveals a topic on the topicmap panel.
+   *
+   * @param   topic     the topic to reveal (dm5.Topic).
+   * @param   pos       Optional: the topic position in model coordinates (object with "x", "y" props).
+   *                    If not given it's up to the topicmap renderer to position the topic.
+   * @param   noSelect  Optional: if trueish the programmatic topic selection is suppressed.
+   */
+  revealTopic ({dispatch}, {topic, pos, noSelect}) {
+    dispatch('renderTopic', {topic, pos})                     // dispatch into topicmap renderer
+    !noSelect && dispatch('callTopicRoute', topic.id)         // dispatch into app
+  },
+
+  revealAssoc ({dispatch}, {assoc, noSelect}) {
+    dispatch('renderAssoc', assoc)                            // dispatch into topicmap renderer
+    !noSelect && dispatch('callAssocRoute', assoc.id)         // dispatch into app
+  },
+
+  revealRelatedTopic ({dispatch}, {relTopic, noSelect}) {
+    dispatch('renderRelatedTopic', relTopic)                  // dispatch into topicmap renderer
+    !noSelect && dispatch('callTopicRoute', relTopic.id)      // dispatch into app
   },
 
   createAssoc ({dispatch}, {playerId1, playerId2}) {
@@ -246,7 +266,7 @@ const actions = {
     console.log('createAssoc', assocModel)
     dm5.restClient.createAssoc(assocModel).then(assoc => {
       console.log('Created', assoc)
-      dispatch('revealAssoc', {assoc, select: true})
+      dispatch('revealAssoc', {assoc})
       dispatch('_processDirectives', assoc.directives)
     })
   },
