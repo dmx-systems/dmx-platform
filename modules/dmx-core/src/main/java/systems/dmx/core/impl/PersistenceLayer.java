@@ -653,12 +653,6 @@ public final class PersistenceLayer extends StorageDecorator {
             othersTopicTypeUri));
     }
 
-    List<RelatedTopicModelImpl> getTopicRelatedTopics(long topicId, List<String> assocTypeUris, String myRoleTypeUri,
-                                                      String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(fetchTopicRelatedTopics(topicId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri));
-    }
-
     RelatedAssociationModelImpl getTopicRelatedAssociation(long topicId, String assocTypeUri, String myRoleTypeUri,
                                                            String othersRoleTypeUri, String othersAssocTypeUri) {
         RelatedAssociationModelImpl assoc = fetchTopicRelatedAssociation(topicId, assocTypeUri, myRoleTypeUri,
@@ -681,12 +675,6 @@ public final class PersistenceLayer extends StorageDecorator {
     List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, String assocTypeUri,
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
         return filterReadables(fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri));
-    }
-
-    List<RelatedTopicModelImpl> getAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        return filterReadables(fetchAssociationRelatedTopics(assocId, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
             othersTopicTypeUri));
     }
 

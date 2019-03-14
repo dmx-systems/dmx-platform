@@ -87,13 +87,6 @@ class TopicModelImpl extends DMXObjectModelImpl implements TopicModel {
         return pl.fetchTopicRelatedTopics(id, assocTypeUri, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
     }
 
-    @Override
-    final List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                                                           String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri) {
-        return pl.fetchTopicRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri, othersTopicTypeUri);
-    }
-
     // ---
 
     @Override

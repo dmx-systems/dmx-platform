@@ -200,14 +200,6 @@ class AssociationModelImpl extends DMXObjectModelImpl implements AssociationMode
             othersTopicTypeUri);
     }
 
-    @Override
-    final List<RelatedTopicModelImpl> getRelatedTopics(List assocTypeUris, String myRoleTypeUri,
-                                                                                           String othersRoleTypeUri,
-                                                                                           String othersTopicTypeUri) {
-        return pl.fetchAssociationRelatedTopics(id, assocTypeUris, myRoleTypeUri, othersRoleTypeUri,
-            othersTopicTypeUri);
-    }
-
     // ---
 
     @Override

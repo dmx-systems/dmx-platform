@@ -343,27 +343,6 @@ class StorageDecorator {
             othersRoleTypeUri, othersTopicTypeUri);
     }
 
-    /**
-     * Convenience method (receives *list* of association types).
-     *
-     * @param   assocTypeUris       may *not* be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     *
-     * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
-     */
-    final List<RelatedTopicModelImpl> fetchTopicRelatedTopics(long topicId, List<String> assocTypeUris,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> result = new ArrayList();
-        for (String assocTypeUri : assocTypeUris) {
-            result.addAll(fetchTopicRelatedTopics(topicId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                othersTopicTypeUri));
-        }
-        return result;
-    }
-
     // ---
 
     /**
@@ -445,27 +424,6 @@ class StorageDecorator {
                                             String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
         return (List<RelatedTopicModelImpl>) storage.fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersTopicTypeUri);
-    }
-
-    /**
-     * Convenience method (receives *list* of association types).
-     *
-     * @param   assocTypeUris       may be null
-     * @param   myRoleTypeUri       may be null
-     * @param   othersRoleTypeUri   may be null
-     * @param   othersTopicTypeUri  may be null
-     *
-     * @return  The fetched topics.
-     *          Note: their child topics are not fetched.
-     */
-    final List<RelatedTopicModelImpl> fetchAssociationRelatedTopics(long assocId, List<String> assocTypeUris,
-                                            String myRoleTypeUri, String othersRoleTypeUri, String othersTopicTypeUri) {
-        List<RelatedTopicModelImpl> result = new ArrayList();
-        for (String assocTypeUri : assocTypeUris) {
-            result.addAll(fetchAssociationRelatedTopics(assocId, assocTypeUri, myRoleTypeUri, othersRoleTypeUri,
-                othersTopicTypeUri));
-        }
-        return result;
     }
 
     // ---
