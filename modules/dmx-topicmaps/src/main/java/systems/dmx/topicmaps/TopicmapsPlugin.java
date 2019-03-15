@@ -356,18 +356,21 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
     }
 
     @PUT
-    @Path("/{id}/pan/{x}/{y}")
+    @Path("/{id}/pan/{x}/{y}/zoom/{zoom}")
     @Transactional
     @Override
-    public void setTopicmapPan(@PathParam("id") long topicmapId, @PathParam("x") int x, @PathParam("y") int y) {
+    public void setTopicmapViewport(@PathParam("id") long topicmapId, @PathParam("x") int panX,
+                                                                      @PathParam("y") int panY,
+                                                                      @PathParam("zoom") double zoom) {
         try {
             mf.newViewProps()
-                .put(PROP_PAN_X, x)
-                .put(PROP_PAN_Y, y)
+                .put(PROP_PAN_X, panX)
+                .put(PROP_PAN_Y, panY)
+                .put(PROP_ZOOM, zoom)
                 .store(dmx.getTopic(topicmapId));
         } catch (Exception e) {
-            throw new RuntimeException("Setting pan of topicmap " + topicmapId + " failed (x=" + x + ", y=" + y + ")",
-                e);
+            throw new RuntimeException("Setting viewport of topicmap " + topicmapId + " failed (panX=" + panX +
+                ", panY=" + panY + ", zoom=" + zoom + ")", e);
         }
     }
 

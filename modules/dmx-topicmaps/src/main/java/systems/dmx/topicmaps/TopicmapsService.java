@@ -97,9 +97,10 @@ public interface TopicmapsService {
 
     // ---
 
+    // TODO: rename to "setTopicPositions"
     void setClusterPosition(long topicmapId, ClusterCoords coords);
 
-    void setTopicmapPan(long topicmapId, int x, int y);
+    void setTopicmapViewport(long topicmapId, int panX, int panY, double zoom);
 
     // ---
 
