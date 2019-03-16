@@ -6,8 +6,8 @@ public interface TopicmapsConstants {
 
     // content assoc
     static final String TOPICMAP_CONTEXT   = "dmx.topicmaps.topicmap_context";
-    static final String ROLE_TYPE_TOPICMAP = "dmx.core.parent";
-    static final String ROLE_TYPE_CONTENT  = "dmx.core.child";
+    static final String ROLE_TYPE_TOPICMAP = "dmx.core.default";
+    static final String ROLE_TYPE_CONTENT  = "dmx.topicmaps.topicmap_content";
 
     // topicmap props
     static final String PROP_PAN_X         = "dmx.topicmaps.pan_x";

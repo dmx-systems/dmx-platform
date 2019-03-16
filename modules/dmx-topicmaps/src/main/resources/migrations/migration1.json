@@ -70,5 +70,13 @@
       "uri":         "dmx.topicmaps.topicmap_context",
       "dataTypeUri": "dmx.core.text"
     }
+  ],
+  "topics": [
+    // Role Types
+    {
+      "value":   "Topicmap Content",
+      "uri":     "dmx.topicmaps.topicmap_content",
+      "typeUri": "dmx.core.role_type"
+    }
   ]
 }
