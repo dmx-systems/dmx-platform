@@ -462,6 +462,17 @@ const getters = {
     const topicmapId = getters.topicmapId     // FIXME: undefined?
     // console.log('# selection getter', topicmapId, state.selections[topicmapId])
     return state.selections[topicmapId]
+  },
+
+  visibleTopicIds (state) {
+    // Note: at startup state.topicmap is undefined
+    // console.log('visibleTopicIds getter', state.topicmap)
+    return state.topicmap && state.topicmap.topics.filter(topic => topic.isVisible()).map(topic => topic.id)
+  },
+
+  visibleAssocIds (state) {
+    // console.log('visibleAssocIds getter', state.topicmap)
+    return state.topicmap && state.topicmap.assocs.map(assoc => assoc.id)   // FIXME: filter visible?
   }
 }
 

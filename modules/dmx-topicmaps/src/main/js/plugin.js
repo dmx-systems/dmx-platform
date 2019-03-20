@@ -19,14 +19,14 @@ export default ({store}) => {
             left:  state.compDefs['toolbar-left'],
             right: state.compDefs['toolbar-right']
           }),
-          // TODO: static props? Note: contextCommands does not operate on state
+          // Note: command definitions are static; "contextCommands" does not operate on "state"
           // TODO: make the commands extensible for 3rd-party plugins
           contextCommands: state => ({
             topic: [
               {label: 'Hide',    handler: idLists => store.dispatch('hideMulti', idLists), multi: true},
               {label: 'Edit',    handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'edit'})},
-              {label: "Related", handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})},
-              {label: "Details", handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'info'})}
+              {label: 'Related', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'related'})},
+              {label: 'Details', handler: id => store.dispatch('callTopicDetailRoute', {id, detail: 'info'})}
             ],
             topic_danger: [
               {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true,
@@ -35,8 +35,8 @@ export default ({store}) => {
             assoc: [
               {label: 'Hide',    handler: idLists => store.dispatch('hideMulti', idLists), multi: true},
               {label: 'Edit',    handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'edit'})},
-              {label: "Related", handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})},
-              {label: "Details", handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'info'})}
+              {label: 'Related', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'related'})},
+              {label: 'Details', handler: id => store.dispatch('callAssocDetailRoute', {id, detail: 'info'})}
             ],
             assoc_danger: [
               {label: 'Delete',  handler: idLists => store.dispatch('deleteMulti', idLists), multi: true}
@@ -78,7 +78,7 @@ export default ({store}) => {
 
     topicmapType: {
       uri: 'dmx.topicmaps.topicmap',
-      name: "Topicmap",
+      name: 'Topicmap',
       renderer: () => import('dm5-cytoscape-renderer' /* webpackChunkName: "cytoscape" */)
     }
   }
