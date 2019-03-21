@@ -1,12 +1,12 @@
 package systems.dmx.core.impl;
 
 import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.storage.spi.DMXTransaction;
 import systems.dmx.core.storage.spi.DMXStorage;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
@@ -240,8 +240,8 @@ class StorageDecorator {
         return (Iterator<AssociationModelImpl>) storage.fetchAllAssociations();
     }
 
-    final long[] fetchPlayerIds(long assocId) {
-        return storage.fetchPlayerIds(assocId);
+    final List<RoleModel> fetchRoleModels(long assocId) {
+        return storage.fetchRoleModels(assocId);
     }
 
     // ---

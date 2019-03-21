@@ -4,6 +4,7 @@ import systems.dmx.core.model.AssociationModel;
 import systems.dmx.core.model.DMXObjectModel;
 import systems.dmx.core.model.RelatedAssociationModel;
 import systems.dmx.core.model.RelatedTopicModel;
+import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.service.ModelFactory;
@@ -84,7 +85,7 @@ public interface DMXStorage {
 
     Iterator<? extends AssociationModel> fetchAllAssociations();
 
-    long[] fetchPlayerIds(long assocId);
+    List<RoleModel> fetchRoleModels(long assocId);
 
     // ---
 

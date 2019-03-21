@@ -268,13 +268,8 @@ public class Neo4jStorage implements DMXStorage {
     }
 
     @Override
-    public long[] fetchPlayerIds(long assocId) {
-        List<Relationship> rels = fetchRelationships(fetchAssociationNode(assocId));
-        long[] playerIds = {
-            playerId(rels.get(0)),
-            playerId(rels.get(1))
-        };
-        return playerIds;
+    public List<RoleModel> fetchRoleModels(long assocId) {
+        return buildRoleModels(fetchAssociationNode(assocId));
     }
 
     // ---

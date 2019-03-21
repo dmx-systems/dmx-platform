@@ -14,14 +14,12 @@ import systems.dmx.core.model.TopicTypeModel;
 import systems.dmx.core.service.CoreService;
 import systems.dmx.core.service.DMXEvent;
 import systems.dmx.core.service.ModelFactory;
-import systems.dmx.core.service.Plugin;
 import systems.dmx.core.service.PluginInfo;
 import systems.dmx.core.service.accesscontrol.AccessControl;
 import systems.dmx.core.storage.spi.DMXTransaction;
 
 import org.osgi.framework.BundleContext;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -186,8 +184,8 @@ public class CoreServiceImpl implements CoreService {
     }
 
     @Override
-    public long[] getPlayerIds(long assocId) {
-        return pl.getPlayerIds(assocId);
+    public List<RoleModel> getRoleModels(long assocId) {
+        return pl.getRoleModels(assocId);
     }
 
     // ---

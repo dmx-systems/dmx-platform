@@ -173,7 +173,6 @@ class AssociationImpl extends DMXObjectImpl implements Association {
         RelatedAssociationModelImpl assoc = pl.getAssociationRelatedAssociation(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri);
         return assoc != null ? assoc.instantiate() : null;
-        // ### FIXME: add access contol
     }
 
     @Override
@@ -181,7 +180,6 @@ class AssociationImpl extends DMXObjectImpl implements Association {
                                                                  String othersRoleTypeUri, String othersAssocTypeUri) {
         return pl.instantiate(pl.getAssociationRelatedAssociations(getId(), assocTypeUri, myRoleTypeUri,
             othersRoleTypeUri, othersAssocTypeUri));
-        // ### FIXME: add access contol
     }
 
     // ---
@@ -191,13 +189,11 @@ class AssociationImpl extends DMXObjectImpl implements Association {
                                                                                        long othersTopicId) {
         return pl.getAssociationBetweenTopicAndAssociation(assocTypeUri, othersTopicId, getId(), othersRoleTypeUri,
             myRoleTypeUri);
-        // ### FIXME: add access contol
     }
 
     @Override
     public final List<Association> getAssociations() {
         return pl.instantiate(pl.getAssociationAssociations(getId()));
-        // ### FIXME: add access contol
     }
 
 
