@@ -1,12 +1,12 @@
 {
     "topic_types": [
         {
-            "value":       "Longitude",
+            "value":       "Longitude",         // TODO: make it a prop?
             "uri":         "dmx.geomaps.longitude",
             "dataTypeUri": "dmx.core.number"
         },
         {
-            "value":       "Latitude",
+            "value":       "Latitude",          // TODO: make it a prop?
             "uri":         "dmx.geomaps.latitude",
             "dataTypeUri": "dmx.core.number"
         },
@@ -39,7 +39,6 @@
             ]
         }
     ],
-
     "assoc_types": [
         {
             "value":       "Geomap Context",

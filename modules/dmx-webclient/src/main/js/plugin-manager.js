@@ -97,7 +97,7 @@ function registerDetailRenderers (renderers, renderer) {
  */
 function loadPluginsFromServer () {
   dm5.restClient.getPlugins().then(pluginInfos => {
-    console.group("[DMX] Fetching plugins from server")
+    console.group("[DMX] Fetching plugins")
     pluginInfos.forEach(pluginInfo => {
       if (pluginInfo.pluginFile || pluginInfo.styleFile) {
         console.group(pluginInfo.pluginUri)

@@ -536,13 +536,15 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
 
     private void _setAssocVisibility(long topicmapId, long assocId, boolean visibility, Association topicmapContext) {
         Association assoc = dmx.getAssociation(assocId);
+        // update DB
         if (visibility) {
             autoRevealAssocs(assoc, topicmapId);
+            // FIXME: idempotence of remove-assoc-from-topicmap is needed for delete-muti?
+            mf.newViewProps(visibility).store(topicmapContext);
         } else {
-            autoHideAssocs(assoc, topicmapId);
+            deleteAllAssocMapcontexts(assoc, topicmapId);
+            deleteAssociationMapcontext(topicmapContext);
         }
-        // update DB ### FIXME: idempotence of remove-assoc-from-topicmap is needed for delete-muti
-        mf.newViewProps(visibility).store(topicmapContext);
         // send message
         me.setAssocVisibility(topicmapId, assocId, visibility);
     }
@@ -579,6 +581,22 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
                 autoHideAssocs(assoc, topicmapId);
             }
         }
+    }
+
+    private void deleteAllAssocMapcontexts(Association object, long topicmapId) {
+        for (Association assoc : object.getAssociations()) {
+            Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
+            if (assocMapcontext != null) {
+                deleteAssociationMapcontext(assocMapcontext);
+                deleteAllAssocMapcontexts(assoc, topicmapId);     // recursion
+            }
+        }
+    }
+
+    private void deleteAssociationMapcontext(Association assocMapcontext) {
+        // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
+        // Deleting a mapcontext association is a privileged operation.
+        dmx.getAccessControl().deleteAssociationMapcontext(assocMapcontext);
     }
 
     // --- Store View Properties ---

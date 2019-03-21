@@ -22,14 +22,14 @@
     "dm5-topic-list": "https://github.com/jri/dm5-topic-list.git",
     "dm5-topicmap-panel": "https://github.com/jri/dm5-topicmap-panel.git",
     "dm5-websocket": "https://github.com/jri/dm5-websocket.git",
-    "element-ui": "^2.6.1",
+    "element-ui": "^2.6.3",
     "font-awesome": "^4.7.0",
     "leaflet": "^1.4.0",
     "vue": "^2.6.10",
     "vue-font-awesome-search": "https://github.com/jri/vue-font-awesome-search.git",
     "vue-router": "^3.0.2",
     "vue2-leaflet": "^2.0.2",
-    "vuedraggable": "^2.19.2",
+    "vuedraggable": "^2.19.3",
     "vuex": "^3.1.0"
   },
   "devDependencies": {
