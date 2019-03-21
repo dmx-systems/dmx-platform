@@ -2,22 +2,19 @@ package systems.dmx.accesscontrol;
 
 import systems.dmx.accesscontrol.event.PostLoginUserListener;
 import systems.dmx.accesscontrol.event.PostLogoutUserListener;
-
 import systems.dmx.config.ConfigCustomizer;
 import systems.dmx.config.ConfigDefinition;
 import systems.dmx.config.ConfigModificationRole;
 import systems.dmx.config.ConfigService;
 import systems.dmx.config.ConfigTarget;
-import systems.dmx.files.FilesService;
-import systems.dmx.files.event.CheckDiskQuotaListener;
-import systems.dmx.workspaces.WorkspacesService;
-
 import systems.dmx.core.Association;
 import systems.dmx.core.AssociationType;
 import systems.dmx.core.DMXObject;
 import systems.dmx.core.Topic;
 import systems.dmx.core.TopicType;
 import systems.dmx.core.model.AssociationModel;
+import systems.dmx.core.model.AssociationRoleModel;
+import systems.dmx.core.model.RoleModel;
 import systems.dmx.core.model.SimpleValue;
 import systems.dmx.core.model.TopicModel;
 import systems.dmx.core.osgi.PluginActivator;
@@ -43,6 +40,9 @@ import systems.dmx.core.service.event.PreUpdateTopicListener;
 import systems.dmx.core.service.event.ServiceRequestFilterListener;
 import systems.dmx.core.service.event.StaticResourceFilterListener;
 import systems.dmx.core.util.JavaUtils;
+import systems.dmx.files.FilesService;
+import systems.dmx.files.event.CheckDiskQuotaListener;
+import systems.dmx.workspaces.WorkspacesService;
 
 // ### TODO: hide Jersey internals. Upgrade to JAX-RS 2.0.
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -65,6 +65,7 @@ import javax.ws.rs.core.Response.Status;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -527,9 +528,9 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
     public void checkAssociationReadAccess(long assocId) {
         checkReadAccess(assocId);
         //
-        long[] playerIds = dmx.getPlayerIds(assocId);
-        checkReadAccess(playerIds[0]);
-        checkReadAccess(playerIds[1]);
+        List<RoleModel> roles = dmx.getRoleModels(assocId);
+        checkReadAccess(roles.get(0));
+        checkReadAccess(roles.get(1));
     }
 
     @Override
@@ -888,6 +889,15 @@ public class AccessControlPlugin extends PluginActivator implements AccessContro
 
 
     // === Calculate Permissions ===
+
+    private void checkReadAccess(RoleModel role) {
+        long id = role.getPlayerId();
+        if (role instanceof AssociationRoleModel) {
+            checkAssociationReadAccess(id);     // recursion
+        } else {
+            checkReadAccess(id);
+        }
+    }
 
     /**
      * @param   objectId    a topic ID, or an association ID
