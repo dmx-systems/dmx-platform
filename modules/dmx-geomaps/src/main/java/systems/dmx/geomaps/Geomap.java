@@ -8,14 +8,13 @@ import systems.dmx.core.util.DMXUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 
 
 /**
- * A geomap model: a collection of Geo Coordinate topic models.
+ * A geomap model: a collection of Geo Coordinate topics.
  * <p>
  * Features:
  * - Serialization to JSON.

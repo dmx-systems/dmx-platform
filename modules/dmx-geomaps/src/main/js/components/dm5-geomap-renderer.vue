@@ -31,15 +31,15 @@ let popup
 export default {
 
   created () {
-    console.log('dm5-geomap-renderer created')
+    // console.log('dm5-geomap-renderer created')
   },
 
   mounted () {
-    console.log('dm5-geomap-renderer mounted')
+    // console.log('dm5-geomap-renderer mounted')
   },
 
   destroyed () {
-    console.log('dm5-geomap-renderer destroyed')
+    // console.log('dm5-geomap-renderer destroyed')
   },
 
   props: {
@@ -49,8 +49,6 @@ export default {
   data () {
     return {
       // map
-      center: [51, 5],
-      zoom: 6,
       url: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
       options: {
         zoomControl: false,
@@ -65,27 +63,48 @@ export default {
   },
 
   computed: {
-    geoCoordTopics () {
-      // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
+
+    geomap () {
       const geomap = this.$store.state.geomaps.geomap
+      // Note: the geomap might not be available yet as it is loaded *after* the topicmap renderer is installed
       if (!geomap) {
-        // console.log('Geomap not available')
+        // console.log('### Geomap not yet available')
         return
       }
-      return geomap.geoCoordTopics
-    }
-  },
-
-  watch: {
-
-    center () {
-      // console.log('center', this.center.lng, this.center.lat)
-      this.syncGeomapState()
+      return geomap
     },
 
-    zoom () {
-      // console.log('zoom', this.zoom)
-      this.syncGeomapState()
+    center: {
+      get () {
+        if (this.geomap) {
+          const viewProps = this.geomap.viewProps
+          return [
+            viewProps['dmx.geomaps.latitude'],
+            viewProps['dmx.geomaps.longitude']
+          ]
+        }
+      },
+      set (center) {
+        // console.log('set center', center, this.center)
+        const viewProps = this.geomap.viewProps
+        viewProps['dmx.geomaps.latitude']  = center.lat
+        viewProps['dmx.geomaps.longitude'] = center.lng
+        this.storeGeomapState()
+      }
+    },
+
+    zoom: {
+      get () {
+        return this.geomap && this.geomap.viewProps['dmx.geomaps.zoom']
+      },
+      set (zoom) {
+        this.geomap.viewProps['dmx.geomaps.zoom'] = zoom
+        this.storeGeomapState()
+      }
+    },
+
+    geoCoordTopics () {
+      return this.geomap && this.geomap.geoCoordTopics
     }
   },
 
@@ -141,8 +160,8 @@ export default {
       ]
     },
 
-    syncGeomapState () {
-      this.$store.dispatch('_syncGeomapState', {
+    storeGeomapState () {
+      this.$store.dispatch('_storeGeomapState', {
         center: this.center,
         zoom:   this.zoom
       })
