@@ -34,7 +34,6 @@ public interface GeomapsService {
      */
     void addCoordinateToGeomap(long geomapId, long geoCoordId);
 
-    // TODO: rename to "setGeomapViewport"
     void setGeomapState(long geomapId, double lon, double lat, double zoom);
 
     /**

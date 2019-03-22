@@ -543,7 +543,7 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
             mf.newViewProps(visibility).store(topicmapContext);
         } else {
             deleteAllAssocMapcontexts(assoc, topicmapId);
-            deleteAssociationMapcontext(topicmapContext);
+            deleteAssocMapcontext(topicmapContext);
         }
         // send message
         me.setAssocVisibility(topicmapId, assocId, visibility);
@@ -587,13 +587,13 @@ public class TopicmapsPlugin extends PluginActivator implements TopicmapsService
         for (Association assoc : object.getAssociations()) {
             Association assocMapcontext = _fetchAssocMapcontext(topicmapId, assoc.getId());
             if (assocMapcontext != null) {
-                deleteAssociationMapcontext(assocMapcontext);
+                deleteAssocMapcontext(assocMapcontext);
                 deleteAllAssocMapcontexts(assoc, topicmapId);     // recursion
             }
         }
     }
 
-    private void deleteAssociationMapcontext(Association assocMapcontext) {
+    private void deleteAssocMapcontext(Association assocMapcontext) {
         // Note: a mapcontext association has no workspace assignment -- it belongs to the system.
         // Deleting a mapcontext association is a privileged operation.
         dmx.getAccessControl().deleteAssociationMapcontext(assocMapcontext);

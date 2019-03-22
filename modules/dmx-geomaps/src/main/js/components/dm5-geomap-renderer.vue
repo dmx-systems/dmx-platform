@@ -1,5 +1,5 @@
 <template>
-  <l-map class="dm5-geomap-renderer" :center="center" :zoom="zoom" :options="options">
+  <l-map class="dm5-geomap-renderer" :center.sync="center" :zoom.sync="zoom" :options="options">
     <l-tile-layer :url="url"></l-tile-layer>
     <l-marker v-for="topic in geoCoordTopics" :lat-lng="latLng(topic)" :key="topic.id"
         @popupopen="popupOpen(topic.id, $event)">
@@ -76,6 +76,19 @@ export default {
     }
   },
 
+  watch: {
+
+    center () {
+      // console.log('center', this.center.lng, this.center.lat)
+      this.syncGeomapState()
+    },
+
+    zoom () {
+      // console.log('zoom', this.zoom)
+      this.syncGeomapState()
+    }
+  },
+
   methods: {
 
     popupOpen (geoCoordId, event) {
@@ -126,6 +139,13 @@ export default {
         geoCoordTopic.childs['dmx.geomaps.latitude'].value,
         geoCoordTopic.childs['dmx.geomaps.longitude'].value
       ]
+    },
+
+    syncGeomapState () {
+      this.$store.dispatch('_syncGeomapState', {
+        center: this.center,
+        zoom:   this.zoom
+      })
     }
   },
 
