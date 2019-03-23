@@ -33,7 +33,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/person/{id}/organizations")
     @Override
     public List<RelatedTopic> getOrganizations(@PathParam("id") long personId) {
-        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_association",
+        return dmx.getTopic(personId).getRelatedTopics("dmx.contacts.organization_involvement",
             "dmx.core.default", "dmx.core.default", "dmx.contacts.organization");
     }
 
@@ -41,7 +41,7 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     @Path("/organization/{id}/persons")
     @Override
     public List<RelatedTopic> getPersons(@PathParam("id") long organizationId) {
-        return dmx.getTopic(organizationId).getRelatedTopics("dmx.contacts.organization_association",
+        return dmx.getTopic(organizationId).getRelatedTopics("dmx.contacts.organization_involvement",
             "dmx.core.default", "dmx.core.default", "dmx.contacts.person");
     }
 
@@ -57,6 +57,6 @@ public class ContactsPlugin extends PluginActivator implements ContactsService, 
     public void preCreateAssociation(AssociationModel assoc) {
         // Person <-> Organization
         DMXUtils.associationAutoTyping(assoc, "dmx.contacts.person", "dmx.contacts.organization",
-            "dmx.contacts.organization_association", "dmx.core.default", "dmx.core.default");
+            "dmx.contacts.organization_involvement", "dmx.core.default", "dmx.core.default");
     }
 }

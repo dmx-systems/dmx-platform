@@ -11,8 +11,8 @@
   ],
   "assoc_types": [
     {
-      "value":       "Organization Association",
-      "uri":         "dmx.contacts.organization_association",
+      "value":       "Organization Involvement",
+      "uri":         "dmx.contacts.organization_involvement",
       "dataTypeUri": "dmx.core.composite",
       "assocDefs": [
         {
