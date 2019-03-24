@@ -1,7 +1,13 @@
 <template>
   <div :class="['dm5-assoc-def-list', mode]">
     <div class="field-label">Child Types ({{size}})</div>
-    <draggable :list="assocDefs" :disabled="infoMode" :animation="300">
+    <template v-if="infoMode">
+      <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
+        :key="assocDef.assocDefUri" @click.native="click(assocDef)">
+      </dm5-assoc-def>
+    </template>
+    <draggable v-else :list="assocDefs" :animation="300">
+      <!-- 3 lines duplicated in favor of code splitting; TODO: avoid -->
       <dm5-assoc-def v-for="assocDef in assocDefs" :assoc-def="assocDef" :class="{marked: marked(assocDef)}"
         :key="assocDef.assocDefUri" @click.native="click(assocDef)">
       </dm5-assoc-def>
@@ -46,7 +52,7 @@ export default {
 
   components: {
     'dm5-assoc-def': require('./dm5-assoc-def').default,
-    'draggable': require('vuedraggable')    // Note: no .default as it's a CommonJS export
+    draggable: () => import('vuedraggable' /* webpackChunkName: "vuedraggable" */)
   }
 }
 </script>
