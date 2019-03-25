@@ -3,7 +3,7 @@
     <div v-if="infoMode" class="fa icon">{{object.value}}</div>
     <div v-else>
       <el-button @click="open" class="fa icon">{{object.value}}</el-button>
-      <el-dialog :visible.sync="visible" :modal="false" :append-to-body="true">
+      <el-dialog :visible.sync="visible">
         <fa-search @icon-select="select"></fa-search>
       </el-dialog>
     </div>

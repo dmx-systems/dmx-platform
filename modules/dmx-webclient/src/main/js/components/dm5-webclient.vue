@@ -18,7 +18,6 @@ Vue.component('dm5-number-field',    require('dm5-object-renderer/src/components
 Vue.component('dm5-object-renderer', require('dm5-object-renderer/src/components/dm5-object-renderer').default)
 Vue.component('dm5-player',          require('dm5-object-renderer/src/components/dm5-player').default)
 Vue.component('dm5-select-field',    require('dm5-object-renderer/src/components/dm5-select-field').default)
-Vue.component('dm5-spinner',         require('dm5-object-renderer/src/components/dm5-spinner').default)
 Vue.component('dm5-text-field',      require('dm5-object-renderer/src/components/dm5-text-field').default)
 Vue.component('dm5-value-renderer',  require('dm5-object-renderer/src/components/dm5-value-renderer').default)
 

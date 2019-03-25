@@ -52,7 +52,10 @@ export default {
 
   components: {
     'dm5-assoc-def': require('./dm5-assoc-def').default,
-    draggable: () => import('vuedraggable' /* webpackChunkName: "vuedraggable" */)
+    draggable: () => ({
+      component: import('vuedraggable' /* webpackChunkName: "vuedraggable" */),
+      loading: require('modules/dmx-webclient/src/main/js/components/dm5-spinner')
+    })
   }
 }
 </script>

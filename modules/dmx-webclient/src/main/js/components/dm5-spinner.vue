@@ -1,6 +1,5 @@
 <template>
-  <div class="dm5-spinner" v-loading="true">
-  </div>
+  <div class="dm5-spinner" v-loading="true"></div>
 </template>
 
 <style>
